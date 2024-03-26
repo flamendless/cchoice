@@ -69,3 +69,5 @@ func (tpl *Template) ValidateColumns() bool {
 
 	return result
 }
+
+var _ ITemplate = (*Template)(nil)
