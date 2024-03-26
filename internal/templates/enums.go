@@ -5,7 +5,7 @@ import "fmt"
 type TemplateKind int
 
 const (
-	Undefined TemplateKind = iota
+	Undefined     TemplateKind = iota
 	Sample
 )
 

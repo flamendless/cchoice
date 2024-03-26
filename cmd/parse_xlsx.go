@@ -26,7 +26,7 @@ func init() {
 	rootCmd.AddCommand(parseXLSXCmd)
 }
 
-func ValidateColumns(tpl *templates.Template, file *excelize.File, sheet string) bool {
+func ProcessColumns(tpl *templates.Template, file *excelize.File, sheet string) bool {
 	rows, err := file.Rows(sheet)
 	if err != nil {
 		fmt.Println(err)
@@ -51,14 +51,42 @@ func ValidateColumns(tpl *templates.Template, file *excelize.File, sheet string)
 		col.Index = i
 	}
 
-	for key, col := range tpl.Columns {
-		if col.Required && col.Index == -1 {
-			fmt.Printf("Failed to find column index for '%s'\n", key)
-			return false
-		}
-	}
+	return tpl.ValidateColumns()
+}
 
-	return true
+func GetRows(tpl *templates.Template, file *excelize.File, sheet string) {
+	rows, err := file.Rows(sheet)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
+
+	rows.Next()
+
+	for rows.Next() {
+		row, err := rows.Columns()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		if len(row) == 0 {
+			break
+		}
+
+		product, err := tpl.RowToProduct(tpl, row)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		product.Print()
+	}
 }
 
 var parseXLSXCmd = &cobra.Command{
@@ -85,11 +113,13 @@ var parseXLSXCmd = &cobra.Command{
 			sheet = file.GetSheetName(0)
 		}
 
-		success := ValidateColumns(tpl, file, sheet)
+		success := ProcessColumns(tpl, file, sheet)
 		if !success {
 			return
 		}
 
-		tpl.Print()
+		fmt.Println()
+
+		GetRows(tpl, file, sheet)
 	},
 }
