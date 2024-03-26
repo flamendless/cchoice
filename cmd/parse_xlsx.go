@@ -80,6 +80,7 @@ func GetRows(tpl *templates.Template, file *excelize.File, sheet string) {
 			break
 		}
 
+		row = tpl.AlignRow(row)
 		product, err := tpl.RowToProduct(tpl, row)
 		if err != nil {
 			fmt.Println(err)

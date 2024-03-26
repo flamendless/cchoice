@@ -37,6 +37,18 @@ func (tpl *Template) Print() {
 	}
 }
 
+func (tpl *Template) AlignRow(row []string) []string {
+	if len(row) >= len(tpl.Columns) {
+		return row
+	}
+
+	res := make([]string, len(tpl.Columns))
+	for i := 1; i < len(row); i++ {
+		res[i] = row[i]
+	}
+	return res
+}
+
 func (tpl *Template) ValidateColumns() bool {
 	var result bool = true
 	notFoundColumns := make([]string, 0, len(tpl.Columns))
