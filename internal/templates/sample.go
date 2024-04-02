@@ -2,6 +2,7 @@ package templates
 
 import (
 	"cchoice/internal/models"
+	"cchoice/utils"
 	"errors"
 
 	"github.com/shopspring/decimal"
@@ -34,14 +35,20 @@ func SampleRowToProduct(tpl *Template, row []string) (*models.Product, error) {
 
 	var errs error
 
-	unitPrice, err := decimal.NewFromString(row[idxUnitPrice])
+	price := row[idxUnitPrice]
+	errPrice := utils.ValidateNotBlank(price, "unit price")
+	if errPrice != nil {
+		errs = errors.Join(errs, errPrice)
+	}
+	unitPrice, err := decimal.NewFromString(price)
 	if err != nil {
 		errs = errors.Join(errs, err)
 	}
 
 	name := row[idxProductName]
-	if name == "" {
-		errs = errors.Join(errs, errors.New("'Product Name' must not be empty"))
+	errProductName := utils.ValidateNotBlank(name, "product name")
+	if errProductName != nil {
+		errs = errors.Join(errs, errProductName)
 	}
 
 	if errs != nil {
