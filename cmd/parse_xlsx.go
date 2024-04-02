@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/xuri/excelize/v2"
 
-	"cchoice/internal/models"
 	"cchoice/internal/templates"
 )
 
@@ -15,6 +15,7 @@ var (
 	filepath string
 	sheet    string
 	strict   bool
+	limit    int
 )
 
 func init() {
@@ -22,6 +23,7 @@ func init() {
 	parseXLSXCmd.Flags().StringVarP(&filepath, "filepath", "p", "", "Filepath to the XLSX file")
 	parseXLSXCmd.Flags().StringVarP(&sheet, "sheet", "s", "", "Sheet name to use")
 	parseXLSXCmd.Flags().BoolVarP(&strict, "strict", "x", false, "Panic upon first product error")
+	parseXLSXCmd.Flags().IntVarP(&limit, "limit", "l", 0, "Limit number of rows to process")
 
 	parseXLSXCmd.MarkFlagRequired("template")
 	parseXLSXCmd.MarkFlagRequired("filepath")
@@ -43,6 +45,10 @@ func ProcessColumns(tpl *templates.Template, file *excelize.File, sheet string) 
 	}()
 
 	rows.Next()
+	for i := 0; i < tpl.SkipInitialRows; i++ {
+		rows.Next()
+	}
+
 	columns, err := rows.Columns()
 	if err != nil {
 		fmt.Println(err)
@@ -50,58 +56,16 @@ func ProcessColumns(tpl *templates.Template, file *excelize.File, sheet string) 
 	}
 
 	for i, cell := range columns {
-		col, _ := tpl.Columns[cell]
+		cell = strings.Replace(cell, "\n", " ", -1)
+		col, exists := tpl.Columns[cell]
+		if !exists {
+			fmt.Printf("Column '%s' does not exist in template columns\n", cell)
+			continue
+		}
 		col.Index = i
 	}
 
 	return tpl.ValidateColumns()
-}
-
-func RowsToProducts(tpl *templates.Template, file *excelize.File, sheet string) []*models.Product {
-	var products []*models.Product = make([]*models.Product, 0, tpl.AssumedRowsCount)
-
-	rows, err := file.Rows(sheet)
-	if err != nil {
-		fmt.Println(err)
-		return products
-	}
-	defer func() {
-		err := rows.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}()
-
-	rows.Next()
-
-	rowIdx := 0
-
-	for rows.Next() {
-		rowIdx++
-		row, err := rows.Columns()
-		if err != nil {
-			fmt.Println(err)
-			return products
-		}
-
-		if len(row) == 0 {
-			break
-		}
-
-		row = tpl.AlignRow(row)
-		product, errs := tpl.RowToProduct(tpl, row)
-		if errs != nil {
-			if strict {
-				fmt.Println(errs)
-				panic("error immediately")
-			}
-			fmt.Printf("row %d: %s\n", rowIdx, errs)
-			continue
-		}
-		products = append(products, product)
-	}
-
-	return products
 }
 
 var parseXLSXCmd = &cobra.Command{
@@ -110,6 +74,8 @@ var parseXLSXCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		templateKind := templates.ParseTemplateEnum(template)
 		tpl := templates.CreateTemplate(templateKind)
+		tpl.Flags.Limit = limit
+		tpl.Flags.Strict = strict
 
 		file, err := excelize.OpenFile(filepath)
 		if err != nil {
@@ -127,6 +93,7 @@ var parseXLSXCmd = &cobra.Command{
 		if sheet == "" {
 			sheet = file.GetSheetName(0)
 		}
+		tpl.Sheet = sheet
 
 		success := ProcessColumns(tpl, file, sheet)
 		if !success {
@@ -135,7 +102,26 @@ var parseXLSXCmd = &cobra.Command{
 
 		fmt.Println()
 
-		products := RowsToProducts(tpl, file, sheet)
+		rows, err := file.Rows(tpl.Sheet)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer func() {
+			err := rows.Close()
+			if err != nil {
+				fmt.Println(err)
+			}
+		}()
+
+		if tpl.ProcessRows == nil {
+			panic(fmt.Sprintf(
+				"Must provide template '%s' -> ProcessRows\n",
+				templateKind.String(),
+			))
+		}
+
+		products := tpl.ProcessRows(tpl, rows)
 		fmt.Println()
 		fmt.Println("Products length:", len(products))
 		for _, product := range products {

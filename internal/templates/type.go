@@ -4,6 +4,8 @@ import (
 	"cchoice/internal/models"
 	"fmt"
 	"strings"
+
+	"github.com/xuri/excelize/v2"
 )
 
 type Column struct {
@@ -11,10 +13,19 @@ type Column struct {
 	Required bool
 }
 
+type Flags struct {
+	Strict bool
+	Limit  int
+}
+
 type Template struct {
+	Flags            Flags
+	Sheet            string
+	SkipInitialRows  int
 	AssumedRowsCount int
 	Columns          map[string]*Column
 	RowToProduct     func(*Template, []string) (*models.Product, error)
+	ProcessRows      func(*Template, *excelize.Rows) []*models.Product
 }
 
 func CreateTemplate(kind TemplateKind) *Template {
@@ -23,9 +34,19 @@ func CreateTemplate(kind TemplateKind) *Template {
 		panic("Can't use undefined template")
 	case Sample:
 		return &Template{
+			SkipInitialRows:  0,
 			AssumedRowsCount: 128,
 			Columns:          SampleColumns,
 			RowToProduct:     SampleRowToProduct,
+			ProcessRows:      SampleProcessRows,
+		}
+	case DeltaPlus:
+		return &Template{
+			SkipInitialRows:  1,
+			AssumedRowsCount: 1024,
+			Columns:          DeltaPlusColumns,
+			RowToProduct:     DeltaPlusRowToProduct,
+			ProcessRows:      DeltaPlusProcessRows,
 		}
 	}
 	return nil

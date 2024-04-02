@@ -4,8 +4,10 @@ import (
 	"cchoice/internal/models"
 	"cchoice/utils"
 	"errors"
+	"fmt"
 
 	"github.com/shopspring/decimal"
+	"github.com/xuri/excelize/v2"
 )
 
 var SampleColumns map[string]*Column = map[string]*Column{
@@ -61,4 +63,46 @@ func SampleRowToProduct(tpl *Template, row []string) (*models.Product, error) {
 		Description: row[idxDesc],
 		UnitPrice:   unitPrice,
 	}, nil
+}
+
+
+func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
+	var products []*models.Product = make([]*models.Product, 0, tpl.AssumedRowsCount)
+
+	rows.Next()
+
+	rowIdx := 0
+
+	for rows.Next() {
+		rowIdx++
+		row, err := rows.Columns()
+
+		if err != nil {
+			fmt.Println(err)
+			return products
+		}
+
+		if len(row) == 0 {
+			break
+		}
+
+		row = tpl.AlignRow(row)
+		product, errs := tpl.RowToProduct(tpl, row)
+		if errs != nil {
+			if tpl.Flags.Strict {
+				fmt.Println(errs)
+				panic("error immediately")
+			}
+			fmt.Printf("row %d: %s\n", rowIdx, errs)
+			continue
+		}
+
+		if (tpl.Flags.Limit != 0) && (rowIdx > tpl.Flags.Limit) {
+			return products
+		}
+
+		products = append(products, product)
+	}
+
+	return products
 }
