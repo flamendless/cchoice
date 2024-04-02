@@ -11,11 +11,10 @@ type Column struct {
 	Required bool
 }
 
-type RowToProductHandler (func(*Template, []string) (*models.Product, error))
-
 type Template struct {
-	Columns      map[string]*Column
-	RowToProduct RowToProductHandler
+	AssumedRowsCount int
+	Columns          map[string]*Column
+	RowToProduct     func(*Template, []string) (*models.Product, error)
 }
 
 func CreateTemplate(kind TemplateKind) *Template {
@@ -24,8 +23,9 @@ func CreateTemplate(kind TemplateKind) *Template {
 		panic("Can't use undefined template")
 	case Sample:
 		return &Template{
-			Columns:      SampleColumns,
-			RowToProduct: SampleRowToProduct,
+			AssumedRowsCount: 128,
+			Columns:          SampleColumns,
+			RowToProduct:     SampleRowToProduct,
 		}
 	}
 	return nil

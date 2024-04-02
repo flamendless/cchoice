@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/xuri/excelize/v2"
 
+	"cchoice/internal/models"
 	"cchoice/internal/templates"
 )
 
@@ -13,12 +14,14 @@ var (
 	template string
 	filepath string
 	sheet    string
+	strict   bool
 )
 
 func init() {
 	parseXLSXCmd.Flags().StringVarP(&template, "template", "t", "", "Template to use")
 	parseXLSXCmd.Flags().StringVarP(&filepath, "filepath", "p", "", "Filepath to the XLSX file")
 	parseXLSXCmd.Flags().StringVarP(&sheet, "sheet", "s", "", "Sheet name to use")
+	parseXLSXCmd.Flags().BoolVarP(&strict, "strict", "x", false, "Panic upon first product error")
 
 	parseXLSXCmd.MarkFlagRequired("template")
 	parseXLSXCmd.MarkFlagRequired("filepath")
@@ -54,11 +57,13 @@ func ProcessColumns(tpl *templates.Template, file *excelize.File, sheet string) 
 	return tpl.ValidateColumns()
 }
 
-func GetRows(tpl *templates.Template, file *excelize.File, sheet string) {
+func RowsToProducts(tpl *templates.Template, file *excelize.File, sheet string) []*models.Product {
+	var products []*models.Product = make([]*models.Product, 0, tpl.AssumedRowsCount)
+
 	rows, err := file.Rows(sheet)
 	if err != nil {
 		fmt.Println(err)
-		return
+		return products
 	}
 	defer func() {
 		err := rows.Close()
@@ -69,11 +74,14 @@ func GetRows(tpl *templates.Template, file *excelize.File, sheet string) {
 
 	rows.Next()
 
+	rowIdx := 0
+
 	for rows.Next() {
+		rowIdx++
 		row, err := rows.Columns()
 		if err != nil {
 			fmt.Println(err)
-			return
+			return products
 		}
 
 		if len(row) == 0 {
@@ -81,13 +89,19 @@ func GetRows(tpl *templates.Template, file *excelize.File, sheet string) {
 		}
 
 		row = tpl.AlignRow(row)
-		product, err := tpl.RowToProduct(tpl, row)
-		if err != nil {
-			fmt.Println(err)
+		product, errs := tpl.RowToProduct(tpl, row)
+		if errs != nil {
+			if strict {
+				fmt.Println(errs)
+				panic("error immediately")
+			}
+			fmt.Printf("row %d: %s\n", rowIdx, errs)
 			continue
 		}
-		product.Print()
+		products = append(products, product)
 	}
+
+	return products
 }
 
 var parseXLSXCmd = &cobra.Command{
@@ -121,6 +135,11 @@ var parseXLSXCmd = &cobra.Command{
 
 		fmt.Println()
 
-		GetRows(tpl, file, sheet)
+		products := RowsToProducts(tpl, file, sheet)
+		fmt.Println()
+		fmt.Println("Products length:", len(products))
+		for _, product := range products {
+			product.Print()
+		}
 	},
 }
