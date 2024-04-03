@@ -2,7 +2,7 @@ package templates
 
 import (
 	"cchoice/internal/models"
-	"cchoice/utils"
+	"cchoice/internal/utils"
 	"errors"
 	"fmt"
 
