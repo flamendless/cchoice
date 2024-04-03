@@ -46,35 +46,46 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, error)
 	idxSizes := tpl.Columns["SIZES"].Index
 	idxSegmentation := tpl.Columns["SEGMENTATION"].Index
 	idxDesc := tpl.Columns["DESCRIPTION"].Index
-	// idxPriceWithoutVat := tpl.Columns["END USER UNIT PRICE PHP WITHOUT VAT*"].Index
-	// idxPriceWithVat := tpl.Columns["END USER UNIT PRICE PHP WITH VAT* (SRP)"].Index
+	idxPriceWithoutVat := tpl.Columns["END USER UNIT PRICE PHP WITHOUT VAT*"].Index
+	idxPriceWithVat := tpl.Columns["END USER UNIT PRICE PHP WITH VAT* (SRP)"].Index
+
+	name := row[idxArticle]
+	colours := row[idxColours]
+	sizes := utils.SanitizeSize(row[idxSizes])
+	segmentation := row[idxSegmentation]
+	desc := row[idxDesc]
+	priceWithoutVat := row[idxPriceWithoutVat]
+	priceWithVat := row[idxPriceWithVat]
 
 	var errs error
 
-	name := row[idxArticle]
 	errProductName := utils.ValidateNotBlank(name, "article")
 	if errProductName != nil {
 		errs = errors.Join(errs, errProductName)
 	}
 
-	colours := row[idxColours]
-	sizes := row[idxSizes]
-	if sizes == "-" {
-		sizes = ""
+	unitPriceWithoutVat, err := utils.SanitizePrice(priceWithoutVat)
+	if err != nil {
+		errs = errors.Join(errs, err)
 	}
-	segmentation := row[idxSegmentation]
-	desc := row[idxDesc]
+
+	unitPriceWithVat, err := utils.SanitizePrice(priceWithVat)
+	if err != nil {
+		errs = errors.Join(errs, err)
+	}
 
 	if errs != nil {
 		return nil, errs
 	}
 
 	return &models.Product{
-		Name:         name,
-		Description:  desc,
-		Colours:      colours,
-		Sizes:        sizes,
-		Segmentation: segmentation,
+		Name:                name,
+		Description:         desc,
+		Colours:             colours,
+		Sizes:               sizes,
+		Segmentation:        segmentation,
+		UnitPriceWithoutVat: unitPriceWithoutVat,
+		UnitPriceWithVat:    unitPriceWithVat,
 	}, nil
 }
 
@@ -88,9 +99,11 @@ func DeltaPlusGetCategory(t *Template, row []string) string {
 func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 	var products []*models.Product = make([]*models.Product, 0, tpl.AssumedRowsCount)
 
-	rows.Next()
-
 	rowIdx := 0
+	for i := 0; i < tpl.SkipInitialRows+1; i++ {
+		rows.Next()
+		rowIdx++
+	}
 
 	var previousRow []string
 	category := ""
@@ -104,7 +117,9 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 			return products
 		}
 
-		if len(row) == 1 {
+		if len(row) == 0 {
+			break
+		} else if len(row) == 1 {
 			if (category == "") && (subcategory == "") {
 				category = row[0]
 			} else if (category != "") && (subcategory == "") {
@@ -119,12 +134,6 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 			}
 			previousRow = row
 			continue
-		}
-
-		fmt.Println(rowIdx, category, subcategory)
-
-		if len(row) == 0 {
-			break
 		}
 
 		row = tpl.AlignRow(row)

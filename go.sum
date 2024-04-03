@@ -1,3 +1,5 @@
+github.com/Rhymond/go-money v1.0.10 h1:jaySwEIcS6cQELv1XiJSGqcicI93ln9RhHHa14zWpZc=
+github.com/Rhymond/go-money v1.0.10/go.mod h1:iHvCuIvitxu2JIlAlhF0g9jHqjRSr+rpdOs7Omqlupg=
 github.com/cohesivestack/valgo v0.4.0 h1:K6d9rsNIRNCwF3angsxDJmJQXUVwt+5S9ZmW/PFVWYE=
 github.com/cohesivestack/valgo v0.4.0/go.mod h1:dJmvzYCCTJkgVK3XM4ZDTSJhV70bpJAgfcemS5VcwpE=
 github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=

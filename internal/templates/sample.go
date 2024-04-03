@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/shopspring/decimal"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -35,19 +34,18 @@ func SampleRowToProduct(tpl *Template, row []string) (*models.Product, error) {
 	idxDesc := tpl.Columns["Description"].Index
 	idxUnitPrice := tpl.Columns["Unit Price"].Index
 
+	serial := row[idxSerial]
+	name := row[idxProductName]
+	desc := row[idxDesc]
+	price := row[idxUnitPrice]
+
 	var errs error
 
-	price := row[idxUnitPrice]
-	errPrice := utils.ValidateNotBlank(price, "unit price")
-	if errPrice != nil {
-		errs = errors.Join(errs, errPrice)
-	}
-	unitPrice, err := decimal.NewFromString(price)
+	unitPriceMoney, err := utils.SanitizePrice(price)
 	if err != nil {
 		errs = errors.Join(errs, err)
 	}
 
-	name := row[idxProductName]
 	errProductName := utils.ValidateNotBlank(name, "product name")
 	if errProductName != nil {
 		errs = errors.Join(errs, errProductName)
@@ -58,20 +56,22 @@ func SampleRowToProduct(tpl *Template, row []string) (*models.Product, error) {
 	}
 
 	return &models.Product{
-		Serial:      row[idxSerial],
-		Name:        name,
-		Description: row[idxDesc],
-		UnitPrice:   unitPrice,
+		Serial:              serial,
+		Name:                name,
+		Description:         desc,
+		UnitPriceWithoutVat: unitPriceMoney,
+		UnitPriceWithVat:    unitPriceMoney,
 	}, nil
 }
-
 
 func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 	var products []*models.Product = make([]*models.Product, 0, tpl.AssumedRowsCount)
 
-	rows.Next()
-
 	rowIdx := 0
+	for i := 0; i < tpl.SkipInitialRows+1; i++ {
+		rows.Next()
+		rowIdx++
+	}
 
 	for rows.Next() {
 		rowIdx++
