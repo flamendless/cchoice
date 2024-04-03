@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"cchoice/internal"
 	"cchoice/internal/models"
 	"fmt"
 	"strings"
@@ -13,14 +14,8 @@ type Column struct {
 	Required bool
 }
 
-type Flags struct {
-	Strict bool
-	Limit  int
-}
-
 type Template struct {
-	Flags            Flags
-	Sheet            string
+	AppContext       *internal.AppContext
 	SkipInitialRows  int
 	AssumedRowsCount int
 	Columns          map[string]*Column

@@ -7,23 +7,19 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/xuri/excelize/v2"
 
+	"cchoice/internal"
 	"cchoice/internal/templates"
 )
 
-var (
-	template string
-	filepath string
-	sheet    string
-	strict   bool
-	limit    int
-)
+var ctx internal.AppContext
 
 func init() {
-	parseXLSXCmd.Flags().StringVarP(&template, "template", "t", "", "Template to use")
-	parseXLSXCmd.Flags().StringVarP(&filepath, "filepath", "p", "", "Filepath to the XLSX file")
-	parseXLSXCmd.Flags().StringVarP(&sheet, "sheet", "s", "", "Sheet name to use")
-	parseXLSXCmd.Flags().BoolVarP(&strict, "strict", "x", false, "Panic upon first product error")
-	parseXLSXCmd.Flags().IntVarP(&limit, "limit", "l", 0, "Limit number of rows to process")
+	f := parseXLSXCmd.Flags
+	f().StringVarP(&ctx.Template, "template", "t", "", "Template to use")
+	f().StringVarP(&ctx.Filepath, "filepath", "p", "", "Filepath to the XLSX file")
+	f().StringVarP(&ctx.Sheet, "sheet", "s", "", "Sheet name to use")
+	f().BoolVarP(&ctx.Strict, "strict", "x", false, "Panic upon first product error")
+	f().IntVarP(&ctx.Limit, "limit", "l", 0, "Limit number of rows to process")
 
 	parseXLSXCmd.MarkFlagRequired("template")
 	parseXLSXCmd.MarkFlagRequired("filepath")
@@ -31,8 +27,8 @@ func init() {
 	rootCmd.AddCommand(parseXLSXCmd)
 }
 
-func ProcessColumns(tpl *templates.Template, file *excelize.File, sheet string) bool {
-	rows, err := file.Rows(sheet)
+func ProcessColumns(tpl *templates.Template, file *excelize.File) bool {
+	rows, err := file.Rows(tpl.AppContext.Sheet)
 	if err != nil {
 		fmt.Println(err)
 		return false
@@ -72,12 +68,10 @@ var parseXLSXCmd = &cobra.Command{
 	Use:   "parse_xlsx",
 	Short: "Parse XLSX file",
 	Run: func(cmd *cobra.Command, args []string) {
-		templateKind := templates.ParseTemplateEnum(template)
+		templateKind := templates.ParseTemplateEnum(ctx.Template)
 		tpl := templates.CreateTemplate(templateKind)
-		tpl.Flags.Limit = limit
-		tpl.Flags.Strict = strict
 
-		file, err := excelize.OpenFile(filepath)
+		file, err := excelize.OpenFile(ctx.Filepath)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -90,19 +84,20 @@ var parseXLSXCmd = &cobra.Command{
 			}
 		}()
 
-		if sheet == "" {
-			sheet = file.GetSheetName(0)
+		if ctx.Sheet == "" {
+			ctx.Sheet = file.GetSheetName(0)
 		}
-		tpl.Sheet = sheet
 
-		success := ProcessColumns(tpl, file, sheet)
+		tpl.AppContext = &ctx
+
+		success := ProcessColumns(tpl, file)
 		if !success {
 			return
 		}
 
 		fmt.Println()
 
-		rows, err := file.Rows(tpl.Sheet)
+		rows, err := file.Rows(ctx.Sheet)
 		if err != nil {
 			fmt.Println(err)
 			return

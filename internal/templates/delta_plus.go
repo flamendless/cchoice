@@ -130,7 +130,7 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 		row = tpl.AlignRow(row)
 		product, errs := tpl.RowToProduct(tpl, row)
 		if errs != nil {
-			if tpl.Flags.Strict {
+			if tpl.AppContext.Strict {
 				fmt.Println(errs)
 				panic("error immediately")
 			}
@@ -142,7 +142,7 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 		product.Category = category
 		product.Subcategory = subcategory
 
-		if (tpl.Flags.Limit != 0) && (rowIdx > tpl.Flags.Limit) {
+		if (tpl.AppContext.Limit != 0) && (rowIdx > tpl.AppContext.Limit) {
 			return products
 		}
 
