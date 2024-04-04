@@ -1,12 +1,13 @@
 package templates
 
 import (
+	"cchoice/internal/logs"
 	"cchoice/internal/models"
 	"cchoice/internal/utils"
 	"errors"
-	"fmt"
 
 	"github.com/xuri/excelize/v2"
+	"go.uber.org/zap"
 )
 
 var SampleColumns map[string]*Column = map[string]*Column{
@@ -78,7 +79,7 @@ func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 		row, err := rows.Columns()
 
 		if err != nil {
-			fmt.Println(err)
+			logs.Log().Error(err.Error())
 			return products
 		}
 
@@ -90,10 +91,14 @@ func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 		product, errs := tpl.RowToProduct(tpl, row)
 		if errs != nil {
 			if tpl.AppContext.Strict {
-				fmt.Println(errs)
-				panic("error immediately")
+				logs.Log().Panic(errs.Error())
+				return nil
 			}
-			fmt.Printf("row %d: %s\n", rowIdx, errs)
+			logs.Log().Info(
+				"processed row to product",
+				zap.Int("row", rowIdx),
+				zap.String("errors", errs.Error()),
+			)
 			continue
 		}
 

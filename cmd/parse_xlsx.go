@@ -6,8 +6,10 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/xuri/excelize/v2"
+	"go.uber.org/zap"
 
 	"cchoice/internal"
+	"cchoice/internal/logs"
 	"cchoice/internal/templates"
 )
 
@@ -21,6 +23,8 @@ func init() {
 	f().BoolVarP(&ctx.Strict, "strict", "x", false, "Panic upon first product error")
 	f().IntVarP(&ctx.Limit, "limit", "l", 0, "Limit number of rows to process")
 
+	logs.InitLog()
+
 	parseXLSXCmd.MarkFlagRequired("template")
 	parseXLSXCmd.MarkFlagRequired("filepath")
 
@@ -30,13 +34,13 @@ func init() {
 func ProcessColumns(tpl *templates.Template, file *excelize.File) bool {
 	rows, err := file.Rows(tpl.AppContext.Sheet)
 	if err != nil {
-		fmt.Println(err)
+		logs.Log().Error(err.Error())
 		return false
 	}
 	defer func() {
 		err = rows.Close()
 		if err != nil {
-			fmt.Println(err)
+			logs.Log().Error(err.Error())
 		}
 	}()
 
@@ -47,7 +51,7 @@ func ProcessColumns(tpl *templates.Template, file *excelize.File) bool {
 
 	columns, err := rows.Columns()
 	if err != nil {
-		fmt.Println(err)
+		logs.Log().Error(err.Error())
 		return false
 	}
 
@@ -55,7 +59,10 @@ func ProcessColumns(tpl *templates.Template, file *excelize.File) bool {
 		cell = strings.Replace(cell, "\n", " ", -1)
 		col, exists := tpl.Columns[cell]
 		if !exists {
-			fmt.Printf("Column '%s' does not exist in template columns\n", cell)
+			logs.Log().Info(fmt.Sprintf(
+				"Column '%s' does not exist in template columns\n",
+				cell,
+			))
 			continue
 		}
 		col.Index = i
@@ -68,18 +75,27 @@ var parseXLSXCmd = &cobra.Command{
 	Use:   "parse_xlsx",
 	Short: "Parse XLSX file",
 	Run: func(cmd *cobra.Command, args []string) {
+		logs.Log().Info(
+			"Parsing XLSX",
+			zap.String("template", ctx.Template),
+			zap.String("filepath", ctx.Filepath),
+			zap.String("sheet", ctx.Sheet),
+			zap.Bool("strict", ctx.Strict),
+			zap.Int("limit", ctx.Limit),
+		)
+
 		templateKind := templates.ParseTemplateEnum(ctx.Template)
 		tpl := templates.CreateTemplate(templateKind)
 
 		file, err := excelize.OpenFile(ctx.Filepath)
 		if err != nil {
-			fmt.Println(err)
+			logs.Log().Error(err.Error())
 			return
 		}
 		defer func() {
 			err = file.Close()
 			if err != nil {
-				fmt.Println(err)
+				logs.Log().Error(err.Error())
 				return
 			}
 		}()
@@ -95,30 +111,29 @@ var parseXLSXCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Println()
-
 		rows, err := file.Rows(ctx.Sheet)
 		if err != nil {
-			fmt.Println(err)
+			logs.Log().Error(err.Error())
 			return
 		}
 		defer func() {
 			err := rows.Close()
 			if err != nil {
-				fmt.Println(err)
+				logs.Log().Error(err.Error())
 			}
 		}()
 
 		if tpl.ProcessRows == nil {
-			panic(fmt.Sprintf(
+			logs.Log().Panic(fmt.Sprintf(
 				"Must provide template '%s' -> ProcessRows\n",
 				templateKind.String(),
 			))
+			return
 		}
 
 		products := tpl.ProcessRows(tpl, rows)
-		fmt.Println()
-		fmt.Println("Products length:", len(products))
+		logs.Log().Info(fmt.Sprintf("Number of processed products: %d\n", len(products)))
+
 		for _, product := range products {
 			product.Print()
 		}

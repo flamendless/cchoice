@@ -1,12 +1,13 @@
 package templates
 
 import (
+	"cchoice/internal/logs"
 	"cchoice/internal/models"
 	"cchoice/internal/utils"
 	"errors"
-	"fmt"
 
 	"github.com/xuri/excelize/v2"
+	"go.uber.org/zap"
 )
 
 var DeltaPlusColumns map[string]*Column = map[string]*Column{
@@ -113,7 +114,7 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 		rowIdx++
 		row, err := rows.Columns()
 		if err != nil {
-			fmt.Println(err)
+			logs.Log().Error(err.Error())
 			return products
 		}
 
@@ -140,10 +141,14 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 		product, errs := tpl.RowToProduct(tpl, row)
 		if errs != nil {
 			if tpl.AppContext.Strict {
-				fmt.Println(errs)
-				panic("error immediately")
+				logs.Log().Error(errs.Error())
+				return nil
 			}
-			fmt.Printf("row %d: %s\n", rowIdx, errs)
+			logs.Log().Info(
+				"processed row to product",
+				zap.Int("row", rowIdx),
+				zap.String("errors", errs.Error()),
+			)
 			previousRow = row
 			continue
 		}
