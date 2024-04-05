@@ -2,17 +2,10 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 
 	v "github.com/cohesivestack/valgo"
 )
-
-func StringsToError(errs []string) error {
-	var err error
-	for i := 0; i < len(errs); i++ {
-		err = errors.Join(errors.New(errs[i]))
-	}
-	return err
-}
 
 func ValidateNotBlank(field string, key string) error {
 	val := v.Check(
@@ -21,7 +14,12 @@ func ValidateNotBlank(field string, key string) error {
 
 	if !val.Valid() {
 		errs := val.Errors()[key]
-		return StringsToError(errs.Messages())
+		errMsg := fmt.Sprintf(
+			"%s - %s",
+			errs.Name(),
+			errs.Messages(),
+		)
+		return errors.New(errMsg)
 	}
 
 	return nil

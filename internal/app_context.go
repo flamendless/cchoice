@@ -1,9 +1,10 @@
 package internal
 
 type AppContext struct {
-	Template string
-	Filepath string
-	Sheet    string
-	Strict   bool
-	Limit    int
+	Template               string
+	Filepath               string
+	Sheet                  string
+	Strict                 bool
+	Limit                  int
+	PrintProcessedProducts bool
 }

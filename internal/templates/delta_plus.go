@@ -4,7 +4,6 @@ import (
 	"cchoice/internal/logs"
 	"cchoice/internal/models"
 	"cchoice/internal/utils"
-	"errors"
 
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
@@ -41,7 +40,7 @@ var DeltaPlusColumns map[string]*Column = map[string]*Column{
 	},
 }
 
-func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, error) {
+func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 	idxArticle := tpl.Columns["ARTICLE"].Index
 	idxColours := tpl.Columns["COLOURS"].Index
 	idxSizes := tpl.Columns["SIZES"].Index
@@ -51,31 +50,31 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, error)
 	idxPriceWithVat := tpl.Columns["END USER UNIT PRICE PHP WITH VAT* (SRP)"].Index
 
 	name := row[idxArticle]
-	colours := row[idxColours]
+	colours := utils.SanitizeColours(row[idxColours])
 	sizes := utils.SanitizeSize(row[idxSizes])
 	segmentation := row[idxSegmentation]
 	desc := row[idxDesc]
 	priceWithoutVat := row[idxPriceWithoutVat]
 	priceWithVat := row[idxPriceWithVat]
 
-	var errs error
+	errs := make([]error, 0, 8)
 
 	errProductName := utils.ValidateNotBlank(name, "article")
 	if errProductName != nil {
-		errs = errors.Join(errs, errProductName)
+		errs = append(errs, errProductName)
 	}
 
 	unitPriceWithoutVat, err := utils.SanitizePrice(priceWithoutVat)
 	if err != nil {
-		errs = errors.Join(errs, err)
+		errs = append(errs, err...)
 	}
 
 	unitPriceWithVat, err := utils.SanitizePrice(priceWithVat)
 	if err != nil {
-		errs = errors.Join(errs, err)
+		errs = append(errs, err...)
 	}
 
-	if errs != nil {
+	if len(errs) > 0 {
 		return nil, errs
 	}
 
@@ -105,6 +104,8 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 		rows.Next()
 		rowIdx++
 	}
+
+	totalErrors := 0
 
 	var previousRow []string
 	category := ""
@@ -139,30 +140,34 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 
 		row = tpl.AlignRow(row)
 		product, errs := tpl.RowToProduct(tpl, row)
-		if errs != nil {
+		if len(errs) > 0 {
 			if tpl.AppContext.Strict {
-				logs.Log().Error(errs.Error())
+				logs.Log().Panic("error", zap.Errors("errors", errs))
 				return nil
 			}
-			logs.Log().Info(
+			logs.Log().Debug(
 				"processed row to product",
 				zap.Int("row", rowIdx),
-				zap.String("errors", errs.Error()),
+				zap.Errors("errors", errs),
 			)
 			previousRow = row
+			totalErrors += 1
 			continue
 		}
 
 		product.Category = category
 		product.Subcategory = subcategory
 
-		if (tpl.AppContext.Limit != 0) && (rowIdx > tpl.AppContext.Limit) {
+		if (tpl.AppContext.Limit > 0) && (rowIdx > tpl.AppContext.Limit) {
 			return products
 		}
 
 		products = append(products, product)
 		previousRow = row
 	}
+
+	logs.Log().Info("total processed", zap.Int("count", len(products)))
+	logs.Log().Info("total errors", zap.Int("count", totalErrors))
 
 	return products
 }

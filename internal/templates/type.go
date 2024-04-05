@@ -19,7 +19,7 @@ type Template struct {
 	SkipInitialRows  int
 	AssumedRowsCount int
 	Columns          map[string]*Column
-	RowToProduct     func(*Template, []string) (*models.Product, error)
+	RowToProduct     func(*Template, []string) (*models.Product, []error)
 	ProcessRows      func(*Template, *excelize.Rows) []*models.Product
 }
 

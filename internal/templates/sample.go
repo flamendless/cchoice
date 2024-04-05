@@ -4,7 +4,6 @@ import (
 	"cchoice/internal/logs"
 	"cchoice/internal/models"
 	"cchoice/internal/utils"
-	"errors"
 
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
@@ -29,7 +28,7 @@ var SampleColumns map[string]*Column = map[string]*Column{
 	},
 }
 
-func SampleRowToProduct(tpl *Template, row []string) (*models.Product, error) {
+func SampleRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 	idxSerial := tpl.Columns["Product Number"].Index
 	idxProductName := tpl.Columns["Product Name"].Index
 	idxDesc := tpl.Columns["Description"].Index
@@ -40,19 +39,19 @@ func SampleRowToProduct(tpl *Template, row []string) (*models.Product, error) {
 	desc := row[idxDesc]
 	price := row[idxUnitPrice]
 
-	var errs error
+	errs := make([]error, 0, 4)
 
 	unitPriceMoney, err := utils.SanitizePrice(price)
-	if err != nil {
-		errs = errors.Join(errs, err)
+	if len(err) > 0 {
+		errs = append(errs, err...)
 	}
 
 	errProductName := utils.ValidateNotBlank(name, "product name")
 	if errProductName != nil {
-		errs = errors.Join(errs, errProductName)
+		errs = append(errs, err...)
 	}
 
-	if errs != nil {
+	if len(errs) > 0 {
 		return nil, errs
 	}
 
@@ -89,20 +88,20 @@ func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 
 		row = tpl.AlignRow(row)
 		product, errs := tpl.RowToProduct(tpl, row)
-		if errs != nil {
+		if len(errs) > 0 {
 			if tpl.AppContext.Strict {
-				logs.Log().Panic(errs.Error())
+				logs.Log().Panic("error", zap.Errors("errors", errs))
 				return nil
 			}
-			logs.Log().Info(
+			logs.Log().Debug(
 				"processed row to product",
 				zap.Int("row", rowIdx),
-				zap.String("errors", errs.Error()),
+				zap.Errors("errors", errs),
 			)
 			continue
 		}
 
-		if (tpl.AppContext.Limit != 0) && (rowIdx > tpl.AppContext.Limit) {
+		if (tpl.AppContext.Limit > 0) && (rowIdx > tpl.AppContext.Limit) {
 			return products
 		}
 

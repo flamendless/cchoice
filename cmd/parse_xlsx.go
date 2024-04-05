@@ -21,6 +21,7 @@ func init() {
 	f().StringVarP(&ctx.Filepath, "filepath", "p", "", "Filepath to the XLSX file")
 	f().StringVarP(&ctx.Sheet, "sheet", "s", "", "Sheet name to use")
 	f().BoolVarP(&ctx.Strict, "strict", "x", false, "Panic upon first product error")
+	f().BoolVarP(&ctx.PrintProcessedProducts, "print_processed_products", "v", false, "Print processed products")
 	f().IntVarP(&ctx.Limit, "limit", "l", 0, "Limit number of rows to process")
 
 	logs.InitLog()
@@ -132,10 +133,11 @@ var parseXLSXCmd = &cobra.Command{
 		}
 
 		products := tpl.ProcessRows(tpl, rows)
-		logs.Log().Info(fmt.Sprintf("Number of processed products: %d\n", len(products)))
 
-		for _, product := range products {
-			product.Print()
+		if tpl.AppContext.PrintProcessedProducts {
+			for _, product := range products {
+				product.Print()
+			}
 		}
 	},
 }
