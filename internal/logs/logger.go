@@ -4,12 +4,16 @@ import (
 	"fmt"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 var logger *zap.Logger
 
 func InitLog() {
-	newLogger, err := zap.NewDevelopment()
+	config := zap.NewDevelopmentConfig()
+	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+
+	newLogger, err := config.Build()
 	if err != nil {
 		fmt.Println(err)
 	}
