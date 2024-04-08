@@ -114,7 +114,9 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 
 		if len(row) == 0 {
 			break
-		} else if len(row) == 1 {
+		}
+
+		if len(row) == 1 {
 			if (category == "") && (subcategory == "") {
 				category = row[0]
 			} else if (category != "") && (subcategory == "") {
@@ -134,18 +136,30 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 		row = tpl.AlignRow(row)
 		product, errs := tpl.RowToProduct(tpl, row)
 		if len(errs) > 0 {
-			if tpl.AppContext.Strict {
-				logs.Log().Panic("error", zap.Errors("errors", errs))
-				return nil
+			proceedToError := true
+
+			sizes := row[tpl.Columns["SIZES"].Index]
+			if sizes != "" {
+				prevProduct := products[len(products) - 1]
+				product = prevProduct.Duplicate()
+				product.Sizes = sizes
+				proceedToError = false
 			}
-			logs.Log().Debug(
-				"processed row to product",
-				zap.Int("row", rowIdx),
-				zap.Errors("errors", errs),
-			)
-			previousRow = row
-			totalErrors += 1
-			continue
+
+			if proceedToError {
+				if tpl.AppContext.Strict {
+					logs.Log().Panic("error", zap.Errors("errors", errs))
+					return nil
+				}
+				logs.Log().Debug(
+					"row to product",
+					zap.Int("row number", rowIdx),
+					zap.Errors("errors", errs),
+				)
+				totalErrors += 1
+				previousRow = row
+				continue
+			}
 		}
 
 		product.Category = category
@@ -160,8 +174,12 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 		previousRow = row
 	}
 
-	logs.Log().Info("total processed", zap.Int("count", len(products)))
-	logs.Log().Info("total errors", zap.Int("count", totalErrors))
+	logs.Log().Info(
+		"results",
+		zap.Int("processed", len(products)),
+		zap.Int("errors", totalErrors),
+		zap.Int("total", len(products) + totalErrors),
+	)
 
 	return products
 }

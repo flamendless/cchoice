@@ -44,3 +44,18 @@ func (product *Product) Print() {
 
 	fmt.Println(builder.String())
 }
+
+func (product *Product) Duplicate() *Product {
+	newProduct := Product{
+		Name:                product.Name,
+		Description:         product.Description,
+		Category:            product.Category,
+		Subcategory:         product.Subcategory,
+		Colours:             product.Colours,
+		Sizes:               product.Sizes,
+		Segmentation:        product.Segmentation,
+		UnitPriceWithoutVat: product.UnitPriceWithoutVat,
+		UnitPriceWithVat:    product.UnitPriceWithVat,
+	}
+	return &newProduct
+}

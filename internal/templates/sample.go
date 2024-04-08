@@ -73,6 +73,8 @@ func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 		rowIdx++
 	}
 
+	totalErrors := 0
+
 	for rows.Next() {
 		rowIdx++
 		row, err := rows.Columns()
@@ -93,11 +95,12 @@ func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 				logs.Log().Panic("error", zap.Errors("errors", errs))
 				return nil
 			}
-			logs.Log().Debug(
-				"processed row to product",
-				zap.Int("row", rowIdx),
+			logs.Log().Info(
+				"row to product",
+				zap.Int("row number", rowIdx),
 				zap.Errors("errors", errs),
 			)
+			totalErrors += 1
 			continue
 		}
 
@@ -109,6 +112,13 @@ func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 
 		products = append(products, product)
 	}
+
+	logs.Log().Info(
+		"results",
+		zap.Int("processed", len(products)),
+		zap.Int("errors", totalErrors),
+		zap.Int("total", len(products) + totalErrors),
+	)
 
 	return products
 }
