@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/Rhymond/go-money"
+	"github.com/gosimple/slug"
 )
 
 type Product struct {
@@ -20,7 +21,9 @@ type Product struct {
 	UnitPriceWithVat    *money.Money
 }
 
-func (product *Product) Finalize() {
+func (product *Product) PostProcess() {
+	product.Category = slug.Make(product.Category)
+	product.Subcategory = slug.Make(product.Subcategory)
 }
 
 func (product *Product) Print() {

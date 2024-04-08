@@ -89,13 +89,6 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 	}, nil
 }
 
-func DeltaPlusGetCategory(t *Template, row []string) string {
-	if len(row) != 1 {
-		return ""
-	}
-	return row[0]
-}
-
 func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 	var products []*models.Product = make([]*models.Product, 0, tpl.AssumedRowsCount)
 
@@ -157,6 +150,7 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 
 		product.Category = category
 		product.Subcategory = subcategory
+		product.PostProcess()
 
 		if (tpl.AppContext.Limit > 0) && (rowIdx > tpl.AppContext.Limit) {
 			return products

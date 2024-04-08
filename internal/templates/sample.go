@@ -101,6 +101,8 @@ func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 			continue
 		}
 
+		product.PostProcess()
+
 		if (tpl.AppContext.Limit > 0) && (rowIdx > tpl.AppContext.Limit) {
 			return products
 		}
