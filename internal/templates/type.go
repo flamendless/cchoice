@@ -37,6 +37,7 @@ func CreateTemplate(kind TemplateKind) *Template {
 			RowToProduct:     SampleRowToProduct,
 			ProcessRows:      SampleProcessRows,
 		}
+
 	case DeltaPlus:
 		return &Template{
 			SkipInitialRows:  1,

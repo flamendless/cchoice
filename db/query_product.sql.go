@@ -3,7 +3,7 @@
 //   sqlc v1.26.0
 // source: query_product.sql
 
-package db
+package cchoice_db
 
 import (
 	"context"
@@ -14,32 +14,38 @@ const createProduct = `-- name: CreateProduct :one
 INSERT INTO product (
 	name,
 	description,
-	product_type_id,
+	colours,
+	sizes,
+	segmentation,
 	product_category_id,
 	unit_price_without_vat,
 	unit_price_with_vat,
 	unit_price_without_vat_currency,
 	unit_price_with_vat_currency,
+	status,
 	created_at,
 	updated_at,
 	deleted_at
 ) VALUES (
 	?, ?, ?, ?,
-	?, ?,
-	?, ?,
+	?, ?, ?, ?,
+	?, ?, ?,
 	?, ?, ?
-) RETURNING id, name, description, product_category_id, product_type_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at
+) RETURNING id, name, description, status, product_category_id, colours, sizes, segmentation, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at
 `
 
 type CreateProductParams struct {
 	Name                        string
 	Description                 sql.NullString
-	ProductTypeID               sql.NullInt64
+	Colours                     sql.NullString
+	Sizes                       sql.NullString
+	Segmentation                sql.NullString
 	ProductCategoryID           sql.NullInt64
 	UnitPriceWithoutVat         int64
 	UnitPriceWithVat            int64
 	UnitPriceWithoutVatCurrency string
 	UnitPriceWithVatCurrency    string
+	Status                      sql.NullString
 	CreatedAt                   string
 	UpdatedAt                   string
 	DeletedAt                   string
@@ -49,12 +55,15 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 	row := q.db.QueryRowContext(ctx, createProduct,
 		arg.Name,
 		arg.Description,
-		arg.ProductTypeID,
+		arg.Colours,
+		arg.Sizes,
+		arg.Segmentation,
 		arg.ProductCategoryID,
 		arg.UnitPriceWithoutVat,
 		arg.UnitPriceWithVat,
 		arg.UnitPriceWithoutVatCurrency,
 		arg.UnitPriceWithVatCurrency,
+		arg.Status,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.DeletedAt,
@@ -64,8 +73,11 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 		&i.ID,
 		&i.Name,
 		&i.Description,
+		&i.Status,
 		&i.ProductCategoryID,
-		&i.ProductTypeID,
+		&i.Colours,
+		&i.Sizes,
+		&i.Segmentation,
 		&i.UnitPriceWithoutVat,
 		&i.UnitPriceWithVat,
 		&i.UnitPriceWithoutVatCurrency,
@@ -78,10 +90,9 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 }
 
 const getProduct = `-- name: GetProduct :one
-SELECT product.id, name, description, product_category_id, product_type_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at, product_category.id, category, subcategory, product_type.id, colours, sizes, segmentation
+SELECT product.id, name, description, status, product_category_id, colours, sizes, segmentation, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at, product_category.id, category, subcategory
 FROM product
 INNER JOIN product_category ON product.product_category_id = product_category.id
-INNER JOIN product_type ON product.product_type_id = product_type.id
 WHERE product.id = ?
 LIMIT 1
 `
@@ -90,8 +101,11 @@ type GetProductRow struct {
 	ID                          int64
 	Name                        string
 	Description                 sql.NullString
+	Status                      sql.NullString
 	ProductCategoryID           sql.NullInt64
-	ProductTypeID               sql.NullInt64
+	Colours                     sql.NullString
+	Sizes                       sql.NullString
+	Segmentation                sql.NullString
 	UnitPriceWithoutVat         int64
 	UnitPriceWithVat            int64
 	UnitPriceWithoutVatCurrency string
@@ -102,10 +116,6 @@ type GetProductRow struct {
 	ID_2                        int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
-	ID_3                        int64
-	Colours                     sql.NullString
-	Sizes                       sql.NullString
-	Segmentation                sql.NullString
 }
 
 func (q *Queries) GetProduct(ctx context.Context, id int64) (GetProductRow, error) {
@@ -115,8 +125,11 @@ func (q *Queries) GetProduct(ctx context.Context, id int64) (GetProductRow, erro
 		&i.ID,
 		&i.Name,
 		&i.Description,
+		&i.Status,
 		&i.ProductCategoryID,
-		&i.ProductTypeID,
+		&i.Colours,
+		&i.Sizes,
+		&i.Segmentation,
 		&i.UnitPriceWithoutVat,
 		&i.UnitPriceWithVat,
 		&i.UnitPriceWithoutVatCurrency,
@@ -127,19 +140,14 @@ func (q *Queries) GetProduct(ctx context.Context, id int64) (GetProductRow, erro
 		&i.ID_2,
 		&i.Category,
 		&i.Subcategory,
-		&i.ID_3,
-		&i.Colours,
-		&i.Sizes,
-		&i.Segmentation,
 	)
 	return i, err
 }
 
 const getProducts = `-- name: GetProducts :many
-SELECT product.id, name, description, product_category_id, product_type_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at, product_category.id, category, subcategory, product_type.id, colours, sizes, segmentation
+SELECT product.id, name, description, status, product_category_id, colours, sizes, segmentation, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at, product_category.id, category, subcategory
 FROM product
 INNER JOIN product_category ON product.product_category_id = product_category.id
-INNER JOIN product_type ON product.product_type_id = product_type.id
 ORDER BY created_at DESC
 `
 
@@ -147,8 +155,11 @@ type GetProductsRow struct {
 	ID                          int64
 	Name                        string
 	Description                 sql.NullString
+	Status                      sql.NullString
 	ProductCategoryID           sql.NullInt64
-	ProductTypeID               sql.NullInt64
+	Colours                     sql.NullString
+	Sizes                       sql.NullString
+	Segmentation                sql.NullString
 	UnitPriceWithoutVat         int64
 	UnitPriceWithVat            int64
 	UnitPriceWithoutVatCurrency string
@@ -159,10 +170,6 @@ type GetProductsRow struct {
 	ID_2                        int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
-	ID_3                        int64
-	Colours                     sql.NullString
-	Sizes                       sql.NullString
-	Segmentation                sql.NullString
 }
 
 func (q *Queries) GetProducts(ctx context.Context) ([]GetProductsRow, error) {
@@ -178,8 +185,11 @@ func (q *Queries) GetProducts(ctx context.Context) ([]GetProductsRow, error) {
 			&i.ID,
 			&i.Name,
 			&i.Description,
+			&i.Status,
 			&i.ProductCategoryID,
-			&i.ProductTypeID,
+			&i.Colours,
+			&i.Sizes,
+			&i.Segmentation,
 			&i.UnitPriceWithoutVat,
 			&i.UnitPriceWithVat,
 			&i.UnitPriceWithoutVatCurrency,
@@ -190,10 +200,6 @@ func (q *Queries) GetProducts(ctx context.Context) ([]GetProductsRow, error) {
 			&i.ID_2,
 			&i.Category,
 			&i.Subcategory,
-			&i.ID_3,
-			&i.Colours,
-			&i.Sizes,
-			&i.Segmentation,
 		); err != nil {
 			return nil, err
 		}

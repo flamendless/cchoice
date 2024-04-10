@@ -1,7 +1,8 @@
-package db
+package cchoicedb
 
 import (
 	"cchoice/database"
+	cchoice_db "cchoice/db"
 	"cchoice/internal/logs"
 	"context"
 	"database/sql"
@@ -29,10 +30,12 @@ func InitDB(dataSourceName string) (*sql.DB, error) {
 		return nil, err
 	}
 
-	// queries := db.New(sqlDB)
-	// prs, err := queries.GetProducts(ctx)
-
 	logs.Log().Info("Successfully initialized DB")
 
 	return sqlDB, nil
+}
+
+func GetQueries(sqlDB *sql.DB) *cchoice_db.Queries {
+	queries := cchoice_db.New(sqlDB)
+	return queries
 }

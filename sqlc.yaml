@@ -5,5 +5,5 @@ sql:
     queries: "database/"
     gen:
       go:
-        package: "db"
+        package: "cchoice_db"
         out: "db"

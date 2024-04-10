@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.26.0
 
-package db
+package cchoice_db
 
 import (
 	"database/sql"
@@ -12,8 +12,11 @@ type Product struct {
 	ID                          int64
 	Name                        string
 	Description                 sql.NullString
+	Status                      sql.NullString
 	ProductCategoryID           sql.NullInt64
-	ProductTypeID               sql.NullInt64
+	Colours                     sql.NullString
+	Sizes                       sql.NullString
+	Segmentation                sql.NullString
 	UnitPriceWithoutVat         int64
 	UnitPriceWithVat            int64
 	UnitPriceWithoutVatCurrency string
@@ -27,11 +30,4 @@ type ProductCategory struct {
 	ID          int64
 	Category    sql.NullString
 	Subcategory sql.NullString
-}
-
-type ProductType struct {
-	ID           int64
-	Colours      sql.NullString
-	Sizes        sql.NullString
-	Segmentation sql.NullString
 }

@@ -86,6 +86,7 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 		Segmentation:        segmentation,
 		UnitPriceWithoutVat: unitPriceWithoutVat,
 		UnitPriceWithVat:    unitPriceWithVat,
+		Status:              models.Active,
 	}, nil
 }
 

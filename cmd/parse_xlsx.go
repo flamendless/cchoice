@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 
 	"cchoice/internal"
-	"cchoice/internal/db"
+	"cchoice/internal/cchoice_db"
 	"cchoice/internal/logs"
 	"cchoice/internal/templates"
 )

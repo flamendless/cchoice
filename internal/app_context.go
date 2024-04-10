@@ -1,6 +1,9 @@
 package internal
 
-import "database/sql"
+import (
+	cchoice_db "cchoice/db"
+	"database/sql"
+)
 
 type AppFlags struct {
 	Template               string
@@ -14,5 +17,5 @@ type AppFlags struct {
 }
 
 type AppContext struct {
-	DB *sql.DB
+	DB      *sql.DB
 }
