@@ -9,6 +9,7 @@ import (
 	"go.uber.org/zap"
 
 	"cchoice/internal"
+	"cchoice/internal/db"
 	"cchoice/internal/logs"
 	"cchoice/internal/templates"
 )
@@ -147,5 +148,14 @@ var parseXLSXCmd = &cobra.Command{
 			return
 		}
 
+		sqlDB, err := db.InitDB(tpl.AppFlags.DBPath)
+		if err != nil {
+			logs.Log().Error(
+				"DB initialization",
+				zap.Error(err),
+			)
+			return
+		}
+		tpl.AppContext.DB = sqlDB
 	},
 }
