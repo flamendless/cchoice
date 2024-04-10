@@ -1,37 +1,30 @@
 package db
 
 import (
+	"cchoice/database"
 	"cchoice/internal/logs"
 	"context"
 	"database/sql"
 
-	// _ "embed"
-	"os"
-
 	_ "github.com/mattn/go-sqlite3"
+	"go.uber.org/zap"
 )
-
-// //go:embed sql/schema.sql
-// var ddl string
 
 func InitDB(dataSourceName string) (*sql.DB, error) {
 	logs.Log().Info("Initializing DB...")
-	logs.Log().Debug("opening database...")
+	logs.Log().Debug(
+		"opening database...",
+		zap.String("data source name", dataSourceName),
+	)
 
 	sqlDB, err := sql.Open("sqlite3", dataSourceName)
 	if err != nil {
 		return nil, err
 	}
 
-	logs.Log().Debug("opening schema.sql")
-	ddl, err := os.ReadFile("sql/schema.sql")
-	if err != nil {
-		return nil, err
-	}
-
 	logs.Log().Debug("executing context...")
 	ctx := context.Background()
-	_, err = sqlDB.ExecContext(ctx, string(ddl))
+	_, err = sqlDB.ExecContext(ctx, string(database.Schema))
 	if err != nil {
 		return nil, err
 	}
