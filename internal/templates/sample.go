@@ -91,7 +91,7 @@ func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 		row = tpl.AlignRow(row)
 		product, errs := tpl.RowToProduct(tpl, row)
 		if len(errs) > 0 {
-			if tpl.AppContext.Strict {
+			if tpl.AppFlags.Strict {
 				logs.Log().Panic("error", zap.Errors("errors", errs))
 				return nil
 			}
@@ -106,7 +106,7 @@ func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 
 		product.PostProcess()
 
-		if (tpl.AppContext.Limit > 0) && (rowIdx > tpl.AppContext.Limit) {
+		if (tpl.AppFlags.Limit > 0) && (rowIdx > tpl.AppFlags.Limit) {
 			return products
 		}
 

@@ -13,15 +13,17 @@ import (
 	"cchoice/internal/templates"
 )
 
-var ctx internal.AppContext
+var ctx internal.AppFlags
 
 func init() {
 	f := parseXLSXCmd.Flags
 	f().StringVarP(&ctx.Template, "template", "t", "", "Template to use")
 	f().StringVarP(&ctx.Filepath, "filepath", "p", "", "Filepath to the XLSX file")
 	f().StringVarP(&ctx.Sheet, "sheet", "s", "", "Sheet name to use")
+	f().StringVarP(&ctx.DBPath, "db_path", "", ":memory:", "Path to database")
 	f().BoolVarP(&ctx.Strict, "strict", "x", false, "Panic upon first product error")
 	f().BoolVarP(&ctx.PrintProcessedProducts, "print_processed_products", "v", false, "Print processed products")
+	f().BoolVarP(&ctx.UseDB, "use_db", "", false, "Use DB to save processed data")
 	f().IntVarP(&ctx.Limit, "limit", "l", 0, "Limit number of rows to process")
 
 	logs.InitLog()
@@ -33,7 +35,7 @@ func init() {
 }
 
 func ProcessColumns(tpl *templates.Template, file *excelize.File) bool {
-	rows, err := file.Rows(tpl.AppContext.Sheet)
+	rows, err := file.Rows(tpl.AppFlags.Sheet)
 	if err != nil {
 		logs.Log().Error(err.Error())
 		return false
@@ -105,7 +107,8 @@ var parseXLSXCmd = &cobra.Command{
 			ctx.Sheet = file.GetSheetName(0)
 		}
 
-		tpl.AppContext = &ctx
+		tpl.AppFlags = &ctx
+		tpl.AppContext = &internal.AppContext{}
 
 		success := ProcessColumns(tpl, file)
 		if !success {
@@ -134,10 +137,15 @@ var parseXLSXCmd = &cobra.Command{
 
 		products := tpl.ProcessRows(tpl, rows)
 
-		if tpl.AppContext.PrintProcessedProducts {
+		if tpl.AppFlags.PrintProcessedProducts {
 			for _, product := range products {
 				product.Print()
 			}
 		}
+
+		if !tpl.AppFlags.UseDB {
+			return
+		}
+
 	},
 }

@@ -15,7 +15,9 @@ type Column struct {
 }
 
 type Template struct {
-	AppContext       *internal.AppContext
+	AppFlags   *internal.AppFlags
+	AppContext *internal.AppContext
+
 	SkipInitialRows  int
 	AssumedRowsCount int
 	Columns          map[string]*Column

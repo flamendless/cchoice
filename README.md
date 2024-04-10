@@ -1,4 +1,4 @@
 # Usage
 
-- Sample `go run ./main.go parse_xlsx -p "xlsx/sample.xlsx" -s "Sheet" -t "sample"`
-- Sample strict `go run ./main.go parse_xlsx -p "xlsx/sample.xlsx" -s "Sheet" -t "sample" -x 1`
+- Sample `go run ./main.go parse_xlsx -p "xlsx/sample.xlsx" -s "Sheet" -t "sample" --use_db --db_path "test.db"`
+- Sample strict `go run ./main.go parse_xlsx -p "xlsx/sample.xlsx" -s "Sheet" -t "sample" -x 1 --use_db --db_path "test.db"`
