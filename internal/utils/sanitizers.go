@@ -38,7 +38,7 @@ func SanitizePrice(price string) (*money.Money, []error) {
 		return nil, errs
 	}
 
-	return money.NewFromFloat(unitPrice.InexactFloat64(), currency), nil
+	return money.New(unitPrice.CoefficientInt64(), currency), nil
 }
 
 func SanitizeColours(color string) string {

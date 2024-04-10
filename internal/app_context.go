@@ -12,10 +12,12 @@ type AppFlags struct {
 	Strict                 bool
 	Limit                  int
 	PrintProcessedProducts bool
+	VerifyPrices           bool
 	DBPath                 string
 	UseDB                  bool
 }
 
 type AppContext struct {
 	DB      *sql.DB
+	Queries *cchoice_db.Queries
 }

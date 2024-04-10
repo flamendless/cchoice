@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 	"cchoice/internal"
 	"cchoice/internal/cchoice_db"
 	"cchoice/internal/logs"
+	"cchoice/internal/models"
 	"cchoice/internal/templates"
 )
 
@@ -25,6 +27,7 @@ func init() {
 	f().BoolVarP(&ctx.Strict, "strict", "x", false, "Panic upon first product error")
 	f().BoolVarP(&ctx.PrintProcessedProducts, "print_processed_products", "v", false, "Print processed products")
 	f().BoolVarP(&ctx.UseDB, "use_db", "", false, "Use DB to save processed data")
+	f().BoolVarP(&ctx.VerifyPrices, "verify_prices", "", true, "Verify prices processed and saved to DB")
 	f().IntVarP(&ctx.Limit, "limit", "l", 0, "Limit number of rows to process")
 
 	logs.InitLog()
@@ -148,7 +151,7 @@ var parseXLSXCmd = &cobra.Command{
 			return
 		}
 
-		sqlDB, err := db.InitDB(tpl.AppFlags.DBPath)
+		sqlDB, err := cchoicedb.InitDB(tpl.AppFlags.DBPath)
 		if err != nil {
 			logs.Log().Error(
 				"DB initialization",
@@ -157,5 +160,46 @@ var parseXLSXCmd = &cobra.Command{
 			return
 		}
 		tpl.AppContext.DB = sqlDB
+		tpl.AppContext.Queries = cchoicedb.GetQueries(sqlDB)
+
+		logs.Log().Debug("Inserting products to DB")
+
+		insertedIds := make([]int64, 0, len(products))
+		for _, product := range products {
+			productID, err := product.InsertToDB(tpl.AppContext)
+			if err != nil {
+				logs.Log().Info(
+					"product insert to db",
+					zap.Error(err),
+				)
+				continue
+			}
+			insertedIds = append(insertedIds, productID)
+		}
+
+		if tpl.AppFlags.PrintProcessedProducts {
+			logs.Log().Debug(
+				"Products inserted to DB",
+				zap.Int64s("ids", insertedIds),
+			)
+		}
+
+		if tpl.AppFlags.VerifyPrices {
+			for i := 0; i < len(products); i++ {
+				product := products[i]
+				row, _ := tpl.AppContext.Queries.GetProduct(context.Background(), int64(i+1))
+				dbp := models.DBRowToProduct(&row)
+
+				cmp, _ := product.UnitPriceWithoutVat.Compare(dbp.UnitPriceWithoutVat)
+				if cmp != 0 {
+					logs.Log().Debug(
+						"checking prices",
+						zap.String("name", product.Name),
+						zap.Int64("product", product.UnitPriceWithoutVat.Amount()),
+						zap.Int64("db", dbp.UnitPriceWithoutVat.Amount()),
+					)
+				}
+			}
+		}
 	},
 }

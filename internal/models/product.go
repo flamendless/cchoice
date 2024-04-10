@@ -39,6 +39,7 @@ func (product *Product) PostProcess() {
 
 func (product *Product) Print() {
 	builder := strings.Builder{}
+
 	builder.WriteString(fmt.Sprintf("ID: %d\n", product.ID))
 	builder.WriteString(fmt.Sprintf("Serial: %s\n", product.Serial))
 	builder.WriteString(fmt.Sprintf("Name: %s\n", product.Name))
@@ -71,4 +72,125 @@ func (product *Product) Duplicate() *Product {
 		UnitPriceWithVat:    product.UnitPriceWithVat,
 	}
 	return &newProduct
+}
+
+func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
+	ctx := context.Background()
+	queries := appCtx.Queries
+
+	var categoryID int64
+
+	if product.Category != "" {
+		existingProductCategory, err := queries.GetProductCategoryByCategoryAndSubcategory(
+			ctx,
+			cchoice_db.GetProductCategoryByCategoryAndSubcategoryParams{
+				Category: sql.NullString{
+					String: product.Category,
+					Valid:  true,
+				},
+				Subcategory: sql.NullString{
+					String: product.Subcategory,
+					Valid:  true,
+				},
+			},
+		)
+		if err != nil {
+			existingProductCategory, err = queries.CreateProductCategory(
+				ctx,
+				cchoice_db.CreateProductCategoryParams{
+					Category: sql.NullString{
+						String: product.Category,
+						Valid:  true,
+					},
+					Subcategory: sql.NullString{
+						String: product.Subcategory,
+						Valid:  product.Subcategory != "",
+					},
+				},
+			)
+			if err != nil {
+				logs.Log().Warn(
+					"Insert product category",
+					zap.Error(err),
+				)
+			}
+		}
+		categoryID = existingProductCategory.ID
+	}
+
+	now := time.Now().UTC().String()
+
+	insertedProduct, err := queries.CreateProduct(
+		ctx,
+		cchoice_db.CreateProductParams{
+			Name: product.Name,
+			Description: sql.NullString{
+				String: product.Description,
+				Valid:  true,
+			},
+			Status: sql.NullString{
+				String: product.Status.String(),
+				Valid:  true,
+			},
+			ProductCategoryID: sql.NullInt64{
+				Int64: categoryID,
+				Valid: categoryID != 0,
+			},
+			Colours: sql.NullString{
+				String: product.Colours,
+				Valid:  true,
+			},
+			Sizes: sql.NullString{
+				String: product.Sizes,
+				Valid:  true,
+			},
+			Segmentation: sql.NullString{
+				String: product.Segmentation,
+				Valid:  true,
+			},
+
+			UnitPriceWithoutVat: product.UnitPriceWithoutVat.Amount() * 100,
+			UnitPriceWithVat:    product.UnitPriceWithVat.Amount() * 100,
+
+			UnitPriceWithoutVatCurrency: product.UnitPriceWithoutVat.Currency().Code,
+			UnitPriceWithVatCurrency:    product.UnitPriceWithVat.Currency().Code,
+
+			CreatedAt: now,
+			UpdatedAt: now,
+			DeletedAt: constants.DT_BEGINNING.String(),
+		},
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	return insertedProduct.ID, nil
+}
+
+func DBRowToProduct(row *cchoice_db.GetProductRow) *Product {
+	dbp := &Product{
+		ID:           row.ID,
+		Name:         row.Name,
+		Description:  row.Description.String,
+		Status:       ParseProductStatusEnum(row.Status.String),
+		Category:     row.Category.String,
+		Subcategory:  row.Subcategory.String,
+		Colours:      row.Colours.String,
+		Sizes:        row.Sizes.String,
+		Segmentation: row.Segmentation.String,
+	}
+
+	unitPriceWithoutVat := decimal.NewFromInt(row.UnitPriceWithoutVat / 100)
+	unitPriceWithVat := decimal.NewFromInt(row.UnitPriceWithVat / 100)
+
+	dbp.UnitPriceWithoutVat = money.New(
+		unitPriceWithoutVat.CoefficientInt64(),
+		row.UnitPriceWithoutVatCurrency,
+	)
+	dbp.UnitPriceWithVat = money.New(
+		unitPriceWithVat.CoefficientInt64(),
+		row.UnitPriceWithVatCurrency,
+	)
+
+	return dbp
 }
