@@ -117,7 +117,7 @@ func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 		"results",
 		zap.Int("processed", len(products)),
 		zap.Int("errors", totalErrors),
-		zap.Int("total", len(products) + totalErrors),
+		zap.Int("total", len(products)+totalErrors),
 	)
 
 	return products

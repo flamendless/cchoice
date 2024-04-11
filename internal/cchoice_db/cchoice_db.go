@@ -1,10 +1,8 @@
 package cchoicedb
 
 import (
-	"cchoice/database"
 	cchoice_db "cchoice/cchoice_db"
 	"cchoice/internal/logs"
-	"context"
 	"database/sql"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -19,13 +17,6 @@ func InitDB(dataSourceName string) (*sql.DB, error) {
 	)
 
 	sqlDB, err := sql.Open("sqlite3", dataSourceName)
-	if err != nil {
-		return nil, err
-	}
-
-	logs.Log().Debug("executing context...")
-	ctx := context.Background()
-	_, err = sqlDB.ExecContext(ctx, string(database.Schema))
 	if err != nil {
 		return nil, err
 	}
