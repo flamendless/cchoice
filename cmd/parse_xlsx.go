@@ -162,29 +162,49 @@ var parseXLSXCmd = &cobra.Command{
 		tpl.AppContext.DB = sqlDB
 		tpl.AppContext.Queries = cchoicedb.GetQueries(sqlDB)
 
-		logs.Log().Debug("Inserting products to DB...")
+		logs.Log().Debug("Inserting/updating products to DB...")
 
 		insertedIds := make([]int64, 0, len(products))
-		for _, product := range products {
-			productID, err := product.InsertToDB(tpl.AppContext)
-			if err != nil {
-				logs.Log().Info(
-					"product insert to db",
-					zap.Error(err),
-				)
-				continue
-			}
-			insertedIds = append(insertedIds, productID)
-		}
+		updatedIds := make([]int64, 0, len(products))
 
-		logs.Log().Debug("Successfully inserted products to DB")
+		for _, product := range products {
+			existingProductId := product.GetDBID(tpl.AppContext)
+			if existingProductId != 0 {
+				productID, err := product.UpdateToDB(tpl.AppContext)
+				if err != nil {
+					logs.Log().Info(
+						"product update to DB",
+						zap.Error(err),
+					)
+					continue
+				}
+				updatedIds = append(updatedIds, productID)
+
+			} else {
+				productID, err := product.InsertToDB(tpl.AppContext)
+				if err != nil {
+					logs.Log().Info(
+						"product insert to DB",
+						zap.Error(err),
+					)
+					continue
+				}
+				insertedIds = append(insertedIds, productID)
+			}
+		}
 
 		if tpl.AppFlags.PrintProcessedProducts {
 			logs.Log().Debug(
-				"Products inserted to DB",
-				zap.Int64s("ids", insertedIds),
+				"Products inserted/updated to DB",
+				zap.Int64s("inserted ids", insertedIds),
+				zap.Int64s("updated ids", updatedIds),
 			)
 		}
+		logs.Log().Debug(
+			"Successfully inserted/updated products to DB",
+			zap.Int("inserted ids count", len(insertedIds)),
+			zap.Int("updated ids count", len(updatedIds)),
+		)
 
 		if tpl.AppFlags.VerifyPrices {
 			logs.Log().Debug("Verifying prices...")

@@ -6,6 +6,7 @@ require (
 	github.com/Rhymond/go-money v1.0.10
 	github.com/cohesivestack/valgo v0.4.0
 	github.com/gosimple/slug v1.14.0
+	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/shopspring/decimal v1.3.1
 	github.com/spf13/cobra v1.8.0
 	github.com/xuri/excelize/v2 v2.8.1
@@ -16,7 +17,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect

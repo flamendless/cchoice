@@ -274,6 +274,20 @@ func (q *Queries) GetProductBySerial(ctx context.Context, serial string) (GetPro
 	return i, err
 }
 
+const getProductIDBySerial = `-- name: GetProductIDBySerial :one
+SELECT id
+FROM tbl_product
+WHERE tbl_product.serial = ?
+LIMIT 1
+`
+
+func (q *Queries) GetProductIDBySerial(ctx context.Context, serial string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getProductIDBySerial, serial)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
 const getProducts = `-- name: GetProducts :many
 SELECT tbl_product.id, serial, name, description, brand, status, product_category_id, colours, sizes, segmentation, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at, tbl_product_category.id, category, subcategory
 FROM tbl_product
@@ -346,4 +360,69 @@ func (q *Queries) GetProducts(ctx context.Context) ([]GetProductsRow, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateProduct = `-- name: UpdateProduct :execlastid
+UPDATE tbl_product
+SET
+	name = ?,
+	description = ?,
+	brand = ?,
+	status = ?,
+	colours = ?,
+	sizes = ?,
+	segmentation = ?,
+	product_category_id = ?,
+	unit_price_without_vat = ?,
+	unit_price_with_vat = ?,
+	unit_price_without_vat_currency = ?,
+	unit_price_with_vat_currency = ?,
+	created_at = ?,
+	updated_at = ?,
+	deleted_at = ?
+WHERE id = ?
+`
+
+type UpdateProductParams struct {
+	Name                        string
+	Description                 sql.NullString
+	Brand                       string
+	Status                      string
+	Colours                     sql.NullString
+	Sizes                       sql.NullString
+	Segmentation                sql.NullString
+	ProductCategoryID           sql.NullInt64
+	UnitPriceWithoutVat         int64
+	UnitPriceWithVat            int64
+	UnitPriceWithoutVatCurrency string
+	UnitPriceWithVatCurrency    string
+	CreatedAt                   string
+	UpdatedAt                   string
+	DeletedAt                   string
+	ID                          int64
+}
+
+func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, updateProduct,
+		arg.Name,
+		arg.Description,
+		arg.Brand,
+		arg.Status,
+		arg.Colours,
+		arg.Sizes,
+		arg.Segmentation,
+		arg.ProductCategoryID,
+		arg.UnitPriceWithoutVat,
+		arg.UnitPriceWithVat,
+		arg.UnitPriceWithoutVatCurrency,
+		arg.UnitPriceWithVatCurrency,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+		arg.DeletedAt,
+		arg.ID,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
 }

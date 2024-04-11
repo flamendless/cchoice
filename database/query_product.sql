@@ -25,6 +25,12 @@ FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.product_category_id = tbl_product_category.id
 ORDER BY created_at DESC;
 
+-- name: GetProductIDBySerial :one
+SELECT id
+FROM tbl_product
+WHERE tbl_product.serial = ?
+LIMIT 1;
+
 -- name: CreateProduct :one
 INSERT INTO tbl_product (
 	serial,
@@ -49,3 +55,23 @@ INSERT INTO tbl_product (
 	?, ?, ?, ?,
 	?, ?, ?, ?
 ) RETURNING *;
+
+-- name: UpdateProduct :execlastid
+UPDATE tbl_product
+SET
+	name = ?,
+	description = ?,
+	brand = ?,
+	status = ?,
+	colours = ?,
+	sizes = ?,
+	segmentation = ?,
+	product_category_id = ?,
+	unit_price_without_vat = ?,
+	unit_price_with_vat = ?,
+	unit_price_without_vat_currency = ?,
+	unit_price_with_vat_currency = ?,
+	created_at = ?,
+	updated_at = ?,
+	deleted_at = ?
+WHERE id = ?;
