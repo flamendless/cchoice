@@ -35,3 +35,14 @@ func ParseTemplateEnum(e string) TemplateKind {
 		panic(fmt.Sprintf("Can't convert '%s' to TemplateKind enum", e))
 	}
 }
+
+func TemplateToBrand(tpl string) string {
+	switch tpl {
+	case "sample":
+		return "sample"
+	case "delta_plus":
+		return "DeltaPlus"
+	default:
+		return ""
+	}
+}

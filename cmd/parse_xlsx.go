@@ -162,7 +162,7 @@ var parseXLSXCmd = &cobra.Command{
 		tpl.AppContext.DB = sqlDB
 		tpl.AppContext.Queries = cchoicedb.GetQueries(sqlDB)
 
-		logs.Log().Debug("Inserting products to DB")
+		logs.Log().Debug("Inserting products to DB...")
 
 		insertedIds := make([]int64, 0, len(products))
 		for _, product := range products {
@@ -177,6 +177,8 @@ var parseXLSXCmd = &cobra.Command{
 			insertedIds = append(insertedIds, productID)
 		}
 
+		logs.Log().Debug("Successfully inserted products to DB")
+
 		if tpl.AppFlags.PrintProcessedProducts {
 			logs.Log().Debug(
 				"Products inserted to DB",
@@ -185,14 +187,18 @@ var parseXLSXCmd = &cobra.Command{
 		}
 
 		if tpl.AppFlags.VerifyPrices {
+			logs.Log().Debug("Verifying prices...")
 			for i := 0; i < len(products); i++ {
 				product := products[i]
-				row, _ := tpl.AppContext.Queries.GetProduct(context.Background(), int64(i+1))
+				row, _ := tpl.AppContext.Queries.GetProductByID(
+					context.Background(),
+					int64(i+1),
+				)
 				dbp := models.DBRowToProduct(&row)
 
 				cmp, _ := product.UnitPriceWithoutVat.Compare(dbp.UnitPriceWithoutVat)
 				if cmp != 0 {
-					logs.Log().Debug(
+					logs.Log().Warn(
 						"checking prices",
 						zap.String("name", product.Name),
 						zap.Int64("product", product.UnitPriceWithoutVat.Amount()),
@@ -200,6 +206,7 @@ var parseXLSXCmd = &cobra.Command{
 					)
 				}
 			}
+			logs.Log().Debug("Successfully verified prices")
 		}
 	},
 }

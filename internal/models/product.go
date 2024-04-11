@@ -5,6 +5,7 @@ import (
 	"cchoice/internal"
 	"cchoice/internal/constants"
 	"cchoice/internal/logs"
+	"cchoice/internal/utils"
 	"context"
 	"database/sql"
 	"fmt"
@@ -22,6 +23,7 @@ type Product struct {
 	Serial              string
 	Name                string
 	Description         string
+	Brand               string
 	Status              ProductStatus
 	Category            string
 	Subcategory         string
@@ -32,7 +34,10 @@ type Product struct {
 	UnitPriceWithVat    *money.Money
 }
 
-func (product *Product) PostProcess() {
+func (product *Product) PostProcess(rowIdx int) {
+	brandInitials := utils.GetInitials(product.Brand)
+	nameInitials := utils.GetInitials(product.Name)
+	product.Serial = fmt.Sprintf("%s-%s-%d", brandInitials, nameInitials, rowIdx)
 	product.Category = slug.Make(product.Category)
 	product.Subcategory = slug.Make(product.Subcategory)
 }
@@ -44,6 +49,7 @@ func (product *Product) Print() {
 	builder.WriteString(fmt.Sprintf("Serial: %s\n", product.Serial))
 	builder.WriteString(fmt.Sprintf("Name: %s\n", product.Name))
 	builder.WriteString(fmt.Sprintf("Description: %s\n", product.Description))
+	builder.WriteString(fmt.Sprintf("Brand: %s\n", product.Brand))
 	builder.WriteString(fmt.Sprintf("Product Status: %s\n", &product.Status))
 
 	builder.WriteString(fmt.Sprintf("Category: %s\n", product.Category))
@@ -61,8 +67,12 @@ func (product *Product) Print() {
 
 func (product *Product) Duplicate() *Product {
 	newProduct := Product{
+		ID:                  product.ID,
+		Serial:              product.Serial,
 		Name:                product.Name,
 		Description:         product.Description,
+		Brand:               product.Brand,
+		Status:              product.Status,
 		Category:            product.Category,
 		Subcategory:         product.Subcategory,
 		Colours:             product.Colours,
@@ -123,15 +133,14 @@ func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
 	insertedProduct, err := queries.CreateProduct(
 		ctx,
 		cchoice_db.CreateProductParams{
-			Name: product.Name,
+			Serial: product.Serial,
+			Name:   product.Name,
 			Description: sql.NullString{
 				String: product.Description,
 				Valid:  true,
 			},
-			Status: sql.NullString{
-				String: product.Status.String(),
-				Valid:  true,
-			},
+			Brand:  product.Brand,
+			Status: product.Status.String(),
 			ProductCategoryID: sql.NullInt64{
 				Int64: categoryID,
 				Valid: categoryID != 0,
@@ -167,12 +176,14 @@ func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
 	return insertedProduct.ID, nil
 }
 
-func DBRowToProduct(row *cchoice_db.GetProductRow) *Product {
+func DBRowToProduct(row *cchoice_db.GetProductByIDRow) *Product {
 	dbp := &Product{
 		ID:           row.ID,
+		Serial:       row.Serial,
 		Name:         row.Name,
 		Description:  row.Description.String,
-		Status:       ParseProductStatusEnum(row.Status.String),
+		Brand:        row.Brand,
+		Status:       ParseProductStatusEnum(row.Status),
 		Category:     row.Category.String,
 		Subcategory:  row.Subcategory.String,
 		Colours:      row.Colours.String,

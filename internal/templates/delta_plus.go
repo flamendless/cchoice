@@ -4,6 +4,7 @@ import (
 	"cchoice/internal/logs"
 	"cchoice/internal/models"
 	"cchoice/internal/utils"
+	"strings"
 
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
@@ -78,15 +79,23 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 		return nil, errs
 	}
 
+	var status models.ProductStatus
+	if strings.Contains(strings.ToLower(name), "discontinued") {
+		status = models.Deleted
+	} else {
+		status = models.Active
+	}
+
 	return &models.Product{
 		Name:                name,
 		Description:         desc,
+		Brand:               TemplateToBrand(tpl.AppFlags.Template),
+		Status:              status,
 		Colours:             colours,
 		Sizes:               sizes,
 		Segmentation:        segmentation,
 		UnitPriceWithoutVat: unitPriceWithoutVat,
 		UnitPriceWithVat:    unitPriceWithVat,
-		Status:              models.Active,
 	}, nil
 }
 
@@ -136,16 +145,20 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 
 		row = tpl.AlignRow(row)
 		product, errs := tpl.RowToProduct(tpl, row)
+
 		if len(errs) > 0 {
 			proceedToError := true
 
-			sizes := row[tpl.Columns["SIZES"].Index]
-			if sizes != "" {
-				prevProduct := products[len(products) - 1]
-				product = prevProduct.Duplicate()
-				product.Sizes = sizes
-				proceedToError = false
-			}
+			// name := row[tpl.Columns["ARTICLE"].Index]
+			// if name == "" {
+			// 	sizes := row[tpl.Columns["SIZES"].Index]
+			// 	if sizes != "" {
+			// 		prevProduct := products[len(products)-1]
+			// 		product = prevProduct.Duplicate()
+			// 		product.Sizes = sizes
+			// 		proceedToError = false
+			// 	}
+			// }
 
 			if proceedToError {
 				if tpl.AppFlags.Strict {
@@ -165,7 +178,7 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 
 		product.Category = category
 		product.Subcategory = subcategory
-		product.PostProcess()
+		product.PostProcess(rowIdx)
 
 		if (tpl.AppFlags.Limit > 0) && (rowIdx > tpl.AppFlags.Limit) {
 			return products
@@ -179,7 +192,7 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 		"results",
 		zap.Int("processed", len(products)),
 		zap.Int("errors", totalErrors),
-		zap.Int("total", len(products) + totalErrors),
+		zap.Int("total", len(products)+totalErrors),
 	)
 
 	return products
