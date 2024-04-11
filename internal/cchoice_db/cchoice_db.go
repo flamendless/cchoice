@@ -2,7 +2,7 @@ package cchoicedb
 
 import (
 	"cchoice/database"
-	cchoice_db "cchoice/db"
+	cchoice_db "cchoice/cchoice_db"
 	"cchoice/internal/logs"
 	"context"
 	"database/sql"

@@ -1,14 +1,16 @@
-CREATE TABLE product_category (
+CREATE TABLE tbl_product_category (
 	id INTEGER PRIMARY KEY,
 	category TEXT,
 	subcategory TEXT
 );
 
-CREATE TABLE product (
+CREATE TABLE tbl_product (
 	id INTEGER PRIMARY KEY,
+	serial TEXT NOT NULL,
 	name TEXT NOT NULL,
 	description TEXT,
-	status TEXT,
+	brand TEXT NOT NULL,
+	status TEXT NOT NULL,
 
 	product_category_id INTEGER,
 
@@ -26,5 +28,6 @@ CREATE TABLE product (
 	updated_at TEXT NOT NULL,
 	deleted_at TEXT NOT NULL,
 
-	FOREIGN KEY (product_category_id) REFERENCES product_category(id)
+	FOREIGN KEY (product_category_id) REFERENCES tbl_product_category(id),
+	UNIQUE (serial)
 );

@@ -6,4 +6,4 @@ sql:
     gen:
       go:
         package: "cchoice_db"
-        out: "db"
+        out: "cchoice_db"

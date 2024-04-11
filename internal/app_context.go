@@ -1,7 +1,7 @@
 package internal
 
 import (
-	cchoice_db "cchoice/db"
+	cchoice_db "cchoice/cchoice_db"
 	"database/sql"
 )
 

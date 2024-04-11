@@ -1,7 +1,7 @@
 package models
 
 import (
-	cchoice_db "cchoice/db"
+	cchoice_db "cchoice/cchoice_db"
 	"cchoice/internal"
 	"cchoice/internal/constants"
 	"cchoice/internal/logs"

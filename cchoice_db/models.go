@@ -8,11 +8,13 @@ import (
 	"database/sql"
 )
 
-type Product struct {
+type TblProduct struct {
 	ID                          int64
+	Serial                      string
 	Name                        string
 	Description                 sql.NullString
-	Status                      sql.NullString
+	Brand                       string
+	Status                      string
 	ProductCategoryID           sql.NullInt64
 	Colours                     sql.NullString
 	Sizes                       sql.NullString
@@ -26,7 +28,7 @@ type Product struct {
 	DeletedAt                   string
 }
 
-type ProductCategory struct {
+type TblProductCategory struct {
 	ID          int64
 	Category    sql.NullString
 	Subcategory sql.NullString

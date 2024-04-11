@@ -11,7 +11,7 @@ import (
 )
 
 const createProductCategory = `-- name: CreateProductCategory :one
-INSERT INTO product_category (
+INSERT INTO tbl_product_category (
 	category,
 	subcategory
 ) VALUES (
@@ -24,28 +24,28 @@ type CreateProductCategoryParams struct {
 	Subcategory sql.NullString
 }
 
-func (q *Queries) CreateProductCategory(ctx context.Context, arg CreateProductCategoryParams) (ProductCategory, error) {
+func (q *Queries) CreateProductCategory(ctx context.Context, arg CreateProductCategoryParams) (TblProductCategory, error) {
 	row := q.db.QueryRowContext(ctx, createProductCategory, arg.Category, arg.Subcategory)
-	var i ProductCategory
+	var i TblProductCategory
 	err := row.Scan(&i.ID, &i.Category, &i.Subcategory)
 	return i, err
 }
 
 const getProductCategories = `-- name: GetProductCategories :many
 SELECT id, category, subcategory
-FROM product_category
+FROM tbl_product_category
 ORDER BY category DESC
 `
 
-func (q *Queries) GetProductCategories(ctx context.Context) ([]ProductCategory, error) {
+func (q *Queries) GetProductCategories(ctx context.Context) ([]TblProductCategory, error) {
 	rows, err := q.db.QueryContext(ctx, getProductCategories)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ProductCategory
+	var items []TblProductCategory
 	for rows.Next() {
-		var i ProductCategory
+		var i TblProductCategory
 		if err := rows.Scan(&i.ID, &i.Category, &i.Subcategory); err != nil {
 			return nil, err
 		}
@@ -62,21 +62,21 @@ func (q *Queries) GetProductCategories(ctx context.Context) ([]ProductCategory, 
 
 const getProductCategoryByCategory = `-- name: GetProductCategoryByCategory :one
 SELECT id, category, subcategory
-FROM product_category
+FROM tbl_product_category
 WHERE category = ?
 LIMIT 1
 `
 
-func (q *Queries) GetProductCategoryByCategory(ctx context.Context, category sql.NullString) (ProductCategory, error) {
+func (q *Queries) GetProductCategoryByCategory(ctx context.Context, category sql.NullString) (TblProductCategory, error) {
 	row := q.db.QueryRowContext(ctx, getProductCategoryByCategory, category)
-	var i ProductCategory
+	var i TblProductCategory
 	err := row.Scan(&i.ID, &i.Category, &i.Subcategory)
 	return i, err
 }
 
 const getProductCategoryByCategoryAndSubcategory = `-- name: GetProductCategoryByCategoryAndSubcategory :one
 SELECT id, category, subcategory
-FROM product_category
+FROM tbl_product_category
 WHERE category = ? AND subcategory = ?
 LIMIT 1
 `
@@ -86,37 +86,37 @@ type GetProductCategoryByCategoryAndSubcategoryParams struct {
 	Subcategory sql.NullString
 }
 
-func (q *Queries) GetProductCategoryByCategoryAndSubcategory(ctx context.Context, arg GetProductCategoryByCategoryAndSubcategoryParams) (ProductCategory, error) {
+func (q *Queries) GetProductCategoryByCategoryAndSubcategory(ctx context.Context, arg GetProductCategoryByCategoryAndSubcategoryParams) (TblProductCategory, error) {
 	row := q.db.QueryRowContext(ctx, getProductCategoryByCategoryAndSubcategory, arg.Category, arg.Subcategory)
-	var i ProductCategory
+	var i TblProductCategory
 	err := row.Scan(&i.ID, &i.Category, &i.Subcategory)
 	return i, err
 }
 
 const getProductCategoryByID = `-- name: GetProductCategoryByID :one
 SELECT id, category, subcategory
-FROM product_category
+FROM tbl_product_category
 WHERE id = ?
 LIMIT 1
 `
 
-func (q *Queries) GetProductCategoryByID(ctx context.Context, id int64) (ProductCategory, error) {
+func (q *Queries) GetProductCategoryByID(ctx context.Context, id int64) (TblProductCategory, error) {
 	row := q.db.QueryRowContext(ctx, getProductCategoryByID, id)
-	var i ProductCategory
+	var i TblProductCategory
 	err := row.Scan(&i.ID, &i.Category, &i.Subcategory)
 	return i, err
 }
 
 const getProductCategoryBySubcategory = `-- name: GetProductCategoryBySubcategory :one
 SELECT id, category, subcategory
-FROM product_category
+FROM tbl_product_category
 WHERE subcategory = ?
 LIMIT 1
 `
 
-func (q *Queries) GetProductCategoryBySubcategory(ctx context.Context, subcategory sql.NullString) (ProductCategory, error) {
+func (q *Queries) GetProductCategoryBySubcategory(ctx context.Context, subcategory sql.NullString) (TblProductCategory, error) {
 	row := q.db.QueryRowContext(ctx, getProductCategoryBySubcategory, subcategory)
-	var i ProductCategory
+	var i TblProductCategory
 	err := row.Scan(&i.ID, &i.Category, &i.Subcategory)
 	return i, err
 }
