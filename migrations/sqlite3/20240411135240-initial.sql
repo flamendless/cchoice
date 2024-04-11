@@ -35,3 +35,5 @@ CREATE TABLE tbl_product (
 );
 
 -- +migrate Down
+DROP TABLE tbl_product;
+DROP TABLE tbl_product_category;
