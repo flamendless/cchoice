@@ -6,6 +6,7 @@ package cchoice_db
 
 import (
 	"database/sql"
+	"time"
 )
 
 type TblProduct struct {
@@ -23,9 +24,9 @@ type TblProduct struct {
 	UnitPriceWithVat            int64
 	UnitPriceWithoutVatCurrency string
 	UnitPriceWithVatCurrency    string
-	CreatedAt                   string
-	UpdatedAt                   string
-	DeletedAt                   string
+	CreatedAt                   time.Time
+	UpdatedAt                   time.Time
+	DeletedAt                   time.Time
 }
 
 type TblProductCategory struct {

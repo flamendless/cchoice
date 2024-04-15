@@ -8,6 +8,7 @@ package cchoice_db
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const createProduct = `-- name: CreateProduct :one
@@ -50,9 +51,9 @@ type CreateProductParams struct {
 	UnitPriceWithVat            int64
 	UnitPriceWithoutVatCurrency string
 	UnitPriceWithVatCurrency    string
-	CreatedAt                   string
-	UpdatedAt                   string
-	DeletedAt                   string
+	CreatedAt                   time.Time
+	UpdatedAt                   time.Time
+	DeletedAt                   time.Time
 }
 
 func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (TblProduct, error) {
@@ -120,9 +121,9 @@ type GetProductByIDRow struct {
 	UnitPriceWithVat            int64
 	UnitPriceWithoutVatCurrency string
 	UnitPriceWithVatCurrency    string
-	CreatedAt                   string
-	UpdatedAt                   string
-	DeletedAt                   string
+	CreatedAt                   time.Time
+	UpdatedAt                   time.Time
+	DeletedAt                   time.Time
 	ID_2                        int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
@@ -179,9 +180,9 @@ type GetProductByNameRow struct {
 	UnitPriceWithVat            int64
 	UnitPriceWithoutVatCurrency string
 	UnitPriceWithVatCurrency    string
-	CreatedAt                   string
-	UpdatedAt                   string
-	DeletedAt                   string
+	CreatedAt                   time.Time
+	UpdatedAt                   time.Time
+	DeletedAt                   time.Time
 	ID_2                        int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
@@ -238,9 +239,9 @@ type GetProductBySerialRow struct {
 	UnitPriceWithVat            int64
 	UnitPriceWithoutVatCurrency string
 	UnitPriceWithVatCurrency    string
-	CreatedAt                   string
-	UpdatedAt                   string
-	DeletedAt                   string
+	CreatedAt                   time.Time
+	UpdatedAt                   time.Time
+	DeletedAt                   time.Time
 	ID_2                        int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
@@ -310,9 +311,9 @@ type GetProductsRow struct {
 	UnitPriceWithVat            int64
 	UnitPriceWithoutVatCurrency string
 	UnitPriceWithVatCurrency    string
-	CreatedAt                   string
-	UpdatedAt                   string
-	DeletedAt                   string
+	CreatedAt                   time.Time
+	UpdatedAt                   time.Time
+	DeletedAt                   time.Time
 	ID_2                        int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
@@ -396,9 +397,9 @@ type UpdateProductParams struct {
 	UnitPriceWithVat            int64
 	UnitPriceWithoutVatCurrency string
 	UnitPriceWithVatCurrency    string
-	CreatedAt                   string
-	UpdatedAt                   string
-	DeletedAt                   string
+	CreatedAt                   time.Time
+	UpdatedAt                   time.Time
+	DeletedAt                   time.Time
 	ID                          int64
 }
 

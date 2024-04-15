@@ -32,6 +32,9 @@ type Product struct {
 	Segmentation        string
 	UnitPriceWithoutVat *money.Money
 	UnitPriceWithVat    *money.Money
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	DeletedAt           time.Time
 }
 
 func (product *Product) PostProcess(rowIdx int) {
@@ -44,24 +47,22 @@ func (product *Product) PostProcess(rowIdx int) {
 
 func (product *Product) Print() {
 	builder := strings.Builder{}
-
 	builder.WriteString(fmt.Sprintf("ID: %d\n", product.ID))
 	builder.WriteString(fmt.Sprintf("Serial: %s\n", product.Serial))
 	builder.WriteString(fmt.Sprintf("Name: %s\n", product.Name))
 	builder.WriteString(fmt.Sprintf("Description: %s\n", product.Description))
 	builder.WriteString(fmt.Sprintf("Brand: %s\n", product.Brand))
 	builder.WriteString(fmt.Sprintf("Product Status: %s\n", &product.Status))
-
 	builder.WriteString(fmt.Sprintf("Category: %s\n", product.Category))
 	builder.WriteString(fmt.Sprintf("Subcategory: %s\n", product.Subcategory))
-
 	builder.WriteString(fmt.Sprintf("Colours: %s\n", product.Colours))
 	builder.WriteString(fmt.Sprintf("Sizes: %s\n", product.Sizes))
 	builder.WriteString(fmt.Sprintf("Segmentation: %s\n", product.Segmentation))
-
 	builder.WriteString(fmt.Sprintf("Unit Price w/o VAT: %s\n", product.UnitPriceWithoutVat.Display()))
 	builder.WriteString(fmt.Sprintf("Unit Price w VAT: %s\n", product.UnitPriceWithVat.Display()))
-
+	builder.WriteString(fmt.Sprintf("Created At %s\n", product.CreatedAt))
+	builder.WriteString(fmt.Sprintf("Updated At %s\n", product.UpdatedAt))
+	builder.WriteString(fmt.Sprintf("Deleted At %s\n", product.DeletedAt))
 	fmt.Println(builder.String())
 }
 
@@ -80,6 +81,9 @@ func (product *Product) Duplicate() *Product {
 		Segmentation:        product.Segmentation,
 		UnitPriceWithoutVat: product.UnitPriceWithoutVat,
 		UnitPriceWithVat:    product.UnitPriceWithVat,
+		CreatedAt:           product.CreatedAt,
+		UpdatedAt:           product.UpdatedAt,
+		DeletedAt:           product.DeletedAt,
 	}
 	return &newProduct
 }
@@ -139,7 +143,7 @@ func (product *Product) GetCategoryID(appCtx *internal.AppContext) (int64, error
 func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
 	ctx := context.Background()
 	categoryID, err := product.GetCategoryID(appCtx)
-	now := time.Now().UTC().String()
+	now := time.Now().UTC()
 	insertedProduct, err := appCtx.Queries.CreateProduct(
 		ctx,
 		cchoice_db.CreateProductParams{
@@ -176,7 +180,7 @@ func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
 
 			CreatedAt: now,
 			UpdatedAt: now,
-			DeletedAt: constants.DT_BEGINNING.String(),
+			DeletedAt: constants.DT_BEGINNING,
 		},
 	)
 	if err != nil {
@@ -189,12 +193,12 @@ func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
 func (product *Product) UpdateToDB(appCtx *internal.AppContext) (int64, error) {
 	ctx := context.Background()
 	categoryID, err := product.GetCategoryID(appCtx)
-	now := time.Now().UTC().String()
+	now := time.Now().UTC()
 
 	updatedID, err := appCtx.Queries.UpdateProduct(
 		ctx,
 		cchoice_db.UpdateProductParams{
-			Name:   product.Name,
+			Name: product.Name,
 			Description: sql.NullString{
 				String: product.Description,
 				Valid:  true,
@@ -223,7 +227,7 @@ func (product *Product) UpdateToDB(appCtx *internal.AppContext) (int64, error) {
 
 			UnitPriceWithoutVatCurrency: product.UnitPriceWithoutVat.Currency().Code,
 			UnitPriceWithVatCurrency:    product.UnitPriceWithVat.Currency().Code,
-			UpdatedAt: now,
+			UpdatedAt:                   now,
 		},
 	)
 	return updatedID, err
@@ -242,6 +246,9 @@ func DBRowToProduct(row *cchoice_db.GetProductByIDRow) *Product {
 		Colours:      row.Colours.String,
 		Sizes:        row.Sizes.String,
 		Segmentation: row.Segmentation.String,
+		CreatedAt:    row.CreatedAt,
+		UpdatedAt:    row.UpdatedAt,
+		DeletedAt:    row.DeletedAt,
 	}
 
 	unitPriceWithoutVat := decimal.NewFromInt(row.UnitPriceWithoutVat / 100)

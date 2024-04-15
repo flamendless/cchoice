@@ -220,7 +220,7 @@ var parseXLSXCmd = &cobra.Command{
 				if cmp != 0 {
 					logs.Log().Warn(
 						"checking prices",
-						zap.String("name", product.Name),
+						zap.Int64("id", product.ID),
 						zap.Int64("product", product.UnitPriceWithoutVat.Amount()),
 						zap.Int64("db", dbp.UnitPriceWithoutVat.Amount()),
 					)

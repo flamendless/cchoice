@@ -1,3 +1,8 @@
+# Setup
+
+- `sqlc generate`
+- `sql-migrate up`
+
 # Usage
 
 - Sample `go run ./main.go parse_xlsx -p "xlsx/sample.xlsx" -s "Sheet" -t "sample" --use_db --db_path "test.db"`

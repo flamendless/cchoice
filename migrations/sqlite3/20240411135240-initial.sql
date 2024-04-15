@@ -26,9 +26,9 @@ CREATE TABLE tbl_product (
 	unit_price_without_vat_currency TEXT NOT NULL,
 	unit_price_with_vat_currency TEXT NOT NULL,
 
-	created_at TEXT NOT NULL,
-	updated_at TEXT NOT NULL,
-	deleted_at TEXT NOT NULL,
+	created_at TIMESTAMP NOT NULL,
+	updated_at TIMESTAMP NOT NULL,
+	deleted_at TIMESTAMP NOT NULL,
 
 	FOREIGN KEY (product_category_id) REFERENCES tbl_product_category(id),
 	UNIQUE (serial)
