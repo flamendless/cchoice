@@ -7,6 +7,7 @@ import (
 	"cchoice/internal/utils"
 	"strings"
 
+	"github.com/Rhymond/go-money"
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 )
@@ -42,30 +43,14 @@ var DeltaPlusColumns map[string]*Column = map[string]*Column{
 	},
 }
 
-func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
-	idxArticle := tpl.Columns["ARTICLE"].Index
-	idxColours := tpl.Columns["COLOURS"].Index
-	idxSizes := tpl.Columns["SIZES"].Index
-	idxSegmentation := tpl.Columns["SEGMENTATION"].Index
-	idxDesc := tpl.Columns["DESCRIPTION"].Index
+func DeltaPlusProcessPrices(tpl *Template, row []string) ([]*money.Money, []error) {
 	idxPriceWithoutVat := tpl.Columns["END USER UNIT PRICE PHP WITHOUT VAT*"].Index
 	idxPriceWithVat := tpl.Columns["END USER UNIT PRICE PHP WITH VAT* (SRP)"].Index
-
-	name := row[idxArticle]
-	colours := utils.SanitizeColours(row[idxColours])
-	sizes := utils.SanitizeSize(row[idxSizes])
-	segmentation := row[idxSegmentation]
-	desc := row[idxDesc]
 	priceWithoutVat := row[idxPriceWithoutVat]
 	priceWithVat := row[idxPriceWithVat]
 
+	prices := make([]*money.Money, 0, 8)
 	errs := make([]error, 0, 8)
-
-	errProductName := utils.ValidateNotBlank(name, "article")
-	if errProductName != nil {
-		parserErr := parser.NewParserError(parser.BlankProductName, errProductName.Error())
-		errs = append(errs, parserErr)
-	}
 
 	unitPriceWithoutVat, err := utils.SanitizePrice(priceWithoutVat)
 	if err != nil {
@@ -77,15 +62,53 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 		errs = append(errs, err...)
 	}
 
-	if len(errs) > 0 {
-		return nil, errs
+	if len(errs) == 0 {
+		prices = append(prices, unitPriceWithoutVat)
+		prices = append(prices, unitPriceWithVat)
 	}
+
+	return prices, errs
+}
+
+func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
+	errs := make([]error, 0, 8)
+
+	idxArticle := tpl.Columns["ARTICLE"].Index
+	idxColours := tpl.Columns["COLOURS"].Index
+	idxSizes := tpl.Columns["SIZES"].Index
+	idxSegmentation := tpl.Columns["SEGMENTATION"].Index
+	idxDesc := tpl.Columns["DESCRIPTION"].Index
+
+	name := row[idxArticle]
 
 	var status models.ProductStatus
 	if strings.Contains(strings.ToLower(name), "discontinued") {
 		status = models.Deleted
+		parserErr := parser.NewParserError(parser.ProductDiscontinued, "product is discontinued")
+		errs = append(errs, parserErr)
+		return nil, errs
 	} else {
 		status = models.Active
+	}
+
+	colours := utils.SanitizeColours(row[idxColours])
+	sizes := utils.SanitizeSize(row[idxSizes])
+	segmentation := row[idxSegmentation]
+	desc := row[idxDesc]
+
+	errProductName := utils.ValidateNotBlank(name, "article")
+	if errProductName != nil {
+		parserErr := parser.NewParserError(parser.BlankProductName, errProductName.Error())
+		errs = append(errs, parserErr)
+	}
+
+	prices, errMonies := DeltaPlusProcessPrices(tpl, row)
+	if len(errMonies) > 0 {
+		errs = append(errs, errMonies...)
+	}
+
+	if len(errs) > 0 {
+		return nil, errs
 	}
 
 	return &models.Product{
@@ -96,8 +119,8 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 		Colours:             colours,
 		Sizes:               sizes,
 		Segmentation:        segmentation,
-		UnitPriceWithoutVat: unitPriceWithoutVat,
-		UnitPriceWithVat:    unitPriceWithVat,
+		UnitPriceWithoutVat: prices[0],
+		UnitPriceWithVat:    prices[1],
 	}, nil
 }
 
@@ -116,6 +139,7 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 	category := ""
 	subcategory := ""
 
+	LoopProductProces:
 	for rows.Next() {
 		rowIdx++
 		row, err := rows.Columns()
@@ -150,25 +174,38 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 
 		if len(errs) > 0 {
 			proceedToError := true
+			duplicate := false
 
-			for _, err := range errs {
+			for i, err := range errs {
 				pc := parser.Code(err)
+				if pc == parser.ProductDiscontinued {
+					continue LoopProductProces
+				}
 				if pc == parser.BlankProductName {
-					//TODO: (Brandon) - process variant/duplicate
-					panic(err)
+					duplicate = true
+					errs[i] = nil
+					break
 				}
 			}
 
-			// name := row[tpl.Columns["ARTICLE"].Index]
-			// if name == "" {
-			// 	sizes := row[tpl.Columns["SIZES"].Index]
-			// 	if sizes != "" {
-			// 		prevProduct := products[len(products)-1]
-			// 		product = prevProduct.Duplicate()
-			// 		product.Sizes = sizes
-			// 		proceedToError = false
-			// 	}
-			// }
+			if duplicate {
+				name := row[tpl.Columns["ARTICLE"].Index]
+				if name == "" {
+					sizes := row[tpl.Columns["SIZES"].Index]
+					if sizes != "" {
+						prevProduct := products[len(products)-1]
+						product = prevProduct.Duplicate()
+						product.Sizes = sizes
+
+						prices, _ := DeltaPlusProcessPrices(tpl, row)
+						if len(prices) > 0 {
+							product.UnitPriceWithoutVat = prices[0]
+							product.UnitPriceWithVat = prices[1]
+						}
+						proceedToError = false
+					}
+				}
+			}
 
 			if proceedToError {
 				if tpl.AppFlags.Strict {
@@ -182,7 +219,7 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 				)
 				totalErrors += 1
 				previousRow = row
-				continue
+				continue LoopProductProces
 			}
 		}
 
