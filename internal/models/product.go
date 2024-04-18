@@ -198,6 +198,7 @@ func (product *Product) UpdateToDB(appCtx *internal.AppContext) (int64, error) {
 	updatedID, err := appCtx.Queries.UpdateProduct(
 		ctx,
 		cchoice_db.UpdateProductParams{
+			ID:   product.ID,
 			Name: product.Name,
 			Description: sql.NullString{
 				String: product.Description,

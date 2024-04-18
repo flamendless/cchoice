@@ -170,7 +170,8 @@ var parseXLSXCmd = &cobra.Command{
 		for _, product := range products {
 			existingProductId := product.GetDBID(tpl.AppContext)
 			if existingProductId != 0 {
-				productID, err := product.UpdateToDB(tpl.AppContext)
+				product.ID = existingProductId
+				_, err := product.UpdateToDB(tpl.AppContext)
 				if err != nil {
 					logs.Log().Info(
 						"product update to DB",
@@ -178,7 +179,7 @@ var parseXLSXCmd = &cobra.Command{
 					)
 					continue
 				}
-				updatedIds = append(updatedIds, productID)
+				updatedIds = append(updatedIds, existingProductId)
 
 			} else {
 				productID, err := product.InsertToDB(tpl.AppContext)
@@ -192,19 +193,6 @@ var parseXLSXCmd = &cobra.Command{
 				insertedIds = append(insertedIds, productID)
 			}
 		}
-
-		if tpl.AppFlags.PrintProcessedProducts {
-			logs.Log().Debug(
-				"Products inserted/updated to DB",
-				zap.Int64s("inserted ids", insertedIds),
-				zap.Int64s("updated ids", updatedIds),
-			)
-		}
-		logs.Log().Debug(
-			"Successfully inserted/updated products to DB",
-			zap.Int("inserted ids count", len(insertedIds)),
-			zap.Int("updated ids count", len(updatedIds)),
-		)
 
 		if tpl.AppFlags.VerifyPrices {
 			logs.Log().Debug("Verifying prices...")
@@ -228,5 +216,11 @@ var parseXLSXCmd = &cobra.Command{
 			}
 			logs.Log().Debug("Successfully verified prices")
 		}
+
+		logs.Log().Debug(
+			"Successfully inserted/updated products to DB",
+			zap.Int("inserted ids count", len(insertedIds)),
+			zap.Int("updated ids count", len(updatedIds)),
+		)
 	},
 }
