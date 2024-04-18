@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"errors"
+	"cchoice/internal/domains/parser"
 	"fmt"
 
 	v "github.com/cohesivestack/valgo"
@@ -19,7 +19,7 @@ func ValidateNotBlank(field string, key string) error {
 			errs.Name(),
 			errs.Messages(),
 		)
-		return errors.New(errMsg)
+		return parser.NewParserError(parser.BlankField, errMsg)
 	}
 
 	return nil
