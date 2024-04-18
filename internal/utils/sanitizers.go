@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"cchoice/internal/domains/parser"
 	"strings"
 
 	"github.com/Rhymond/go-money"
@@ -31,7 +32,8 @@ func SanitizePrice(price string) (*money.Money, []error) {
 
 	unitPrice, err := decimal.NewFromString(price)
 	if err != nil {
-		errs = append(errs, err)
+		parserErr := parser.NewParserError(parser.CantCovert, err.Error())
+		errs = append(errs, parserErr)
 	}
 
 	if len(errs) > 0 {

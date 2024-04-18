@@ -8,7 +8,8 @@ import (
 type ErrorCode string
 
 const (
-	BlankField ErrorCode = "BLANK_FIELD"
+	BlankProductName ErrorCode = "BLANK_PRODUCT_NAME"
+	CantCovert       ErrorCode = "CANT_CONVERT"
 )
 
 type parserError struct {

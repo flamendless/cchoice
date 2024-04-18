@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"cchoice/internal/domains/parser"
 	"cchoice/internal/logs"
 	"cchoice/internal/models"
 	"cchoice/internal/utils"
@@ -62,7 +63,8 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 
 	errProductName := utils.ValidateNotBlank(name, "article")
 	if errProductName != nil {
-		errs = append(errs, errProductName)
+		parserErr := parser.NewParserError(parser.BlankProductName, errProductName.Error())
+		errs = append(errs, parserErr)
 	}
 
 	unitPriceWithoutVat, err := utils.SanitizePrice(priceWithoutVat)
@@ -148,6 +150,14 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 
 		if len(errs) > 0 {
 			proceedToError := true
+
+			for _, err := range errs {
+				pc := parser.Code(err)
+				if pc == parser.BlankProductName {
+					//TODO: (Brandon) - process variant/duplicate
+					panic(err)
+				}
+			}
 
 			// name := row[tpl.Columns["ARTICLE"].Index]
 			// if name == "" {
