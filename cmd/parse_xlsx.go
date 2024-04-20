@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/xuri/excelize/v2"
@@ -29,8 +30,6 @@ func init() {
 	f().BoolVarP(&ctx.UseDB, "use_db", "", false, "Use DB to save processed data")
 	f().BoolVarP(&ctx.VerifyPrices, "verify_prices", "", true, "Verify prices processed and saved to DB")
 	f().IntVarP(&ctx.Limit, "limit", "l", 0, "Limit number of rows to process")
-
-	logs.InitLog()
 
 	parseXLSXCmd.MarkFlagRequired("template")
 	parseXLSXCmd.MarkFlagRequired("filepath")
@@ -113,11 +112,14 @@ var parseXLSXCmd = &cobra.Command{
 
 		tpl.AppFlags = &ctx
 		tpl.AppContext = &internal.AppContext{}
+		tpl.AppContext.Metrics = &internal.Metrics{}
 
+		startProcessColumns := time.Now()
 		success := ProcessColumns(tpl, file)
 		if !success {
 			return
 		}
+		tpl.AppContext.Metrics.Add("process column time", time.Since(startProcessColumns))
 
 		rows, err := file.Rows(ctx.Sheet)
 		if err != nil {
@@ -139,7 +141,9 @@ var parseXLSXCmd = &cobra.Command{
 			return
 		}
 
+		startProcessRows := time.Now()
 		products := tpl.ProcessRows(tpl, rows)
+		tpl.AppContext.Metrics.Add("process rows time", time.Since(startProcessRows))
 
 		if tpl.AppFlags.PrintProcessedProducts {
 			for _, product := range products {
@@ -167,6 +171,7 @@ var parseXLSXCmd = &cobra.Command{
 		insertedIds := make([]int64, 0, len(products))
 		updatedIds := make([]int64, 0, len(products))
 
+		startInsertUpdateDB := time.Now()
 		for _, product := range products {
 			existingProductId := product.GetDBID(tpl.AppContext)
 			if existingProductId != 0 {
@@ -193,6 +198,10 @@ var parseXLSXCmd = &cobra.Command{
 				insertedIds = append(insertedIds, productID)
 			}
 		}
+		tpl.AppContext.Metrics.Add(
+			"insert/update products to DB time",
+			time.Since(startInsertUpdateDB),
+		)
 
 		if tpl.AppFlags.VerifyPrices {
 			logs.Log().Debug("Verifying prices...")
@@ -222,5 +231,7 @@ var parseXLSXCmd = &cobra.Command{
 			zap.Int("inserted ids count", len(insertedIds)),
 			zap.Int("updated ids count", len(updatedIds)),
 		)
+
+		tpl.AppContext.Metrics.LogTime(logs.Log())
 	},
 }
