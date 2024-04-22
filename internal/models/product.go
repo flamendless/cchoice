@@ -90,7 +90,7 @@ func (product *Product) Duplicate() *Product {
 
 func (product *Product) GetDBID(appCtx *internal.AppContext) int64 {
 	ctx := context.Background()
-	existingProductID, err := appCtx.Queries.GetProductIDBySerial(ctx, product.Serial)
+	existingProductID, err := appCtx.QueriesRead.GetProductIDBySerial(ctx, product.Serial)
 	if err != nil {
 		return 0
 	}
@@ -101,7 +101,7 @@ func (product *Product) GetCategoryID(appCtx *internal.AppContext) (int64, error
 	ctx := context.Background()
 	var categoryID int64
 	if product.Category != "" {
-		existingProductCategory, err := appCtx.Queries.GetProductCategoryByCategoryAndSubcategory(
+		existingProductCategory, err := appCtx.QueriesRead.GetProductCategoryByCategoryAndSubcategory(
 			ctx,
 			cchoice_db.GetProductCategoryByCategoryAndSubcategoryParams{
 				Category: sql.NullString{
@@ -143,6 +143,10 @@ func (product *Product) GetCategoryID(appCtx *internal.AppContext) (int64, error
 func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
 	ctx := context.Background()
 	categoryID, err := product.GetCategoryID(appCtx)
+	if err != nil {
+		return 0, err
+	}
+
 	now := time.Now().UTC()
 	insertedProduct, err := appCtx.Queries.CreateProduct(
 		ctx,

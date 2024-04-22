@@ -9,7 +9,12 @@ import (
 	"go.uber.org/zap"
 )
 
-func InitDB(dataSourceName string) (*sql.DB, error) {
+func InitDB(dataSourceName string, mode string) (*sql.DB, error) {
+	if mode != "" {
+		dbFlags := "?_journal_mode=wal"
+		dataSourceName = dataSourceName + dbFlags + "&mode=" + mode
+	}
+
 	logs.Log().Info("Initializing DB...")
 	logs.Log().Debug(
 		"opening database...",
@@ -20,9 +25,7 @@ func InitDB(dataSourceName string) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	logs.Log().Info("Successfully initialized DB")
-
 	return sqlDB, nil
 }
 

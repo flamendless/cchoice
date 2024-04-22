@@ -25,9 +25,11 @@ type Metrics struct {
 }
 
 type AppContext struct {
-	DB      *sql.DB
-	Queries *cchoice_db.Queries
-	Metrics *Metrics
+	DB          *sql.DB
+	DBRead      *sql.DB
+	Queries     *cchoice_db.Queries
+	QueriesRead *cchoice_db.Queries
+	Metrics     *Metrics
 }
 
 func (metrics *Metrics) Add(key string, dur time.Duration) {

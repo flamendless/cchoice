@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -155,14 +156,26 @@ var parseXLSXCmd = &cobra.Command{
 			return
 		}
 
-		sqlDB, err := cchoicedb.InitDB(tpl.AppFlags.DBPath)
+		sqlDBRead, err := cchoicedb.InitDB(tpl.AppFlags.DBPath, "ro")
 		if err != nil {
 			logs.Log().Error(
-				"DB initialization",
+				"DB (read-only) initialization",
 				zap.Error(err),
 			)
 			return
 		}
+		tpl.AppContext.DBRead = sqlDBRead
+		tpl.AppContext.QueriesRead = cchoicedb.GetQueries(sqlDBRead)
+
+		sqlDB, err := cchoicedb.InitDB(tpl.AppFlags.DBPath, "rw")
+		if err != nil {
+			logs.Log().Error(
+				"DB (read-write) initialization",
+				zap.Error(err),
+			)
+			return
+		}
+		sqlDB.SetMaxOpenConns(1)
 		tpl.AppContext.DB = sqlDB
 		tpl.AppContext.Queries = cchoicedb.GetQueries(sqlDB)
 
@@ -171,37 +184,62 @@ var parseXLSXCmd = &cobra.Command{
 		insertedIds := make([]int64, 0, len(products))
 		updatedIds := make([]int64, 0, len(products))
 
-		startInsertUpdateDB := time.Now()
-		for _, product := range products {
-			existingProductId := product.GetDBID(tpl.AppContext)
-			if existingProductId != 0 {
-				product.ID = existingProductId
-				_, err := product.UpdateToDB(tpl.AppContext)
-				if err != nil {
-					logs.Log().Info(
-						"product update to DB",
-						zap.Error(err),
-					)
-					continue
-				}
-				updatedIds = append(updatedIds, existingProductId)
+		var insertMetrics int64
+		var updateMetrics int64
+		var wg sync.WaitGroup
+		wg.Add(len(products))
 
-			} else {
-				productID, err := product.InsertToDB(tpl.AppContext)
-				if err != nil {
-					logs.Log().Info(
-						"product insert to DB",
-						zap.Error(err),
-					)
-					continue
+		startWG := time.Now()
+		for _, product := range products {
+			go func() {
+				defer wg.Done()
+				existingProductId := product.GetDBID(tpl.AppContext)
+				if existingProductId != 0 {
+					now := time.Now()
+					product.ID = existingProductId
+					_, err := product.UpdateToDB(tpl.AppContext)
+					if err != nil {
+						logs.Log().Info(
+							"product update to DB",
+							zap.Int64("id", product.ID),
+							zap.Error(err),
+						)
+					} else {
+						updatedIds = append(updatedIds, existingProductId)
+						updateMetrics += int64(time.Since(now))
+					}
+
+				} else {
+					now := time.Now()
+					productID, err := product.InsertToDB(tpl.AppContext)
+					if err != nil {
+						logs.Log().Info(
+							"product insert to DB",
+							zap.Int64("id", product.ID),
+							zap.Error(err),
+						)
+					} else {
+						insertedIds = append(insertedIds, productID)
+						insertMetrics += int64(time.Since(now))
+					}
 				}
-				insertedIds = append(insertedIds, productID)
-			}
+			}()
 		}
-		tpl.AppContext.Metrics.Add(
-			"insert/update products to DB time",
-			time.Since(startInsertUpdateDB),
-		)
+		wg.Wait()
+		tpl.AppContext.Metrics.Add("Get product IDS (async)", time.Since(startWG))
+
+		if len(insertedIds) > 0 {
+			tpl.AppContext.Metrics.Add(
+				"insert products to DB time",
+				time.Duration(insertMetrics/int64(len(insertedIds))),
+			)
+		}
+		if len(updatedIds) > 0 {
+			tpl.AppContext.Metrics.Add(
+				"update products to DB time",
+				time.Duration(updateMetrics/int64(len(updatedIds))),
+			)
+		}
 
 		if tpl.AppFlags.VerifyPrices {
 			logs.Log().Debug("Verifying prices...")
