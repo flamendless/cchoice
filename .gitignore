@@ -1,4 +1,5 @@
 xlsx/*.xlsx
+!xlsx/sample.xlsx
 test.db
 test.db-shm
 test.db-wal

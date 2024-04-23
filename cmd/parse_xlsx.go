@@ -154,6 +154,7 @@ var parseXLSXCmd = &cobra.Command{
 		}
 
 		if !tpl.AppFlags.UseDB {
+			tpl.AppContext.Metrics.LogTime(logs.Log())
 			return
 		}
 
