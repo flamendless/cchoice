@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -186,47 +187,70 @@ var parseXLSXCmd = &cobra.Command{
 
 		var insertMetrics int64
 		var updateMetrics int64
+
+		nProcessors := runtime.NumCPU()
+		batchsize := nProcessors*2 - 1
+		processed := 0
 		var wg sync.WaitGroup
-		wg.Add(len(products))
 
 		startWG := time.Now()
-		for _, product := range products {
+		for start, end := 0, 0; start <= len(products)-1; start = end {
+			end = start + batchsize
+			if end > len(products) {
+				end = len(products)
+			}
+
+			batch := products[start:end]
+			wg.Add(1)
+
 			go func() {
 				defer wg.Done()
-				existingProductId := product.GetDBID(tpl.AppContext)
-				if existingProductId != 0 {
-					now := time.Now()
-					product.ID = existingProductId
-					_, err := product.UpdateToDB(tpl.AppContext)
-					if err != nil {
-						logs.Log().Info(
-							"product update to DB",
-							zap.Int64("id", product.ID),
-							zap.Error(err),
-						)
-					} else {
-						updatedIds = append(updatedIds, existingProductId)
-						updateMetrics += int64(time.Since(now))
-					}
+				for _, product := range batch {
+					processed++
+					existingProductId := product.GetDBID(tpl.AppContext)
+					if existingProductId != 0 {
+						now := time.Now()
+						product.ID = existingProductId
+						_, err := product.UpdateToDB(tpl.AppContext)
+						if err != nil {
+							logs.Log().Info(
+								"product update to DB",
+								zap.Int64("id", product.ID),
+								zap.Error(err),
+							)
+						} else {
+							updatedIds = append(updatedIds, existingProductId)
+							updateMetrics += int64(time.Since(now))
+						}
 
-				} else {
-					now := time.Now()
-					productID, err := product.InsertToDB(tpl.AppContext)
-					if err != nil {
-						logs.Log().Info(
-							"product insert to DB",
-							zap.Int64("id", product.ID),
-							zap.Error(err),
-						)
 					} else {
-						insertedIds = append(insertedIds, productID)
-						insertMetrics += int64(time.Since(now))
+						now := time.Now()
+						productID, err := product.InsertToDB(tpl.AppContext)
+						if err != nil {
+							logs.Log().Info(
+								"product insert to DB",
+								zap.Int64("id", product.ID),
+								zap.Error(err),
+							)
+						} else {
+							insertedIds = append(insertedIds, productID)
+							insertMetrics += int64(time.Since(now))
+						}
 					}
 				}
 			}()
 		}
 		wg.Wait()
-		tpl.AppContext.Metrics.Add("Get product IDS (async)", time.Since(startWG))
+		tpl.AppContext.Metrics.Add("Get product IDS (parallel)", time.Since(startWG))
+
+		if processed != len(products) {
+			logs.Log().Error(
+				"parallel processing",
+				zap.Int("processed", processed),
+				zap.Int("expected", len(products)),
+			)
+			panic(1)
+		}
 
 		if len(insertedIds) > 0 {
 			tpl.AppContext.Metrics.Add(
