@@ -74,11 +74,7 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 	errs := make([]error, 0, 8)
 
 	idxArticle := tpl.Columns["ARTICLE"].Index
-	idxColours := tpl.Columns["COLOURS"].Index
-	idxSizes := tpl.Columns["SIZES"].Index
-	idxSegmentation := tpl.Columns["SEGMENTATION"].Index
 	idxDesc := tpl.Columns["DESCRIPTION"].Index
-
 	name := row[idxArticle]
 
 	var status models.ProductStatus
@@ -91,9 +87,6 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 		status = models.Active
 	}
 
-	colours := utils.SanitizeColours(row[idxColours])
-	sizes := utils.SanitizeSize(row[idxSizes])
-	segmentation := row[idxSegmentation]
 	desc := row[idxDesc]
 
 	errProductName := utils.ValidateNotBlank(name, "article")
@@ -116,11 +109,29 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 		Description:         desc,
 		Brand:               TemplateToBrand(tpl.AppFlags.Template),
 		Status:              status,
-		Colours:             colours,
-		Sizes:               sizes,
-		Segmentation:        segmentation,
 		UnitPriceWithoutVat: prices[0],
 		UnitPriceWithVat:    prices[1],
+	}, nil
+}
+
+func DeltaPlusRowToSpecs(tpl *Template, row []string) (*models.ProductSpecs, []error) {
+	errs := make([]error, 0, 8)
+
+	idxColours := tpl.Columns["COLOURS"].Index
+	idxSizes := tpl.Columns["SIZES"].Index
+	idxSegmentation := tpl.Columns["SEGMENTATION"].Index
+	colours := utils.SanitizeColours(row[idxColours])
+	sizes := utils.SanitizeSize(row[idxSizes])
+	segmentation := row[idxSegmentation]
+
+	if len(errs) > 0 {
+		return nil, errs
+	}
+
+	return &models.ProductSpecs{
+		Colours:      colours,
+		Sizes:        sizes,
+		Segmentation: segmentation,
 	}, nil
 }
 
@@ -139,7 +150,7 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 	category := ""
 	subcategory := ""
 
-	LoopProductProces:
+LoopProductProces:
 	for rows.Next() {
 		rowIdx++
 		row, err := rows.Columns()
@@ -195,7 +206,7 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 					if sizes != "" {
 						prevProduct := products[len(products)-1]
 						product = prevProduct.Duplicate()
-						product.Sizes = sizes
+						product.ProductSpecs.Sizes = sizes
 
 						prices, _ := DeltaPlusProcessPrices(tpl, row)
 						if len(prices) > 0 {
@@ -223,8 +234,10 @@ func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product 
 			}
 		}
 
-		product.Category = category
-		product.Subcategory = subcategory
+		product.ProductCategory = &models.ProductCategory{
+			Category:    category,
+			Subcategory: subcategory,
+		}
 		product.PostProcess(rowIdx)
 
 		if (tpl.AppFlags.Limit > 0) && (rowIdx > tpl.AppFlags.Limit) {

@@ -18,6 +18,23 @@ import (
 	"go.uber.org/zap"
 )
 
+type ProductCategory struct {
+	ID          int64
+	Category    string
+	Subcategory string
+}
+
+type ProductSpecs struct {
+	ID            int64
+	Colours       string
+	Sizes         string
+	Segmentation  string
+	PartNumber    string
+	Power         string
+	Capacity      string
+	ScopeOfSupply string
+}
+
 type Product struct {
 	ID                  int64
 	Serial              string
@@ -25,11 +42,8 @@ type Product struct {
 	Description         string
 	Brand               string
 	Status              ProductStatus
-	Category            string
-	Subcategory         string
-	Colours             string
-	Sizes               string
-	Segmentation        string
+	ProductCategory     *ProductCategory
+	ProductSpecs        *ProductSpecs
 	UnitPriceWithoutVat *money.Money
 	UnitPriceWithVat    *money.Money
 	CreatedAt           time.Time
@@ -41,8 +55,8 @@ func (product *Product) PostProcess(rowIdx int) {
 	brandInitials := utils.GetInitials(product.Brand)
 	nameInitials := utils.GetInitials(product.Name)
 	product.Serial = fmt.Sprintf("%s-%s-%d", brandInitials, nameInitials, rowIdx)
-	product.Category = slug.Make(product.Category)
-	product.Subcategory = slug.Make(product.Subcategory)
+	product.ProductCategory.Category = slug.Make(product.ProductCategory.Category)
+	product.ProductCategory.Subcategory = slug.Make(product.ProductCategory.Subcategory)
 }
 
 func (product *Product) Print() {
@@ -53,17 +67,29 @@ func (product *Product) Print() {
 	builder.WriteString(fmt.Sprintf("Description: %s\n", product.Description))
 	builder.WriteString(fmt.Sprintf("Brand: %s\n", product.Brand))
 	builder.WriteString(fmt.Sprintf("Product Status: %s\n", &product.Status))
-	builder.WriteString(fmt.Sprintf("Category: %s\n", product.Category))
-	builder.WriteString(fmt.Sprintf("Subcategory: %s\n", product.Subcategory))
-	builder.WriteString(fmt.Sprintf("Colours: %s\n", product.Colours))
-	builder.WriteString(fmt.Sprintf("Sizes: %s\n", product.Sizes))
-	builder.WriteString(fmt.Sprintf("Segmentation: %s\n", product.Segmentation))
+	product.ProductCategory.Print(&builder)
+	product.ProductSpecs.Print(&builder)
 	builder.WriteString(fmt.Sprintf("Unit Price w/o VAT: %s\n", product.UnitPriceWithoutVat.Display()))
 	builder.WriteString(fmt.Sprintf("Unit Price w VAT: %s\n", product.UnitPriceWithVat.Display()))
 	builder.WriteString(fmt.Sprintf("Created At %s\n", product.CreatedAt))
 	builder.WriteString(fmt.Sprintf("Updated At %s\n", product.UpdatedAt))
 	builder.WriteString(fmt.Sprintf("Deleted At %s\n", product.DeletedAt))
 	fmt.Println(builder.String())
+}
+
+func (productSpecs *ProductSpecs) Print(builder *strings.Builder) {
+	builder.WriteString(fmt.Sprintf("Colours: %s\n", productSpecs.Colours))
+	builder.WriteString(fmt.Sprintf("Sizes: %s\n", productSpecs.Sizes))
+	builder.WriteString(fmt.Sprintf("Segmentation: %s\n", productSpecs.Segmentation))
+	builder.WriteString(fmt.Sprintf("Part Number: %s\n", productSpecs.PartNumber))
+	builder.WriteString(fmt.Sprintf("Power: %s\n", productSpecs.Power))
+	builder.WriteString(fmt.Sprintf("Capacity: %s\n", productSpecs.Capacity))
+	builder.WriteString(fmt.Sprintf("Scope of Supply: %s\n", productSpecs.ScopeOfSupply))
+}
+
+func (productCategory *ProductCategory) Print(builder *strings.Builder) {
+	builder.WriteString(fmt.Sprintf("Category: %s\n", productCategory.Category))
+	builder.WriteString(fmt.Sprintf("Subcategory: %s\n", productCategory.Subcategory))
 }
 
 func (product *Product) Duplicate() *Product {
@@ -74,11 +100,8 @@ func (product *Product) Duplicate() *Product {
 		Description:         product.Description,
 		Brand:               product.Brand,
 		Status:              product.Status,
-		Category:            product.Category,
-		Subcategory:         product.Subcategory,
-		Colours:             product.Colours,
-		Sizes:               product.Sizes,
-		Segmentation:        product.Segmentation,
+		ProductCategory:     product.ProductCategory,
+		ProductSpecs:        product.ProductSpecs,
 		UnitPriceWithoutVat: product.UnitPriceWithoutVat,
 		UnitPriceWithVat:    product.UnitPriceWithVat,
 		CreatedAt:           product.CreatedAt,
@@ -97,19 +120,19 @@ func (product *Product) GetDBID(appCtx *internal.AppContext) int64 {
 	return existingProductID
 }
 
-func (product *Product) GetCategoryID(appCtx *internal.AppContext) (int64, error) {
+func (product *Product) GetOrInsertCategoryID(appCtx *internal.AppContext) (int64, error) {
 	ctx := context.Background()
 	var categoryID int64
-	if product.Category != "" {
+	if product.ProductCategory.ID != 0 {
 		existingProductCategory, err := appCtx.QueriesRead.GetProductCategoryByCategoryAndSubcategory(
 			ctx,
 			cchoice_db.GetProductCategoryByCategoryAndSubcategoryParams{
 				Category: sql.NullString{
-					String: product.Category,
+					String: product.ProductCategory.Category,
 					Valid:  true,
 				},
 				Subcategory: sql.NullString{
-					String: product.Subcategory,
+					String: product.ProductCategory.Subcategory,
 					Valid:  true,
 				},
 			},
@@ -119,12 +142,12 @@ func (product *Product) GetCategoryID(appCtx *internal.AppContext) (int64, error
 				ctx,
 				cchoice_db.CreateProductCategoryParams{
 					Category: sql.NullString{
-						String: product.Category,
+						String: product.ProductCategory.Category,
 						Valid:  true,
 					},
 					Subcategory: sql.NullString{
-						String: product.Subcategory,
-						Valid:  product.Subcategory != "",
+						String: product.ProductCategory.Subcategory,
+						Valid:  product.ProductCategory.Subcategory != "",
 					},
 				},
 			)
@@ -140,9 +163,20 @@ func (product *Product) GetCategoryID(appCtx *internal.AppContext) (int64, error
 	return categoryID, nil
 }
 
+func (productSpecs *ProductSpecs) GetOrInsertProductSpecsID(appCtx *internal.AppContext) (int64, error) {
+	// ctx := context.Background()
+	var productSpecsID int64
+	return productSpecsID, nil
+}
+
 func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
 	ctx := context.Background()
-	categoryID, err := product.GetCategoryID(appCtx)
+	categoryID, err := product.GetOrInsertCategoryID(appCtx)
+	if err != nil {
+		return 0, err
+	}
+
+	productSpecsID, err := product.ProductSpecs.GetOrInsertProductSpecsID(appCtx)
 	if err != nil {
 		return 0, err
 	}
@@ -163,17 +197,9 @@ func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
 				Int64: categoryID,
 				Valid: categoryID != 0,
 			},
-			Colours: sql.NullString{
-				String: product.Colours,
-				Valid:  true,
-			},
-			Sizes: sql.NullString{
-				String: product.Sizes,
-				Valid:  true,
-			},
-			Segmentation: sql.NullString{
-				String: product.Segmentation,
-				Valid:  true,
+			ProductSpecsID: sql.NullInt64{
+				Int64: productSpecsID,
+				Valid: productSpecsID != 0,
 			},
 
 			UnitPriceWithoutVat: product.UnitPriceWithoutVat.Amount() * 100,
@@ -196,7 +222,8 @@ func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
 
 func (product *Product) UpdateToDB(appCtx *internal.AppContext) (int64, error) {
 	ctx := context.Background()
-	categoryID, err := product.GetCategoryID(appCtx)
+	categoryID, err := product.GetOrInsertCategoryID(appCtx)
+	productSpecsID, err := product.ProductSpecs.GetOrInsertProductSpecsID(appCtx)
 	now := time.Now().UTC()
 
 	updatedID, err := appCtx.Queries.UpdateProduct(
@@ -214,17 +241,9 @@ func (product *Product) UpdateToDB(appCtx *internal.AppContext) (int64, error) {
 				Int64: categoryID,
 				Valid: categoryID != 0,
 			},
-			Colours: sql.NullString{
-				String: product.Colours,
-				Valid:  true,
-			},
-			Sizes: sql.NullString{
-				String: product.Sizes,
-				Valid:  true,
-			},
-			Segmentation: sql.NullString{
-				String: product.Segmentation,
-				Valid:  true,
+			ProductSpecsID: sql.NullInt64{
+				Int64: productSpecsID,
+				Valid: productSpecsID != 0,
 			},
 
 			UnitPriceWithoutVat: product.UnitPriceWithoutVat.Amount() * 100,
@@ -240,20 +259,28 @@ func (product *Product) UpdateToDB(appCtx *internal.AppContext) (int64, error) {
 
 func DBRowToProduct(row *cchoice_db.GetProductByIDRow) *Product {
 	dbp := &Product{
-		ID:           row.ID,
-		Serial:       row.Serial,
-		Name:         row.Name,
-		Description:  row.Description.String,
-		Brand:        row.Brand,
-		Status:       ParseProductStatusEnum(row.Status),
-		Category:     row.Category.String,
-		Subcategory:  row.Subcategory.String,
-		Colours:      row.Colours.String,
-		Sizes:        row.Sizes.String,
-		Segmentation: row.Segmentation.String,
-		CreatedAt:    row.CreatedAt,
-		UpdatedAt:    row.UpdatedAt,
-		DeletedAt:    row.DeletedAt,
+		ID:          row.ID,
+		Serial:      row.Serial,
+		Name:        row.Name,
+		Description: row.Description.String,
+		Brand:       row.Brand,
+		Status:      ParseProductStatusEnum(row.Status),
+		ProductCategory: &ProductCategory{
+			Category:    row.Category.String,
+			Subcategory: row.Subcategory.String,
+		},
+		ProductSpecs: &ProductSpecs{
+			Colours:       row.Colours.String,
+			Sizes:         row.Sizes.String,
+			Segmentation:  row.Segmentation.String,
+			PartNumber:    row.PartNumber.String,
+			Power:         row.Power.String,
+			Capacity:      row.Capacity.String,
+			ScopeOfSupply: row.ScopeOfSupply.String,
+		},
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
+		DeletedAt: row.DeletedAt,
 	}
 
 	unitPriceWithoutVat := decimal.NewFromInt(row.UnitPriceWithoutVat / 100)

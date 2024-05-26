@@ -22,6 +22,7 @@ type Template struct {
 	AssumedRowsCount int
 	Columns          map[string]*Column
 	RowToProduct     func(*Template, []string) (*models.Product, []error)
+	RowToSpecs       func(*Template, []string) (*models.ProductSpecs, []error)
 	ProcessRows      func(*Template, *excelize.Rows) []*models.Product
 }
 
@@ -35,6 +36,7 @@ func CreateTemplate(kind TemplateKind) *Template {
 			AssumedRowsCount: 128,
 			Columns:          SampleColumns,
 			RowToProduct:     SampleRowToProduct,
+			RowToSpecs:       SampleRowToSpecs,
 			ProcessRows:      SampleProcessRows,
 		}
 
@@ -44,10 +46,23 @@ func CreateTemplate(kind TemplateKind) *Template {
 			AssumedRowsCount: 1024,
 			Columns:          DeltaPlusColumns,
 			RowToProduct:     DeltaPlusRowToProduct,
+			RowToSpecs:       DeltaPlusRowToSpecs,
 			ProcessRows:      DeltaPlusProcessRows,
 		}
+
+	case Bosch:
+		return &Template{
+			SkipInitialRows:  2,
+			AssumedRowsCount: 256,
+			Columns:          BoschColumns,
+			RowToProduct:     BoschRowToProduct,
+			RowToSpecs:       BoschRowToSpecs,
+			ProcessRows:      BoschProcessRows,
+		}
+
+	default:
+		panic(fmt.Sprintf("No template parser found for %s", kind.String()))
 	}
-	return nil
 }
 
 func (tpl *Template) Print() {

@@ -2,6 +2,7 @@
 SELECT *
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.product_category_id = tbl_product_category.id
+INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
 WHERE tbl_product.id = ?
 LIMIT 1;
 
@@ -9,6 +10,7 @@ LIMIT 1;
 SELECT *
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.product_category_id = tbl_product_category.id
+INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
 WHERE tbl_product.name = ?
 LIMIT 1;
 
@@ -16,6 +18,7 @@ LIMIT 1;
 SELECT *
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.product_category_id = tbl_product_category.id
+INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
 WHERE tbl_product.serial = ?
 LIMIT 1;
 
@@ -23,6 +26,7 @@ LIMIT 1;
 SELECT *
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.product_category_id = tbl_product_category.id
+INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
 ORDER BY created_at DESC;
 
 -- name: GetProductIDBySerial :one
@@ -38,10 +42,8 @@ INSERT INTO tbl_product (
 	description,
 	brand,
 	status,
-	colours,
-	sizes,
-	segmentation,
 	product_category_id,
+	product_specs_id,
 	unit_price_without_vat,
 	unit_price_with_vat,
 	unit_price_without_vat_currency,
@@ -53,7 +55,7 @@ INSERT INTO tbl_product (
 	?, ?, ?, ?,
 	?, ?, ?, ?,
 	?, ?, ?, ?,
-	?, ?, ?, ?
+	?, ?
 ) RETURNING *;
 
 -- name: UpdateProduct :execlastid
@@ -63,10 +65,8 @@ SET
 	description = ?,
 	brand = ?,
 	status = ?,
-	colours = ?,
-	sizes = ?,
-	segmentation = ?,
 	product_category_id = ?,
+	product_specs_id = ?,
 	unit_price_without_vat = ?,
 	unit_price_with_vat = ?,
 	unit_price_without_vat_currency = ?,

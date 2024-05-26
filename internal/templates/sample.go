@@ -64,6 +64,15 @@ func SampleRowToProduct(tpl *Template, row []string) (*models.Product, []error) 
 	}, nil
 }
 
+func SampleRowToSpecs(tpl *Template, row []string) (*models.ProductSpecs, []error) {
+	errs := make([]error, 0, 4)
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return &models.ProductSpecs{
+	}, nil
+}
+
 func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 	var products []*models.Product = make([]*models.Product, 0, tpl.AssumedRowsCount)
 

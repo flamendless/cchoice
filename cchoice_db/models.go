@@ -17,9 +17,7 @@ type TblProduct struct {
 	Brand                       string
 	Status                      string
 	ProductCategoryID           sql.NullInt64
-	Colours                     sql.NullString
-	Sizes                       sql.NullString
-	Segmentation                sql.NullString
+	ProductSpecsID              sql.NullInt64
 	UnitPriceWithoutVat         int64
 	UnitPriceWithVat            int64
 	UnitPriceWithoutVatCurrency string
@@ -33,4 +31,15 @@ type TblProductCategory struct {
 	ID          int64
 	Category    sql.NullString
 	Subcategory sql.NullString
+}
+
+type TblProductSpec struct {
+	ID            int64
+	Colours       sql.NullString
+	Sizes         sql.NullString
+	Segmentation  sql.NullString
+	PartNumber    sql.NullString
+	Power         sql.NullString
+	Capacity      sql.NullString
+	ScopeOfSupply sql.NullString
 }

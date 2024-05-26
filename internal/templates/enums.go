@@ -8,6 +8,7 @@ const (
 	Undefined TemplateKind = iota
 	Sample
 	DeltaPlus
+	Bosch
 )
 
 func (t TemplateKind) String() string {
@@ -18,6 +19,8 @@ func (t TemplateKind) String() string {
 		return "sample"
 	case DeltaPlus:
 		return "delta_plus"
+	case Bosch:
+		return "bosch"
 	default:
 		panic("unknown enum")
 	}
@@ -31,6 +34,8 @@ func ParseTemplateEnum(e string) TemplateKind {
 		return Sample
 	case "delta_plus":
 		return DeltaPlus
+	case "bosch":
+		return Bosch
 	default:
 		panic(fmt.Sprintf("Can't convert '%s' to TemplateKind enum", e))
 	}
@@ -42,6 +47,8 @@ func TemplateToBrand(tpl string) string {
 		return "sample"
 	case "delta_plus":
 		return "DeltaPlus"
+	case "bosch":
+		return "Bosch"
 	default:
 		return ""
 	}
