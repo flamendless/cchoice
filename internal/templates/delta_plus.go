@@ -114,25 +114,18 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 	}, nil
 }
 
-func DeltaPlusRowToSpecs(tpl *Template, row []string) (*models.ProductSpecs, []error) {
-	errs := make([]error, 0, 8)
-
+func DeltaPlusRowToSpecs(tpl *Template, row []string) *models.ProductSpecs {
 	idxColours := tpl.Columns["COLOURS"].Index
 	idxSizes := tpl.Columns["SIZES"].Index
 	idxSegmentation := tpl.Columns["SEGMENTATION"].Index
 	colours := utils.SanitizeColours(row[idxColours])
 	sizes := utils.SanitizeSize(row[idxSizes])
 	segmentation := row[idxSegmentation]
-
-	if len(errs) > 0 {
-		return nil, errs
-	}
-
 	return &models.ProductSpecs{
 		Colours:      colours,
 		Sizes:        sizes,
 		Segmentation: segmentation,
-	}, nil
+	}
 }
 
 func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
@@ -183,9 +176,14 @@ LoopProductProces:
 		row = tpl.AlignRow(row)
 		product, errs := tpl.RowToProduct(tpl, row)
 
+		if product != nil {
+			specs := tpl.RowToSpecs(tpl, row)
+			product.ProductSpecs = specs
+		}
+
 		if len(errs) > 0 {
 			proceedToError := true
-			duplicate := false
+			// duplicate := false
 
 			for i, err := range errs {
 				pc := parser.Code(err)
@@ -193,30 +191,30 @@ LoopProductProces:
 					continue LoopProductProces
 				}
 				if pc == parser.BlankProductName {
-					duplicate = true
+					// duplicate = true
 					errs[i] = nil
 					break
 				}
 			}
 
-			if duplicate {
-				name := row[tpl.Columns["ARTICLE"].Index]
-				if name == "" {
-					sizes := row[tpl.Columns["SIZES"].Index]
-					if sizes != "" {
-						prevProduct := products[len(products)-1]
-						product = prevProduct.Duplicate()
-						product.ProductSpecs.Sizes = sizes
-
-						prices, _ := DeltaPlusProcessPrices(tpl, row)
-						if len(prices) > 0 {
-							product.UnitPriceWithoutVat = prices[0]
-							product.UnitPriceWithVat = prices[1]
-						}
-						proceedToError = false
-					}
-				}
-			}
+			// if duplicate {
+			// 	name := row[tpl.Columns["ARTICLE"].Index]
+			// 	if name == "" {
+			// 		sizes := row[tpl.Columns["SIZES"].Index]
+			// 		if sizes != "" {
+			// 			prevProduct := products[len(products)-1]
+			// 			product = prevProduct.Duplicate()
+			// 			product.ProductSpecs.Sizes = sizes
+			//
+			// 			prices, _ := DeltaPlusProcessPrices(tpl, row)
+			// 			if len(prices) > 0 {
+			// 				product.UnitPriceWithoutVat = prices[0]
+			// 				product.UnitPriceWithVat = prices[1]
+			// 			}
+			// 			proceedToError = false
+			// 		}
+			// 	}
+			// }
 
 			if proceedToError {
 				if tpl.AppFlags.Strict {

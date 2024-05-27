@@ -119,3 +119,27 @@ func (q *Queries) GetProductSpecsByID(ctx context.Context, id int64) (TblProduct
 	)
 	return i, err
 }
+
+const getProductSpecsByProductID = `-- name: GetProductSpecsByProductID :one
+SELECT tbl_product_specs.id, tbl_product_specs.colours, tbl_product_specs.sizes, tbl_product_specs.segmentation, tbl_product_specs.part_number, tbl_product_specs.power, tbl_product_specs.capacity, tbl_product_specs.scope_of_supply
+FROM tbl_product_specs
+INNER JOIN tbl_product ON tbl_product.product_specs_id = tbl_product_specs.id
+WHERE tbl_product.id = ?
+LIMIT 1
+`
+
+func (q *Queries) GetProductSpecsByProductID(ctx context.Context, id int64) (TblProductSpec, error) {
+	row := q.db.QueryRowContext(ctx, getProductSpecsByProductID, id)
+	var i TblProductSpec
+	err := row.Scan(
+		&i.ID,
+		&i.Colours,
+		&i.Sizes,
+		&i.Segmentation,
+		&i.PartNumber,
+		&i.Power,
+		&i.Capacity,
+		&i.ScopeOfSupply,
+	)
+	return i, err
+}

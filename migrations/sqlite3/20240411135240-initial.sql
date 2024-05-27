@@ -2,8 +2,11 @@
 -- +migrate Up
 CREATE TABLE tbl_product_category (
 	id INTEGER PRIMARY KEY,
+	product_id INTEGER NOT NULL,
 	category TEXT,
-	subcategory TEXT
+	subcategory TEXT,
+
+	FOREIGN KEY (product_id) REFERENCES tbl_product_category(id)
 );
 
 CREATE TABLE tbl_product_specs (
@@ -25,7 +28,6 @@ CREATE TABLE tbl_product (
 	brand TEXT NOT NULL,
 	status TEXT NOT NULL,
 
-	product_category_id INTEGER,
 	product_specs_id INTEGER,
 
 	unit_price_without_vat INTEGER NOT NULL,
@@ -38,7 +40,6 @@ CREATE TABLE tbl_product (
 	updated_at DATETIME NOT NULL,
 	deleted_at DATETIME NOT NULL,
 
-	FOREIGN KEY (product_category_id) REFERENCES tbl_product_category(id),
 	FOREIGN KEY (product_specs_id) REFERENCES tbl_product_specs(id),
 	UNIQUE (serial)
 );

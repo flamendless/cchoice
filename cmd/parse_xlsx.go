@@ -170,6 +170,7 @@ var parseXLSXCmd = &cobra.Command{
 		tpl.AppContext.QueriesRead = cchoicedb.GetQueries(sqlDBRead)
 
 		sqlDB, err := cchoicedb.InitDB(tpl.AppFlags.DBPath, "rw")
+		defer sqlDB.Close()
 		if err != nil {
 			logs.Log().Error(
 				"DB (read-write) initialization",
@@ -191,7 +192,6 @@ var parseXLSXCmd = &cobra.Command{
 
 		nProcessors := runtime.NumCPU()
 		batchsize := nProcessors*2 - 1
-		processed := 0
 		var wg sync.WaitGroup
 
 		startWG := time.Now()
@@ -207,11 +207,9 @@ var parseXLSXCmd = &cobra.Command{
 			go func() {
 				defer wg.Done()
 				for _, product := range batch {
-					processed++
 					existingProductId := product.GetDBID(tpl.AppContext)
 					if existingProductId != 0 {
 						now := time.Now()
-						product.ID = existingProductId
 						_, err := product.UpdateToDB(tpl.AppContext)
 						if err != nil {
 							logs.Log().Info(
@@ -244,14 +242,12 @@ var parseXLSXCmd = &cobra.Command{
 		wg.Wait()
 		tpl.AppContext.Metrics.Add("Get product IDS (parallel)", time.Since(startWG))
 
-		if processed != len(products) {
-			logs.Log().Error(
-				"parallel processing",
-				zap.Int("processed", processed),
-				zap.Int("expected", len(products)),
-			)
-			panic(1)
-		}
+		logs.Log().Info(
+			"parallel processing",
+			zap.Int("products", len(products)),
+			zap.Int("inserted", len(insertedIds)),
+			zap.Int("updated", len(updatedIds)),
+		)
 
 		if len(insertedIds) > 0 {
 			tpl.AppContext.Metrics.Add(
@@ -267,26 +263,40 @@ var parseXLSXCmd = &cobra.Command{
 		}
 
 		if tpl.AppFlags.VerifyPrices {
+			hasError := false
 			logs.Log().Debug("Verifying prices...")
 			for i := 0; i < len(products); i++ {
 				product := products[i]
-				row, _ := tpl.AppContext.Queries.GetProductByID(
-					context.Background(),
-					int64(i+1),
-				)
-				dbp := models.DBRowToProduct(&row)
+				if product.ID == 0 {
+					continue
+				}
 
+				row, err := tpl.AppContext.Queries.GetProductBySerial(context.Background(), product.Serial)
+				if err != nil {
+					continue
+				}
+
+				dbp := models.DBRowToProduct(&row)
 				cmp, _ := product.UnitPriceWithoutVat.Compare(dbp.UnitPriceWithoutVat)
 				if cmp != 0 {
+					hasError = true
 					logs.Log().Warn(
 						"checking prices",
-						zap.Int64("id", product.ID),
-						zap.Int64("product", product.UnitPriceWithoutVat.Amount()),
-						zap.Int64("db", dbp.UnitPriceWithoutVat.Amount()),
+						zap.Int64("product ID", product.ID),
+						zap.String("product brand", product.Brand),
+						zap.String("product serial", product.Serial),
+						zap.Int64("product price", product.UnitPriceWithoutVat.Amount()),
+						zap.Int64("db ID", dbp.ID),
+						zap.String("db brand", dbp.Brand),
+						zap.String("db serial", dbp.Serial),
+						zap.Int64("db price", dbp.UnitPriceWithoutVat.Amount()),
 					)
 				}
 			}
-			logs.Log().Debug("Successfully verified prices")
+
+			if !hasError {
+				logs.Log().Debug("Successfully verified prices")
+			}
 		}
 
 		logs.Log().Debug(

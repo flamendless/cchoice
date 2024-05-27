@@ -20,6 +20,7 @@ import (
 
 type ProductCategory struct {
 	ID          int64
+	ProductID   int64
 	Category    string
 	Subcategory string
 }
@@ -54,7 +55,7 @@ type Product struct {
 func (product *Product) PostProcess(rowIdx int) {
 	brandInitials := utils.GetInitials(product.Brand)
 	nameInitials := utils.GetInitials(product.Name)
-	product.Serial = fmt.Sprintf("%s-%s-%d", brandInitials, nameInitials, rowIdx)
+	product.Serial = fmt.Sprintf("%s-%s-%d-%d", brandInitials, nameInitials, rowIdx, product.ID)
 	product.ProductCategory.Category = slug.Make(product.ProductCategory.Category)
 	product.ProductCategory.Subcategory = slug.Make(product.ProductCategory.Subcategory)
 }
@@ -117,6 +118,7 @@ func (product *Product) GetDBID(appCtx *internal.AppContext) int64 {
 	if err != nil {
 		return 0
 	}
+	product.ID = existingProductID
 	return existingProductID
 }
 
@@ -124,59 +126,110 @@ func (product *Product) GetOrInsertCategoryID(appCtx *internal.AppContext) (int6
 	ctx := context.Background()
 	var categoryID int64
 	if product.ProductCategory.ID != 0 {
-		existingProductCategory, err := appCtx.QueriesRead.GetProductCategoryByCategoryAndSubcategory(
+		return 0, nil
+	}
+
+	existingProductCategory, err := appCtx.QueriesRead.GetProductCategoryByCategoryAndSubcategory(
+		ctx,
+		cchoice_db.GetProductCategoryByCategoryAndSubcategoryParams{
+			Category: sql.NullString{
+				String: product.ProductCategory.Category,
+				Valid:  true,
+			},
+			Subcategory: sql.NullString{
+				String: product.ProductCategory.Subcategory,
+				Valid:  true,
+			},
+		},
+	)
+	if err == nil {
+		categoryID = existingProductCategory.ID
+	} else {
+		newProductCategory, err := appCtx.Queries.CreateProductCategory(
 			ctx,
-			cchoice_db.GetProductCategoryByCategoryAndSubcategoryParams{
+			cchoice_db.CreateProductCategoryParams{
+				ProductID: product.ID,
 				Category: sql.NullString{
 					String: product.ProductCategory.Category,
 					Valid:  true,
 				},
 				Subcategory: sql.NullString{
 					String: product.ProductCategory.Subcategory,
+					Valid:  product.ProductCategory.Subcategory != "",
+				},
+			},
+		)
+		if err != nil {
+			logs.Log().Warn(
+				"Insert product category",
+				zap.Error(err),
+			)
+		}
+		categoryID = newProductCategory.ID
+	}
+	return categoryID, nil
+}
+
+func (product *Product) GetOrInsertProductSpecsID(appCtx *internal.AppContext) (int64, error) {
+	ctx := context.Background()
+	var productSpecsID int64
+
+	if product.ProductSpecs.ID != 0 {
+		return productSpecsID, nil
+	}
+
+	existingProductSpecs, err := appCtx.QueriesRead.GetProductSpecsByProductID(ctx, product.ID)
+	if err == nil {
+		productSpecsID = existingProductSpecs.ID
+	} else {
+		newProductSpecs, err := appCtx.Queries.CreateProductSpecs(
+			ctx,
+			cchoice_db.CreateProductSpecsParams{
+				Colours: sql.NullString{
+					String: product.ProductSpecs.Colours,
+					Valid:  true,
+				},
+				Sizes: sql.NullString{
+					String: product.ProductSpecs.Sizes,
+					Valid:  true,
+				},
+				Segmentation: sql.NullString{
+					String: product.ProductSpecs.Segmentation,
+					Valid:  true,
+				},
+				PartNumber: sql.NullString{
+					String: product.ProductSpecs.PartNumber,
+					Valid:  true,
+				},
+				Power: sql.NullString{
+					String: product.ProductSpecs.Power,
+					Valid:  true,
+				},
+				Capacity: sql.NullString{
+					String: product.ProductSpecs.Capacity,
+					Valid:  true,
+				},
+				ScopeOfSupply: sql.NullString{
+					String: product.ProductSpecs.ScopeOfSupply,
 					Valid:  true,
 				},
 			},
 		)
 		if err != nil {
-			existingProductCategory, err = appCtx.Queries.CreateProductCategory(
-				ctx,
-				cchoice_db.CreateProductCategoryParams{
-					Category: sql.NullString{
-						String: product.ProductCategory.Category,
-						Valid:  true,
-					},
-					Subcategory: sql.NullString{
-						String: product.ProductCategory.Subcategory,
-						Valid:  product.ProductCategory.Subcategory != "",
-					},
-				},
+			logs.Log().Warn(
+				"Insert product specs",
+				zap.Error(err),
 			)
-			if err != nil {
-				logs.Log().Warn(
-					"Insert product category",
-					zap.Error(err),
-				)
-			}
 		}
-		categoryID = existingProductCategory.ID
+		productSpecsID = newProductSpecs.ID
 	}
-	return categoryID, nil
-}
-
-func (productSpecs *ProductSpecs) GetOrInsertProductSpecsID(appCtx *internal.AppContext) (int64, error) {
-	// ctx := context.Background()
-	var productSpecsID int64
 	return productSpecsID, nil
 }
 
 func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
 	ctx := context.Background()
-	categoryID, err := product.GetOrInsertCategoryID(appCtx)
-	if err != nil {
-		return 0, err
-	}
 
-	productSpecsID, err := product.ProductSpecs.GetOrInsertProductSpecsID(appCtx)
+	productSpecsID, err := product.GetOrInsertProductSpecsID(appCtx)
 	if err != nil {
 		return 0, err
 	}
@@ -193,10 +246,6 @@ func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
 			},
 			Brand:  product.Brand,
 			Status: product.Status.String(),
-			ProductCategoryID: sql.NullInt64{
-				Int64: categoryID,
-				Valid: categoryID != 0,
-			},
 			ProductSpecsID: sql.NullInt64{
 				Int64: productSpecsID,
 				Valid: productSpecsID != 0,
@@ -217,15 +266,21 @@ func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
 		return 0, err
 	}
 
+	product.ID = insertedProduct.ID
+
+	_, err = product.GetOrInsertCategoryID(appCtx)
+	if err != nil {
+		return 0, err
+	}
+
 	return insertedProduct.ID, nil
 }
 
 func (product *Product) UpdateToDB(appCtx *internal.AppContext) (int64, error) {
 	ctx := context.Background()
-	categoryID, err := product.GetOrInsertCategoryID(appCtx)
-	productSpecsID, err := product.ProductSpecs.GetOrInsertProductSpecsID(appCtx)
-	now := time.Now().UTC()
+	productSpecsID, err := product.GetOrInsertProductSpecsID(appCtx)
 
+	now := time.Now().UTC()
 	updatedID, err := appCtx.Queries.UpdateProduct(
 		ctx,
 		cchoice_db.UpdateProductParams{
@@ -237,10 +292,6 @@ func (product *Product) UpdateToDB(appCtx *internal.AppContext) (int64, error) {
 			},
 			Brand:  product.Brand,
 			Status: product.Status.String(),
-			ProductCategoryID: sql.NullInt64{
-				Int64: categoryID,
-				Valid: categoryID != 0,
-			},
 			ProductSpecsID: sql.NullInt64{
 				Int64: productSpecsID,
 				Valid: productSpecsID != 0,
@@ -254,10 +305,14 @@ func (product *Product) UpdateToDB(appCtx *internal.AppContext) (int64, error) {
 			UpdatedAt:                   now,
 		},
 	)
+
+	product.ID = updatedID
+	_, err = product.GetOrInsertCategoryID(appCtx)
+
 	return updatedID, err
 }
 
-func DBRowToProduct(row *cchoice_db.GetProductByIDRow) *Product {
+func DBRowToProduct(row *cchoice_db.GetProductBySerialRow) *Product {
 	dbp := &Product{
 		ID:          row.ID,
 		Serial:      row.Serial,

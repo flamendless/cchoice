@@ -1,7 +1,7 @@
 -- name: GetProductByID :one
 SELECT *
 FROM tbl_product
-INNER JOIN tbl_product_category ON tbl_product.product_category_id = tbl_product_category.id
+INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
 WHERE tbl_product.id = ?
 LIMIT 1;
@@ -9,7 +9,7 @@ LIMIT 1;
 -- name: GetProductByName :one
 SELECT *
 FROM tbl_product
-INNER JOIN tbl_product_category ON tbl_product.product_category_id = tbl_product_category.id
+INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
 WHERE tbl_product.name = ?
 LIMIT 1;
@@ -17,7 +17,7 @@ LIMIT 1;
 -- name: GetProductBySerial :one
 SELECT *
 FROM tbl_product
-INNER JOIN tbl_product_category ON tbl_product.product_category_id = tbl_product_category.id
+INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
 WHERE tbl_product.serial = ?
 LIMIT 1;
@@ -25,7 +25,7 @@ LIMIT 1;
 -- name: GetProducts :many
 SELECT *
 FROM tbl_product
-INNER JOIN tbl_product_category ON tbl_product.product_category_id = tbl_product_category.id
+INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
 ORDER BY created_at DESC;
 
@@ -42,7 +42,6 @@ INSERT INTO tbl_product (
 	description,
 	brand,
 	status,
-	product_category_id,
 	product_specs_id,
 	unit_price_without_vat,
 	unit_price_with_vat,
@@ -55,7 +54,7 @@ INSERT INTO tbl_product (
 	?, ?, ?, ?,
 	?, ?, ?, ?,
 	?, ?, ?, ?,
-	?, ?
+	?
 ) RETURNING *;
 
 -- name: UpdateProduct :execlastid
@@ -65,7 +64,6 @@ SET
 	description = ?,
 	brand = ?,
 	status = ?,
-	product_category_id = ?,
 	product_specs_id = ?,
 	unit_price_without_vat = ?,
 	unit_price_with_vat = ?,

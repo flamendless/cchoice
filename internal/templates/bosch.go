@@ -43,11 +43,18 @@ var BoschColumns map[string]*Column = map[string]*Column{
 }
 
 func BoschProcessPrices(tpl *Template, row []string) ([]*money.Money, []error) {
+	idxPriceWithoutVat := tpl.Columns["Retail Price (Local Currency)"].Index
 	idxPriceWithVat := tpl.Columns["Retail Price (Local Currency)"].Index
+	priceWithoutVat := row[idxPriceWithoutVat]
 	priceWithVat := row[idxPriceWithVat]
 
 	prices := make([]*money.Money, 0, 8)
 	errs := make([]error, 0, 8)
+
+	unitPriceWithoutVat, err := utils.SanitizePrice(priceWithoutVat)
+	if err != nil {
+		errs = append(errs, err...)
+	}
 
 	unitPriceWithVat, err := utils.SanitizePrice(priceWithVat)
 	if err != nil {
@@ -55,6 +62,7 @@ func BoschProcessPrices(tpl *Template, row []string) ([]*money.Money, []error) {
 	}
 
 	if len(errs) == 0 {
+		prices = append(prices, unitPriceWithoutVat)
 		prices = append(prices, unitPriceWithVat)
 	}
 
@@ -73,8 +81,6 @@ func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 		errs = append(errs, parserErr)
 	}
 
-	status := models.Active
-
 	prices, errMonies := BoschProcessPrices(tpl, row)
 	if len(errMonies) > 0 {
 		errs = append(errs, errMonies...)
@@ -84,18 +90,18 @@ func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 		return nil, errs
 	}
 
+	status := models.Active
+
 	return &models.Product{
 		Name:                name,
 		Brand:               TemplateToBrand(tpl.AppFlags.Template),
 		Status:              status,
-		UnitPriceWithVat:    prices[0],
 		UnitPriceWithoutVat: prices[0],
+		UnitPriceWithVat:    prices[1],
 	}, nil
 }
 
-func BoschRowToSpecs(tpl *Template, row []string) (*models.ProductSpecs, []error) {
-	errs := make([]error, 0, 8)
-
+func BoschRowToSpecs(tpl *Template, row []string) *models.ProductSpecs {
 	idxPartNumber := tpl.Columns["Part Number"].Index
 	idxPower := tpl.Columns["Power"].Index
 	idxCapacity := tpl.Columns["Capacity"].Index
@@ -106,16 +112,12 @@ func BoschRowToSpecs(tpl *Template, row []string) (*models.ProductSpecs, []error
 	capacity := row[idxCapacity]
 	scopeOfSupply := row[idxScopeOfSupply]
 
-	if len(errs) > 0 {
-		return nil, errs
-	}
-
 	return &models.ProductSpecs{
 		PartNumber:    partNumber,
 		Power:         power,
 		Capacity:      capacity,
 		ScopeOfSupply: scopeOfSupply,
-	}, nil
+	}
 }
 
 func BoschProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
@@ -144,7 +146,7 @@ LoopProductProces:
 
 		row = tpl.AlignRow(row)
 		product, errs := tpl.RowToProduct(tpl, row)
-		specs, errs := tpl.RowToSpecs(tpl, row)
+		specs := tpl.RowToSpecs(tpl, row)
 
 		if len(errs) > 0 {
 			proceedToError := true
