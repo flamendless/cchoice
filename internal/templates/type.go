@@ -1,7 +1,7 @@
 package templates
 
 import (
-	"cchoice/internal"
+	"cchoice/internal/ctx"
 	"cchoice/internal/models"
 	"fmt"
 	"strings"
@@ -15,8 +15,8 @@ type Column struct {
 }
 
 type Template struct {
-	AppFlags   *internal.AppFlags
-	AppContext *internal.AppContext
+	AppFlags   *ctx.ParseXLSXFlags
+	AppContext *ctx.App
 
 	SkipInitialRows  int
 	AssumedRowsCount int

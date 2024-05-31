@@ -2,8 +2,8 @@ package models
 
 import (
 	cchoice_db "cchoice/cchoice_db"
-	"cchoice/internal"
 	"cchoice/internal/constants"
+	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 	"context"
@@ -112,7 +112,7 @@ func (product *Product) Duplicate() *Product {
 	return &newProduct
 }
 
-func (product *Product) GetDBID(appCtx *internal.AppContext) int64 {
+func (product *Product) GetDBID(appCtx *ctx.App) int64 {
 	ctx := context.Background()
 	existingProductID, err := appCtx.QueriesRead.GetProductIDBySerial(ctx, product.Serial)
 	if err != nil {
@@ -122,7 +122,7 @@ func (product *Product) GetDBID(appCtx *internal.AppContext) int64 {
 	return existingProductID
 }
 
-func (product *Product) GetOrInsertCategoryID(appCtx *internal.AppContext) (int64, error) {
+func (product *Product) GetOrInsertCategoryID(appCtx *ctx.App) (int64, error) {
 	ctx := context.Background()
 	var categoryID int64
 	if product.ProductCategory.ID != 0 {
@@ -170,7 +170,7 @@ func (product *Product) GetOrInsertCategoryID(appCtx *internal.AppContext) (int6
 	return categoryID, nil
 }
 
-func (product *Product) GetOrInsertProductSpecsID(appCtx *internal.AppContext) (int64, error) {
+func (product *Product) GetOrInsertProductSpecsID(appCtx *ctx.App) (int64, error) {
 	ctx := context.Background()
 	var productSpecsID int64
 
@@ -226,7 +226,7 @@ func (product *Product) GetOrInsertProductSpecsID(appCtx *internal.AppContext) (
 	return productSpecsID, nil
 }
 
-func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
+func (product *Product) InsertToDB(appCtx *ctx.App) (int64, error) {
 	ctx := context.Background()
 
 	productSpecsID, err := product.GetOrInsertProductSpecsID(appCtx)
@@ -276,7 +276,7 @@ func (product *Product) InsertToDB(appCtx *internal.AppContext) (int64, error) {
 	return insertedProduct.ID, nil
 }
 
-func (product *Product) UpdateToDB(appCtx *internal.AppContext) (int64, error) {
+func (product *Product) UpdateToDB(appCtx *ctx.App) (int64, error) {
 	ctx := context.Background()
 	productSpecsID, err := product.GetOrInsertProductSpecsID(appCtx)
 

@@ -12,26 +12,26 @@ import (
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 
-	"cchoice/internal"
 	"cchoice/internal/cchoice_db"
+	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
 	"cchoice/internal/models"
 	"cchoice/internal/templates"
 )
 
-var ctx internal.AppFlags
+var ctxParseXLSX ctx.ParseXLSXFlags
 
 func init() {
 	f := parseXLSXCmd.Flags
-	f().StringVarP(&ctx.Template, "template", "t", "", "Template to use")
-	f().StringVarP(&ctx.Filepath, "filepath", "p", "", "Filepath to the XLSX file")
-	f().StringVarP(&ctx.Sheet, "sheet", "s", "", "Sheet name to use")
-	f().StringVarP(&ctx.DBPath, "db_path", "", ":memory:", "Path to database")
-	f().BoolVarP(&ctx.Strict, "strict", "x", false, "Panic upon first product error")
-	f().BoolVarP(&ctx.PrintProcessedProducts, "print_processed_products", "v", false, "Print processed products")
-	f().BoolVarP(&ctx.UseDB, "use_db", "", false, "Use DB to save processed data")
-	f().BoolVarP(&ctx.VerifyPrices, "verify_prices", "", true, "Verify prices processed and saved to DB")
-	f().IntVarP(&ctx.Limit, "limit", "l", 0, "Limit number of rows to process")
+	f().StringVarP(&ctxParseXLSX.Template, "template", "t", "", "Template to use")
+	f().StringVarP(&ctxParseXLSX.Filepath, "filepath", "p", "", "Filepath to the XLSX file")
+	f().StringVarP(&ctxParseXLSX.Sheet, "sheet", "s", "", "Sheet name to use")
+	f().StringVarP(&ctxParseXLSX.DBPath, "db_path", "", ":memory:", "Path to database")
+	f().BoolVarP(&ctxParseXLSX.Strict, "strict", "x", false, "Panic upon first product error")
+	f().BoolVarP(&ctxParseXLSX.PrintProcessedProducts, "print_processed_products", "v", false, "Print processed products")
+	f().BoolVarP(&ctxParseXLSX.UseDB, "use_db", "", false, "Use DB to save processed data")
+	f().BoolVarP(&ctxParseXLSX.VerifyPrices, "verify_prices", "", true, "Verify prices processed and saved to DB")
+	f().IntVarP(&ctxParseXLSX.Limit, "limit", "l", 0, "Limit number of rows to process")
 
 	parseXLSXCmd.MarkFlagRequired("template")
 	parseXLSXCmd.MarkFlagRequired("filepath")
@@ -85,17 +85,17 @@ var parseXLSXCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.Log().Info(
 			"Parsing XLSX",
-			zap.String("template", ctx.Template),
-			zap.String("filepath", ctx.Filepath),
-			zap.String("sheet", ctx.Sheet),
-			zap.Bool("strict", ctx.Strict),
-			zap.Int("limit", ctx.Limit),
+			zap.String("template", ctxParseXLSX.Template),
+			zap.String("filepath", ctxParseXLSX.Filepath),
+			zap.String("sheet", ctxParseXLSX.Sheet),
+			zap.Bool("strict", ctxParseXLSX.Strict),
+			zap.Int("limit", ctxParseXLSX.Limit),
 		)
 
-		templateKind := templates.ParseTemplateEnum(ctx.Template)
+		templateKind := templates.ParseTemplateEnum(ctxParseXLSX.Template)
 		tpl := templates.CreateTemplate(templateKind)
 
-		file, err := excelize.OpenFile(ctx.Filepath)
+		file, err := excelize.OpenFile(ctxParseXLSX.Filepath)
 		if err != nil {
 			logs.Log().Error(err.Error())
 			return
@@ -108,13 +108,13 @@ var parseXLSXCmd = &cobra.Command{
 			}
 		}()
 
-		if ctx.Sheet == "" {
-			ctx.Sheet = file.GetSheetName(0)
+		if ctxParseXLSX.Sheet == "" {
+			ctxParseXLSX.Sheet = file.GetSheetName(0)
 		}
 
-		tpl.AppFlags = &ctx
-		tpl.AppContext = &internal.AppContext{}
-		tpl.AppContext.Metrics = &internal.Metrics{}
+		tpl.AppFlags = &ctxParseXLSX
+		tpl.AppContext = &ctx.App{}
+		tpl.AppContext.Metrics = &ctx.Metrics{}
 
 		startProcessColumns := time.Now()
 		success := ProcessColumns(tpl, file)
@@ -123,7 +123,7 @@ var parseXLSXCmd = &cobra.Command{
 		}
 		tpl.AppContext.Metrics.Add("process column time", time.Since(startProcessColumns))
 
-		rows, err := file.Rows(ctx.Sheet)
+		rows, err := file.Rows(ctxParseXLSX.Sheet)
 		if err != nil {
 			logs.Log().Error(err.Error())
 			return
