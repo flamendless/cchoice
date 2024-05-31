@@ -8,8 +8,8 @@ set -euf -o pipefail
 GOOS="linux"
 DBNAME="test.db"
 
-api() {
-	go run ./main.go run_api_server
+http() {
+	go run ./main.go serve_http
 }
 
 clean() {

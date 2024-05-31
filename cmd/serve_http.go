@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"cchoice/api"
+	"cchoice/http_server"
 	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
 
@@ -12,23 +12,23 @@ import (
 var ctxAPI ctx.APIFlags
 
 func init() {
-	f := runAPIServerCmd.Flags
+	f := serveHTTPCmd.Flags
 	f().StringVarP(&ctxAPI.Address, "address", "a", "", "Address to use")
 	f().IntVarP(&ctxAPI.Port, "port", "p", 3000, "Port of the address")
 
-	rootCmd.AddCommand(runAPIServerCmd)
+	rootCmd.AddCommand(serveHTTPCmd)
 }
 
-var runAPIServerCmd = &cobra.Command{
-	Use:   "run_api_server",
-	Short: "Run the API server",
+var serveHTTPCmd = &cobra.Command{
+	Use:   "serve_http",
+	Short: "Run the HTTP server",
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.Log().Info(
-			"Run API Server",
+			"Run the HTTP Server",
 			zap.String("address", ctxAPI.Address),
 			zap.Int("port", ctxAPI.Port),
 		)
 
-		api.Serve(ctxAPI)
+		http_server.Serve(ctxAPI)
 	},
 }
