@@ -27,8 +27,7 @@ clean() {
 		rm "${DBNAME}-wal"
 	fi
 
-	sqlc generate
-	sql-migrate up
+	gensql
 }
 
 testall() {
@@ -47,15 +46,35 @@ deps() {
 	export PATH="$PATH:$HOME/.local/bin"
 }
 
+gensql() {
+	sqlc generate
+	sql-migrate up
+}
+
 genproto() {
 	set +f
 	protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/*.proto
 	set -f
 }
 
+check() {
+	goimports -w -local -v .
+	go vet ./...
+	prealloc ./...
+	smrcptr ./...
+}
+
 if [ "$#" -eq 0 ]; then
 	echo "First use: chmod +x ${0}"
-	echo "Usage: ${0} clean | testall | http | grpc | genproto"
+	echo "Usage: ${0}"
+	echo "Commands:"
+	echo "    clean"
+	echo "    check"
+	echo "    testall"
+	echo "    http"
+	echo "    grpc"
+	echo "    genproto"
+	echo "    gensql"
 else
 	"$1" "$@"
 fi

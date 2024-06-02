@@ -12,7 +12,7 @@ import (
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 
-	"cchoice/internal/cchoice_db"
+	cchoicedb "cchoice/internal/cchoice_db"
 	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
 	"cchoice/internal/models"
