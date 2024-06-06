@@ -7,6 +7,8 @@ set -euf -o pipefail
 
 GOOS="linux"
 DBNAME="test.db"
+WIN_PATH=/mnt/c/Windows/System32
+alias cmd.exe="$WIN_PATH"/cmd.exe
 
 http() {
 	go run ./main.go serve_http
@@ -14,6 +16,11 @@ http() {
 
 grpc() {
 	go run ./main.go serve_grpc
+}
+
+grpc_ui() {
+	cmd.exe /c "start vivaldi http://127.0.0.1:36477/"
+	grpcui -port 36477 -plaintext ":50051"
 }
 
 clean() {
@@ -49,12 +56,14 @@ deps() {
 gensql() {
 	sqlc generate
 	sql-migrate up
+	check
 }
 
 genproto() {
 	set +f
 	protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/*.proto
 	set -f
+	check
 }
 
 check() {

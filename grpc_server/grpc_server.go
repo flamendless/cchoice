@@ -4,30 +4,12 @@ import (
 	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
 	pb "cchoice/proto"
-	"context"
-	"log"
 	"net"
 
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
-
-type TodoServer struct {
-	pb.UnimplementedTodoServiceServer
-}
-
-func (s *TodoServer) CreateTodo(ctx context.Context, in *pb.NewTodo) (*pb.Todo, error) {
-	log.Printf("Received: %v", in.GetName())
-	todo := &pb.Todo{
-		Name:        in.GetName(),
-		Description: in.GetDescription(),
-		Done:        false,
-		Id:          uuid.New().String(),
-	}
-
-	return todo, nil
-}
 
 func Serve(ctxGRPC ctx.GRPCFlags) {
 	lis, err := net.Listen("tcp", ctxGRPC.Port)
@@ -38,11 +20,14 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 
 	s := grpc.NewServer()
 
-	pb.RegisterTodoServiceServer(s, &TodoServer{})
+	pb.RegisterProductServiceServer(s, &ProductServer{})
+
+	reflection.Register(s)
 
 	logs.Log().Info(
 		"Server",
 		zap.String("address", lis.Addr().String()),
+		zap.String("network", lis.Addr().Network()),
 	)
 
 	err = s.Serve(lis)

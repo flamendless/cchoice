@@ -1,0 +1,41 @@
+syntax="proto3";
+
+package proto;
+import "proto/common.proto";
+
+option go_package = "cchoice/pb";
+
+message ProductCategory {
+   int64 id = 1;
+   int64 product_id = 2;
+   string category = 3;
+   string subcategory = 4;
+}
+
+message ProductSpecs {
+   int64 id = 1;
+   string colours = 2;
+   string sizes = 3;
+   string segmentation = 4;
+   string part_number = 5;
+   string power = 6;
+   string capacity = 7;
+   string scope_of_supply = 8;
+}
+
+message Product {
+   int64 id = 1;
+   string name = 2;
+   string serial = 3;
+   string description = 4;
+   string brand = 5;
+   int64 product_category = 6;
+   int64 product_specs = 7;
+}
+
+service ProductService {
+   rpc Void(VoidParam) returns (VoidReturn) {}
+   rpc GetProductCategory(ID) returns (ProductCategory) {}
+   rpc GetProductSpecs(ID) returns (ProductSpecs) {}
+   rpc GetProduct(ID) returns (Product) {}
+}
