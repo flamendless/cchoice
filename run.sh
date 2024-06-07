@@ -10,12 +10,14 @@ DBNAME="test.db"
 WIN_PATH=/mnt/c/Windows/System32
 alias cmd.exe="$WIN_PATH"/cmd.exe
 
+PRE_CMD="./run.sh check && ./run.sh genall"
+
 http() {
-	go run ./main.go serve_http
+	air --build.bin "./tmp/main serve_http" --build.pre_cmd "${PRE_CMD}"
 }
 
 grpc() {
-	go run ./main.go serve_grpc
+	air --build.bin "./tmp/main serve_grpc" --build.pre_cmd "${PRE_CMD}"
 }
 
 grpc_ui() {
@@ -54,19 +56,28 @@ deps() {
 }
 
 gensql() {
+	echo "running gensql..."
+	echo "running sqlc..."
 	sqlc generate
+	echo "running sql-migrate..."
 	sql-migrate up
-	check
 }
 
 genproto() {
+	echo "running genproto..."
 	set +f
 	protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/*.proto
 	set -f
-	check
+}
+
+genall() {
+	echo "running genall..."
+	gensql
+	genproto
 }
 
 check() {
+	echo "running check..."
 	goimports -w -local -v .
 	go vet ./...
 	prealloc ./...
@@ -77,13 +88,15 @@ if [ "$#" -eq 0 ]; then
 	echo "First use: chmod +x ${0}"
 	echo "Usage: ${0}"
 	echo "Commands:"
-	echo "    clean"
 	echo "    check"
-	echo "    testall"
-	echo "    http"
-	echo "    grpc"
+	echo "    clean"
+	echo "    genall"
 	echo "    genproto"
 	echo "    gensql"
+	echo "    grpc"
+	echo "    grpc_ui"
+	echo "    http"
+	echo "    testall"
 else
 	"$1" "$@"
 fi
