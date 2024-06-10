@@ -4,9 +4,17 @@ package proto;
 
 option go_package = "cchoice/pb";
 
+import "google/protobuf/timestamp.proto";
+
 message VoidParam {}
 message VoidReturn {}
 
 message ID {
    int64 id = 1;
+}
+
+message Metadata {
+   google.protobuf.Timestamp created_at = 1;
+   google.protobuf.Timestamp updated_at = 2;
+   google.protobuf.Timestamp deleted_at = 3;
 }

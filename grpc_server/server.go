@@ -20,7 +20,10 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 
 	s := grpc.NewServer()
 
-	pb.RegisterProductServiceServer(s, &ProductServer{})
+	ctxDB := ctx.NewDatabaseCtx(ctxGRPC.DBPath)
+	defer ctxDB.Close()
+
+	pb.RegisterProductServiceServer(s, &ProductServer{ctxDB: ctxDB})
 
 	if ctxGRPC.Reflection {
 		reflection.Register(s)

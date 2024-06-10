@@ -6,6 +6,7 @@ import (
 	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
+	pb "cchoice/proto"
 	"context"
 	"database/sql"
 	"fmt"
@@ -16,6 +17,7 @@ import (
 	"github.com/gosimple/slug"
 	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type ProductCategory struct {
@@ -351,4 +353,47 @@ func DBRowToProduct(row *cchoice_db.GetProductBySerialRow) *Product {
 	)
 
 	return dbp
+}
+
+func DBRowToProductPB(row *cchoice_db.GetProductByIDRow) *pb.Product {
+	pbProduct := &pb.Product{
+		ID:          row.ID,
+		Serial:      row.Serial,
+		Name:        row.Name,
+		Description: row.Description.String,
+		// Brand:       row.Brand,
+		// Status:      ParseProductStatusEnum(row.Status),
+		// ProductCategory: &ProductCategory{
+		// 	Category:    row.Category.String,
+		// 	Subcategory: row.Subcategory.String,
+		// },
+		// ProductSpecs: &ProductSpecs{
+		// 	Colours:       row.Colours.String,
+		// 	Sizes:         row.Sizes.String,
+		// 	Segmentation:  row.Segmentation.String,
+		// 	PartNumber:    row.PartNumber.String,
+		// 	Power:         row.Power.String,
+		// 	Capacity:      row.Capacity.String,
+		// 	ScopeOfSupply: row.ScopeOfSupply.String,
+		// },
+		Metadata: &pb.Metadata{
+			CreatedAt: timestamppb.New(row.CreatedAt),
+			UpdatedAt: timestamppb.New(row.UpdatedAt),
+			DeletedAt: timestamppb.New(row.DeletedAt),
+		},
+	}
+
+	// unitPriceWithoutVat := decimal.NewFromInt(row.UnitPriceWithoutVat / 100)
+	// unitPriceWithVat := decimal.NewFromInt(row.UnitPriceWithVat / 100)
+	//
+	// pbProduct.UnitPriceWithoutVat = money.New(
+	// 	unitPriceWithoutVat.CoefficientInt64(),
+	// 	row.UnitPriceWithoutVatCurrency,
+	// )
+	// pbProduct.UnitPriceWithVat = money.New(
+	// 	unitPriceWithVat.CoefficientInt64(),
+	// 	row.UnitPriceWithVatCurrency,
+	// )
+
+	return pbProduct
 }

@@ -8,13 +8,14 @@ import "proto/product_specs.proto";
 option go_package = "cchoice/pb";
 
 message Product {
-   int64 id = 1;
+   int64 ID = 1;
    string name = 2;
    string serial = 3;
    string description = 4;
    string brand = 5;
    int64 product_category = 6;
    int64 product_specs = 7;
+   Metadata metadata = 8;
 }
 
 service ProductService {
