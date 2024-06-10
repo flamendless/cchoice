@@ -4,9 +4,9 @@ import (
 	cchoice_db "cchoice/cchoice_db"
 	"cchoice/internal/constants"
 	"cchoice/internal/ctx"
+	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
-	pb "cchoice/proto"
 	"context"
 	"database/sql"
 	"fmt"
@@ -44,7 +44,7 @@ type Product struct {
 	Name                string
 	Description         string
 	Brand               string
-	Status              ProductStatus
+	Status              enums.ProductStatus
 	ProductCategory     *ProductCategory
 	ProductSpecs        *ProductSpecs
 	UnitPriceWithoutVat *money.Money
@@ -324,7 +324,7 @@ func DBRowToProduct(row *cchoice_db.GetProductBySerialRow) *Product {
 		Name:        row.Name,
 		Description: row.Description.String,
 		Brand:       row.Brand,
-		Status:      ParseProductStatusEnum(row.Status),
+		Status:      enums.ParseProductStatusEnum(row.Status),
 		ProductCategory: &ProductCategory{
 			Category:    row.Category.String,
 			Subcategory: row.Subcategory.String,

@@ -2,6 +2,7 @@ package templates
 
 import (
 	"cchoice/internal/domains/parser"
+	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/models"
 	"cchoice/internal/utils"
@@ -90,7 +91,7 @@ func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 		return nil, errs
 	}
 
-	status := models.Active
+	status := enums.Active
 
 	return &models.Product{
 		Name:                name,

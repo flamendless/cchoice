@@ -2,6 +2,7 @@ package templates
 
 import (
 	"cchoice/internal/domains/parser"
+	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/models"
 	"cchoice/internal/utils"
@@ -77,14 +78,14 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 	idxDesc := tpl.Columns["DESCRIPTION"].Index
 	name := row[idxArticle]
 
-	var status models.ProductStatus
+	var status enums.ProductStatus
 	if strings.Contains(strings.ToLower(name), "discontinued") {
-		status = models.Deleted
+		status = enums.Deleted
 		parserErr := parser.NewParserError(parser.ProductDiscontinued, "product is discontinued")
 		errs = append(errs, parserErr)
 		return nil, errs
 	} else {
-		status = models.Active
+		status = enums.Active
 	}
 
 	desc := row[idxDesc]
