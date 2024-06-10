@@ -1,5 +1,6 @@
 package ctx
 
 type GRPCFlags struct {
-	Port string
+	Port       string
+	Reflection bool
 }

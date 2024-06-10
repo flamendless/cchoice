@@ -22,7 +22,9 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 
 	pb.RegisterProductServiceServer(s, &ProductServer{})
 
-	reflection.Register(s)
+	if ctxGRPC.Reflection {
+		reflection.Register(s)
+	}
 
 	logs.Log().Info(
 		"Server",

@@ -17,7 +17,7 @@ http() {
 }
 
 grpc() {
-	air --build.bin "./tmp/main serve_grpc" --build.pre_cmd "${PRE_CMD}"
+	air --build.bin "./tmp/main serve_grpc -r=1" --build.pre_cmd "${PRE_CMD}"
 }
 
 grpc_ui() {
