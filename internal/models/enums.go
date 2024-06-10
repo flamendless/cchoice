@@ -1,6 +1,9 @@
 package models
 
-import "fmt"
+import (
+	pb "cchoice/proto"
+	"fmt"
+)
 
 type ProductStatus int
 
@@ -33,5 +36,18 @@ func ParseProductStatusEnum(e string) ProductStatus {
 		return Deleted
 	default:
 		panic(fmt.Sprintf("Can't convert '%s' to ProductStatus enum", e))
+	}
+}
+
+func ParseProductStatusEnumPB(e string) pb.ProductStatus {
+	switch e {
+	case "undefined":
+		return pb.ProductStatus_undefined
+	case "active":
+		return pb.ProductStatus_active
+	case "deleted":
+		return pb.ProductStatus_deleted
+	default:
+		panic(fmt.Sprintf("Can't convert '%s' to pb.ProductStatus enum", e))
 	}
 }

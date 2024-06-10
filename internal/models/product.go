@@ -315,7 +315,10 @@ func (product *Product) UpdateToDB(ctxDB *ctx.Database) (int64, error) {
 }
 
 func DBRowToProduct(row *cchoice_db.GetProductBySerialRow) *Product {
-	dbp := &Product{
+	unitPriceWithoutVat := decimal.NewFromInt(row.UnitPriceWithoutVat / 100)
+	unitPriceWithVat := decimal.NewFromInt(row.UnitPriceWithVat / 100)
+
+	return &Product{
 		ID:          row.ID,
 		Serial:      row.Serial,
 		Name:        row.Name,
@@ -335,65 +338,60 @@ func DBRowToProduct(row *cchoice_db.GetProductBySerialRow) *Product {
 			Capacity:      row.Capacity.String,
 			ScopeOfSupply: row.ScopeOfSupply.String,
 		},
+		UnitPriceWithoutVat: money.New(
+			unitPriceWithoutVat.CoefficientInt64(),
+			row.UnitPriceWithoutVatCurrency,
+		),
+		UnitPriceWithVat: money.New(
+			unitPriceWithVat.CoefficientInt64(),
+			row.UnitPriceWithVatCurrency,
+		),
 		CreatedAt: row.CreatedAt,
 		UpdatedAt: row.UpdatedAt,
 		DeletedAt: row.DeletedAt,
 	}
+}
 
+func DBRowToProductPB(row *cchoice_db.GetProductByIDRow) *pb.Product {
 	unitPriceWithoutVat := decimal.NewFromInt(row.UnitPriceWithoutVat / 100)
 	unitPriceWithVat := decimal.NewFromInt(row.UnitPriceWithVat / 100)
-
-	dbp.UnitPriceWithoutVat = money.New(
+	moneyWithoutVat := money.New(
 		unitPriceWithoutVat.CoefficientInt64(),
 		row.UnitPriceWithoutVatCurrency,
 	)
-	dbp.UnitPriceWithVat = money.New(
+	moneyWithVat := money.New(
 		unitPriceWithVat.CoefficientInt64(),
 		row.UnitPriceWithVatCurrency,
 	)
 
-	return dbp
-}
-
-func DBRowToProductPB(row *cchoice_db.GetProductByIDRow) *pb.Product {
 	pbProduct := &pb.Product{
 		ID:          row.ID,
 		Serial:      row.Serial,
 		Name:        row.Name,
 		Description: row.Description.String,
-		// Brand:       row.Brand,
-		// Status:      ParseProductStatusEnum(row.Status),
-		// ProductCategory: &ProductCategory{
-		// 	Category:    row.Category.String,
-		// 	Subcategory: row.Subcategory.String,
-		// },
-		// ProductSpecs: &ProductSpecs{
-		// 	Colours:       row.Colours.String,
-		// 	Sizes:         row.Sizes.String,
-		// 	Segmentation:  row.Segmentation.String,
-		// 	PartNumber:    row.PartNumber.String,
-		// 	Power:         row.Power.String,
-		// 	Capacity:      row.Capacity.String,
-		// 	ScopeOfSupply: row.ScopeOfSupply.String,
-		// },
+		Brand:       row.Brand,
+		Status:      ParseProductStatusEnumPB(row.Status),
+		ProductCategory: &pb.ProductCategory{
+			Category:    row.Category.String,
+			Subcategory: row.Subcategory.String,
+		},
+		ProductSpecs: &pb.ProductSpecs{
+			Colours:       row.Colours.String,
+			Sizes:         row.Sizes.String,
+			Segmentation:  row.Segmentation.String,
+			PartNumber:    row.PartNumber.String,
+			Power:         row.Power.String,
+			Capacity:      row.Capacity.String,
+			ScopeOfSupply: row.ScopeOfSupply.String,
+		},
+		UnitPriceWithoutVatDisplay: moneyWithoutVat.Display(),
+		UnitPriceWithVatDisplay:    moneyWithVat.Display(),
 		Metadata: &pb.Metadata{
 			CreatedAt: timestamppb.New(row.CreatedAt),
 			UpdatedAt: timestamppb.New(row.UpdatedAt),
 			DeletedAt: timestamppb.New(row.DeletedAt),
 		},
 	}
-
-	// unitPriceWithoutVat := decimal.NewFromInt(row.UnitPriceWithoutVat / 100)
-	// unitPriceWithVat := decimal.NewFromInt(row.UnitPriceWithVat / 100)
-	//
-	// pbProduct.UnitPriceWithoutVat = money.New(
-	// 	unitPriceWithoutVat.CoefficientInt64(),
-	// 	row.UnitPriceWithoutVatCurrency,
-	// )
-	// pbProduct.UnitPriceWithVat = money.New(
-	// 	unitPriceWithVat.CoefficientInt64(),
-	// 	row.UnitPriceWithVatCurrency,
-	// )
 
 	return pbProduct
 }

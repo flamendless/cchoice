@@ -1,11 +1,18 @@
 syntax="proto3";
 
 package proto;
+
 import "proto/common.proto";
 import "proto/product_category.proto";
 import "proto/product_specs.proto";
 
 option go_package = "cchoice/pb";
+
+enum ProductStatus {
+   undefined = 0;
+   active = 1;
+   deleted = 2;
+}
 
 message Product {
    int64 ID = 1;
@@ -13,9 +20,12 @@ message Product {
    string serial = 3;
    string description = 4;
    string brand = 5;
-   int64 product_category = 6;
-   int64 product_specs = 7;
-   Metadata metadata = 8;
+   ProductStatus status = 6;
+   ProductCategory product_category = 7;
+   ProductSpecs product_specs = 8;
+   string unit_price_without_vat_display = 9;
+   string unit_price_with_vat_display = 10;
+   Metadata metadata = 11;
 }
 
 service ProductService {
