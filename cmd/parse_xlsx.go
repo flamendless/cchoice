@@ -12,7 +12,6 @@ import (
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 
-	cchoicedb "cchoice/internal/cchoice_db"
 	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
 	"cchoice/internal/models"
@@ -31,6 +30,7 @@ func init() {
 	f().BoolVarP(&ctxParseXLSX.PrintProcessedProducts, "print_processed_products", "v", false, "Print processed products")
 	f().BoolVarP(&ctxParseXLSX.UseDB, "use_db", "", false, "Use DB to save processed data")
 	f().BoolVarP(&ctxParseXLSX.VerifyPrices, "verify_prices", "", true, "Verify prices processed and saved to DB")
+	f().BoolVarP(&ctxParseXLSX.PanicOnFirstDBError, "panic_on_error", "", false, "Whether to panic immediately on first DB error or not")
 	f().IntVarP(&ctxParseXLSX.Limit, "limit", "l", 0, "Limit number of rows to process")
 
 	parseXLSXCmd.MarkFlagRequired("template")
@@ -113,15 +113,15 @@ var parseXLSXCmd = &cobra.Command{
 		}
 
 		tpl.AppFlags = &ctxParseXLSX
-		tpl.AppContext = &ctx.App{}
-		tpl.AppContext.Metrics = &ctx.Metrics{}
+		tpl.CtxApp = &ctx.App{}
+		tpl.CtxApp.Metrics = &ctx.Metrics{}
 
 		startProcessColumns := time.Now()
 		success := ProcessColumns(tpl, file)
 		if !success {
 			return
 		}
-		tpl.AppContext.Metrics.Add("process column time", time.Since(startProcessColumns))
+		tpl.CtxApp.Metrics.Add("process column time", time.Since(startProcessColumns))
 
 		rows, err := file.Rows(ctxParseXLSX.Sheet)
 		if err != nil {
@@ -145,7 +145,7 @@ var parseXLSXCmd = &cobra.Command{
 
 		startProcessRows := time.Now()
 		products := tpl.ProcessRows(tpl, rows)
-		tpl.AppContext.Metrics.Add("process rows time", time.Since(startProcessRows))
+		tpl.CtxApp.Metrics.Add("process rows time", time.Since(startProcessRows))
 
 		if tpl.AppFlags.PrintProcessedProducts {
 			for _, product := range products {
@@ -154,33 +154,12 @@ var parseXLSXCmd = &cobra.Command{
 		}
 
 		if !tpl.AppFlags.UseDB {
-			tpl.AppContext.Metrics.LogTime(logs.Log())
+			tpl.CtxApp.Metrics.LogTime(logs.Log())
 			return
 		}
 
-		sqlDBRead, err := cchoicedb.InitDB(tpl.AppFlags.DBPath, "ro")
-		if err != nil {
-			logs.Log().Error(
-				"DB (read-only) initialization",
-				zap.Error(err),
-			)
-			return
-		}
-		tpl.AppContext.DBRead = sqlDBRead
-		tpl.AppContext.QueriesRead = cchoicedb.GetQueries(sqlDBRead)
-
-		sqlDB, err := cchoicedb.InitDB(tpl.AppFlags.DBPath, "rw")
-		defer sqlDB.Close()
-		if err != nil {
-			logs.Log().Error(
-				"DB (read-write) initialization",
-				zap.Error(err),
-			)
-			return
-		}
-		sqlDB.SetMaxOpenConns(1)
-		tpl.AppContext.DB = sqlDB
-		tpl.AppContext.Queries = cchoicedb.GetQueries(sqlDB)
+		tpl.CtxApp.DB = ctx.NewDatabaseCtx(tpl.AppFlags.DBPath)
+		defer tpl.CtxApp.DB.Close()
 
 		logs.Log().Debug("Inserting/updating products to DB...")
 
@@ -207,16 +186,20 @@ var parseXLSXCmd = &cobra.Command{
 			go func() {
 				defer wg.Done()
 				for _, product := range batch {
-					existingProductId := product.GetDBID(tpl.AppContext)
+					existingProductId := product.GetDBID(tpl.CtxApp.DB)
 					if existingProductId != 0 {
 						now := time.Now()
-						_, err := product.UpdateToDB(tpl.AppContext)
+						_, err := product.UpdateToDB(tpl.CtxApp.DB)
 						if err != nil {
 							logs.Log().Info(
 								"product update to DB",
 								zap.Int64("id", product.ID),
 								zap.Error(err),
 							)
+
+							if tpl.AppFlags.PanicOnFirstDBError {
+								panic(1)
+							}
 						} else {
 							updatedIds = append(updatedIds, existingProductId)
 							updateMetrics += int64(time.Since(now))
@@ -224,13 +207,17 @@ var parseXLSXCmd = &cobra.Command{
 
 					} else {
 						now := time.Now()
-						productID, err := product.InsertToDB(tpl.AppContext)
+						productID, err := product.InsertToDB(tpl.CtxApp.DB)
 						if err != nil {
 							logs.Log().Info(
 								"product insert to DB",
 								zap.Int64("id", product.ID),
 								zap.Error(err),
 							)
+
+							if tpl.AppFlags.PanicOnFirstDBError {
+								panic(1)
+							}
 						} else {
 							insertedIds = append(insertedIds, productID)
 							insertMetrics += int64(time.Since(now))
@@ -240,7 +227,7 @@ var parseXLSXCmd = &cobra.Command{
 			}()
 		}
 		wg.Wait()
-		tpl.AppContext.Metrics.Add("Get product IDS (parallel)", time.Since(startWG))
+		tpl.CtxApp.Metrics.Add("Get product IDS (parallel)", time.Since(startWG))
 
 		logs.Log().Info(
 			"parallel processing",
@@ -250,13 +237,13 @@ var parseXLSXCmd = &cobra.Command{
 		)
 
 		if len(insertedIds) > 0 {
-			tpl.AppContext.Metrics.Add(
+			tpl.CtxApp.Metrics.Add(
 				"insert products to DB time",
 				time.Duration(insertMetrics/int64(len(insertedIds))),
 			)
 		}
 		if len(updatedIds) > 0 {
-			tpl.AppContext.Metrics.Add(
+			tpl.CtxApp.Metrics.Add(
 				"update products to DB time",
 				time.Duration(updateMetrics/int64(len(updatedIds))),
 			)
@@ -271,7 +258,7 @@ var parseXLSXCmd = &cobra.Command{
 					continue
 				}
 
-				row, err := tpl.AppContext.Queries.GetProductBySerial(context.Background(), product.Serial)
+				row, err := tpl.CtxApp.DB.Queries.GetProductBySerial(context.Background(), product.Serial)
 				if err != nil {
 					continue
 				}
@@ -305,6 +292,6 @@ var parseXLSXCmd = &cobra.Command{
 			zap.Int("updated ids count", len(updatedIds)),
 		)
 
-		tpl.AppContext.Metrics.LogTime(logs.Log())
+		tpl.CtxApp.Metrics.LogTime(logs.Log())
 	},
 }

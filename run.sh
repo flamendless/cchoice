@@ -7,17 +7,16 @@ set -euf -o pipefail
 
 GOOS="linux"
 DBNAME="test.db"
+DBPATH="file:./${DBNAME}"
 WIN_PATH=/mnt/c/Windows/System32
 alias cmd.exe="$WIN_PATH"/cmd.exe
 
-PRE_CMD="./run.sh check && ./run.sh genall"
-
 http() {
-	air --build.bin "./tmp/main serve_http" --build.pre_cmd "${PRE_CMD}"
+	air --build.bin "./tmp/main serve_http"
 }
 
 grpc() {
-	air --build.bin "./tmp/main serve_grpc -r=1" --build.pre_cmd "${PRE_CMD}"
+	air --build.bin "./tmp/main serve_grpc -r=1 --db_path '${DBPATH}'"
 }
 
 grpc_ui() {
@@ -41,10 +40,10 @@ clean() {
 
 testall() {
 	clean
-	go run ./main.go parse_xlsx -p "xlsx/Price_List_effective_25_August_2023_r2.xlsx" -s "2023 PRICE LIST" -t "delta_plus" --use_db --db_path "file:./test.db" --verify_prices=1
-	go run ./main.go parse_xlsx -p "xlsx/Price_List_effective_25_August_2023_r2.xlsx" -s "2023 PRICE LIST" -t "delta_plus" --use_db --db_path "file:./test.db" --verify_prices=1
-	go run ./main.go parse_xlsx -p "xlsx/bosch.xlsx" -s "DATABASE" -t "bosch" --use_db --db_path "file:./test.db" --verify_prices=1
-	go run ./main.go parse_xlsx -p "xlsx/bosch.xlsx" -s "DATABASE" -t "bosch" --use_db --db_path "file:./test.db" --verify_prices=1
+	go run ./main.go parse_xlsx -p "xlsx/Price_List_effective_25_August_2023_r2.xlsx" -s "2023 PRICE LIST" -t "delta_plus" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
+	go run ./main.go parse_xlsx -p "xlsx/Price_List_effective_25_August_2023_r2.xlsx" -s "2023 PRICE LIST" -t "delta_plus" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
+	go run ./main.go parse_xlsx -p "xlsx/bosch.xlsx" -s "DATABASE" -t "bosch" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
+	go run ./main.go parse_xlsx -p "xlsx/bosch.xlsx" -s "DATABASE" -t "bosch" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
 }
 
 deps() {

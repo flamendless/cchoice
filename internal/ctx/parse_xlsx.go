@@ -10,4 +10,5 @@ type ParseXLSXFlags struct {
 	VerifyPrices           bool
 	DBPath                 string
 	UseDB                  bool
+	PanicOnFirstDBError    bool
 }

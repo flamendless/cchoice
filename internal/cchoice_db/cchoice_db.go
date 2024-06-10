@@ -15,7 +15,7 @@ func InitDB(dataSourceName string, mode string) (*sql.DB, error) {
 		dataSourceName = dataSourceName + dbFlags + "&mode=" + mode
 	}
 
-	logs.Log().Info("Initializing DB...")
+	logs.Log().Info("Initializing DB...", zap.String("mode", mode))
 	logs.Log().Debug(
 		"opening database...",
 		zap.String("data source name", dataSourceName),
