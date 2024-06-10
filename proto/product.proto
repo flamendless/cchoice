@@ -29,8 +29,5 @@ message Product {
 }
 
 service ProductService {
-   rpc Void(VoidParam) returns (VoidReturn) {}
-   rpc GetProductCategoryByID(ID) returns (ProductCategory) {}
-   rpc GetProductSpecsByID(ID) returns (ProductSpecs) {}
-   rpc GetProductByID(ID) returns (Product) {}
+   rpc GetByID(ID) returns (Product) {}
 }

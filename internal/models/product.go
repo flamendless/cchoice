@@ -17,7 +17,6 @@ import (
 	"github.com/gosimple/slug"
 	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type ProductCategory struct {
@@ -350,48 +349,4 @@ func DBRowToProduct(row *cchoice_db.GetProductBySerialRow) *Product {
 		UpdatedAt: row.UpdatedAt,
 		DeletedAt: row.DeletedAt,
 	}
-}
-
-func DBRowToProductPB(row *cchoice_db.GetProductByIDRow) *pb.Product {
-	unitPriceWithoutVat := decimal.NewFromInt(row.UnitPriceWithoutVat / 100)
-	unitPriceWithVat := decimal.NewFromInt(row.UnitPriceWithVat / 100)
-	moneyWithoutVat := money.New(
-		unitPriceWithoutVat.CoefficientInt64(),
-		row.UnitPriceWithoutVatCurrency,
-	)
-	moneyWithVat := money.New(
-		unitPriceWithVat.CoefficientInt64(),
-		row.UnitPriceWithVatCurrency,
-	)
-
-	pbProduct := &pb.Product{
-		ID:          row.ID,
-		Serial:      row.Serial,
-		Name:        row.Name,
-		Description: row.Description.String,
-		Brand:       row.Brand,
-		Status:      ParseProductStatusEnumPB(row.Status),
-		ProductCategory: &pb.ProductCategory{
-			Category:    row.Category.String,
-			Subcategory: row.Subcategory.String,
-		},
-		ProductSpecs: &pb.ProductSpecs{
-			Colours:       row.Colours.String,
-			Sizes:         row.Sizes.String,
-			Segmentation:  row.Segmentation.String,
-			PartNumber:    row.PartNumber.String,
-			Power:         row.Power.String,
-			Capacity:      row.Capacity.String,
-			ScopeOfSupply: row.ScopeOfSupply.String,
-		},
-		UnitPriceWithoutVatDisplay: moneyWithoutVat.Display(),
-		UnitPriceWithVatDisplay:    moneyWithVat.Display(),
-		Metadata: &pb.Metadata{
-			CreatedAt: timestamppb.New(row.CreatedAt),
-			UpdatedAt: timestamppb.New(row.UpdatedAt),
-			DeletedAt: timestamppb.New(row.DeletedAt),
-		},
-	}
-
-	return pbProduct
 }

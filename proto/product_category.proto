@@ -2,6 +2,8 @@ syntax="proto3";
 
 package proto;
 
+import "proto/common.proto";
+
 option go_package = "cchoice/pb";
 
 message ProductCategory {
@@ -9,4 +11,9 @@ message ProductCategory {
    int64 product_id = 2;
    string category = 3;
    string subcategory = 4;
+}
+
+service ProductCategoryService {
+   rpc GetByID(ID) returns (ProductCategory) {}
+   rpc GetByProductID(ID) returns (ProductCategory) {}
 }
