@@ -403,6 +403,94 @@ func (q *Queries) GetProducts(ctx context.Context) ([]GetProductsRow, error) {
 	return items, nil
 }
 
+const getProductsByStatus = `-- name: GetProductsByStatus :many
+SELECT tbl_product.id, serial, name, description, brand, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at, tbl_product_category.id, product_id, category, subcategory, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply
+FROM tbl_product
+INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
+INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
+WHERE tbl_product.status = ?
+ORDER BY created_at DESC
+`
+
+type GetProductsByStatusRow struct {
+	ID                          int64
+	Serial                      string
+	Name                        string
+	Description                 sql.NullString
+	Brand                       string
+	Status                      string
+	ProductSpecsID              sql.NullInt64
+	UnitPriceWithoutVat         int64
+	UnitPriceWithVat            int64
+	UnitPriceWithoutVatCurrency string
+	UnitPriceWithVatCurrency    string
+	CreatedAt                   time.Time
+	UpdatedAt                   time.Time
+	DeletedAt                   time.Time
+	ID_2                        int64
+	ProductID                   int64
+	Category                    sql.NullString
+	Subcategory                 sql.NullString
+	ID_3                        int64
+	Colours                     sql.NullString
+	Sizes                       sql.NullString
+	Segmentation                sql.NullString
+	PartNumber                  sql.NullString
+	Power                       sql.NullString
+	Capacity                    sql.NullString
+	ScopeOfSupply               sql.NullString
+}
+
+func (q *Queries) GetProductsByStatus(ctx context.Context, status string) ([]GetProductsByStatusRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductsByStatus, status)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductsByStatusRow
+	for rows.Next() {
+		var i GetProductsByStatusRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Serial,
+			&i.Name,
+			&i.Description,
+			&i.Brand,
+			&i.Status,
+			&i.ProductSpecsID,
+			&i.UnitPriceWithoutVat,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithoutVatCurrency,
+			&i.UnitPriceWithVatCurrency,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.ID_2,
+			&i.ProductID,
+			&i.Category,
+			&i.Subcategory,
+			&i.ID_3,
+			&i.Colours,
+			&i.Sizes,
+			&i.Segmentation,
+			&i.PartNumber,
+			&i.Power,
+			&i.Capacity,
+			&i.ScopeOfSupply,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateProduct = `-- name: UpdateProduct :execlastid
 UPDATE tbl_product
 SET

@@ -9,9 +9,9 @@ import "proto/product_specs.proto";
 option go_package = "cchoice/pb";
 
 enum ProductStatus {
-   undefined = 0;
-   active = 1;
-   deleted = 2;
+   UNDEFINED = 0;
+   ACTIVE = 1;
+   DELETED = 2;
 }
 
 message Product {
@@ -28,6 +28,16 @@ message Product {
    Metadata metadata = 11;
 }
 
+message ProductsResponse {
+   int64 length = 1;
+   repeated Product products = 2;
+}
+
+message ProductStatusRequest {
+   ProductStatus status = 1;
+}
+
 service ProductService {
-   rpc GetByID(ID) returns (Product) {}
+   rpc GetProductByID(IDRequest) returns (Product) {}
+   rpc ListProductsByProductStatus(ProductStatusRequest) returns (ProductsResponse) {}
 }

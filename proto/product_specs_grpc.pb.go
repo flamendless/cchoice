@@ -8,7 +8,6 @@ package pb
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -23,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProductSpecsServiceClient interface {
-	GetByID(ctx context.Context, in *ID, opts ...grpc.CallOption) (*ProductSpecs, error)
+	GetProductSpecsByID(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*ProductSpecs, error)
 }
 
 type productSpecsServiceClient struct {
@@ -34,9 +33,9 @@ func NewProductSpecsServiceClient(cc grpc.ClientConnInterface) ProductSpecsServi
 	return &productSpecsServiceClient{cc}
 }
 
-func (c *productSpecsServiceClient) GetByID(ctx context.Context, in *ID, opts ...grpc.CallOption) (*ProductSpecs, error) {
+func (c *productSpecsServiceClient) GetProductSpecsByID(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*ProductSpecs, error) {
 	out := new(ProductSpecs)
-	err := c.cc.Invoke(ctx, "/proto.ProductSpecsService/GetByID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.ProductSpecsService/GetProductSpecsByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +46,7 @@ func (c *productSpecsServiceClient) GetByID(ctx context.Context, in *ID, opts ..
 // All implementations must embed UnimplementedProductSpecsServiceServer
 // for forward compatibility
 type ProductSpecsServiceServer interface {
-	GetByID(context.Context, *ID) (*ProductSpecs, error)
+	GetProductSpecsByID(context.Context, *IDRequest) (*ProductSpecs, error)
 	mustEmbedUnimplementedProductSpecsServiceServer()
 }
 
@@ -55,8 +54,8 @@ type ProductSpecsServiceServer interface {
 type UnimplementedProductSpecsServiceServer struct {
 }
 
-func (UnimplementedProductSpecsServiceServer) GetByID(context.Context, *ID) (*ProductSpecs, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetByID not implemented")
+func (UnimplementedProductSpecsServiceServer) GetProductSpecsByID(context.Context, *IDRequest) (*ProductSpecs, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProductSpecsByID not implemented")
 }
 func (UnimplementedProductSpecsServiceServer) mustEmbedUnimplementedProductSpecsServiceServer() {}
 
@@ -71,20 +70,20 @@ func RegisterProductSpecsServiceServer(s grpc.ServiceRegistrar, srv ProductSpecs
 	s.RegisterService(&ProductSpecsService_ServiceDesc, srv)
 }
 
-func _ProductSpecsService_GetByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ID)
+func _ProductSpecsService_GetProductSpecsByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProductSpecsServiceServer).GetByID(ctx, in)
+		return srv.(ProductSpecsServiceServer).GetProductSpecsByID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.ProductSpecsService/GetByID",
+		FullMethod: "/proto.ProductSpecsService/GetProductSpecsByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProductSpecsServiceServer).GetByID(ctx, req.(*ID))
+		return srv.(ProductSpecsServiceServer).GetProductSpecsByID(ctx, req.(*IDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -97,8 +96,8 @@ var ProductSpecsService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ProductSpecsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetByID",
-			Handler:    _ProductSpecsService_GetByID_Handler,
+			MethodName: "GetProductSpecsByID",
+			Handler:    _ProductSpecsService_GetProductSpecsByID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

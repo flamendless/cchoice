@@ -18,5 +18,5 @@ message ProductSpecs {
 }
 
 service ProductSpecsService {
-   rpc GetByID(ID) returns (ProductSpecs) {}
+   rpc GetProductSpecsByID(IDRequest) returns (ProductSpecs) {}
 }

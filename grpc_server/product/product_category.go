@@ -25,12 +25,12 @@ func productCategoryFromRow(row *cchoice_db.TblProductCategory) *pb.ProductCateg
 	}
 }
 
-func (s *ProductCategoryServer) GetByID(
+func (s *ProductCategoryServer) GetProductCategoryByID(
 	ctx context.Context,
-	in *pb.ID,
+	in *pb.IDRequest,
 ) (*pb.ProductCategory, error) {
 	id := in.GetId()
-	logs.Log().Debug("GetByID", zap.Int64("id", id))
+	logs.Log().Debug("GetProductCategoryByID", zap.Int64("id", id))
 
 	existingProductCategory, err := s.CtxDB.QueriesRead.GetProductCategoryByID(ctx, id)
 	if err != nil {
@@ -39,12 +39,12 @@ func (s *ProductCategoryServer) GetByID(
 	return productCategoryFromRow(&existingProductCategory), nil
 }
 
-func (s *ProductCategoryServer) GetByProductID(
+func (s *ProductCategoryServer) GetProductCategoryByProductID(
 	ctx context.Context,
-	in *pb.ID,
+	in *pb.IDRequest,
 ) (*pb.ProductCategory, error) {
 	id := in.GetId()
-	logs.Log().Debug("GetByProductID", zap.Int64("id", id))
+	logs.Log().Debug("GetProductCategoryByProductID", zap.Int64("id", id))
 
 	existingProductCategory, err := s.CtxDB.QueriesRead.GetProductCategoryByProductID(ctx, id)
 	if err != nil {

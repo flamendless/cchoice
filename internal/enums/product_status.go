@@ -16,11 +16,11 @@ const (
 func (t ProductStatus) String() string {
 	switch t {
 	case Undefined:
-		return "undefined"
+		return "UNDEFINED"
 	case Active:
-		return "active"
+		return "ACTIVE"
 	case Deleted:
-		return "deleted"
+		return "DELETED"
 	default:
 		panic("unknown enum")
 	}
@@ -28,11 +28,11 @@ func (t ProductStatus) String() string {
 
 func ParseProductStatusEnum(e string) ProductStatus {
 	switch e {
-	case "undefined":
+	case "UNDEFINED":
 		return Undefined
-	case "active":
+	case "ACTIVE":
 		return Active
-	case "deleted":
+	case "DELETED":
 		return Deleted
 	default:
 		panic(fmt.Sprintf("Can't convert '%s' to ProductStatus enum", e))
@@ -41,12 +41,12 @@ func ParseProductStatusEnum(e string) ProductStatus {
 
 func ParseProductStatusEnumPB(e string) pb.ProductStatus {
 	switch e {
-	case "undefined":
-		return pb.ProductStatus_undefined
-	case "active":
-		return pb.ProductStatus_active
-	case "deleted":
-		return pb.ProductStatus_deleted
+	case "UNDEFINED":
+		return pb.ProductStatus_UNDEFINED
+	case "ACTIVE":
+		return pb.ProductStatus_ACTIVE
+	case "DELETED":
+		return pb.ProductStatus_DELETED
 	default:
 		panic(fmt.Sprintf("Can't convert '%s' to pb.ProductStatus enum", e))
 	}

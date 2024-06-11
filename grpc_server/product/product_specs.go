@@ -15,12 +15,12 @@ type ProductSpecsServer struct {
 	CtxDB *ctx.Database
 }
 
-func (s *ProductSpecsServer) GetByID(
+func (s *ProductSpecsServer) GetProductSpecsByID(
 	ctx context.Context,
-	in *pb.ID,
+	in *pb.IDRequest,
 ) (*pb.ProductSpecs, error) {
 	id := in.GetId()
-	logs.Log().Debug("GetByID", zap.Int64("id", id))
+	logs.Log().Debug("GetProductSpecsByID", zap.Int64("id", id))
 
 	existingProductSpecs, err := s.CtxDB.QueriesRead.GetProductSpecsByID(ctx, id)
 	if err != nil {

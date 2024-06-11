@@ -62,9 +62,12 @@ func productFromRow(row *cchoice_db.GetProductByIDRow) *pb.Product {
 	}
 }
 
-func (s *ProductServer) GetByID(ctx context.Context, in *pb.ID) (*pb.Product, error) {
+func (s *ProductServer) GetProductByID(
+	ctx context.Context,
+	in *pb.IDRequest,
+) (*pb.Product, error) {
 	id := in.GetId()
-	logs.Log().Debug("GetByID", zap.Int64("id", id))
+	logs.Log().Debug("GetProductByID", zap.Int64("id", id))
 
 	existingProduct, err := s.CtxDB.QueriesRead.GetProductByID(ctx, id)
 	if err != nil {
@@ -72,5 +75,33 @@ func (s *ProductServer) GetByID(ctx context.Context, in *pb.ID) (*pb.Product, er
 	}
 
 	res := productFromRow(&existingProduct)
+	return res, nil
+}
+
+func (s *ProductServer) ListProductsByProductStatus(
+	ctx context.Context,
+	in *pb.ProductStatusRequest,
+) (*pb.ProductsResponse, error) {
+	status := in.GetStatus()
+	logs.Log().Debug("ListProductsByProductStatus", zap.String("status", status.String()))
+
+	products, err := s.CtxDB.QueriesRead.GetProductsByStatus(ctx, status.String())
+	if err != nil {
+		return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+	}
+
+	res := &pb.ProductsResponse{
+		Length: int64(len(products)),
+		Products: make([]*pb.Product, 0, len(products)),
+	}
+
+	for _, row := range products {
+		row2 := cchoice_db.GetProductByIDRow(row)
+		res.Products = append(
+			res.Products,
+			productFromRow(&row2),
+		)
+	}
+
 	return res, nil
 }
