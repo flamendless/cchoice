@@ -1,7 +1,8 @@
 package ctx
 
 type ClientFlags struct {
-	Secure  bool
-	Address string
-	Port    string
+	Secure      bool
+	Address     string
+	Port        string
+	GRPCAddress string
 }

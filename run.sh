@@ -8,22 +8,25 @@ set -euf -o pipefail
 GOOS="linux"
 DBNAME="test.db"
 DBPATH="file:./${DBNAME}"
+
+GRPC_SERVER_ADDR=":50051"
+
 WIN_PATH=/mnt/c/Windows/System32
 alias cmd.exe="$WIN_PATH"/cmd.exe
 
 grpc() {
-	air serve_grpc -r=1 --db_path "${DBPATH}"
+	air serve_grpc -r=1 --db_path "${DBPATH}" --address "${GRPC_SERVER_ADDR}"
 }
 
 grpc_ui() {
 	cmd.exe /c "start vivaldi http://127.0.0.1:36477/"
-	grpcui -port 36477 -plaintext ":50051"
+	grpcui -port 36477 -plaintext "${GRPC_SERVER_ADDR}"
 }
 
 client() {
 	clientport="3001"
 	cmd.exe /c "start vivaldi http://localhost:${clientport}/"
-	air serve_client -p ":${clientport}"
+	air serve_client -p ":${clientport}" --grpc_address "${GRPC_SERVER_ADDR}"
 }
 
 clean() {

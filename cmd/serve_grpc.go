@@ -13,7 +13,7 @@ var ctxGRPC ctx.GRPCFlags
 
 func init() {
 	f := serveGRPCCmd.Flags
-	f().StringVarP(&ctxGRPC.Port, "port", "p", ":50051", "Port of the address")
+	f().StringVarP(&ctxGRPC.Address, "address", "a", ":50051", "Address to use")
 	f().BoolVarP(&ctxGRPC.Reflection, "reflection", "r", false, "Allow reflection or not")
 	f().StringVarP(&ctxGRPC.DBPath, "db_path", "", ":memory:", "Path to database")
 
@@ -26,7 +26,7 @@ var serveGRPCCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.Log().Info(
 			"Run the GRPC Server",
-			zap.String("port", ctxGRPC.Port),
+			zap.String("address", ctxGRPC.Address),
 			zap.Bool("reflection", ctxGRPC.Reflection),
 			zap.String("DB Path", ctxGRPC.DBPath),
 		)

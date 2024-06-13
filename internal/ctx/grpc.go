@@ -1,7 +1,7 @@
 package ctx
 
 type GRPCFlags struct {
-	Port       string
+	Address    string
 	Reflection bool
 	DBPath     string
 }

@@ -13,7 +13,7 @@ import (
 )
 
 func Serve(ctxGRPC ctx.GRPCFlags) {
-	lis, err := net.Listen("tcp", ctxGRPC.Port)
+	lis, err := net.Listen("tcp", ctxGRPC.Address)
 	if err != nil {
 		logs.Log().Fatal("Failed connection", zap.Error(err))
 		return
