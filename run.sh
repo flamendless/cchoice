@@ -12,16 +12,22 @@ WIN_PATH=/mnt/c/Windows/System32
 alias cmd.exe="$WIN_PATH"/cmd.exe
 
 http() {
-	air --build.bin "./tmp/main serve_http"
+	air serve_http
 }
 
 grpc() {
-	air --build.bin "./tmp/main serve_grpc -r=1 --db_path '${DBPATH}'"
+	air serve_grpc -r=1 --db_path "${DBPATH}"
 }
 
 grpc_ui() {
 	cmd.exe /c "start vivaldi http://127.0.0.1:36477/"
 	grpcui -port 36477 -plaintext ":50051"
+}
+
+site() {
+	siteport="3001"
+	cmd.exe /c "start vivaldi http://localhost:${siteport}/"
+	air serve_site -p ":${siteport}"
 }
 
 clean() {
@@ -75,6 +81,10 @@ genall() {
 	genproto
 }
 
+gentempl() {
+	templ generate templ
+}
+
 check() {
 	echo "running check..."
 	goimports -w -local -v .
@@ -94,6 +104,7 @@ if [ "$#" -eq 0 ]; then
 	echo "    gensql"
 	echo "    grpc"
 	echo "    grpc_ui"
+	echo "    gentempl"
 	echo "    http"
 	echo "    testall"
 else

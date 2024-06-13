@@ -1,0 +1,10 @@
+package site
+
+import (
+	"strconv"
+	pb "cchoice/proto"
+)
+
+templ cProducts(products []*pb.Product) {
+	<div>Hello, { strconv.Itoa(len(products)) }</div>
+}
