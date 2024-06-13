@@ -75,14 +75,15 @@ genproto() {
 	set -f
 }
 
+gentempl() {
+	templ generate templ
+}
+
 genall() {
 	echo "running genall..."
 	gensql
 	genproto
-}
-
-gentempl() {
-	templ generate templ
+	gentempl
 }
 
 check() {

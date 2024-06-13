@@ -5,7 +5,7 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = ""
-  cmd = "templ generate && ./run.sh genproto && go build -o ./tmp/main ."
+  cmd = "./run.sh genall && go build -o ./tmp/main ."
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "cchoice_db", "xlsx", "migrations"]
   exclude_file = []
