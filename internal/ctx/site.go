@@ -1,5 +1,7 @@
 package ctx
 
 type SiteFlags struct {
-	Port string
+	Secure  bool
+	Address string
+	Port    string
 }

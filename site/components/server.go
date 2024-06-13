@@ -1,10 +1,13 @@
-package site
+package components
 
 import (
 	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
 	pb "cchoice/proto"
+	"cchoice/site/session"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/a-h/templ"
 )
@@ -19,5 +22,13 @@ func Serve(ctxSite *ctx.SiteFlags) {
 		cProducts(products).Render(r.Context(), w)
 	})
 
-	http.ListenAndServe(ctxSite.Port, nil)
+	sh := session.NewMiddleware(h, session.WithSecure(ctxSite.Secure))
+
+	server := &http.Server{
+		Addr:         fmt.Sprintf("%s%s", ctxSite.Address, ctxSite.Port),
+		Handler:      sh,
+		ReadTimeout:  time.Second * 10,
+		WriteTimeout: time.Second * 10,
+	}
+	server.ListenAndServe()
 }

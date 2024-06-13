@@ -1,4 +1,4 @@
-package site
+package components
 
 import (
 	"strconv"
@@ -6,5 +6,7 @@ import (
 )
 
 templ cProducts(products []*pb.Product) {
-	<div>Hello, { strconv.Itoa(len(products)) }</div>
+	@cHead()
+
+	<div>Products, { strconv.Itoa(len(products)) }</div>
 }
