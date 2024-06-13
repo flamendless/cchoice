@@ -11,10 +11,6 @@ DBPATH="file:./${DBNAME}"
 WIN_PATH=/mnt/c/Windows/System32
 alias cmd.exe="$WIN_PATH"/cmd.exe
 
-http() {
-	air serve_http
-}
-
 grpc() {
 	air serve_grpc -r=1 --db_path "${DBPATH}"
 }
@@ -106,7 +102,6 @@ if [ "$#" -eq 0 ]; then
 	echo "    grpc"
 	echo "    grpc_ui"
 	echo "    gentempl"
-	echo "    http"
 	echo "    testall"
 else
 	"$1" "$@"
