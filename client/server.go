@@ -1,10 +1,11 @@
-package components
+package client
 
 import (
 	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
 	pb "cchoice/proto"
-	"cchoice/site/session"
+	"cchoice/client/components"
+	"cchoice/client/session"
 	"fmt"
 	"net/http"
 	"time"
@@ -12,14 +13,13 @@ import (
 	"github.com/a-h/templ"
 )
 
-func Serve(ctxSite *ctx.SiteFlags) {
+func Serve(ctxSite *ctx.ClientFlags) {
 	logs.Log().Info("Starting site server")
 
-	http.Handle("/", templ.Handler(hello("cchoice")))
-
+	http.Handle("/", templ.Handler(components.Hello("cchoice")))
 	http.HandleFunc("/products", func(w http.ResponseWriter, r *http.Request) {
 		products := []*pb.Product{}
-		cProducts(products).Render(r.Context(), w)
+		components.CProducts(products).Render(r.Context(), w)
 	})
 
 	sh := session.NewMiddleware(h, session.WithSecure(ctxSite.Secure))

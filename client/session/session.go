@@ -38,10 +38,10 @@ type Middleware struct {
 	HTTPOnly bool
 }
 
-func ID(r *http.Request) (id string) {
+func ID(r *http.Request) string {
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
-		return
+		return ""
 	}
 	return cookie.Value
 }

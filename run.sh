@@ -20,10 +20,10 @@ grpc_ui() {
 	grpcui -port 36477 -plaintext ":50051"
 }
 
-site() {
-	siteport="3001"
-	cmd.exe /c "start vivaldi http://localhost:${siteport}/"
-	air serve_site -p ":${siteport}"
+client() {
+	clientport="3001"
+	cmd.exe /c "start vivaldi http://localhost:${clientport}/"
+	air serve_client -p ":${clientport}"
 }
 
 clean() {

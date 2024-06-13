@@ -1,6 +1,6 @@
 package ctx
 
-type SiteFlags struct {
+type ClientFlags struct {
 	Secure  bool
 	Address string
 	Port    string
