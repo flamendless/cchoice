@@ -5,8 +5,8 @@ go 1.22.1
 require (
 	github.com/Rhymond/go-money v1.0.10
 	github.com/a-h/templ v0.2.707
+	github.com/alexedwards/scs/v2 v2.8.0
 	github.com/cohesivestack/valgo v0.4.0
-	github.com/go-chi/chi/v5 v5.0.12
 	github.com/gosimple/slug v1.14.0
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/shopspring/decimal v1.3.1

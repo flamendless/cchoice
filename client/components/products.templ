@@ -5,7 +5,7 @@ import (
 	pb "cchoice/proto"
 )
 
-templ CProducts(products []*pb.Product) {
+templ Products(products []*pb.Product) {
 	@cHead()
 
 	<div>Products, { strconv.Itoa(len(products)) }</div>
