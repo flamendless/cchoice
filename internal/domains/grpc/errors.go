@@ -8,7 +8,8 @@ import (
 type ErrorCode string
 
 const (
-	IDNotFound ErrorCode = "ID_NOT_FOUND"
+	IDNotFound            ErrorCode = "ID_NOT_FOUND"
+	UnimplementedFunction ErrorCode = "UNIMPLEMENTED_FUNC"
 )
 
 type grpcError struct {

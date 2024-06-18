@@ -94,7 +94,16 @@ func (s *ProductServer) ListProductsByProductStatus(
 
 	products := make([]*pb.Product, 0, 1000)
 
-	if sortBy != nil {
+	if sortBy == nil {
+		fetched, err := s.CtxDB.QueriesRead.GetProductsByStatus(ctx, status.String())
+		if err != nil {
+			return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+		}
+		for _, f := range fetched {
+			row2 := cchoice_db.GetProductsRow(f)
+			products = append(products, productFromRow(&row2))
+		}
+	} else {
 		if sortBy.Field == pb.SortField_NAME {
 			if sortBy.Dir == pb.SortDir_ASC {
 				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByNameAsc(ctx, status.String())
@@ -116,15 +125,27 @@ func (s *ProductServer) ListProductsByProductStatus(
 					products = append(products, productFromRow(&row2))
 				}
 			}
-		}
-	} else {
-		fetched, err := s.CtxDB.QueriesRead.GetProductsByStatus(ctx, status.String())
-		if err != nil {
-			return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
-		}
-		for _, f := range fetched {
-			row2 := cchoice_db.GetProductsRow(f)
-			products = append(products, productFromRow(&row2))
+		} else if sortBy.Field == pb.SortField_CREATED_AT {
+			if sortBy.Dir == pb.SortDir_ASC {
+				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByCreationDateDesc(ctx, status.String())
+				if err != nil {
+					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+				}
+				for _, f := range fetched {
+					row2 := cchoice_db.GetProductsRow(f)
+					products = append(products, productFromRow(&row2))
+				}
+
+			} else if sortBy.Dir == pb.SortDir_DESC {
+				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByCreationDateDesc(ctx, status.String())
+				if err != nil {
+					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+				}
+				for _, f := range fetched {
+					row2 := cchoice_db.GetProductsRow(f)
+					products = append(products, productFromRow(&row2))
+				}
+			}
 		}
 	}
 

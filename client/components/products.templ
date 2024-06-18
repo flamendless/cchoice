@@ -7,13 +7,33 @@ import (
 templ ProductTableToolbar() {
 	<div class="m-4 flex place-content-center">
 		<button
-			class="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 rounded-full p-2"
+			class="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 rounded-full p-2 m-2"
 			hx-get="/products_table"
 			hx-vals='{"sortField": "name", "sortDir": "ASC"}'
 			hx-target="#product_tbl"
 			hx-swap="outerHTML"
 		>
-			Sort by name
+			Sort by name (ASC)
+		</button>
+
+		<button
+			class="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 rounded-full p-2 m-2"
+			hx-get="/products_table"
+			hx-vals='{"sortField": "name", "sortDir": "DESC"}'
+			hx-target="#product_tbl"
+			hx-swap="outerHTML"
+		>
+			Sort by name (DESC)
+		</button>
+
+		<button
+			class="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 rounded-full p-2 m-2"
+			hx-get="/products_table"
+			hx-vals='{"sortField": "created_at", "sortDir": "DESC"}'
+			hx-target="#product_tbl"
+			hx-swap="outerHTML"
+		>
+			Sort by creation date (DESC)
 		</button>
 	</div>
 }
