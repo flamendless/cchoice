@@ -69,8 +69,13 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	})
 
 	mux.HandleFunc("GET /products_table", func(w http.ResponseWriter, r *http.Request) {
-		paramSortField := r.URL.Query().Get("sortField")
-		paramSortDir := r.URL.Query().Get("sortDir")
+		paramSortField := r.URL.Query().Get("sort_field")
+		paramSortDir := r.URL.Query().Get("sort_dir")
+		logs.Log().Info(
+			"products_table params",
+			zap.String("sort field", paramSortField),
+			zap.String("sort dir", paramSortDir),
+		)
 		if paramSortField == "" || paramSortDir == "" {
 			return
 		}

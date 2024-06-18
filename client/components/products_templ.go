@@ -27,7 +27,7 @@ func ProductTableToolbar() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"m-4 flex place-content-center\"><button class=\"bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 rounded-full p-2 m-2\" hx-get=\"/products_table\" hx-vals=\"{&#34;sortField&#34;: &#34;name&#34;, &#34;sortDir&#34;: &#34;ASC&#34;}\" hx-target=\"#product_tbl\" hx-swap=\"outerHTML\">Sort by name (ASC)</button> <button class=\"bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 rounded-full p-2 m-2\" hx-get=\"/products_table\" hx-vals=\"{&#34;sortField&#34;: &#34;name&#34;, &#34;sortDir&#34;: &#34;DESC&#34;}\" hx-target=\"#product_tbl\" hx-swap=\"outerHTML\">Sort by name (DESC)</button> <button class=\"bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 rounded-full p-2 m-2\" hx-get=\"/products_table\" hx-vals=\"{&#34;sortField&#34;: &#34;created_at&#34;, &#34;sortDir&#34;: &#34;DESC&#34;}\" hx-target=\"#product_tbl\" hx-swap=\"outerHTML\">Sort by creation date (DESC)</button></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"m-4\"><form class=\"flex flex-row place-content-center\" hx-get=\"/products_table\" hx-trigger=\"submit\" hx-swap=\"outerHTML\" hx-target=\"#product_tbl\"><div class=\"m-4\"><label for=\"sort_field\">Sort By:</label> <select class=\"bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring focus:ring-orange-300\" name=\"sort_field\" id=\"sort_field\" hx-include=\"[name=&#39;sort_dir&#39;]\"><option value=\"name\">Name</option> <option value=\"created_at\">Creation Date</option></select></div><div class=\"m-4\"><label for=\"sort_dir\">Sort Direction:</label> <select class=\"bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring focus:ring-orange-300\" name=\"sort_dir\" id=\"sort_dir\" hx-include=\"[name=&#39;sort_field&#39;]\"><option value=\"ASC\">Ascending</option> <option value=\"DESC\">Descending</option></select></div><button type=\"submit\" class=\"bg-orange-500 hover:bg-orange-600 active:bg-orange-700 focus:outline-none focus:ring focus:ring-orange-300 rounded-full p-2 m-2\">Sort</button></form></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -87,7 +87,7 @@ func ProductTableBody(products []*pb.Product) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(product.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/products.templ`, Line: 57, Col: 53}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/products.templ`, Line: 68, Col: 53}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -100,7 +100,7 @@ func ProductTableBody(products []*pb.Product) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(product.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/products.templ`, Line: 58, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/products.templ`, Line: 69, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -113,7 +113,7 @@ func ProductTableBody(products []*pb.Product) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(product.Brand)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/products.templ`, Line: 59, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/products.templ`, Line: 70, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -126,7 +126,7 @@ func ProductTableBody(products []*pb.Product) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(product.UnitPriceWithoutVatDisplay)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/products.templ`, Line: 60, Col: 75}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/products.templ`, Line: 71, Col: 75}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -139,7 +139,7 @@ func ProductTableBody(products []*pb.Product) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(product.UnitPriceWithVatDisplay)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/products.templ`, Line: 61, Col: 72}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/products.templ`, Line: 72, Col: 72}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
