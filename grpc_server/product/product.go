@@ -20,7 +20,7 @@ type ProductServer struct {
 	CtxDB *ctx.Database
 }
 
-func productFromRow(row *cchoice_db.GetProductByIDRow) *pb.Product {
+func productFromRow(row *cchoice_db.GetProductsRow) *pb.Product {
 	unitPriceWithoutVat := decimal.NewFromInt(row.UnitPriceWithoutVat / 100)
 	unitPriceWithVat := decimal.NewFromInt(row.UnitPriceWithVat / 100)
 	moneyWithoutVat := money.New(
@@ -74,7 +74,8 @@ func (s *ProductServer) GetProductByID(
 		return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
 	}
 
-	res := productFromRow(&existingProduct)
+	row2 := cchoice_db.GetProductsRow(existingProduct)
+	res := productFromRow(&row2)
 	return res, nil
 }
 
@@ -83,24 +84,53 @@ func (s *ProductServer) ListProductsByProductStatus(
 	in *pb.ProductStatusRequest,
 ) (*pb.ProductsResponse, error) {
 	status := in.GetStatus()
-	logs.Log().Debug("ListProductsByProductStatus", zap.String("status", status.String()))
+	sortBy := in.GetSortBy()
 
-	products, err := s.CtxDB.QueriesRead.GetProductsByStatus(ctx, status.String())
-	if err != nil {
-		return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+	logs.Log().Debug(
+		"ListProductsByProductStatus",
+		zap.String("status", status.String()),
+		zap.String("sort_by", sortBy.String()),
+	)
+
+	products := make([]*pb.Product, 0, 1000)
+
+	if sortBy != nil {
+		if sortBy.Field == pb.SortField_NAME {
+			if sortBy.Dir == pb.SortDir_ASC {
+				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByNameAsc(ctx, status.String())
+				if err != nil {
+					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+				}
+				for _, f := range fetched {
+					row2 := cchoice_db.GetProductsRow(f)
+					products = append(products, productFromRow(&row2))
+				}
+
+			} else if sortBy.Dir == pb.SortDir_DESC {
+				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByNameDesc(ctx, status.String())
+				if err != nil {
+					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+				}
+				for _, f := range fetched {
+					row2 := cchoice_db.GetProductsRow(f)
+					products = append(products, productFromRow(&row2))
+				}
+			}
+		}
+	} else {
+		fetched, err := s.CtxDB.QueriesRead.GetProductsByStatus(ctx, status.String())
+		if err != nil {
+			return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+		}
+		for _, f := range fetched {
+			row2 := cchoice_db.GetProductsRow(f)
+			products = append(products, productFromRow(&row2))
+		}
 	}
 
 	res := &pb.ProductsResponse{
 		Length: int64(len(products)),
-		Products: make([]*pb.Product, 0, len(products)),
-	}
-
-	for _, row := range products {
-		row2 := cchoice_db.GetProductByIDRow(row)
-		res.Products = append(
-			res.Products,
-			productFromRow(&row2),
-		)
+		Products: products,
 	}
 
 	return res, nil

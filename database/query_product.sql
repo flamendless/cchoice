@@ -37,6 +37,22 @@ INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs
 WHERE tbl_product.status = ?
 ORDER BY created_at DESC;
 
+-- name: GetProductsByStatusSortByNameAsc :many
+SELECT *
+FROM tbl_product
+INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
+INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
+WHERE tbl_product.status = ?
+ORDER BY tbl_product.name ASC;
+
+-- name: GetProductsByStatusSortByNameDesc :many
+SELECT *
+FROM tbl_product
+INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
+INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
+WHERE tbl_product.status = ?
+ORDER BY tbl_product.name DESC;
+
 -- name: GetProductIDBySerial :one
 SELECT id
 FROM tbl_product

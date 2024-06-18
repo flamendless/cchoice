@@ -2,6 +2,7 @@ package logs
 
 import (
 	"fmt"
+	"net/http"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -23,4 +24,12 @@ func InitLog() {
 
 func Log() *zap.Logger {
 	return logger
+}
+
+func LogHTTPHandlerError(r *http.Request, err error) {
+	Log().Fatal(
+		r.URL.String(),
+		zap.String("method", r.Method),
+		zap.Error(err),
+	)
 }

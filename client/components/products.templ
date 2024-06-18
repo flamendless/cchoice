@@ -4,29 +4,59 @@ import (
 	pb "cchoice/proto"
 )
 
-templ Products(products []*pb.Product) {
+templ ProductTableToolbar() {
+	<div class="m-4 flex place-content-center">
+		<button
+			class="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 rounded-full p-2"
+			hx-get="/products_table"
+			hx-vals='{"sortField": "name", "sortDir": "ASC"}'
+			hx-target="#product_tbl"
+			hx-swap="outerHTML"
+		>
+			Sort by name
+		</button>
+	</div>
+}
+
+templ ProductTableHead() {
+	<thead>
+		<tr>
+			<th class="border border-slate-600">Name</th>
+			<th class="border border-slate-600">Description</th>
+			<th class="border border-slate-600">Brand</th>
+			<th class="border border-slate-600">Price without VAT</th>
+			<th class="border border-slate-600">Price with VAT</th>
+		</tr>
+	</thead>
+}
+
+templ ProductTableBody(products []*pb.Product) {
+	<tbody id="product_tbl">
+	for _, product := range products {
+		<tr>
+			<td class="border border-slate-600">{ product.Name }</td>
+			<td class="border border-slate-600">{ product.Description }</td>
+			<td class="border border-slate-600">{ product.Brand }</td>
+			<td class="border border-slate-600">{ product.UnitPriceWithoutVatDisplay }</td>
+			<td class="border border-slate-600">{ product.UnitPriceWithVatDisplay }</td>
+		</tr>
+	}
+	</tbody>
+}
+
+templ ProductTableView(products []*pb.Product) {
 	<header>
 		<h1 class="text-center text-3xl font-bold underline">
 			Product Table
 		</h1>
 	</header>
 
-	<table>
-		<tr>
-			<th>Name</th>
-			<th>Description</th>
-			<th>Brand</th>
-			<th>Price without VAT</th>
-			<th>Price with VAT</th>
-		</tr>
-		for _, product := range products {
-			<tr>
-				<td>{ product.Name }</td>
-				<td>{ product.Description }</td>
-				<td>{ product.Brand }</td>
-				<td>{ product.UnitPriceWithoutVatDisplay }</td>
-				<td>{ product.UnitPriceWithVatDisplay }</td>
-			</tr>
-		}
-	</table>
+	@ProductTableToolbar()
+
+	<div class="m-4">
+		<table class="table-auto border-collapse border border-slate-500">
+			@ProductTableHead()
+			@ProductTableBody(products)
+		</table>
+	</div>
 }

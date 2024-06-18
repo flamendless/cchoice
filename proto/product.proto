@@ -9,7 +9,7 @@ import "proto/product_specs.proto";
 option go_package = "cchoice/pb";
 
 enum ProductStatus {
-   UNDEFINED = 0;
+   PRODUCT_STATUS_UNDEFINED = 0;
    ACTIVE = 1;
    DELETED = 2;
 }
@@ -35,6 +35,7 @@ message ProductsResponse {
 
 message ProductStatusRequest {
    ProductStatus status = 1;
+   SortBy sort_by = 2;
 }
 
 service ProductService {

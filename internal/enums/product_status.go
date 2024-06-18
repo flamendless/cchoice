@@ -8,14 +8,14 @@ import (
 type ProductStatus int
 
 const (
-	Undefined ProductStatus = iota
+	UndefinedProductStatus ProductStatus = iota
 	Active
 	Deleted
 )
 
 func (t ProductStatus) String() string {
 	switch t {
-	case Undefined:
+	case UndefinedProductStatus:
 		return "UNDEFINED"
 	case Active:
 		return "ACTIVE"
@@ -29,7 +29,7 @@ func (t ProductStatus) String() string {
 func ParseProductStatusEnum(e string) ProductStatus {
 	switch e {
 	case "UNDEFINED":
-		return Undefined
+		return UndefinedProductStatus
 	case "ACTIVE":
 		return Active
 	case "DELETED":
@@ -42,7 +42,7 @@ func ParseProductStatusEnum(e string) ProductStatus {
 func ParseProductStatusEnumPB(e string) pb.ProductStatus {
 	switch e {
 	case "UNDEFINED":
-		return pb.ProductStatus_UNDEFINED
+		return pb.ProductStatus_PRODUCT_STATUS_UNDEFINED
 	case "ACTIVE":
 		return pb.ProductStatus_ACTIVE
 	case "DELETED":

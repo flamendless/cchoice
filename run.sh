@@ -26,9 +26,7 @@ grpc_ui() {
 client() {
 	local clientport="3001"
 	cmd.exe /c "start vivaldi http://localhost:${clientport}/"
-	grpc & \
-		air serve_client -p ":${clientport}" --grpc_address "${GRPC_SERVER_ADDR}" && \
-		pkill air
+	air serve_client -p ":${clientport}" --grpc_address "${GRPC_SERVER_ADDR}"
 }
 
 clean() {
@@ -82,6 +80,8 @@ gentempl() {
 
 genall() {
 	echo "running genall..."
+	go generate
+	npx tailwindcss build -i client/static/css/style.css -o client/static/css/tailwind.css -m
 	gensql
 	genproto
 	gentempl

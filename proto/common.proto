@@ -6,6 +6,22 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "cchoice/pb";
 
+enum SortField {
+   SORT_FIELD_UNDEFINED = 0;
+   NAME = 1;
+}
+
+enum SortDir {
+   SORT_DIR_UNDEFINED = 0;
+   ASC = 1;
+   DESC = 2;
+}
+
+message SortBy {
+   SortField field = 1;
+   SortDir dir = 2;
+}
+
 message VoidParam {}
 message VoidReturn {}
 

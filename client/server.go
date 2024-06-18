@@ -5,6 +5,7 @@ import (
 	"cchoice/client/components/layout"
 	"cchoice/client/middlewares"
 	"cchoice/internal/ctx"
+	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	pb "cchoice/proto"
 	"context"
@@ -19,8 +20,6 @@ import (
 
 //go:embed static/*
 var static embed.FS
-
-//go:generate npx tailwindcss build -i static/css/style.css -o static/css/tailwind.css -m
 
 var sessionManager *scs.SessionManager
 
@@ -48,10 +47,6 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	mux.Handle("GET /static/", http.FileServer(http.FS(static)))
 
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		components.Hello("cchoice").Render(r.Context(), w)
-	})
-
 	// mux.HandleFunc("GET /", getHandler)
 	// mux.HandleFunc("PUT /", putHandler)
 
@@ -66,10 +61,41 @@ func Serve(ctxClient *ctx.ClientFlags) {
 			&pb.ProductStatusRequest{Status: pb.ProductStatus_ACTIVE},
 		)
 		if err != nil {
-			logs.Log().Fatal(r.URL.String(), zap.Error(err))
+			logs.LogHTTPHandlerError(r, err)
+			return
 		}
 
-		layout.Base("Products", components.Products(products.Products)).Render(r.Context(), w)
+		layout.Base("Products", components.ProductTableView(products.Products)).Render(r.Context(), w)
+	})
+
+	mux.HandleFunc("GET /products_table", func(w http.ResponseWriter, r *http.Request) {
+		paramSortField := r.URL.Query().Get("sortField")
+		paramSortDir := r.URL.Query().Get("sortDir")
+		if paramSortField == "" || paramSortDir == "" {
+			return
+		}
+
+		//TODO: This should be in a handler?
+		client := pb.NewProductServiceClient(grpcConn)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		products, err := client.ListProductsByProductStatus(
+			ctx,
+			&pb.ProductStatusRequest{
+				Status: pb.ProductStatus_ACTIVE,
+				SortBy: &pb.SortBy{
+					Field: enums.ParseSortFieldEnumPB(paramSortField),
+					Dir: enums.ParseSortDirEnumPB(paramSortDir),
+				},
+			},
+		)
+		if err != nil {
+			logs.LogHTTPHandlerError(r, err)
+			return
+		}
+
+		components.ProductTableBody(products.Products).Render(r.Context(), w)
 	})
 
 	mw := middlewares.NewMiddleware(
