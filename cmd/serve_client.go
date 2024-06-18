@@ -16,7 +16,7 @@ func init() {
 	f().BoolVarP(&ctxClient.Secure, "secure", "s", true, "Use secure session")
 	f().StringVarP(&ctxClient.Address, "address", "a", "localhost", "Address")
 	f().StringVarP(&ctxClient.Port, "port", "p", ":3001", "Port of the address")
-	f().StringVarP(&ctxClient.GRPCAddress, "grpc_address", "g", ":50051", "Address for GRPC connection")
+	f().StringVarP(&ctxClient.GRPCAddress, "grpc_address", "g", "", "Address for GRPC connection")
 
 	rootCmd.AddCommand(serveClientCmd)
 }

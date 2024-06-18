@@ -24,9 +24,11 @@ grpc_ui() {
 }
 
 client() {
-	clientport="3001"
+	local clientport="3001"
 	cmd.exe /c "start vivaldi http://localhost:${clientport}/"
-	air serve_client -p ":${clientport}" --grpc_address "${GRPC_SERVER_ADDR}"
+	grpc & \
+		air serve_client -p ":${clientport}" --grpc_address "${GRPC_SERVER_ADDR}" && \
+		pkill air
 }
 
 clean() {

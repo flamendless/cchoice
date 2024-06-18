@@ -1,12 +1,32 @@
 package components
 
 import (
-	"strconv"
 	pb "cchoice/proto"
 )
 
 templ Products(products []*pb.Product) {
-	@cHead()
+	<header>
+		<h1 class="text-center text-3xl font-bold underline">
+			Product Table
+		</h1>
+	</header>
 
-	<div>Products, { strconv.Itoa(len(products)) }</div>
+	<table>
+		<tr>
+			<th>Name</th>
+			<th>Description</th>
+			<th>Brand</th>
+			<th>Price without VAT</th>
+			<th>Price with VAT</th>
+		</tr>
+		for _, product := range products {
+			<tr>
+				<td>{ product.Name }</td>
+				<td>{ product.Description }</td>
+				<td>{ product.Brand }</td>
+				<td>{ product.UnitPriceWithoutVatDisplay }</td>
+				<td>{ product.UnitPriceWithVatDisplay }</td>
+			</tr>
+		}
+	</table>
 }

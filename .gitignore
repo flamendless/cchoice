@@ -4,3 +4,5 @@ test.db
 test.db-shm
 test.db-wal
 tmp/
+client/static/css/tailwind.css
+node_modules/

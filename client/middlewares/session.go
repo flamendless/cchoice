@@ -1,10 +1,19 @@
 package middlewares
 
 import (
+	"cchoice/internal/logs"
 	"net/http"
 
 	"github.com/segmentio/ksuid"
+	"go.uber.org/zap"
 )
+
+type Middleware struct {
+	Next     http.Handler
+	Secure   bool
+	HTTPOnly bool
+	UseGRPC  bool
+}
 
 type MiddlewareOpts func(*Middleware)
 
@@ -21,21 +30,24 @@ func NewMiddleware(next http.Handler, opts ...MiddlewareOpts) http.Handler {
 }
 
 func WithSecure(secure bool) MiddlewareOpts {
+	logs.Log().Info("Middleware", zap.Bool("with secure", secure))
 	return func(m *Middleware) {
 		m.Secure = secure
 	}
 }
 
 func WithHTTPOnly(httpOnly bool) MiddlewareOpts {
+	logs.Log().Info("Middleware", zap.Bool("with HTTP only", httpOnly))
 	return func(m *Middleware) {
 		m.HTTPOnly = httpOnly
 	}
 }
 
-type Middleware struct {
-	Next     http.Handler
-	Secure   bool
-	HTTPOnly bool
+func WithGRPC(useGRPC bool) MiddlewareOpts {
+	logs.Log().Info("Middleware", zap.Bool("use GRPC", useGRPC))
+	return func(m *Middleware) {
+		m.UseGRPC = useGRPC
+	}
 }
 
 func ID(r *http.Request) string {
@@ -51,11 +63,12 @@ func (mw Middleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if id == "" {
 		id = ksuid.New().String()
 		http.SetCookie(w, &http.Cookie{
-			Name: "session_id",
-			Value: id,
-			Secure: mw.Secure,
+			Name:     "session_id",
+			Value:    id,
+			Secure:   mw.Secure,
 			HttpOnly: mw.HTTPOnly,
 		})
 	}
+
 	mw.Next.ServeHTTP(w, r)
 }

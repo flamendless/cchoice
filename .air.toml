@@ -4,10 +4,10 @@ tmp_dir = "tmp"
 
 [build]
   args_bin = []
-  bin = ""
+  bin = "./tmp/main"
   cmd = "./run.sh genall && go build -o ./tmp/main ."
   delay = 1000
-  exclude_dir = ["assets", "tmp", "vendor", "testdata", "cchoice_db", "xlsx", "migrations"]
+  exclude_dir = ["assets", "tmp", "vendor", "testdata", "cchoice_db", "xlsx", "migrations", "node_modules"]
   exclude_file = []
   exclude_regex = ["_test.go", ".pb.go", ".sql.go", ".*_templ.go"]
   exclude_unchanged = false
