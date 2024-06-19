@@ -20,7 +20,9 @@ type ProductServer struct {
 	CtxDB *ctx.Database
 }
 
-func productFromRow(row *cchoice_db.GetProductsRow) *pb.Product {
+type ProductsRow cchoice_db.GetProductsRow
+
+func (row ProductsRow) ToPBProduct() *pb.Product {
 	unitPriceWithoutVat := decimal.NewFromInt(row.UnitPriceWithoutVat / 100)
 	unitPriceWithVat := decimal.NewFromInt(row.UnitPriceWithVat / 100)
 	moneyWithoutVat := money.New(
@@ -74,8 +76,7 @@ func (s *ProductServer) GetProductByID(
 		return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
 	}
 
-	row2 := cchoice_db.GetProductsRow(existingProduct)
-	res := productFromRow(&row2)
+	res := ProductsRow(existingProduct).ToPBProduct()
 	return res, nil
 }
 
@@ -100,8 +101,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 			return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
 		}
 		for _, f := range fetched {
-			row2 := cchoice_db.GetProductsRow(f)
-			products = append(products, productFromRow(&row2))
+			products = append(products, ProductsRow(f).ToPBProduct())
 		}
 	} else {
 		if sortBy.Field == pb.SortField_NAME {
@@ -111,8 +111,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
 				}
 				for _, f := range fetched {
-					row2 := cchoice_db.GetProductsRow(f)
-					products = append(products, productFromRow(&row2))
+					products = append(products, ProductsRow(f).ToPBProduct())
 				}
 
 			} else if sortBy.Dir == pb.SortDir_DESC {
@@ -121,8 +120,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
 				}
 				for _, f := range fetched {
-					row2 := cchoice_db.GetProductsRow(f)
-					products = append(products, productFromRow(&row2))
+					products = append(products, ProductsRow(f).ToPBProduct())
 				}
 			}
 		} else if sortBy.Field == pb.SortField_CREATED_AT {
@@ -132,8 +130,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
 				}
 				for _, f := range fetched {
-					row2 := cchoice_db.GetProductsRow(f)
-					products = append(products, productFromRow(&row2))
+					products = append(products, ProductsRow(f).ToPBProduct())
 				}
 
 			} else if sortBy.Dir == pb.SortDir_DESC {
@@ -142,15 +139,14 @@ func (s *ProductServer) ListProductsByProductStatus(
 					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
 				}
 				for _, f := range fetched {
-					row2 := cchoice_db.GetProductsRow(f)
-					products = append(products, productFromRow(&row2))
+					products = append(products, ProductsRow(f).ToPBProduct())
 				}
 			}
 		}
 	}
 
 	res := &pb.ProductsResponse{
-		Length: int64(len(products)),
+		Length:   int64(len(products)),
 		Products: products,
 	}
 
