@@ -52,6 +52,7 @@ templ ProductTableToolbar() {
 templ ProductTableHead() {
 	<thead>
 		<tr>
+			<th class="border border-slate-600">Serial</th>
 			<th class="border border-slate-600">Name</th>
 			<th class="border border-slate-600">Description</th>
 			<th class="border border-slate-600">Brand</th>
@@ -65,6 +66,7 @@ templ ProductTableBody(products []*pb.Product) {
 	<tbody id="product_tbl">
 	for _, product := range products {
 		<tr>
+			<td class="border border-slate-600">{ product.Serial }</td>
 			<td class="border border-slate-600">{ product.Name }</td>
 			<td class="border border-slate-600">{ product.Description }</td>
 			<td class="border border-slate-600">{ product.Brand }</td>
@@ -75,7 +77,7 @@ templ ProductTableBody(products []*pb.Product) {
 	</tbody>
 }
 
-templ ProductTableView(products []*pb.Product) {
+templ ProductTableView(data *pb.ProductsResponse) {
 	<header>
 		<h1 class="text-center text-3xl font-bold underline">
 			Product Table
@@ -87,7 +89,7 @@ templ ProductTableView(products []*pb.Product) {
 	<div class="m-4">
 		<table class="table-auto border-collapse border border-slate-500">
 			@ProductTableHead()
-			@ProductTableBody(products)
+			@ProductTableBody(data.Products)
 		</table>
 	</div>
 }

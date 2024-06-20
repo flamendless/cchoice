@@ -26,8 +26,8 @@ func Log() *zap.Logger {
 	return logger
 }
 
-func LogHTTPHandlerError(r *http.Request, err error) {
-	Log().Fatal(
+func LogHTTPHandler(logger *zap.Logger, r *http.Request, err error) {
+	logger.Fatal(
 		r.URL.String(),
 		zap.String("method", r.Method),
 		zap.Error(err),

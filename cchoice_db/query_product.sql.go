@@ -158,78 +158,6 @@ func (q *Queries) GetProductByID(ctx context.Context, id int64) (GetProductByIDR
 	return i, err
 }
 
-const getProductByName = `-- name: GetProductByName :one
-SELECT tbl_product.id, serial, name, description, brand, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at, tbl_product_category.id, product_id, category, subcategory, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply
-FROM tbl_product
-INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
-INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
-WHERE tbl_product.name = ?
-LIMIT 1
-`
-
-type GetProductByNameRow struct {
-	ID                          int64
-	Serial                      string
-	Name                        string
-	Description                 sql.NullString
-	Brand                       string
-	Status                      string
-	ProductSpecsID              sql.NullInt64
-	UnitPriceWithoutVat         int64
-	UnitPriceWithVat            int64
-	UnitPriceWithoutVatCurrency string
-	UnitPriceWithVatCurrency    string
-	CreatedAt                   time.Time
-	UpdatedAt                   time.Time
-	DeletedAt                   time.Time
-	ID_2                        int64
-	ProductID                   int64
-	Category                    sql.NullString
-	Subcategory                 sql.NullString
-	ID_3                        int64
-	Colours                     sql.NullString
-	Sizes                       sql.NullString
-	Segmentation                sql.NullString
-	PartNumber                  sql.NullString
-	Power                       sql.NullString
-	Capacity                    sql.NullString
-	ScopeOfSupply               sql.NullString
-}
-
-func (q *Queries) GetProductByName(ctx context.Context, name string) (GetProductByNameRow, error) {
-	row := q.db.QueryRowContext(ctx, getProductByName, name)
-	var i GetProductByNameRow
-	err := row.Scan(
-		&i.ID,
-		&i.Serial,
-		&i.Name,
-		&i.Description,
-		&i.Brand,
-		&i.Status,
-		&i.ProductSpecsID,
-		&i.UnitPriceWithoutVat,
-		&i.UnitPriceWithVat,
-		&i.UnitPriceWithoutVatCurrency,
-		&i.UnitPriceWithVatCurrency,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
-		&i.ID_2,
-		&i.ProductID,
-		&i.Category,
-		&i.Subcategory,
-		&i.ID_3,
-		&i.Colours,
-		&i.Sizes,
-		&i.Segmentation,
-		&i.PartNumber,
-		&i.Power,
-		&i.Capacity,
-		&i.ScopeOfSupply,
-	)
-	return i, err
-}
-
 const getProductBySerial = `-- name: GetProductBySerial :one
 SELECT tbl_product.id, serial, name, description, brand, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at, tbl_product_category.id, product_id, category, subcategory, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply
 FROM tbl_product
@@ -303,6 +231,8 @@ func (q *Queries) GetProductBySerial(ctx context.Context, serial string) (GetPro
 }
 
 const getProductIDBySerial = `-- name: GetProductIDBySerial :one
+;
+
 SELECT id
 FROM tbl_product
 WHERE tbl_product.serial = ?
@@ -362,6 +292,101 @@ func (q *Queries) GetProducts(ctx context.Context) ([]GetProductsRow, error) {
 	var items []GetProductsRow
 	for rows.Next() {
 		var i GetProductsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Serial,
+			&i.Name,
+			&i.Description,
+			&i.Brand,
+			&i.Status,
+			&i.ProductSpecsID,
+			&i.UnitPriceWithoutVat,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithoutVatCurrency,
+			&i.UnitPriceWithVatCurrency,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.ID_2,
+			&i.ProductID,
+			&i.Category,
+			&i.Subcategory,
+			&i.ID_3,
+			&i.Colours,
+			&i.Sizes,
+			&i.Segmentation,
+			&i.PartNumber,
+			&i.Power,
+			&i.Capacity,
+			&i.ScopeOfSupply,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getProductsByFilter = `-- name: GetProductsByFilter :many
+SELECT tbl_product.id, serial, name, description, brand, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at, tbl_product_category.id, product_id, category, subcategory, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply
+FROM tbl_product
+INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
+INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
+WHERE
+	(tbl_product.status = ?1 OR ?1 IS NULL) OR
+	(tbl_product.brand = ?2 OR ?2 IS NULL)
+ORDER BY tbl_product.updated_at DESC
+`
+
+type GetProductsByFilterParams struct {
+	Status string
+	Brand  string
+}
+
+type GetProductsByFilterRow struct {
+	ID                          int64
+	Serial                      string
+	Name                        string
+	Description                 sql.NullString
+	Brand                       string
+	Status                      string
+	ProductSpecsID              sql.NullInt64
+	UnitPriceWithoutVat         int64
+	UnitPriceWithVat            int64
+	UnitPriceWithoutVatCurrency string
+	UnitPriceWithVatCurrency    string
+	CreatedAt                   time.Time
+	UpdatedAt                   time.Time
+	DeletedAt                   time.Time
+	ID_2                        int64
+	ProductID                   int64
+	Category                    sql.NullString
+	Subcategory                 sql.NullString
+	ID_3                        int64
+	Colours                     sql.NullString
+	Sizes                       sql.NullString
+	Segmentation                sql.NullString
+	PartNumber                  sql.NullString
+	Power                       sql.NullString
+	Capacity                    sql.NullString
+	ScopeOfSupply               sql.NullString
+}
+
+func (q *Queries) GetProductsByFilter(ctx context.Context, arg GetProductsByFilterParams) ([]GetProductsByFilterRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductsByFilter, arg.Status, arg.Brand)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductsByFilterRow
+	for rows.Next() {
+		var i GetProductsByFilterRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Serial,
@@ -829,6 +854,54 @@ func (q *Queries) GetProductsByStatusSortByNameDesc(ctx context.Context, status 
 			&i.Power,
 			&i.Capacity,
 			&i.ScopeOfSupply,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getProductsWithSort = `-- name: GetProductsWithSort :many
+SELECT id, serial, name, description, brand, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at
+FROM tbl_product
+ORDER BY
+	(CASE WHEN @sort = 'sku' AND @dir = 'ASC' THEN  tbl_product.sku END) ASC,
+	(CASE WHEN @sort = 'sku' AND @dir = 'DESC' THEN tbl_product.sku END) DESC,
+	(CASE WHEN @sort = 'created_at' AND @dir = 'ASC' THEN tbl_product.created_at END) ASC,
+	(CASE WHEN @sort = 'created_at' AND @dir = 'DESC' THEN tbl_product.created_at END) DESC
+`
+
+func (q *Queries) GetProductsWithSort(ctx context.Context) ([]TblProduct, error) {
+	rows, err := q.db.QueryContext(ctx, getProductsWithSort)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TblProduct
+	for rows.Next() {
+		var i TblProduct
+		if err := rows.Scan(
+			&i.ID,
+			&i.Serial,
+			&i.Name,
+			&i.Description,
+			&i.Brand,
+			&i.Status,
+			&i.ProductSpecsID,
+			&i.UnitPriceWithoutVat,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithoutVatCurrency,
+			&i.UnitPriceWithVatCurrency,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
 		); err != nil {
 			return nil, err
 		}

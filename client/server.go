@@ -1,14 +1,11 @@
 package client
 
 import (
-	"cchoice/client/components"
-	"cchoice/client/components/layout"
+	"cchoice/client/handlers"
 	"cchoice/client/middlewares"
+	"cchoice/client/services"
 	"cchoice/internal/ctx"
-	"cchoice/internal/enums"
 	"cchoice/internal/logs"
-	pb "cchoice/proto"
-	"context"
 	"embed"
 	"fmt"
 	"net/http"
@@ -43,6 +40,11 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	grpcConn := NewGRPCConn(ctxClient.GRPCAddress)
 	defer GRPCConnectionClose(grpcConn)
 
+	logger := logs.Log()
+
+	productService := services.NewProductService(grpcConn)
+	productHandler := handlers.NewProductHandler(logger, &productService)
+
 	mux := http.NewServeMux()
 
 	mux.Handle("GET /static/", http.FileServer(http.FS(static)))
@@ -50,58 +52,8 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	// mux.HandleFunc("GET /", getHandler)
 	// mux.HandleFunc("PUT /", putHandler)
 
-	mux.HandleFunc("GET /products", func(w http.ResponseWriter, r *http.Request) {
-		//TODO: This should be in a handler?
-		client := pb.NewProductServiceClient(grpcConn)
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		products, err := client.ListProductsByProductStatus(
-			ctx,
-			&pb.ProductStatusRequest{Status: pb.ProductStatus_ACTIVE},
-		)
-		if err != nil {
-			logs.LogHTTPHandlerError(r, err)
-			return
-		}
-
-		layout.Base("Products", components.ProductTableView(products.Products)).Render(r.Context(), w)
-	})
-
-	mux.HandleFunc("GET /products_table", func(w http.ResponseWriter, r *http.Request) {
-		paramSortField := r.URL.Query().Get("sort_field")
-		paramSortDir := r.URL.Query().Get("sort_dir")
-		logs.Log().Info(
-			"products_table params",
-			zap.String("sort field", paramSortField),
-			zap.String("sort dir", paramSortDir),
-		)
-		if paramSortField == "" || paramSortDir == "" {
-			return
-		}
-
-		//TODO: This should be in a handler?
-		client := pb.NewProductServiceClient(grpcConn)
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		products, err := client.ListProductsByProductStatus(
-			ctx,
-			&pb.ProductStatusRequest{
-				Status: pb.ProductStatus_ACTIVE,
-				SortBy: &pb.SortBy{
-					Field: enums.ParseSortFieldEnumPB(paramSortField),
-					Dir: enums.ParseSortDirEnumPB(paramSortDir),
-				},
-			},
-		)
-		if err != nil {
-			logs.LogHTTPHandlerError(r, err)
-			return
-		}
-
-		components.ProductTableBody(products.Products).Render(r.Context(), w)
-	})
+	mux.HandleFunc("GET /products", productHandler.ProductTablePage)
+	mux.HandleFunc("GET /products_table", productHandler.ProductTableBody)
 
 	mw := middlewares.NewMiddleware(
 		mux,

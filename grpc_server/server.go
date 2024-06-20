@@ -1,7 +1,7 @@
 package grpc_server
 
 import (
-	"cchoice/grpc_server/product"
+	"cchoice/grpc_server/products"
 	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
 	pb "cchoice/proto"
@@ -24,9 +24,9 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 	ctxDB := ctx.NewDatabaseCtx(ctxGRPC.DBPath)
 	defer ctxDB.Close()
 
-	pb.RegisterProductServiceServer(s, &product.ProductServer{CtxDB: ctxDB})
-	pb.RegisterProductCategoryServiceServer(s, &product.ProductCategoryServer{CtxDB: ctxDB})
-	pb.RegisterProductSpecsServiceServer(s, &product.ProductSpecsServer{CtxDB: ctxDB})
+	pb.RegisterProductServiceServer(s, &products.ProductServer{CtxDB: ctxDB})
+	pb.RegisterProductCategoryServiceServer(s, &products.ProductCategoryServer{CtxDB: ctxDB})
+	pb.RegisterProductSpecsServiceServer(s, &products.ProductSpecsServer{CtxDB: ctxDB})
 
 	if ctxGRPC.Reflection {
 		reflection.Register(s)
