@@ -21,6 +21,7 @@ templ ProductTableToolbar() {
 					id="sort_field"
 					hx-include="[name='sort_dir']"
 				>
+					<option value="">---</option>
 					<option value="name">Name</option>
 					<option value="created_at">Creation Date</option>
 				</select>
@@ -34,6 +35,7 @@ templ ProductTableToolbar() {
 					id="sort_dir"
 					hx-include="[name='sort_field']"
 				>
+					<option value="">---</option>
 					<option value="ASC">Ascending</option>
 					<option value="DESC">Descending</option>
 				</select>

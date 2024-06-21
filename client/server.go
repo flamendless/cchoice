@@ -52,13 +52,14 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	// mux.HandleFunc("GET /", getHandler)
 	// mux.HandleFunc("PUT /", putHandler)
 
-	mux.HandleFunc("GET /products", productHandler.ProductTablePage)
-	mux.HandleFunc("GET /products_table", productHandler.ProductTableBody)
+	mux.HandleFunc("GET /products", handlers.Validate(productHandler.ProductTablePage))
+	mux.HandleFunc("GET /products_table", handlers.Validate(productHandler.ProductTableBody))
 
 	mw := middlewares.NewMiddleware(
 		mux,
+		middlewares.WithSessionID(true),
 		middlewares.WithSecure(ctxClient.Secure),
-		middlewares.WithGRPC(ctxClient.GRPCAddress != ""),
+		middlewares.WithGRPC(grpcConn != nil),
 	)
 
 	mw = sessionManager.LoadAndSave(mw)

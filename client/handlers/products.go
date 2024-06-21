@@ -3,21 +3,35 @@ package handlers
 import (
 	"cchoice/client/components"
 	"cchoice/client/components/layout"
-	"cchoice/client/services"
 	"cchoice/internal/logs"
+	pb "cchoice/proto"
+	"errors"
 	"net/http"
+	"net/url"
 
+	"github.com/a-h/templ"
 	"go.uber.org/zap"
 )
 
+type HandlerRes struct {
+	Component  templ.Component
+	Error      error
+	StatusCode int
+}
+
+type ProductService interface {
+	GetProducts() (*pb.ProductsResponse, error)
+	GetProductsWithSorting(string, sortDir string) ([]*pb.Product, error)
+}
+
 type ProductHandler struct {
 	Logger         *zap.Logger
-	ProductService *services.ProductService
+	ProductService ProductService
 }
 
 func NewProductHandler(
 	logger *zap.Logger,
-	productService *services.ProductService,
+	productService ProductService,
 ) ProductHandler {
 	return ProductHandler{
 		Logger:         logger,
@@ -25,42 +39,40 @@ func NewProductHandler(
 	}
 }
 
-func (h *ProductHandler) ProductTablePage(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) ProductTablePage(w http.ResponseWriter, r *http.Request) *HandlerRes {
 	res, err := h.ProductService.GetProducts()
 	if err != nil {
-		logs.LogHTTPHandler(h.Logger, r, err)
-
-		//error page
-		return
+		return &HandlerRes{Error: err, StatusCode: http.StatusInternalServerError}
 	}
 
-	layout.Base(
-		"Products",
-		components.ProductTableView(res),
-	).Render(r.Context(), w)
+	return &HandlerRes{
+		Component: layout.Base("Products", components.ProductTableView(res)),
+	}
 }
 
-func (h *ProductHandler) ProductTableBody(w http.ResponseWriter, r *http.Request) {
-	paramSortField := r.URL.Query().Get("sort_field")
-	paramSortDir := r.URL.Query().Get("sort_dir")
-	logs.Log().Info(
-		"products_table params",
+func (h *ProductHandler) ProductTableBody(w http.ResponseWriter, r *http.Request) *HandlerRes {
+	q, err := url.ParseQuery(r.URL.RawQuery)
+	if err != nil {
+		return &HandlerRes{Error: err, StatusCode: http.StatusBadRequest}
+	}
+
+	paramSortField := q.Get("sort_field")
+	paramSortDir := q.Get("sort_dir")
+	logs.Log().Debug(
+		"ProductTableBody params",
 		zap.String("sort field", paramSortField),
 		zap.String("sort dir", paramSortDir),
 	)
 	if paramSortField == "" || paramSortDir == "" {
-
-		//error page
-		return
+		return &HandlerRes{Error: errors.New("Invalid URL params"), StatusCode: http.StatusBadRequest}
 	}
 
 	res, err := h.ProductService.GetProductsWithSorting(paramSortField, paramSortDir)
 	if err != nil {
-		logs.LogHTTPHandler(h.Logger, r, err)
-
-		//error page
-		return
+		return &HandlerRes{Error: err, StatusCode: http.StatusInternalServerError}
 	}
 
-	components.ProductTableBody(res).Render(r.Context(), w)
+	return &HandlerRes{
+		Component: components.ProductTableBody(res),
+	}
 }
