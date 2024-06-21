@@ -698,7 +698,7 @@ FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
 WHERE tbl_product.status = ?
-ORDER BY tbl_product.name ASC
+ORDER BY LOWER(tbl_product.name) ASC
 `
 
 type GetProductsByStatusSortByNameAscRow struct {
@@ -786,7 +786,7 @@ FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
 WHERE tbl_product.status = ?
-ORDER BY tbl_product.name DESC
+ORDER BY LOWER(tbl_product.name) DESC
 `
 
 type GetProductsByStatusSortByNameDescRow struct {

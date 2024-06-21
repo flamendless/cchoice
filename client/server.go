@@ -61,7 +61,9 @@ func Serve(ctxClient *ctx.ClientFlags) {
 		mux,
 		middlewares.WithSessionID(true),
 		middlewares.WithSecure(ctxClient.Secure),
+		middlewares.WithHTTPOnly(false),
 		middlewares.WithGRPC(grpcConn != nil),
+		middlewares.WithRequestDurMetrics(true),
 	)
 
 	mw = sessionManager.LoadAndSave(mw)
