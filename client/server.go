@@ -20,15 +20,15 @@ var static embed.FS
 
 var sessionManager *scs.SessionManager
 
-func putHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("hi")
-	sessionManager.Put(r.Context(), "message", "Hello from a session!")
-}
-
-func getHandler(w http.ResponseWriter, r *http.Request) {
-	msg := sessionManager.GetString(r.Context(), "message")
-	fmt.Println(msg)
-}
+// func putHandler(w http.ResponseWriter, r *http.Request) {
+// 	fmt.Println("hi")
+// 	sessionManager.Put(r.Context(), "message", "Hello from a session!")
+// }
+//
+// func getHandler(w http.ResponseWriter, r *http.Request) {
+// 	msg := sessionManager.GetString(r.Context(), "message")
+// 	fmt.Println(msg)
+// }
 
 func Serve(ctxClient *ctx.ClientFlags) {
 	addr := fmt.Sprintf("%s%s", ctxClient.Address, ctxClient.Port)
@@ -42,6 +42,8 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	logger := logs.Log()
 
+	errHandler := handlers.NewErrorHandler(logger)
+
 	productService := services.NewProductService(grpcConn)
 	productHandler := handlers.NewProductHandler(logger, &productService)
 
@@ -52,8 +54,8 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	// mux.HandleFunc("GET /", getHandler)
 	// mux.HandleFunc("PUT /", putHandler)
 
-	mux.HandleFunc("GET /products", handlers.Validate(productHandler.ProductTablePage))
-	mux.HandleFunc("GET /products_table", handlers.Validate(productHandler.ProductTableBody))
+	mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))
+	mux.HandleFunc("GET /products_table", errHandler.Default(productHandler.ProductTableBody))
 
 	mw := middlewares.NewMiddleware(
 		mux,
