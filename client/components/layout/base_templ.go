@@ -52,7 +52,7 @@ func Base(title string, children ...templ.Component) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script type=\"text/javascript\">\n\t\t\t\tdocument.body.addEventListener('htmx:afterRequest', function (evt) {\n\t\t\t\t\tconst errorTarget = document.getElementById(\"error_banner\")\n\t\t\t\t\tif (errorTarget === null) {\n\t\t\t\t\t\tconsole.warn(\"no element for handling error found\");\n\t\t\t\t\t\treturn\n\t\t\t\t\t}\n\n\t\t\t\t\tif (evt.detail.successful) {\n\t\t\t\t\t\terrorTarget.setAttribute(\"hidden\", \"true\")\n\t\t\t\t\t\terrorTarget.innerText = \"\";\n\t\t\t\t\t} else if (evt.detail.failed && evt.detail.xhr) {\n\t\t\t\t\t\tconsole.warn(\"Server error\", evt.detail)\n\t\t\t\t\t\tconst xhr = evt.detail.xhr;\n\t\t\t\t\t\terrorTarget.innerText = `Error: ${xhr.statusText} (${xhr.status}) - ${xhr.responseText}`;\n\t\t\t\t\t\terrorTarget.removeAttribute(\"hidden\");\n\t\t\t\t\t} else {\n\t\t\t\t\t\tconsole.error(\"Unexpected htmx error\", evt.detail)\n\t\t\t\t\t\terrorTarget.innerText = \"Unexpected error, check your connection and try to refresh the page.\";\n\t\t\t\t\t\terrorTarget.removeAttribute(\"hidden\");\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t</script></body></html>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script type=\"text/javascript\" src=\"/static/js/error_handler.js\"></script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

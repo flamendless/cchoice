@@ -11,7 +11,7 @@ templ ProductTableToolbar() {
 			hx-get="/products_table"
 			hx-trigger="submit"
 			hx-swap="outerHTML"
-			hx-target="#product_tbl"
+			hx-target="#product_table"
 		>
 			<div class="m-4">
 				<label for="sort_field">Sort By:</label>
@@ -43,6 +43,7 @@ templ ProductTableToolbar() {
 
 			<button
 				type="submit"
+				hx-indicator="#spinner"
 				class="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 focus:outline-none focus:ring focus:ring-orange-300 rounded-full p-2 m-2"
 			>
 				Sort
@@ -65,7 +66,7 @@ templ ProductTableHead() {
 }
 
 templ ProductTableBody(products []*pb.Product) {
-	<tbody id="product_tbl">
+	<tbody id="product_table">
 	for _, product := range products {
 		<tr>
 			<td class="border border-slate-600">{ product.Serial }</td>

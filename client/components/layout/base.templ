@@ -22,29 +22,7 @@ templ Base(title string, children ...templ.Component) {
 				@child
 			}
 
-			<script type="text/javascript">
-				document.body.addEventListener('htmx:afterRequest', function (evt) {
-					const errorTarget = document.getElementById("error_banner")
-					if (errorTarget === null) {
-						console.warn("no element for handling error found");
-						return
-					}
-
-					if (evt.detail.successful) {
-						errorTarget.setAttribute("hidden", "true")
-						errorTarget.innerText = "";
-					} else if (evt.detail.failed && evt.detail.xhr) {
-						console.warn("Server error", evt.detail)
-						const xhr = evt.detail.xhr;
-						errorTarget.innerText = `Error: ${xhr.statusText} (${xhr.status}) - ${xhr.responseText}`;
-						errorTarget.removeAttribute("hidden");
-					} else {
-						console.error("Unexpected htmx error", evt.detail)
-						errorTarget.innerText = "Unexpected error, check your connection and try to refresh the page.";
-						errorTarget.removeAttribute("hidden");
-					}
-				});
-			</script>
+			<script type="text/javascript" src="/static/js/error_handler.js"></script>
 		</body>
 	</html>
 }

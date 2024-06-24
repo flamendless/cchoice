@@ -1,10 +1,25 @@
 package components
 
 templ ErrorBanner() {
-	<header
+	<div
 		id="error_banner"
 		hidden
-		class="alert alert-warning sticky-top justify-between w-screen text-center z-50 bg-red-500"
+		class="flex flex-row alert alert-warning justify-between text-center z-50 bg-red-500 sticky top-0 left-0"
 	>
-	</header>
+
+		<p id="error_banner_text" class="grow">
+		</p>
+
+		<button
+			id="error_banner_closer"
+			class="mr-4 ml-4"
+			hidden
+			hx-get="/close_error_banner"
+			hx-trigger="click"
+			hx-target="#error_banner"
+			hx-swap="outerHTML"
+		>
+			X
+		</button>
+	</div>
 }

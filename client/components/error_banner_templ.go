@@ -23,7 +23,7 @@ func ErrorBanner() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header id=\"error_banner\" hidden class=\"alert alert-warning sticky-top justify-between w-screen text-center z-50 bg-red-500\"></header>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"error_banner\" hidden class=\"flex flex-row alert alert-warning justify-between text-center z-50 bg-red-500 sticky top-0 left-0\"><p id=\"error_banner_text\" class=\"grow\"></p><button id=\"error_banner_closer\" class=\"mr-4 ml-4\" hidden hx-get=\"/close_error_banner\" hx-trigger=\"click\" hx-target=\"#error_banner\" hx-swap=\"outerHTML\">X</button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

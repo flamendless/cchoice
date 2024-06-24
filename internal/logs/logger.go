@@ -27,7 +27,7 @@ func Log() *zap.Logger {
 }
 
 func LogHTTPHandler(logger *zap.Logger, r *http.Request, err error) {
-	logger.Fatal(
+	logger.Warn(
 		r.URL.String(),
 		zap.String("method", r.Method),
 		zap.Error(err),

@@ -39,7 +39,7 @@ func NewProductHandler(
 	}
 }
 
-func (h *ProductHandler) ProductTablePage(w http.ResponseWriter, r *http.Request) *HandlerRes {
+func (h *ProductHandler) ProductTablePage(w *http.ResponseWriter, r *http.Request) *HandlerRes {
 	res, err := h.ProductService.GetProducts()
 	if err != nil {
 		return &HandlerRes{Error: err, StatusCode: http.StatusInternalServerError}
@@ -50,7 +50,7 @@ func (h *ProductHandler) ProductTablePage(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (h *ProductHandler) ProductTableBody(w http.ResponseWriter, r *http.Request) *HandlerRes {
+func (h *ProductHandler) ProductTableBody(w *http.ResponseWriter, r *http.Request) *HandlerRes {
 	q, err := url.ParseQuery(r.URL.RawQuery)
 	if err != nil {
 		return &HandlerRes{Error: err, StatusCode: http.StatusBadRequest}

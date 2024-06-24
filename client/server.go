@@ -1,6 +1,7 @@
 package client
 
 import (
+	"cchoice/client/components"
 	"cchoice/client/handlers"
 	"cchoice/client/middlewares"
 	"cchoice/client/services"
@@ -54,6 +55,9 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	// mux.HandleFunc("GET /", getHandler)
 	// mux.HandleFunc("PUT /", putHandler)
 
+	mux.HandleFunc("GET /close_error_banner", func(w http.ResponseWriter, r *http.Request) {
+		components.ErrorBanner().Render(r.Context(), w)
+	})
 	mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))
 	mux.HandleFunc("GET /products_table", errHandler.Default(productHandler.ProductTableBody))
 
