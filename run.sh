@@ -15,7 +15,7 @@ WIN_PATH=/mnt/c/Windows/System32
 alias cmd.exe="$WIN_PATH"/cmd.exe
 
 grpc() {
-	air serve_grpc -r=1 --db_path "${DBPATH}" --address "${GRPC_SERVER_ADDR}"
+	air serve_grpc -r=1 --db_path "${DBPATH}" --address "${GRPC_SERVER_ADDR}" --log_payload_received=true
 }
 
 grpc_ui() {

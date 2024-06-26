@@ -5,13 +5,11 @@ import (
 	"cchoice/internal/ctx"
 	"cchoice/internal/domains/grpc"
 	"cchoice/internal/enums"
-	"cchoice/internal/logs"
 	pb "cchoice/proto"
 	"context"
 
 	"github.com/Rhymond/go-money"
 	"github.com/shopspring/decimal"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -69,8 +67,6 @@ func (s *ProductServer) GetProductByID(
 	in *pb.IDRequest,
 ) (*pb.Product, error) {
 	id := in.GetId()
-	logs.Log().Debug("GetProductByID", zap.Int64("id", id))
-
 	existingProduct, err := s.CtxDB.QueriesRead.GetProductByID(ctx, id)
 	if err != nil {
 		return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
@@ -86,12 +82,6 @@ func (s *ProductServer) ListProductsByProductStatus(
 ) (*pb.ProductsResponse, error) {
 	status := in.GetStatus()
 	sortBy := in.GetSortBy()
-
-	logs.Log().Debug(
-		"ListProductsByProductStatus",
-		zap.String("status", status.String()),
-		zap.String("sort_by", sortBy.String()),
-	)
 
 	products := make([]*pb.Product, 0, 1000)
 

@@ -7,6 +7,7 @@ import (
 	pb "cchoice/proto"
 	"net"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -19,7 +20,34 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 		return
 	}
 
-	s := grpc.NewServer()
+	logger := logs.Log()
+	var opts []logging.Option
+
+	if ctxGRPC.LogPayloadReceived {
+		opts = []logging.Option{
+			logging.WithLogOnEvents(
+				logging.StartCall,
+				logging.FinishCall,
+				logging.PayloadReceived,
+			),
+		}
+	} else {
+		opts = []logging.Option{
+			logging.WithLogOnEvents(
+				logging.StartCall,
+				logging.FinishCall,
+			),
+		}
+	}
+
+	s := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			logging.UnaryServerInterceptor(logs.InterceptorLogger(logger), opts...),
+		),
+		grpc.ChainStreamInterceptor(
+			logging.StreamServerInterceptor(logs.InterceptorLogger(logger), opts...),
+		),
+	)
 
 	ctxDB := ctx.NewDatabaseCtx(ctxGRPC.DBPath)
 	defer ctxDB.Close()
