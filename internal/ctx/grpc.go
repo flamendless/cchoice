@@ -5,4 +5,5 @@ type GRPCFlags struct {
 	Reflection         bool
 	DBPath             string
 	LogPayloadReceived bool
+	RateLimit          bool
 }

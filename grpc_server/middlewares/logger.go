@@ -10,8 +10,8 @@ import (
 	"go.uber.org/zap"
 )
 
-func AddLogger(ctxGRPC *ctx.GRPCFlags, opts []logging.Option) (*zap.Logger, []logging.Option) {
-	logger := logs.Log()
+func AddLogger(ctxGRPC *ctx.GRPCFlags) (*zap.Logger, []logging.Option) {
+	var opts []logging.Option
 
 	if ctxGRPC.LogPayloadReceived {
 		opts = append(opts, logging.WithLogOnEvents(
@@ -26,6 +26,7 @@ func AddLogger(ctxGRPC *ctx.GRPCFlags, opts []logging.Option) (*zap.Logger, []lo
 		))
 	}
 
+	logger := logs.Log()
 	return logger, opts
 }
 

@@ -9,6 +9,7 @@ import (
 	"net"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/ratelimit"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -21,15 +22,16 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 		return
 	}
 
-	var opts []logging.Option
-	logger, opts := middlewares.AddLogger(&ctxGRPC, opts)
+	logger, opts := middlewares.AddLogger(&ctxGRPC)
 
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			logging.UnaryServerInterceptor(middlewares.InterceptorLogger(logger), opts...),
+			ratelimit.UnaryServerInterceptor(middlewares.AddRateLimit(&ctxGRPC)),
 		),
 		grpc.ChainStreamInterceptor(
 			logging.StreamServerInterceptor(middlewares.InterceptorLogger(logger), opts...),
+			ratelimit.StreamServerInterceptor(middlewares.AddRateLimit(&ctxGRPC)),
 		),
 	)
 
