@@ -1,6 +1,7 @@
 package grpc_server
 
 import (
+	"cchoice/grpc_server/middlewares"
 	"cchoice/grpc_server/products"
 	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
@@ -20,32 +21,15 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 		return
 	}
 
-	logger := logs.Log()
 	var opts []logging.Option
-
-	if ctxGRPC.LogPayloadReceived {
-		opts = []logging.Option{
-			logging.WithLogOnEvents(
-				logging.StartCall,
-				logging.FinishCall,
-				logging.PayloadReceived,
-			),
-		}
-	} else {
-		opts = []logging.Option{
-			logging.WithLogOnEvents(
-				logging.StartCall,
-				logging.FinishCall,
-			),
-		}
-	}
+	logger, opts := middlewares.AddLogger(&ctxGRPC, opts)
 
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
-			logging.UnaryServerInterceptor(logs.InterceptorLogger(logger), opts...),
+			logging.UnaryServerInterceptor(middlewares.InterceptorLogger(logger), opts...),
 		),
 		grpc.ChainStreamInterceptor(
-			logging.StreamServerInterceptor(logs.InterceptorLogger(logger), opts...),
+			logging.StreamServerInterceptor(middlewares.InterceptorLogger(logger), opts...),
 		),
 	)
 
