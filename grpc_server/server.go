@@ -8,6 +8,7 @@ import (
 	pb "cchoice/proto"
 	"net"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/ratelimit"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
@@ -29,11 +30,13 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 		grpc.ChainUnaryInterceptor(
 			logging.UnaryServerInterceptor(middlewares.InterceptorLogger(logger), opts...),
 			ratelimit.UnaryServerInterceptor(middlewares.AddRateLimit(&ctxGRPC)),
+			auth.UnaryServerInterceptor(middlewares.AuthBearer),
 			recovery.UnaryServerInterceptor(middlewares.AddRecovery()...),
 		),
 		grpc.ChainStreamInterceptor(
 			logging.StreamServerInterceptor(middlewares.InterceptorLogger(logger), opts...),
 			ratelimit.StreamServerInterceptor(middlewares.AddRateLimit(&ctxGRPC)),
+			auth.StreamServerInterceptor(middlewares.AuthBearer),
 			recovery.StreamServerInterceptor(middlewares.AddRecovery()...),
 		),
 	)

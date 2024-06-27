@@ -20,7 +20,7 @@ grpc() {
 
 grpc_ui() {
 	cmd.exe /c "start vivaldi http://127.0.0.1:36477/"
-	grpcui -port 36477 -plaintext "${GRPC_SERVER_ADDR}"
+	grpcui -authority "bearer" -reflect-header "authorization: bearer grpcui" -port 36477 -plaintext "${GRPC_SERVER_ADDR}"
 }
 
 client() {
