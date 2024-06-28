@@ -22,15 +22,13 @@ INSERT INTO tbl_user(
 		'client',
 		'client@cchoice.com',
 		'+639000000001',
-		'SYSTEM'
+		'API'
 	)
 ;
 
 -- +migrate Down
 DELETE FROM tbl_user
-WHERE
-user_type = 'SYSTEM' AND
-(
-	email = 'grpcui@cchoice.com' OR
-	email = 'client@cchoice.com'
-);
+WHERE user_type = 'SYSTEM' AND email = 'grpcui@cchoice.com';
+
+DELETE FROM tbl_user
+WHERE user_type = 'API' AND email = 'client@cchoice.com';

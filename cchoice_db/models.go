@@ -43,3 +43,16 @@ type TblProductSpec struct {
 	Capacity      sql.NullString
 	ScopeOfSupply sql.NullString
 }
+
+type TblUser struct {
+	ID         int64
+	FirstName  string
+	MiddleName string
+	LastName   string
+	Email      string
+	MobileNo   string
+	UserType   string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	DeletedAt  time.Time
+}

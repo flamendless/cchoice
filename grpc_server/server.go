@@ -27,7 +27,10 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 
 	logger, opts := middlewares.AddLogger(&ctxGRPC)
 
-	validator, err := cchoiceauth.NewValidator()
+	ctxDB := ctx.NewDatabaseCtx(ctxGRPC.DBPath)
+	defer ctxDB.Close()
+
+	validator, err := cchoiceauth.NewValidator(ctxDB)
 	authMW := middlewares.AddAuth(validator)
 
 	s := grpc.NewServer(
@@ -44,9 +47,6 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 			recovery.StreamServerInterceptor(middlewares.AddRecovery()...),
 		),
 	)
-
-	ctxDB := ctx.NewDatabaseCtx(ctxGRPC.DBPath)
-	defer ctxDB.Close()
 
 	pb.RegisterProductServiceServer(s, &products.ProductServer{CtxDB: ctxDB})
 	pb.RegisterProductCategoryServiceServer(s, &products.ProductCategoryServer{CtxDB: ctxDB})

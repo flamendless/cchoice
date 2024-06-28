@@ -3,8 +3,11 @@ package auth
 //https://engineering.getweave.com/post/go-jwt-1/
 
 import (
+	"cchoice/cchoice_db"
 	"cchoice/conf"
+	"cchoice/internal/ctx"
 	"cchoice/internal/enums"
+	"context"
 	"crypto"
 	"fmt"
 	"time"
@@ -17,7 +20,8 @@ type Issuer struct {
 }
 
 type Validator struct {
-	key crypto.PublicKey
+	key   crypto.PublicKey
+	CtxDB *ctx.Database
 }
 
 func NewIssuer() (*Issuer, error) {
@@ -34,7 +38,7 @@ func NewIssuer() (*Issuer, error) {
 
 func (i *Issuer) IssueToken(
 	aud enums.AudKind,
-	user string,
+	username string,
 ) (string, error) {
 	conf := conf.GetConf()
 	now := time.Now()
@@ -46,7 +50,7 @@ func (i *Issuer) IssueToken(
 		"iss": "http://localhost:8081",
 
 		// other fields
-		"user": user,
+		"username": username,
 	})
 
 	tokenString, err := token.SignedString(i.key)
@@ -57,7 +61,7 @@ func (i *Issuer) IssueToken(
 	return tokenString, nil
 }
 
-func NewValidator() (*Validator, error) {
+func NewValidator(ctxDB *ctx.Database) (*Validator, error) {
 	conf := conf.GetConf()
 	key, err := jwt.ParseEdPublicKeyFromPEM(conf.PubKey)
 	if err != nil {
@@ -65,7 +69,8 @@ func NewValidator() (*Validator, error) {
 	}
 
 	return &Validator{
-		key: key,
+		key:   key,
+		CtxDB: ctxDB,
 	}, nil
 }
 
@@ -85,13 +90,26 @@ func (v *Validator) GetToken(tokenString string) (*jwt.Token, error) {
 		return nil, fmt.Errorf("Unable to parse token string: %w", err)
 	}
 
-	aud, ok := token.Claims.(jwt.MapClaims)["aud"]
+	claims := token.Claims.(jwt.MapClaims)
+	aud, ok := claims["aud"]
 	if !ok {
 		return nil, fmt.Errorf("token had no audience claim")
 	}
 
-	if aud != enums.AudAPI.String() && aud != enums.AudSystem.String() {
-		return nil, fmt.Errorf("token had the wrong audience claim: %s", aud)
+	audString := aud.(string)
+	if enums.ParseAudEnum(audString) == enums.AudUndefined {
+		return nil, fmt.Errorf("Token had the wrong audience claim: %s", aud)
+	}
+
+	_, err = v.CtxDB.QueriesRead.GetUserByEMailAndUserType(
+		context.Background(),
+		cchoice_db.GetUserByEMailAndUserTypeParams{
+			Email: claims["username"].(string),
+			UserType: audString,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("Invalid token in DB: %w", err)
 	}
 
 	return token, nil

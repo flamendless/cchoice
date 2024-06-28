@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"cchoice/internal/auth"
+	"cchoice/internal/ctx"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"os"
@@ -14,12 +15,14 @@ import (
 var (
 	subcmd      string
 	tokenString string
+	dbPath      string
 )
 
 func init() {
 	f := JWTCmd.Flags
 	f().StringVarP(&subcmd, "subcmd", "s", "", "subcommand to use")
 	f().StringVarP(&tokenString, "token", "t", "", "token to validate")
+	f().StringVarP(&dbPath, "db", "", "", "db path")
 
 	rootCmd.AddCommand(JWTCmd)
 }
@@ -41,7 +44,10 @@ func issue() string {
 }
 
 func validate(tokenString string) *jwt.Token {
-	v, err := auth.NewValidator()
+	ctxDB := ctx.NewDatabaseCtx(dbPath)
+	defer ctxDB.Close()
+
+	v, err := auth.NewValidator(ctxDB)
 	if err != nil {
 		logs.Log().Error("Unable to create validator", zap.Error(err))
 		panic(1)
