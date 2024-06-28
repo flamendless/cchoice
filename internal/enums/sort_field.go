@@ -41,13 +41,11 @@ func ParseSortFieldEnum(e string) SortField {
 
 func ParseSortFieldEnumPB(e string) pb.SortField {
 	switch e {
-	case "UndefinedSortField":
-		return *pb.SortField_SORT_FIELD_UNDEFINED.Enum()
 	case "name":
 		return pb.SortField_NAME
 	case "created_at":
 		return pb.SortField_CREATED_AT
 	default:
-		panic(fmt.Sprintf("Can't convert '%s' to pb.SortField enum", e))
+		return pb.SortField_SORT_FIELD_UNDEFINED
 	}
 }

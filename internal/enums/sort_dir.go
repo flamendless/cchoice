@@ -41,13 +41,11 @@ func ParseSortDirEnum(e string) SortDir {
 
 func ParseSortDirEnumPB(e string) pb.SortDir {
 	switch e {
-	case "UndefinedDirField":
-		return *pb.SortDir_SORT_DIR_UNDEFINED.Enum()
 	case "ASC":
 		return pb.SortDir_ASC
 	case "DESC":
 		return pb.SortDir_DESC
 	default:
-		panic(fmt.Sprintf("Can't convert '%s' to pb.SortDir enum", e))
+		return pb.SortDir_SORT_DIR_UNDEFINED
 	}
 }

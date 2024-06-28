@@ -3,7 +3,7 @@ package handlers
 import (
 	"cchoice/client/components"
 	"cchoice/client/components/layout"
-	"cchoice/internal/logs"
+	"cchoice/internal/enums"
 	pb "cchoice/proto"
 	"errors"
 	"net/http"
@@ -20,8 +20,7 @@ type HandlerRes struct {
 }
 
 type ProductService interface {
-	GetProducts() (*pb.ProductsResponse, error)
-	GetProductsWithSorting(string, sortDir string) ([]*pb.Product, error)
+	GetProductsWithSorting(pb.SortField, pb.SortDir) (*pb.ProductsResponse, error)
 }
 
 type ProductHandler struct {
@@ -40,39 +39,30 @@ func NewProductHandler(
 }
 
 func (h *ProductHandler) ProductTablePage(w *http.ResponseWriter, r *http.Request) *HandlerRes {
-	res, err := h.ProductService.GetProducts()
+	q, err := url.ParseQuery(r.URL.RawQuery)
+	if err != nil {
+		return &HandlerRes{Error: err, StatusCode: http.StatusBadRequest}
+	}
+
+	sortField := pb.SortField_NAME
+	sortDir := pb.SortDir_ASC
+	qSortField := q.Get("sort_field")
+	qSortDir := q.Get("sort_dir")
+
+	if qSortField != "" || qSortDir != "" {
+		sortField = enums.ParseSortFieldEnumPB(qSortField)
+		sortDir = enums.ParseSortDirEnumPB(qSortDir)
+		if sortField == pb.SortField_SORT_FIELD_UNDEFINED || sortDir == pb.SortDir_SORT_DIR_UNDEFINED {
+			return &HandlerRes{Error: errors.New("Invalid URL params"), StatusCode: http.StatusBadRequest}
+		}
+	}
+
+	res, err := h.ProductService.GetProductsWithSorting(sortField, sortDir)
 	if err != nil {
 		return &HandlerRes{Error: err, StatusCode: http.StatusInternalServerError}
 	}
 
 	return &HandlerRes{
 		Component: layout.Base("Products", components.ProductTableView(res)),
-	}
-}
-
-func (h *ProductHandler) ProductTableBody(w *http.ResponseWriter, r *http.Request) *HandlerRes {
-	q, err := url.ParseQuery(r.URL.RawQuery)
-	if err != nil {
-		return &HandlerRes{Error: err, StatusCode: http.StatusBadRequest}
-	}
-
-	paramSortField := q.Get("sort_field")
-	paramSortDir := q.Get("sort_dir")
-	logs.Log().Debug(
-		"ProductTableBody params",
-		zap.String("sort field", paramSortField),
-		zap.String("sort dir", paramSortDir),
-	)
-	if paramSortField == "" || paramSortDir == "" {
-		return &HandlerRes{Error: errors.New("Invalid URL params"), StatusCode: http.StatusBadRequest}
-	}
-
-	res, err := h.ProductService.GetProductsWithSorting(paramSortField, paramSortDir)
-	if err != nil {
-		return &HandlerRes{Error: err, StatusCode: http.StatusInternalServerError}
-	}
-
-	return &HandlerRes{
-		Component: components.ProductTableBody(res),
 	}
 }

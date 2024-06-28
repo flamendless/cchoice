@@ -8,10 +8,11 @@ templ ProductTableToolbar() {
 	<div class="m-4">
 		<form
 			class="flex flex-row place-content-center"
-			hx-get="/products_table"
+			hx-get="/products"
 			hx-trigger="submit"
 			hx-swap="outerHTML"
 			hx-target="#product_table"
+			hx-select="#product_table"
 		>
 			<div class="m-4">
 				<label for="sort_field">Sort By:</label>

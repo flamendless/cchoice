@@ -59,7 +59,6 @@ func Serve(ctxClient *ctx.ClientFlags) {
 		components.ErrorBanner().Render(r.Context(), w)
 	})
 	mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))
-	mux.HandleFunc("GET /products_table", errHandler.Default(productHandler.ProductTableBody))
 
 	mw := middlewares.NewMiddleware(
 		mux,
