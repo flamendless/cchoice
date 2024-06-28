@@ -2,26 +2,22 @@ package auth
 
 import (
 	"context"
-	"errors"
 )
 
 type AuthToken struct {
-	Token  string
-	TSC bool
+	Token string
+	Sub   string
+	TSC   bool
 }
 
-func ParseBearerToken(token string) (*AuthToken, error) {
-	if token == "client" || token == "grpcui" {
-		return &AuthToken{
-			Token: token,
-		}, nil
-	}
-
-	return nil, errors.New("Invalid token")
+func ParseToken(token string) (*AuthToken, error) {
+	return &AuthToken{
+		Token: token,
+	}, nil
 }
 
-func UserClaimFromBearerToken(token *AuthToken) string {
-	return token.Token
+func UserClaimFromToken(token *AuthToken) string {
+	return token.Sub
 }
 
 func (t AuthToken) GetRequestMetadata(

@@ -6,7 +6,9 @@ require (
 	github.com/Rhymond/go-money v1.0.13
 	github.com/a-h/templ v0.2.707
 	github.com/alexedwards/scs/v2 v2.8.0
+	github.com/caarlos0/env/v11 v11.1.0
 	github.com/cohesivestack/valgo v0.4.1
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/gosimple/slug v1.14.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/juju/ratelimit v1.0.2

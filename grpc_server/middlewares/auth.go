@@ -19,14 +19,14 @@ func AuthBearer(ctx context.Context) (context.Context, error) {
 		return nil, err
 	}
 
-	bearerToken, err := cchoiceauth.ParseBearerToken(token)
+	bearerToken, err := cchoiceauth.ParseToken(token)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid auth token: %v", err)
 	}
 
 	ctx = logging.InjectFields(
 		ctx,
-		logging.Fields{"auth.sub", cchoiceauth.UserClaimFromBearerToken(bearerToken)},
+		logging.Fields{"auth.sub", cchoiceauth.UserClaimFromToken(bearerToken)},
 	)
 
 	return context.WithValue(ctx, CtxToken, bearerToken), nil

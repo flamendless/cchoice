@@ -14,6 +14,9 @@ GRPC_SERVER_ADDR=":50051"
 WIN_PATH=/mnt/c/Windows/System32
 alias cmd.exe="$WIN_PATH"/cmd.exe
 
+export PRIVKEY=$(cat ~/.ssh/cchoice.ed)
+export PUBKEY=$(cat ~/.ssh/cchoice.ed.pub)
+
 grpc() {
 	air serve_grpc -r=1 --db_path "${DBPATH}" --address "${GRPC_SERVER_ADDR}" --log_payload_received=true
 }
@@ -27,6 +30,10 @@ client() {
 	local clientport="3001"
 	cmd.exe /c "start vivaldi http://localhost:${clientport}/"
 	air serve_client -p ":${clientport}" --grpc_address "${GRPC_SERVER_ADDR}"
+}
+
+customrun() {
+	go run ./main.go "${@:2}"
 }
 
 clean() {
@@ -108,6 +115,7 @@ if [ "$#" -eq 0 ]; then
 	echo "    grpc_ui"
 	echo "    gentempl"
 	echo "    testall"
+	echo "    customrun"
 else
 	"$1" "$@"
 fi
