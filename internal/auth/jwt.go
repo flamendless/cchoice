@@ -3,18 +3,14 @@ package auth
 //https://engineering.getweave.com/post/go-jwt-1/
 
 import (
+	"cchoice/conf"
+	"cchoice/internal/enums"
 	"crypto"
 	"fmt"
 	"time"
 
-	"github.com/caarlos0/env/v11"
 	"github.com/golang-jwt/jwt/v5"
 )
-
-type JWTConfig struct {
-	PrivKey string `env:"PRIVKEY,required"`
-	PubKey  string `env:"PUBKEY,required"`
-}
 
 type Issuer struct {
 	key crypto.PrivateKey
@@ -24,24 +20,9 @@ type Validator struct {
 	key crypto.PublicKey
 }
 
-var (
-	jwtConf JWTConfig
-	privkey []byte
-	pubkey  []byte
-)
-
-func init() {
-	jwtConf := JWTConfig{}
-	err := env.Parse(&jwtConf)
-	if err != nil {
-		panic(err)
-	}
-	privkey = []byte(jwtConf.PrivKey)
-	pubkey = []byte(jwtConf.PubKey)
-}
-
 func NewIssuer() (*Issuer, error) {
-	key, err := jwt.ParseEdPrivateKeyFromPEM(privkey)
+	conf := conf.GetConf()
+	key, err := jwt.ParseEdPrivateKeyFromPEM(conf.PrivKey)
 	if err != nil {
 		return nil, err
 	}
@@ -51,13 +32,18 @@ func NewIssuer() (*Issuer, error) {
 	}, nil
 }
 
-func (i *Issuer) IssueToken(user string, roles []string) (string, error) {
+func (i *Issuer) IssueToken(
+	aud enums.AudKind,
+	user string,
+	roles []string,
+) (string, error) {
+	conf := conf.GetConf()
 	now := time.Now()
 	token := jwt.NewWithClaims(&jwt.SigningMethodEd25519{}, jwt.MapClaims{
-		"aud": "api",
+		"aud": aud.String(),
 		"nbf": now.Unix(),
 		"iat": now.Unix(),
-		"exp": now.Add(time.Minute).Unix(),
+		"exp": now.Add(conf.TokenExp).Unix(),
 		"iss": "http://localhost:8081",
 
 		// other fields
@@ -74,7 +60,8 @@ func (i *Issuer) IssueToken(user string, roles []string) (string, error) {
 }
 
 func NewValidator() (*Validator, error) {
-	key, err := jwt.ParseEdPublicKeyFromPEM(pubkey)
+	conf := conf.GetConf()
+	key, err := jwt.ParseEdPublicKeyFromPEM(conf.PubKey)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to parse as ed private key: %w", err)
 	}
