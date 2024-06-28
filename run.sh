@@ -4,6 +4,7 @@
 # @Brandon Blanker Lim-it
 
 set -euf -o pipefail
+source .env
 
 GOOS="linux"
 DBNAME="test.db"
@@ -13,9 +14,6 @@ GRPC_SERVER_ADDR=":50051"
 
 WIN_PATH=/mnt/c/Windows/System32
 alias cmd.exe="$WIN_PATH"/cmd.exe
-
-export PRIVKEY=$(cat ~/.ssh/cchoice.ed)
-export PUBKEY=$(cat ~/.ssh/cchoice.ed.pub)
 
 grpc() {
 	air serve_grpc -r=1 --db_path "${DBPATH}" --address "${GRPC_SERVER_ADDR}" --log_payload_received=true

@@ -6,28 +6,37 @@ import (
 	cchoiceauth "cchoice/internal/auth"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
-	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-var CtxToken cchoiceauth.AuthToken
+var CtxToken cchoiceauth.ClientToken
 
-func AuthBearer(ctx context.Context) (context.Context, error) {
+type AuthMiddleware struct {
+	Validator *cchoiceauth.Validator
+}
+
+func AddAuth(validator *cchoiceauth.Validator) AuthMiddleware {
+	return AuthMiddleware{
+		Validator: validator,
+	}
+}
+
+func (mw *AuthMiddleware) Handle(ctx context.Context) (context.Context, error) {
 	token, err := auth.AuthFromMD(ctx, "bearer")
 	if err != nil {
 		return nil, err
 	}
 
-	bearerToken, err := cchoiceauth.ParseToken(token)
+	jwtToken, err := mw.Validator.GetToken(token)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid auth token: %v", err)
 	}
 
-	ctx = logging.InjectFields(
-		ctx,
-		logging.Fields{"auth.sub", cchoiceauth.UserClaimFromToken(bearerToken)},
-	)
+	// ctx = logging.InjectFields(
+	// 	ctx,
+	// 	logging.Fields{"auth.sub", cchoiceauth.UserClaimFromToken(bearerToken)},
+	// )
 
-	return context.WithValue(ctx, CtxToken, bearerToken), nil
+	return context.WithValue(ctx, CtxToken, jwtToken), nil
 }

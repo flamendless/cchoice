@@ -7,15 +7,17 @@ import (
 )
 
 type config struct {
-	PrivKey  string        `env:"PRIVKEY,required"`
-	PubKey   string        `env:"PUBKEY,required"`
-	TokenExp time.Duration `env:"TokenExp"`
+	PrivKey        string        `env:"PRIVKEY,required"`
+	PubKey         string        `env:"PUBKEY,required"`
+	TokenExp       time.Duration `env:"TokenExp"`
+	ClientUsername string        `env:"ClientUsername,required"`
 }
 
 type Config struct {
-	PrivKey  []byte
-	PubKey   []byte
-	TokenExp time.Duration
+	PrivKey        []byte
+	PubKey         []byte
+	TokenExp       time.Duration
+	ClientUsername string
 }
 
 var conf Config
@@ -34,9 +36,10 @@ func LoadConf() {
 	}
 
 	conf = Config{
-		PrivKey:  []byte(configMd.PrivKey),
-		PubKey:   []byte(configMd.PubKey),
-		TokenExp: configMd.TokenExp,
+		PrivKey:        []byte(configMd.PrivKey),
+		PubKey:         []byte(configMd.PubKey),
+		TokenExp:       configMd.TokenExp,
+		ClientUsername: configMd.ClientUsername,
 	}
 }
 

@@ -35,7 +35,6 @@ func NewIssuer() (*Issuer, error) {
 func (i *Issuer) IssueToken(
 	aud enums.AudKind,
 	user string,
-	roles []string,
 ) (string, error) {
 	conf := conf.GetConf()
 	now := time.Now()
@@ -47,8 +46,7 @@ func (i *Issuer) IssueToken(
 		"iss": "http://localhost:8081",
 
 		// other fields
-		"user":  user,
-		"roles": roles,
+		"user": user,
 	})
 
 	tokenString, err := token.SignedString(i.key)
@@ -92,8 +90,8 @@ func (v *Validator) GetToken(tokenString string) (*jwt.Token, error) {
 		return nil, fmt.Errorf("token had no audience claim")
 	}
 
-	if aud != "api" && aud != "system" {
-		return nil, fmt.Errorf("token had the wrong audience claim")
+	if aud != enums.AudAPI.String() && aud != enums.AudSystem.String() {
+		return nil, fmt.Errorf("token had the wrong audience claim: %s", aud)
 	}
 
 	return token, nil

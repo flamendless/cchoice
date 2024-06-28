@@ -6,6 +6,7 @@ import (
 	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
 	pb "cchoice/proto"
+	cchoiceauth "cchoice/internal/auth"
 	"net"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
@@ -26,17 +27,20 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 
 	logger, opts := middlewares.AddLogger(&ctxGRPC)
 
+	validator, err := cchoiceauth.NewValidator()
+	authMW := middlewares.AddAuth(validator)
+
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			logging.UnaryServerInterceptor(middlewares.InterceptorLogger(logger), opts...),
 			ratelimit.UnaryServerInterceptor(middlewares.AddRateLimit(&ctxGRPC)),
-			auth.UnaryServerInterceptor(middlewares.AuthBearer),
+			auth.UnaryServerInterceptor(authMW.Handle),
 			recovery.UnaryServerInterceptor(middlewares.AddRecovery()...),
 		),
 		grpc.ChainStreamInterceptor(
 			logging.StreamServerInterceptor(middlewares.InterceptorLogger(logger), opts...),
 			ratelimit.StreamServerInterceptor(middlewares.AddRateLimit(&ctxGRPC)),
-			auth.StreamServerInterceptor(middlewares.AuthBearer),
+			auth.StreamServerInterceptor(authMW.Handle),
 			recovery.StreamServerInterceptor(middlewares.AddRecovery()...),
 		),
 	)

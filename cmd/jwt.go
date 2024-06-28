@@ -31,11 +31,7 @@ func issue() string {
 		panic(1)
 	}
 
-	token, err := issuer.IssueToken(
-		enums.AudSystem,
-		"test",
-		[]string{"test"},
-	)
+	token, err := issuer.IssueToken(enums.AudSystem, "test")
 	if err != nil {
 		logs.Log().Error("Unable to issue token", zap.Error(err))
 		panic(1)
