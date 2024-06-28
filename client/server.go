@@ -38,7 +38,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	sessionManager = scs.New()
 	sessionManager.Lifetime = 24 * time.Hour
 
-	grpcConn := NewGRPCConn(ctxClient.GRPCAddress)
+	grpcConn := NewGRPCConn(ctxClient.GRPCAddress, ctxClient.TSC)
 	defer GRPCConnectionClose(grpcConn)
 
 	logger := logs.Log()

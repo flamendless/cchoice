@@ -5,4 +5,5 @@ type ClientFlags struct {
 	Address     string
 	Port        string
 	GRPCAddress string
+	TSC         bool
 }

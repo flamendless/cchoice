@@ -1,6 +1,7 @@
 package client
 
 import (
+	"cchoice/internal/auth"
 	"cchoice/internal/logs"
 
 	"go.uber.org/zap"
@@ -8,9 +9,16 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func NewGRPCConn(addr string) *grpc.ClientConn {
+func NewGRPCConn(addr string, tsc bool) *grpc.ClientConn {
 	var opts []grpc.DialOption
-	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	opts = append(
+		opts,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithPerRPCCredentials(auth.AuthToken{
+			Token: "client",
+			TSC: tsc,
+		}),
+	)
 
 	conn, err := grpc.NewClient(addr, opts...)
 	if err != nil {
