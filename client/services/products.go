@@ -18,7 +18,7 @@ func NewProductService(grpcConn *grpc.ClientConn) ProductService {
 	}
 }
 
-func (s *ProductService) GetProductsWithSorting(
+func (s ProductService) GetProductsWithSorting(
 	sortField pb.SortField,
 	sortDir pb.SortDir,
 ) (*pb.ProductsResponse, error) {

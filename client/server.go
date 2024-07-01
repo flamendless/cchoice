@@ -48,16 +48,24 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	productService := services.NewProductService(grpcConn)
 	productHandler := handlers.NewProductHandler(logger, &productService)
 
+	authService := services.NewAuthService(grpcConn)
+	authHandler := handlers.NewAuthHandler(logger, &authService, sessionManager)
+
 	mux := http.NewServeMux()
 
 	mux.Handle("GET /static/", http.FileServer(http.FS(static)))
 
-	// mux.HandleFunc("GET /", getHandler)
-	// mux.HandleFunc("PUT /", putHandler)
-
+	//UTILS-LIKe
 	mux.HandleFunc("GET /close_error_banner", func(w http.ResponseWriter, r *http.Request) {
 		components.ErrorBanner().Render(r.Context(), w)
 	})
+
+	//AUTH
+	mux.HandleFunc("GET /", errHandler.Default(authHandler.AuthPage))
+	mux.HandleFunc("GET /auth", errHandler.Default(authHandler.AuthPage))
+	mux.HandleFunc("POST /auth", errHandler.Default(authHandler.Authenticate))
+
+	//PRODUCTS
 	mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))
 
 	mw := middlewares.NewMiddleware(

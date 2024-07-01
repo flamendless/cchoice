@@ -38,7 +38,7 @@ func Base(title string, children ...templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link href=\"/static/css/tailwind.css\" rel=\"stylesheet\"><script src=\"/static/js/htmx.min.js\"></script></head><body>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link href=\"/static/css/tailwind.css\" rel=\"stylesheet\"><script src=\"/static/js/htmx.min.js\"></script><style>\n\t\t\t\thtml, body {\n\t\t\t\t\tmax-width: 100%;\n\t\t\t\t\toverflow-x: hidden;\n\t\t\t\t}\n\t\t\t</style></head><body class=\"w-screen\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -104,7 +104,7 @@ func (v *Validator) GetToken(tokenString string) (*jwt.Token, error) {
 	_, err = v.CtxDB.QueriesRead.GetUserByEMailAndUserType(
 		context.Background(),
 		cchoice_db.GetUserByEMailAndUserTypeParams{
-			Email: claims["username"].(string),
+			Email:    claims["username"].(string),
 			UserType: audString,
 		},
 	)

@@ -9,15 +9,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/a-h/templ"
 	"go.uber.org/zap"
 )
-
-type HandlerRes struct {
-	Component  templ.Component
-	Error      error
-	StatusCode int
-}
 
 type ProductService interface {
 	GetProductsWithSorting(pb.SortField, pb.SortDir) (*pb.ProductsResponse, error)
@@ -38,7 +31,7 @@ func NewProductHandler(
 	}
 }
 
-func (h *ProductHandler) ProductTablePage(w *http.ResponseWriter, r *http.Request) *HandlerRes {
+func (h ProductHandler) ProductTablePage(w *http.ResponseWriter, r *http.Request) *HandlerRes {
 	q, err := url.ParseQuery(r.URL.RawQuery)
 	if err != nil {
 		return &HandlerRes{Error: err, StatusCode: http.StatusBadRequest}

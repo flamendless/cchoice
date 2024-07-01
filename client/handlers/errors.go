@@ -29,6 +29,10 @@ func (h *ErrorHandler) Default(fn FnHandler) FnHTTP {
 			return
 		}
 
+		if res.Component == nil {
+			panic("Returned component in HandlerRes is nil")
+		}
+
 		res.Component.Render(r.Context(), w)
 	}
 }

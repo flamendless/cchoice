@@ -23,6 +23,7 @@ require (
 )
 
 require (
+	github.com/alexedwards/argon2id v1.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect

@@ -1,12 +1,14 @@
 package grpc_server
 
 import (
+	grpcauth "cchoice/grpc_server/auth"
 	"cchoice/grpc_server/middlewares"
 	"cchoice/grpc_server/products"
+	cchoiceauth "cchoice/internal/auth"
+	internalauth "cchoice/internal/auth"
 	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
 	pb "cchoice/proto"
-	cchoiceauth "cchoice/internal/auth"
 	"net"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
@@ -48,9 +50,15 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 		),
 	)
 
+	issuer, err := internalauth.NewIssuer()
+	if err != nil {
+		panic(err)
+	}
+
 	pb.RegisterProductServiceServer(s, &products.ProductServer{CtxDB: ctxDB})
 	pb.RegisterProductCategoryServiceServer(s, &products.ProductCategoryServer{CtxDB: ctxDB})
 	pb.RegisterProductSpecsServiceServer(s, &products.ProductSpecsServer{CtxDB: ctxDB})
+	pb.RegisterAuthServiceServer(s, &grpcauth.AuthServer{CtxDB: ctxDB, Issuer: issuer})
 
 	if ctxGRPC.Reflection {
 		reflection.Register(s)

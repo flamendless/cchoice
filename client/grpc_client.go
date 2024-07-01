@@ -31,7 +31,7 @@ func NewGRPCConn(addr string, tsc bool) *grpc.ClientConn {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithPerRPCCredentials(auth.ClientToken{
 			Token: tokenString,
-			TSC: tsc,
+			TSC:   tsc,
 		}),
 	)
 
