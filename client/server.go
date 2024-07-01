@@ -21,16 +21,6 @@ var static embed.FS
 
 var sessionManager *scs.SessionManager
 
-// func putHandler(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Println("hi")
-// 	sessionManager.Put(r.Context(), "message", "Hello from a session!")
-// }
-//
-// func getHandler(w http.ResponseWriter, r *http.Request) {
-// 	msg := sessionManager.GetString(r.Context(), "message")
-// 	fmt.Println(msg)
-// }
-
 func Serve(ctxClient *ctx.ClientFlags) {
 	addr := fmt.Sprintf("%s%s", ctxClient.Address, ctxClient.Port)
 	logs.Log().Info("Starting site server", zap.String("address", addr))
@@ -55,7 +45,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	mux.Handle("GET /static/", http.FileServer(http.FS(static)))
 
-	//UTILS-LIKe
+	//UTILS-LIKE
 	mux.HandleFunc("GET /close_error_banner", func(w http.ResponseWriter, r *http.Request) {
 		components.ErrorBanner().Render(r.Context(), w)
 	})
@@ -66,7 +56,9 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	mux.HandleFunc("POST /auth", errHandler.Default(authHandler.Authenticate))
 
 	//PRODUCTS
-	mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))
+	mux.HandleFunc("GET /products", errHandler.Default(
+		authHandler.Authenticated(productHandler.ProductTablePage),
+	))
 
 	mw := middlewares.NewMiddleware(
 		mux,

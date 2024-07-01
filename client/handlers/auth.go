@@ -33,6 +33,19 @@ func NewAuthHandler(
 	}
 }
 
+func (h AuthHandler) Authenticated(fn FnHandler) FnHandler {
+	return func(w *http.ResponseWriter, r *http.Request) *HandlerRes {
+		tokenString := h.SM.GetString(r.Context(), "tokenString")
+		if tokenString == "" {
+			return &HandlerRes{
+				Error:      errors.New("Not authenticated"),
+				StatusCode: http.StatusUnauthorized,
+			}
+		}
+		return fn(w, r)
+	}
+}
+
 func (h AuthHandler) AuthPage(w *http.ResponseWriter, r *http.Request) *HandlerRes {
 	return &HandlerRes{
 		Component: layout.Base("Auth", components.AuthView()),
@@ -65,7 +78,7 @@ func (h AuthHandler) Authenticate(w *http.ResponseWriter, r *http.Request) *Hand
 		}
 	}
 
-	h.SM.Put(r.Context(), "token", res.Token)
+	h.SM.Put(r.Context(), "tokenString", res.Token)
 
 	return &HandlerRes{
 		Component: layout.Base("Auth", components.AuthView()),
