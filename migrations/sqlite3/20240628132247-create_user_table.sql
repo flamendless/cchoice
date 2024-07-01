@@ -6,8 +6,10 @@ CREATE TABLE tbl_user (
 	middle_name TEXT NOT NULL,
 	last_name TEXT NOT NULL,
 	email TEXT NOT NULL,
+	password TEXT NOT NULL,
 	mobile_no TEXT NOT NULL,
 	user_type TEXT CHECK (user_type IN ('USER', 'SYSTEM', 'ADMIN', 'API')) NOT NULL DEFAULT 'USER',
+	status TEXT CHECK (status in ('ACTIVE', 'INACTIVE', 'DELETED')) NOT NULL DEFAULT 'ACTIVE',
 
 	created_at DATETIME NOT NULL DEFAULT (DATE('1970-01-01 00:00:00')),
 	updated_at DATETIME NOT NULL DEFAULT (DATE('1970-01-01 00:00:00')),
@@ -18,7 +20,9 @@ CREATE TABLE tbl_user (
 );
 
 CREATE INDEX idx_tbl_user_user_type ON tbl_user(user_type);
+CREATE INDEX idx_tbl_user_status ON tbl_user(status);
 
 -- +migrate Down
 DROP TABLE tbl_user;
 DROP INDEX idx_tbl_user_user_type;
+DROP INDEX idx_tbl_user_status;

@@ -14,7 +14,8 @@ SELECT id
 FROM tbl_user
 WHERE
 	email = ? AND
-	user_type = ?
+	user_type = ? AND
+	status = 'ACTIVE'
 LIMIT 1
 `
 
@@ -28,4 +29,21 @@ func (q *Queries) GetUserByEMailAndUserType(ctx context.Context, arg GetUserByEM
 	var id int64
 	err := row.Scan(&id)
 	return id, err
+}
+
+const getUserHashedPassword = `-- name: GetUserHashedPassword :one
+SELECT password
+FROM tbl_user
+WHERE
+	user_type = 'API' AND
+	status = 'ACTIVE' AND
+	email = ?
+LIMIT 1
+`
+
+func (q *Queries) GetUserHashedPassword(ctx context.Context, email string) (string, error) {
+	row := q.db.QueryRowContext(ctx, getUserHashedPassword, email)
+	var password string
+	err := row.Scan(&password)
+	return password, err
 }

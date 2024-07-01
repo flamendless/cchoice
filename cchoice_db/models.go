@@ -50,8 +50,10 @@ type TblUser struct {
 	MiddleName string
 	LastName   string
 	Email      string
+	Password   string
 	MobileNo   string
 	UserType   string
+	Status     string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	DeletedAt  time.Time

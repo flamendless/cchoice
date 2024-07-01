@@ -5,6 +5,7 @@ INSERT INTO tbl_user(
 	middle_name,
 	last_name,
 	email,
+	password,
 	mobile_no,
 	user_type
 ) VALUES
@@ -13,6 +14,7 @@ INSERT INTO tbl_user(
 		'grpcui',
 		'grpcui',
 		'grpcui@cchoice.com',
+		'grpcuipw',
 		'+639000000000',
 		'SYSTEM'
 	),
@@ -21,6 +23,7 @@ INSERT INTO tbl_user(
 		'client',
 		'client',
 		'client@cchoice.com',
+		'clientpw',
 		'+639000000001',
 		'API'
 	)
