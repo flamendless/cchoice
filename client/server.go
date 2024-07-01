@@ -35,11 +35,11 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	errHandler := handlers.NewErrorHandler(logger)
 
-	productService := services.NewProductService(grpcConn)
-	productHandler := handlers.NewProductHandler(logger, &productService)
-
-	authService := services.NewAuthService(grpcConn)
+	authService := services.NewAuthService(grpcConn, sessionManager)
 	authHandler := handlers.NewAuthHandler(logger, &authService, sessionManager)
+
+	productService := services.NewProductService(grpcConn)
+	productHandler := handlers.NewProductHandler(logger, &productService, &authService)
 
 	mux := http.NewServeMux()
 
@@ -56,9 +56,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	mux.HandleFunc("POST /auth", errHandler.Default(authHandler.Authenticate))
 
 	//PRODUCTS
-	mux.HandleFunc("GET /products", errHandler.Default(
-		authHandler.Authenticated(productHandler.ProductTablePage),
-	))
+	mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))
 
 	mw := middlewares.NewMiddleware(
 		mux,

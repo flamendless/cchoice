@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"cchoice/client/common"
 	"cchoice/client/components"
 	"cchoice/client/components/layout"
 	pb "cchoice/proto"
@@ -13,6 +14,7 @@ import (
 
 type AuthService interface {
 	Authenticate(string, string) (*pb.AuthLoginResponse, error)
+	Authenticated(*http.Request) *common.HandlerRes
 }
 
 type AuthHandler struct {
@@ -33,29 +35,16 @@ func NewAuthHandler(
 	}
 }
 
-func (h AuthHandler) Authenticated(fn FnHandler) FnHandler {
-	return func(w *http.ResponseWriter, r *http.Request) *HandlerRes {
-		tokenString := h.SM.GetString(r.Context(), "tokenString")
-		if tokenString == "" {
-			return &HandlerRes{
-				Error:      errors.New("Not authenticated"),
-				StatusCode: http.StatusUnauthorized,
-			}
-		}
-		return fn(w, r)
-	}
-}
-
-func (h AuthHandler) AuthPage(w *http.ResponseWriter, r *http.Request) *HandlerRes {
-	return &HandlerRes{
+func (h AuthHandler) AuthPage(w *http.ResponseWriter, r *http.Request) *common.HandlerRes {
+	return &common.HandlerRes{
 		Component: layout.Base("Auth", components.AuthView()),
 	}
 }
 
-func (h AuthHandler) Authenticate(w *http.ResponseWriter, r *http.Request) *HandlerRes {
+func (h AuthHandler) Authenticate(w *http.ResponseWriter, r *http.Request) *common.HandlerRes {
 	err := r.ParseForm()
 	if err != nil {
-		return &HandlerRes{
+		return &common.HandlerRes{
 			Error:      errors.New("Failed to parse form"),
 			StatusCode: http.StatusBadRequest,
 		}
@@ -64,7 +53,7 @@ func (h AuthHandler) Authenticate(w *http.ResponseWriter, r *http.Request) *Hand
 	username := r.Form.Get("username")
 	password := r.Form.Get("password")
 	if username == "" || password == "" {
-		return &HandlerRes{
+		return &common.HandlerRes{
 			Error:      errors.New("Incomplete form data"),
 			StatusCode: http.StatusBadRequest,
 		}
@@ -72,7 +61,7 @@ func (h AuthHandler) Authenticate(w *http.ResponseWriter, r *http.Request) *Hand
 
 	res, err := h.AuthService.Authenticate(username, password)
 	if err != nil {
-		return &HandlerRes{
+		return &common.HandlerRes{
 			Error:      err,
 			StatusCode: http.StatusUnauthorized,
 		}
@@ -80,7 +69,7 @@ func (h AuthHandler) Authenticate(w *http.ResponseWriter, r *http.Request) *Hand
 
 	h.SM.Put(r.Context(), "tokenString", res.Token)
 
-	return &HandlerRes{
+	return &common.HandlerRes{
 		Component: layout.Base("Auth", components.AuthView()),
 	}
 }

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"cchoice/client/common"
 	"cchoice/client/components"
 	"cchoice/client/components/layout"
 	"cchoice/internal/enums"
@@ -19,22 +20,33 @@ type ProductService interface {
 type ProductHandler struct {
 	Logger         *zap.Logger
 	ProductService ProductService
+	AuthService    AuthService
 }
 
 func NewProductHandler(
 	logger *zap.Logger,
 	productService ProductService,
+	authService AuthService,
 ) ProductHandler {
 	return ProductHandler{
 		Logger:         logger,
 		ProductService: productService,
+		AuthService:    authService,
 	}
 }
 
-func (h ProductHandler) ProductTablePage(w *http.ResponseWriter, r *http.Request) *HandlerRes {
+func (h ProductHandler) ProductTablePage(
+	w *http.ResponseWriter,
+	r *http.Request,
+) *common.HandlerRes {
+	resAuth := h.AuthService.Authenticated(r)
+	if resAuth != nil {
+		return resAuth
+	}
+
 	q, err := url.ParseQuery(r.URL.RawQuery)
 	if err != nil {
-		return &HandlerRes{Error: err, StatusCode: http.StatusBadRequest}
+		return &common.HandlerRes{Error: err, StatusCode: http.StatusBadRequest}
 	}
 
 	sortField := pb.SortField_NAME
@@ -46,16 +58,16 @@ func (h ProductHandler) ProductTablePage(w *http.ResponseWriter, r *http.Request
 		sortField = enums.ParseSortFieldEnumPB(qSortField)
 		sortDir = enums.ParseSortDirEnumPB(qSortDir)
 		if sortField == pb.SortField_SORT_FIELD_UNDEFINED || sortDir == pb.SortDir_SORT_DIR_UNDEFINED {
-			return &HandlerRes{Error: errors.New("Invalid URL params"), StatusCode: http.StatusBadRequest}
+			return &common.HandlerRes{Error: errors.New("Invalid URL params"), StatusCode: http.StatusBadRequest}
 		}
 	}
 
 	res, err := h.ProductService.GetProductsWithSorting(sortField, sortDir)
 	if err != nil {
-		return &HandlerRes{Error: err, StatusCode: http.StatusInternalServerError}
+		return &common.HandlerRes{Error: err, StatusCode: http.StatusInternalServerError}
 	}
 
-	return &HandlerRes{
+	return &common.HandlerRes{
 		Component: layout.Base("Products", components.ProductTableView(res)),
 	}
 }

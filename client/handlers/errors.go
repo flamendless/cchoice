@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"cchoice/client/common"
 	"cchoice/internal/logs"
 	"net/http"
 
@@ -8,7 +9,7 @@ import (
 )
 
 type FnHTTP = func(http.ResponseWriter, *http.Request)
-type FnHandler = func(*http.ResponseWriter, *http.Request) *HandlerRes
+type FnHandler = func(*http.ResponseWriter, *http.Request) *common.HandlerRes
 
 type ErrorHandler struct {
 	Logger *zap.Logger
