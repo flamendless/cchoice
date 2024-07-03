@@ -5,6 +5,7 @@ import (
 	"cchoice/internal/ctx"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
+	"fmt"
 	"os"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -15,7 +16,10 @@ import (
 var (
 	subcmd      string
 	tokenString string
+	audString   string
 	dbPath      string
+	username    string
+	tokenOnly   bool
 )
 
 func init() {
@@ -23,6 +27,9 @@ func init() {
 	f().StringVarP(&subcmd, "subcmd", "s", "", "subcommand to use")
 	f().StringVarP(&tokenString, "token", "t", "", "token to validate")
 	f().StringVarP(&dbPath, "db", "", "", "db path")
+	f().StringVarP(&audString, "aud", "a", "API", "AUD")
+	f().StringVarP(&username, "username", "u", "", "username")
+	f().BoolVarP(&tokenOnly, "token_only", "o", false, "whether to output token in shell")
 
 	rootCmd.AddCommand(JWTCmd)
 }
@@ -34,7 +41,12 @@ func issue() string {
 		panic(1)
 	}
 
-	token, err := issuer.IssueToken(enums.AudSystem, "test")
+	aud := enums.ParseAudEnum(audString)
+	if aud == enums.AudUndefined {
+		panic("Invalid AUD string")
+	}
+
+	token, err := issuer.IssueToken(aud, username)
 	if err != nil {
 		logs.Log().Error("Unable to issue token", zap.Error(err))
 		panic(1)
@@ -69,6 +81,9 @@ var JWTCmd = &cobra.Command{
 		if subcmd == "issue" {
 			tokenString := issue()
 			logs.Log().Info("issued token", zap.String("token", tokenString))
+			if tokenOnly {
+				fmt.Println(tokenString)
+			}
 
 		} else if subcmd == "validate" {
 			token := validate(tokenString)

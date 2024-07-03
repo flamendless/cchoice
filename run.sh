@@ -21,7 +21,8 @@ grpc() {
 
 grpc_ui() {
 	cmd.exe /c "start vivaldi http://127.0.0.1:36477/"
-	grpcui -authority "bearer" -reflect-header "authorization: bearer grpcui" -port 36477 -plaintext "${GRPC_SERVER_ADDR}"
+	local token=$(go run ./main.go jwt -s "issue" -a "API" -o "true" -u "client@cchoice.com")
+	grpcui -authority "bearer" -reflect-header "authorization: bearer ${token}" -port 36477 -plaintext "${GRPC_SERVER_ADDR}"
 }
 
 client() {
