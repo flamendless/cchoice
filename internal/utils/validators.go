@@ -32,7 +32,6 @@ func ValidateUsername(username string) error {
 	val := v.Check(
 		v.String(username, "username").Not().Blank().OfLengthBetween(8, 32),
 	)
-	fmt.Println(username, val.Valid())
 	if !val.Valid() {
 		errs := val.Errors()["username"]
 		errMsg := fmt.Sprintf(

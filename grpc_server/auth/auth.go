@@ -74,17 +74,12 @@ func (s *AuthServer) Authenticate(
 		return nil, errPW
 	}
 
-	hashedPassword, err := argon2id.CreateHash(password, argon2id.DefaultParams)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to hash password: %w", err)
-	}
-
 	hashedDBPassword, err := s.CtxDB.QueriesRead.GetUserHashedPassword(context.Background(), username)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid token in DB: %w", err)
 	}
 
-	match, err := argon2id.ComparePasswordAndHash(hashedDBPassword, hashedPassword)
+	match, err := argon2id.ComparePasswordAndHash(password, hashedDBPassword)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid token in DB: %w", err)
 	}
