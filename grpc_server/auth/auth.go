@@ -20,8 +20,8 @@ type AuthServer struct {
 
 func (s *AuthServer) Authenticate(
 	ctx context.Context,
-	in *pb.AuthLoginRequest,
-) (*pb.AuthLoginResponse, error) {
+	in *pb.AuthenticateRequest,
+) (*pb.AuthenticateResponse, error) {
 	username := in.GetUsername()
 	password := in.GetPassword()
 
@@ -59,7 +59,7 @@ func (s *AuthServer) Authenticate(
 		return nil, errPW
 	}
 
-	res := &pb.AuthLoginResponse{
+	res := &pb.AuthenticateResponse{
 		Token: token,
 	}
 

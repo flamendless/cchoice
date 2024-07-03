@@ -49,8 +49,8 @@ func (h ProductHandler) ProductTablePage(
 		return &common.HandlerRes{Error: err, StatusCode: http.StatusBadRequest}
 	}
 
-	sortField := pb.SortField_NAME
-	sortDir := pb.SortDir_ASC
+	sortField := pb.SortField_SORT_FIELD_NAME
+	sortDir := pb.SortDir_SORT_DIR_ASC
 	qSortField := q.Get("sort_field")
 	qSortDir := q.Get("sort_dir")
 

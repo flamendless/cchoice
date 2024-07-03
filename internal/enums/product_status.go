@@ -44,9 +44,9 @@ func ParseProductStatusEnumPB(e string) pb.ProductStatus {
 	case "UNDEFINED":
 		return pb.ProductStatus_PRODUCT_STATUS_UNDEFINED
 	case "ACTIVE":
-		return pb.ProductStatus_ACTIVE
+		return pb.ProductStatus_PRODUCT_STATUS_ACTIVE
 	case "DELETED":
-		return pb.ProductStatus_DELETED
+		return pb.ProductStatus_PRODUCT_STATUS_DELETED
 	default:
 		panic(fmt.Sprintf("Can't convert '%s' to pb.ProductStatus enum", e))
 	}

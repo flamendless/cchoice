@@ -42,9 +42,9 @@ func ParseSortFieldEnum(e string) SortField {
 func ParseSortFieldEnumPB(e string) pb.SortField {
 	switch e {
 	case "name":
-		return pb.SortField_NAME
+		return pb.SortField_SORT_FIELD_NAME
 	case "created_at":
-		return pb.SortField_CREATED_AT
+		return pb.SortField_SORT_FIELD_CREATED_AT
 	default:
 		return pb.SortField_SORT_FIELD_UNDEFINED
 	}

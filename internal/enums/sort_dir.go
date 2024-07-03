@@ -42,9 +42,9 @@ func ParseSortDirEnum(e string) SortDir {
 func ParseSortDirEnumPB(e string) pb.SortDir {
 	switch e {
 	case "ASC":
-		return pb.SortDir_ASC
+		return pb.SortDir_SORT_DIR_ASC
 	case "DESC":
-		return pb.SortDir_DESC
+		return pb.SortDir_SORT_DIR_DESC
 	default:
 		return pb.SortDir_SORT_DIR_UNDEFINED
 	}

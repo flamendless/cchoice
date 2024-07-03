@@ -8,14 +8,14 @@ option go_package = "cchoice/pb";
 
 enum SortField {
    SORT_FIELD_UNDEFINED = 0;
-   NAME = 1;
-   CREATED_AT = 2;
+   SORT_FIELD_NAME = 1;
+   SORT_FIELD_CREATED_AT = 2;
 }
 
 enum SortDir {
    SORT_DIR_UNDEFINED = 0;
-   ASC = 1;
-   DESC = 2;
+   SORT_DIR_ASC = 1;
+   SORT_DIR_DESC = 2;
 }
 
 message SortBy {

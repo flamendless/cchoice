@@ -10,8 +10,8 @@ option go_package = "cchoice/pb";
 
 enum ProductStatus {
    PRODUCT_STATUS_UNDEFINED = 0;
-   ACTIVE = 1;
-   DELETED = 2;
+   PRODUCT_STATUS_ACTIVE = 1;
+   PRODUCT_STATUS_DELETED = 2;
 }
 
 message Product {

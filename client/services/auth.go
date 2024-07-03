@@ -42,12 +42,12 @@ func (s AuthService) Authenticated(w http.ResponseWriter, r *http.Request) *comm
 func (s AuthService) Authenticate(
 	username string,
 	password string,
-) (*pb.AuthLoginResponse, error) {
+) (*pb.AuthenticateResponse, error) {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	res, err := client.Authenticate(ctx, &pb.AuthLoginRequest{
+	res, err := client.Authenticate(ctx, &pb.AuthenticateRequest{
 		Username: username,
 		Password: password,
 	})

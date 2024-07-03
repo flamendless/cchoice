@@ -13,7 +13,7 @@ import (
 )
 
 type AuthService interface {
-	Authenticate(string, string) (*pb.AuthLoginResponse, error)
+	Authenticate(string, string) (*pb.AuthenticateResponse, error)
 	Authenticated(http.ResponseWriter, *http.Request) *common.HandlerRes
 }
 

@@ -94,8 +94,8 @@ func (s *ProductServer) ListProductsByProductStatus(
 			products = append(products, ProductsRow(f).ToPBProduct())
 		}
 	} else {
-		if sortBy.Field == pb.SortField_NAME {
-			if sortBy.Dir == pb.SortDir_ASC {
+		if sortBy.Field == pb.SortField_SORT_FIELD_NAME {
+			if sortBy.Dir == pb.SortDir_SORT_DIR_ASC {
 				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByNameAsc(ctx, status.String())
 				if err != nil {
 					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
@@ -104,7 +104,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 					products = append(products, ProductsRow(f).ToPBProduct())
 				}
 
-			} else if sortBy.Dir == pb.SortDir_DESC {
+			} else if sortBy.Dir == pb.SortDir_SORT_DIR_DESC {
 				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByNameDesc(ctx, status.String())
 				if err != nil {
 					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
@@ -113,8 +113,8 @@ func (s *ProductServer) ListProductsByProductStatus(
 					products = append(products, ProductsRow(f).ToPBProduct())
 				}
 			}
-		} else if sortBy.Field == pb.SortField_CREATED_AT {
-			if sortBy.Dir == pb.SortDir_ASC {
+		} else if sortBy.Field == pb.SortField_SORT_FIELD_CREATED_AT {
+			if sortBy.Dir == pb.SortDir_SORT_DIR_ASC {
 				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByCreationDateDesc(ctx, status.String())
 				if err != nil {
 					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
@@ -123,7 +123,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 					products = append(products, ProductsRow(f).ToPBProduct())
 				}
 
-			} else if sortBy.Dir == pb.SortDir_DESC {
+			} else if sortBy.Dir == pb.SortDir_SORT_DIR_DESC {
 				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByCreationDateDesc(ctx, status.String())
 				if err != nil {
 					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())

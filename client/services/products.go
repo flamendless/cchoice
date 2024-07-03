@@ -29,7 +29,7 @@ func (s ProductService) GetProductsWithSorting(
 	res, err := client.ListProductsByProductStatus(
 		ctx,
 		&pb.ProductStatusRequest{
-			Status: pb.ProductStatus_ACTIVE,
+			Status: pb.ProductStatus_PRODUCT_STATUS_ACTIVE,
 			SortBy: &pb.SortBy{
 				Field: sortField,
 				Dir:   sortDir,
