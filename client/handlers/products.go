@@ -36,10 +36,10 @@ func NewProductHandler(
 }
 
 func (h ProductHandler) ProductTablePage(
-	w *http.ResponseWriter,
+	w http.ResponseWriter,
 	r *http.Request,
 ) *common.HandlerRes {
-	resAuth := h.AuthService.Authenticated(r)
+	resAuth := h.AuthService.Authenticated(w, r)
 	if resAuth != nil {
 		return resAuth
 	}

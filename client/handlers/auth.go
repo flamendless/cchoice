@@ -14,7 +14,7 @@ import (
 
 type AuthService interface {
 	Authenticate(string, string) (*pb.AuthLoginResponse, error)
-	Authenticated(*http.Request) *common.HandlerRes
+	Authenticated(http.ResponseWriter, *http.Request) *common.HandlerRes
 }
 
 type AuthHandler struct {
@@ -35,13 +35,13 @@ func NewAuthHandler(
 	}
 }
 
-func (h AuthHandler) AuthPage(w *http.ResponseWriter, r *http.Request) *common.HandlerRes {
+func (h AuthHandler) AuthPage(w http.ResponseWriter, r *http.Request) *common.HandlerRes {
 	return &common.HandlerRes{
 		Component: layout.Base("Auth", components.AuthView()),
 	}
 }
 
-func (h AuthHandler) Authenticate(w *http.ResponseWriter, r *http.Request) *common.HandlerRes {
+func (h AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) *common.HandlerRes {
 	err := r.ParseForm()
 	if err != nil {
 		return &common.HandlerRes{

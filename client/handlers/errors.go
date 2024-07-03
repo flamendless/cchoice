@@ -9,7 +9,7 @@ import (
 )
 
 type FnHTTP = func(http.ResponseWriter, *http.Request)
-type FnHandler = func(*http.ResponseWriter, *http.Request) *common.HandlerRes
+type FnHandler = func(http.ResponseWriter, *http.Request) *common.HandlerRes
 
 type ErrorHandler struct {
 	Logger *zap.Logger
@@ -23,10 +23,15 @@ func NewErrorHandler(logger *zap.Logger) *ErrorHandler {
 
 func (h *ErrorHandler) Default(fn FnHandler) FnHTTP {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res := fn(&w, r)
+		res := fn(w, r)
 		if res.Error != nil {
 			logs.LogHTTPHandler(h.Logger, r, res.Error)
-			http.Error(w, res.Error.Error(), res.StatusCode)
+
+			if res.RedirectTo == "" {
+				http.Error(w, res.Error.Error(), res.StatusCode)
+			} else {
+				http.Redirect(w, r, res.RedirectTo, http.StatusTemporaryRedirect)
+			}
 			return
 		}
 

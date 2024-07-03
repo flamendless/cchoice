@@ -27,12 +27,13 @@ func NewAuthService(
 	}
 }
 
-func (s AuthService) Authenticated(r *http.Request) *common.HandlerRes {
+func (s AuthService) Authenticated(w http.ResponseWriter, r *http.Request) *common.HandlerRes {
 	tokenString := s.SM.GetString(r.Context(), "tokenString")
 	if tokenString == "" {
 		return &common.HandlerRes{
 			Error:      errors.New("Not authenticated"),
 			StatusCode: http.StatusUnauthorized,
+			RedirectTo: "/auth",
 		}
 	}
 	return nil

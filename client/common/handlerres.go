@@ -6,4 +6,5 @@ type HandlerRes struct {
 	Component  templ.Component
 	Error      error
 	StatusCode int
+	RedirectTo string
 }
