@@ -12,6 +12,6 @@ func TestEncDecDBID(t *testing.T) {
 	enc := EncDBID(test)
 	dec := DecDBID(enc)
 	if test != dec {
-		t.Fatalf("enc/dec")
+		t.Fatalf("Fail: %d = %s = %d", test, enc, dec)
 	}
 }

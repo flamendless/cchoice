@@ -10,24 +10,20 @@ const (
 
 func (a AudKind) String() string {
 	switch a {
-	case AUD_UNDEFINED:
-		return "undefined"
 	case AUD_API:
 		return "API"
 	case AUD_SYSTEM:
-		return "system"
+		return "SYSTEM"
 	default:
-		return "undefined"
+		return "UNDEFINED"
 	}
 }
 
 func ParseAudEnum(e string) AudKind {
 	switch e {
-	case "undefined":
-		return AUD_UNDEFINED
 	case "API":
 		return AUD_API
-	case "system":
+	case "SYSTEM":
 		return AUD_SYSTEM
 	default:
 		return AUD_UNDEFINED

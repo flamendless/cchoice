@@ -2,7 +2,6 @@ package enums
 
 import (
 	pb "cchoice/proto"
-	"fmt"
 )
 
 type SortField int
@@ -15,35 +14,31 @@ const (
 
 func (t SortField) String() string {
 	switch t {
-	case SORT_FIELD_UNDEFINED:
-		return "UNDEFINED"
 	case SORT_FIELD_NAME:
-		return "name"
+		return "NAME"
 	case SORT_FIELD_CREATED_AT:
-		return "created_t"
+		return "CREATED_AT"
 	default:
-		panic("unknown enum")
+		return "UNDEFINED"
 	}
 }
 
 func ParseSortFieldEnum(e string) SortField {
 	switch e {
-	case "UNDEFINED":
-		return SORT_FIELD_UNDEFINED
-	case "name":
+	case "NAME":
 		return SORT_FIELD_NAME
-	case "created_at":
+	case "CREATED_AT":
 		return SORT_FIELD_CREATED_AT
 	default:
-		panic(fmt.Sprintf("Can't convert '%s' to SortField enum", e))
+		return SORT_FIELD_UNDEFINED
 	}
 }
 
 func ParseSortFieldEnumPB(e string) pb.SortField_SortField {
 	switch e {
-	case "name":
+	case "NAME":
 		return pb.SortField_NAME
-	case "created_at":
+	case "CREATED_AT":
 		return pb.SortField_CREATED_AT
 	default:
 		return pb.SortField_UNDEFINED
