@@ -27,7 +27,7 @@ message VoidParam {}
 message VoidReturn {}
 
 message IDRequest {
-   int64 id = 1;
+   string id = 1;
 }
 
 message Metadata {

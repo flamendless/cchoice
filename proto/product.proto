@@ -15,7 +15,7 @@ enum ProductStatus {
 }
 
 message Product {
-   int64 ID = 1;
+   string ID = 1;
    string name = 2;
    string serial = 3;
    string description = 4;

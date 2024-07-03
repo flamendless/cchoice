@@ -5,6 +5,7 @@ import (
 	"cchoice/internal/ctx"
 	"cchoice/internal/domains/grpc"
 	"cchoice/internal/logs"
+	"cchoice/internal/serialize"
 	pb "cchoice/proto"
 	"context"
 
@@ -18,8 +19,8 @@ type ProductCategoryServer struct {
 
 func productCategoryFromRow(row *cchoice_db.TblProductCategory) *pb.ProductCategory {
 	return &pb.ProductCategory{
-		ID:          row.ID,
-		ProductId:   row.ProductID,
+		ID:          serialize.EncDBID(row.ID),
+		ProductId:   serialize.EncDBID(row.ProductID),
 		Category:    row.Category.String,
 		Subcategory: row.Subcategory.String,
 	}
@@ -29,10 +30,13 @@ func (s *ProductCategoryServer) GetProductCategoryByID(
 	ctx context.Context,
 	in *pb.IDRequest,
 ) (*pb.ProductCategory, error) {
-	id := in.GetId()
-	logs.Log().Debug("GetProductCategoryByID", zap.Int64("id", id))
+	encid := in.GetId()
+	logs.Log().Debug("GetProductCategoryByID", zap.String("encid", encid))
 
-	existingProductCategory, err := s.CtxDB.QueriesRead.GetProductCategoryByID(ctx, id)
+	existingProductCategory, err := s.CtxDB.QueriesRead.GetProductCategoryByID(
+		ctx,
+		serialize.DecDBID(encid),
+	)
 	if err != nil {
 		return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
 	}
@@ -43,10 +47,13 @@ func (s *ProductCategoryServer) GetProductCategoryByProductID(
 	ctx context.Context,
 	in *pb.IDRequest,
 ) (*pb.ProductCategory, error) {
-	id := in.GetId()
-	logs.Log().Debug("GetProductCategoryByProductID", zap.Int64("id", id))
+	encid := in.GetId()
+	logs.Log().Debug("GetProductCategoryByProductID", zap.String("encid", encid))
 
-	existingProductCategory, err := s.CtxDB.QueriesRead.GetProductCategoryByProductID(ctx, id)
+	existingProductCategory, err := s.CtxDB.QueriesRead.GetProductCategoryByProductID(
+		ctx,
+		serialize.DecDBID(encid),
+	)
 	if err != nil {
 		return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
 	}

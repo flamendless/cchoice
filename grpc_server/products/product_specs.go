@@ -4,6 +4,7 @@ import (
 	"cchoice/internal/ctx"
 	"cchoice/internal/domains/grpc"
 	"cchoice/internal/logs"
+	"cchoice/internal/serialize"
 	pb "cchoice/proto"
 	"context"
 
@@ -19,16 +20,20 @@ func (s *ProductSpecsServer) GetProductSpecsByID(
 	ctx context.Context,
 	in *pb.IDRequest,
 ) (*pb.ProductSpecs, error) {
-	id := in.GetId()
-	logs.Log().Debug("GetProductSpecsByID", zap.Int64("id", id))
+	encid := in.GetId()
+	logs.Log().Debug("GetProductSpecsByID", zap.String("encid", encid))
 
-	existingProductSpecs, err := s.CtxDB.QueriesRead.GetProductSpecsByID(ctx, id)
+	existingProductSpecs, err := s.CtxDB.QueriesRead.GetProductSpecsByID(
+		ctx,
+		serialize.DecDBID(encid),
+
+	)
 	if err != nil {
 		return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
 	}
 
 	return &pb.ProductSpecs{
-		ID:            existingProductSpecs.ID,
+		ID:            serialize.EncDBID(existingProductSpecs.ID),
 		Colours:       existingProductSpecs.Colours.String,
 		Sizes:         existingProductSpecs.Sizes.String,
 		Segmentation:  existingProductSpecs.Segmentation.String,

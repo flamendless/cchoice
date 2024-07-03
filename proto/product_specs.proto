@@ -7,7 +7,7 @@ import "proto/common.proto";
 option go_package = "cchoice/pb";
 
 message ProductSpecs {
-   int64 ID = 1;
+   string ID = 1;
    string colours = 2;
    string sizes = 3;
    string segmentation = 4;

@@ -5,6 +5,7 @@ import (
 	"cchoice/internal/ctx"
 	"cchoice/internal/domains/grpc"
 	"cchoice/internal/enums"
+	"cchoice/internal/serialize"
 	pb "cchoice/proto"
 	"context"
 
@@ -33,7 +34,7 @@ func (row ProductsRow) ToPBProduct() *pb.Product {
 	)
 
 	return &pb.Product{
-		ID:          row.ID,
+		ID:          serialize.EncDBID(row.ID),
 		Serial:      row.Serial,
 		Name:        row.Name,
 		Description: row.Description.String,
@@ -66,8 +67,11 @@ func (s *ProductServer) GetProductByID(
 	ctx context.Context,
 	in *pb.IDRequest,
 ) (*pb.Product, error) {
-	id := in.GetId()
-	existingProduct, err := s.CtxDB.QueriesRead.GetProductByID(ctx, id)
+	encid := in.GetId()
+	existingProduct, err := s.CtxDB.QueriesRead.GetProductByID(
+		ctx,
+		serialize.DecDBID(encid),
+	)
 	if err != nil {
 		return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
 	}
