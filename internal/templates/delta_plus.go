@@ -80,12 +80,12 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 
 	var status enums.ProductStatus
 	if strings.Contains(strings.ToLower(name), "discontinued") {
-		status = enums.Deleted
+		status = enums.PRODUCT_STATUS_DELETED
 		parserErr := parser.NewParserError(parser.ProductDiscontinued, "product is discontinued")
 		errs = append(errs, parserErr)
 		return nil, errs
 	} else {
-		status = enums.Active
+		status = enums.PRODUCT_STATUS_ACTIVE
 	}
 
 	desc := row[idxDesc]

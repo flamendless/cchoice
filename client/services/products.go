@@ -19,8 +19,8 @@ func NewProductService(grpcConn *grpc.ClientConn) ProductService {
 }
 
 func (s ProductService) GetProductsWithSorting(
-	sortField pb.SortField,
-	sortDir pb.SortDir,
+	sortField pb.SortField_SortField,
+	sortDir pb.SortDir_SortDir,
 ) (*pb.ProductsResponse, error) {
 	client := pb.NewProductServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -29,7 +29,7 @@ func (s ProductService) GetProductsWithSorting(
 	res, err := client.ListProductsByProductStatus(
 		ctx,
 		&pb.ProductStatusRequest{
-			Status: pb.ProductStatus_PRODUCT_STATUS_ACTIVE,
+			Status: pb.ProductStatus_ACTIVE,
 			SortBy: &pb.SortBy{
 				Field: sortField,
 				Dir:   sortDir,

@@ -8,7 +8,7 @@ CREATE TABLE tbl_user (
 	email TEXT NOT NULL,
 	password TEXT NOT NULL,
 	mobile_no TEXT NOT NULL,
-	user_type TEXT CHECK (user_type IN ('USER', 'SYSTEM', 'ADMIN', 'API')) NOT NULL DEFAULT 'USER',
+	user_type TEXT CHECK (user_type IN ('API', 'SYSTEM')) NOT NULL DEFAULT 'API',
 	status TEXT CHECK (status in ('ACTIVE', 'INACTIVE', 'DELETED')) NOT NULL DEFAULT 'ACTIVE',
 
 	created_at DATETIME NOT NULL DEFAULT (DATE('1970-01-01 00:00:00')),

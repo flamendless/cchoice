@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"cchoice/cchoice_db"
 	"cchoice/internal/auth"
 	"cchoice/internal/ctx"
 	"cchoice/internal/enums"
@@ -16,6 +17,44 @@ type AuthServer struct {
 	pb.UnimplementedAuthServiceServer
 	CtxDB  *ctx.Database
 	Issuer *auth.Issuer
+}
+
+func (s *AuthServer) Register(
+	ctx context.Context,
+	in *pb.RegisterRequest,
+) (*pb.RegisterResponse, error) {
+	err := utils.ValidateUserReg(in)
+	if err != nil {
+		return nil, err
+	}
+
+	hashedPassword, err := argon2id.CreateHash(in.Password, argon2id.DefaultParams)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to hash password: %w", err)
+	}
+
+	err = s.CtxDB.Queries.CreateUser(context.Background(), cchoice_db.CreateUserParams{
+		FirstName: in.FirstName,
+		MiddleName: in.MiddleName,
+		LastName: in.LastName,
+		Email: in.Email,
+		Password: hashedPassword,
+		MobileNo: in.MobileNo,
+		UserType: enums.USER_TYPE_API.String(),
+		Status: enums.PRODUCT_STATUS_ACTIVE.String(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	tokenString, err := s.Issuer.IssueToken(enums.AUD_API, in.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.RegisterResponse{
+		Token: tokenString,
+	}, nil
 }
 
 func (s *AuthServer) Authenticate(
@@ -54,13 +93,13 @@ func (s *AuthServer) Authenticate(
 		return nil, fmt.Errorf("Invalid credentials")
 	}
 
-	token, err := s.Issuer.IssueToken(enums.AudAPI, username)
+	tokenString, err := s.Issuer.IssueToken(enums.AUD_API, username)
 	if err != nil {
-		return nil, errPW
+		return nil, err
 	}
 
 	res := &pb.AuthenticateResponse{
-		Token: token,
+		Token: tokenString,
 	}
 
 	return res, nil

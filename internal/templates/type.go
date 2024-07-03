@@ -28,9 +28,9 @@ type Template struct {
 
 func CreateTemplate(kind TemplateKind) *Template {
 	switch kind {
-	case Undefined:
+	case TEMPLATE_UNDEFINED:
 		panic("Can't use undefined template")
-	case Sample:
+	case TEMPLATE_SAMPLE:
 		return &Template{
 			SkipInitialRows:  0,
 			AssumedRowsCount: 128,
@@ -40,7 +40,7 @@ func CreateTemplate(kind TemplateKind) *Template {
 			ProcessRows:      SampleProcessRows,
 		}
 
-	case DeltaPlus:
+	case TEMPLATE_DELTAPLUS:
 		return &Template{
 			SkipInitialRows:  1,
 			AssumedRowsCount: 1024,
@@ -50,7 +50,7 @@ func CreateTemplate(kind TemplateKind) *Template {
 			ProcessRows:      DeltaPlusProcessRows,
 		}
 
-	case Bosch:
+	case TEMPLATE_BOSCH:
 		return &Template{
 			SkipInitialRows:  2,
 			AssumedRowsCount: 256,

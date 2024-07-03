@@ -15,3 +15,18 @@ WHERE
 	status = 'ACTIVE' AND
 	email = ?
 LIMIT 1;
+
+-- name: CreateUser :exec
+INSERT INTO tbl_user (
+	first_name,
+	middle_name,
+	last_name,
+	email,
+	password,
+	mobile_no,
+	user_type,
+	status
+) VALUES (
+	?, ?, ?, ?,
+	?, ?, ?, ?
+);

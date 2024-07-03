@@ -91,7 +91,7 @@ func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 		return nil, errs
 	}
 
-	status := enums.Active
+	status := enums.PRODUCT_STATUS_ACTIVE
 
 	return &models.Product{
 		Name:                name,

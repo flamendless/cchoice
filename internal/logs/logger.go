@@ -10,6 +10,10 @@ import (
 
 var logger *zap.Logger
 
+func init() {
+	InitLog()
+}
+
 func InitLog() {
 	config := zap.NewDevelopmentConfig()
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder

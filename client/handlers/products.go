@@ -14,7 +14,7 @@ import (
 )
 
 type ProductService interface {
-	GetProductsWithSorting(pb.SortField, pb.SortDir) (*pb.ProductsResponse, error)
+	GetProductsWithSorting(pb.SortField_SortField, pb.SortDir_SortDir) (*pb.ProductsResponse, error)
 }
 
 type ProductHandler struct {
@@ -49,15 +49,15 @@ func (h ProductHandler) ProductTablePage(
 		return &common.HandlerRes{Error: err, StatusCode: http.StatusBadRequest}
 	}
 
-	sortField := pb.SortField_SORT_FIELD_NAME
-	sortDir := pb.SortDir_SORT_DIR_ASC
+	sortField := pb.SortField_NAME
+	sortDir := pb.SortDir_ASC
 	qSortField := q.Get("sort_field")
 	qSortDir := q.Get("sort_dir")
 
 	if qSortField != "" || qSortDir != "" {
 		sortField = enums.ParseSortFieldEnumPB(qSortField)
 		sortDir = enums.ParseSortDirEnumPB(qSortDir)
-		if sortField == pb.SortField_SORT_FIELD_UNDEFINED || sortDir == pb.SortDir_SORT_DIR_UNDEFINED {
+		if sortField == pb.SortField_UNDEFINED || sortDir == pb.SortDir_UNDEFINED {
 			return &common.HandlerRes{Error: errors.New("Invalid URL params"), StatusCode: http.StatusBadRequest}
 		}
 	}

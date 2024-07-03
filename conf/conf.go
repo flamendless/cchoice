@@ -1,9 +1,11 @@
 package conf
 
 import (
+	"cchoice/internal/logs"
 	"time"
 
 	"github.com/caarlos0/env/v11"
+	"go.uber.org/zap"
 )
 
 type config struct {
@@ -41,6 +43,15 @@ func LoadConf() {
 		TokenExp:       configMd.TokenExp,
 		ClientUsername: configMd.ClientUsername,
 	}
+
+	if logs.Log() == nil {
+		logs.InitLog()
+	}
+
+	logs.Log().Info(
+		"conf",
+		zap.Duration("token exp", conf.TokenExp),
+	)
 }
 
 func GetConf() Config {

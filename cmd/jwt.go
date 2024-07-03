@@ -42,7 +42,7 @@ func issue() string {
 	}
 
 	aud := enums.ParseAudEnum(audString)
-	if aud == enums.AudUndefined {
+	if aud == enums.AUD_UNDEFINED {
 		panic("Invalid AUD string")
 	}
 

@@ -9,6 +9,47 @@ import (
 	"context"
 )
 
+const createUser = `-- name: CreateUser :exec
+INSERT INTO tbl_user (
+	first_name,
+	middle_name,
+	last_name,
+	email,
+	password,
+	mobile_no,
+	user_type,
+	status
+) VALUES (
+	?, ?, ?, ?,
+	?, ?, ?, ?
+)
+`
+
+type CreateUserParams struct {
+	FirstName  string
+	MiddleName string
+	LastName   string
+	Email      string
+	Password   string
+	MobileNo   string
+	UserType   string
+	Status     string
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
+	_, err := q.db.ExecContext(ctx, createUser,
+		arg.FirstName,
+		arg.MiddleName,
+		arg.LastName,
+		arg.Email,
+		arg.Password,
+		arg.MobileNo,
+		arg.UserType,
+		arg.Status,
+	)
+	return err
+}
+
 const getUserByEMailAndUserType = `-- name: GetUserByEMailAndUserType :one
 SELECT id
 FROM tbl_user

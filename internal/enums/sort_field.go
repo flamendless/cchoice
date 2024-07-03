@@ -8,18 +8,18 @@ import (
 type SortField int
 
 const (
-	UndefinedSortField SortField = iota
-	Name
-	CreatedAt
+	SORT_FIELD_UNDEFINED SortField = iota
+	SORT_FIELD_NAME
+	SORT_FIELD_CREATED_AT
 )
 
 func (t SortField) String() string {
 	switch t {
-	case UndefinedSortField:
+	case SORT_FIELD_UNDEFINED:
 		return "UNDEFINED"
-	case Name:
+	case SORT_FIELD_NAME:
 		return "name"
-	case CreatedAt:
+	case SORT_FIELD_CREATED_AT:
 		return "created_t"
 	default:
 		panic("unknown enum")
@@ -29,23 +29,23 @@ func (t SortField) String() string {
 func ParseSortFieldEnum(e string) SortField {
 	switch e {
 	case "UNDEFINED":
-		return UndefinedSortField
+		return SORT_FIELD_UNDEFINED
 	case "name":
-		return Name
+		return SORT_FIELD_NAME
 	case "created_at":
-		return CreatedAt
+		return SORT_FIELD_CREATED_AT
 	default:
 		panic(fmt.Sprintf("Can't convert '%s' to SortField enum", e))
 	}
 }
 
-func ParseSortFieldEnumPB(e string) pb.SortField {
+func ParseSortFieldEnumPB(e string) pb.SortField_SortField {
 	switch e {
 	case "name":
-		return pb.SortField_SORT_FIELD_NAME
+		return pb.SortField_NAME
 	case "created_at":
-		return pb.SortField_SORT_FIELD_CREATED_AT
+		return pb.SortField_CREATED_AT
 	default:
-		return pb.SortField_SORT_FIELD_UNDEFINED
+		return pb.SortField_UNDEFINED
 	}
 }

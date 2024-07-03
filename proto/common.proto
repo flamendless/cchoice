@@ -6,21 +6,25 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "cchoice/pb";
 
-enum SortField {
-   SORT_FIELD_UNDEFINED = 0;
-   SORT_FIELD_NAME = 1;
-   SORT_FIELD_CREATED_AT = 2;
+message SortField {
+   enum SortField {
+      UNDEFINED = 0;
+      NAME = 1;
+      CREATED_AT = 2;
+   }
 }
 
-enum SortDir {
-   SORT_DIR_UNDEFINED = 0;
-   SORT_DIR_ASC = 1;
-   SORT_DIR_DESC = 2;
+message SortDir {
+   enum SortDir {
+      UNDEFINED = 0;
+      ASC = 1;
+      DESC = 2;
+   }
 }
 
 message SortBy {
-   SortField field = 1;
-   SortDir dir = 2;
+   SortField.SortField field = 1;
+   SortDir.SortDir dir = 2;
 }
 
 message VoidParam {}

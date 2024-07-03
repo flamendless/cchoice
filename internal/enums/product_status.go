@@ -8,18 +8,18 @@ import (
 type ProductStatus int
 
 const (
-	UndefinedProductStatus ProductStatus = iota
-	Active
-	Deleted
+	PRODUCT_STATUS_UNDEFINED ProductStatus = iota
+	PRODUCT_STATUS_ACTIVE
+	PRODUCT_STATUS_DELETED
 )
 
 func (t ProductStatus) String() string {
 	switch t {
-	case UndefinedProductStatus:
+	case PRODUCT_STATUS_UNDEFINED:
 		return "UNDEFINED"
-	case Active:
+	case PRODUCT_STATUS_ACTIVE:
 		return "ACTIVE"
-	case Deleted:
+	case PRODUCT_STATUS_DELETED:
 		return "DELETED"
 	default:
 		panic("unknown enum")
@@ -29,24 +29,24 @@ func (t ProductStatus) String() string {
 func ParseProductStatusEnum(e string) ProductStatus {
 	switch e {
 	case "UNDEFINED":
-		return UndefinedProductStatus
+		return PRODUCT_STATUS_UNDEFINED
 	case "ACTIVE":
-		return Active
+		return PRODUCT_STATUS_ACTIVE
 	case "DELETED":
-		return Deleted
+		return PRODUCT_STATUS_DELETED
 	default:
 		panic(fmt.Sprintf("Can't convert '%s' to ProductStatus enum", e))
 	}
 }
 
-func ParseProductStatusEnumPB(e string) pb.ProductStatus {
+func ParseProductStatusEnumPB(e string) pb.ProductStatus_ProductStatus {
 	switch e {
-	case "UNDEFINED":
-		return pb.ProductStatus_PRODUCT_STATUS_UNDEFINED
 	case "ACTIVE":
-		return pb.ProductStatus_PRODUCT_STATUS_ACTIVE
+		return pb.ProductStatus_ACTIVE
 	case "DELETED":
-		return pb.ProductStatus_PRODUCT_STATUS_DELETED
+		return pb.ProductStatus_DELETED
+	case "UNDEFINED":
+		return pb.ProductStatus_UNDEFINED
 	default:
 		panic(fmt.Sprintf("Can't convert '%s' to pb.ProductStatus enum", e))
 	}

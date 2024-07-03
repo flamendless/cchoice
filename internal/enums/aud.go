@@ -3,18 +3,18 @@ package enums
 type AudKind int
 
 const (
-	AudUndefined AudKind = iota
-	AudAPI
-	AudSystem
+	AUD_UNDEFINED AudKind = iota
+	AUD_API
+	AUD_SYSTEM
 )
 
 func (a AudKind) String() string {
 	switch a {
-	case AudUndefined:
+	case AUD_UNDEFINED:
 		return "undefined"
-	case AudAPI:
+	case AUD_API:
 		return "API"
-	case AudSystem:
+	case AUD_SYSTEM:
 		return "system"
 	default:
 		return "undefined"
@@ -24,12 +24,12 @@ func (a AudKind) String() string {
 func ParseAudEnum(e string) AudKind {
 	switch e {
 	case "undefined":
-		return AudUndefined
+		return AUD_UNDEFINED
 	case "API":
-		return AudAPI
+		return AUD_API
 	case "system":
-		return AudSystem
+		return AUD_SYSTEM
 	default:
-		return AudUndefined
+		return AUD_UNDEFINED
 	}
 }

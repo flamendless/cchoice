@@ -17,8 +17,6 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
-	logs.InitLog()
-
 	start := time.Now()
 	defer func() {
 		logs.Log().Info(

@@ -5,21 +5,21 @@ import "fmt"
 type TemplateKind int
 
 const (
-	Undefined TemplateKind = iota
-	Sample
-	DeltaPlus
-	Bosch
+	TEMPLATE_UNDEFINED TemplateKind = iota
+	TEMPLATE_SAMPLE
+	TEMPLATE_DELTAPLUS
+	TEMPLATE_BOSCH
 )
 
 func (t TemplateKind) String() string {
 	switch t {
-	case Undefined:
+	case TEMPLATE_UNDEFINED:
 		return "undefined"
-	case Sample:
+	case TEMPLATE_SAMPLE:
 		return "sample"
-	case DeltaPlus:
+	case TEMPLATE_DELTAPLUS:
 		return "delta_plus"
-	case Bosch:
+	case TEMPLATE_BOSCH:
 		return "bosch"
 	default:
 		panic("unknown enum")
@@ -29,13 +29,13 @@ func (t TemplateKind) String() string {
 func ParseTemplateEnum(e string) TemplateKind {
 	switch e {
 	case "undefined":
-		return Undefined
+		return TEMPLATE_UNDEFINED
 	case "sample":
-		return Sample
+		return TEMPLATE_SAMPLE
 	case "delta_plus":
-		return DeltaPlus
+		return TEMPLATE_DELTAPLUS
 	case "bosch":
-		return Bosch
+		return TEMPLATE_BOSCH
 	default:
 		panic(fmt.Sprintf("Can't convert '%s' to TemplateKind enum", e))
 	}

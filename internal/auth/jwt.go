@@ -97,7 +97,7 @@ func (v *Validator) GetToken(tokenString string) (*jwt.Token, error) {
 	}
 
 	audString := aud.(string)
-	if enums.ParseAudEnum(audString) == enums.AudUndefined {
+	if enums.ParseAudEnum(audString) == enums.AUD_UNDEFINED {
 		return nil, fmt.Errorf("Token had the wrong audience claim: %s", aud)
 	}
 

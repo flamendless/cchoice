@@ -8,18 +8,18 @@ import (
 type SortDir int
 
 const (
-	UndefinedSortDir SortDir = iota
-	ASC
-	DESC
+	SORT_DIR_UNDEFINED SortDir = iota
+	SORT_DIR_ASC
+	SORT_DIR_DESC
 )
 
 func (t SortDir) String() string {
 	switch t {
-	case UndefinedSortDir:
+	case SORT_DIR_UNDEFINED:
 		return "UNDEFINED"
-	case ASC:
+	case SORT_DIR_ASC:
 		return "ASC"
-	case DESC:
+	case SORT_DIR_DESC:
 		return "DESC"
 	default:
 		panic("unknown enum")
@@ -29,23 +29,23 @@ func (t SortDir) String() string {
 func ParseSortDirEnum(e string) SortDir {
 	switch e {
 	case "UNDEFINED":
-		return UndefinedSortDir
+		return SORT_DIR_UNDEFINED
 	case "ASC":
-		return ASC
+		return SORT_DIR_ASC
 	case "DESC":
-		return DESC
+		return SORT_DIR_DESC
 	default:
 		panic(fmt.Sprintf("Can't convert '%s' to SortDir enum", e))
 	}
 }
 
-func ParseSortDirEnumPB(e string) pb.SortDir {
+func ParseSortDirEnumPB(e string) pb.SortDir_SortDir {
 	switch e {
 	case "ASC":
-		return pb.SortDir_SORT_DIR_ASC
+		return pb.SortDir_ASC
 	case "DESC":
-		return pb.SortDir_SORT_DIR_DESC
+		return pb.SortDir_DESC
 	default:
-		return pb.SortDir_SORT_DIR_UNDEFINED
+		return pb.SortDir_UNDEFINED
 	}
 }
