@@ -101,7 +101,12 @@ genall() {
 
 check() {
 	echo "running check..."
-	goimports -w -local -v .
+	set +f
+	local gofiles=( internal/**/*.go conf/*.go )
+	for file in "${gofiles[@]}"; do
+		goimports -w -local -v "$file"
+	done
+	set -f
 	go vet ./...
 	prealloc ./...
 	smrcptr ./...

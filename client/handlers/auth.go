@@ -37,8 +37,16 @@ func NewAuthHandler(
 }
 
 func (h AuthHandler) AuthPage(w http.ResponseWriter, r *http.Request) *common.HandlerRes {
+	tokenString := h.SM.GetString(r.Context(), "tokenString")
+	if tokenString == "" {
+		return &common.HandlerRes{
+			Component:  layout.Base("Log In", components.AuthView()),
+			ReplaceURL: "/auth",
+		}
+	}
 	return &common.HandlerRes{
-		Component: layout.Base("Log In", components.AuthView()),
+		Component:  layout.Base("Home"),
+		ReplaceURL: "/home",
 	}
 }
 
@@ -71,7 +79,8 @@ func (h AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) *commo
 	h.SM.Put(r.Context(), "tokenString", res.Token)
 
 	return &common.HandlerRes{
-		Component: layout.Base("Log In", components.AuthView()),
+		Component:  layout.Base("Home"),
+		ReplaceURL: "/home",
 	}
 }
 

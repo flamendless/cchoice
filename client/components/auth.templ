@@ -36,7 +36,7 @@ templ AuthView() {
 			class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 place-self-center w-1/3"
 			hx-post="/auth"
 			hx-trigger="submit"
-			hx-swap="none"
+			hx-target="body"
 		>
 
 			<div class="m-4">
@@ -50,7 +50,6 @@ templ AuthView() {
 			<div
 				hx-boost="true"
 				hx-target="body"
-				hx-swap="outerHTML"
 				class="flex flex-col items-center justify-between m-4"
 			>
 				<button
@@ -91,7 +90,6 @@ templ RegisterView() {
 			class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 place-self-center w-1/3"
 			hx-post="/register"
 			hx-trigger="submit"
-			hx-swap="outerHTML"
 			hx-target="body"
 		>
 
@@ -126,7 +124,6 @@ templ RegisterView() {
 			<div
 				hx-boost="true"
 				hx-target="body"
-				hx-swap="outerHTML"
 				class="flex flex-col items-center justify-between m-4"
 			>
 				<button
