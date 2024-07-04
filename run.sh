@@ -102,7 +102,7 @@ genall() {
 check() {
 	echo "running check..."
 	set +f
-	local gofiles=( internal/**/*.go conf/*.go )
+	local gofiles=( internal/**/*.go conf/*.go grpc_server/**/*.go cmd/*.go )
 	for file in "${gofiles[@]}"; do
 		goimports -w -local -v "$file"
 	done
