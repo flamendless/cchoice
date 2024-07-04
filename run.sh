@@ -107,6 +107,10 @@ check() {
 	smrcptr ./...
 }
 
+testall() {
+	go test ./...
+}
+
 if [ "$#" -eq 0 ]; then
 	echo "First use: chmod +x ${0}"
 	echo "Usage: ${0}"
@@ -121,6 +125,7 @@ if [ "$#" -eq 0 ]; then
 	echo "    gentempl"
 	echo "    testall"
 	echo "    customrun"
+	echo "    testall"
 else
 	"$1" "$@"
 fi
