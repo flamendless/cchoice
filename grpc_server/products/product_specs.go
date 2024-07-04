@@ -26,7 +26,6 @@ func (s *ProductSpecsServer) GetProductSpecsByID(
 	existingProductSpecs, err := s.CtxDB.QueriesRead.GetProductSpecsByID(
 		ctx,
 		serialize.DecDBID(encid),
-
 	)
 	if err != nil {
 		return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
