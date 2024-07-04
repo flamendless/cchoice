@@ -24,6 +24,11 @@ func NewErrorHandler(logger *zap.Logger) *ErrorHandler {
 func (h *ErrorHandler) Default(fn FnHandler) FnHTTP {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res := fn(w, r)
+
+		if res.ReplaceURL != "" {
+			w.Header().Add("HX-Replace-Url", res.ReplaceURL)
+		}
+
 		if res.Error != nil {
 			logs.LogHTTPHandler(h.Logger, r, res.Error)
 

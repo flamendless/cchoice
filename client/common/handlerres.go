@@ -7,4 +7,5 @@ type HandlerRes struct {
 	Error      error
 	StatusCode int
 	RedirectTo string
+	ReplaceURL string
 }

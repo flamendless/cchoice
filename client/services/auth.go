@@ -39,21 +39,28 @@ func (s AuthService) Authenticated(w http.ResponseWriter, r *http.Request) *comm
 	return nil
 }
 
-func (s AuthService) Authenticate(
-	username string,
-	password string,
-) (*pb.AuthenticateResponse, error) {
+func (s AuthService) Authenticate(data *pb.AuthenticateRequest) (*pb.AuthenticateResponse, error) {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	res, err := client.Authenticate(ctx, &pb.AuthenticateRequest{
-		Username: username,
-		Password: password,
-	})
+	res, err := client.Authenticate(ctx, data)
 	if err != nil {
 		return nil, err
 	}
 
 	return res, err
+}
+
+func (s AuthService) Register(data *pb.RegisterRequest) (*pb.RegisterResponse, error) {
+	client := pb.NewAuthServiceClient(s.GRPCConn)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	res, err := client.Register(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }

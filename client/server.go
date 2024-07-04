@@ -53,7 +53,9 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	//AUTH
 	mux.HandleFunc("GET /", errHandler.Default(authHandler.AuthPage))
 	mux.HandleFunc("GET /auth", errHandler.Default(authHandler.AuthPage))
+	mux.HandleFunc("GET /register", errHandler.Default(authHandler.RegisterPage))
 	mux.HandleFunc("POST /auth", errHandler.Default(authHandler.Authenticate))
+	mux.HandleFunc("POST /register", errHandler.Default(authHandler.Register))
 
 	//PRODUCTS
 	mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))

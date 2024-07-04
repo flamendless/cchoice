@@ -67,6 +67,7 @@ func ValidateUserReg(data *pb.RegisterRequest) error {
 		v.String(data.LastName, "last name").Not().Blank(),
 		v.String(data.Email, "email").Not().Blank(),
 		v.String(data.Password, "password").Not().Blank().OfLengthBetween(8, 32),
+		v.String(data.ConfirmPassword, "confirm_password").Not().Blank().OfLengthBetween(8, 32).EqualTo(data.Password),
 		v.String(data.MobileNo, "mobile number").Not().Blank().OfLength(13),
 	)
 
