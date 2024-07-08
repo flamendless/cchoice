@@ -43,12 +43,10 @@ func (s AuthService) Authenticate(data *pb.AuthenticateRequest) (*pb.Authenticat
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-
 	res, err := client.Authenticate(ctx, data)
 	if err != nil {
 		return nil, err
 	}
-
 	return res, err
 }
 
@@ -56,11 +54,33 @@ func (s AuthService) Register(data *pb.RegisterRequest) (*pb.RegisterResponse, e
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-
 	res, err := client.Register(ctx, data)
 	if err != nil {
 		return nil, err
 	}
+	return res, nil
+}
 
+func (s AuthService) EnrollOTP(data *pb.EnrollOTPRequest) (*pb.EnrollOTPResponse, error) {
+	client := pb.NewAuthServiceClient(s.GRPCConn)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	res, err := client.EnrollOTP(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (s AuthService) ValidateInitialOTP(
+	data *pb.ValidateInitialOTPRequest,
+) (*pb.ValidateInitialOTPResponse, error) {
+	client := pb.NewAuthServiceClient(s.GRPCConn)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	res, err := client.ValidateInitialOTP(ctx, data)
+	if err != nil {
+		return nil, err
+	}
 	return res, nil
 }

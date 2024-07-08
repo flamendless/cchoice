@@ -60,7 +60,8 @@ func (s *AuthServer) Register(
 	}
 
 	return &pb.RegisterResponse{
-		Token: "",
+		UserId: serialize.EncDBID(userID),
+		Token:  "",
 	}, nil
 }
 
@@ -132,13 +133,14 @@ func (s *AuthServer) EnrollOTP(
 	}
 
 	recoveryCodes := auth.GenerateRecoverCodes()
+	secret := key.Secret()
 	err = s.CtxDB.Queries.EnrollOTP(
 		context.Background(),
 		cchoice_db.EnrollOTPParams{
 			ID: authID,
 			OtpSecret: sql.NullString{
 				Valid:  true,
-				String: key.Secret(),
+				String: secret,
 			},
 			RecoveryCodes: sql.NullString{
 				Valid:  true,
@@ -151,9 +153,9 @@ func (s *AuthServer) EnrollOTP(
 	}
 
 	return &pb.EnrollOTPResponse{
-		Key:   key.String(),
+		Secret:        secret,
 		RecoveryCodes: recoveryCodes,
-		Image: buf,
+		Image:         buf,
 	}, nil
 }
 

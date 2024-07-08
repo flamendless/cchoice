@@ -25,6 +25,10 @@ func (h *ErrorHandler) Default(fn FnHandler) FnHTTP {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res := fn(w, r)
 
+		if res == nil {
+			panic("Returned HandlerRes is nil")
+		}
+
 		if res.ReplaceURL != "" {
 			w.Header().Add("HX-Replace-Url", res.ReplaceURL)
 		}

@@ -56,6 +56,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	mux.HandleFunc("GET /register", errHandler.Default(authHandler.RegisterPage))
 	mux.HandleFunc("POST /auth", errHandler.Default(authHandler.Authenticate))
 	mux.HandleFunc("POST /register", errHandler.Default(authHandler.Register))
+	mux.HandleFunc("POST /otp-validate", errHandler.Default(authHandler.ValidateInitialOTP))
 
 	//PRODUCTS
 	mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))

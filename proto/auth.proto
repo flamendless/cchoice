@@ -32,7 +32,8 @@ message RegisterRequest {
 }
 
 message RegisterResponse {
-   string token = 1;
+   string user_id = 1;
+   string token = 2;
 }
 
 message AuthenticateRequest {
@@ -51,7 +52,7 @@ message EnrollOTPRequest {
 }
 
 message EnrollOTPResponse {
-   string key = 1;
+   string secret = 1;
    string recovery_codes = 2;
    bytes image = 3;
 }

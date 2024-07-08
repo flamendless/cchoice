@@ -33,5 +33,6 @@ func ValidateOTP(passcode string, secret string) bool {
 }
 
 func GenerateRecoverCodes() string {
+	//TODO: Brandon
 	return "test"
 }

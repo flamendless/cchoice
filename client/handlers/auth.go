@@ -4,6 +4,7 @@ import (
 	"cchoice/client/common"
 	"cchoice/client/components"
 	"cchoice/client/components/layout"
+	"cchoice/internal/serialize"
 	pb "cchoice/proto"
 	"errors"
 	"net/http"
@@ -16,6 +17,8 @@ type AuthService interface {
 	Authenticate(*pb.AuthenticateRequest) (*pb.AuthenticateResponse, error)
 	Register(*pb.RegisterRequest) (*pb.RegisterResponse, error)
 	Authenticated(http.ResponseWriter, *http.Request) *common.HandlerRes
+	EnrollOTP(*pb.EnrollOTPRequest) (*pb.EnrollOTPResponse, error)
+	ValidateInitialOTP(*pb.ValidateInitialOTPRequest) (*pb.ValidateInitialOTPResponse, error)
 }
 
 type AuthHandler struct {
@@ -93,7 +96,7 @@ func (h AuthHandler) Register(w http.ResponseWriter, r *http.Request) *common.Ha
 		}
 	}
 
-	_, err = h.AuthService.Register(&pb.RegisterRequest{
+	resRegister, err := h.AuthService.Register(&pb.RegisterRequest{
 		FirstName:       r.Form.Get("first_name"),
 		MiddleName:      r.Form.Get("middle_name"),
 		LastName:        r.Form.Get("last_name"),
@@ -101,6 +104,73 @@ func (h AuthHandler) Register(w http.ResponseWriter, r *http.Request) *common.Ha
 		Password:        r.Form.Get("password"),
 		ConfirmPassword: r.Form.Get("confirm_password"),
 		MobileNo:        r.Form.Get("mobile_no"),
+	})
+	if err != nil {
+		return &common.HandlerRes{
+			Error:      err,
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	res, err := h.AuthService.EnrollOTP(&pb.EnrollOTPRequest{
+		UserId:      resRegister.UserId,
+		Issuer:      "cchoice",
+		AccountName: r.Form.Get("email"),
+	})
+	if err != nil {
+		return &common.HandlerRes{
+			Error:      err,
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	h.SM.Put(
+		r.Context(),
+		"userRegistration",
+		resRegister.UserId,
+	)
+
+	imgSrc := serialize.PNGEncode(res.Image)
+	return &common.HandlerRes{
+		Component: layout.Base(
+			"OTP Setup",
+			components.OTPSetupView(res.Secret, imgSrc, res.RecoveryCodes),
+		),
+		ReplaceURL: "/otp-setup",
+	}
+}
+
+func (h AuthHandler) ValidateInitialOTP(
+	w http.ResponseWriter,
+	r *http.Request,
+) *common.HandlerRes {
+	err := r.ParseForm()
+	if err != nil {
+		return &common.HandlerRes{
+			Error:      errors.New("Failed to parse form"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	userID, ok := h.SM.Get(r.Context(), "userRegistration").(string)
+	if !ok {
+		return &common.HandlerRes{
+			Error:      errors.New("Expired session. Register again"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	passcode := r.Form.Get("otp")
+	if passcode == "" {
+		return &common.HandlerRes{
+			Error:      errors.New("Invalid OTP"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	_, err = h.AuthService.ValidateInitialOTP(&pb.ValidateInitialOTPRequest{
+		UserId:   userID,
+		Passcode: passcode,
 	})
 	if err != nil {
 		return &common.HandlerRes{
