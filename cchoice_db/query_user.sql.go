@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const createUser = `-- name: CreateUser :exec
+const createUser = `-- name: CreateUser :one
 INSERT INTO tbl_user (
 	first_name,
 	middle_name,
@@ -22,7 +22,7 @@ INSERT INTO tbl_user (
 ) VALUES (
 	?, ?, ?, ?,
 	?, ?, ?, ?
-)
+) RETURNING id
 `
 
 type CreateUserParams struct {
@@ -36,8 +36,8 @@ type CreateUserParams struct {
 	Status     string
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
-	_, err := q.db.ExecContext(ctx, createUser,
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createUser,
 		arg.FirstName,
 		arg.MiddleName,
 		arg.LastName,
@@ -47,7 +47,9 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
 		arg.UserType,
 		arg.Status,
 	)
-	return err
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const getUserByEMailAndUserType = `-- name: GetUserByEMailAndUserType :one
@@ -72,8 +74,36 @@ func (q *Queries) GetUserByEMailAndUserType(ctx context.Context, arg GetUserByEM
 	return id, err
 }
 
-const getUserHashedPassword = `-- name: GetUserHashedPassword :one
-SELECT password
+const getUserByID = `-- name: GetUserByID :one
+SELECT id, first_name, middle_name, last_name, email, password, mobile_no, user_type, status, created_at, updated_at, deleted_at
+FROM tbl_user
+WHERE
+	id = ?
+LIMIT 1
+`
+
+func (q *Queries) GetUserByID(ctx context.Context, id int64) (TblUser, error) {
+	row := q.db.QueryRowContext(ctx, getUserByID, id)
+	var i TblUser
+	err := row.Scan(
+		&i.ID,
+		&i.FirstName,
+		&i.MiddleName,
+		&i.LastName,
+		&i.Email,
+		&i.Password,
+		&i.MobileNo,
+		&i.UserType,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getUserIDAndHashedPassword = `-- name: GetUserIDAndHashedPassword :one
+SELECT id, password
 FROM tbl_user
 WHERE
 	user_type = 'API' AND
@@ -82,9 +112,14 @@ WHERE
 LIMIT 1
 `
 
-func (q *Queries) GetUserHashedPassword(ctx context.Context, email string) (string, error) {
-	row := q.db.QueryRowContext(ctx, getUserHashedPassword, email)
-	var password string
-	err := row.Scan(&password)
-	return password, err
+type GetUserIDAndHashedPasswordRow struct {
+	ID       int64
+	Password string
+}
+
+func (q *Queries) GetUserIDAndHashedPassword(ctx context.Context, email string) (GetUserIDAndHashedPasswordRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserIDAndHashedPassword, email)
+	var i GetUserIDAndHashedPasswordRow
+	err := row.Scan(&i.ID, &i.Password)
+	return i, err
 }

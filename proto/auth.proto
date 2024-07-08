@@ -44,7 +44,29 @@ message AuthenticateResponse {
    string token = 1;
 }
 
+message EnrollOTPRequest {
+   string user_id = 1;
+   string issuer = 2;
+   string account_name = 3;
+}
+
+message EnrollOTPResponse {
+   string key = 1;
+   string recovery_codes = 2;
+   bytes image = 3;
+}
+
+message ValidateInitialOTPRequest {
+   string user_id = 1;
+   string passcode = 2;
+}
+
+message ValidateInitialOTPResponse {
+}
+
 service AuthService {
    rpc Register(RegisterRequest) returns (RegisterResponse) {}
    rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
+   rpc EnrollOTP(EnrollOTPRequest) returns (EnrollOTPResponse) {}
+   rpc ValidateInitialOTP(ValidateInitialOTPRequest) returns (ValidateInitialOTPResponse) {}
 }

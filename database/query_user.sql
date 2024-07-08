@@ -1,3 +1,10 @@
+-- name: GetUserByID :one
+SELECT *
+FROM tbl_user
+WHERE
+	id = ?
+LIMIT 1;
+
 -- name: GetUserByEMailAndUserType :one
 SELECT id
 FROM tbl_user
@@ -7,8 +14,8 @@ WHERE
 	status = 'ACTIVE'
 LIMIT 1;
 
--- name: GetUserHashedPassword :one
-SELECT password
+-- name: GetUserIDAndHashedPassword :one
+SELECT id, password
 FROM tbl_user
 WHERE
 	user_type = 'API' AND
@@ -16,7 +23,7 @@ WHERE
 	email = ?
 LIMIT 1;
 
--- name: CreateUser :exec
+-- name: CreateUser :one
 INSERT INTO tbl_user (
 	first_name,
 	middle_name,
@@ -29,4 +36,4 @@ INSERT INTO tbl_user (
 ) VALUES (
 	?, ?, ?, ?,
 	?, ?, ?, ?
-);
+) RETURNING id;

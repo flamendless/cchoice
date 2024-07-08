@@ -8,7 +8,6 @@ package pb
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -25,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type AuthServiceClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error)
+	EnrollOTP(ctx context.Context, in *EnrollOTPRequest, opts ...grpc.CallOption) (*EnrollOTPResponse, error)
+	ValidateInitialOTP(ctx context.Context, in *ValidateInitialOTPRequest, opts ...grpc.CallOption) (*ValidateInitialOTPResponse, error)
 }
 
 type authServiceClient struct {
@@ -53,12 +54,32 @@ func (c *authServiceClient) Authenticate(ctx context.Context, in *AuthenticateRe
 	return out, nil
 }
 
+func (c *authServiceClient) EnrollOTP(ctx context.Context, in *EnrollOTPRequest, opts ...grpc.CallOption) (*EnrollOTPResponse, error) {
+	out := new(EnrollOTPResponse)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/EnrollOTP", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) ValidateInitialOTP(ctx context.Context, in *ValidateInitialOTPRequest, opts ...grpc.CallOption) (*ValidateInitialOTPResponse, error) {
+	out := new(ValidateInitialOTPResponse)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/ValidateInitialOTP", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility
 type AuthServiceServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error)
+	EnrollOTP(context.Context, *EnrollOTPRequest) (*EnrollOTPResponse, error)
+	ValidateInitialOTP(context.Context, *ValidateInitialOTPRequest) (*ValidateInitialOTPResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -71,6 +92,12 @@ func (UnimplementedAuthServiceServer) Register(context.Context, *RegisterRequest
 }
 func (UnimplementedAuthServiceServer) Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Authenticate not implemented")
+}
+func (UnimplementedAuthServiceServer) EnrollOTP(context.Context, *EnrollOTPRequest) (*EnrollOTPResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EnrollOTP not implemented")
+}
+func (UnimplementedAuthServiceServer) ValidateInitialOTP(context.Context, *ValidateInitialOTPRequest) (*ValidateInitialOTPResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ValidateInitialOTP not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
@@ -121,6 +148,42 @@ func _AuthService_Authenticate_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_EnrollOTP_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnrollOTPRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).EnrollOTP(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AuthService/EnrollOTP",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).EnrollOTP(ctx, req.(*EnrollOTPRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_ValidateInitialOTP_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidateInitialOTPRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ValidateInitialOTP(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AuthService/ValidateInitialOTP",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ValidateInitialOTP(ctx, req.(*ValidateInitialOTPRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -135,6 +198,14 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Authenticate",
 			Handler:    _AuthService_Authenticate_Handler,
+		},
+		{
+			MethodName: "EnrollOTP",
+			Handler:    _AuthService_EnrollOTP_Handler,
+		},
+		{
+			MethodName: "ValidateInitialOTP",
+			Handler:    _AuthService_ValidateInitialOTP_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

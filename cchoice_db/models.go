@@ -9,6 +9,15 @@ import (
 	"time"
 )
 
+type TblAuth struct {
+	ID            int64
+	UserID        int64
+	Token         string
+	OtpEnabled    bool
+	OtpSecret     sql.NullString
+	RecoveryCodes sql.NullString
+}
+
 type TblProduct struct {
 	ID                          int64
 	Serial                      string

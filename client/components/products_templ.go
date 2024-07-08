@@ -5,13 +5,12 @@ package components
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
+import "github.com/a-h/templ"
+import "context"
+import "io"
+import "bytes"
+
 import (
-	"bytes"
-	"context"
-	"io"
-
-	"github.com/a-h/templ"
-
 	pb "cchoice/proto"
 )
 
