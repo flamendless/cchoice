@@ -1,9 +1,5 @@
 package enums
 
-import (
-	pb "cchoice/proto"
-)
-
 type ProductStatus int
 
 const (
@@ -31,16 +27,5 @@ func ParseProductStatusEnum(e string) ProductStatus {
 		return PRODUCT_STATUS_DELETED
 	default:
 		return PRODUCT_STATUS_UNDEFINED
-	}
-}
-
-func ParseProductStatusEnumPB(e string) pb.ProductStatus_ProductStatus {
-	switch e {
-	case "ACTIVE":
-		return pb.ProductStatus_ACTIVE
-	case "DELETED":
-		return pb.ProductStatus_DELETED
-	default:
-		return pb.ProductStatus_UNDEFINED
 	}
 }

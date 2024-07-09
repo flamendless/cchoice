@@ -40,17 +40,29 @@ func TestParseProductStatusEnum(t *testing.T) {
 }
 
 func TestParseProductStatusEnumPB(t *testing.T) {
-	undef := ParseProductStatusEnumPB("UNDEFINED")
-	asc := ParseProductStatusEnumPB("ACTIVE")
-	desc := ParseProductStatusEnumPB("DELETED")
+	undef := StringToPBEnum(
+		"UNDEFINED",
+		pb.ProductStatus_ProductStatus_value,
+		pb.ProductStatus_UNDEFINED,
+	)
+	active := StringToPBEnum(
+		"ACTIVE",
+		pb.ProductStatus_ProductStatus_value,
+		pb.ProductStatus_UNDEFINED,
+	)
+	deleted := StringToPBEnum(
+		"DELETED",
+		pb.ProductStatus_ProductStatus_value,
+		pb.ProductStatus_UNDEFINED,
+	)
 
 	if undef != pb.ProductStatus_UNDEFINED {
 		t.Fatalf("Mismatch: %s = %s", undef, pb.ProductStatus_UNDEFINED)
 	}
-	if asc != pb.ProductStatus_ACTIVE {
-		t.Fatalf("Mismatch: %s = %s", asc, pb.ProductStatus_ACTIVE)
+	if active != pb.ProductStatus_ACTIVE {
+		t.Fatalf("Mismatch: %s = %s", active, pb.ProductStatus_ACTIVE)
 	}
-	if desc != pb.ProductStatus_DELETED {
-		t.Fatalf("Mismatch: %s = %s", desc, pb.ProductStatus_DELETED)
+	if deleted != pb.ProductStatus_DELETED {
+		t.Fatalf("Mismatch: %s = %s", deleted, pb.ProductStatus_DELETED)
 	}
 }

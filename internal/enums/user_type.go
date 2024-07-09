@@ -1,7 +1,6 @@
 package enums
 
 import (
-	pb "cchoice/proto"
 	"fmt"
 )
 
@@ -36,16 +35,5 @@ func ParseUserTypeEnum(e string) UserType {
 		return USER_TYPE_SYSTEM
 	default:
 		panic(fmt.Sprintf("Can't convert '%s' to UserType enum", e))
-	}
-}
-
-func ParseUserTypeEnumPB(e string) pb.UserType_UserType {
-	switch e {
-	case "API":
-		return pb.UserType_API
-	case "SYSTEM":
-		return pb.UserType_SYSTEM
-	default:
-		return pb.UserType_UNDEFINED
 	}
 }

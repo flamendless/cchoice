@@ -40,9 +40,21 @@ func TestParseUserTypeEnum(t *testing.T) {
 }
 
 func TestParseUserTypeEnumPB(t *testing.T) {
-	undef := ParseUserTypeEnumPB("UNDEFINED")
-	api := ParseUserTypeEnumPB("API")
-	system := ParseUserTypeEnumPB("SYSTEM")
+	undef := StringToPBEnum(
+		"UNDEFINED",
+		pb.UserType_UserType_value,
+		pb.UserType_UNDEFINED,
+	)
+	api := StringToPBEnum(
+		"API",
+		pb.UserType_UserType_value,
+		pb.UserType_UNDEFINED,
+	)
+	system := StringToPBEnum(
+		"SYSTEM",
+		pb.UserType_UserType_value,
+		pb.UserType_UNDEFINED,
+	)
 
 	if undef != pb.UserType_UNDEFINED {
 		t.Fatalf("Mismatch: %s = %s", undef, pb.UserType_UNDEFINED)

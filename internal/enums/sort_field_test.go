@@ -40,9 +40,21 @@ func TestParseSortFieldEnum(t *testing.T) {
 }
 
 func TestParseSortFieldEnumPB(t *testing.T) {
-	undef := ParseSortFieldEnumPB("UNDEFINED")
-	name := ParseSortFieldEnumPB("NAME")
-	createdAt := ParseSortFieldEnumPB("CREATED_AT")
+	undef := StringToPBEnum(
+		"UNDEFINED",
+		pb.SortField_SortField_value,
+		pb.SortField_UNDEFINED,
+	)
+	name := StringToPBEnum(
+		"NAME",
+		pb.SortField_SortField_value,
+		pb.SortField_UNDEFINED,
+	)
+	createdAt := StringToPBEnum(
+		"CREATED_AT",
+		pb.SortField_SortField_value,
+		pb.SortField_UNDEFINED,
+	)
 
 	if undef != pb.SortField_UNDEFINED {
 		t.Fatalf("Mismatch: %s = %s", undef, pb.SortField_UNDEFINED)

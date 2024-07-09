@@ -1,9 +1,5 @@
 package enums
 
-import (
-	pb "cchoice/proto"
-)
-
 type SortField int
 
 const (
@@ -31,16 +27,5 @@ func ParseSortFieldEnum(e string) SortField {
 		return SORT_FIELD_CREATED_AT
 	default:
 		return SORT_FIELD_UNDEFINED
-	}
-}
-
-func ParseSortFieldEnumPB(e string) pb.SortField_SortField {
-	switch e {
-	case "NAME":
-		return pb.SortField_NAME
-	case "CREATED_AT":
-		return pb.SortField_CREATED_AT
-	default:
-		return pb.SortField_UNDEFINED
 	}
 }

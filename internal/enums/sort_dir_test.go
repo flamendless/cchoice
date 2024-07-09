@@ -40,9 +40,9 @@ func TestParseSortDirEnum(t *testing.T) {
 }
 
 func TestParseSortDirEnumPB(t *testing.T) {
-	undef := ParseSortDirEnumPB("UNDEFINED")
-	asc := ParseSortDirEnumPB("ASC")
-	desc := ParseSortDirEnumPB("DESC")
+	undef := StringToPBEnum("UNDEFINED", pb.SortDir_SortDir_value, pb.SortDir_UNDEFINED)
+	asc := StringToPBEnum("ASC", pb.SortDir_SortDir_value, pb.SortDir_UNDEFINED)
+	desc := StringToPBEnum("DESC", pb.SortDir_SortDir_value, pb.SortDir_UNDEFINED)
 
 	if undef != pb.SortDir_UNDEFINED {
 		t.Fatalf("Mismatch: %s = %s", undef, pb.SortDir_UNDEFINED)

@@ -39,7 +39,11 @@ func (row ProductsRow) ToPBProduct() *pb.Product {
 		Name:        row.Name,
 		Description: row.Description.String,
 		Brand:       row.Brand,
-		Status:      enums.ParseProductStatusEnumPB(row.Status),
+		Status: enums.StringToPBEnum(
+			row.Status,
+			pb.ProductStatus_ProductStatus_value,
+			pb.ProductStatus_UNDEFINED,
+		),
 		ProductCategory: &pb.ProductCategory{
 			Category:    row.Category.String,
 			Subcategory: row.Subcategory.String,

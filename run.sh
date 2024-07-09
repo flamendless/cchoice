@@ -54,7 +54,7 @@ clean() {
 	fi
 }
 
-testall() {
+cleandb() {
 	clean
 	gensql
 	go run ./main.go parse_xlsx -p "assets/xlsx/Price_List_effective_25_August_2023_r2.xlsx" -s "2023 PRICE LIST" -t "delta_plus" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
@@ -128,7 +128,7 @@ if [ "$#" -eq 0 ]; then
 	echo "    grpc"
 	echo "    grpc_ui"
 	echo "    gentempl"
-	echo "    testall"
+	echo "    cleandb"
 	echo "    customrun"
 	echo "    testall"
 else

@@ -55,8 +55,16 @@ func (h ProductHandler) ProductTablePage(
 	qSortDir := q.Get("sort_dir")
 
 	if qSortField != "" || qSortDir != "" {
-		sortField = enums.ParseSortFieldEnumPB(qSortField)
-		sortDir = enums.ParseSortDirEnumPB(qSortDir)
+		sortField = enums.StringToPBEnum(
+			qSortField,
+			pb.SortField_SortField_value,
+			pb.SortField_UNDEFINED,
+		)
+		sortDir = enums.StringToPBEnum(
+			qSortDir,
+			pb.SortDir_SortDir_value,
+			pb.SortDir_UNDEFINED,
+		)
 		if sortField == pb.SortField_UNDEFINED || sortDir == pb.SortDir_UNDEFINED {
 			return &common.HandlerRes{Error: errors.New("Invalid URL params"), StatusCode: http.StatusBadRequest}
 		}
