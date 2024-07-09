@@ -177,7 +177,7 @@ func (s *AuthServer) GetOTPCode(
 	return &pb.GetOTPCodeResponse{}, nil
 }
 
-func (s *AuthServer) ValidateInitialOTP(
+func (s *AuthServer) ValidateOTP(
 	ctx context.Context,
 	in *pb.ValidateInitialOTPRequest,
 ) (*pb.ValidateInitialOTPResponse, error) {

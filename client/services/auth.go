@@ -2,6 +2,7 @@ package services
 
 import (
 	"cchoice/client/common"
+	"cchoice/internal/enums"
 	pb "cchoice/proto"
 	"context"
 	"errors"
@@ -39,61 +40,85 @@ func (s AuthService) Authenticated(w http.ResponseWriter, r *http.Request) *comm
 	return nil
 }
 
-func (s AuthService) Authenticate(data *pb.AuthenticateRequest) (*pb.AuthenticateResponse, error) {
+func (s AuthService) Authenticate(data *common.AuthAuthenticateRequest) (string, error) {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	res, err := client.Authenticate(ctx, data)
+	res, err := client.Authenticate(ctx, &pb.AuthenticateRequest{
+		Username: data.Username,
+		Password: data.Password,
+	})
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return res, err
+	return res.Token, err
 }
 
-func (s AuthService) Register(data *pb.RegisterRequest) (*pb.RegisterResponse, error) {
+func (s AuthService) Register(data *common.AuthRegisterRequest) (string, error) {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	res, err := client.Register(ctx, data)
+	res, err := client.Register(ctx, &pb.RegisterRequest{
+		FirstName:       data.FirstName,
+		MiddleName:      data.MiddleName,
+		LastName:        data.LastName,
+		Email:           data.Email,
+		Password:        data.Password,
+		ConfirmPassword: data.ConfirmPassword,
+		MobileNo:        data.MobileNo,
+	})
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return res, nil
+	return res.UserId, nil
 }
 
-func (s AuthService) EnrollOTP(data *pb.EnrollOTPRequest) (*pb.EnrollOTPResponse, error) {
+func (s AuthService) EnrollOTP(data *common.AuthEnrollOTPRequest) (*common.AuthEnrollOTPResponse, error) {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	res, err := client.EnrollOTP(ctx, data)
+	res, err := client.EnrollOTP(ctx, &pb.EnrollOTPRequest{
+		UserId:      data.UserID,
+		Issuer:      data.Issuer,
+		AccountName: data.AccountName,
+	})
 	if err != nil {
 		return nil, err
 	}
-	return res, nil
+	return &common.AuthEnrollOTPResponse{
+		Secret:        res.Secret,
+		RecoveryCodes: res.RecoveryCodes,
+		Image:         res.Image,
+	}, nil
 }
 
-func (s AuthService) GetOTPCode(
-	data *pb.GetOTPCodeRequest,
-) (*pb.GetOTPCodeResponse, error) {
+func (s AuthService) GetOTPCode(data *common.AuthGetOTPCodeRequest) error {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	res, err := client.GetOTPCode(ctx, data)
+	_, err := client.GetOTPCode(ctx, &pb.GetOTPCodeRequest{
+		Method: enums.StringToPBEnum(
+			data.Method,
+			pb.OTPMethod_OTPMethod_value,
+			pb.OTPMethod_UNDEFINED,
+		),
+	})
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return res, nil
+	return nil
 }
 
-func (s AuthService) ValidateInitialOTP(
-	data *pb.ValidateInitialOTPRequest,
-) (*pb.ValidateInitialOTPResponse, error) {
+func (s AuthService) ValidateInitialOTP(data *common.AuthValidateInitialOTP) error {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	res, err := client.ValidateInitialOTP(ctx, data)
+	_, err := client.ValidateInitialOTP(ctx, &pb.ValidateInitialOTPRequest{
+		UserId:   data.UserID,
+		Passcode: data.Passcode,
+	})
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return res, nil
+	return nil
 }

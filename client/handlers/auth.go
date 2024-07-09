@@ -4,9 +4,7 @@ import (
 	"cchoice/client/common"
 	"cchoice/client/components"
 	"cchoice/client/components/layout"
-	"cchoice/internal/enums"
 	"cchoice/internal/serialize"
-	pb "cchoice/proto"
 	"errors"
 	"net/http"
 
@@ -15,12 +13,12 @@ import (
 )
 
 type AuthService interface {
-	Authenticate(*pb.AuthenticateRequest) (*pb.AuthenticateResponse, error)
-	Register(*pb.RegisterRequest) (*pb.RegisterResponse, error)
 	Authenticated(http.ResponseWriter, *http.Request) *common.HandlerRes
-	EnrollOTP(*pb.EnrollOTPRequest) (*pb.EnrollOTPResponse, error)
-	ValidateInitialOTP(*pb.ValidateInitialOTPRequest) (*pb.ValidateInitialOTPResponse, error)
-	GetOTPCode(*pb.GetOTPCodeRequest) (*pb.GetOTPCodeResponse, error)
+	Authenticate(*common.AuthAuthenticateRequest) (string, error)
+	Register(*common.AuthRegisterRequest) (string, error)
+	EnrollOTP(*common.AuthEnrollOTPRequest) (*common.AuthEnrollOTPResponse, error)
+	ValidateInitialOTP(*common.AuthValidateInitialOTP) error
+	GetOTPCode(*common.AuthGetOTPCodeRequest) error
 }
 
 type AuthHandler struct {
@@ -70,18 +68,18 @@ func (h AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) *commo
 		}
 	}
 
-	res, err := h.AuthService.Authenticate(&pb.AuthenticateRequest{
+	tokenString, err := h.AuthService.Authenticate(&common.AuthAuthenticateRequest{
 		Username: r.Form.Get("username"),
 		Password: r.Form.Get("password"),
 	})
-	if err != nil {
+	if err != nil || tokenString == "" {
 		return &common.HandlerRes{
 			Error:      err,
 			StatusCode: http.StatusUnauthorized,
 		}
 	}
 
-	h.SM.Put(r.Context(), "tokenString", res.Token)
+	h.SM.Put(r.Context(), "tokenString", tokenString)
 
 	return &common.HandlerRes{
 		Component:  layout.Base("Home"),
@@ -98,7 +96,7 @@ func (h AuthHandler) Register(w http.ResponseWriter, r *http.Request) *common.Ha
 		}
 	}
 
-	resRegister, err := h.AuthService.Register(&pb.RegisterRequest{
+	userID, err := h.AuthService.Register(&common.AuthRegisterRequest{
 		FirstName:       r.Form.Get("first_name"),
 		MiddleName:      r.Form.Get("middle_name"),
 		LastName:        r.Form.Get("last_name"),
@@ -114,8 +112,8 @@ func (h AuthHandler) Register(w http.ResponseWriter, r *http.Request) *common.Ha
 		}
 	}
 
-	res, err := h.AuthService.EnrollOTP(&pb.EnrollOTPRequest{
-		UserId:      resRegister.UserId,
+	res, err := h.AuthService.EnrollOTP(&common.AuthEnrollOTPRequest{
+		UserID:      userID,
 		Issuer:      "cchoice",
 		AccountName: r.Form.Get("email"),
 	})
@@ -129,7 +127,7 @@ func (h AuthHandler) Register(w http.ResponseWriter, r *http.Request) *common.Ha
 	h.SM.Put(
 		r.Context(),
 		"userRegistration",
-		resRegister.UserId,
+		userID,
 	)
 
 	imgSrc := serialize.PNGEncode(res.Image)
@@ -154,15 +152,9 @@ func (h AuthHandler) GetOTPCode(
 		}
 	}
 
-	_, err = h.AuthService.GetOTPCode(
-		&pb.GetOTPCodeRequest{
-			Method: enums.StringToPBEnum(
-				r.Form.Get("method"),
-				pb.OTPMethod_OTPMethod_value,
-				pb.OTPMethod_UNDEFINED,
-			),
-		},
-	)
+	err = h.AuthService.GetOTPCode(&common.AuthGetOTPCodeRequest{
+		Method: r.Form.Get("method"),
+	})
 	if err != nil {
 		return &common.HandlerRes{
 			Error:      err,
@@ -201,8 +193,8 @@ func (h AuthHandler) ValidateInitialOTP(
 		}
 	}
 
-	_, err = h.AuthService.ValidateInitialOTP(&pb.ValidateInitialOTPRequest{
-		UserId:   userID,
+	err = h.AuthService.ValidateInitialOTP(&common.AuthValidateInitialOTP{
+		UserID:   userID,
 		Passcode: passcode,
 	})
 	if err != nil {

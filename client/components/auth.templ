@@ -155,7 +155,7 @@ templ OTPSetupView(secret string, imgSrc string, recoveryCodes string) {
 	<div class="w-screen flex place-content-center">
 		<form
 			class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 place-self-center w-1/3"
-			hx-post="/otp-validate"
+			hx-post="/otp-validate-initial"
 			hx-trigger="submit"
 			hx-target="body"
 		>

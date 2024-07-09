@@ -113,6 +113,7 @@ check() {
 }
 
 testall() {
+	genall
 	go test ./...
 }
 
