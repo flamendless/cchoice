@@ -21,6 +21,15 @@ message UserStatus {
    }
 }
 
+message OTPMethod {
+   enum OTPMethod {
+      UNDEFINED = 0;
+      AUTHENTICATOR = 1;
+      SMS = 2;
+      EMAIL = 3;
+   }
+}
+
 message RegisterRequest {
    string first_name = 1;
    string middle_name = 2;
@@ -57,6 +66,13 @@ message EnrollOTPResponse {
    bytes image = 3;
 }
 
+message GetOTPCodeRequest {
+   OTPMethod.OTPMethod method = 1;
+}
+
+message GetOTPCodeResponse {
+}
+
 message ValidateInitialOTPRequest {
    string user_id = 1;
    string passcode = 2;
@@ -69,5 +85,6 @@ service AuthService {
    rpc Register(RegisterRequest) returns (RegisterResponse) {}
    rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
    rpc EnrollOTP(EnrollOTPRequest) returns (EnrollOTPResponse) {}
+   rpc GetOTPCode(GetOTPCodeRequest) returns (GetOTPCodeResponse) {}
    rpc ValidateInitialOTP(ValidateInitialOTPRequest) returns (ValidateInitialOTPResponse) {}
 }

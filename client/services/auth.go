@@ -72,6 +72,19 @@ func (s AuthService) EnrollOTP(data *pb.EnrollOTPRequest) (*pb.EnrollOTPResponse
 	return res, nil
 }
 
+func (s AuthService) GetOTPCode(
+	data *pb.GetOTPCodeRequest,
+) (*pb.GetOTPCodeResponse, error) {
+	client := pb.NewAuthServiceClient(s.GRPCConn)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	res, err := client.GetOTPCode(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func (s AuthService) ValidateInitialOTP(
 	data *pb.ValidateInitialOTPRequest,
 ) (*pb.ValidateInitialOTPResponse, error) {

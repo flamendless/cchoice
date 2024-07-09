@@ -121,6 +121,58 @@ func (UserStatus_UserStatus) EnumDescriptor() ([]byte, []int) {
 	return file_proto_auth_proto_rawDescGZIP(), []int{1, 0}
 }
 
+type OTPMethod_OTPMethod int32
+
+const (
+	OTPMethod_UNDEFINED     OTPMethod_OTPMethod = 0
+	OTPMethod_AUTHENTICATOR OTPMethod_OTPMethod = 1
+	OTPMethod_SMS           OTPMethod_OTPMethod = 2
+	OTPMethod_EMAIL         OTPMethod_OTPMethod = 3
+)
+
+// Enum value maps for OTPMethod_OTPMethod.
+var (
+	OTPMethod_OTPMethod_name = map[int32]string{
+		0: "UNDEFINED",
+		1: "AUTHENTICATOR",
+		2: "SMS",
+		3: "EMAIL",
+	}
+	OTPMethod_OTPMethod_value = map[string]int32{
+		"UNDEFINED":     0,
+		"AUTHENTICATOR": 1,
+		"SMS":           2,
+		"EMAIL":         3,
+	}
+)
+
+func (x OTPMethod_OTPMethod) Enum() *OTPMethod_OTPMethod {
+	p := new(OTPMethod_OTPMethod)
+	*p = x
+	return p
+}
+
+func (x OTPMethod_OTPMethod) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (OTPMethod_OTPMethod) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_auth_proto_enumTypes[2].Descriptor()
+}
+
+func (OTPMethod_OTPMethod) Type() protoreflect.EnumType {
+	return &file_proto_auth_proto_enumTypes[2]
+}
+
+func (x OTPMethod_OTPMethod) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use OTPMethod_OTPMethod.Descriptor instead.
+func (OTPMethod_OTPMethod) EnumDescriptor() ([]byte, []int) {
+	return file_proto_auth_proto_rawDescGZIP(), []int{2, 0}
+}
+
 type UserType struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -197,6 +249,44 @@ func (*UserStatus) Descriptor() ([]byte, []int) {
 	return file_proto_auth_proto_rawDescGZIP(), []int{1}
 }
 
+type OTPMethod struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *OTPMethod) Reset() {
+	*x = OTPMethod{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_auth_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *OTPMethod) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OTPMethod) ProtoMessage() {}
+
+func (x *OTPMethod) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_auth_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OTPMethod.ProtoReflect.Descriptor instead.
+func (*OTPMethod) Descriptor() ([]byte, []int) {
+	return file_proto_auth_proto_rawDescGZIP(), []int{2}
+}
+
 type RegisterRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -214,7 +304,7 @@ type RegisterRequest struct {
 func (x *RegisterRequest) Reset() {
 	*x = RegisterRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_auth_proto_msgTypes[2]
+		mi := &file_proto_auth_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -227,7 +317,7 @@ func (x *RegisterRequest) String() string {
 func (*RegisterRequest) ProtoMessage() {}
 
 func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_auth_proto_msgTypes[2]
+	mi := &file_proto_auth_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -240,7 +330,7 @@ func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterRequest.ProtoReflect.Descriptor instead.
 func (*RegisterRequest) Descriptor() ([]byte, []int) {
-	return file_proto_auth_proto_rawDescGZIP(), []int{2}
+	return file_proto_auth_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *RegisterRequest) GetFirstName() string {
@@ -304,7 +394,7 @@ type RegisterResponse struct {
 func (x *RegisterResponse) Reset() {
 	*x = RegisterResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_auth_proto_msgTypes[3]
+		mi := &file_proto_auth_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -317,7 +407,7 @@ func (x *RegisterResponse) String() string {
 func (*RegisterResponse) ProtoMessage() {}
 
 func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_auth_proto_msgTypes[3]
+	mi := &file_proto_auth_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -330,7 +420,7 @@ func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterResponse.ProtoReflect.Descriptor instead.
 func (*RegisterResponse) Descriptor() ([]byte, []int) {
-	return file_proto_auth_proto_rawDescGZIP(), []int{3}
+	return file_proto_auth_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *RegisterResponse) GetUserId() string {
@@ -359,7 +449,7 @@ type AuthenticateRequest struct {
 func (x *AuthenticateRequest) Reset() {
 	*x = AuthenticateRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_auth_proto_msgTypes[4]
+		mi := &file_proto_auth_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -372,7 +462,7 @@ func (x *AuthenticateRequest) String() string {
 func (*AuthenticateRequest) ProtoMessage() {}
 
 func (x *AuthenticateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_auth_proto_msgTypes[4]
+	mi := &file_proto_auth_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -385,7 +475,7 @@ func (x *AuthenticateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthenticateRequest.ProtoReflect.Descriptor instead.
 func (*AuthenticateRequest) Descriptor() ([]byte, []int) {
-	return file_proto_auth_proto_rawDescGZIP(), []int{4}
+	return file_proto_auth_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *AuthenticateRequest) GetUsername() string {
@@ -413,7 +503,7 @@ type AuthenticateResponse struct {
 func (x *AuthenticateResponse) Reset() {
 	*x = AuthenticateResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_auth_proto_msgTypes[5]
+		mi := &file_proto_auth_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -426,7 +516,7 @@ func (x *AuthenticateResponse) String() string {
 func (*AuthenticateResponse) ProtoMessage() {}
 
 func (x *AuthenticateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_auth_proto_msgTypes[5]
+	mi := &file_proto_auth_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -439,7 +529,7 @@ func (x *AuthenticateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthenticateResponse.ProtoReflect.Descriptor instead.
 func (*AuthenticateResponse) Descriptor() ([]byte, []int) {
-	return file_proto_auth_proto_rawDescGZIP(), []int{5}
+	return file_proto_auth_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *AuthenticateResponse) GetToken() string {
@@ -462,7 +552,7 @@ type EnrollOTPRequest struct {
 func (x *EnrollOTPRequest) Reset() {
 	*x = EnrollOTPRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_auth_proto_msgTypes[6]
+		mi := &file_proto_auth_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -475,7 +565,7 @@ func (x *EnrollOTPRequest) String() string {
 func (*EnrollOTPRequest) ProtoMessage() {}
 
 func (x *EnrollOTPRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_auth_proto_msgTypes[6]
+	mi := &file_proto_auth_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -488,7 +578,7 @@ func (x *EnrollOTPRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EnrollOTPRequest.ProtoReflect.Descriptor instead.
 func (*EnrollOTPRequest) Descriptor() ([]byte, []int) {
-	return file_proto_auth_proto_rawDescGZIP(), []int{6}
+	return file_proto_auth_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *EnrollOTPRequest) GetUserId() string {
@@ -525,7 +615,7 @@ type EnrollOTPResponse struct {
 func (x *EnrollOTPResponse) Reset() {
 	*x = EnrollOTPResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_auth_proto_msgTypes[7]
+		mi := &file_proto_auth_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -538,7 +628,7 @@ func (x *EnrollOTPResponse) String() string {
 func (*EnrollOTPResponse) ProtoMessage() {}
 
 func (x *EnrollOTPResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_auth_proto_msgTypes[7]
+	mi := &file_proto_auth_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -551,7 +641,7 @@ func (x *EnrollOTPResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EnrollOTPResponse.ProtoReflect.Descriptor instead.
 func (*EnrollOTPResponse) Descriptor() ([]byte, []int) {
-	return file_proto_auth_proto_rawDescGZIP(), []int{7}
+	return file_proto_auth_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *EnrollOTPResponse) GetSecret() string {
@@ -575,6 +665,91 @@ func (x *EnrollOTPResponse) GetImage() []byte {
 	return nil
 }
 
+type GetOTPCodeRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Method OTPMethod_OTPMethod `protobuf:"varint,1,opt,name=method,proto3,enum=proto.OTPMethod_OTPMethod" json:"method,omitempty"`
+}
+
+func (x *GetOTPCodeRequest) Reset() {
+	*x = GetOTPCodeRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_auth_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetOTPCodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOTPCodeRequest) ProtoMessage() {}
+
+func (x *GetOTPCodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_auth_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOTPCodeRequest.ProtoReflect.Descriptor instead.
+func (*GetOTPCodeRequest) Descriptor() ([]byte, []int) {
+	return file_proto_auth_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GetOTPCodeRequest) GetMethod() OTPMethod_OTPMethod {
+	if x != nil {
+		return x.Method
+	}
+	return OTPMethod_UNDEFINED
+}
+
+type GetOTPCodeResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetOTPCodeResponse) Reset() {
+	*x = GetOTPCodeResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_auth_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetOTPCodeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOTPCodeResponse) ProtoMessage() {}
+
+func (x *GetOTPCodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_auth_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOTPCodeResponse.ProtoReflect.Descriptor instead.
+func (*GetOTPCodeResponse) Descriptor() ([]byte, []int) {
+	return file_proto_auth_proto_rawDescGZIP(), []int{10}
+}
+
 type ValidateInitialOTPRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -587,7 +762,7 @@ type ValidateInitialOTPRequest struct {
 func (x *ValidateInitialOTPRequest) Reset() {
 	*x = ValidateInitialOTPRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_auth_proto_msgTypes[8]
+		mi := &file_proto_auth_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -600,7 +775,7 @@ func (x *ValidateInitialOTPRequest) String() string {
 func (*ValidateInitialOTPRequest) ProtoMessage() {}
 
 func (x *ValidateInitialOTPRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_auth_proto_msgTypes[8]
+	mi := &file_proto_auth_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -613,7 +788,7 @@ func (x *ValidateInitialOTPRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidateInitialOTPRequest.ProtoReflect.Descriptor instead.
 func (*ValidateInitialOTPRequest) Descriptor() ([]byte, []int) {
-	return file_proto_auth_proto_rawDescGZIP(), []int{8}
+	return file_proto_auth_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ValidateInitialOTPRequest) GetUserId() string {
@@ -639,7 +814,7 @@ type ValidateInitialOTPResponse struct {
 func (x *ValidateInitialOTPResponse) Reset() {
 	*x = ValidateInitialOTPResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_auth_proto_msgTypes[9]
+		mi := &file_proto_auth_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -652,7 +827,7 @@ func (x *ValidateInitialOTPResponse) String() string {
 func (*ValidateInitialOTPResponse) ProtoMessage() {}
 
 func (x *ValidateInitialOTPResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_auth_proto_msgTypes[9]
+	mi := &file_proto_auth_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -665,7 +840,7 @@ func (x *ValidateInitialOTPResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidateInitialOTPResponse.ProtoReflect.Descriptor instead.
 func (*ValidateInitialOTPResponse) Descriptor() ([]byte, []int) {
-	return file_proto_auth_proto_rawDescGZIP(), []int{9}
+	return file_proto_auth_proto_rawDescGZIP(), []int{12}
 }
 
 var File_proto_auth_proto protoreflect.FileDescriptor
@@ -681,7 +856,12 @@ var file_proto_auth_proto_rawDesc = []byte{
 	0x73, 0x12, 0x0d, 0x0a, 0x09, 0x55, 0x4e, 0x44, 0x45, 0x46, 0x49, 0x4e, 0x45, 0x44, 0x10, 0x00,
 	0x12, 0x0a, 0x0a, 0x06, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45, 0x10, 0x01, 0x12, 0x0c, 0x0a, 0x08,
 	0x49, 0x4e, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45, 0x10, 0x02, 0x12, 0x0b, 0x0a, 0x07, 0x44, 0x45,
-	0x4c, 0x45, 0x54, 0x45, 0x44, 0x10, 0x03, 0x22, 0xe8, 0x01, 0x0a, 0x0f, 0x52, 0x65, 0x67, 0x69,
+	0x4c, 0x45, 0x54, 0x45, 0x44, 0x10, 0x03, 0x22, 0x4e, 0x0a, 0x09, 0x4f, 0x54, 0x50, 0x4d, 0x65,
+	0x74, 0x68, 0x6f, 0x64, 0x22, 0x41, 0x0a, 0x09, 0x4f, 0x54, 0x50, 0x4d, 0x65, 0x74, 0x68, 0x6f,
+	0x64, 0x12, 0x0d, 0x0a, 0x09, 0x55, 0x4e, 0x44, 0x45, 0x46, 0x49, 0x4e, 0x45, 0x44, 0x10, 0x00,
+	0x12, 0x11, 0x0a, 0x0d, 0x41, 0x55, 0x54, 0x48, 0x45, 0x4e, 0x54, 0x49, 0x43, 0x41, 0x54, 0x4f,
+	0x52, 0x10, 0x01, 0x12, 0x07, 0x0a, 0x03, 0x53, 0x4d, 0x53, 0x10, 0x02, 0x12, 0x09, 0x0a, 0x05,
+	0x45, 0x4d, 0x41, 0x49, 0x4c, 0x10, 0x03, 0x22, 0xe8, 0x01, 0x0a, 0x0f, 0x52, 0x65, 0x67, 0x69,
 	0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1d, 0x0a, 0x0a, 0x66,
 	0x69, 0x72, 0x73, 0x74, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x09, 0x66, 0x69, 0x72, 0x73, 0x74, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x1f, 0x0a, 0x0b, 0x6d, 0x69,
@@ -721,35 +901,45 @@ var file_proto_auth_proto_rawDesc = []byte{
 	0x65, 0x72, 0x79, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x0d, 0x72, 0x65, 0x63, 0x6f, 0x76, 0x65, 0x72, 0x79, 0x43, 0x6f, 0x64, 0x65, 0x73, 0x12, 0x14,
 	0x0a, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x05, 0x69,
-	0x6d, 0x61, 0x67, 0x65, 0x22, 0x50, 0x0a, 0x19, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65,
-	0x49, 0x6e, 0x69, 0x74, 0x69, 0x61, 0x6c, 0x4f, 0x54, 0x50, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x61,
-	0x73, 0x73, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61,
-	0x73, 0x73, 0x63, 0x6f, 0x64, 0x65, 0x22, 0x1c, 0x0a, 0x1a, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61,
-	0x74, 0x65, 0x49, 0x6e, 0x69, 0x74, 0x69, 0x61, 0x6c, 0x4f, 0x54, 0x50, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x32, 0xb6, 0x02, 0x0a, 0x0b, 0x41, 0x75, 0x74, 0x68, 0x53, 0x65, 0x72,
-	0x76, 0x69, 0x63, 0x65, 0x12, 0x3d, 0x0a, 0x08, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72,
-	0x12, 0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65,
-	0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x22, 0x00, 0x12, 0x49, 0x0a, 0x0c, 0x41, 0x75, 0x74, 0x68, 0x65, 0x6e, 0x74, 0x69, 0x63,
-	0x61, 0x74, 0x65, 0x12, 0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x41, 0x75, 0x74, 0x68,
-	0x65, 0x6e, 0x74, 0x69, 0x63, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
-	0x1b, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x41, 0x75, 0x74, 0x68, 0x65, 0x6e, 0x74, 0x69,
-	0x63, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x40,
-	0x0a, 0x09, 0x45, 0x6e, 0x72, 0x6f, 0x6c, 0x6c, 0x4f, 0x54, 0x50, 0x12, 0x17, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x2e, 0x45, 0x6e, 0x72, 0x6f, 0x6c, 0x6c, 0x4f, 0x54, 0x50, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x45, 0x6e, 0x72,
-	0x6f, 0x6c, 0x6c, 0x4f, 0x54, 0x50, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
-	0x12, 0x5b, 0x0a, 0x12, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65, 0x49, 0x6e, 0x69, 0x74,
-	0x69, 0x61, 0x6c, 0x4f, 0x54, 0x50, 0x12, 0x20, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x56,
-	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65, 0x49, 0x6e, 0x69, 0x74, 0x69, 0x61, 0x6c, 0x4f, 0x54,
-	0x50, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65, 0x49, 0x6e, 0x69, 0x74, 0x69, 0x61, 0x6c,
-	0x4f, 0x54, 0x50, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x0c, 0x5a,
-	0x0a, 0x63, 0x63, 0x68, 0x6f, 0x69, 0x63, 0x65, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x6d, 0x61, 0x67, 0x65, 0x22, 0x47, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x4f, 0x54, 0x50, 0x43, 0x6f,
+	0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x32, 0x0a, 0x06, 0x6d, 0x65, 0x74,
+	0x68, 0x6f, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x2e, 0x4f, 0x54, 0x50, 0x4d, 0x65, 0x74, 0x68, 0x6f, 0x64, 0x2e, 0x4f, 0x54, 0x50, 0x4d,
+	0x65, 0x74, 0x68, 0x6f, 0x64, 0x52, 0x06, 0x6d, 0x65, 0x74, 0x68, 0x6f, 0x64, 0x22, 0x14, 0x0a,
+	0x12, 0x47, 0x65, 0x74, 0x4f, 0x54, 0x50, 0x43, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x50, 0x0a, 0x19, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65, 0x49,
+	0x6e, 0x69, 0x74, 0x69, 0x61, 0x6c, 0x4f, 0x54, 0x50, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x61, 0x73,
+	0x73, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61, 0x73,
+	0x73, 0x63, 0x6f, 0x64, 0x65, 0x22, 0x1c, 0x0a, 0x1a, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74,
+	0x65, 0x49, 0x6e, 0x69, 0x74, 0x69, 0x61, 0x6c, 0x4f, 0x54, 0x50, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x32, 0xfb, 0x02, 0x0a, 0x0b, 0x41, 0x75, 0x74, 0x68, 0x53, 0x65, 0x72, 0x76,
+	0x69, 0x63, 0x65, 0x12, 0x3d, 0x0a, 0x08, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x12,
+	0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e,
+	0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x00, 0x12, 0x49, 0x0a, 0x0c, 0x41, 0x75, 0x74, 0x68, 0x65, 0x6e, 0x74, 0x69, 0x63, 0x61,
+	0x74, 0x65, 0x12, 0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x41, 0x75, 0x74, 0x68, 0x65,
+	0x6e, 0x74, 0x69, 0x63, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x41, 0x75, 0x74, 0x68, 0x65, 0x6e, 0x74, 0x69, 0x63,
+	0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x40, 0x0a,
+	0x09, 0x45, 0x6e, 0x72, 0x6f, 0x6c, 0x6c, 0x4f, 0x54, 0x50, 0x12, 0x17, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x2e, 0x45, 0x6e, 0x72, 0x6f, 0x6c, 0x6c, 0x4f, 0x54, 0x50, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x45, 0x6e, 0x72, 0x6f,
+	0x6c, 0x6c, 0x4f, 0x54, 0x50, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x43, 0x0a, 0x0a, 0x47, 0x65, 0x74, 0x4f, 0x54, 0x50, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x18, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x47, 0x65, 0x74, 0x4f, 0x54, 0x50, 0x43, 0x6f, 0x64, 0x65,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e,
+	0x47, 0x65, 0x74, 0x4f, 0x54, 0x50, 0x43, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x00, 0x12, 0x5b, 0x0a, 0x12, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65,
+	0x49, 0x6e, 0x69, 0x74, 0x69, 0x61, 0x6c, 0x4f, 0x54, 0x50, 0x12, 0x20, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65, 0x49, 0x6e, 0x69, 0x74, 0x69,
+	0x61, 0x6c, 0x4f, 0x54, 0x50, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65, 0x49, 0x6e, 0x69,
+	0x74, 0x69, 0x61, 0x6c, 0x4f, 0x54, 0x50, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x00, 0x42, 0x0c, 0x5a, 0x0a, 0x63, 0x63, 0x68, 0x6f, 0x69, 0x63, 0x65, 0x2f, 0x70, 0x62, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -764,36 +954,43 @@ func file_proto_auth_proto_rawDescGZIP() []byte {
 	return file_proto_auth_proto_rawDescData
 }
 
-var file_proto_auth_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_proto_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_proto_auth_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_proto_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_proto_auth_proto_goTypes = []interface{}{
 	(UserType_UserType)(0),             // 0: proto.UserType.UserType
 	(UserStatus_UserStatus)(0),         // 1: proto.UserStatus.UserStatus
-	(*UserType)(nil),                   // 2: proto.UserType
-	(*UserStatus)(nil),                 // 3: proto.UserStatus
-	(*RegisterRequest)(nil),            // 4: proto.RegisterRequest
-	(*RegisterResponse)(nil),           // 5: proto.RegisterResponse
-	(*AuthenticateRequest)(nil),        // 6: proto.AuthenticateRequest
-	(*AuthenticateResponse)(nil),       // 7: proto.AuthenticateResponse
-	(*EnrollOTPRequest)(nil),           // 8: proto.EnrollOTPRequest
-	(*EnrollOTPResponse)(nil),          // 9: proto.EnrollOTPResponse
-	(*ValidateInitialOTPRequest)(nil),  // 10: proto.ValidateInitialOTPRequest
-	(*ValidateInitialOTPResponse)(nil), // 11: proto.ValidateInitialOTPResponse
+	(OTPMethod_OTPMethod)(0),           // 2: proto.OTPMethod.OTPMethod
+	(*UserType)(nil),                   // 3: proto.UserType
+	(*UserStatus)(nil),                 // 4: proto.UserStatus
+	(*OTPMethod)(nil),                  // 5: proto.OTPMethod
+	(*RegisterRequest)(nil),            // 6: proto.RegisterRequest
+	(*RegisterResponse)(nil),           // 7: proto.RegisterResponse
+	(*AuthenticateRequest)(nil),        // 8: proto.AuthenticateRequest
+	(*AuthenticateResponse)(nil),       // 9: proto.AuthenticateResponse
+	(*EnrollOTPRequest)(nil),           // 10: proto.EnrollOTPRequest
+	(*EnrollOTPResponse)(nil),          // 11: proto.EnrollOTPResponse
+	(*GetOTPCodeRequest)(nil),          // 12: proto.GetOTPCodeRequest
+	(*GetOTPCodeResponse)(nil),         // 13: proto.GetOTPCodeResponse
+	(*ValidateInitialOTPRequest)(nil),  // 14: proto.ValidateInitialOTPRequest
+	(*ValidateInitialOTPResponse)(nil), // 15: proto.ValidateInitialOTPResponse
 }
 var file_proto_auth_proto_depIdxs = []int32{
-	4,  // 0: proto.AuthService.Register:input_type -> proto.RegisterRequest
-	6,  // 1: proto.AuthService.Authenticate:input_type -> proto.AuthenticateRequest
-	8,  // 2: proto.AuthService.EnrollOTP:input_type -> proto.EnrollOTPRequest
-	10, // 3: proto.AuthService.ValidateInitialOTP:input_type -> proto.ValidateInitialOTPRequest
-	5,  // 4: proto.AuthService.Register:output_type -> proto.RegisterResponse
-	7,  // 5: proto.AuthService.Authenticate:output_type -> proto.AuthenticateResponse
-	9,  // 6: proto.AuthService.EnrollOTP:output_type -> proto.EnrollOTPResponse
-	11, // 7: proto.AuthService.ValidateInitialOTP:output_type -> proto.ValidateInitialOTPResponse
-	4,  // [4:8] is the sub-list for method output_type
-	0,  // [0:4] is the sub-list for method input_type
-	0,  // [0:0] is the sub-list for extension type_name
-	0,  // [0:0] is the sub-list for extension extendee
-	0,  // [0:0] is the sub-list for field type_name
+	2,  // 0: proto.GetOTPCodeRequest.method:type_name -> proto.OTPMethod.OTPMethod
+	6,  // 1: proto.AuthService.Register:input_type -> proto.RegisterRequest
+	8,  // 2: proto.AuthService.Authenticate:input_type -> proto.AuthenticateRequest
+	10, // 3: proto.AuthService.EnrollOTP:input_type -> proto.EnrollOTPRequest
+	12, // 4: proto.AuthService.GetOTPCode:input_type -> proto.GetOTPCodeRequest
+	14, // 5: proto.AuthService.ValidateInitialOTP:input_type -> proto.ValidateInitialOTPRequest
+	7,  // 6: proto.AuthService.Register:output_type -> proto.RegisterResponse
+	9,  // 7: proto.AuthService.Authenticate:output_type -> proto.AuthenticateResponse
+	11, // 8: proto.AuthService.EnrollOTP:output_type -> proto.EnrollOTPResponse
+	13, // 9: proto.AuthService.GetOTPCode:output_type -> proto.GetOTPCodeResponse
+	15, // 10: proto.AuthService.ValidateInitialOTP:output_type -> proto.ValidateInitialOTPResponse
+	6,  // [6:11] is the sub-list for method output_type
+	1,  // [1:6] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_proto_auth_proto_init() }
@@ -827,7 +1024,7 @@ func file_proto_auth_proto_init() {
 			}
 		}
 		file_proto_auth_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RegisterRequest); i {
+			switch v := v.(*OTPMethod); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -839,7 +1036,7 @@ func file_proto_auth_proto_init() {
 			}
 		}
 		file_proto_auth_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RegisterResponse); i {
+			switch v := v.(*RegisterRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -851,7 +1048,7 @@ func file_proto_auth_proto_init() {
 			}
 		}
 		file_proto_auth_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AuthenticateRequest); i {
+			switch v := v.(*RegisterResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -863,7 +1060,7 @@ func file_proto_auth_proto_init() {
 			}
 		}
 		file_proto_auth_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AuthenticateResponse); i {
+			switch v := v.(*AuthenticateRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -875,7 +1072,7 @@ func file_proto_auth_proto_init() {
 			}
 		}
 		file_proto_auth_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EnrollOTPRequest); i {
+			switch v := v.(*AuthenticateResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -887,7 +1084,7 @@ func file_proto_auth_proto_init() {
 			}
 		}
 		file_proto_auth_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EnrollOTPResponse); i {
+			switch v := v.(*EnrollOTPRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -899,7 +1096,7 @@ func file_proto_auth_proto_init() {
 			}
 		}
 		file_proto_auth_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ValidateInitialOTPRequest); i {
+			switch v := v.(*EnrollOTPResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -911,6 +1108,42 @@ func file_proto_auth_proto_init() {
 			}
 		}
 		file_proto_auth_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetOTPCodeRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_auth_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetOTPCodeResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_auth_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ValidateInitialOTPRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_auth_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidateInitialOTPResponse); i {
 			case 0:
 				return &v.state
@@ -928,8 +1161,8 @@ func file_proto_auth_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_auth_proto_rawDesc,
-			NumEnums:      2,
-			NumMessages:   10,
+			NumEnums:      3,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -159,6 +159,24 @@ func (s *AuthServer) EnrollOTP(
 	}, nil
 }
 
+func (s *AuthServer) GetOTPCode(
+	ctx context.Context,
+	in *pb.GetOTPCodeRequest,
+) (*pb.GetOTPCodeResponse, error) {
+	switch in.Method {
+	case pb.OTPMethod_SMS:
+		//TODO: (Brandon)
+		break
+	case pb.OTPMethod_EMAIL:
+		//TODO: (Brandon)
+		break
+	case pb.OTPMethod_AUTHENTICATOR:
+	default:
+		return nil, errors.New("Must select valid OTP Method")
+	}
+	return &pb.GetOTPCodeResponse{}, nil
+}
+
 func (s *AuthServer) ValidateInitialOTP(
 	ctx context.Context,
 	in *pb.ValidateInitialOTPRequest,

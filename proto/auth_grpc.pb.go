@@ -25,6 +25,7 @@ type AuthServiceClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error)
 	EnrollOTP(ctx context.Context, in *EnrollOTPRequest, opts ...grpc.CallOption) (*EnrollOTPResponse, error)
+	GetOTPCode(ctx context.Context, in *GetOTPCodeRequest, opts ...grpc.CallOption) (*GetOTPCodeResponse, error)
 	ValidateInitialOTP(ctx context.Context, in *ValidateInitialOTPRequest, opts ...grpc.CallOption) (*ValidateInitialOTPResponse, error)
 }
 
@@ -63,6 +64,15 @@ func (c *authServiceClient) EnrollOTP(ctx context.Context, in *EnrollOTPRequest,
 	return out, nil
 }
 
+func (c *authServiceClient) GetOTPCode(ctx context.Context, in *GetOTPCodeRequest, opts ...grpc.CallOption) (*GetOTPCodeResponse, error) {
+	out := new(GetOTPCodeResponse)
+	err := c.cc.Invoke(ctx, "/proto.AuthService/GetOTPCode", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) ValidateInitialOTP(ctx context.Context, in *ValidateInitialOTPRequest, opts ...grpc.CallOption) (*ValidateInitialOTPResponse, error) {
 	out := new(ValidateInitialOTPResponse)
 	err := c.cc.Invoke(ctx, "/proto.AuthService/ValidateInitialOTP", in, out, opts...)
@@ -79,6 +89,7 @@ type AuthServiceServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error)
 	EnrollOTP(context.Context, *EnrollOTPRequest) (*EnrollOTPResponse, error)
+	GetOTPCode(context.Context, *GetOTPCodeRequest) (*GetOTPCodeResponse, error)
 	ValidateInitialOTP(context.Context, *ValidateInitialOTPRequest) (*ValidateInitialOTPResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
@@ -95,6 +106,9 @@ func (UnimplementedAuthServiceServer) Authenticate(context.Context, *Authenticat
 }
 func (UnimplementedAuthServiceServer) EnrollOTP(context.Context, *EnrollOTPRequest) (*EnrollOTPResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EnrollOTP not implemented")
+}
+func (UnimplementedAuthServiceServer) GetOTPCode(context.Context, *GetOTPCodeRequest) (*GetOTPCodeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOTPCode not implemented")
 }
 func (UnimplementedAuthServiceServer) ValidateInitialOTP(context.Context, *ValidateInitialOTPRequest) (*ValidateInitialOTPResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ValidateInitialOTP not implemented")
@@ -166,6 +180,24 @@ func _AuthService_EnrollOTP_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_GetOTPCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOTPCodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetOTPCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.AuthService/GetOTPCode",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetOTPCode(ctx, req.(*GetOTPCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_ValidateInitialOTP_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ValidateInitialOTPRequest)
 	if err := dec(in); err != nil {
@@ -202,6 +234,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EnrollOTP",
 			Handler:    _AuthService_EnrollOTP_Handler,
+		},
+		{
+			MethodName: "GetOTPCode",
+			Handler:    _AuthService_GetOTPCode_Handler,
 		},
 		{
 			MethodName: "ValidateInitialOTP",

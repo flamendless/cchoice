@@ -4,6 +4,7 @@ import (
 	"cchoice/client/common"
 	"cchoice/client/components"
 	"cchoice/client/components/layout"
+	"cchoice/internal/enums"
 	"cchoice/internal/serialize"
 	pb "cchoice/proto"
 	"errors"
@@ -19,6 +20,7 @@ type AuthService interface {
 	Authenticated(http.ResponseWriter, *http.Request) *common.HandlerRes
 	EnrollOTP(*pb.EnrollOTPRequest) (*pb.EnrollOTPResponse, error)
 	ValidateInitialOTP(*pb.ValidateInitialOTPRequest) (*pb.ValidateInitialOTPResponse, error)
+	GetOTPCode(*pb.GetOTPCodeRequest) (*pb.GetOTPCodeResponse, error)
 }
 
 type AuthHandler struct {
@@ -138,6 +140,37 @@ func (h AuthHandler) Register(w http.ResponseWriter, r *http.Request) *common.Ha
 		),
 		ReplaceURL: "/otp-setup",
 	}
+}
+
+func (h AuthHandler) GetOTPCode(
+	w http.ResponseWriter,
+	r *http.Request,
+) *common.HandlerRes {
+	err := r.ParseForm()
+	if err != nil {
+		return &common.HandlerRes{
+			Error:      errors.New("Failed to parse form"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	_, err = h.AuthService.GetOTPCode(
+		&pb.GetOTPCodeRequest{
+			Method: enums.StringToPBEnum(
+				r.Form.Get("method"),
+				pb.OTPMethod_OTPMethod_value,
+				pb.OTPMethod_UNDEFINED,
+			),
+		},
+	)
+	if err != nil {
+		return &common.HandlerRes{
+			Error:      err,
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	return nil
 }
 
 func (h AuthHandler) ValidateInitialOTP(
