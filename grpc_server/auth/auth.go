@@ -163,12 +163,43 @@ func (s *AuthServer) GetOTPCode(
 	ctx context.Context,
 	in *pb.GetOTPCodeRequest,
 ) (*pb.GetOTPCodeResponse, error) {
+
+	var recipient cchoice_db.GetUserEMailAndMobileNoByIDRow
+	var err error
+	var code string
+
+	if (in.Method == pb.OTPMethod_SMS) || (in.Method == pb.OTPMethod_EMAIL) {
+		userID := serialize.DecDBID(in.UserId)
+		recipient, err = s.CtxDB.QueriesRead.GetUserEMailAndMobileNoByID(
+			context.Background(),
+			userID,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		res, err := s.CtxDB.QueriesRead.GetAuthIDAndSecretByUserIDAndUnvalidatedOTP(
+			context.Background(),
+			userID,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		code, err = auth.GeneratePassCode(res.OtpSecret.String)
+		if err != nil {
+			return nil, err
+		}
+
+		fmt.Println(code, res.OtpSecret.String, recipient.MobileNo, recipient.Email)
+	}
+
 	switch in.Method {
 	case pb.OTPMethod_SMS:
-		//TODO: (Brandon)
+		//TODO: (Brandon) - send code via SMS
 		break
 	case pb.OTPMethod_EMAIL:
-		//TODO: (Brandon)
+		//TODO: (Brandon) - send code via E-Mail
 		break
 	case pb.OTPMethod_AUTHENTICATOR:
 	default:
@@ -177,7 +208,7 @@ func (s *AuthServer) GetOTPCode(
 	return &pb.GetOTPCodeResponse{}, nil
 }
 
-func (s *AuthServer) ValidateOTP(
+func (s *AuthServer) ValidateInitialOTP(
 	ctx context.Context,
 	in *pb.ValidateInitialOTPRequest,
 ) (*pb.ValidateInitialOTPResponse, error) {

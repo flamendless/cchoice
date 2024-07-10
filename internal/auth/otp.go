@@ -3,6 +3,7 @@ package auth
 import (
 	"bytes"
 	"image/png"
+	"time"
 
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
@@ -35,4 +36,12 @@ func ValidateOTP(passcode string, secret string) bool {
 func GenerateRecoverCodes() string {
 	//TODO: Brandon
 	return "test"
+}
+
+func GeneratePassCode(secret string) (string, error) {
+	passcode, err := totp.GenerateCode(secret, time.Now())
+	if err != nil {
+		return "", err
+	}
+	return passcode, nil
 }

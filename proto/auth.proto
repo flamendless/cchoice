@@ -68,6 +68,7 @@ message EnrollOTPResponse {
 
 message GetOTPCodeRequest {
    OTPMethod.OTPMethod method = 1;
+   string user_id = 2;
 }
 
 message GetOTPCodeResponse {

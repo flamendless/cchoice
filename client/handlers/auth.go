@@ -4,9 +4,13 @@ import (
 	"cchoice/client/common"
 	"cchoice/client/components"
 	"cchoice/client/components/layout"
+	"cchoice/internal/enums"
+
 	"cchoice/internal/serialize"
+	pb "cchoice/proto"
 	"errors"
 	"net/http"
+	"net/url"
 
 	"github.com/alexedwards/scs/v2"
 	"go.uber.org/zap"
@@ -25,6 +29,12 @@ type AuthHandler struct {
 	Logger      *zap.Logger
 	AuthService AuthService
 	SM          *scs.SessionManager
+}
+
+type UserForRegistration struct {
+	UserID      string
+	EMail string
+	MobileNo    string
 }
 
 func NewAuthHandler(
@@ -112,53 +122,126 @@ func (h AuthHandler) Register(w http.ResponseWriter, r *http.Request) *common.Ha
 		}
 	}
 
-	res, err := h.AuthService.EnrollOTP(&common.AuthEnrollOTPRequest{
-		UserID:      userID,
-		Issuer:      "cchoice",
-		AccountName: r.Form.Get("email"),
-	})
-	if err != nil {
-		return &common.HandlerRes{
-			Error:      err,
-			StatusCode: http.StatusInternalServerError,
-		}
-	}
-
 	h.SM.Put(
 		r.Context(),
 		"userRegistration",
-		userID,
+		&UserForRegistration{
+			UserID:      userID,
+			EMail: r.Form.Get("email"),
+			MobileNo:    r.Form.Get("mobile_no"),
+		},
 	)
 
-	imgSrc := serialize.PNGEncode(res.Image)
 	return &common.HandlerRes{
 		Component: layout.Base(
-			"OTP Setup",
-			components.OTPSetupView(res.Secret, imgSrc, res.RecoveryCodes),
+			"OTP",
+			components.OTPView(pb.OTPMethod_UNDEFINED),
 		),
-		ReplaceURL: "/otp-setup",
+		RedirectTo: "/otp",
+		ReplaceURL: "/otp",
 	}
 }
 
-func (h AuthHandler) GetOTPCode(
+func (h AuthHandler) OTPView(
 	w http.ResponseWriter,
 	r *http.Request,
 ) *common.HandlerRes {
-	err := r.ParseForm()
-	if err != nil {
-		return &common.HandlerRes{
-			Error:      errors.New("Failed to parse form"),
-			StatusCode: http.StatusBadRequest,
-		}
-	}
-
-	err = h.AuthService.GetOTPCode(&common.AuthGetOTPCodeRequest{
-		Method: r.Form.Get("method"),
-	})
+	q, err := url.ParseQuery(r.URL.RawQuery)
 	if err != nil {
 		return &common.HandlerRes{
 			Error:      err,
 			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	qOTPMethod := q.Get("otp_method")
+	otpMethod := enums.StringToPBEnum(
+		qOTPMethod,
+		pb.OTPMethod_OTPMethod_value,
+		pb.OTPMethod_UNDEFINED,
+	)
+	if otpMethod == pb.OTPMethod_UNDEFINED {
+		return &common.HandlerRes{
+			Component: layout.Base(
+				"OTP",
+				components.OTPView(otpMethod),
+			),
+			ReplaceURL: "/otp",
+		}
+	}
+
+	userForRegistration, ok := h.SM.Get(r.Context(), "userRegistration").(UserForRegistration)
+	if !ok {
+		return &common.HandlerRes{
+			Error:      errors.New("Expired session. Register again"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	if otpMethod == pb.OTPMethod_AUTHENTICATOR {
+		res, err := h.AuthService.EnrollOTP(&common.AuthEnrollOTPRequest{
+			UserID:      userForRegistration.UserID,
+			Issuer:      "cchoice",
+			AccountName: userForRegistration.EMail,
+		})
+		if err != nil {
+			return &common.HandlerRes{
+				Error:      err,
+				StatusCode: http.StatusInternalServerError,
+			}
+		}
+		imgSrc := serialize.PNGEncode(res.Image)
+		return &common.HandlerRes{
+			Component: components.OTPMethodAuthenticate(
+				res.Secret,
+				imgSrc,
+				res.RecoveryCodes,
+			),
+			ReplaceURL: "/otp",
+		}
+	}
+
+	if otpMethod == pb.OTPMethod_EMAIL || otpMethod == pb.OTPMethod_SMS {
+		res, err := h.AuthService.EnrollOTP(&common.AuthEnrollOTPRequest{
+			UserID:      userForRegistration.UserID,
+			Issuer:      "cchoice",
+			AccountName: userForRegistration.EMail,
+		})
+		if err != nil {
+			return &common.HandlerRes{
+				Error:      err,
+				StatusCode: http.StatusInternalServerError,
+			}
+		}
+		err = h.AuthService.GetOTPCode(&common.AuthGetOTPCodeRequest{
+			UserID: userForRegistration.UserID,
+			Method: qOTPMethod,
+		})
+		if err != nil {
+			return &common.HandlerRes{
+				Error:      err,
+				StatusCode: http.StatusInternalServerError,
+			}
+		}
+
+		if otpMethod == pb.OTPMethod_SMS {
+			return &common.HandlerRes{
+				Component: components.OTPMethodSMSOrEMail(
+					"SMS",
+					userForRegistration.MobileNo,
+					res.RecoveryCodes,
+				),
+				ReplaceURL: "/otp",
+			}
+		} else if otpMethod == pb.OTPMethod_EMAIL {
+			return &common.HandlerRes{
+				Component: components.OTPMethodSMSOrEMail(
+					"E-Mail",
+					userForRegistration.EMail,
+					res.RecoveryCodes,
+				),
+				ReplaceURL: "/otp",
+			}
 		}
 	}
 
@@ -177,7 +260,7 @@ func (h AuthHandler) ValidateInitialOTP(
 		}
 	}
 
-	userID, ok := h.SM.Get(r.Context(), "userRegistration").(string)
+	userForRegistration, ok := h.SM.Get(r.Context(), "userRegistration").(UserForRegistration)
 	if !ok {
 		return &common.HandlerRes{
 			Error:      errors.New("Expired session. Register again"),
@@ -194,7 +277,7 @@ func (h AuthHandler) ValidateInitialOTP(
 	}
 
 	err = h.AuthService.ValidateInitialOTP(&common.AuthValidateInitialOTP{
-		UserID:   userID,
+		UserID:   userForRegistration.UserID,
 		Passcode: passcode,
 	})
 	if err != nil {

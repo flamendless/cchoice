@@ -8,6 +8,7 @@ import (
 	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
 	"embed"
+	"encoding/gob"
 	"fmt"
 	"net/http"
 	"time"
@@ -27,6 +28,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	sessionManager = scs.New()
 	sessionManager.Lifetime = 24 * time.Hour
+	gob.Register(handlers.UserForRegistration{})
 
 	grpcConn := NewGRPCConn(ctxClient.GRPCAddress, ctxClient.TSC)
 	defer GRPCConnectionClose(grpcConn)
@@ -54,6 +56,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	mux.HandleFunc("GET /", errHandler.Default(authHandler.AuthPage))
 	mux.HandleFunc("GET /auth", errHandler.Default(authHandler.AuthPage))
 	mux.HandleFunc("GET /register", errHandler.Default(authHandler.RegisterPage))
+	mux.HandleFunc("GET /otp", errHandler.Default(authHandler.OTPView))
 	mux.HandleFunc("POST /auth", errHandler.Default(authHandler.Authenticate))
 	mux.HandleFunc("POST /register", errHandler.Default(authHandler.Register))
 	mux.HandleFunc("POST /otp-validate-initial", errHandler.Default(authHandler.ValidateInitialOTP))

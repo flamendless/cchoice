@@ -33,5 +33,6 @@ type AuthValidateInitialOTP struct {
 }
 
 type AuthGetOTPCodeRequest struct {
+	UserID string
 	Method string
 }

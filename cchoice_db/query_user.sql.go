@@ -102,6 +102,26 @@ func (q *Queries) GetUserByID(ctx context.Context, id int64) (TblUser, error) {
 	return i, err
 }
 
+const getUserEMailAndMobileNoByID = `-- name: GetUserEMailAndMobileNoByID :one
+SELECT email, mobile_no
+FROM tbl_user
+WHERE
+	id = ?
+LIMIT 1
+`
+
+type GetUserEMailAndMobileNoByIDRow struct {
+	Email    string
+	MobileNo string
+}
+
+func (q *Queries) GetUserEMailAndMobileNoByID(ctx context.Context, id int64) (GetUserEMailAndMobileNoByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserEMailAndMobileNoByID, id)
+	var i GetUserEMailAndMobileNoByIDRow
+	err := row.Scan(&i.Email, &i.MobileNo)
+	return i, err
+}
+
 const getUserIDAndHashedPassword = `-- name: GetUserIDAndHashedPassword :one
 SELECT id, password
 FROM tbl_user

@@ -97,6 +97,7 @@ func (s AuthService) GetOTPCode(data *common.AuthGetOTPCodeRequest) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	_, err := client.GetOTPCode(ctx, &pb.GetOTPCodeRequest{
+		UserId: data.UserID,
 		Method: enums.StringToPBEnum(
 			data.Method,
 			pb.OTPMethod_OTPMethod_value,

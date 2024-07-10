@@ -5,6 +5,13 @@ WHERE
 	id = ?
 LIMIT 1;
 
+-- name: GetUserEMailAndMobileNoByID :one
+SELECT email, mobile_no
+FROM tbl_user
+WHERE
+	id = ?
+LIMIT 1;
+
 -- name: GetUserByEMailAndUserType :one
 SELECT id
 FROM tbl_user
