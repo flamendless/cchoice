@@ -14,7 +14,7 @@ import (
 
 type AuthService interface {
 	Authenticated(enums.AudKind, http.ResponseWriter, *http.Request) *common.HandlerRes
-	Authenticate(*common.AuthAuthenticateRequest) (string, error)
+	Authenticate(*common.AuthAuthenticateRequest) (*common.AuthAuthenticateResponse, error)
 	Register(*common.AuthRegisterRequest) (string, error)
 	EnrollOTP(*common.AuthEnrollOTPRequest) (*common.AuthEnrollOTPResponse, error)
 	FinishOTPEnrollment(*common.AuthFinishOTPEnrollment) error
@@ -71,18 +71,27 @@ func (h AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) *commo
 		}
 	}
 
-	tokenString, err := h.AuthService.Authenticate(&common.AuthAuthenticateRequest{
+	res, err := h.AuthService.Authenticate(&common.AuthAuthenticateRequest{
 		Username: r.Form.Get("username"),
 		Password: r.Form.Get("password"),
 	})
-	if err != nil || tokenString == "" {
+	if err != nil {
 		return &common.HandlerRes{
 			Error:      err,
 			StatusCode: http.StatusUnauthorized,
 		}
 	}
 
-	h.SM.Put(r.Context(), "tokenString", tokenString)
+	h.SM.Put(r.Context(), "tokenString", res.Token)
+
+	if res.NeedOTP {
+		return &common.HandlerRes{
+			Component:  components.CenterCard(
+				components.OTPView(false),
+			),
+			ReplaceURL: "/otp",
+		}
+	}
 
 	return &common.HandlerRes{
 		Component:  components.Base("Home"),

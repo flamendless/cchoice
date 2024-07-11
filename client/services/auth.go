@@ -55,7 +55,7 @@ func (s AuthService) Authenticated(aud enums.AudKind, w http.ResponseWriter, r *
 	return nil
 }
 
-func (s AuthService) Authenticate(data *common.AuthAuthenticateRequest) (string, error) {
+func (s AuthService) Authenticate(data *common.AuthAuthenticateRequest) (*common.AuthAuthenticateResponse, error) {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -64,9 +64,12 @@ func (s AuthService) Authenticate(data *common.AuthAuthenticateRequest) (string,
 		Password: data.Password,
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return res.Token, err
+	return &common.AuthAuthenticateResponse{
+		Token:   res.Token,
+		NeedOTP: res.NeedOtp,
+	}, nil
 }
 
 func (s AuthService) Register(data *common.AuthRegisterRequest) (string, error) {

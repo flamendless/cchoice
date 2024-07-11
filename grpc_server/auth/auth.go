@@ -127,6 +127,24 @@ func (s *AuthServer) Authenticate(
 		return nil, err
 	}
 
+	resOTP, err := s.CtxDB.QueriesRead.GetAuthOTP(context.Background(), resUser.ID)
+	if err != nil {
+		return nil, err
+	}
+	if resOTP.OtpEnabled {
+		eOTPStatus := enums.ParseOTPStatusEnum(resOTP.OtpStatus)
+		if eOTPStatus == enums.OTP_STATUS_ENROLLED || eOTPStatus == enums.OTP_STATUS_SENT_CODE {
+			err = s.CtxDB.Queries.NeedOTP(context.Background(), resUser.ID)
+			if err != nil {
+				return nil, err
+			}
+			return &pb.AuthenticateResponse{
+				Token:   tokenString,
+				NeedOtp: true,
+			}, nil
+		}
+	}
+
 	err = s.CtxDB.Queries.UpdateAuthTokenByUserID(
 		context.Background(),
 		cchoice_db.UpdateAuthTokenByUserIDParams{

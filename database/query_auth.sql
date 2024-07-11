@@ -43,7 +43,18 @@ UPDATE tbl_auth SET
 	otp_status = 'ENROLLED'
 WHERE
 	id = ? AND
-	otp_enabled = false AND
-	otp_secret IS NOT NULL AND otp_secret != '' AND
-	recovery_codes IS NOT NULL AND recovery_codes != ''
+	otp_enabled = true
+;
+
+-- name: GetAuthOTP :one
+SELECT otp_enabled, otp_status
+FROM tbl_auth
+WHERE user_id = ?
+;
+
+-- name: NeedOTP :exec
+UPDATE tbl_auth SET
+	otp_status = 'SENT_CODE'
+WHERE
+	user_id = ?
 ;

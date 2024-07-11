@@ -33,7 +33,7 @@ func (h AuthHandler) OTPEnrollView(
 		return &common.HandlerRes{
 			Component: components.Base(
 				"OTP ENROLL",
-				components.CenterCard(components.OTPEnrollView()),
+				components.CenterCard(components.OTPView(true)),
 			),
 			RedirectTo: "/otp-enroll",
 			ReplaceURL: "/otp-enroll",

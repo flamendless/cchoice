@@ -54,7 +54,7 @@ func (h AuthHandler) Register(w http.ResponseWriter, r *http.Request) *common.Ha
 	return &common.HandlerRes{
 		Component: components.Base(
 			"OTP ENROLL",
-			components.CenterCard(components.OTPEnrollView()),
+			components.CenterCard(components.OTPView(true)),
 		),
 		RedirectTo: "/otp-enroll",
 		ReplaceURL: "/otp-enroll",

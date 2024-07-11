@@ -53,9 +53,7 @@ UPDATE tbl_auth SET
 	otp_status = 'ENROLLED'
 WHERE
 	id = ? AND
-	otp_enabled = false AND
-	otp_secret IS NOT NULL AND otp_secret != '' AND
-	recovery_codes IS NOT NULL AND recovery_codes != ''
+	otp_enabled = true
 `
 
 func (q *Queries) FinishOTPEnrollment(ctx context.Context, id int64) error {
@@ -100,6 +98,40 @@ func (q *Queries) GetAuthForOTPValidation(ctx context.Context, userID int64) (Ge
 	var i GetAuthForOTPValidationRow
 	err := row.Scan(&i.ID, &i.OtpSecret)
 	return i, err
+}
+
+const getAuthOTP = `-- name: GetAuthOTP :one
+;
+
+SELECT otp_enabled, otp_status
+FROM tbl_auth
+WHERE user_id = ?
+`
+
+type GetAuthOTPRow struct {
+	OtpEnabled bool
+	OtpStatus  string
+}
+
+func (q *Queries) GetAuthOTP(ctx context.Context, userID int64) (GetAuthOTPRow, error) {
+	row := q.db.QueryRowContext(ctx, getAuthOTP, userID)
+	var i GetAuthOTPRow
+	err := row.Scan(&i.OtpEnabled, &i.OtpStatus)
+	return i, err
+}
+
+const needOTP = `-- name: NeedOTP :exec
+;
+
+UPDATE tbl_auth SET
+	otp_status = 'SENT_CODE'
+WHERE
+	user_id = ?
+`
+
+func (q *Queries) NeedOTP(ctx context.Context, userID int64) error {
+	_, err := q.db.ExecContext(ctx, needOTP, userID)
+	return err
 }
 
 const updateAuthTokenByUserID = `-- name: UpdateAuthTokenByUserID :exec

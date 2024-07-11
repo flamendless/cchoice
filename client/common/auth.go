@@ -5,6 +5,11 @@ type AuthAuthenticateRequest struct {
 	Password string
 }
 
+type AuthAuthenticateResponse struct {
+	Token   string
+	NeedOTP bool
+}
+
 type AuthRegisterRequest struct {
 	FirstName       string
 	MiddleName      string

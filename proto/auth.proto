@@ -61,6 +61,7 @@ message AuthenticateRequest {
 
 message AuthenticateResponse {
    string token = 1;
+   bool need_otp = 2;
 }
 
 message EnrollOTPRequest {

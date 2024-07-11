@@ -1,15 +1,5 @@
 package components
 
-templ OTPEnrollView() {
-	<header>
-		<h1 class="text-center text-3xl font-bold underline m-4">
-			OTP
-		</h1>
-	</header>
-
-	@OTPMethodChoose(true)
-}
-
 templ OTPEnrollMethodAuthenticator(secret string, imgSrc string, recoveryCodes string) {
 	<form
 		id="otp_method_form"
