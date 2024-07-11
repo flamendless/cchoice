@@ -150,7 +150,7 @@ func (q *Queries) GetUserEMailAndMobileNoByID(ctx context.Context, id int64) (Ge
 const getUserForAuth = `-- name: GetUserForAuth :one
 SELECT
 	tbl_user.id,
-    tbl_user.password,
+	tbl_user.password,
 	tbl_auth.otp_enabled
 FROM tbl_user
 INNER JOIN tbl_auth ON tbl_auth.user_id = tbl_user.id

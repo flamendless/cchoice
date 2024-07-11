@@ -4,8 +4,8 @@ import (
 	"cchoice/client/common"
 	"cchoice/client/components"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	pb "cchoice/proto"
-	"errors"
 	"net/http"
 	"net/url"
 
@@ -65,7 +65,10 @@ func (h ProductHandler) ProductTablePage(
 			pb.SortDir_UNDEFINED,
 		)
 		if sortField == pb.SortField_UNDEFINED || sortDir == pb.SortDir_UNDEFINED {
-			return &common.HandlerRes{Error: errors.New("Invalid URL params"), StatusCode: http.StatusBadRequest}
+			return &common.HandlerRes{
+				Error:      errs.ERR_CHOOSE_VALID_OPTION,
+				StatusCode: http.StatusBadRequest,
+			}
 		}
 	}
 

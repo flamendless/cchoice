@@ -61,8 +61,8 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	mux.HandleFunc("POST /auth", errHandler.Default(authHandler.Authenticate))
 
 	//OTP
-	mux.HandleFunc("GET /otp", errHandler.Default(authHandler.OTPEnrollView))
-	mux.HandleFunc("POST /otp", errHandler.Default(authHandler.FinishOTPEnrollment))
+	mux.HandleFunc("GET /otp-enroll", errHandler.Default(authHandler.OTPEnrollView))
+	mux.HandleFunc("POST /otp-enroll", errHandler.Default(authHandler.OTPEnrollFinish))
 
 	//PRODUCTS
 	mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))

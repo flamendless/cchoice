@@ -74,7 +74,7 @@ func (s *AuthServer) Register(
 		Password:   hashedPassword,
 		MobileNo:   in.MobileNo,
 		UserType:   enums.USER_TYPE_API.String(),
-		Status:     enums.PRODUCT_STATUS_ACTIVE.String(),
+		Status:     pb.UserStatus_ACTIVE.String(),
 	})
 	if err != nil {
 		return nil, err

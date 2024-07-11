@@ -25,7 +25,7 @@ INSERT INTO tbl_user(
 		'client@cchoice.com',
 		'clientpw',
 		'+639000000001',
-		'API'
+		'SYSTEM'
 	)
 ;
 

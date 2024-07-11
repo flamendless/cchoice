@@ -105,8 +105,9 @@ func (v Validator) GetToken(
 		return nil, fmt.Errorf("Token had the wrong audience claim: %s", aud)
 	}
 
+	var errValidity error
 	if expectedAUD == enums.AUD_API {
-		_, err = v.CtxDB.QueriesRead.GetUserByEMailAndUserTypeAndToken(
+		_, errValidity = v.CtxDB.Queries.GetUserByEMailAndUserTypeAndToken(
 			context.Background(),
 			cchoice_db.GetUserByEMailAndUserTypeAndTokenParams{
 				Email:    claims["username"].(string),
@@ -114,20 +115,17 @@ func (v Validator) GetToken(
 				Token:    tokenString,
 			},
 		)
-		if err != nil {
-			return nil, fmt.Errorf("Invalid token: %w", err)
-		}
 	} else if expectedAUD == enums.AUD_SYSTEM {
-		_, err = v.CtxDB.QueriesRead.GetUserByEMailAndUserType(
+		_, errValidity = v.CtxDB.Queries.GetUserByEMailAndUserType(
 			context.Background(),
 			cchoice_db.GetUserByEMailAndUserTypeParams{
 				Email:    claims["username"].(string),
 				UserType: audString,
 			},
 		)
-		if err != nil {
-			return nil, fmt.Errorf("Invalid token: %w", err)
-		}
+	}
+	if errValidity != nil {
+		return nil, fmt.Errorf("Invalid token: %w", errValidity)
 	}
 
 	return token, nil
