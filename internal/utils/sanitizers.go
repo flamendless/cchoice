@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"cchoice/internal/domains/parser"
+	"cchoice/internal/errs"
 	"strings"
 
 	"github.com/Rhymond/go-money"
@@ -9,7 +9,7 @@ import (
 )
 
 func SanitizePrice(price string) (*money.Money, []error) {
-	var errs []error = make([]error, 0, 2)
+	var errsRes []error = make([]error, 0, 2)
 	currency := money.PHP
 
 	hasPHPTrailing := strings.HasSuffix(price, "PHP")
@@ -27,17 +27,17 @@ func SanitizePrice(price string) (*money.Money, []error) {
 
 	errPrice := ValidateNotBlank(price, "unit price")
 	if errPrice != nil {
-		errs = append(errs, errPrice)
+		errsRes = append(errsRes, errPrice)
 	}
 
 	unitPrice, err := decimal.NewFromString(price)
 	if err != nil {
-		parserErr := parser.NewParserError(parser.CantCovert, err.Error())
-		errs = append(errs, parserErr)
+		parserErr := errs.NewParserError(errs.CantCovert, err.Error())
+		errsRes = append(errsRes, parserErr)
 	}
 
-	if len(errs) > 0 {
-		return nil, errs
+	if len(errsRes) > 0 {
+		return nil, errsRes
 	}
 
 	return money.New(unitPrice.CoefficientInt64(), currency), nil

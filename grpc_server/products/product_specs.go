@@ -2,7 +2,7 @@ package products
 
 import (
 	"cchoice/internal/ctx"
-	"cchoice/internal/domains/grpc"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/serialize"
 	pb "cchoice/proto"
@@ -28,7 +28,7 @@ func (s *ProductSpecsServer) GetProductSpecsByID(
 		serialize.DecDBID(encid),
 	)
 	if err != nil {
-		return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+		return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
 	}
 
 	return &pb.ProductSpecs{

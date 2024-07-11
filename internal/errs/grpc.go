@@ -1,27 +1,27 @@
-package grpc
+package errs
 
 import (
 	stdErrors "errors"
 	"fmt"
 )
 
-type ErrorCode string
+type GRPCErrorCode string
 
 const (
-	IDNotFound            ErrorCode = "ID_NOT_FOUND"
-	UnimplementedFunction ErrorCode = "UNIMPLEMENTED_FUNC"
+	IDNotFound            GRPCErrorCode = "ID_NOT_FOUND"
+	UnimplementedFunction GRPCErrorCode = "UNIMPLEMENTED_FUNC"
 )
 
 type grpcError struct {
 	error
-	errorCode ErrorCode
+	errorCode GRPCErrorCode
 }
 
 func (pe grpcError) Error() string {
 	return fmt.Sprintf("%s: %s", pe.errorCode, pe.error.Error())
 }
 
-func Unwrap(err error) error {
+func GRPCErrorCodeUnwrap(err error) error {
 	e, ok := err.(grpcError)
 	if ok {
 		return stdErrors.Unwrap(e.error)
@@ -29,7 +29,7 @@ func Unwrap(err error) error {
 	return stdErrors.Unwrap(err)
 }
 
-func Code(err error) ErrorCode {
+func GRPCErrorCodeCode(err error) GRPCErrorCode {
 	if err == nil {
 		return ""
 	}
@@ -42,14 +42,14 @@ func Code(err error) ErrorCode {
 	return ""
 }
 
-func NewGRPCError(errorCode ErrorCode, format string, args ...interface{}) error {
+func NewGRPCError(errorCode GRPCErrorCode, format string, args ...interface{}) error {
 	return grpcError{
 		error:     fmt.Errorf(format, args...),
 		errorCode: errorCode,
 	}
 }
 
-func WrapIntoGRPCError(err error, errorCode ErrorCode, msg string) error {
+func WrapIntoGRPCError(err error, errorCode GRPCErrorCode, msg string) error {
 	return grpcError{
 		error:     fmt.Errorf("%s: [%w]", msg, err),
 		errorCode: errorCode,

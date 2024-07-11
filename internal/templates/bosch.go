@@ -1,8 +1,8 @@
 package templates
 
 import (
-	"cchoice/internal/domains/parser"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/models"
 	"cchoice/internal/utils"
@@ -71,24 +71,24 @@ func BoschProcessPrices(tpl *Template, row []string) ([]*money.Money, []error) {
 }
 
 func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
-	errs := make([]error, 0, 8)
+	errsRes := make([]error, 0, 8)
 
 	idxModel := tpl.Columns["Model"].Index
 
 	name := row[idxModel]
 	errProductName := utils.ValidateNotBlank(name, "Model")
 	if errProductName != nil {
-		parserErr := parser.NewParserError(parser.BlankProductName, errProductName.Error())
-		errs = append(errs, parserErr)
+		parserErr := errs.NewParserError(errs.BlankProductName, errProductName.Error())
+		errsRes = append(errsRes, parserErr)
 	}
 
 	prices, errMonies := BoschProcessPrices(tpl, row)
 	if len(errMonies) > 0 {
-		errs = append(errs, errMonies...)
+		errsRes = append(errsRes, errMonies...)
 	}
 
-	if len(errs) > 0 {
-		return nil, errs
+	if len(errsRes) > 0 {
+		return nil, errsRes
 	}
 
 	status := enums.PRODUCT_STATUS_ACTIVE

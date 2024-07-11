@@ -3,8 +3,8 @@ package products
 import (
 	"cchoice/cchoice_db"
 	"cchoice/internal/ctx"
-	"cchoice/internal/domains/grpc"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/serialize"
 	pb "cchoice/proto"
 	"context"
@@ -77,7 +77,7 @@ func (s *ProductServer) GetProductByID(
 		serialize.DecDBID(encid),
 	)
 	if err != nil {
-		return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+		return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
 	}
 
 	res := ProductsRow(existingProduct).ToPBProduct()
@@ -96,7 +96,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 	if sortBy == nil {
 		fetched, err := s.CtxDB.QueriesRead.GetProductsByStatus(ctx, status.String())
 		if err != nil {
-			return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+			return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
 		}
 		for _, f := range fetched {
 			products = append(products, ProductsRow(f).ToPBProduct())
@@ -106,7 +106,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 			if sortBy.Dir == pb.SortDir_ASC {
 				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByNameAsc(ctx, status.String())
 				if err != nil {
-					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+					return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
 				}
 				for _, f := range fetched {
 					products = append(products, ProductsRow(f).ToPBProduct())
@@ -115,7 +115,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 			} else if sortBy.Dir == pb.SortDir_DESC {
 				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByNameDesc(ctx, status.String())
 				if err != nil {
-					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+					return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
 				}
 				for _, f := range fetched {
 					products = append(products, ProductsRow(f).ToPBProduct())
@@ -125,7 +125,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 			if sortBy.Dir == pb.SortDir_ASC {
 				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByCreationDateDesc(ctx, status.String())
 				if err != nil {
-					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+					return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
 				}
 				for _, f := range fetched {
 					products = append(products, ProductsRow(f).ToPBProduct())
@@ -134,7 +134,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 			} else if sortBy.Dir == pb.SortDir_DESC {
 				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByCreationDateDesc(ctx, status.String())
 				if err != nil {
-					return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+					return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
 				}
 				for _, f := range fetched {
 					products = append(products, ProductsRow(f).ToPBProduct())

@@ -1,28 +1,28 @@
-package parser
+package errs
 
 import (
 	stdErrors "errors"
 	"fmt"
 )
 
-type ErrorCode string
+type ParserErrorCode string
 
 const (
-	ProductDiscontinued ErrorCode = "PRODUCT_DISCONTINUED"
-	BlankProductName    ErrorCode = "BLANK_PRODUCT_NAME"
-	CantCovert          ErrorCode = "CANT_CONVERT"
+	ProductDiscontinued ParserErrorCode = "PRODUCT_DISCONTINUED"
+	BlankProductName    ParserErrorCode = "BLANK_PRODUCT_NAME"
+	CantCovert          ParserErrorCode = "CANT_CONVERT"
 )
 
 type parserError struct {
 	error
-	errorCode ErrorCode
+	errorCode ParserErrorCode
 }
 
 func (pe parserError) Error() string {
 	return fmt.Sprintf("%s: %s", pe.errorCode, pe.error.Error())
 }
 
-func Unwrap(err error) error {
+func ParserErrorCodeUnwrap(err error) error {
 	e, ok := err.(parserError)
 	if ok {
 		return stdErrors.Unwrap(e.error)
@@ -30,7 +30,7 @@ func Unwrap(err error) error {
 	return stdErrors.Unwrap(err)
 }
 
-func Code(err error) ErrorCode {
+func ParserErrorCodeCode(err error) ParserErrorCode {
 	if err == nil {
 		return ""
 	}
@@ -43,14 +43,14 @@ func Code(err error) ErrorCode {
 	return ""
 }
 
-func NewParserError(errorCode ErrorCode, format string, args ...interface{}) error {
+func NewParserError(errorCode ParserErrorCode, format string, args ...interface{}) error {
 	return parserError{
 		error:     fmt.Errorf(format, args...),
 		errorCode: errorCode,
 	}
 }
 
-func WrapIntoParserError(err error, errorCode ErrorCode, msg string) error {
+func WrapIntoParserError(err error, errorCode ParserErrorCode, msg string) error {
 	return parserError{
 		error:     fmt.Errorf("%s: [%w]", msg, err),
 		errorCode: errorCode,

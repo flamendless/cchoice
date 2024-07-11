@@ -5,7 +5,6 @@ import (
 	"cchoice/client/components"
 	"cchoice/client/components/layout"
 	"cchoice/internal/enums"
-	"fmt"
 
 	"cchoice/internal/serialize"
 	pb "cchoice/proto"

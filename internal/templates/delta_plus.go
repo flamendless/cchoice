@@ -1,8 +1,8 @@
 package templates
 
 import (
-	"cchoice/internal/domains/parser"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/models"
 	"cchoice/internal/utils"
@@ -72,7 +72,7 @@ func DeltaPlusProcessPrices(tpl *Template, row []string) ([]*money.Money, []erro
 }
 
 func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
-	errs := make([]error, 0, 8)
+	errsRes := make([]error, 0, 8)
 
 	idxArticle := tpl.Columns["ARTICLE"].Index
 	idxDesc := tpl.Columns["DESCRIPTION"].Index
@@ -81,9 +81,9 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 	var status enums.ProductStatus
 	if strings.Contains(strings.ToLower(name), "discontinued") {
 		status = enums.PRODUCT_STATUS_DELETED
-		parserErr := parser.NewParserError(parser.ProductDiscontinued, "product is discontinued")
-		errs = append(errs, parserErr)
-		return nil, errs
+		parserErr := errs.NewParserError(errs.ProductDiscontinued, "product is discontinued")
+		errsRes = append(errsRes, parserErr)
+		return nil, errsRes
 	} else {
 		status = enums.PRODUCT_STATUS_ACTIVE
 	}
@@ -92,17 +92,17 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 
 	errProductName := utils.ValidateNotBlank(name, "article")
 	if errProductName != nil {
-		parserErr := parser.NewParserError(parser.BlankProductName, errProductName.Error())
-		errs = append(errs, parserErr)
+		parserErr := errs.NewParserError(errs.BlankProductName, errProductName.Error())
+		errsRes = append(errsRes, parserErr)
 	}
 
 	prices, errMonies := DeltaPlusProcessPrices(tpl, row)
 	if len(errMonies) > 0 {
-		errs = append(errs, errMonies...)
+		errsRes = append(errsRes, errMonies...)
 	}
 
-	if len(errs) > 0 {
-		return nil, errs
+	if len(errsRes) > 0 {
+		return nil, errsRes
 	}
 
 	return &models.Product{
@@ -175,25 +175,25 @@ LoopProductProces:
 		}
 
 		row = tpl.AlignRow(row)
-		product, errs := tpl.RowToProduct(tpl, row)
+		product, errsRes := tpl.RowToProduct(tpl, row)
 
 		if product != nil {
 			specs := tpl.RowToSpecs(tpl, row)
 			product.ProductSpecs = specs
 		}
 
-		if len(errs) > 0 {
+		if len(errsRes) > 0 {
 			proceedToError := true
 			// duplicate := false
 
-			for i, err := range errs {
-				pc := parser.Code(err)
-				if pc == parser.ProductDiscontinued {
+			for i, err := range errsRes {
+				pc := errs.ParserErrorCodeCode(err)
+				if pc == errs.ProductDiscontinued {
 					continue LoopProductProces
 				}
-				if pc == parser.BlankProductName {
+				if pc == errs.BlankProductName {
 					// duplicate = true
-					errs[i] = nil
+					errsRes[i] = nil
 					break
 				}
 			}
@@ -219,13 +219,13 @@ LoopProductProces:
 
 			if proceedToError {
 				if tpl.AppFlags.Strict {
-					logs.Log().Panic("error", zap.Errors("errors", errs))
+					logs.Log().Panic("error", zap.Errors("errors", errsRes))
 					return nil
 				}
 				logs.Log().Debug(
 					"row to product",
 					zap.Int("row number", rowIdx),
-					zap.Errors("errors", errs),
+					zap.Errors("errors", errsRes),
 				)
 				totalErrors += 1
 				previousRow = row

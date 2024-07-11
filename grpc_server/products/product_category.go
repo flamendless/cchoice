@@ -3,7 +3,7 @@ package products
 import (
 	"cchoice/cchoice_db"
 	"cchoice/internal/ctx"
-	"cchoice/internal/domains/grpc"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/serialize"
 	pb "cchoice/proto"
@@ -38,7 +38,7 @@ func (s *ProductCategoryServer) GetProductCategoryByID(
 		serialize.DecDBID(encid),
 	)
 	if err != nil {
-		return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+		return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
 	}
 	return productCategoryFromRow(&existingProductCategory), nil
 }
@@ -55,7 +55,7 @@ func (s *ProductCategoryServer) GetProductCategoryByProductID(
 		serialize.DecDBID(encid),
 	)
 	if err != nil {
-		return nil, grpc.NewGRPCError(grpc.IDNotFound, err.Error())
+		return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
 	}
 	return productCategoryFromRow(&existingProductCategory), nil
 }
