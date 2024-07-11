@@ -33,51 +33,48 @@ templ AuthView() {
 		</h1>
 	</header>
 
-	<div class="w-screen flex place-content-center">
-		<form
-			class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 place-self-center w-1/3"
-			hx-post="/auth"
-			hx-trigger="submit"
+	<form
+		hx-post="/auth"
+		hx-trigger="submit"
+		hx-target="body"
+	>
+
+		<div class="m-4">
+			@Input("username", "Username", "text", "Username")
+		</div>
+
+		<div class="m-4">
+			@Input("password", "Password", "password", "********")
+		</div>
+
+		<div
+			hx-boost="true"
 			hx-target="body"
+			class="flex flex-col items-center justify-between m-4"
 		>
-
-			<div class="m-4">
-				@Input("username", "Username", "text", "Username")
-			</div>
-
-			<div class="m-4">
-				@Input("password", "Password", "password", "********")
-			</div>
-
-			<div
-				hx-boost="true"
-				hx-target="body"
-				class="flex flex-col items-center justify-between m-4"
+			<button
+				type="submit"
+				hx-indicator="#spinner"
+				class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-1/2 mt-2"
 			>
-				<button
-					type="submit"
-					hx-indicator="#spinner"
-					class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-1/2 mt-2"
-				>
-					Log In
-				</button>
+				Log In
+			</button>
 
-				<a
-					href="/forgot-password"
-					class="inline-block align-baseline font-bold text-sm text-orange-500 hover:text-orange-800 mt-4"
-				>
-					Forgot Password?
-				</a>
+			<a
+				href="/forgot-password"
+				class="inline-block align-baseline font-bold text-sm text-orange-500 hover:text-orange-800 mt-4"
+			>
+				Forgot Password?
+			</a>
 
-				<a
-					href="/register"
-					class="inline-block align-baseline font-bold text-sm text-orange-500 hover:text-orange-800 mt-4"
-				>
-					Register here
-				</a>
-			</div>
-		</form>
-	</div>
+			<a
+				href="/register"
+				class="inline-block align-baseline font-bold text-sm text-orange-500 hover:text-orange-800 mt-4"
+			>
+				Register here
+			</a>
+		</div>
+	</form>
 }
 
 templ RegisterView() {
@@ -87,64 +84,61 @@ templ RegisterView() {
 		</h1>
 	</header>
 
-	<div class="w-screen flex place-content-center">
-		<form
-			class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 place-self-center w-1/3"
-			hx-post="/register"
-			hx-trigger="submit"
+	<form
+		hx-post="/register"
+		hx-trigger="submit"
+		hx-target="body"
+	>
+
+		<div class="m-4">
+			@Input("first_name", "First Name", "text", "First Name")
+		</div>
+
+		<div class="m-4">
+			@Input("middle_name", "Middle Name", "text", "Middle Name")
+		</div>
+
+		<div class="m-4">
+			@Input("last_name", "Last Name", "text", "Last Name")
+		</div>
+
+		<div class="m-4">
+			@Input("email", "E-Mail", "email", "E-Mail")
+		</div>
+
+		<div class="m-4">
+			@Input("mobile_no", "Mobile Number", "text", "+639")
+		</div>
+
+		<div class="m-4">
+			@Input("password", "Password", "password", "********")
+		</div>
+
+		<div class="m-4">
+			@Input("confirm_password", "Confirm Password", "password", "********")
+		</div>
+
+		<div
+			hx-boost="true"
 			hx-target="body"
+			class="flex flex-col items-center justify-between m-4"
 		>
-
-			<div class="m-4">
-				@Input("first_name", "First Name", "text", "First Name")
-			</div>
-
-			<div class="m-4">
-				@Input("middle_name", "Middle Name", "text", "Middle Name")
-			</div>
-
-			<div class="m-4">
-				@Input("last_name", "Last Name", "text", "Last Name")
-			</div>
-
-			<div class="m-4">
-				@Input("email", "E-Mail", "email", "E-Mail")
-			</div>
-
-			<div class="m-4">
-				@Input("mobile_no", "Mobile Number", "text", "+639")
-			</div>
-
-			<div class="m-4">
-				@Input("password", "Password", "password", "********")
-			</div>
-
-			<div class="m-4">
-				@Input("confirm_password", "Confirm Password", "password", "********")
-			</div>
-
-			<div
-				hx-boost="true"
-				hx-target="body"
-				class="flex flex-col items-center justify-between m-4"
+			<button
+				type="submit"
+				hx-indicator="#spinner"
+				class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-1/2 mt-2"
 			>
-				<button
-					type="submit"
-					hx-indicator="#spinner"
-					class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-1/2 mt-2"
-				>
-					Register
-				</button>
+				Register
+			</button>
 
-				<a
-					href="/auth"
-					class="inline-block align-baseline font-bold text-sm text-orange-500 hover:text-orange-800 mt-4"
-				>
-					Already have an account? Log in here
-				</a>
-			</div>
-		</form>
-	</div>
+			<a
+				href="/auth"
+				class="inline-block align-baseline font-bold text-sm text-orange-500 hover:text-orange-800 mt-4"
+			>
+				Already have an account? Log in here
+			</a>
+		</div>
+	</form>
 }
 
 templ OTPView(method pb.OTPMethod_OTPMethod) {
@@ -154,20 +148,17 @@ templ OTPView(method pb.OTPMethod_OTPMethod) {
 		</h1>
 	</header>
 
-	<div class="w-screen flex place-content-center">
-		switch method {
-		case pb.OTPMethod_AUTHENTICATOR:
-			@OTPMethodAuthenticate("", "", "")
-		default:
-			@OTPMethodChoose()
-		}
-	</div>
+	switch method {
+	case pb.OTPMethod_AUTHENTICATOR:
+		@OTPMethodAuthenticate("", "", "")
+	default:
+		@OTPMethodChoose()
+	}
 }
 
 templ OTPMethodChoose() {
 	<form
 		id="otp_method_form"
-		class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 place-self-center w-1/3"
 		hx-get="/otp"
 		hx-trigger="submit"
 		hx-target="#otp_method_form"
@@ -225,7 +216,6 @@ templ OTPRecoveryCodes(recoveryCodes string) {
 templ OTPMethodAuthenticate(secret string, imgSrc string, recoveryCodes string) {
 	<form
 		id="otp_method_form"
-		class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 place-self-center w-1/3"
 		hx-post="/otp-validate-initial"
 		hx-trigger="submit"
 		hx-target="body"
@@ -264,7 +254,6 @@ templ OTPMethodAuthenticate(secret string, imgSrc string, recoveryCodes string) 
 templ OTPMethodSMSOrEMail(label string, recipient string, recoveryCodes string) {
 	<form
 		id="otp_method_form"
-		class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 place-self-center w-1/3"
 		hx-post="/otp-validate-initial"
 		hx-trigger="submit"
 		hx-target="body"

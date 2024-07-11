@@ -28,7 +28,9 @@ templ Base(title string, children ...templ.Component) {
 		</head>
 
 		<body class="w-screen">
-			@components.ErrorBanner()
+			<div id="error_banner" hidden>
+				@components.ErrorBanner()
+			</div>
 
 			for _, child := range children {
 				@child

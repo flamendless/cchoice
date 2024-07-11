@@ -53,7 +53,10 @@ func (h AuthHandler) AuthPage(w http.ResponseWriter, r *http.Request) *common.Ha
 	tokenString := h.SM.GetString(r.Context(), "tokenString")
 	if tokenString == "" {
 		return &common.HandlerRes{
-			Component:  layout.Base("Log In", components.AuthView()),
+			Component:  layout.Base(
+				"Log In",
+				components.CenterCard(components.AuthView()),
+			),
 			ReplaceURL: "/auth",
 		}
 	}
@@ -65,7 +68,10 @@ func (h AuthHandler) AuthPage(w http.ResponseWriter, r *http.Request) *common.Ha
 
 func (h AuthHandler) RegisterPage(w http.ResponseWriter, r *http.Request) *common.HandlerRes {
 	return &common.HandlerRes{
-		Component: layout.Base("Register", components.RegisterView()),
+		Component: layout.Base(
+			"Register",
+			components.CenterCard(components.RegisterView()),
+		),
 	}
 }
 
@@ -135,7 +141,7 @@ func (h AuthHandler) Register(w http.ResponseWriter, r *http.Request) *common.Ha
 	return &common.HandlerRes{
 		Component: layout.Base(
 			"OTP",
-			components.OTPView(pb.OTPMethod_UNDEFINED),
+			components.CenterCard(components.OTPView(pb.OTPMethod_UNDEFINED)),
 		),
 		RedirectTo: "/otp",
 		ReplaceURL: "/otp",
@@ -164,7 +170,7 @@ func (h AuthHandler) OTPView(
 		return &common.HandlerRes{
 			Component: layout.Base(
 				"OTP",
-				components.OTPView(otpMethod),
+				components.CenterCard(components.OTPView(otpMethod)),
 			),
 			ReplaceURL: "/otp",
 		}
@@ -288,7 +294,10 @@ func (h AuthHandler) ValidateInitialOTP(
 	}
 
 	return &common.HandlerRes{
-		Component:  layout.Base("Log In", components.AuthView()),
+		Component:  layout.Base(
+			"Log In",
+			components.CenterCard(components.AuthView()),
+		),
 		ReplaceURL: "/auth",
 	}
 }
