@@ -18,7 +18,7 @@ func NewGRPCConn(addr string, tsc bool) *grpc.ClientConn {
 	}
 
 	tokenString, err := issuer.IssueToken(
-		enums.AUD_API,
+		enums.AUD_SYSTEM,
 		conf.GetConf().ClientUsername,
 	)
 	if err != nil {

@@ -3,9 +3,9 @@ package services
 import (
 	"cchoice/client/common"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	pb "cchoice/proto"
 	"context"
-	"errors"
 	"net/http"
 	"time"
 
@@ -28,11 +28,26 @@ func NewAuthService(
 	}
 }
 
-func (s AuthService) Authenticated(w http.ResponseWriter, r *http.Request) *common.HandlerRes {
+func (s AuthService) Authenticated(aud enums.AudKind, w http.ResponseWriter, r *http.Request) *common.HandlerRes {
 	tokenString := s.SM.GetString(r.Context(), "tokenString")
 	if tokenString == "" {
 		return &common.HandlerRes{
-			Error:      errors.New("Not authenticated"),
+			Error:      errs.ERR_NO_AUTH,
+			StatusCode: http.StatusUnauthorized,
+			RedirectTo: "/auth",
+		}
+	}
+
+	client := pb.NewAuthServiceClient(s.GRPCConn)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	_, err := client.ValidateToken(ctx, &pb.ValidateTokenRequest{
+		Aud:   aud.String(),
+		Token: tokenString,
+	})
+	if err != nil {
+		return &common.HandlerRes{
+			Error:      errs.ERR_NO_AUTH,
 			StatusCode: http.StatusUnauthorized,
 			RedirectTo: "/auth",
 		}

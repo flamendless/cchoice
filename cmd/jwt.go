@@ -1,3 +1,6 @@
+//TODO: (Brandon)
+//this should be a test
+
 package cmd
 
 import (
@@ -27,8 +30,8 @@ func init() {
 	f().StringVarP(&subcmd, "subcmd", "s", "", "subcommand to use")
 	f().StringVarP(&tokenString, "token", "t", "", "token to validate")
 	f().StringVarP(&dbPath, "db", "", "", "db path")
-	f().StringVarP(&audString, "aud", "a", "API", "AUD")
-	f().StringVarP(&username, "username", "u", "", "username")
+	f().StringVarP(&audString, "aud", "a", "SYSTEM", "AUD")
+	f().StringVarP(&username, "username", "u", "client@cchoice.com", "username")
 	f().BoolVarP(&tokenOnly, "token_only", "o", false, "whether to output token in shell")
 
 	rootCmd.AddCommand(JWTCmd)
@@ -65,7 +68,8 @@ func validate(tokenString string) *jwt.Token {
 		panic(1)
 	}
 
-	token, err := v.GetToken(tokenString)
+	expectedAUD := enums.ParseAudEnum(audString)
+	token, err := v.GetToken(expectedAUD, tokenString)
 	if err != nil {
 		logs.Log().Error("Unable to get validated token", zap.Error(err))
 		os.Exit(1)
@@ -80,7 +84,11 @@ var JWTCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if subcmd == "issue" {
 			tokenString := issue()
-			logs.Log().Info("issued token", zap.String("token", tokenString))
+			logs.Log().Info(
+				"issued token",
+				zap.String("aud", audString),
+				zap.String("token", tokenString),
+			)
 			if tokenOnly {
 				fmt.Println(tokenString)
 			}
@@ -91,7 +99,11 @@ var JWTCmd = &cobra.Command{
 
 		} else if subcmd == "both" {
 			tokenString := issue()
-			logs.Log().Info("issued token", zap.String("token", tokenString))
+			logs.Log().Info(
+				"issued token",
+				zap.String("aud", audString),
+				zap.String("token", tokenString),
+			)
 
 			token := validate(tokenString)
 			logs.Log().Info("validated token", zap.Any("token", token))

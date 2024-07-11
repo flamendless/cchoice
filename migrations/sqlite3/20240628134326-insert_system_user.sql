@@ -34,4 +34,4 @@ DELETE FROM tbl_user
 WHERE user_type = 'SYSTEM' AND email = 'grpcui@cchoice.com';
 
 DELETE FROM tbl_user
-WHERE user_type = 'API' AND email = 'client@cchoice.com';
+WHERE user_type = 'SYSTEM' AND email = 'client@cchoice.com';

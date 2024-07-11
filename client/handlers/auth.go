@@ -5,6 +5,7 @@ import (
 	"cchoice/client/components"
 	"cchoice/client/components/layout"
 	"cchoice/internal/enums"
+	"fmt"
 
 	"cchoice/internal/serialize"
 	pb "cchoice/proto"
@@ -17,7 +18,7 @@ import (
 )
 
 type AuthService interface {
-	Authenticated(http.ResponseWriter, *http.Request) *common.HandlerRes
+	Authenticated(enums.AudKind, http.ResponseWriter, *http.Request) *common.HandlerRes
 	Authenticate(*common.AuthAuthenticateRequest) (string, error)
 	Register(*common.AuthRegisterRequest) (string, error)
 	EnrollOTP(*common.AuthEnrollOTPRequest) (*common.AuthEnrollOTPResponse, error)

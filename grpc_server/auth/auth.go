@@ -14,12 +14,41 @@ import (
 	"fmt"
 
 	"github.com/alexedwards/argon2id"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type AuthServer struct {
 	pb.UnimplementedAuthServiceServer
-	CtxDB  *ctx.Database
-	Issuer *auth.Issuer
+	CtxDB     *ctx.Database
+	Issuer    *auth.Issuer
+	Validator *auth.Validator
+}
+
+func NewGRPCAuthServer(
+	ctxDB *ctx.Database,
+	issuer *auth.Issuer,
+	validator *auth.Validator,
+) *AuthServer {
+	return &AuthServer{
+		CtxDB:     ctxDB,
+		Issuer:    issuer,
+		Validator: validator,
+	}
+}
+
+func (s *AuthServer) ValidateToken(
+	ctx context.Context,
+	in *pb.ValidateTokenRequest,
+) (*pb.ValidateTokenResponse, error) {
+	expectedAUD := enums.ParseAudEnum(in.Aud)
+	_, err := s.Validator.GetToken(expectedAUD, in.Token)
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "Invalid auth token: %v", err)
+	}
+	return &pb.ValidateTokenResponse{
+		Success: true,
+	}, nil
 }
 
 func (s *AuthServer) Register(

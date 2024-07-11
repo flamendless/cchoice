@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"cchoice/client/common"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"net/http"
 
@@ -36,10 +37,15 @@ func (h *ErrorHandler) Default(fn FnHandler) FnHTTP {
 		if res.Error != nil {
 			logs.LogHTTPHandler(h.Logger, r, res.Error)
 
-			if res.RedirectTo == "" {
-				http.Error(w, res.Error.Error(), res.StatusCode)
-			} else {
+			if res.Error == errs.ERR_NO_AUTH {
 				http.Redirect(w, r, res.RedirectTo, http.StatusTemporaryRedirect)
+
+			} else {
+				if res.RedirectTo == "" {
+					http.Error(w, res.Error.Error(), res.StatusCode)
+				} else {
+					http.Redirect(w, r, res.RedirectTo, http.StatusTemporaryRedirect)
+				}
 			}
 			return
 		}

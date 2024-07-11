@@ -21,6 +21,17 @@ WHERE
 	status = 'ACTIVE'
 LIMIT 1;
 
+-- name: GetUserByEMailAndUserTypeAndToken :one
+SELECT tbl_user.id
+FROM tbl_user
+INNER JOIN tbl_auth ON tbl_auth.user_id = tbl_user.id
+WHERE
+	email = ? AND
+	user_type = ? AND
+	status = 'ACTIVE' AND
+	tbl_auth.token = ?
+LIMIT 1;
+
 -- name: GetUserIDAndHashedPassword :one
 SELECT id, password
 FROM tbl_user

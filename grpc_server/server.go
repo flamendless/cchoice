@@ -33,6 +33,9 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 	defer ctxDB.Close()
 
 	validator, err := cchoiceauth.NewValidator(ctxDB)
+	if err != nil {
+		panic(err)
+	}
 	authMW := middlewares.AddAuth(validator)
 
 	s := grpc.NewServer(
@@ -55,10 +58,11 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 		panic(err)
 	}
 
+	grpcAuthServer := grpcauth.NewGRPCAuthServer(ctxDB, issuer, validator)
+	pb.RegisterAuthServiceServer(s, grpcAuthServer)
 	pb.RegisterProductServiceServer(s, &products.ProductServer{CtxDB: ctxDB})
 	pb.RegisterProductCategoryServiceServer(s, &products.ProductCategoryServer{CtxDB: ctxDB})
 	pb.RegisterProductSpecsServiceServer(s, &products.ProductSpecsServer{CtxDB: ctxDB})
-	pb.RegisterAuthServiceServer(s, &grpcauth.AuthServer{CtxDB: ctxDB, Issuer: issuer})
 
 	if ctxGRPC.Reflection {
 		reflection.Register(s)

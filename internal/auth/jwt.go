@@ -9,6 +9,7 @@ import (
 	"cchoice/internal/enums"
 	"context"
 	"crypto"
+	"errors"
 	"fmt"
 	"time"
 
@@ -74,7 +75,10 @@ func NewValidator(ctxDB *ctx.Database) (*Validator, error) {
 	}, nil
 }
 
-func (v *Validator) GetToken(tokenString string) (*jwt.Token, error) {
+func (v Validator) GetToken(
+	expectedAUD enums.AudKind,
+	tokenString string,
+) (*jwt.Token, error) {
 	token, err := jwt.Parse(
 		tokenString,
 		func(token *jwt.Token) (interface{}, error) {
@@ -85,7 +89,6 @@ func (v *Validator) GetToken(tokenString string) (*jwt.Token, error) {
 			return v.key, nil
 		},
 	)
-
 	if err != nil {
 		return nil, fmt.Errorf("Unable to parse token string: %w", err)
 	}
@@ -93,23 +96,38 @@ func (v *Validator) GetToken(tokenString string) (*jwt.Token, error) {
 	claims := token.Claims.(jwt.MapClaims)
 	aud, ok := claims["aud"]
 	if !ok {
-		return nil, fmt.Errorf("token had no audience claim")
+		return nil, errors.New("token had no audience claim")
 	}
 
 	audString := aud.(string)
-	if enums.ParseAudEnum(audString) == enums.AUD_UNDEFINED {
+	eAUD := enums.ParseAudEnum(audString)
+	if eAUD == enums.AUD_UNDEFINED || eAUD != expectedAUD {
 		return nil, fmt.Errorf("Token had the wrong audience claim: %s", aud)
 	}
 
-	_, err = v.CtxDB.QueriesRead.GetUserByEMailAndUserType(
-		context.Background(),
-		cchoice_db.GetUserByEMailAndUserTypeParams{
-			Email:    claims["username"].(string),
-			UserType: audString,
-		},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("Invalid token in DB: %w", err)
+	if expectedAUD == enums.AUD_API {
+		_, err = v.CtxDB.QueriesRead.GetUserByEMailAndUserTypeAndToken(
+			context.Background(),
+			cchoice_db.GetUserByEMailAndUserTypeAndTokenParams{
+				Email:    claims["username"].(string),
+				UserType: audString,
+				Token:    tokenString,
+			},
+		)
+		if err != nil {
+			return nil, fmt.Errorf("Invalid token: %w", err)
+		}
+	} else if expectedAUD == enums.AUD_SYSTEM {
+		_, err = v.CtxDB.QueriesRead.GetUserByEMailAndUserType(
+			context.Background(),
+			cchoice_db.GetUserByEMailAndUserTypeParams{
+				Email:    claims["username"].(string),
+				UserType: audString,
+			},
+		)
+		if err != nil {
+			return nil, fmt.Errorf("Invalid token: %w", err)
+		}
 	}
 
 	return token, nil

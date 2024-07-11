@@ -44,7 +44,6 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	productHandler := handlers.NewProductHandler(logger, &productService, &authService)
 
 	mux := http.NewServeMux()
-
 	mux.Handle("GET /static/", http.FileServer(http.FS(static)))
 
 	//UTILS-LIKE

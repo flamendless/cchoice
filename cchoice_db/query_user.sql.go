@@ -74,6 +74,31 @@ func (q *Queries) GetUserByEMailAndUserType(ctx context.Context, arg GetUserByEM
 	return id, err
 }
 
+const getUserByEMailAndUserTypeAndToken = `-- name: GetUserByEMailAndUserTypeAndToken :one
+SELECT tbl_user.id
+FROM tbl_user
+INNER JOIN tbl_auth ON tbl_auth.user_id = tbl_user.id
+WHERE
+	email = ? AND
+	user_type = ? AND
+	status = 'ACTIVE' AND
+	tbl_auth.token = ?
+LIMIT 1
+`
+
+type GetUserByEMailAndUserTypeAndTokenParams struct {
+	Email    string
+	UserType string
+	Token    string
+}
+
+func (q *Queries) GetUserByEMailAndUserTypeAndToken(ctx context.Context, arg GetUserByEMailAndUserTypeAndTokenParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getUserByEMailAndUserTypeAndToken, arg.Email, arg.UserType, arg.Token)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
 const getUserByID = `-- name: GetUserByID :one
 SELECT id, first_name, middle_name, last_name, email, password, mobile_no, user_type, status, created_at, updated_at, deleted_at
 FROM tbl_user

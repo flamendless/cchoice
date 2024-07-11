@@ -30,6 +30,15 @@ message OTPMethod {
    }
 }
 
+message ValidateTokenRequest {
+   string token = 1;
+   string aud = 2;
+}
+
+message ValidateTokenResponse {
+   bool success = 1;
+}
+
 message RegisterRequest {
    string first_name = 1;
    string middle_name = 2;
@@ -83,6 +92,7 @@ message ValidateInitialOTPResponse {
 }
 
 service AuthService {
+   rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) {}
    rpc Register(RegisterRequest) returns (RegisterResponse) {}
    rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
    rpc EnrollOTP(EnrollOTPRequest) returns (EnrollOTPResponse) {}
