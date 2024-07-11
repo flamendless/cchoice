@@ -125,11 +125,11 @@ func (s AuthService) GetOTPCode(data *common.AuthGetOTPCodeRequest) error {
 	return nil
 }
 
-func (s AuthService) ValidateInitialOTP(data *common.AuthValidateInitialOTP) error {
+func (s AuthService) FinishOTPEnrollment(data *common.AuthFinishOTPEnrollment) error {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	_, err := client.ValidateInitialOTP(ctx, &pb.ValidateInitialOTPRequest{
+	_, err := client.FinishOTPEnrollment(ctx, &pb.FinishOTPEnrollmentRequest{
 		UserId:   data.UserID,
 		Passcode: data.Passcode,
 	})

@@ -5,6 +5,7 @@ import (
 	"cchoice/internal/auth"
 	"cchoice/internal/ctx"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/serialize"
 	"cchoice/internal/utils"
 	pb "cchoice/proto"
@@ -79,11 +80,7 @@ func (s *AuthServer) Register(
 		return nil, err
 	}
 
-	err = s.CtxDB.Queries.CreateAuth(context.Background(), cchoice_db.CreateAuthParams{
-		UserID:     userID,
-		Token:      "",
-		OtpEnabled: false,
-	})
+	err = s.CtxDB.Queries.CreateInitialAuth(context.Background(), userID)
 	if err != nil {
 		return nil, err
 	}
@@ -111,12 +108,12 @@ func (s *AuthServer) Authenticate(
 		return nil, errPW
 	}
 
-	userIDAndHashedPW, err := s.CtxDB.QueriesRead.GetUserIDAndHashedPassword(context.Background(), username)
+	resUser, err := s.CtxDB.QueriesRead.GetUserForAuth(context.Background(), username)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid token in DB: %w", err)
 	}
 
-	match, err := argon2id.ComparePasswordAndHash(password, userIDAndHashedPW.Password)
+	match, err := argon2id.ComparePasswordAndHash(password, resUser.Password)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid token in DB: %w", err)
 	}
@@ -134,7 +131,7 @@ func (s *AuthServer) Authenticate(
 		context.Background(),
 		cchoice_db.UpdateAuthTokenByUserIDParams{
 			Token:  tokenString,
-			UserID: userIDAndHashedPW.ID,
+			UserID: resUser.ID,
 		},
 	)
 	if err != nil {
@@ -151,9 +148,9 @@ func (s *AuthServer) EnrollOTP(
 	in *pb.EnrollOTPRequest,
 ) (*pb.EnrollOTPResponse, error) {
 	userID := serialize.DecDBID(in.UserId)
-	authID, err := s.CtxDB.QueriesRead.GetAuthIDByUserID(context.Background(), userID)
+	authID, err := s.CtxDB.QueriesRead.GetAuthForEnrollmentByUserID(context.Background(), userID)
 	if err != nil {
-		return nil, err
+		return nil, errs.ERR_ALREADY_OTP_ENROLLED
 	}
 
 	key, buf, err := auth.GenerateOTP(in.Issuer, in.AccountName)
@@ -161,7 +158,7 @@ func (s *AuthServer) EnrollOTP(
 		return nil, err
 	}
 
-	recoveryCodes := auth.GenerateRecoverCodes()
+	recoveryCodes := auth.GenerateRecoveryCodes()
 	secret := key.Secret()
 	err = s.CtxDB.Queries.EnrollOTP(
 		context.Background(),
@@ -192,7 +189,6 @@ func (s *AuthServer) GetOTPCode(
 	ctx context.Context,
 	in *pb.GetOTPCodeRequest,
 ) (*pb.GetOTPCodeResponse, error) {
-
 	var recipient cchoice_db.GetUserEMailAndMobileNoByIDRow
 	var err error
 	var code string
@@ -207,7 +203,7 @@ func (s *AuthServer) GetOTPCode(
 			return nil, err
 		}
 
-		res, err := s.CtxDB.QueriesRead.GetAuthIDAndSecretByUserIDAndUnvalidatedOTP(
+		res, err := s.CtxDB.QueriesRead.GetAuthForOTPValidation(
 			context.Background(),
 			userID,
 		)
@@ -237,17 +233,17 @@ func (s *AuthServer) GetOTPCode(
 	return &pb.GetOTPCodeResponse{}, nil
 }
 
-func (s *AuthServer) ValidateInitialOTP(
+func (s *AuthServer) FinishOTPEnrollment(
 	ctx context.Context,
-	in *pb.ValidateInitialOTPRequest,
-) (*pb.ValidateInitialOTPResponse, error) {
+	in *pb.FinishOTPEnrollmentRequest,
+) (*pb.FinishOTPEnrollmentResponse, error) {
 	userID := serialize.DecDBID(in.UserId)
-	res, err := s.CtxDB.QueriesRead.GetAuthIDAndSecretByUserIDAndUnvalidatedOTP(
+	res, err := s.CtxDB.QueriesRead.GetAuthForOTPValidation(
 		context.Background(),
 		userID,
 	)
 	if err != nil {
-		return nil, err
+		return nil, errs.ERR_ALREADY_OTP_ENROLLED
 	}
 
 	valid := auth.ValidateOTP(in.Passcode, res.OtpSecret.String)
@@ -255,7 +251,7 @@ func (s *AuthServer) ValidateInitialOTP(
 		return nil, errors.New("Invalid OTP")
 	}
 
-	err = s.CtxDB.Queries.ValidateInitialOTP(
+	err = s.CtxDB.Queries.FinishOTPEnrollment(
 		context.Background(),
 		res.ID,
 	)
@@ -263,5 +259,5 @@ func (s *AuthServer) ValidateInitialOTP(
 		return nil, err
 	}
 
-	return &pb.ValidateInitialOTPResponse{}, nil
+	return &pb.FinishOTPEnrollmentResponse{}, nil
 }

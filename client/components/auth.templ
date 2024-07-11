@@ -150,7 +150,7 @@ templ OTPView(method pb.OTPMethod_OTPMethod) {
 
 	switch method {
 	case pb.OTPMethod_AUTHENTICATOR:
-		@OTPMethodAuthenticate("", "", "")
+		@OTPMethodAuthenticator("", "", "")
 	default:
 		@OTPMethodChoose()
 	}
@@ -213,7 +213,7 @@ templ OTPRecoveryCodes(recoveryCodes string) {
 	</div>
 }
 
-templ OTPMethodAuthenticate(secret string, imgSrc string, recoveryCodes string) {
+templ OTPMethodAuthenticator(secret string, imgSrc string, recoveryCodes string) {
 	<form
 		id="otp_method_form"
 		hx-post="/otp-validate-initial"

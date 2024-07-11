@@ -87,6 +87,7 @@ genproto() {
 }
 
 gentempl() {
+	echo "running gentempl..."
 	templ generate templ
 }
 

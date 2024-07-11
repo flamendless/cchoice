@@ -10,32 +10,28 @@ import (
 	"database/sql"
 )
 
-const createAuth = `-- name: CreateAuth :exec
+const createInitialAuth = `-- name: CreateInitialAuth :exec
 INSERT INTO tbl_auth (
 	user_id,
 	token,
-	otp_enabled
+	otp_enabled,
+	otp_status
 ) VALUES (
-	?, ?, ?
+	?, '', false, 'INITIAL'
 )
 `
 
-type CreateAuthParams struct {
-	UserID     int64
-	Token      string
-	OtpEnabled bool
-}
-
-func (q *Queries) CreateAuth(ctx context.Context, arg CreateAuthParams) error {
-	_, err := q.db.ExecContext(ctx, createAuth, arg.UserID, arg.Token, arg.OtpEnabled)
+func (q *Queries) CreateInitialAuth(ctx context.Context, userID int64) error {
+	_, err := q.db.ExecContext(ctx, createInitialAuth, userID)
 	return err
 }
 
 const enrollOTP = `-- name: EnrollOTP :exec
 UPDATE tbl_auth SET
-	otp_enabled = false,
+	otp_enabled = true,
 	otp_secret = ?,
-	recovery_codes = ?
+	recovery_codes = ?,
+	otp_status = 'INITIAL'
 WHERE id = ?
 `
 
@@ -50,42 +46,60 @@ func (q *Queries) EnrollOTP(ctx context.Context, arg EnrollOTPParams) error {
 	return err
 }
 
-const getAuthIDAndSecretByUserIDAndUnvalidatedOTP = `-- name: GetAuthIDAndSecretByUserIDAndUnvalidatedOTP :one
-SELECT id, otp_secret
+const finishOTPEnrollment = `-- name: FinishOTPEnrollment :exec
+;
+
+UPDATE tbl_auth SET
+	otp_status = 'ENROLLED'
+WHERE
+	id = ? AND
+	otp_enabled = false AND
+	otp_secret IS NOT NULL AND otp_secret != '' AND
+	recovery_codes IS NOT NULL AND recovery_codes != ''
+`
+
+func (q *Queries) FinishOTPEnrollment(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, finishOTPEnrollment, id)
+	return err
+}
+
+const getAuthForEnrollmentByUserID = `-- name: GetAuthForEnrollmentByUserID :one
+SELECT id
 FROM tbl_auth
 WHERE
 	user_id = ? AND
 	otp_enabled = false AND
-	otp_secret IS NOT NULL AND otp_secret != '' AND
-	recovery_codes IS NOT NULL AND recovery_codes != ''
+	otp_status = 'INITIAL'
 LIMIT 1
 `
 
-type GetAuthIDAndSecretByUserIDAndUnvalidatedOTPRow struct {
+func (q *Queries) GetAuthForEnrollmentByUserID(ctx context.Context, userID int64) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getAuthForEnrollmentByUserID, userID)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const getAuthForOTPValidation = `-- name: GetAuthForOTPValidation :one
+SELECT id, otp_secret
+FROM tbl_auth
+WHERE
+	user_id = ? AND
+	otp_enabled = true AND
+	otp_status = 'INITIAL'
+LIMIT 1
+`
+
+type GetAuthForOTPValidationRow struct {
 	ID        int64
 	OtpSecret sql.NullString
 }
 
-func (q *Queries) GetAuthIDAndSecretByUserIDAndUnvalidatedOTP(ctx context.Context, userID int64) (GetAuthIDAndSecretByUserIDAndUnvalidatedOTPRow, error) {
-	row := q.db.QueryRowContext(ctx, getAuthIDAndSecretByUserIDAndUnvalidatedOTP, userID)
-	var i GetAuthIDAndSecretByUserIDAndUnvalidatedOTPRow
+func (q *Queries) GetAuthForOTPValidation(ctx context.Context, userID int64) (GetAuthForOTPValidationRow, error) {
+	row := q.db.QueryRowContext(ctx, getAuthForOTPValidation, userID)
+	var i GetAuthForOTPValidationRow
 	err := row.Scan(&i.ID, &i.OtpSecret)
 	return i, err
-}
-
-const getAuthIDByUserID = `-- name: GetAuthIDByUserID :one
-SELECT id
-FROM tbl_auth
-WHERE
-	user_id = ?
-LIMIT 1
-`
-
-func (q *Queries) GetAuthIDByUserID(ctx context.Context, userID int64) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getAuthIDByUserID, userID)
-	var id int64
-	err := row.Scan(&id)
-	return id, err
 }
 
 const updateAuthTokenByUserID = `-- name: UpdateAuthTokenByUserID :exec
@@ -99,22 +113,5 @@ type UpdateAuthTokenByUserIDParams struct {
 
 func (q *Queries) UpdateAuthTokenByUserID(ctx context.Context, arg UpdateAuthTokenByUserIDParams) error {
 	_, err := q.db.ExecContext(ctx, updateAuthTokenByUserID, arg.Token, arg.UserID)
-	return err
-}
-
-const validateInitialOTP = `-- name: ValidateInitialOTP :exec
-;
-
-UPDATE tbl_auth SET
-	otp_enabled = true
-WHERE
-	id = ? AND
-	otp_enabled = false AND
-	otp_secret IS NOT NULL AND otp_secret != '' AND
-	recovery_codes IS NOT NULL AND recovery_codes != ''
-`
-
-func (q *Queries) ValidateInitialOTP(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, validateInitialOTP, id)
 	return err
 }

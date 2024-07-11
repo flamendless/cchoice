@@ -53,12 +53,16 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	//AUTH
 	mux.HandleFunc("GET /", errHandler.Default(authHandler.AuthPage))
-	mux.HandleFunc("GET /auth", errHandler.Default(authHandler.AuthPage))
 	mux.HandleFunc("GET /register", errHandler.Default(authHandler.RegisterPage))
-	mux.HandleFunc("GET /otp", errHandler.Default(authHandler.OTPView))
-	mux.HandleFunc("POST /auth", errHandler.Default(authHandler.Authenticate))
 	mux.HandleFunc("POST /register", errHandler.Default(authHandler.Register))
-	mux.HandleFunc("POST /otp-validate-initial", errHandler.Default(authHandler.ValidateInitialOTP))
+
+	//REGISTER
+	mux.HandleFunc("GET /auth", errHandler.Default(authHandler.AuthPage))
+	mux.HandleFunc("POST /auth", errHandler.Default(authHandler.Authenticate))
+
+	//OTP
+	mux.HandleFunc("GET /otp", errHandler.Default(authHandler.OTPEnrollView))
+	mux.HandleFunc("POST /otp", errHandler.Default(authHandler.FinishOTPEnrollment))
 
 	//PRODUCTS
 	mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))

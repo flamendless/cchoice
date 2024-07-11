@@ -21,7 +21,7 @@ type AuthService interface {
 	Authenticate(*common.AuthAuthenticateRequest) (string, error)
 	Register(*common.AuthRegisterRequest) (string, error)
 	EnrollOTP(*common.AuthEnrollOTPRequest) (*common.AuthEnrollOTPResponse, error)
-	ValidateInitialOTP(*common.AuthValidateInitialOTP) error
+	FinishOTPEnrollment(*common.AuthFinishOTPEnrollment) error
 	GetOTPCode(*common.AuthGetOTPCodeRequest) error
 }
 
@@ -148,7 +148,7 @@ func (h AuthHandler) Register(w http.ResponseWriter, r *http.Request) *common.Ha
 	}
 }
 
-func (h AuthHandler) OTPView(
+func (h AuthHandler) OTPEnrollView(
 	w http.ResponseWriter,
 	r *http.Request,
 ) *common.HandlerRes {
@@ -184,21 +184,29 @@ func (h AuthHandler) OTPView(
 		}
 	}
 
-	if otpMethod == pb.OTPMethod_AUTHENTICATOR {
-		res, err := h.AuthService.EnrollOTP(&common.AuthEnrollOTPRequest{
-			UserID:      userForRegistration.UserID,
-			Issuer:      "cchoice",
-			AccountName: userForRegistration.EMail,
-		})
-		if err != nil {
-			return &common.HandlerRes{
-				Error:      err,
-				StatusCode: http.StatusInternalServerError,
-			}
+	var recipient string
+	if otpMethod == pb.OTPMethod_AUTHENTICATOR || otpMethod == pb.OTPMethod_EMAIL {
+		recipient = userForRegistration.EMail
+	} else if otpMethod == pb.OTPMethod_SMS {
+		recipient = userForRegistration.MobileNo
+	}
+
+	res, err := h.AuthService.EnrollOTP(&common.AuthEnrollOTPRequest{
+		UserID:      userForRegistration.UserID,
+		Issuer:      "cchoice",
+		AccountName: recipient,
+	})
+	if err != nil {
+		return &common.HandlerRes{
+			Error:      err,
+			StatusCode: http.StatusInternalServerError,
 		}
+	}
+
+	if otpMethod == pb.OTPMethod_AUTHENTICATOR {
 		imgSrc := serialize.PNGEncode(res.Image)
 		return &common.HandlerRes{
-			Component: components.OTPMethodAuthenticate(
+			Component: components.OTPMethodAuthenticator(
 				res.Secret,
 				imgSrc,
 				res.RecoveryCodes,
@@ -208,17 +216,6 @@ func (h AuthHandler) OTPView(
 	}
 
 	if otpMethod == pb.OTPMethod_EMAIL || otpMethod == pb.OTPMethod_SMS {
-		res, err := h.AuthService.EnrollOTP(&common.AuthEnrollOTPRequest{
-			UserID:      userForRegistration.UserID,
-			Issuer:      "cchoice",
-			AccountName: userForRegistration.EMail,
-		})
-		if err != nil {
-			return &common.HandlerRes{
-				Error:      err,
-				StatusCode: http.StatusInternalServerError,
-			}
-		}
 		err = h.AuthService.GetOTPCode(&common.AuthGetOTPCodeRequest{
 			UserID: userForRegistration.UserID,
 			Method: qOTPMethod,
@@ -230,31 +227,20 @@ func (h AuthHandler) OTPView(
 			}
 		}
 
-		if otpMethod == pb.OTPMethod_SMS {
-			return &common.HandlerRes{
-				Component: components.OTPMethodSMSOrEMail(
-					"SMS",
-					userForRegistration.MobileNo,
-					res.RecoveryCodes,
-				),
-				ReplaceURL: "/otp",
-			}
-		} else if otpMethod == pb.OTPMethod_EMAIL {
-			return &common.HandlerRes{
-				Component: components.OTPMethodSMSOrEMail(
-					"E-Mail",
-					userForRegistration.EMail,
-					res.RecoveryCodes,
-				),
-				ReplaceURL: "/otp",
-			}
+		return &common.HandlerRes{
+			Component: components.OTPMethodSMSOrEMail(
+				otpMethod.String(),
+				recipient,
+				res.RecoveryCodes,
+			),
+			ReplaceURL: "/otp",
 		}
 	}
 
-	return nil
+	panic("should not be reached")
 }
 
-func (h AuthHandler) ValidateInitialOTP(
+func (h AuthHandler) FinishOTPEnrollment(
 	w http.ResponseWriter,
 	r *http.Request,
 ) *common.HandlerRes {
@@ -282,7 +268,7 @@ func (h AuthHandler) ValidateInitialOTP(
 		}
 	}
 
-	err = h.AuthService.ValidateInitialOTP(&common.AuthValidateInitialOTP{
+	err = h.AuthService.FinishOTPEnrollment(&common.AuthFinishOTPEnrollment{
 		UserID:   userForRegistration.UserID,
 		Passcode: passcode,
 	})

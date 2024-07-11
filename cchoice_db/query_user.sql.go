@@ -147,9 +147,13 @@ func (q *Queries) GetUserEMailAndMobileNoByID(ctx context.Context, id int64) (Ge
 	return i, err
 }
 
-const getUserIDAndHashedPassword = `-- name: GetUserIDAndHashedPassword :one
-SELECT id, password
+const getUserForAuth = `-- name: GetUserForAuth :one
+SELECT
+	tbl_user.id,
+    tbl_user.password,
+	tbl_auth.otp_enabled
 FROM tbl_user
+INNER JOIN tbl_auth ON tbl_auth.user_id = tbl_user.id
 WHERE
 	user_type = 'API' AND
 	status = 'ACTIVE' AND
@@ -157,14 +161,15 @@ WHERE
 LIMIT 1
 `
 
-type GetUserIDAndHashedPasswordRow struct {
-	ID       int64
-	Password string
+type GetUserForAuthRow struct {
+	ID         int64
+	Password   string
+	OtpEnabled bool
 }
 
-func (q *Queries) GetUserIDAndHashedPassword(ctx context.Context, email string) (GetUserIDAndHashedPasswordRow, error) {
-	row := q.db.QueryRowContext(ctx, getUserIDAndHashedPassword, email)
-	var i GetUserIDAndHashedPasswordRow
-	err := row.Scan(&i.ID, &i.Password)
+func (q *Queries) GetUserForAuth(ctx context.Context, email string) (GetUserForAuthRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserForAuth, email)
+	var i GetUserForAuthRow
+	err := row.Scan(&i.ID, &i.Password, &i.OtpEnabled)
 	return i, err
 }

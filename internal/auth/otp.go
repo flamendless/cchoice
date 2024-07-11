@@ -33,7 +33,7 @@ func ValidateOTP(passcode string, secret string) bool {
 	return valid
 }
 
-func GenerateRecoverCodes() string {
+func GenerateRecoveryCodes() string {
 	//TODO: Brandon
 	return "test"
 }

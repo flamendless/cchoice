@@ -16,6 +16,7 @@ type TblAuth struct {
 	OtpEnabled    bool
 	OtpSecret     sql.NullString
 	RecoveryCodes sql.NullString
+	OtpStatus     string
 }
 
 type TblProduct struct {

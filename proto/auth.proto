@@ -83,12 +83,12 @@ message GetOTPCodeRequest {
 message GetOTPCodeResponse {
 }
 
-message ValidateInitialOTPRequest {
+message FinishOTPEnrollmentRequest {
    string user_id = 1;
    string passcode = 2;
 }
 
-message ValidateInitialOTPResponse {
+message FinishOTPEnrollmentResponse {
 }
 
 service AuthService {
@@ -97,5 +97,5 @@ service AuthService {
    rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
    rpc EnrollOTP(EnrollOTPRequest) returns (EnrollOTPResponse) {}
    rpc GetOTPCode(GetOTPCodeRequest) returns (GetOTPCodeResponse) {}
-   rpc ValidateInitialOTP(ValidateInitialOTPRequest) returns (ValidateInitialOTPResponse) {}
+   rpc FinishOTPEnrollment(FinishOTPEnrollmentRequest) returns (FinishOTPEnrollmentResponse) {}
 }

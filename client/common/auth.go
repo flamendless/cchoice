@@ -27,7 +27,7 @@ type AuthEnrollOTPResponse struct {
 	Image         []byte
 }
 
-type AuthValidateInitialOTP struct {
+type AuthFinishOTPEnrollment struct {
 	UserID   string
 	Passcode string
 }
