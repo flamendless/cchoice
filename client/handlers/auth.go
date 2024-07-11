@@ -3,7 +3,6 @@ package handlers
 import (
 	"cchoice/client/common"
 	"cchoice/client/components"
-	"cchoice/client/components/layout"
 	"cchoice/internal/enums"
 
 	"cchoice/internal/serialize"
@@ -53,7 +52,7 @@ func (h AuthHandler) AuthPage(w http.ResponseWriter, r *http.Request) *common.Ha
 	tokenString := h.SM.GetString(r.Context(), "tokenString")
 	if tokenString == "" {
 		return &common.HandlerRes{
-			Component:  layout.Base(
+			Component:  components.Base(
 				"Log In",
 				components.CenterCard(components.AuthView()),
 			),
@@ -61,14 +60,14 @@ func (h AuthHandler) AuthPage(w http.ResponseWriter, r *http.Request) *common.Ha
 		}
 	}
 	return &common.HandlerRes{
-		Component:  layout.Base("Home"),
+		Component:  components.Base("Home"),
 		ReplaceURL: "/home",
 	}
 }
 
 func (h AuthHandler) RegisterPage(w http.ResponseWriter, r *http.Request) *common.HandlerRes {
 	return &common.HandlerRes{
-		Component: layout.Base(
+		Component: components.Base(
 			"Register",
 			components.CenterCard(components.RegisterView()),
 		),
@@ -98,7 +97,7 @@ func (h AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) *commo
 	h.SM.Put(r.Context(), "tokenString", tokenString)
 
 	return &common.HandlerRes{
-		Component:  layout.Base("Home"),
+		Component:  components.Base("Home"),
 		ReplaceURL: "/home",
 	}
 }
@@ -139,7 +138,7 @@ func (h AuthHandler) Register(w http.ResponseWriter, r *http.Request) *common.Ha
 	)
 
 	return &common.HandlerRes{
-		Component: layout.Base(
+		Component: components.Base(
 			"OTP",
 			components.CenterCard(components.OTPView(pb.OTPMethod_UNDEFINED)),
 		),
@@ -168,7 +167,7 @@ func (h AuthHandler) OTPEnrollView(
 	)
 	if otpMethod == pb.OTPMethod_UNDEFINED {
 		return &common.HandlerRes{
-			Component: layout.Base(
+			Component: components.Base(
 				"OTP",
 				components.CenterCard(components.OTPView(otpMethod)),
 			),
@@ -280,7 +279,7 @@ func (h AuthHandler) FinishOTPEnrollment(
 	}
 
 	return &common.HandlerRes{
-		Component:  layout.Base(
+		Component:  components.Base(
 			"Log In",
 			components.CenterCard(components.AuthView()),
 		),

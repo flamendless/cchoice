@@ -3,7 +3,6 @@ package handlers
 import (
 	"cchoice/client/common"
 	"cchoice/client/components"
-	"cchoice/client/components/layout"
 	"cchoice/internal/enums"
 	pb "cchoice/proto"
 	"errors"
@@ -76,6 +75,6 @@ func (h ProductHandler) ProductTablePage(
 	}
 
 	return &common.HandlerRes{
-		Component: layout.Base("Products", components.ProductTableView(res)),
+		Component: components.Base("Products", components.ProductTableView(res)),
 	}
 }
