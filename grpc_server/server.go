@@ -2,6 +2,8 @@ package grpc_server
 
 import (
 	grpcauth "cchoice/grpc_server/auth"
+	grpcotp "cchoice/grpc_server/otp"
+	grpcuser "cchoice/grpc_server/user"
 	"cchoice/grpc_server/middlewares"
 	"cchoice/grpc_server/products"
 	cchoiceauth "cchoice/internal/auth"
@@ -59,7 +61,11 @@ func Serve(ctxGRPC ctx.GRPCFlags) {
 	}
 
 	grpcAuthServer := grpcauth.NewGRPCAuthServer(ctxDB, issuer, validator)
+	grpcOTPServer := grpcotp.NewGRPCOTPServer(ctxDB, issuer, validator)
+	grpcUserServer := grpcuser.NewGRPCUserServer(ctxDB)
 	pb.RegisterAuthServiceServer(s, grpcAuthServer)
+	pb.RegisterOTPServiceServer(s, grpcOTPServer)
+	pb.RegisterUserServiceServer(s, grpcUserServer)
 	pb.RegisterProductServiceServer(s, &products.ProductServer{CtxDB: ctxDB})
 	pb.RegisterProductCategoryServiceServer(s, &products.ProductCategoryServer{CtxDB: ctxDB})
 	pb.RegisterProductSpecsServiceServer(s, &products.ProductSpecsServer{CtxDB: ctxDB})

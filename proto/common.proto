@@ -6,6 +6,32 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "cchoice/pb";
 
+message UserType {
+   enum UserType {
+      UNDEFINED = 0;
+      SYSTEM = 2;
+      API = 4;
+   }
+}
+
+message UserStatus {
+   enum UserStatus {
+      UNDEFINED = 0;
+      ACTIVE = 1;
+      INACTIVE = 2;
+      DELETED = 3;
+   }
+}
+
+message OTPMethod {
+   enum OTPMethod {
+      UNDEFINED = 0;
+      AUTHENTICATOR = 1;
+      SMS = 2;
+      EMAIL = 3;
+   }
+}
+
 message SortField {
    enum SortField {
       UNDEFINED = 0;

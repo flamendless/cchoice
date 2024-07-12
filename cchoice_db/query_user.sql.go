@@ -9,6 +9,30 @@ import (
 	"context"
 )
 
+const checkUniqueEMailandMobileNo = `-- name: CheckUniqueEMailandMobileNo :one
+SELECT
+	EXISTS (
+		SELECT 1
+		FROM tbl_user
+		WHERE
+			email = ? OR
+			mobile_no = ?
+		LIMIT 1
+	)
+`
+
+type CheckUniqueEMailandMobileNoParams struct {
+	Email    string
+	MobileNo string
+}
+
+func (q *Queries) CheckUniqueEMailandMobileNo(ctx context.Context, arg CheckUniqueEMailandMobileNoParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, checkUniqueEMailandMobileNo, arg.Email, arg.MobileNo)
+	var column_1 int64
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const createUser = `-- name: CreateUser :one
 INSERT INTO tbl_user (
 	first_name,
@@ -130,8 +154,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id int64) (TblUser, error) {
 const getUserEMailAndMobileNoByID = `-- name: GetUserEMailAndMobileNoByID :one
 SELECT email, mobile_no
 FROM tbl_user
-WHERE
-	id = ?
+WHERE id = ?
 LIMIT 1
 `
 
@@ -171,5 +194,28 @@ func (q *Queries) GetUserForAuth(ctx context.Context, email string) (GetUserForA
 	row := q.db.QueryRowContext(ctx, getUserForAuth, email)
 	var i GetUserForAuthRow
 	err := row.Scan(&i.ID, &i.Password, &i.OtpEnabled)
+	return i, err
+}
+
+const getUserWithAuthByID = `-- name: GetUserWithAuthByID :one
+SELECT
+	tbl_user.id,
+	tbl_auth.otp_enabled
+FROM tbl_user
+INNER JOIN tbl_auth ON tbl_auth.user_id = tbl_user.id
+WHERE
+	tbl_user.id = ?
+LIMIT 1
+`
+
+type GetUserWithAuthByIDRow struct {
+	ID         int64
+	OtpEnabled bool
+}
+
+func (q *Queries) GetUserWithAuthByID(ctx context.Context, id int64) (GetUserWithAuthByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserWithAuthByID, id)
+	var i GetUserWithAuthByIDRow
+	err := row.Scan(&i.ID, &i.OtpEnabled)
 	return i, err
 }

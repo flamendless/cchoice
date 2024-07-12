@@ -4,9 +4,9 @@ import (
 	"cchoice/client/components"
 	"cchoice/client/handlers"
 	"cchoice/client/middlewares"
-	"cchoice/client/services"
 	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
+	pb "cchoice/proto"
 	"embed"
 	"encoding/gob"
 	"fmt"
@@ -28,7 +28,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	sessionManager = scs.New()
 	sessionManager.Lifetime = 24 * time.Hour
-	gob.Register(handlers.UserForRegistration{})
+	gob.Register(pb.RegisterResponse{})
 
 	grpcConn := NewGRPCConn(ctxClient.GRPCAddress, ctxClient.TSC)
 	defer GRPCConnectionClose(grpcConn)
@@ -37,11 +37,18 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	errHandler := handlers.NewErrorHandler(logger)
 
-	authService := services.NewAuthService(grpcConn, sessionManager)
-	authHandler := handlers.NewAuthHandler(logger, &authService, sessionManager)
+	authService := pb.NewAuthServiceClient(grpcConn)
+	// authService := services.NewAuthService(grpcConn, sessionManager)
+	authHandler := handlers.NewAuthHandler(logger, authService, sessionManager)
 
-	productService := services.NewProductService(grpcConn)
-	productHandler := handlers.NewProductHandler(logger, &productService, &authService)
+	userService := pb.NewUserServiceClient(grpcConn)
+	userHandler := handlers.NewUserHandler(logger, userService, sessionManager)
+
+	otpService := pb.NewOTPServiceClient(grpcConn)
+	otpHandler := handlers.NewOTPHandler(logger, otpService, sessionManager)
+
+	// productService := services.NewProductService(grpcConn)
+	// productHandler := handlers.NewProductHandler(logger, &productService, &authService)
 
 	mux := http.NewServeMux()
 	mux.Handle("GET /static/", http.FileServer(http.FS(static)))
@@ -52,22 +59,22 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	})
 
 	//AUTH
-	mux.HandleFunc("GET /", errHandler.Default(authHandler.AuthPage))
-	mux.HandleFunc("GET /register", errHandler.Default(authHandler.RegisterPage))
-	mux.HandleFunc("POST /register", errHandler.Default(authHandler.Register))
+	// mux.HandleFunc("GET /", errHandler.Default(userHandler.AuthPage))
+	mux.HandleFunc("GET /register", errHandler.Default(userHandler.RegisterPage))
+	mux.HandleFunc("POST /register", errHandler.Default(userHandler.Register))
 
 	//REGISTER
 	mux.HandleFunc("GET /auth", errHandler.Default(authHandler.AuthPage))
 	mux.HandleFunc("POST /auth", errHandler.Default(authHandler.Authenticate))
 
 	//OTP
-	mux.HandleFunc("GET /otp", errHandler.Default(authHandler.OTPView))
-	mux.HandleFunc("POST /otp", errHandler.Default(authHandler.OTPValidate))
-	mux.HandleFunc("GET /otp-enroll", errHandler.Default(authHandler.OTPEnrollView))
-	mux.HandleFunc("POST /otp-enroll", errHandler.Default(authHandler.OTPEnrollFinish))
+	// mux.HandleFunc("GET /otp", errHandler.Default(otpHandler.OTPView))
+	// mux.HandleFunc("POST /otp", errHandler.Default(otpHandler.OTPValidate))
+	mux.HandleFunc("GET /otp-enroll", errHandler.Default(otpHandler.OTPEnrollView))
+	mux.HandleFunc("POST /otp-enroll", errHandler.Default(otpHandler.OTPEnrollFinish))
 
 	//PRODUCTS
-	mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))
+	// mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))
 
 	mw := middlewares.NewMiddleware(
 		mux,

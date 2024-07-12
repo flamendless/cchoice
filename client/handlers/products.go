@@ -38,10 +38,12 @@ func (h ProductHandler) ProductTablePage(
 	w http.ResponseWriter,
 	r *http.Request,
 ) *common.HandlerRes {
-	resAuth, _ := h.AuthService.Authenticated(enums.AUD_API, w, r)
-	if resAuth != nil {
-		return resAuth
-	}
+	// _, err := h.AuthService.Authenticated(enums.AUD_API, w, r)
+	// if err != nil {
+	// 	return &common.HandlerRes{
+	// 		Error: err,
+	// 	}
+	// }
 
 	q, err := url.ParseQuery(r.URL.RawQuery)
 	if err != nil {

@@ -21,6 +21,159 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type UserType_UserType int32
+
+const (
+	UserType_UNDEFINED UserType_UserType = 0
+	UserType_SYSTEM    UserType_UserType = 2
+	UserType_API       UserType_UserType = 4
+)
+
+// Enum value maps for UserType_UserType.
+var (
+	UserType_UserType_name = map[int32]string{
+		0: "UNDEFINED",
+		2: "SYSTEM",
+		4: "API",
+	}
+	UserType_UserType_value = map[string]int32{
+		"UNDEFINED": 0,
+		"SYSTEM":    2,
+		"API":       4,
+	}
+)
+
+func (x UserType_UserType) Enum() *UserType_UserType {
+	p := new(UserType_UserType)
+	*p = x
+	return p
+}
+
+func (x UserType_UserType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (UserType_UserType) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_common_proto_enumTypes[0].Descriptor()
+}
+
+func (UserType_UserType) Type() protoreflect.EnumType {
+	return &file_proto_common_proto_enumTypes[0]
+}
+
+func (x UserType_UserType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use UserType_UserType.Descriptor instead.
+func (UserType_UserType) EnumDescriptor() ([]byte, []int) {
+	return file_proto_common_proto_rawDescGZIP(), []int{0, 0}
+}
+
+type UserStatus_UserStatus int32
+
+const (
+	UserStatus_UNDEFINED UserStatus_UserStatus = 0
+	UserStatus_ACTIVE    UserStatus_UserStatus = 1
+	UserStatus_INACTIVE  UserStatus_UserStatus = 2
+	UserStatus_DELETED   UserStatus_UserStatus = 3
+)
+
+// Enum value maps for UserStatus_UserStatus.
+var (
+	UserStatus_UserStatus_name = map[int32]string{
+		0: "UNDEFINED",
+		1: "ACTIVE",
+		2: "INACTIVE",
+		3: "DELETED",
+	}
+	UserStatus_UserStatus_value = map[string]int32{
+		"UNDEFINED": 0,
+		"ACTIVE":    1,
+		"INACTIVE":  2,
+		"DELETED":   3,
+	}
+)
+
+func (x UserStatus_UserStatus) Enum() *UserStatus_UserStatus {
+	p := new(UserStatus_UserStatus)
+	*p = x
+	return p
+}
+
+func (x UserStatus_UserStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (UserStatus_UserStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_common_proto_enumTypes[1].Descriptor()
+}
+
+func (UserStatus_UserStatus) Type() protoreflect.EnumType {
+	return &file_proto_common_proto_enumTypes[1]
+}
+
+func (x UserStatus_UserStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use UserStatus_UserStatus.Descriptor instead.
+func (UserStatus_UserStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_common_proto_rawDescGZIP(), []int{1, 0}
+}
+
+type OTPMethod_OTPMethod int32
+
+const (
+	OTPMethod_UNDEFINED     OTPMethod_OTPMethod = 0
+	OTPMethod_AUTHENTICATOR OTPMethod_OTPMethod = 1
+	OTPMethod_SMS           OTPMethod_OTPMethod = 2
+	OTPMethod_EMAIL         OTPMethod_OTPMethod = 3
+)
+
+// Enum value maps for OTPMethod_OTPMethod.
+var (
+	OTPMethod_OTPMethod_name = map[int32]string{
+		0: "UNDEFINED",
+		1: "AUTHENTICATOR",
+		2: "SMS",
+		3: "EMAIL",
+	}
+	OTPMethod_OTPMethod_value = map[string]int32{
+		"UNDEFINED":     0,
+		"AUTHENTICATOR": 1,
+		"SMS":           2,
+		"EMAIL":         3,
+	}
+)
+
+func (x OTPMethod_OTPMethod) Enum() *OTPMethod_OTPMethod {
+	p := new(OTPMethod_OTPMethod)
+	*p = x
+	return p
+}
+
+func (x OTPMethod_OTPMethod) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (OTPMethod_OTPMethod) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_common_proto_enumTypes[2].Descriptor()
+}
+
+func (OTPMethod_OTPMethod) Type() protoreflect.EnumType {
+	return &file_proto_common_proto_enumTypes[2]
+}
+
+func (x OTPMethod_OTPMethod) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use OTPMethod_OTPMethod.Descriptor instead.
+func (OTPMethod_OTPMethod) EnumDescriptor() ([]byte, []int) {
+	return file_proto_common_proto_rawDescGZIP(), []int{2, 0}
+}
+
 type SortField_SortField int32
 
 const (
@@ -54,11 +207,11 @@ func (x SortField_SortField) String() string {
 }
 
 func (SortField_SortField) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_common_proto_enumTypes[0].Descriptor()
+	return file_proto_common_proto_enumTypes[3].Descriptor()
 }
 
 func (SortField_SortField) Type() protoreflect.EnumType {
-	return &file_proto_common_proto_enumTypes[0]
+	return &file_proto_common_proto_enumTypes[3]
 }
 
 func (x SortField_SortField) Number() protoreflect.EnumNumber {
@@ -67,7 +220,7 @@ func (x SortField_SortField) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SortField_SortField.Descriptor instead.
 func (SortField_SortField) EnumDescriptor() ([]byte, []int) {
-	return file_proto_common_proto_rawDescGZIP(), []int{0, 0}
+	return file_proto_common_proto_rawDescGZIP(), []int{3, 0}
 }
 
 type SortDir_SortDir int32
@@ -103,11 +256,11 @@ func (x SortDir_SortDir) String() string {
 }
 
 func (SortDir_SortDir) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_common_proto_enumTypes[1].Descriptor()
+	return file_proto_common_proto_enumTypes[4].Descriptor()
 }
 
 func (SortDir_SortDir) Type() protoreflect.EnumType {
-	return &file_proto_common_proto_enumTypes[1]
+	return &file_proto_common_proto_enumTypes[4]
 }
 
 func (x SortDir_SortDir) Number() protoreflect.EnumNumber {
@@ -116,7 +269,121 @@ func (x SortDir_SortDir) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SortDir_SortDir.Descriptor instead.
 func (SortDir_SortDir) EnumDescriptor() ([]byte, []int) {
-	return file_proto_common_proto_rawDescGZIP(), []int{1, 0}
+	return file_proto_common_proto_rawDescGZIP(), []int{4, 0}
+}
+
+type UserType struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *UserType) Reset() {
+	*x = UserType{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_common_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserType) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserType) ProtoMessage() {}
+
+func (x *UserType) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_common_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserType.ProtoReflect.Descriptor instead.
+func (*UserType) Descriptor() ([]byte, []int) {
+	return file_proto_common_proto_rawDescGZIP(), []int{0}
+}
+
+type UserStatus struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *UserStatus) Reset() {
+	*x = UserStatus{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_common_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserStatus) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserStatus) ProtoMessage() {}
+
+func (x *UserStatus) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_common_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserStatus.ProtoReflect.Descriptor instead.
+func (*UserStatus) Descriptor() ([]byte, []int) {
+	return file_proto_common_proto_rawDescGZIP(), []int{1}
+}
+
+type OTPMethod struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *OTPMethod) Reset() {
+	*x = OTPMethod{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_common_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *OTPMethod) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OTPMethod) ProtoMessage() {}
+
+func (x *OTPMethod) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_common_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OTPMethod.ProtoReflect.Descriptor instead.
+func (*OTPMethod) Descriptor() ([]byte, []int) {
+	return file_proto_common_proto_rawDescGZIP(), []int{2}
 }
 
 type SortField struct {
@@ -128,7 +395,7 @@ type SortField struct {
 func (x *SortField) Reset() {
 	*x = SortField{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_common_proto_msgTypes[0]
+		mi := &file_proto_common_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -141,7 +408,7 @@ func (x *SortField) String() string {
 func (*SortField) ProtoMessage() {}
 
 func (x *SortField) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_common_proto_msgTypes[0]
+	mi := &file_proto_common_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -154,7 +421,7 @@ func (x *SortField) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SortField.ProtoReflect.Descriptor instead.
 func (*SortField) Descriptor() ([]byte, []int) {
-	return file_proto_common_proto_rawDescGZIP(), []int{0}
+	return file_proto_common_proto_rawDescGZIP(), []int{3}
 }
 
 type SortDir struct {
@@ -166,7 +433,7 @@ type SortDir struct {
 func (x *SortDir) Reset() {
 	*x = SortDir{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_common_proto_msgTypes[1]
+		mi := &file_proto_common_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -179,7 +446,7 @@ func (x *SortDir) String() string {
 func (*SortDir) ProtoMessage() {}
 
 func (x *SortDir) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_common_proto_msgTypes[1]
+	mi := &file_proto_common_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -192,7 +459,7 @@ func (x *SortDir) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SortDir.ProtoReflect.Descriptor instead.
 func (*SortDir) Descriptor() ([]byte, []int) {
-	return file_proto_common_proto_rawDescGZIP(), []int{1}
+	return file_proto_common_proto_rawDescGZIP(), []int{4}
 }
 
 type SortBy struct {
@@ -207,7 +474,7 @@ type SortBy struct {
 func (x *SortBy) Reset() {
 	*x = SortBy{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_common_proto_msgTypes[2]
+		mi := &file_proto_common_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -220,7 +487,7 @@ func (x *SortBy) String() string {
 func (*SortBy) ProtoMessage() {}
 
 func (x *SortBy) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_common_proto_msgTypes[2]
+	mi := &file_proto_common_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -233,7 +500,7 @@ func (x *SortBy) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SortBy.ProtoReflect.Descriptor instead.
 func (*SortBy) Descriptor() ([]byte, []int) {
-	return file_proto_common_proto_rawDescGZIP(), []int{2}
+	return file_proto_common_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SortBy) GetField() SortField_SortField {
@@ -259,7 +526,7 @@ type VoidParam struct {
 func (x *VoidParam) Reset() {
 	*x = VoidParam{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_common_proto_msgTypes[3]
+		mi := &file_proto_common_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -272,7 +539,7 @@ func (x *VoidParam) String() string {
 func (*VoidParam) ProtoMessage() {}
 
 func (x *VoidParam) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_common_proto_msgTypes[3]
+	mi := &file_proto_common_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -285,7 +552,7 @@ func (x *VoidParam) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VoidParam.ProtoReflect.Descriptor instead.
 func (*VoidParam) Descriptor() ([]byte, []int) {
-	return file_proto_common_proto_rawDescGZIP(), []int{3}
+	return file_proto_common_proto_rawDescGZIP(), []int{6}
 }
 
 type VoidReturn struct {
@@ -297,7 +564,7 @@ type VoidReturn struct {
 func (x *VoidReturn) Reset() {
 	*x = VoidReturn{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_common_proto_msgTypes[4]
+		mi := &file_proto_common_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -310,7 +577,7 @@ func (x *VoidReturn) String() string {
 func (*VoidReturn) ProtoMessage() {}
 
 func (x *VoidReturn) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_common_proto_msgTypes[4]
+	mi := &file_proto_common_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -323,7 +590,7 @@ func (x *VoidReturn) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VoidReturn.ProtoReflect.Descriptor instead.
 func (*VoidReturn) Descriptor() ([]byte, []int) {
-	return file_proto_common_proto_rawDescGZIP(), []int{4}
+	return file_proto_common_proto_rawDescGZIP(), []int{7}
 }
 
 type IDRequest struct {
@@ -337,7 +604,7 @@ type IDRequest struct {
 func (x *IDRequest) Reset() {
 	*x = IDRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_common_proto_msgTypes[5]
+		mi := &file_proto_common_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -350,7 +617,7 @@ func (x *IDRequest) String() string {
 func (*IDRequest) ProtoMessage() {}
 
 func (x *IDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_common_proto_msgTypes[5]
+	mi := &file_proto_common_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -363,7 +630,7 @@ func (x *IDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IDRequest.ProtoReflect.Descriptor instead.
 func (*IDRequest) Descriptor() ([]byte, []int) {
-	return file_proto_common_proto_rawDescGZIP(), []int{5}
+	return file_proto_common_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *IDRequest) GetId() string {
@@ -386,7 +653,7 @@ type Metadata struct {
 func (x *Metadata) Reset() {
 	*x = Metadata{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_common_proto_msgTypes[6]
+		mi := &file_proto_common_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -399,7 +666,7 @@ func (x *Metadata) String() string {
 func (*Metadata) ProtoMessage() {}
 
 func (x *Metadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_common_proto_msgTypes[6]
+	mi := &file_proto_common_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -412,7 +679,7 @@ func (x *Metadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Metadata.ProtoReflect.Descriptor instead.
 func (*Metadata) Descriptor() ([]byte, []int) {
-	return file_proto_common_proto_rawDescGZIP(), []int{6}
+	return file_proto_common_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *Metadata) GetCreatedAt() *timestamppb.Timestamp {
@@ -448,7 +715,7 @@ type Money struct {
 func (x *Money) Reset() {
 	*x = Money{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_common_proto_msgTypes[7]
+		mi := &file_proto_common_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -461,7 +728,7 @@ func (x *Money) String() string {
 func (*Money) ProtoMessage() {}
 
 func (x *Money) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_common_proto_msgTypes[7]
+	mi := &file_proto_common_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -474,7 +741,7 @@ func (x *Money) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Money.ProtoReflect.Descriptor instead.
 func (*Money) Descriptor() ([]byte, []int) {
-	return file_proto_common_proto_rawDescGZIP(), []int{7}
+	return file_proto_common_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *Money) GetCurrency() string {
@@ -497,42 +764,56 @@ var file_proto_common_proto_rawDesc = []byte{
 	0x0a, 0x12, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x70,
 	0x72, 0x6f, 0x74, 0x6f, 0x12, 0x05, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1f, 0x67, 0x6f, 0x6f,
 	0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x74, 0x69, 0x6d,
-	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x41, 0x0a, 0x09,
-	0x53, 0x6f, 0x72, 0x74, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x22, 0x34, 0x0a, 0x09, 0x53, 0x6f, 0x72,
-	0x74, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x12, 0x0d, 0x0a, 0x09, 0x55, 0x4e, 0x44, 0x45, 0x46, 0x49,
-	0x4e, 0x45, 0x44, 0x10, 0x00, 0x12, 0x08, 0x0a, 0x04, 0x4e, 0x41, 0x4d, 0x45, 0x10, 0x01, 0x12,
-	0x0e, 0x0a, 0x0a, 0x43, 0x52, 0x45, 0x41, 0x54, 0x45, 0x44, 0x5f, 0x41, 0x54, 0x10, 0x02, 0x22,
-	0x36, 0x0a, 0x07, 0x53, 0x6f, 0x72, 0x74, 0x44, 0x69, 0x72, 0x22, 0x2b, 0x0a, 0x07, 0x53, 0x6f,
-	0x72, 0x74, 0x44, 0x69, 0x72, 0x12, 0x0d, 0x0a, 0x09, 0x55, 0x4e, 0x44, 0x45, 0x46, 0x49, 0x4e,
-	0x45, 0x44, 0x10, 0x00, 0x12, 0x07, 0x0a, 0x03, 0x41, 0x53, 0x43, 0x10, 0x01, 0x12, 0x08, 0x0a,
-	0x04, 0x44, 0x45, 0x53, 0x43, 0x10, 0x02, 0x22, 0x64, 0x0a, 0x06, 0x53, 0x6f, 0x72, 0x74, 0x42,
-	0x79, 0x12, 0x30, 0x0a, 0x05, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e,
-	0x32, 0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x53, 0x6f, 0x72, 0x74, 0x46, 0x69, 0x65,
-	0x6c, 0x64, 0x2e, 0x53, 0x6f, 0x72, 0x74, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x52, 0x05, 0x66, 0x69,
-	0x65, 0x6c, 0x64, 0x12, 0x28, 0x0a, 0x03, 0x64, 0x69, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e,
-	0x32, 0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x53, 0x6f, 0x72, 0x74, 0x44, 0x69, 0x72,
-	0x2e, 0x53, 0x6f, 0x72, 0x74, 0x44, 0x69, 0x72, 0x52, 0x03, 0x64, 0x69, 0x72, 0x22, 0x0b, 0x0a,
-	0x09, 0x56, 0x6f, 0x69, 0x64, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x22, 0x0c, 0x0a, 0x0a, 0x56, 0x6f,
-	0x69, 0x64, 0x52, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x22, 0x1b, 0x0a, 0x09, 0x49, 0x44, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0xbb, 0x01, 0x0a, 0x08, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
-	0x74, 0x61, 0x12, 0x39, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61,
-	0x6d, 0x70, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x39, 0x0a,
-	0x0a, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x75,
-	0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x39, 0x0a, 0x0a, 0x64, 0x65, 0x6c, 0x65,
-	0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67,
-	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54,
-	0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65,
-	0x64, 0x41, 0x74, 0x22, 0x39, 0x0a, 0x05, 0x4d, 0x6f, 0x6e, 0x65, 0x79, 0x12, 0x1a, 0x0a, 0x08,
-	0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
-	0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75,
-	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x42, 0x0c,
-	0x5a, 0x0a, 0x63, 0x63, 0x68, 0x6f, 0x69, 0x63, 0x65, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x33,
+	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x3a, 0x0a, 0x08,
+	0x55, 0x73, 0x65, 0x72, 0x54, 0x79, 0x70, 0x65, 0x22, 0x2e, 0x0a, 0x08, 0x55, 0x73, 0x65, 0x72,
+	0x54, 0x79, 0x70, 0x65, 0x12, 0x0d, 0x0a, 0x09, 0x55, 0x4e, 0x44, 0x45, 0x46, 0x49, 0x4e, 0x45,
+	0x44, 0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06, 0x53, 0x59, 0x53, 0x54, 0x45, 0x4d, 0x10, 0x02, 0x12,
+	0x07, 0x0a, 0x03, 0x41, 0x50, 0x49, 0x10, 0x04, 0x22, 0x50, 0x0a, 0x0a, 0x55, 0x73, 0x65, 0x72,
+	0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x42, 0x0a, 0x0a, 0x55, 0x73, 0x65, 0x72, 0x53, 0x74,
+	0x61, 0x74, 0x75, 0x73, 0x12, 0x0d, 0x0a, 0x09, 0x55, 0x4e, 0x44, 0x45, 0x46, 0x49, 0x4e, 0x45,
+	0x44, 0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45, 0x10, 0x01, 0x12,
+	0x0c, 0x0a, 0x08, 0x49, 0x4e, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45, 0x10, 0x02, 0x12, 0x0b, 0x0a,
+	0x07, 0x44, 0x45, 0x4c, 0x45, 0x54, 0x45, 0x44, 0x10, 0x03, 0x22, 0x4e, 0x0a, 0x09, 0x4f, 0x54,
+	0x50, 0x4d, 0x65, 0x74, 0x68, 0x6f, 0x64, 0x22, 0x41, 0x0a, 0x09, 0x4f, 0x54, 0x50, 0x4d, 0x65,
+	0x74, 0x68, 0x6f, 0x64, 0x12, 0x0d, 0x0a, 0x09, 0x55, 0x4e, 0x44, 0x45, 0x46, 0x49, 0x4e, 0x45,
+	0x44, 0x10, 0x00, 0x12, 0x11, 0x0a, 0x0d, 0x41, 0x55, 0x54, 0x48, 0x45, 0x4e, 0x54, 0x49, 0x43,
+	0x41, 0x54, 0x4f, 0x52, 0x10, 0x01, 0x12, 0x07, 0x0a, 0x03, 0x53, 0x4d, 0x53, 0x10, 0x02, 0x12,
+	0x09, 0x0a, 0x05, 0x45, 0x4d, 0x41, 0x49, 0x4c, 0x10, 0x03, 0x22, 0x41, 0x0a, 0x09, 0x53, 0x6f,
+	0x72, 0x74, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x22, 0x34, 0x0a, 0x09, 0x53, 0x6f, 0x72, 0x74, 0x46,
+	0x69, 0x65, 0x6c, 0x64, 0x12, 0x0d, 0x0a, 0x09, 0x55, 0x4e, 0x44, 0x45, 0x46, 0x49, 0x4e, 0x45,
+	0x44, 0x10, 0x00, 0x12, 0x08, 0x0a, 0x04, 0x4e, 0x41, 0x4d, 0x45, 0x10, 0x01, 0x12, 0x0e, 0x0a,
+	0x0a, 0x43, 0x52, 0x45, 0x41, 0x54, 0x45, 0x44, 0x5f, 0x41, 0x54, 0x10, 0x02, 0x22, 0x36, 0x0a,
+	0x07, 0x53, 0x6f, 0x72, 0x74, 0x44, 0x69, 0x72, 0x22, 0x2b, 0x0a, 0x07, 0x53, 0x6f, 0x72, 0x74,
+	0x44, 0x69, 0x72, 0x12, 0x0d, 0x0a, 0x09, 0x55, 0x4e, 0x44, 0x45, 0x46, 0x49, 0x4e, 0x45, 0x44,
+	0x10, 0x00, 0x12, 0x07, 0x0a, 0x03, 0x41, 0x53, 0x43, 0x10, 0x01, 0x12, 0x08, 0x0a, 0x04, 0x44,
+	0x45, 0x53, 0x43, 0x10, 0x02, 0x22, 0x64, 0x0a, 0x06, 0x53, 0x6f, 0x72, 0x74, 0x42, 0x79, 0x12,
+	0x30, 0x0a, 0x05, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1a,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x53, 0x6f, 0x72, 0x74, 0x46, 0x69, 0x65, 0x6c, 0x64,
+	0x2e, 0x53, 0x6f, 0x72, 0x74, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x52, 0x05, 0x66, 0x69, 0x65, 0x6c,
+	0x64, 0x12, 0x28, 0x0a, 0x03, 0x64, 0x69, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x16,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x53, 0x6f, 0x72, 0x74, 0x44, 0x69, 0x72, 0x2e, 0x53,
+	0x6f, 0x72, 0x74, 0x44, 0x69, 0x72, 0x52, 0x03, 0x64, 0x69, 0x72, 0x22, 0x0b, 0x0a, 0x09, 0x56,
+	0x6f, 0x69, 0x64, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x22, 0x0c, 0x0a, 0x0a, 0x56, 0x6f, 0x69, 0x64,
+	0x52, 0x65, 0x74, 0x75, 0x72, 0x6e, 0x22, 0x1b, 0x0a, 0x09, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x02, 0x69, 0x64, 0x22, 0xbb, 0x01, 0x0a, 0x08, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
+	0x12, 0x39, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70,
+	0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x39, 0x0a, 0x0a, 0x75,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
+	0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x75, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x39, 0x0a, 0x0a, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65,
+	0x64, 0x5f, 0x61, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f,
+	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d,
+	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64, 0x41,
+	0x74, 0x22, 0x39, 0x0a, 0x05, 0x4d, 0x6f, 0x6e, 0x65, 0x79, 0x12, 0x1a, 0x0a, 0x08, 0x63, 0x75,
+	0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x63, 0x75,
+	0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x42, 0x0c, 0x5a, 0x0a,
+	0x63, 0x63, 0x68, 0x6f, 0x69, 0x63, 0x65, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -547,27 +828,33 @@ func file_proto_common_proto_rawDescGZIP() []byte {
 	return file_proto_common_proto_rawDescData
 }
 
-var file_proto_common_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_proto_common_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_proto_common_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
+var file_proto_common_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_proto_common_proto_goTypes = []interface{}{
-	(SortField_SortField)(0),      // 0: proto.SortField.SortField
-	(SortDir_SortDir)(0),          // 1: proto.SortDir.SortDir
-	(*SortField)(nil),             // 2: proto.SortField
-	(*SortDir)(nil),               // 3: proto.SortDir
-	(*SortBy)(nil),                // 4: proto.SortBy
-	(*VoidParam)(nil),             // 5: proto.VoidParam
-	(*VoidReturn)(nil),            // 6: proto.VoidReturn
-	(*IDRequest)(nil),             // 7: proto.IDRequest
-	(*Metadata)(nil),              // 8: proto.Metadata
-	(*Money)(nil),                 // 9: proto.Money
-	(*timestamppb.Timestamp)(nil), // 10: google.protobuf.Timestamp
+	(UserType_UserType)(0),        // 0: proto.UserType.UserType
+	(UserStatus_UserStatus)(0),    // 1: proto.UserStatus.UserStatus
+	(OTPMethod_OTPMethod)(0),      // 2: proto.OTPMethod.OTPMethod
+	(SortField_SortField)(0),      // 3: proto.SortField.SortField
+	(SortDir_SortDir)(0),          // 4: proto.SortDir.SortDir
+	(*UserType)(nil),              // 5: proto.UserType
+	(*UserStatus)(nil),            // 6: proto.UserStatus
+	(*OTPMethod)(nil),             // 7: proto.OTPMethod
+	(*SortField)(nil),             // 8: proto.SortField
+	(*SortDir)(nil),               // 9: proto.SortDir
+	(*SortBy)(nil),                // 10: proto.SortBy
+	(*VoidParam)(nil),             // 11: proto.VoidParam
+	(*VoidReturn)(nil),            // 12: proto.VoidReturn
+	(*IDRequest)(nil),             // 13: proto.IDRequest
+	(*Metadata)(nil),              // 14: proto.Metadata
+	(*Money)(nil),                 // 15: proto.Money
+	(*timestamppb.Timestamp)(nil), // 16: google.protobuf.Timestamp
 }
 var file_proto_common_proto_depIdxs = []int32{
-	0,  // 0: proto.SortBy.field:type_name -> proto.SortField.SortField
-	1,  // 1: proto.SortBy.dir:type_name -> proto.SortDir.SortDir
-	10, // 2: proto.Metadata.created_at:type_name -> google.protobuf.Timestamp
-	10, // 3: proto.Metadata.updated_at:type_name -> google.protobuf.Timestamp
-	10, // 4: proto.Metadata.deleted_at:type_name -> google.protobuf.Timestamp
+	3,  // 0: proto.SortBy.field:type_name -> proto.SortField.SortField
+	4,  // 1: proto.SortBy.dir:type_name -> proto.SortDir.SortDir
+	16, // 2: proto.Metadata.created_at:type_name -> google.protobuf.Timestamp
+	16, // 3: proto.Metadata.updated_at:type_name -> google.protobuf.Timestamp
+	16, // 4: proto.Metadata.deleted_at:type_name -> google.protobuf.Timestamp
 	5,  // [5:5] is the sub-list for method output_type
 	5,  // [5:5] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
@@ -582,7 +869,7 @@ func file_proto_common_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_proto_common_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SortField); i {
+			switch v := v.(*UserType); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -594,7 +881,7 @@ func file_proto_common_proto_init() {
 			}
 		}
 		file_proto_common_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SortDir); i {
+			switch v := v.(*UserStatus); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -606,7 +893,7 @@ func file_proto_common_proto_init() {
 			}
 		}
 		file_proto_common_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SortBy); i {
+			switch v := v.(*OTPMethod); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -618,7 +905,7 @@ func file_proto_common_proto_init() {
 			}
 		}
 		file_proto_common_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*VoidParam); i {
+			switch v := v.(*SortField); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -630,7 +917,7 @@ func file_proto_common_proto_init() {
 			}
 		}
 		file_proto_common_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*VoidReturn); i {
+			switch v := v.(*SortDir); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -642,7 +929,7 @@ func file_proto_common_proto_init() {
 			}
 		}
 		file_proto_common_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*IDRequest); i {
+			switch v := v.(*SortBy); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -654,7 +941,7 @@ func file_proto_common_proto_init() {
 			}
 		}
 		file_proto_common_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Metadata); i {
+			switch v := v.(*VoidParam); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -666,6 +953,42 @@ func file_proto_common_proto_init() {
 			}
 		}
 		file_proto_common_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*VoidReturn); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_common_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*IDRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_common_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Metadata); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_common_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Money); i {
 			case 0:
 				return &v.state
@@ -683,8 +1006,8 @@ func file_proto_common_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_common_proto_rawDesc,
-			NumEnums:      2,
-			NumMessages:   8,
+			NumEnums:      5,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

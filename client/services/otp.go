@@ -2,24 +2,21 @@ package services
 
 import (
 	"cchoice/client/common"
-	"cchoice/internal/auth"
 	"cchoice/internal/enums"
-	"cchoice/internal/errs"
 	pb "cchoice/proto"
 	"context"
-	"net/http"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
 	"google.golang.org/grpc"
 )
 
-type AuthService struct {
+type OTPService struct {
 	GRPCConn *grpc.ClientConn
 	SM       *scs.SessionManager
 }
 
-func NewAuthService(
+func NewOTPService(
 	grpcConn *grpc.ClientConn,
 	sm *scs.SessionManager,
 ) AuthService {
@@ -29,73 +26,7 @@ func NewAuthService(
 	}
 }
 
-func (s AuthService) Authenticated(aud enums.AudKind, w http.ResponseWriter, r *http.Request) (*auth.ValidToken, error) {
-	tokenString := s.SM.GetString(r.Context(), "tokenString")
-	if tokenString == "" {
-		return nil, errs.ERR_NO_AUTH
-	}
-
-	needOTP := s.SM.PopBool(r.Context(), "needOTP")
-	if needOTP {
-		return nil, errs.ERR_NEED_OTP
-	}
-
-	client := pb.NewAuthServiceClient(s.GRPCConn)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	res, err := client.ValidateToken(ctx, &pb.ValidateTokenRequest{
-		Aud:   aud.String(),
-		Token: tokenString,
-	})
-	if err != nil {
-		return nil, errs.ERR_NO_AUTH
-	}
-
-	return &auth.ValidToken{
-		UserID: res.UserId,
-	}, nil
-}
-
-func (s AuthService) Authenticate(r *http.Request, data *common.AuthAuthenticateRequest) (*common.AuthAuthenticateResponse, error) {
-	client := pb.NewAuthServiceClient(s.GRPCConn)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	res, err := client.Authenticate(ctx, &pb.AuthenticateRequest{
-		Username: data.Username,
-		Password: data.Password,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	s.SM.Put(r.Context(), "tokenString", res.Token)
-
-	return &common.AuthAuthenticateResponse{
-		Token:   res.Token,
-		NeedOTP: res.NeedOtp,
-	}, nil
-}
-
-func (s AuthService) Register(data *common.AuthRegisterRequest) (string, error) {
-	client := pb.NewAuthServiceClient(s.GRPCConn)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	res, err := client.Register(ctx, &pb.RegisterRequest{
-		FirstName:       data.FirstName,
-		MiddleName:      data.MiddleName,
-		LastName:        data.LastName,
-		Email:           data.Email,
-		Password:        data.Password,
-		ConfirmPassword: data.ConfirmPassword,
-		MobileNo:        data.MobileNo,
-	})
-	if err != nil {
-		return "", err
-	}
-	return res.UserId, nil
-}
-
-func (s AuthService) EnrollOTP(data *common.AuthEnrollOTPRequest) (*common.AuthEnrollOTPResponse, error) {
+func (s OTPService) EnrollOTP(data *common.AuthEnrollOTPRequest) (*common.AuthEnrollOTPResponse, error) {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -114,7 +45,7 @@ func (s AuthService) EnrollOTP(data *common.AuthEnrollOTPRequest) (*common.AuthE
 	}, nil
 }
 
-func (s AuthService) GetOTPCode(data *common.AuthGetOTPCodeRequest) error {
+func (s OTPService) GetOTPCode(data *common.AuthGetOTPCodeRequest) error {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -132,7 +63,7 @@ func (s AuthService) GetOTPCode(data *common.AuthGetOTPCodeRequest) error {
 	return nil
 }
 
-func (s AuthService) FinishOTPEnrollment(data *common.AuthFinishOTPEnrollment) error {
+func (s OTPService) FinishOTPEnrollment(data *common.AuthFinishOTPEnrollment) error {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -146,7 +77,7 @@ func (s AuthService) FinishOTPEnrollment(data *common.AuthFinishOTPEnrollment) e
 	return nil
 }
 
-func (s AuthService) ValidateToken(data *common.AuthValidateTokenRequest) (*common.AuthValidateTokenResponse, error) {
+func (s OTPService) ValidateToken(data *common.AuthValidateTokenRequest) (*common.AuthValidateTokenResponse, error) {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -162,7 +93,7 @@ func (s AuthService) ValidateToken(data *common.AuthValidateTokenRequest) (*comm
 	}, nil
 }
 
-func (s AuthService) GetOTPInfo(data *common.AuthGetOTPInfoRequest) (*common.AuthGetOTPInfoResponse, error) {
+func (s OTPService) GetOTPInfo(data *common.AuthGetOTPInfoRequest) (*common.AuthGetOTPInfoResponse, error) {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -178,7 +109,7 @@ func (s AuthService) GetOTPInfo(data *common.AuthGetOTPInfoRequest) (*common.Aut
 	}, nil
 }
 
-func (s AuthService) ValidateOTP(data *common.AuthValidateOTPRequest) error {
+func (s OTPService) ValidateOTP(data *common.AuthValidateOTPRequest) error {
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

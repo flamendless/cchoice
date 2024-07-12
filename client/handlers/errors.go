@@ -42,6 +42,10 @@ func (h *ErrorHandler) Default(fn FnHandler) FnHTTP {
 
 			} else {
 				if res.RedirectTo == "" {
+					if res.StatusCode == 0 {
+						res.StatusCode = http.StatusInternalServerError
+					}
+
 					http.Error(w, res.Error.Error(), res.StatusCode)
 				} else {
 					http.Redirect(w, r, res.RedirectTo, http.StatusTemporaryRedirect)

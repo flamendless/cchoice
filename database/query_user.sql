@@ -5,11 +5,20 @@ WHERE
 	id = ?
 LIMIT 1;
 
+-- name: GetUserWithAuthByID :one
+SELECT
+	tbl_user.id,
+	tbl_auth.otp_enabled
+FROM tbl_user
+INNER JOIN tbl_auth ON tbl_auth.user_id = tbl_user.id
+WHERE
+	tbl_user.id = ?
+LIMIT 1;
+
 -- name: GetUserEMailAndMobileNoByID :one
 SELECT email, mobile_no
 FROM tbl_user
-WHERE
-	id = ?
+WHERE id = ?
 LIMIT 1;
 
 -- name: GetUserByEMailAndUserType :one
@@ -59,3 +68,15 @@ INSERT INTO tbl_user (
 	?, ?, ?, ?,
 	?, ?, ?, ?
 ) RETURNING id;
+
+-- name: CheckUniqueEMailandMobileNo :one
+SELECT
+	EXISTS (
+		SELECT 1
+		FROM tbl_user
+		WHERE
+			email = ? OR
+			mobile_no = ?
+		LIMIT 1
+	)
+;
