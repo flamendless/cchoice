@@ -83,8 +83,7 @@ SELECT id, otp_secret
 FROM tbl_auth
 WHERE
 	user_id = ? AND
-	otp_enabled = true AND
-	otp_status = 'INITIAL'
+	otp_enabled = true
 LIMIT 1
 `
 
@@ -131,6 +130,20 @@ WHERE
 
 func (q *Queries) NeedOTP(ctx context.Context, userID int64) error {
 	_, err := q.db.ExecContext(ctx, needOTP, userID)
+	return err
+}
+
+const setOTPStatusValidByUserID = `-- name: SetOTPStatusValidByUserID :exec
+;
+
+UPDATE tbl_auth SET
+	otp_status = 'VALID'
+WHERE
+	user_id = ?
+`
+
+func (q *Queries) SetOTPStatusValidByUserID(ctx context.Context, userID int64) error {
+	_, err := q.db.ExecContext(ctx, setOTPStatusValidByUserID, userID)
 	return err
 }
 

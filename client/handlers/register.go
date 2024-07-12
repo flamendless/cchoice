@@ -3,7 +3,7 @@ package handlers
 import (
 	"cchoice/client/common"
 	"cchoice/client/components"
-	"errors"
+	"cchoice/internal/errs"
 	"net/http"
 )
 
@@ -20,7 +20,7 @@ func (h AuthHandler) Register(w http.ResponseWriter, r *http.Request) *common.Ha
 	err := r.ParseForm()
 	if err != nil {
 		return &common.HandlerRes{
-			Error:      errors.New("Failed to parse form"),
+			Error:      errs.ERR_PARSE_FORM,
 			StatusCode: http.StatusBadRequest,
 		}
 	}

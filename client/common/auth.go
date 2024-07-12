@@ -38,6 +38,29 @@ type AuthFinishOTPEnrollment struct {
 }
 
 type AuthGetOTPCodeRequest struct {
+	UserID    string
+	OTPMethod string
+}
+
+type AuthGetOTPInfoRequest struct {
+	UserID    string
+	OTPMethod string
+}
+
+type AuthGetOTPInfoResponse struct {
+	Recipient string
+}
+
+type AuthValidateTokenRequest struct {
+	Token string
+	AUD   string
+}
+
+type AuthValidateTokenResponse struct {
 	UserID string
-	Method string
+}
+
+type AuthValidateOTPRequest struct {
+	UserID   string
+	Passcode string
 }

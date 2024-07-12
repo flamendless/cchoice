@@ -43,12 +43,13 @@ func (s *AuthServer) ValidateToken(
 	in *pb.ValidateTokenRequest,
 ) (*pb.ValidateTokenResponse, error) {
 	expectedAUD := enums.ParseAudEnum(in.Aud)
-	_, err := s.Validator.GetToken(expectedAUD, in.Token)
+	res, err := s.Validator.GetToken(expectedAUD, in.Token)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid auth token: %v", err)
 	}
 	return &pb.ValidateTokenResponse{
 		Success: true,
+		UserId:  res.UserID,
 	}, nil
 }
 
@@ -127,6 +128,17 @@ func (s *AuthServer) Authenticate(
 		return nil, err
 	}
 
+	err = s.CtxDB.Queries.UpdateAuthTokenByUserID(
+		context.Background(),
+		cchoice_db.UpdateAuthTokenByUserIDParams{
+			Token:  tokenString,
+			UserID: resUser.ID,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	resOTP, err := s.CtxDB.QueriesRead.GetAuthOTP(context.Background(), resUser.ID)
 	if err != nil {
 		return nil, err
@@ -143,17 +155,6 @@ func (s *AuthServer) Authenticate(
 				NeedOtp: true,
 			}, nil
 		}
-	}
-
-	err = s.CtxDB.Queries.UpdateAuthTokenByUserID(
-		context.Background(),
-		cchoice_db.UpdateAuthTokenByUserIDParams{
-			Token:  tokenString,
-			UserID: resUser.ID,
-		},
-	)
-	if err != nil {
-		return nil, err
 	}
 
 	return &pb.AuthenticateResponse{
@@ -264,8 +265,14 @@ func (s *AuthServer) FinishOTPEnrollment(
 		return nil, errs.ERR_ALREADY_OTP_ENROLLED
 	}
 
-	valid := auth.ValidateOTP(in.Passcode, res.OtpSecret.String)
-	if !valid {
+	resValid, err := s.ValidateOTP(context.Background(), &pb.ValidateOTPRequest{
+		Passcode: in.Passcode,
+		UserId:   in.UserId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !resValid.Valid {
 		return nil, errors.New("Invalid OTP")
 	}
 
@@ -278,4 +285,68 @@ func (s *AuthServer) FinishOTPEnrollment(
 	}
 
 	return &pb.FinishOTPEnrollmentResponse{}, nil
+}
+
+func (s *AuthServer) GetOTPInfo(
+	ctx context.Context,
+	in *pb.GetOTPInfoRequest,
+) (*pb.GetOTPInfoResponse, error) {
+	info, err := s.CtxDB.QueriesRead.GetUserEMailAndMobileNoByID(
+		context.Background(),
+		serialize.DecDBID(in.UserId),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	var recipient string
+
+	eOTPMethod := enums.StringToPBEnum(
+		in.OtpMethod,
+		pb.OTPMethod_OTPMethod_value,
+		pb.OTPMethod_UNDEFINED,
+	)
+
+	switch eOTPMethod {
+	case pb.OTPMethod_UNDEFINED:
+		return nil, errs.ERR_CHOOSE_VALID_OPTION
+	case pb.OTPMethod_AUTHENTICATOR:
+		recipient = "Authenticator"
+	case pb.OTPMethod_SMS:
+		recipient = info.MobileNo
+	case pb.OTPMethod_EMAIL:
+		recipient = info.Email
+	}
+
+	return &pb.GetOTPInfoResponse{
+		Recipient: recipient,
+	}, nil
+}
+
+func (s *AuthServer) ValidateOTP(
+	ctx context.Context,
+	in *pb.ValidateOTPRequest,
+) (*pb.ValidateOTPResponse, error) {
+	userID := serialize.DecDBID(in.UserId)
+	res, err := s.CtxDB.QueriesRead.GetAuthForOTPValidation(
+		context.Background(),
+		userID,
+	)
+	if err != nil {
+		return nil, errs.ERR_ALREADY_OTP_ENROLLED
+	}
+
+	valid := auth.ValidateOTP(in.Passcode, res.OtpSecret.String)
+	if !valid {
+		return nil, errors.New("Invalid OTP")
+	}
+
+	err = s.CtxDB.Queries.SetOTPStatusValidByUserID(context.Background(), userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.ValidateOTPResponse{
+		Valid: valid,
+	}, nil
 }

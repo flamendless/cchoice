@@ -12,8 +12,7 @@ SELECT id, otp_secret
 FROM tbl_auth
 WHERE
 	user_id = ? AND
-	otp_enabled = true AND
-	otp_status = 'INITIAL'
+	otp_enabled = true
 LIMIT 1;
 
 -- name: CreateInitialAuth :exec
@@ -55,6 +54,13 @@ WHERE user_id = ?
 -- name: NeedOTP :exec
 UPDATE tbl_auth SET
 	otp_status = 'SENT_CODE'
+WHERE
+	user_id = ?
+;
+
+-- name: SetOTPStatusValidByUserID :exec
+UPDATE tbl_auth SET
+	otp_status = 'VALID'
 WHERE
 	user_id = ?
 ;

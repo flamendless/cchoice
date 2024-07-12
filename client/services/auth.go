@@ -2,6 +2,8 @@ package services
 
 import (
 	"cchoice/client/common"
+	"cchoice/client/components"
+	"cchoice/internal/auth"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	pb "cchoice/proto"
@@ -28,20 +30,31 @@ func NewAuthService(
 	}
 }
 
-func (s AuthService) Authenticated(aud enums.AudKind, w http.ResponseWriter, r *http.Request) *common.HandlerRes {
+func (s AuthService) Authenticated(aud enums.AudKind, w http.ResponseWriter, r *http.Request) (*common.HandlerRes, auth.ValidToken) {
 	tokenString := s.SM.GetString(r.Context(), "tokenString")
+	token := auth.ValidToken{}
 	if tokenString == "" {
 		return &common.HandlerRes{
 			Error:      errs.ERR_NO_AUTH,
 			StatusCode: http.StatusUnauthorized,
 			RedirectTo: "/auth",
-		}
+		}, token
+	}
+
+	needOTP := s.SM.GetBool(r.Context(), "needOTP")
+	if needOTP {
+		return &common.HandlerRes{
+			Component: components.CenterCard(
+				components.OTPView(false),
+			),
+			ReplaceURL: "/otp",
+		}, token
 	}
 
 	client := pb.NewAuthServiceClient(s.GRPCConn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	_, err := client.ValidateToken(ctx, &pb.ValidateTokenRequest{
+	res, err := client.ValidateToken(ctx, &pb.ValidateTokenRequest{
 		Aud:   aud.String(),
 		Token: tokenString,
 	})
@@ -50,9 +63,11 @@ func (s AuthService) Authenticated(aud enums.AudKind, w http.ResponseWriter, r *
 			Error:      errs.ERR_NO_AUTH,
 			StatusCode: http.StatusUnauthorized,
 			RedirectTo: "/auth",
-		}
+		}, token
 	}
-	return nil
+
+	token.UserID = res.UserId
+	return nil, token
 }
 
 func (s AuthService) Authenticate(data *common.AuthAuthenticateRequest) (*common.AuthAuthenticateResponse, error) {
@@ -117,7 +132,7 @@ func (s AuthService) GetOTPCode(data *common.AuthGetOTPCodeRequest) error {
 	_, err := client.GetOTPCode(ctx, &pb.GetOTPCodeRequest{
 		UserId: data.UserID,
 		Method: enums.StringToPBEnum(
-			data.Method,
+			data.OTPMethod,
 			pb.OTPMethod_OTPMethod_value,
 			pb.OTPMethod_UNDEFINED,
 		),
@@ -140,4 +155,51 @@ func (s AuthService) FinishOTPEnrollment(data *common.AuthFinishOTPEnrollment) e
 		return err
 	}
 	return nil
+}
+
+func (s AuthService) ValidateToken(data *common.AuthValidateTokenRequest) (*common.AuthValidateTokenResponse, error) {
+	client := pb.NewAuthServiceClient(s.GRPCConn)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	res, err := client.ValidateToken(ctx, &pb.ValidateTokenRequest{
+		Token: data.Token,
+		Aud:   data.AUD,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &common.AuthValidateTokenResponse{
+		UserID: res.UserId,
+	}, nil
+}
+
+func (s AuthService) GetOTPInfo(data *common.AuthGetOTPInfoRequest) (*common.AuthGetOTPInfoResponse, error) {
+	client := pb.NewAuthServiceClient(s.GRPCConn)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	res, err := client.GetOTPInfo(ctx, &pb.GetOTPInfoRequest{
+		UserId:    data.UserID,
+		OtpMethod: data.OTPMethod,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &common.AuthGetOTPInfoResponse{
+		Recipient: res.Recipient,
+	}, nil
+}
+
+func (s AuthService) ValidateOTP(data *common.AuthValidateOTPRequest) error {
+	client := pb.NewAuthServiceClient(s.GRPCConn)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err := client.ValidateOTP(ctx, &pb.ValidateOTPRequest{
+		Passcode: data.Passcode,
+		UserId:   data.UserID,
+	})
+	if err != nil {
+		return err
+	}
+	return  nil
 }

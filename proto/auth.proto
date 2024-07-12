@@ -37,6 +37,7 @@ message ValidateTokenRequest {
 
 message ValidateTokenResponse {
    bool success = 1;
+   string user_id = 2;
 }
 
 message RegisterRequest {
@@ -92,11 +93,31 @@ message FinishOTPEnrollmentRequest {
 message FinishOTPEnrollmentResponse {
 }
 
+message GetOTPInfoRequest {
+   string user_id = 1;
+   string otp_method = 2;
+}
+
+message GetOTPInfoResponse {
+   string recipient = 1;
+}
+
+message ValidateOTPRequest {
+   string passcode = 1;
+   string user_id = 2;
+}
+
+message ValidateOTPResponse {
+   bool valid = 1;
+}
+
 service AuthService {
+   rpc GetOTPInfo(GetOTPInfoRequest) returns (GetOTPInfoResponse) {}
    rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) {}
    rpc Register(RegisterRequest) returns (RegisterResponse) {}
    rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
    rpc EnrollOTP(EnrollOTPRequest) returns (EnrollOTPResponse) {}
    rpc GetOTPCode(GetOTPCodeRequest) returns (GetOTPCodeResponse) {}
    rpc FinishOTPEnrollment(FinishOTPEnrollmentRequest) returns (FinishOTPEnrollmentResponse) {}
+   rpc ValidateOTP(ValidateOTPRequest) returns (ValidateOTPResponse) {}
 }

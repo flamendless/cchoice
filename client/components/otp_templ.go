@@ -196,7 +196,7 @@ func OTPMethodSMSOrEMail(label string, recipient string) templ.Component {
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form id=\"otp_method_form\" hx-post=\"/otp-enroll\" hx-trigger=\"submit\" hx-target=\"body\"><div class=\"flex justify-center m-4 text-center\"><label class=\"block text-gray-700 text-sm font-bold mb-2\">Check the OTP code sent to your ")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form id=\"otp_method_form\" hx-post=\"/otp\" hx-trigger=\"submit\" hx-target=\"body\"><div class=\"flex justify-center m-4 text-center\"><label class=\"block text-gray-700 text-sm font-bold mb-2\">Check the OTP code sent to your ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

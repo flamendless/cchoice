@@ -103,7 +103,7 @@ templ OTPMethodAuthenticator() {
 templ OTPMethodSMSOrEMail(label string, recipient string) {
 	<form
 		id="otp_method_form"
-		hx-post="/otp-enroll"
+		hx-post="/otp"
 		hx-trigger="submit"
 		hx-target="body"
 	>

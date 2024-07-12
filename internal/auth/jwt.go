@@ -7,6 +7,7 @@ import (
 	"cchoice/conf"
 	"cchoice/internal/ctx"
 	"cchoice/internal/enums"
+	"cchoice/internal/serialize"
 	"context"
 	"crypto"
 	"errors"
@@ -15,6 +16,11 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 )
+
+type ValidToken struct {
+	Token    *jwt.Token
+	UserID   string
+}
 
 type Issuer struct {
 	key crypto.PrivateKey
@@ -48,7 +54,7 @@ func (i *Issuer) IssueToken(
 		"nbf": now.Unix(),
 		"iat": now.Unix(),
 		"exp": now.Add(conf.TokenExp).Unix(),
-		"iss": "http://localhost:8081",
+		"iss": "http://localhost:8081", //TODO: (Brandon)
 
 		// other fields
 		"username": username,
@@ -75,10 +81,10 @@ func NewValidator(ctxDB *ctx.Database) (*Validator, error) {
 	}, nil
 }
 
-func (v Validator) GetToken(
+func (v *Validator) GetToken(
 	expectedAUD enums.AudKind,
 	tokenString string,
-) (*jwt.Token, error) {
+) (*ValidToken, error) {
 	token, err := jwt.Parse(
 		tokenString,
 		func(token *jwt.Token) (interface{}, error) {
@@ -105,21 +111,24 @@ func (v Validator) GetToken(
 		return nil, fmt.Errorf("Token had the wrong audience claim: %s", aud)
 	}
 
+	username := claims["username"].(string)
+
+	var userID int64
 	var errValidity error
 	if expectedAUD == enums.AUD_API {
-		_, errValidity = v.CtxDB.Queries.GetUserByEMailAndUserTypeAndToken(
+		userID, errValidity = v.CtxDB.Queries.GetUserByEMailAndUserTypeAndToken(
 			context.Background(),
 			cchoice_db.GetUserByEMailAndUserTypeAndTokenParams{
-				Email:    claims["username"].(string),
+				Email:    username,
 				UserType: audString,
 				Token:    tokenString,
 			},
 		)
 	} else if expectedAUD == enums.AUD_SYSTEM {
-		_, errValidity = v.CtxDB.Queries.GetUserByEMailAndUserType(
+		userID, errValidity = v.CtxDB.Queries.GetUserByEMailAndUserType(
 			context.Background(),
 			cchoice_db.GetUserByEMailAndUserTypeParams{
-				Email:    claims["username"].(string),
+				Email:    username,
 				UserType: audString,
 			},
 		)
@@ -128,5 +137,8 @@ func (v Validator) GetToken(
 		return nil, fmt.Errorf("Invalid token: %w", errValidity)
 	}
 
-	return token, nil
+	return &ValidToken{
+		Token:    token,
+		UserID:   serialize.EncDBID(userID),
+	}, nil
 }

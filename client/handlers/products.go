@@ -38,7 +38,7 @@ func (h ProductHandler) ProductTablePage(
 	w http.ResponseWriter,
 	r *http.Request,
 ) *common.HandlerRes {
-	resAuth := h.AuthService.Authenticated(enums.AUD_API, w, r)
+	resAuth, _ := h.AuthService.Authenticated(enums.AUD_API, w, r)
 	if resAuth != nil {
 		return resAuth
 	}

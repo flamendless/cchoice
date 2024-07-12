@@ -69,13 +69,13 @@ func validate(tokenString string) *jwt.Token {
 	}
 
 	expectedAUD := enums.ParseAudEnum(audString)
-	token, err := v.GetToken(expectedAUD, tokenString)
+	res, err := v.GetToken(expectedAUD, tokenString)
 	if err != nil {
 		logs.Log().Error("Unable to get validated token", zap.Error(err))
 		os.Exit(1)
 	}
 
-	return token
+	return res.Token
 }
 
 var JWTCmd = &cobra.Command{
