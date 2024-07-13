@@ -5,10 +5,10 @@ import (
 	"cchoice/internal/auth"
 	"cchoice/internal/ctx"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/utils"
 	pb "cchoice/proto"
 	"context"
-	"fmt"
 
 	"github.com/alexedwards/argon2id"
 	"google.golang.org/grpc/codes"
@@ -44,8 +44,8 @@ func (s *AuthServer) ValidateToken(
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid auth token: %v", err)
 	}
 	return &pb.ValidateTokenResponse{
-		Success: true,
-		UserId:  res.UserID,
+		UserId:      res.UserID,
+		TokenString: res.TokenString,
 	}, nil
 }
 
@@ -68,16 +68,12 @@ func (s *AuthServer) Authenticate(
 
 	resUser, err := s.CtxDB.QueriesRead.GetUserForAuth(context.Background(), username)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid token in DB: %w", err)
+		return nil, errs.ERR_INVALID_RESOURCE
 	}
 
 	match, err := argon2id.ComparePasswordAndHash(password, resUser.Password)
-	if err != nil {
-		return nil, fmt.Errorf("Invalid token in DB: %w", err)
-	}
-
-	if !match {
-		return nil, fmt.Errorf("Invalid credentials")
+	if err != nil || !match {
+		return nil, errs.ERR_INVALID_CREDENTIALS
 	}
 
 	tokenString, err := s.Issuer.IssueToken(enums.AUD_API, username)
@@ -96,25 +92,8 @@ func (s *AuthServer) Authenticate(
 		return nil, err
 	}
 
-	// resOTP, err := s.CtxDB.QueriesRead.GetAuthOTP(context.Background(), resUser.ID)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// if resOTP.OtpEnabled {
-	// 	eOTPStatus := enums.ParseOTPStatusEnum(resOTP.OtpStatus)
-	// 	if eOTPStatus == enums.OTP_STATUS_ENROLLED || eOTPStatus == enums.OTP_STATUS_SENT_CODE {
-	// 		err = s.CtxDB.Queries.NeedOTP(context.Background(), resUser.ID)
-	// 		if err != nil {
-	// 			return nil, err
-	// 		}
-	// 		return &pb.AuthenticateResponse{
-	// 			Token:   tokenString,
-	// 			NeedOtp: true,
-	// 		}, nil
-	// 	}
-	// }
-
 	return &pb.AuthenticateResponse{
-		Token: tokenString,
+		Token:   tokenString,
+		NeedOtp: resUser.OtpEnabled,
 	}, nil
 }

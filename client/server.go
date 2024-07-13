@@ -1,6 +1,7 @@
 package client
 
 import (
+	"cchoice/client/common"
 	"cchoice/client/components"
 	"cchoice/client/handlers"
 	"cchoice/client/middlewares"
@@ -29,23 +30,25 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	sessionManager = scs.New()
 	sessionManager.Lifetime = 24 * time.Hour
 	gob.Register(pb.RegisterResponse{})
+	gob.Register(common.AuthSession{})
 
 	grpcConn := NewGRPCConn(ctxClient.GRPCAddress, ctxClient.TSC)
 	defer GRPCConnectionClose(grpcConn)
 
 	logger := logs.Log()
 
+	mwAuth := middlewares.NewAuthenticated(sessionManager, pb.NewAuthServiceClient(grpcConn))
+
 	errHandler := handlers.NewErrorHandler(logger)
 
 	authService := pb.NewAuthServiceClient(grpcConn)
-	// authService := services.NewAuthService(grpcConn, sessionManager)
-	authHandler := handlers.NewAuthHandler(logger, authService, sessionManager)
+	authHandler := handlers.NewAuthHandler(logger, authService, sessionManager, mwAuth)
 
 	userService := pb.NewUserServiceClient(grpcConn)
 	userHandler := handlers.NewUserHandler(logger, userService, sessionManager)
 
 	otpService := pb.NewOTPServiceClient(grpcConn)
-	otpHandler := handlers.NewOTPHandler(logger, otpService, sessionManager)
+	otpHandler := handlers.NewOTPHandler(logger, otpService, authService, sessionManager, mwAuth)
 
 	// productService := services.NewProductService(grpcConn)
 	// productHandler := handlers.NewProductHandler(logger, &productService, &authService)
@@ -59,17 +62,16 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	})
 
 	//AUTH
-	// mux.HandleFunc("GET /", errHandler.Default(userHandler.AuthPage))
-	mux.HandleFunc("GET /register", errHandler.Default(userHandler.RegisterPage))
-	mux.HandleFunc("POST /register", errHandler.Default(userHandler.Register))
-
-	//REGISTER
 	mux.HandleFunc("GET /auth", errHandler.Default(authHandler.AuthPage))
 	mux.HandleFunc("POST /auth", errHandler.Default(authHandler.Authenticate))
 
+	//REGISTER
+	mux.HandleFunc("GET /register", errHandler.Default(userHandler.RegisterPage))
+	mux.HandleFunc("POST /register", errHandler.Default(userHandler.Register))
+
 	//OTP
-	// mux.HandleFunc("GET /otp", errHandler.Default(otpHandler.OTPView))
-	// mux.HandleFunc("POST /otp", errHandler.Default(otpHandler.OTPValidate))
+	mux.HandleFunc("GET /otp", errHandler.Default(otpHandler.OTPView))
+	mux.HandleFunc("POST /otp", errHandler.Default(otpHandler.OTPValidate))
 	mux.HandleFunc("GET /otp-enroll", errHandler.Default(otpHandler.OTPEnrollView))
 	mux.HandleFunc("POST /otp-enroll", errHandler.Default(otpHandler.OTPEnrollFinish))
 

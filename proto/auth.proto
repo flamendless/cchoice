@@ -10,8 +10,8 @@ message ValidateTokenRequest {
 }
 
 message ValidateTokenResponse {
-   bool success = 1;
-   string user_id = 2;
+   string user_id = 1;
+   string token_string = 2;
 }
 
 message AuthenticateRequest {

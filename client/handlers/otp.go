@@ -3,11 +3,11 @@ package handlers
 import (
 	"cchoice/client/common"
 	"cchoice/client/components"
+	"cchoice/client/middlewares"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/serialize"
 	pb "cchoice/proto"
-	"errors"
 	"net/http"
 	"net/url"
 
@@ -20,21 +20,26 @@ type OTPService interface {
 }
 
 type OTPHandler struct {
-	Logger      *zap.Logger
-	OTPService  OTPService
-	AuthService AuthService
-	SM          *scs.SessionManager
+	Logger        *zap.Logger
+	OTPService    OTPService
+	AuthService   AuthService
+	SM            *scs.SessionManager
+	Authenticated *middlewares.Authenticated
 }
 
 func NewOTPHandler(
 	logger *zap.Logger,
 	otpService OTPService,
+	authService AuthService,
 	sm *scs.SessionManager,
+	authenticated *middlewares.Authenticated,
 ) OTPHandler {
 	return OTPHandler{
-		Logger:      logger,
-		OTPService:  otpService,
-		SM:          sm,
+		Logger:        logger,
+		OTPService:    otpService,
+		AuthService:   authService,
+		SM:            sm,
+		Authenticated: authenticated,
 	}
 }
 
@@ -42,19 +47,15 @@ func (h OTPHandler) OTPView(
 	w http.ResponseWriter,
 	r *http.Request,
 ) *common.HandlerRes {
-	needOTP := h.SM.GetBool(r.Context(), "needOTP")
-	tokenString := h.SM.GetString(r.Context(), "tokenString")
-	if !needOTP || tokenString == "" {
-		return &common.HandlerRes{
-			Error:      errs.ERR_EXPIRED_OTP_LOGIN_AGAIN,
-			StatusCode: http.StatusBadRequest,
-		}
+	validToken, err := h.Authenticated.AuthenticatedSkipOTP(w, r, enums.AUD_API)
+	if err != nil {
+		return &common.HandlerRes{Error: err}
 	}
 
 	q, err := url.ParseQuery(r.URL.RawQuery)
 	if err != nil {
 		return &common.HandlerRes{
-			Error:      err,
+			Error:      errs.ERR_PARSE_FORM,
 			StatusCode: http.StatusBadRequest,
 		}
 	}
@@ -76,49 +77,44 @@ func (h OTPHandler) OTPView(
 		}
 	}
 
-	// resValidateToken, err := h.OTPService.ValidateToken(&common.AuthValidateTokenRequest{
-	// 	Token: tokenString,
-	// 	AUD:   "API",
-	// })
-	// if err != nil {
-	// 	return &common.HandlerRes{
-	// 		Error:      errs.ERR_NO_AUTH,
-	// 		StatusCode: http.StatusUnauthorized,
-	// 	}
-	// }
-	//
-	// resInfo, err := h.OTPService.GetOTPInfo(&common.AuthGetOTPInfoRequest{
-	// 	UserID:    resValidateToken.UserID,
-	// 	OTPMethod: otpMethod.String(),
-	// })
-	//
-	// if otpMethod == pb.OTPMethod_AUTHENTICATOR {
-	// 	return &common.HandlerRes{
-	// 		Component:  components.OTPMethodAuthenticator(),
-	// 		ReplaceURL: "/otp",
-	// 	}
-	// }
-	//
-	// if otpMethod == pb.OTPMethod_EMAIL || otpMethod == pb.OTPMethod_SMS {
-	// 	err = h.OTPService.GetOTPCode(&common.AuthGetOTPCodeRequest{
-	// 		UserID:    resValidateToken.UserID,
-	// 		OTPMethod: qOTPMethod,
-	// 	})
-	// 	if err != nil {
-	// 		return &common.HandlerRes{
-	// 			Error:      err,
-	// 			StatusCode: http.StatusInternalServerError,
-	// 		}
-	// 	}
-	//
-	// 	return &common.HandlerRes{
-	// 		Component: components.OTPMethodSMSOrEMail(
-	// 			otpMethod.String(),
-	// 			resInfo.Recipient,
-	// 		),
-	// 		ReplaceURL: "/otp",
-	// 	}
-	// }
+	resInfo, err := h.OTPService.GetOTPInfo(
+		r.Context(),
+		&pb.GetOTPInfoRequest{
+			UserId:    validToken.UserID,
+			OtpMethod: otpMethod.String(),
+		},
+	)
+
+	if otpMethod == pb.OTPMethod_AUTHENTICATOR {
+		return &common.HandlerRes{
+			Component:  components.OTPMethodAuthenticator(),
+			ReplaceURL: "/otp",
+		}
+	}
+
+	if otpMethod == pb.OTPMethod_EMAIL || otpMethod == pb.OTPMethod_SMS {
+		_, err := h.OTPService.GenerateOTPCode(
+			r.Context(),
+			&pb.GenerateOTPCodeRequest{
+				UserId: validToken.UserID,
+				Method: otpMethod,
+			},
+		)
+		if err != nil {
+			return &common.HandlerRes{
+				Error:      err,
+				StatusCode: http.StatusInternalServerError,
+			}
+		}
+
+		return &common.HandlerRes{
+			Component: components.OTPMethodSMSOrEMail(
+				otpMethod.String(),
+				resInfo.Recipient,
+			),
+			ReplaceURL: "/otp",
+		}
+	}
 
 	panic("should not be reached")
 }
@@ -127,41 +123,45 @@ func (h OTPHandler) OTPValidate(
 	w http.ResponseWriter,
 	r *http.Request,
 ) *common.HandlerRes {
-	// validToken, err := h.AuthService.Authenticated(enums.AUD_API, w, r)
-	// if err != nil {
-	// 	return &common.HandlerRes{
-	// 		Error: err,
-	// 	}
-	// }
+	validToken, err := h.Authenticated.AuthenticatedSkipOTP(w, r, enums.AUD_API)
+	if err != nil {
+		return &common.HandlerRes{Error: err}
+	}
 
-	// err = r.ParseForm()
-	// if err != nil {
-	// 	return &common.HandlerRes{
-	// 		Error:      errs.ERR_PARSE_FORM,
-	// 		StatusCode: http.StatusBadRequest,
-	// 	}
-	// }
-
-	passcode := r.Form.Get("otp")
-	if passcode == "" {
+	err = r.ParseForm()
+	if err != nil {
 		return &common.HandlerRes{
-			Error:      errors.New("Invalid OTP"),
+			Error:      errs.ERR_PARSE_FORM,
 			StatusCode: http.StatusBadRequest,
 		}
 	}
 
-	// err = h.OTPService.ValidateOTP(&common.AuthValidateOTPRequest{
-	// 	UserID:   validToken.UserID,
-	// 	Passcode: passcode,
-	// })
-	// if err != nil {
-	// 	return &common.HandlerRes{
-	// 		Error:      err,
-	// 		StatusCode: http.StatusBadRequest,
-	// 	}
-	// }
+	passcode := r.Form.Get("otp")
+	if passcode == "" {
+		return &common.HandlerRes{
+			Error:      errs.ERR_INVALID_OTP,
+			StatusCode: http.StatusBadRequest,
+		}
+	}
 
-	h.SM.PopBool(r.Context(), "needOTP")
+	res, err := h.OTPService.ValidateOTP(
+		r.Context(),
+		&pb.ValidateOTPRequest{
+			UserId:   validToken.UserID,
+			Passcode: passcode,
+		},
+	)
+	if err != nil || !res.Valid {
+		return &common.HandlerRes{
+			Error:      err,
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	h.SM.Put(r.Context(), "authSession", common.AuthSession{
+		Token:   validToken.TokenString,
+		NeedOTP: false,
+	})
 
 	return &common.HandlerRes{
 		Component:  components.Base("Home"),

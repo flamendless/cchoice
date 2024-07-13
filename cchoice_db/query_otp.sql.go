@@ -84,21 +84,6 @@ func (q *Queries) GetAuthForOTPValidation(ctx context.Context, userID int64) (Ge
 	return i, err
 }
 
-const getAuthOTP = `-- name: GetAuthOTP :one
-;
-
-SELECT otp_enabled
-FROM tbl_auth
-WHERE user_id = ?
-`
-
-func (q *Queries) GetAuthOTP(ctx context.Context, userID int64) (bool, error) {
-	row := q.db.QueryRowContext(ctx, getAuthOTP, userID)
-	var otp_enabled bool
-	err := row.Scan(&otp_enabled)
-	return otp_enabled, err
-}
-
 const getOTPEnabledByUserID = `-- name: GetOTPEnabledByUserID :one
 SELECT otp_enabled
 FROM tbl_auth

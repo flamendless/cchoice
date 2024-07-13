@@ -38,9 +38,3 @@ WHERE
 	user_id = ? AND
 	otp_enabled = false
 ;
-
--- name: GetAuthOTP :one
-SELECT otp_enabled
-FROM tbl_auth
-WHERE user_id = ?
-;

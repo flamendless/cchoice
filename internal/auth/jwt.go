@@ -18,8 +18,9 @@ import (
 )
 
 type ValidToken struct {
-	Token    *jwt.Token
-	UserID   string
+	Token       *jwt.Token
+	TokenString string
+	UserID      string
 }
 
 type Issuer struct {
@@ -138,7 +139,8 @@ func (v *Validator) GetToken(
 	}
 
 	return &ValidToken{
-		Token:    token,
-		UserID:   serialize.EncDBID(userID),
+		TokenString: tokenString,
+		Token:       token,
+		UserID:      serialize.EncDBID(userID),
 	}, nil
 }

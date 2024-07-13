@@ -3,10 +3,11 @@ package handlers
 import (
 	"cchoice/client/common"
 	"cchoice/client/components"
-	// "cchoice/internal/auth"
-	// "cchoice/internal/enums"
+	"cchoice/client/middlewares"
+	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	pb "cchoice/proto"
+	"fmt"
 
 	"net/http"
 
@@ -19,26 +20,30 @@ type AuthService interface {
 }
 
 type AuthHandler struct {
-	Logger      *zap.Logger
-	AuthService AuthService
-	SM          *scs.SessionManager
+	Logger        *zap.Logger
+	AuthService   AuthService
+	SM            *scs.SessionManager
+	Authenticated *middlewares.Authenticated
 }
 
 func NewAuthHandler(
 	logger *zap.Logger,
 	authService AuthService,
 	sm *scs.SessionManager,
+	authenticated *middlewares.Authenticated,
 ) AuthHandler {
 	return AuthHandler{
-		Logger:      logger,
-		AuthService: authService,
-		SM:          sm,
+		Logger:        logger,
+		AuthService:   authService,
+		SM:            sm,
+		Authenticated: authenticated,
 	}
 }
 
 func (h AuthHandler) AuthPage(w http.ResponseWriter, r *http.Request) *common.HandlerRes {
-	tokenString := h.SM.GetString(r.Context(), "tokenString")
-	if tokenString == "" {
+	_, err := h.Authenticated.Authenticated(w, r, enums.AUD_API)
+	fmt.Println(1111, err)
+	if err != nil {
 		return &common.HandlerRes{
 			Component: components.Base(
 				"Log In",
@@ -62,29 +67,29 @@ func (h AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) *commo
 		}
 	}
 
-	// res, err := h.AuthService.Authenticate(r, &common.AuthAuthenticateRequest{
-	// 	Username: r.Form.Get("username"),
-	// 	Password: r.Form.Get("password"),
-	// })
-	// if err != nil {
-	// 	return &common.HandlerRes{
-	// 		Error:      err,
-	// 		StatusCode: http.StatusUnauthorized,
-	// 	}
-	// }
+	res, err := h.AuthService.Authenticate(
+		r.Context(),
+		&pb.AuthenticateRequest{
+			Username: r.Form.Get("username"),
+			Password: r.Form.Get("password"),
+		},
+	)
+	if err != nil {
+		return &common.HandlerRes{
+			Error:      err,
+			StatusCode: http.StatusUnauthorized,
+		}
+	}
 
-	// if res.NeedOTP {
-	// 	h.SM.Put(r.Context(), "needOTP", true)
-	// 	return &common.HandlerRes{
-	// 		Component: components.CenterCard(
-	// 			components.OTPView(false),
-	// 		),
-	// 		ReplaceURL: "/otp",
-	// 	}
-	// }
+	h.SM.Put(r.Context(), "authSession", common.AuthSession{
+		Token:   res.Token,
+		NeedOTP: res.NeedOtp,
+	})
 
 	return &common.HandlerRes{
-		Component:  components.Base("Home"),
-		ReplaceURL: "/home",
+		Component: components.CenterCard(
+			components.OTPView(false),
+		),
+		ReplaceURL: "/otp",
 	}
 }

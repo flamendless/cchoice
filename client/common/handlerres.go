@@ -9,3 +9,8 @@ type HandlerRes struct {
 	RedirectTo string
 	ReplaceURL string
 }
+
+type AuthSession struct {
+	Token   string
+	NeedOTP bool
+}
