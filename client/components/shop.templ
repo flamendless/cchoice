@@ -1,0 +1,22 @@
+package components
+
+templ ShopHome() {
+	@Base(
+		"Shop",
+		WideCenterCard(
+			ShopHeader(),
+		),
+	)
+}
+
+templ ShopHeader() {
+	<div class="m-4 flex flex-col items-center">
+		@LogoWithText("20%", "20%")
+
+		<div class="m-4 flex flex-row items-center place-content-center w-screen">
+			@SideMenu()
+			@SearchBar()
+			@Cart()
+		</div>
+	</div>
+}

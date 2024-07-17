@@ -50,6 +50,9 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	otpService := pb.NewOTPServiceClient(grpcConn)
 	otpHandler := handlers.NewOTPHandler(logger, otpService, authService, sessionManager, mwAuth)
 
+	shopService := struct{}{}
+	shopHandler := handlers.NewShopHandler(logger, shopService, sessionManager)
+
 	// productService := services.NewProductService(grpcConn)
 	// productHandler := handlers.NewProductHandler(logger, &productService, &authService)
 
@@ -77,6 +80,9 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	//PRODUCTS
 	// mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))
+
+	//SHOP
+	mux.HandleFunc("GET /home", errHandler.Default(shopHandler.HomePage))
 
 	mw := middlewares.NewMiddleware(
 		mux,
