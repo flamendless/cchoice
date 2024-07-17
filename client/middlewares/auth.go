@@ -26,7 +26,7 @@ func NewAuthenticated(
 	}
 }
 
-func (mw Authenticated) Authenticated(
+func (mw *Authenticated) Authenticated(
 	w http.ResponseWriter,
 	r *http.Request,
 	aud enums.AudKind,
@@ -56,7 +56,7 @@ func (mw Authenticated) Authenticated(
 	}, nil
 }
 
-func (mw Authenticated) AuthenticatedSkipOTP(
+func (mw *Authenticated) AuthenticatedSkipOTP(
 	w http.ResponseWriter,
 	r *http.Request,
 	aud enums.AudKind,
