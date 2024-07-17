@@ -12,7 +12,7 @@ templ CenterCard(children ...templ.Component) {
 
 templ WideCenterCard(children ...templ.Component) {
 	<div
-		class="bg-white shadow-md rounded pb-8 mb-4 place-self-center w-screen flex flex-col place-content-center m-8"
+		class="bg-white shadow-xl rounded p-1 mb-4 place-self-center flex flex-col place-content-center m-2 border-cchoice border"
 	>
 		for _, child := range children {
 			@child

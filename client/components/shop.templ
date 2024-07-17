@@ -5,18 +5,49 @@ templ ShopHome() {
 		"Shop",
 		WideCenterCard(
 			ShopHeader(),
+			ShopBanner(),
+			ShopBrands([]string{"bosch", "dewalt", "makita", "trend"}),
 		),
 	)
 }
 
 templ ShopHeader() {
 	<div class="m-4 flex flex-col items-center">
-		@LogoWithText("20%", "20%")
-
-		<div class="m-4 flex flex-row items-center place-content-center w-screen">
+		@LogoWithText("10%", "10%")
+		<div class="m-2 flex flex-row items-center place-content-center w-screen">
 			@SideMenu()
 			@SearchBar()
 			@Cart()
+		</div>
+	</div>
+}
+
+templ ShopBanner() {
+	<div class="m-4 flex flex-row items-center place-content-center bg-searchbar">
+		<img
+			src="/static/images/banner.png"
+			alt="banner"
+			class="h-96"
+		/>
+	</div>
+}
+
+templ ShopBrands(brands []string) {
+	<div class="m-4 flex flex-col items-center place-content-center">
+		<a
+			href="/all-brands"
+			class="place-self-start text-cchoice"
+		>
+			View all brands
+		</a>
+		<div class="flex flex-row place-content-center justify-around w-full">
+			for _, brand := range brands {
+				<img
+					src={ "/static/images/brand_logos/" + brand + ".png" }
+					alt={ brand }
+					class="m-8"
+				/>
+			}
 		</div>
 	</div>
 }

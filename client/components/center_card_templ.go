@@ -57,7 +57,7 @@ func WideCenterCard(children ...templ.Component) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"bg-white shadow-md rounded pb-8 mb-4 place-self-center w-screen flex flex-col place-content-center m-8\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"bg-white shadow-xl rounded p-1 mb-4 place-self-center flex flex-col place-content-center m-2 border-cchoice border\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
