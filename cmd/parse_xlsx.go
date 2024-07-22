@@ -143,6 +143,26 @@ var parseXLSXCmd = &cobra.Command{
 			return
 		}
 
+		if !tpl.AppFlags.UseDB {
+			tpl.CtxApp.Metrics.LogTime(logs.Log())
+			return
+		}
+
+		tpl.CtxApp.DB = ctx.NewDatabaseCtx(tpl.AppFlags.DBPath)
+		defer tpl.CtxApp.DB.Close()
+
+		logs.Log().Debug("Getting brand...")
+		brandName := templates.TemplateToBrand(ctxParseXLSX.Template)
+		brand := models.NewBrand(brandName)
+		brandID := brand.GetDBID(tpl.CtxApp.DB)
+		if brandID == 0 {
+			_, err := brand.InsertToDB(tpl.CtxApp.DB)
+			if err != nil {
+				panic(err)
+			}
+		}
+		tpl.Brand = &brand
+
 		startProcessRows := time.Now()
 		products := tpl.ProcessRows(tpl, rows)
 		tpl.CtxApp.Metrics.Add("process rows time", time.Since(startProcessRows))
@@ -152,14 +172,6 @@ var parseXLSXCmd = &cobra.Command{
 				product.Print()
 			}
 		}
-
-		if !tpl.AppFlags.UseDB {
-			tpl.CtxApp.Metrics.LogTime(logs.Log())
-			return
-		}
-
-		tpl.CtxApp.DB = ctx.NewDatabaseCtx(tpl.AppFlags.DBPath)
-		defer tpl.CtxApp.DB.Close()
 
 		logs.Log().Debug("Inserting/updating products to DB...")
 
@@ -264,17 +276,22 @@ var parseXLSXCmd = &cobra.Command{
 				}
 
 				dbp := models.DBRowToProduct(&row)
+
+				brand := models.NewBrand(row.BrandName)
+				_ = brand.GetDBID(tpl.CtxApp.DB)
+				dbp.Brand = &brand
+
 				cmp, _ := product.UnitPriceWithoutVat.Compare(dbp.UnitPriceWithoutVat)
 				if cmp != 0 {
 					hasError = true
 					logs.Log().Warn(
 						"checking prices",
 						zap.Int64("product ID", product.ID),
-						zap.String("product brand", product.Brand),
+						zap.String("product brand", product.Brand.Name),
 						zap.String("product serial", product.Serial),
 						zap.Int64("product price", product.UnitPriceWithoutVat.Amount()),
 						zap.Int64("db ID", dbp.ID),
-						zap.String("db brand", dbp.Brand),
+						zap.String("db brand", dbp.Brand.Name),
 						zap.String("db serial", dbp.Serial),
 						zap.Int64("db price", dbp.UnitPriceWithoutVat.Amount()),
 					)

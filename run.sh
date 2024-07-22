@@ -102,6 +102,7 @@ genall() {
 
 check() {
 	echo "running check..."
+	go mod tidy
 	set +f
 	local gofiles=( internal/**/*.go conf/*.go grpc_server/**/*.go cmd/*.go )
 	for file in "${gofiles[@]}"; do

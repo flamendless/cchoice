@@ -73,7 +73,7 @@ templ ProductTableBody(products []*pb.Product) {
 			<td class="border border-slate-600">{ product.Serial }</td>
 			<td class="border border-slate-600">{ product.Name }</td>
 			<td class="border border-slate-600">{ product.Description }</td>
-			<td class="border border-slate-600">{ product.Brand }</td>
+			<td class="border border-slate-600">{ product.Brand.Name }</td>
 			<td class="border border-slate-600">{ product.UnitPriceWithoutVatDisplay }</td>
 			<td class="border border-slate-600">{ product.UnitPriceWithVatDisplay }</td>
 		</tr>

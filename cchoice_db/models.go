@@ -18,12 +18,17 @@ type TblAuth struct {
 	RecoveryCodes sql.NullString
 }
 
+type TblBrand struct {
+	ID   int64
+	Name string
+}
+
 type TblProduct struct {
 	ID                          int64
 	Serial                      string
 	Name                        string
 	Description                 sql.NullString
-	Brand                       string
+	BrandID                     int64
 	Status                      string
 	ProductSpecsID              sql.NullInt64
 	UnitPriceWithoutVat         int64

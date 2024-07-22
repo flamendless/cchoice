@@ -108,7 +108,7 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 	return &models.Product{
 		Name:                name,
 		Description:         desc,
-		Brand:               TemplateToBrand(tpl.AppFlags.Template),
+		Brand:               tpl.Brand,
 		Status:              status,
 		UnitPriceWithoutVat: prices[0],
 		UnitPriceWithVat:    prices[1],

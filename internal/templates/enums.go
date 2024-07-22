@@ -50,6 +50,6 @@ func TemplateToBrand(tpl string) string {
 	case "bosch":
 		return "Bosch"
 	default:
-		return ""
+		panic(fmt.Sprintf("Can't convert template '%s' to brand string", tpl))
 	}
 }

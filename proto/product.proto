@@ -2,6 +2,7 @@ syntax="proto3";
 
 package proto;
 
+import "proto/brand.proto";
 import "proto/common.proto";
 import "proto/product_category.proto";
 import "proto/product_specs.proto";
@@ -21,7 +22,7 @@ message Product {
    string name = 2;
    string serial = 3;
    string description = 4;
-   string brand = 5;
+   Brand brand = 5;
    ProductStatus.ProductStatus status = 6;
    ProductCategory product_category = 7;
    ProductSpecs product_specs = 8;

@@ -95,7 +95,7 @@ func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 
 	return &models.Product{
 		Name:                name,
-		Brand:               TemplateToBrand(tpl.AppFlags.Template),
+		Brand:               tpl.Brand,
 		Status:              status,
 		UnitPriceWithoutVat: prices[0],
 		UnitPriceWithVat:    prices[1],

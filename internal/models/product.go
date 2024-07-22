@@ -42,7 +42,7 @@ type Product struct {
 	Serial              string
 	Name                string
 	Description         string
-	Brand               string
+	Brand               *Brand
 	Status              enums.ProductStatus
 	ProductCategory     *ProductCategory
 	ProductSpecs        *ProductSpecs
@@ -54,7 +54,7 @@ type Product struct {
 }
 
 func (product *Product) PostProcess(rowIdx int) {
-	brandInitials := utils.GetInitials(product.Brand)
+	brandInitials := utils.GetInitials(product.Brand.Name)
 	nameInitials := utils.GetInitials(product.Name)
 	product.Serial = fmt.Sprintf("%s-%s-%d-%d", brandInitials, nameInitials, rowIdx, product.ID)
 	product.ProductCategory.Category = slug.Make(product.ProductCategory.Category)
@@ -245,8 +245,8 @@ func (product *Product) InsertToDB(ctxDB *ctx.Database) (int64, error) {
 				String: product.Description,
 				Valid:  true,
 			},
-			Brand:  product.Brand,
-			Status: product.Status.String(),
+			BrandID: product.Brand.ID,
+			Status:  product.Status.String(),
 			ProductSpecsID: sql.NullInt64{
 				Int64: productSpecsID,
 				Valid: productSpecsID != 0,
@@ -291,8 +291,8 @@ func (product *Product) UpdateToDB(ctxDB *ctx.Database) (int64, error) {
 				String: product.Description,
 				Valid:  true,
 			},
-			Brand:  product.Brand,
-			Status: product.Status.String(),
+			BrandID: product.Brand.ID,
+			Status:  product.Status.String(),
 			ProductSpecsID: sql.NullInt64{
 				Int64: productSpecsID,
 				Valid: productSpecsID != 0,
@@ -322,7 +322,7 @@ func DBRowToProduct(row *cchoice_db.GetProductBySerialRow) *Product {
 		Serial:      row.Serial,
 		Name:        row.Name,
 		Description: row.Description.String,
-		Brand:       row.Brand,
+		Brand:       &Brand{},
 		Status:      enums.ParseProductStatusEnum(row.Status),
 		ProductCategory: &ProductCategory{
 			Category:    row.Category.String,

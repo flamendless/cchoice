@@ -17,6 +17,7 @@ type Column struct {
 type Template struct {
 	AppFlags *ctx.ParseXLSXFlags
 	CtxApp   *ctx.App
+	Brand    *models.Brand
 
 	SkipInitialRows  int
 	AssumedRowsCount int

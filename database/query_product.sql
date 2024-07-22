@@ -1,74 +1,101 @@
 -- name: GetProductByID :one
-SELECT *
+SELECT
+	*,
+	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
 WHERE tbl_product.id = ?
 LIMIT 1;
 
 -- name: GetProductBySerial :one
-SELECT *
+SELECT
+	*,
+	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
 WHERE tbl_product.serial = ?
 LIMIT 1;
 
 -- name: GetProducts :many
-SELECT *
+SELECT
+	*,
+	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
 ORDER BY created_at DESC;
 
 -- name: GetProductsByStatus :many
-SELECT *
+SELECT
+	*,
+	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
 WHERE tbl_product.status = ?
 ORDER BY created_at DESC;
 
 -- name: GetProductsByStatusSortByNameAsc :many
-SELECT *
+SELECT
+	*,
+	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
 WHERE tbl_product.status = ?
 ORDER BY LOWER(tbl_product.name) ASC;
 
 -- name: GetProductsByStatusSortByNameDesc :many
-SELECT *
+SELECT
+	*,
+	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
 WHERE tbl_product.status = ?
 ORDER BY LOWER(tbl_product.name) DESC;
 
 -- name: GetProductsByStatusSortByCreationDateAsc :many
-SELECT *
+SELECT
+	*,
+	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
 WHERE tbl_product.status = ?
 ORDER BY tbl_product.created_at ASC;
 
 -- name: GetProductsByStatusSortByCreationDateDesc :many
-SELECT *
+SELECT
+	*,
+	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
 WHERE tbl_product.status = ?
 ORDER BY tbl_product.created_at DESC;
 
 -- name: GetProductsByFilter :many
-SELECT *
+SELECT
+	*,
+	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
 INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
 WHERE
 	(tbl_product.status = @status OR @status IS NULL) OR
-	(tbl_product.brand = @brand OR @brand IS NULL)
+	(tbl_brand.name = @brand OR @brand IS NULL)
 ORDER BY tbl_product.updated_at DESC;
 
 -- name: GetProductsWithSort :many
@@ -92,7 +119,7 @@ INSERT INTO tbl_product (
 	serial,
 	name,
 	description,
-	brand,
+	brand_id,
 	status,
 	product_specs_id,
 	unit_price_without_vat,
@@ -114,7 +141,7 @@ UPDATE tbl_product
 SET
 	name = ?,
 	description = ?,
-	brand = ?,
+	brand_id = ?,
 	status = ?,
 	product_specs_id = ?,
 	unit_price_without_vat = ?,

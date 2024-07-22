@@ -58,6 +58,7 @@ func SampleRowToProduct(tpl *Template, row []string) (*models.Product, []error) 
 	return &models.Product{
 		Serial:              serial,
 		Name:                name,
+		Brand:               tpl.Brand,
 		Description:         desc,
 		UnitPriceWithoutVat: unitPriceMoney,
 		UnitPriceWithVat:    unitPriceMoney,
