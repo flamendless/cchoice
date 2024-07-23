@@ -7,6 +7,7 @@ package cchoice_db
 
 import (
 	"context"
+	"time"
 )
 
 const createBrand = `-- name: CreateBrand :one
@@ -14,14 +15,51 @@ INSERT INTO tbl_brand (
 	name
 ) VALUES (
 	?
-) RETURNING id, name
+) RETURNING id
 `
 
-func (q *Queries) CreateBrand(ctx context.Context, name string) (TblBrand, error) {
+func (q *Queries) CreateBrand(ctx context.Context, name string) (int64, error) {
 	row := q.db.QueryRowContext(ctx, createBrand, name)
-	var i TblBrand
-	err := row.Scan(&i.ID, &i.Name)
-	return i, err
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const createBrandImage = `-- name: CreateBrandImage :one
+INSERT INTO tbl_brand_image (
+	brand_id,
+	path,
+	is_main,
+	created_at,
+	updated_at,
+	deleted_at
+) VALUES (
+	?, ?, ?,
+	?, ?, ?
+) RETURNING id
+`
+
+type CreateBrandImageParams struct {
+	BrandID   int64
+	Path      string
+	IsMain    bool
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
+}
+
+func (q *Queries) CreateBrandImage(ctx context.Context, arg CreateBrandImageParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createBrandImage,
+		arg.BrandID,
+		arg.Path,
+		arg.IsMain,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+		arg.DeletedAt,
+	)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const getBrandIDByName = `-- name: GetBrandIDByName :one
@@ -37,4 +75,52 @@ func (q *Queries) GetBrandIDByName(ctx context.Context, name string) (int64, err
 	var id int64
 	err := row.Scan(&id)
 	return id, err
+}
+
+const getBrandLogos = `-- name: GetBrandLogos :many
+SELECT
+	tbl_brand.id AS id,
+	tbl_brand.name AS name,
+	tbl_brand_image.id AS brand_image_id,
+	tbl_brand_image.path AS path
+FROM tbl_brand
+INNER JOIN tbl_brand_image ON tbl_brand_image.brand_id = tbl_brand.id
+WHERE
+	tbl_brand_image.is_main = true
+LIMIT ?
+`
+
+type GetBrandLogosRow struct {
+	ID           int64
+	Name         string
+	BrandImageID int64
+	Path         string
+}
+
+func (q *Queries) GetBrandLogos(ctx context.Context, limit int64) ([]GetBrandLogosRow, error) {
+	rows, err := q.db.QueryContext(ctx, getBrandLogos, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetBrandLogosRow
+	for rows.Next() {
+		var i GetBrandLogosRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.BrandImageID,
+			&i.Path,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

@@ -3,6 +3,7 @@ package handlers
 import (
 	"cchoice/client/common"
 	"cchoice/client/components"
+	pb "cchoice/proto"
 	"net/http"
 
 	"github.com/alexedwards/scs/v2"
@@ -10,6 +11,7 @@ import (
 )
 
 type ShopService interface {
+	pb.ShopServiceClient
 }
 
 type ShopHandler struct {

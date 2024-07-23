@@ -18,7 +18,7 @@ message ProductStatus {
 }
 
 message Product {
-   string ID = 1;
+   string id = 1;
    string name = 2;
    string serial = 3;
    string description = 4;

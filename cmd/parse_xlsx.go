@@ -12,6 +12,7 @@ import (
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 
+	"cchoice/internal/constants"
 	"cchoice/internal/ctx"
 	"cchoice/internal/logs"
 	"cchoice/internal/models"
@@ -156,12 +157,25 @@ var parseXLSXCmd = &cobra.Command{
 		brand := models.NewBrand(brandName)
 		brandID := brand.GetDBID(tpl.CtxApp.DB)
 		if brandID == 0 {
-			_, err := brand.InsertToDB(tpl.CtxApp.DB)
+			brandID, err := brand.InsertToDB(tpl.CtxApp.DB)
+			if err != nil {
+				panic(err)
+			}
+			now := time.Now().UTC()
+			brandImage := models.BrandImage{
+				BrandID:   brandID,
+				Path:      "static/images/brand_logos/" + ctxParseXLSX.Template + ".png",
+				IsMain:    true,
+				CreatedAt: now,
+				UpdatedAt: now,
+				DeletedAt: constants.DT_BEGINNING,
+			}
+			_, err = brandImage.InsertToDB(tpl.CtxApp.DB)
 			if err != nil {
 				panic(err)
 			}
 		}
-		tpl.Brand = &brand
+		tpl.Brand = brand
 
 		startProcessRows := time.Now()
 		products := tpl.ProcessRows(tpl, rows)
@@ -279,7 +293,7 @@ var parseXLSXCmd = &cobra.Command{
 
 				brand := models.NewBrand(row.BrandName)
 				_ = brand.GetDBID(tpl.CtxApp.DB)
-				dbp.Brand = &brand
+				dbp.Brand = brand
 
 				cmp, _ := product.UnitPriceWithoutVat.Compare(dbp.UnitPriceWithoutVat)
 				if cmp != 0 {

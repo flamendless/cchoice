@@ -39,18 +39,17 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	mwAuth := middlewares.NewAuthenticated(sessionManager, pb.NewAuthServiceClient(grpcConn))
 
-	errHandler := handlers.NewErrorHandler(logger)
-
 	authService := pb.NewAuthServiceClient(grpcConn)
-	authHandler := handlers.NewAuthHandler(logger, authService, sessionManager, mwAuth)
-
+	brandService := pb.NewBrandServiceClient(grpcConn)
 	userService := pb.NewUserServiceClient(grpcConn)
-	userHandler := handlers.NewUserHandler(logger, userService, sessionManager)
-
 	otpService := pb.NewOTPServiceClient(grpcConn)
-	otpHandler := handlers.NewOTPHandler(logger, otpService, authService, sessionManager, mwAuth)
+	shopService := pb.NewShopServiceClient(grpcConn)
 
-	shopService := struct{}{}
+	errHandler := handlers.NewErrorHandler(logger)
+	authHandler := handlers.NewAuthHandler(logger, authService, sessionManager, mwAuth)
+	brandHandler := handlers.NewBrandHandler(logger, brandService)
+	userHandler := handlers.NewUserHandler(logger, userService, sessionManager)
+	otpHandler := handlers.NewOTPHandler(logger, otpService, authService, sessionManager, mwAuth)
 	shopHandler := handlers.NewShopHandler(logger, shopService, sessionManager)
 
 	// productService := services.NewProductService(grpcConn)
@@ -83,6 +82,9 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	//SHOP
 	mux.HandleFunc("GET /home", errHandler.Default(shopHandler.HomePage))
+
+	//BRAND
+	mux.HandleFunc("GET /brand-logos", errHandler.Default(brandHandler.BrandLogos))
 
 	mw := middlewares.NewMiddleware(
 		mux,

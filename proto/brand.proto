@@ -4,7 +4,27 @@ package proto;
 
 option go_package = "cchoice/pb";
 
+message BrandImage {
+   string id = 1;
+   string brand_id = 2;
+   string path = 3;
+   bool is_main = 4;
+}
+
 message Brand {
-   string ID = 1;
+   string id = 1;
    string name = 2;
+   BrandImage main_image = 3;
+}
+
+message GetBrandLogosRequest {
+}
+
+message GetBrandLogosResponse {
+   int64 length = 1;
+   repeated Brand brands = 2;
+}
+
+service BrandService {
+   rpc GetBrandLogos(GetBrandLogosRequest) returns (GetBrandLogosResponse) {}
 }

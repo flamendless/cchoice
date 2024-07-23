@@ -5,6 +5,7 @@ go 1.22.1
 require (
 	github.com/Rhymond/go-money v1.0.13
 	github.com/a-h/templ v0.2.707
+	github.com/alexedwards/argon2id v1.0.0
 	github.com/alexedwards/scs/v2 v2.8.0
 	github.com/caarlos0/env/v11 v11.1.0
 	github.com/cohesivestack/valgo v0.4.1
@@ -13,6 +14,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/juju/ratelimit v1.0.2
 	github.com/mattn/go-sqlite3 v1.14.22
+	github.com/pquerna/otp v1.4.0
 	github.com/segmentio/ksuid v1.0.4
 	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/cobra v1.8.1
@@ -23,14 +25,12 @@ require (
 )
 
 require (
-	github.com/alexedwards/argon2id v1.0.0 // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/pquerna/otp v1.4.0 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect

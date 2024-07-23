@@ -1,8 +1,10 @@
 package models
 
 import (
+	"cchoice/cchoice_db"
 	"cchoice/internal/ctx"
 	"context"
+	"time"
 )
 
 type Brand struct {
@@ -10,8 +12,18 @@ type Brand struct {
 	Name string
 }
 
-func NewBrand(brandName string) Brand {
-	return Brand{
+type BrandImage struct {
+	ID        int64
+	BrandID   int64
+	Path      string
+	IsMain    bool
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
+}
+
+func NewBrand(brandName string) *Brand {
+	return &Brand{
 		Name: brandName,
 	}
 }
@@ -28,10 +40,30 @@ func (brand *Brand) GetDBID(ctxDB *ctx.Database) int64 {
 
 func (brand *Brand) InsertToDB(ctxDB *ctx.Database) (int64, error) {
 	ctx := context.Background()
-	newBrand, err := ctxDB.Queries.CreateBrand(ctx, brand.Name)
+	newBrandID, err := ctxDB.Queries.CreateBrand(ctx, brand.Name)
 	if err != nil {
 		return 0, err
 	}
-	brand.ID = newBrand.ID
-	return newBrand.ID, nil
+	brand.ID = newBrandID
+	return newBrandID, nil
+}
+
+func (brandImage *BrandImage) InsertToDB(ctxDB *ctx.Database) (int64, error) {
+	ctx := context.Background()
+	newBrandImageID, err := ctxDB.Queries.CreateBrandImage(
+		ctx,
+		cchoice_db.CreateBrandImageParams{
+			BrandID:   brandImage.BrandID,
+			Path:      brandImage.Path,
+			IsMain:    brandImage.IsMain,
+			CreatedAt: brandImage.CreatedAt,
+			UpdatedAt: brandImage.UpdatedAt,
+			DeletedAt: brandImage.DeletedAt,
+		},
+	)
+	if err != nil {
+		return 0, err
+	}
+	brandImage.ID = newBrandImageID
+	return newBrandImageID, nil
 }

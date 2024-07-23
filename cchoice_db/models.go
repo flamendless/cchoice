@@ -23,6 +23,16 @@ type TblBrand struct {
 	Name string
 }
 
+type TblBrandImage struct {
+	ID        int64
+	BrandID   int64
+	Path      string
+	IsMain    bool
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
+}
+
 type TblProduct struct {
 	ID                          int64
 	Serial                      string

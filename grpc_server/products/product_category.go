@@ -19,7 +19,7 @@ type ProductCategoryServer struct {
 
 func productCategoryFromRow(row *cchoice_db.TblProductCategory) *pb.ProductCategory {
 	return &pb.ProductCategory{
-		ID:          serialize.EncDBID(row.ID),
+		Id:          serialize.EncDBID(row.ID),
 		ProductId:   serialize.EncDBID(row.ProductID),
 		Category:    row.Category.String,
 		Subcategory: row.Subcategory.String,

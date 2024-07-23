@@ -67,7 +67,7 @@ func (product *Product) Print() {
 	builder.WriteString(fmt.Sprintf("Serial: %s\n", product.Serial))
 	builder.WriteString(fmt.Sprintf("Name: %s\n", product.Name))
 	builder.WriteString(fmt.Sprintf("Description: %s\n", product.Description))
-	builder.WriteString(fmt.Sprintf("Brand: %s\n", product.Brand))
+	builder.WriteString(fmt.Sprintf("Brand: %s\n", product.Brand.Name))
 	builder.WriteString(fmt.Sprintf("Product Status: %s\n", &product.Status))
 	product.ProductCategory.Print(&builder)
 	product.ProductSpecs.Print(&builder)

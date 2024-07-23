@@ -34,12 +34,12 @@ func (row ProductsRow) ToPBProduct() *pb.Product {
 	)
 
 	return &pb.Product{
-		ID:          serialize.EncDBID(row.ID),
+		Id:          serialize.EncDBID(row.ID),
 		Serial:      row.Serial,
 		Name:        row.Name,
 		Description: row.Description.String,
 		Brand: &pb.Brand{
-			ID:   serialize.EncDBID(row.BrandID),
+			Id:   serialize.EncDBID(row.BrandID),
 			Name: row.BrandName,
 		},
 		Status: enums.StringToPBEnum(

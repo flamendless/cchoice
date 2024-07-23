@@ -32,7 +32,7 @@ func (s *ProductSpecsServer) GetProductSpecsByID(
 	}
 
 	return &pb.ProductSpecs{
-		ID:            serialize.EncDBID(existingProductSpecs.ID),
+		Id:            serialize.EncDBID(existingProductSpecs.ID),
 		Colours:       existingProductSpecs.Colours.String,
 		Sizes:         existingProductSpecs.Sizes.String,
 		Segmentation:  existingProductSpecs.Segmentation.String,

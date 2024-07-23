@@ -1,12 +1,16 @@
 package components
 
+import "cchoice/proto"
+
+const MAX_BRANDS_DISPLAY = 5
+
 templ ShopHome() {
 	@Base(
 		"Shop",
 		WideCenterCard(
 			ShopHeader(),
 			ShopBanner(),
-			ShopBrands([]string{"bosch", "dewalt", "makita", "trend"}),
+			ShopBrands([]*pb.Brand{}),
 		),
 	)
 }
@@ -32,20 +36,30 @@ templ ShopBanner() {
 	</div>
 }
 
-templ ShopBrands(brands []string) {
-	<div class="m-4 flex flex-col items-center place-content-center">
+templ ShopBrands(brands []*pb.Brand) {
+	<div
+		class="m-4 flex flex-col items-center place-content-center"
+		hx-trigger="load"
+		hx-get="/brand-logos"
+		hx-swap="innerHTML"
+		hx-target="#brand_logos"
+		hx-select="#brand_logos"
+	>
 		<a
 			href="/all-brands"
 			class="place-self-start text-cchoice"
 		>
 			View all brands
 		</a>
-		<div class="flex flex-row place-content-center justify-around w-full">
-			for _, brand := range brands {
+		<div
+			id="brand_logos"
+			class="flex flex-row flex-wrap place-content-center justify-around w-full"
+		>
+			for i := 0; i < min(len(brands), MAX_BRANDS_DISPLAY); i++ {
 				<img
-					src={ "/static/images/brand_logos/" + brand + ".png" }
-					alt={ brand }
-					class="m-8"
+					src={ brands[i].MainImage.Path }
+					alt={ "logo of " + brands[i].MainImage.Id }
+					class="m-4 max-w-xs w-1/6"
 				/>
 			}
 		</div>
