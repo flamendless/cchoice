@@ -16,6 +16,28 @@ func NewGRPCBrandServer(ctxDB *ctx.Database) *BrandServer {
 	return &BrandServer{CtxDB: ctxDB}
 }
 
+func (s *BrandServer) GetBrand(
+	ctx context.Context,
+	in *pb.GetBrandRequest,
+) (*pb.GetBrandResponse, error) {
+	brandID := serialize.DecDBID(in.Id)
+	brand, err := s.CtxDB.Queries.GetBrandByID(context.Background(), brandID)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.GetBrandResponse{
+		Brand: &pb.Brand{
+			Id: in.Id,
+			Name: brand.Name,
+			MainImage: &pb.BrandImage{
+				Id:      serialize.EncDBID(brand.BrandImageID),
+				BrandId: in.Id,
+				Path:    brand.Path,
+			},
+		},
+	}, nil
+}
+
 func (s *BrandServer) GetBrandLogos(
 	ctx context.Context,
 	in *pb.GetBrandLogosRequest,

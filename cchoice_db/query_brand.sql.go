@@ -62,6 +62,37 @@ func (q *Queries) CreateBrandImage(ctx context.Context, arg CreateBrandImagePara
 	return id, err
 }
 
+const getBrandByID = `-- name: GetBrandByID :one
+SELECT
+	tbl_brand.id, tbl_brand.name,
+	tbl_brand_image.id AS brand_image_id,
+	tbl_brand_image.path AS path
+FROM tbl_brand
+INNER JOIN tbl_brand_image ON tbl_brand_image.brand_id = tbl_brand.id
+WHERE
+	tbl_brand.id = ?
+LIMIT 1
+`
+
+type GetBrandByIDRow struct {
+	ID           int64
+	Name         string
+	BrandImageID int64
+	Path         string
+}
+
+func (q *Queries) GetBrandByID(ctx context.Context, id int64) (GetBrandByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getBrandByID, id)
+	var i GetBrandByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.BrandImageID,
+		&i.Path,
+	)
+	return i, err
+}
+
 const getBrandIDByName = `-- name: GetBrandIDByName :one
 SELECT id
 FROM tbl_brand

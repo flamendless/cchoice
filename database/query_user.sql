@@ -8,6 +8,10 @@ LIMIT 1;
 -- name: GetUserWithAuthByID :one
 SELECT
 	tbl_user.id,
+	tbl_user.first_name,
+	tbl_user.middle_name,
+	tbl_user.last_name,
+	tbl_user.email,
 	tbl_auth.otp_enabled
 FROM tbl_user
 INNER JOIN tbl_auth ON tbl_auth.user_id = tbl_user.id

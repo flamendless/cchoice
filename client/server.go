@@ -29,7 +29,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	sessionManager = scs.New()
 	sessionManager.Lifetime = 24 * time.Hour
-	gob.Register(pb.RegisterResponse{})
+	gob.Register(common.User{})
 	gob.Register(common.AuthSession{})
 
 	grpcConn := NewGRPCConn(ctxClient.GRPCAddress, ctxClient.TSC)
@@ -37,7 +37,11 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	logger := logs.Log()
 
-	mwAuth := middlewares.NewAuthenticated(sessionManager, pb.NewAuthServiceClient(grpcConn))
+	mwAuth := middlewares.NewAuthenticated(
+		sessionManager,
+		pb.NewAuthServiceClient(grpcConn),
+		pb.NewUserServiceClient(grpcConn),
+	)
 
 	authService := pb.NewAuthServiceClient(grpcConn)
 	brandService := pb.NewBrandServiceClient(grpcConn)
@@ -66,6 +70,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	//AUTH
 	mux.HandleFunc("GET /auth", errHandler.Default(authHandler.AuthPage))
 	mux.HandleFunc("POST /auth", errHandler.Default(authHandler.Authenticate))
+	mux.HandleFunc("GET /auth/avatar",  errHandler.Default(authHandler.Avatar))
 
 	//REGISTER
 	mux.HandleFunc("GET /register", errHandler.Default(userHandler.RegisterPage))
@@ -81,9 +86,11 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	// mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))
 
 	//SHOP
+	mux.HandleFunc("GET /", errHandler.Default(shopHandler.HomePage))
 	mux.HandleFunc("GET /home", errHandler.Default(shopHandler.HomePage))
 
 	//BRAND
+	mux.HandleFunc("GET /brand/{id}", errHandler.Default(brandHandler.BrandPage))
 	mux.HandleFunc("GET /brand-logos", errHandler.Default(brandHandler.BrandLogos))
 
 	mw := middlewares.NewMiddleware(

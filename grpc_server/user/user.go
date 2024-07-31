@@ -78,6 +78,10 @@ func (s *UserServer) GetUserByID(
 	return &pb.GetUserByIDResponse{
 		User: &pb.User{
 			Id:         in.UserId,
+			FirstName:  res.FirstName,
+			MiddleName: res.MiddleName,
+			LastName:   res.LastName,
+			Email:      res.Email,
 			OtpEnabled: res.OtpEnabled,
 		},
 	}, nil

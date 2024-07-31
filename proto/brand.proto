@@ -17,8 +17,15 @@ message Brand {
    BrandImage main_image = 3;
 }
 
-message GetBrandLogosRequest {
+message GetBrandRequest {
+   string id = 1;
 }
+
+message GetBrandResponse {
+   Brand brand = 1;
+}
+
+message GetBrandLogosRequest {}
 
 message GetBrandLogosResponse {
    int64 length = 1;
@@ -26,5 +33,6 @@ message GetBrandLogosResponse {
 }
 
 service BrandService {
+   rpc GetBrand(GetBrandRequest) returns (GetBrandResponse) {}
    rpc GetBrandLogos(GetBrandLogosRequest) returns (GetBrandLogosResponse) {}
 }

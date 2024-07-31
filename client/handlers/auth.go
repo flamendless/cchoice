@@ -7,7 +7,6 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	pb "cchoice/proto"
-	"fmt"
 
 	"net/http"
 
@@ -42,7 +41,6 @@ func NewAuthHandler(
 
 func (h AuthHandler) AuthPage(w http.ResponseWriter, r *http.Request) *common.HandlerRes {
 	_, err := h.Authenticated.Authenticated(w, r, enums.AUD_API)
-	fmt.Println(1111, err)
 	if err != nil {
 		return &common.HandlerRes{
 			Component: components.Base(
@@ -91,5 +89,17 @@ func (h AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) *commo
 			components.OTPView(false),
 		),
 		ReplaceURL: "/otp",
+	}
+}
+
+func (h AuthHandler) Avatar(w http.ResponseWriter, r *http.Request) *common.HandlerRes {
+	user, err := h.Authenticated.User(w, r, enums.AUD_API)
+	if err != nil {
+		return &common.HandlerRes{
+			Component: components.UserAvatar(""),
+		}
+	}
+	return &common.HandlerRes{
+		Component: components.UserAvatar(user.FirstName),
 	}
 }

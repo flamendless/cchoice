@@ -5,6 +5,17 @@ WHERE
 	name = ?
 LIMIT 1;
 
+-- name: GetBrandByID :one
+SELECT
+	tbl_brand.*,
+	tbl_brand_image.id AS brand_image_id,
+	tbl_brand_image.path AS path
+FROM tbl_brand
+INNER JOIN tbl_brand_image ON tbl_brand_image.brand_id = tbl_brand.id
+WHERE
+	tbl_brand.id = ?
+LIMIT 1;
+
 -- name: GetBrandLogos :many
 SELECT
 	tbl_brand.id AS id,
