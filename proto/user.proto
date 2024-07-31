@@ -6,7 +6,11 @@ option go_package = "cchoice/pb";
 
 message User {
    string id = 1;
-   bool otp_enabled = 2;
+   string first_name = 2;
+   string middle_name = 3;
+   string last_name = 4;
+   string email = 5;
+   bool otp_enabled = 6;
 }
 
 message RegisterRequest {

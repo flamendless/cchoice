@@ -200,6 +200,10 @@ func (q *Queries) GetUserForAuth(ctx context.Context, email string) (GetUserForA
 const getUserWithAuthByID = `-- name: GetUserWithAuthByID :one
 SELECT
 	tbl_user.id,
+	tbl_user.first_name,
+	tbl_user.middle_name,
+	tbl_user.last_name,
+	tbl_user.email,
 	tbl_auth.otp_enabled
 FROM tbl_user
 INNER JOIN tbl_auth ON tbl_auth.user_id = tbl_user.id
@@ -210,12 +214,23 @@ LIMIT 1
 
 type GetUserWithAuthByIDRow struct {
 	ID         int64
+	FirstName  string
+	MiddleName string
+	LastName   string
+	Email      string
 	OtpEnabled bool
 }
 
 func (q *Queries) GetUserWithAuthByID(ctx context.Context, id int64) (GetUserWithAuthByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getUserWithAuthByID, id)
 	var i GetUserWithAuthByIDRow
-	err := row.Scan(&i.ID, &i.OtpEnabled)
+	err := row.Scan(
+		&i.ID,
+		&i.FirstName,
+		&i.MiddleName,
+		&i.LastName,
+		&i.Email,
+		&i.OtpEnabled,
+	)
 	return i, err
 }

@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BrandServiceClient interface {
+	GetBrand(ctx context.Context, in *GetBrandRequest, opts ...grpc.CallOption) (*GetBrandResponse, error)
 	GetBrandLogos(ctx context.Context, in *GetBrandLogosRequest, opts ...grpc.CallOption) (*GetBrandLogosResponse, error)
 }
 
@@ -31,6 +32,15 @@ type brandServiceClient struct {
 
 func NewBrandServiceClient(cc grpc.ClientConnInterface) BrandServiceClient {
 	return &brandServiceClient{cc}
+}
+
+func (c *brandServiceClient) GetBrand(ctx context.Context, in *GetBrandRequest, opts ...grpc.CallOption) (*GetBrandResponse, error) {
+	out := new(GetBrandResponse)
+	err := c.cc.Invoke(ctx, "/proto.BrandService/GetBrand", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *brandServiceClient) GetBrandLogos(ctx context.Context, in *GetBrandLogosRequest, opts ...grpc.CallOption) (*GetBrandLogosResponse, error) {
@@ -46,6 +56,7 @@ func (c *brandServiceClient) GetBrandLogos(ctx context.Context, in *GetBrandLogo
 // All implementations must embed UnimplementedBrandServiceServer
 // for forward compatibility
 type BrandServiceServer interface {
+	GetBrand(context.Context, *GetBrandRequest) (*GetBrandResponse, error)
 	GetBrandLogos(context.Context, *GetBrandLogosRequest) (*GetBrandLogosResponse, error)
 	mustEmbedUnimplementedBrandServiceServer()
 }
@@ -54,6 +65,9 @@ type BrandServiceServer interface {
 type UnimplementedBrandServiceServer struct {
 }
 
+func (UnimplementedBrandServiceServer) GetBrand(context.Context, *GetBrandRequest) (*GetBrandResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBrand not implemented")
+}
 func (UnimplementedBrandServiceServer) GetBrandLogos(context.Context, *GetBrandLogosRequest) (*GetBrandLogosResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBrandLogos not implemented")
 }
@@ -68,6 +82,24 @@ type UnsafeBrandServiceServer interface {
 
 func RegisterBrandServiceServer(s grpc.ServiceRegistrar, srv BrandServiceServer) {
 	s.RegisterService(&BrandService_ServiceDesc, srv)
+}
+
+func _BrandService_GetBrand_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBrandRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BrandServiceServer).GetBrand(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.BrandService/GetBrand",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BrandServiceServer).GetBrand(ctx, req.(*GetBrandRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _BrandService_GetBrandLogos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -95,6 +127,10 @@ var BrandService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "proto.BrandService",
 	HandlerType: (*BrandServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetBrand",
+			Handler:    _BrandService_GetBrand_Handler,
+		},
 		{
 			MethodName: "GetBrandLogos",
 			Handler:    _BrandService_GetBrandLogos_Handler,

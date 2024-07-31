@@ -14,3 +14,11 @@ type AuthSession struct {
 	Token   string
 	NeedOTP bool
 }
+
+type User struct {
+	ID         string
+	FirstName  string
+	MiddleName string
+	LastName   string
+	Email      string
+}
