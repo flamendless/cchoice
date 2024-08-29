@@ -25,7 +25,9 @@ message GetBrandResponse {
    Brand brand = 1;
 }
 
-message GetBrandLogosRequest {}
+message GetBrandLogosRequest {
+   int64 limit = 1;
+}
 
 message GetBrandLogosResponse {
    int64 length = 1;

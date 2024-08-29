@@ -5,6 +5,7 @@ import "errors"
 var (
 	ERR_INVALID_INPUT           = errors.New("Invalid input")
 	ERR_INVALID_RESOURCE        = errors.New("Invalid resource")
+	ERR_INVALID_PARAMS          = errors.New("Invalid params")
 	ERR_INVALID_CREDENTIALS     = errors.New("Invalid credentials")
 	ERR_PARSE_FORM              = errors.New("Failed to parse form")
 	ERR_NO_AUTH                 = errors.New("Not authenticated")

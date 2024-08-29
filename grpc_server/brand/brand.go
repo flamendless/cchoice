@@ -5,6 +5,8 @@ import (
 	"cchoice/internal/serialize"
 	pb "cchoice/proto"
 	"context"
+	"errors"
+	"os"
 )
 
 type BrandServer struct {
@@ -49,6 +51,15 @@ func (s *BrandServer) GetBrandLogos(
 
 	brands := make([]*pb.Brand, 0, len(brandLogos))
 	for _, brandLogo := range brandLogos {
+		if len(brands) >= int(in.Limit) {
+			break
+		}
+
+		_, err := os.Stat("client/" + brandLogo.Path)
+		if errors.Is(err, os.ErrNotExist) {
+			continue
+		}
+
 		serBrandID := serialize.EncDBID(brandLogo.ID)
 		brands = append(brands, &pb.Brand{
 			Id:   serBrandID,

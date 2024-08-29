@@ -41,6 +41,10 @@ func init() {
 }
 
 func ProcessColumns(tpl *templates.Template, file *excelize.File) bool {
+	if tpl.BrandOnly {
+		return true
+	}
+
 	rows, err := file.Rows(tpl.AppFlags.Sheet)
 	if err != nil {
 		logs.Log().Error(err.Error())
@@ -136,7 +140,7 @@ var parseXLSXCmd = &cobra.Command{
 			}
 		}()
 
-		if tpl.ProcessRows == nil {
+		if tpl.ProcessRows == nil && !tpl.BrandOnly {
 			logs.Log().Panic(fmt.Sprintf(
 				"Must provide template '%s' -> ProcessRows\n",
 				templateKind.String(),
@@ -176,6 +180,9 @@ var parseXLSXCmd = &cobra.Command{
 			}
 		}
 		tpl.Brand = brand
+		if tpl.BrandOnly {
+			return
+		}
 
 		startProcessRows := time.Now()
 		products := tpl.ProcessRows(tpl, rows)

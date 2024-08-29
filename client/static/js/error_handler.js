@@ -18,10 +18,5 @@ document.body.addEventListener("htmx:afterRequest", function (evt) {
 		el_error_closer.removeAttribute("hidden");
 		el_error_banner.removeAttribute("hidden");
 
-	} else {
-		console.error("Unexpected htmx error", evt.detail);
-
-		el_error_banner.innerText = "Unexpected error, check your connection and try to refresh the page.";
-		el_error_banner.removeAttribute("hidden");
 	}
 });

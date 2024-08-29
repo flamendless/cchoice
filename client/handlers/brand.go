@@ -7,6 +7,7 @@ import (
 	pb "cchoice/proto"
 	"context"
 	"net/http"
+	"strconv"
 
 	"go.uber.org/zap"
 )
@@ -31,7 +32,19 @@ func NewBrandHandler(
 }
 
 func (h BrandHandler) BrandLogos(w http.ResponseWriter, r *http.Request) *common.HandlerRes {
-	res, err := h.BrandService.GetBrandLogos(context.Background(), &pb.GetBrandLogosRequest{})
+	qlimit := r.URL.Query().Get("limit")
+	if qlimit == "" {
+		qlimit = "100"
+	}
+
+	limit, err := strconv.Atoi(qlimit)
+	if err != nil {
+		return &common.HandlerRes{Error: errs.ERR_INVALID_PARAMS}
+	}
+
+	res, err := h.BrandService.GetBrandLogos(context.Background(), &pb.GetBrandLogosRequest{
+		Limit: int64(limit),
+	})
 	if err != nil {
 		return &common.HandlerRes{Error: err}
 	}
