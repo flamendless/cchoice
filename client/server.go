@@ -92,6 +92,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	//BRAND
 	mux.HandleFunc("GET /brand/{id}", errHandler.Default(brandHandler.BrandPage))
 	mux.HandleFunc("GET /brand-logos", errHandler.Default(brandHandler.BrandLogos))
+	mux.HandleFunc("GET /all-brands", errHandler.Default(nil)) //TODO: (Brandon)
 
 	mw := middlewares.NewMiddleware(
 		mux,

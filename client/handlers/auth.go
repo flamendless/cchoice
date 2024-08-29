@@ -85,8 +85,11 @@ func (h AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) *commo
 	})
 
 	return &common.HandlerRes{
-		Component: components.CenterCard(
-			components.OTPView(false),
+		Component: components.Base(
+			"OTP",
+			components.CenterCard(
+				components.OTPView(false),
+			),
 		),
 		ReplaceURL: "/otp",
 	}

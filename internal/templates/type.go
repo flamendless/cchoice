@@ -21,6 +21,7 @@ type Template struct {
 
 	SkipInitialRows  int
 	AssumedRowsCount int
+	BrandOnly        bool
 	Columns          map[string]*Column
 	RowToProduct     func(*Template, []string) (*models.Product, []error)
 	RowToSpecs       func(*Template, []string) *models.ProductSpecs
@@ -60,6 +61,23 @@ func CreateTemplate(kind TemplateKind) *Template {
 			RowToSpecs:       BoschRowToSpecs,
 			ProcessRows:      BoschProcessRows,
 		}
+
+	case TEMPLATE_SPARTA:
+		return &Template{BrandOnly: true}
+	case TEMPLATE_UNITED_POWER:
+		return &Template{BrandOnly: true}
+	case TEMPLATE_SHINSETSU:
+		return &Template{BrandOnly: true}
+	case TEMPLATE_MAXLIFT:
+		return &Template{BrandOnly: true}
+	case TEMPLATE_TRUMP:
+		return &Template{BrandOnly: true}
+	case TEMPLATE_REDMAX:
+		return &Template{BrandOnly: true}
+	case TEMPLATE_BRADFORD:
+		return &Template{BrandOnly: true}
+	case TEMPLATE_KOBEWEL:
+		return &Template{BrandOnly: true}
 
 	default:
 		panic(fmt.Sprintf("No template parser found for %s", kind.String()))

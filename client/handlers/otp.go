@@ -8,6 +8,7 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/serialize"
 	pb "cchoice/proto"
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -108,9 +109,12 @@ func (h OTPHandler) OTPView(
 		}
 
 		return &common.HandlerRes{
-			Component: components.OTPMethodSMSOrEMail(
-				otpMethod.String(),
-				resInfo.Recipient,
+			Component: components.Base(
+				"OTP",
+				components.OTPMethodSMSOrEMail(
+					otpMethod.String(),
+					resInfo.Recipient,
+				),
 			),
 			ReplaceURL: "/otp",
 		}

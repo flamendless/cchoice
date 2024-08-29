@@ -99,7 +99,7 @@ func LogoWithText(width string, height string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<img src=\"/static/svg/logo_with_text.svg\" alt=\"cchoice logo and text\" class=\"-mt-8 -mb-4 w-fit\" width=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<img src=\"/static/svg/logo_with_text.svg\" alt=\"cchoice logo and text\" class=\"-mt-8 -mb-4 w-fit cursor-pointer\" width=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

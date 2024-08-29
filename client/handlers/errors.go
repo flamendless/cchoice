@@ -25,7 +25,6 @@ func NewErrorHandler(logger *zap.Logger) *ErrorHandler {
 func (h *ErrorHandler) Default(fn FnHandler) FnHTTP {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res := fn(w, r)
-
 		if res == nil {
 			panic("Returned HandlerRes is nil")
 		}
@@ -34,11 +33,16 @@ func (h *ErrorHandler) Default(fn FnHandler) FnHTTP {
 			w.Header().Add("HX-Replace-Url", res.ReplaceURL)
 		}
 
+		if res.RedirectTo != "" {
+			w.Header().Add("HX-Redirect", res.RedirectTo)
+		}
+
 		if res.Error != nil {
 			logs.LogHTTPHandler(h.Logger, r, res.Error)
 
 			if res.Error == errs.ERR_NO_AUTH {
-				http.Redirect(w, r, res.RedirectTo, http.StatusTemporaryRedirect)
+				// http.Redirect(w, r, res.RedirectTo, http.StatusTemporaryRedirect)
+				w.Header().Add("HX-Redirect", res.RedirectTo)
 
 			} else {
 				if res.RedirectTo == "" {
@@ -48,7 +52,8 @@ func (h *ErrorHandler) Default(fn FnHandler) FnHTTP {
 
 					http.Error(w, res.Error.Error(), res.StatusCode)
 				} else {
-					http.Redirect(w, r, res.RedirectTo, http.StatusTemporaryRedirect)
+					// http.Redirect(w, r, res.RedirectTo, http.StatusTemporaryRedirect)
+					w.Header().Add("HX-Redirect", res.RedirectTo)
 				}
 			}
 			return

@@ -35,5 +35,6 @@ func NewShopHandler(
 func (h ShopHandler) HomePage(w http.ResponseWriter, r *http.Request) *common.HandlerRes {
 	return &common.HandlerRes{
 		Component: components.ShopHome(),
+		RedirectTo: "/home",
 	}
 }

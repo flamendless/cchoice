@@ -118,6 +118,7 @@ FROM tbl_brand
 INNER JOIN tbl_brand_image ON tbl_brand_image.brand_id = tbl_brand.id
 WHERE
 	tbl_brand_image.is_main = true
+ORDER BY tbl_brand.name ASC
 LIMIT ?
 `
 

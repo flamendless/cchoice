@@ -1,6 +1,7 @@
 package components
 
 import "cchoice/proto"
+import "fmt"
 
 const MAX_BRANDS_DISPLAY = 5
 
@@ -17,7 +18,10 @@ templ ShopHome() {
 
 templ ShopHeader() {
 	<div class="m-2 flex flex-row w-auto">
-		<div class="w-1/3 flex place-content-end">
+		<div
+			class="w-1/3 flex place-content-end"
+			hx-get="/"
+		>
 			@LogoWithText("10%", "10%")
 		</div>
 
@@ -53,19 +57,18 @@ templ ShopBrands(brands []*pb.Brand) {
 	<div
 		class="m-4 flex flex-col items-center place-content-center"
 		hx-trigger="load"
-		hx-get="/brand-logos"
+		hx-get={ fmt.Sprintf("/brand-logos?limit=%d", MAX_BRANDS_DISPLAY*2) }
 		hx-swap="innerHTML"
 		hx-target="#brand_logos"
 		hx-select="#brand_logos"
 	>
-		if len(brands) >= MAX_BRANDS_DISPLAY{
-			<a
-				href="/all-brands"
-				class="place-self-start text-cchoice"
-			>
-				View all brands
-			</a>
-		}
+
+		<a
+			href="/all-brands"
+			class="place-self-start text-cchoice"
+		>
+			View all brands
+		</a>
 
 		<div
 			id="brand_logos"
