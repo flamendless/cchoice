@@ -15,6 +15,13 @@ GRPC_SERVER_ADDR=":50051"
 WIN_PATH=/mnt/c/Windows/System32
 alias cmd.exe="$WIN_PATH"/cmd.exe
 
+set +f
+GOFILES=( internal/**/*.go conf/*.go grpc_server/**/*.go cmd/*.go )
+for file in "${GOFILES[@]}"; do
+	go generate "$file"
+done
+set -f
+
 grpc_ui() {
 	cmd.exe /c "start vivaldi http://127.0.0.1:36477/"
 	local token=$(go run ./main.go jwt -s "issue" -a "API" -o "true" -u "client@cchoice.com")
@@ -60,6 +67,7 @@ clean() {
 
 cleandb() {
 	clean
+	genall
 	gensql
 
 	local otherbrands=("sparta" "shinsetsu" "redmax" "bradford" "kobewel")
@@ -103,7 +111,9 @@ gentempl() {
 
 genall() {
 	echo "running genall..."
-	go generate
+	for file in "${GOFILES[@]}"; do
+		go generate "$file"
+	done
 	npx tailwindcss build -i client/static/css/style.css -o client/static/css/tailwind.css -m
 	gensql
 	genproto
@@ -113,12 +123,9 @@ genall() {
 check() {
 	echo "running check..."
 	go mod tidy
-	set +f
-	local gofiles=( internal/**/*.go conf/*.go grpc_server/**/*.go cmd/*.go )
-	for file in "${gofiles[@]}"; do
+	for file in "${GOFILES[@]}"; do
 		goimports -w -local -v "$file"
 	done
-	set -f
 	go vet ./...
 	prealloc ./...
 	smrcptr ./...

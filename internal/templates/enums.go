@@ -1,65 +1,42 @@
 package templates
 
+//go:generate stringer -type=TemplateKind -linecomment
+
 import "fmt"
 
 type TemplateKind int
 
 const (
-	TEMPLATE_UNDEFINED TemplateKind = iota
-	TEMPLATE_SAMPLE
-	TEMPLATE_DELTAPLUS
-	TEMPLATE_BOSCH
-	TEMPLATE_SPARTA
-	TEMPLATE_SHINSETSU
-	TEMPLATE_REDMAX
-	TEMPLATE_BRADFORD
-	TEMPLATE_KOBEWEL
+	TEMPLATE_UNDEFINED TemplateKind = iota //undefined
+	TEMPLATE_SAMPLE                        //sample
+	TEMPLATE_DELTAPLUS                     //delta_plus
+	TEMPLATE_BOSCH                         //bosch
+	TEMPLATE_SPARTA                        //sparta
+	TEMPLATE_SHINSETSU                     //shinsetsu
+	TEMPLATE_REDMAX                        //redmax
+	TEMPLATE_BRADFORD                      //bradford
+	TEMPLATE_KOBEWEL                       //kobewel
 )
-
-func (t TemplateKind) String() string {
-	switch t {
-	case TEMPLATE_UNDEFINED:
-		return "undefined"
-	case TEMPLATE_SAMPLE:
-		return "sample"
-	case TEMPLATE_DELTAPLUS:
-		return "delta_plus"
-	case TEMPLATE_BOSCH:
-		return "bosch"
-	case TEMPLATE_SPARTA:
-		return "sparta"
-	case TEMPLATE_SHINSETSU:
-		return "shinsetsu"
-	case TEMPLATE_REDMAX:
-		return "redmax"
-	case TEMPLATE_BRADFORD:
-		return "bradford"
-	case TEMPLATE_KOBEWEL:
-		return "kobewel"
-	default:
-		panic("unknown enum")
-	}
-}
 
 func ParseTemplateEnum(e string) TemplateKind {
 	switch e {
-	case "undefined":
+	case TEMPLATE_UNDEFINED.String():
 		return TEMPLATE_UNDEFINED
-	case "sample":
+	case TEMPLATE_SAMPLE.String():
 		return TEMPLATE_SAMPLE
-	case "delta_plus":
+	case TEMPLATE_DELTAPLUS.String():
 		return TEMPLATE_DELTAPLUS
-	case "bosch":
+	case TEMPLATE_BOSCH.String():
 		return TEMPLATE_BOSCH
-	case "sparta":
+	case TEMPLATE_SPARTA.String():
 		return TEMPLATE_SPARTA
-	case "shinsetsu":
+	case TEMPLATE_SHINSETSU.String():
 		return TEMPLATE_SHINSETSU
-	case "redmax":
+	case TEMPLATE_REDMAX.String():
 		return TEMPLATE_REDMAX
-	case "bradford":
+	case TEMPLATE_BRADFORD.String():
 		return TEMPLATE_BRADFORD
-	case "kobewel":
+	case TEMPLATE_KOBEWEL.String():
 		return TEMPLATE_KOBEWEL
 	default:
 		panic(fmt.Sprintf("Can't convert '%s' to TemplateKind enum", e))
