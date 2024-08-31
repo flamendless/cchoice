@@ -8,7 +8,6 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/serialize"
 	pb "cchoice/proto"
-	"fmt"
 	"net/http"
 	"net/url"
 
