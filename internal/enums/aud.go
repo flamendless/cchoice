@@ -1,5 +1,7 @@
 package enums
 
+//go:generate stringer -type=AudKind -trimprefix=AUD_
+
 type AudKind int
 
 const (
@@ -8,22 +10,11 @@ const (
 	AUD_SYSTEM
 )
 
-func (a AudKind) String() string {
-	switch a {
-	case AUD_API:
-		return "API"
-	case AUD_SYSTEM:
-		return "SYSTEM"
-	default:
-		return "UNDEFINED"
-	}
-}
-
 func ParseAudEnum(e string) AudKind {
 	switch e {
-	case "API":
+	case AUD_API.String():
 		return AUD_API
-	case "SYSTEM":
+	case AUD_SYSTEM.String():
 		return AUD_SYSTEM
 	default:
 		return AUD_UNDEFINED

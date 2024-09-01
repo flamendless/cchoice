@@ -29,7 +29,7 @@ func (s *BrandServer) GetBrand(
 	}
 	return &pb.GetBrandResponse{
 		Brand: &pb.Brand{
-			Id: in.Id,
+			Id:   in.Id,
 			Name: brand.Name,
 			MainImage: &pb.BrandImage{
 				Id:      serialize.EncDBID(brand.BrandImageID),

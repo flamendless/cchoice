@@ -1,21 +1,21 @@
 package templates
 
-//go:generate stringer -type=TemplateKind -linecomment
+//go:generate stringer -type=TemplateKind -trimprefix=TEMPLATE_
 
 import "fmt"
 
 type TemplateKind int
 
 const (
-	TEMPLATE_UNDEFINED TemplateKind = iota //undefined
-	TEMPLATE_SAMPLE                        //sample
-	TEMPLATE_DELTAPLUS                     //delta_plus
-	TEMPLATE_BOSCH                         //bosch
-	TEMPLATE_SPARTA                        //sparta
-	TEMPLATE_SHINSETSU                     //shinsetsu
-	TEMPLATE_REDMAX                        //redmax
-	TEMPLATE_BRADFORD                      //bradford
-	TEMPLATE_KOBEWEL                       //kobewel
+	TEMPLATE_UNDEFINED TemplateKind = iota
+	TEMPLATE_SAMPLE
+	TEMPLATE_DELTAPLUS
+	TEMPLATE_BOSCH
+	TEMPLATE_SPARTA
+	TEMPLATE_SHINSETSU
+	TEMPLATE_REDMAX
+	TEMPLATE_BRADFORD
+	TEMPLATE_KOBEWEL
 )
 
 func ParseTemplateEnum(e string) TemplateKind {
@@ -40,28 +40,5 @@ func ParseTemplateEnum(e string) TemplateKind {
 		return TEMPLATE_KOBEWEL
 	default:
 		panic(fmt.Sprintf("Can't convert '%s' to TemplateKind enum", e))
-	}
-}
-
-func TemplateToBrand(tpl string) string {
-	switch tpl {
-	case "sample":
-		return "sample"
-	case "delta_plus":
-		return "DeltaPlus"
-	case "bosch":
-		return "Bosch"
-	case "sparta":
-		return "Sparta"
-	case "shinsetsu":
-		return "Shinsetsu"
-	case "redmax":
-		return "RedMax"
-	case "bradford":
-		return "Brandford"
-	case "kobewel":
-		return "Kobewel"
-	default:
-		panic(fmt.Sprintf("Can't convert template '%s' to brand string", tpl))
 	}
 }
