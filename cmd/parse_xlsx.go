@@ -157,8 +157,7 @@ var parseXLSXCmd = &cobra.Command{
 		defer tpl.CtxApp.DB.Close()
 
 		logs.Log().Debug("Getting brand...")
-		brandName := templates.TemplateToBrand(ctxParseXLSX.Template)
-		brand := models.NewBrand(brandName)
+		brand := models.NewBrand(ctxParseXLSX.Template)
 		brandID := brand.GetDBID(tpl.CtxApp.DB)
 		if brandID == 0 {
 			brandID, err := brand.InsertToDB(tpl.CtxApp.DB)

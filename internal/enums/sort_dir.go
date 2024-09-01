@@ -1,5 +1,7 @@
 package enums
 
+//go:generate stringer -type=SortDir -trimprefix=SORT_DIR_
+
 type SortDir int
 
 const (
@@ -8,22 +10,11 @@ const (
 	SORT_DIR_DESC
 )
 
-func (t SortDir) String() string {
-	switch t {
-	case SORT_DIR_ASC:
-		return "ASC"
-	case SORT_DIR_DESC:
-		return "DESC"
-	default:
-		return "UNDEFINED"
-	}
-}
-
 func ParseSortDirEnum(e string) SortDir {
 	switch e {
-	case "ASC":
+	case SORT_DIR_ASC.String():
 		return SORT_DIR_ASC
-	case "DESC":
+	case SORT_DIR_DESC.String():
 		return SORT_DIR_DESC
 	default:
 		return SORT_DIR_UNDEFINED

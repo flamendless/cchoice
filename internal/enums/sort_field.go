@@ -1,5 +1,7 @@
 package enums
 
+//go:generate stringer -type=SortField -trimprefix=SORT_FIELD_
+
 type SortField int
 
 const (
@@ -8,22 +10,11 @@ const (
 	SORT_FIELD_CREATED_AT
 )
 
-func (t SortField) String() string {
-	switch t {
-	case SORT_FIELD_NAME:
-		return "NAME"
-	case SORT_FIELD_CREATED_AT:
-		return "CREATED_AT"
-	default:
-		return "UNDEFINED"
-	}
-}
-
 func ParseSortFieldEnum(e string) SortField {
 	switch e {
-	case "NAME":
+	case SORT_FIELD_NAME.String():
 		return SORT_FIELD_NAME
-	case "CREATED_AT":
+	case SORT_FIELD_CREATED_AT.String():
 		return SORT_FIELD_CREATED_AT
 	default:
 		return SORT_FIELD_UNDEFINED

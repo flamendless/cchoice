@@ -1,5 +1,7 @@
 package enums
 
+//go:generate stringer -type=OTPStatus -trimprefix=OTP_STATUS_
+
 import (
 	"fmt"
 )
@@ -14,34 +16,17 @@ const (
 	OTP_STATUS_VALID
 )
 
-func (t OTPStatus) String() string {
-	switch t {
-	case OTP_STATUS_UNDEFINED:
-		return "UNDEFINED"
-	case OTP_STATUS_INITIAL:
-		return "INITIAL"
-	case OTP_STATUS_ENROLLED:
-		return "ENROLLED"
-	case OTP_STATUS_SENT_CODE:
-		return "SENT_CODE"
-	case OTP_STATUS_VALID:
-		return "VALID"
-	default:
-		panic("unknown enum")
-	}
-}
-
 func ParseOTPStatusEnum(e string) OTPStatus {
 	switch e {
-	case "UNDEFINED":
+	case OTP_STATUS_UNDEFINED.String():
 		return OTP_STATUS_UNDEFINED
-	case "INITIAL":
+	case OTP_STATUS_INITIAL.String():
 		return OTP_STATUS_INITIAL
-	case "ENROLLED":
+	case OTP_STATUS_ENROLLED.String():
 		return OTP_STATUS_ENROLLED
-	case "SENT_CODE":
+	case OTP_STATUS_SENT_CODE.String():
 		return OTP_STATUS_SENT_CODE
-	case "VALID":
+	case OTP_STATUS_VALID.String():
 		return OTP_STATUS_VALID
 	default:
 		panic(fmt.Sprintf("Can't convert '%s' to OTPStatus enum", e))

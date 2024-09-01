@@ -15,13 +15,6 @@ GRPC_SERVER_ADDR=":50051"
 WIN_PATH=/mnt/c/Windows/System32
 alias cmd.exe="$WIN_PATH"/cmd.exe
 
-set +f
-GOFILES=( internal/**/*.go conf/*.go grpc_server/**/*.go cmd/*.go )
-for file in "${GOFILES[@]}"; do
-	go generate "$file"
-done
-set -f
-
 grpc_ui() {
 	cmd.exe /c "start vivaldi http://127.0.0.1:36477/"
 	local token=$(go run ./main.go jwt -s "issue" -a "API" -o "true" -u "client@cchoice.com")
@@ -70,15 +63,15 @@ cleandb() {
 	genall
 	gensql
 
-	local otherbrands=("sparta" "shinsetsu" "redmax" "bradford" "kobewel")
+	local otherbrands=("SPARTA" "SHINSETSU" "REDMAX" "BRADFORD" "KOBEWEL")
 	for brand in "${otherbrands[@]}"; do
 		go run ./main.go parse_xlsx -p "assets/xlsx/sample.xlsx" -t "${brand}" --use_db --db_path "${DBPATH}" --panic_on_error=1
 	done
 
-	go run ./main.go parse_xlsx -p "assets/xlsx/Price_List_effective_25_August_2023_r2.xlsx" -s "2023 PRICE LIST" -t "delta_plus" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
-	go run ./main.go parse_xlsx -p "assets/xlsx/Price_List_effective_25_August_2023_r2.xlsx" -s "2023 PRICE LIST" -t "delta_plus" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
-	go run ./main.go parse_xlsx -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "bosch" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
-	go run ./main.go parse_xlsx -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "bosch" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
+	go run ./main.go parse_xlsx -p "assets/xlsx/Price_List_effective_25_August_2023_r2.xlsx" -s "2023 PRICE LIST" -t "DELTAPLUS" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
+	go run ./main.go parse_xlsx -p "assets/xlsx/Price_List_effective_25_August_2023_r2.xlsx" -s "2023 PRICE LIST" -t "DELTAPLUS" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
+	go run ./main.go parse_xlsx -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
+	go run ./main.go parse_xlsx -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
 }
 
 deps() {
@@ -111,9 +104,7 @@ gentempl() {
 
 genall() {
 	echo "running genall..."
-	for file in "${GOFILES[@]}"; do
-		go generate "$file"
-	done
+	go generate ./...
 	npx tailwindcss build -i client/static/css/style.css -o client/static/css/tailwind.css -m
 	gensql
 	genproto
@@ -123,9 +114,14 @@ genall() {
 check() {
 	echo "running check..."
 	go mod tidy
-	for file in "${GOFILES[@]}"; do
+
+	set +f
+	local gofiles=( internal/**/*.go conf/*.go grpc_server/**/*.go cmd/*.go )
+	for file in "${gofiles[@]}"; do
 		goimports -w -local -v "$file"
 	done
+	set -f
+
 	go vet ./...
 	prealloc ./...
 	smrcptr ./...
