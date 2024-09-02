@@ -5,64 +5,39 @@ import (
 	"testing"
 )
 
+var tblUserType = map[UserType]string{
+	USER_TYPE_UNDEFINED: "UNDEFINED",
+	USER_TYPE_API:       "API",
+	USER_TYPE_SYSTEM:    "SYSTEM",
+}
+
 func TestUserTypeToString(t *testing.T) {
-	undef := USER_TYPE_UNDEFINED
-	api := USER_TYPE_API
-	system := USER_TYPE_SYSTEM
-
-	if undef.String() != "UNDEFINED" {
-		t.Fatalf("Mismatch: %s = %s", undef.String(), "UNDEFINED")
-	}
-
-	if api.String() != "API" {
-		t.Fatalf("Mismatch: %s = %s", api.String(), "API")
-	}
-
-	if system.String() != "SYSTEM" {
-		t.Fatalf("Mismatch: %s = %s", system.String(), "SYSTEM")
+	for usertype, val := range tblUserType {
+		if usertype.String() != val {
+			t.Fatalf("Mismatch: %s = %s", usertype.String(), val)
+		}
 	}
 }
 
 func TestParseUserTypeEnum(t *testing.T) {
-	undef := ParseUserTypeEnum("UNDEFINED")
-	api := ParseUserTypeEnum("API")
-	system := ParseUserTypeEnum("SYSTEM")
-
-	if undef != USER_TYPE_UNDEFINED {
-		t.Fatalf("Mismatch: %s = %s", undef, USER_TYPE_UNDEFINED)
-	}
-	if api != USER_TYPE_API {
-		t.Fatalf("Mismatch: %s = %s", api, USER_TYPE_API)
-	}
-	if system != USER_TYPE_SYSTEM {
-		t.Fatalf("Mismatch: %s = %s", system, USER_TYPE_SYSTEM)
+	for usertype, val := range tblUserType {
+		parsed := ParseUserTypeEnum(val)
+		if parsed != usertype {
+			t.Fatalf("Mismatch: %s = %s", val, usertype)
+		}
 	}
 }
 
 func TestParseUserTypeEnumPB(t *testing.T) {
-	undef := StringToPBEnum(
-		"UNDEFINED",
-		pb.UserType_UserType_value,
-		pb.UserType_UNDEFINED,
-	)
-	api := StringToPBEnum(
-		"API",
-		pb.UserType_UserType_value,
-		pb.UserType_UNDEFINED,
-	)
-	system := StringToPBEnum(
-		"SYSTEM",
-		pb.UserType_UserType_value,
-		pb.UserType_UNDEFINED,
-	)
-
-	if undef != pb.UserType_UNDEFINED {
-		t.Fatalf("Mismatch: %s = %s", undef, pb.UserType_UNDEFINED)
+	tbl := map[string]pb.UserType_UserType{
+		"UNDEFINED": pb.UserType_UNDEFINED,
+		"API":       pb.UserType_API,
+		"SYSTEM":    pb.UserType_SYSTEM,
 	}
-	if api != pb.UserType_API {
-		t.Fatalf("Mismatch: %s = %s", api, pb.UserType_API)
-	}
-	if system != pb.UserType_SYSTEM {
-		t.Fatalf("Mismatch: %s = %s", system, pb.UserType_SYSTEM)
+	for val, usertype := range tbl {
+		enum := StringToPBEnum(val, pb.UserType_UserType_value, pb.UserType_UNDEFINED)
+		if enum != usertype {
+			t.Fatalf("Mismatch: %s = %s", enum, usertype)
+		}
 	}
 }

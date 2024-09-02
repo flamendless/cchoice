@@ -5,52 +5,39 @@ import (
 	"testing"
 )
 
+var tblSortDir = map[SortDir]string{
+	SORT_DIR_UNDEFINED: "UNDEFINED",
+	SORT_DIR_ASC:       "ASC",
+	SORT_DIR_DESC:      "DESC",
+}
+
 func TestSortDirToString(t *testing.T) {
-	undef := SORT_DIR_UNDEFINED
-	asc := SORT_DIR_ASC
-	desc := SORT_DIR_DESC
-
-	if undef.String() != "UNDEFINED" {
-		t.Fatalf("Mismatch: %s = %s", undef.String(), "UNDEFINED")
-	}
-
-	if asc.String() != "ASC" {
-		t.Fatalf("Mismatch: %s = %s", asc.String(), "ASC")
-	}
-
-	if desc.String() != "DESC" {
-		t.Fatalf("Mismatch: %s = %s", desc.String(), "DESC")
+	for sortdir, val := range tblSortDir {
+		if sortdir.String() != val {
+			t.Fatalf("Mismatch: %s = %s", sortdir.String(), val)
+		}
 	}
 }
 
 func TestParseSortDirEnum(t *testing.T) {
-	undef := ParseSortDirEnum("UNDEFINED")
-	asc := ParseSortDirEnum("ASC")
-	desc := ParseSortDirEnum("DESC")
-
-	if undef != SORT_DIR_UNDEFINED {
-		t.Fatalf("Mismatch: %s = %s", undef, SORT_DIR_UNDEFINED)
-	}
-	if asc != SORT_DIR_ASC {
-		t.Fatalf("Mismatch: %s = %s", asc, SORT_DIR_ASC)
-	}
-	if desc != SORT_DIR_DESC {
-		t.Fatalf("Mismatch: %s = %s", desc, SORT_DIR_DESC)
+	for sortdir, val := range tblSortDir {
+		parsed := ParseSortDirEnum(val)
+		if parsed != sortdir {
+			t.Fatalf("Mismatch: %s = %s", val, sortdir)
+		}
 	}
 }
 
 func TestParseSortDirEnumPB(t *testing.T) {
-	undef := StringToPBEnum("UNDEFINED", pb.SortDir_SortDir_value, pb.SortDir_UNDEFINED)
-	asc := StringToPBEnum("ASC", pb.SortDir_SortDir_value, pb.SortDir_UNDEFINED)
-	desc := StringToPBEnum("DESC", pb.SortDir_SortDir_value, pb.SortDir_UNDEFINED)
-
-	if undef != pb.SortDir_UNDEFINED {
-		t.Fatalf("Mismatch: %s = %s", undef, pb.SortDir_UNDEFINED)
+	tbl := map[string]pb.SortDir_SortDir{
+		"UNDEFINED": pb.SortDir_UNDEFINED,
+		"ASC":       pb.SortDir_ASC,
+		"DESC":      pb.SortDir_DESC,
 	}
-	if asc != pb.SortDir_ASC {
-		t.Fatalf("Mismatch: %s = %s", asc, pb.SortDir_ASC)
-	}
-	if desc != pb.SortDir_DESC {
-		t.Fatalf("Mismatch: %s = %s", desc, pb.SortDir_DESC)
+	for val, sortdir := range tbl {
+		enum := StringToPBEnum(val, pb.SortDir_SortDir_value, pb.SortDir_UNDEFINED)
+		if enum != sortdir {
+			t.Fatalf("Mismatch: %s = %s", enum, sortdir)
+		}
 	}
 }

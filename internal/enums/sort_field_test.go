@@ -5,64 +5,39 @@ import (
 	"testing"
 )
 
+var tblSortField = map[SortField]string{
+	SORT_FIELD_UNDEFINED:  "UNDEFINED",
+	SORT_FIELD_NAME:       "NAME",
+	SORT_FIELD_CREATED_AT: "CREATED_AT",
+}
+
 func TestSortFieldToString(t *testing.T) {
-	undef := SORT_FIELD_UNDEFINED
-	name := SORT_FIELD_NAME
-	createdAt := SORT_FIELD_CREATED_AT
-
-	if undef.String() != "UNDEFINED" {
-		t.Fatalf("Mismatch: %s = %s", undef.String(), "UNDEFINED")
-	}
-
-	if name.String() != "NAME" {
-		t.Fatalf("Mismatch: %s = %s", name.String(), "NAME")
-	}
-
-	if createdAt.String() != "CREATED_AT" {
-		t.Fatalf("Mismatch: %s = %s", createdAt.String(), "CREATED_AT")
+	for sortfield, val := range tblSortField {
+		if sortfield.String() != val {
+			t.Fatalf("Mismatch: %s = %s", sortfield.String(), val)
+		}
 	}
 }
 
 func TestParseSortFieldEnum(t *testing.T) {
-	undef := ParseSortFieldEnum("UNDEFINED")
-	name := ParseSortFieldEnum("NAME")
-	createdAt := ParseSortFieldEnum("CREATED_AT")
-
-	if undef != SORT_FIELD_UNDEFINED {
-		t.Fatalf("Mismatch: %s = %s", undef, SORT_FIELD_UNDEFINED)
-	}
-	if name != SORT_FIELD_NAME {
-		t.Fatalf("Mismatch: %s = %s", name, SORT_FIELD_NAME)
-	}
-	if createdAt != SORT_FIELD_CREATED_AT {
-		t.Fatalf("Mismatch: %s = %s", createdAt, SORT_FIELD_CREATED_AT)
+	for sortfield, val := range tblSortField {
+		parsed := ParseSortFieldEnum(val)
+		if parsed != sortfield {
+			t.Fatalf("Mismatch: %s = %s", val, sortfield)
+		}
 	}
 }
 
 func TestParseSortFieldEnumPB(t *testing.T) {
-	undef := StringToPBEnum(
-		"UNDEFINED",
-		pb.SortField_SortField_value,
-		pb.SortField_UNDEFINED,
-	)
-	name := StringToPBEnum(
-		"NAME",
-		pb.SortField_SortField_value,
-		pb.SortField_UNDEFINED,
-	)
-	createdAt := StringToPBEnum(
-		"CREATED_AT",
-		pb.SortField_SortField_value,
-		pb.SortField_UNDEFINED,
-	)
-
-	if undef != pb.SortField_UNDEFINED {
-		t.Fatalf("Mismatch: %s = %s", undef, pb.SortField_UNDEFINED)
+	tbl := map[string]pb.SortField_SortField{
+		"UNDEFINED":  pb.SortField_UNDEFINED,
+		"NAME":       pb.SortField_NAME,
+		"CREATED_AT": pb.SortField_CREATED_AT,
 	}
-	if name != pb.SortField_NAME {
-		t.Fatalf("Mismatch: %s = %s", name, pb.SortField_NAME)
-	}
-	if createdAt != pb.SortField_CREATED_AT {
-		t.Fatalf("Mismatch: %s = %s", createdAt, pb.SortField_CREATED_AT)
+	for val, sortfield := range tbl {
+		enum := StringToPBEnum(val, pb.SortField_SortField_value, pb.SortField_UNDEFINED)
+		if enum != sortfield {
+			t.Fatalf("Mismatch: %s = %s", enum, sortfield)
+		}
 	}
 }
