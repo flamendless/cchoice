@@ -14,3 +14,13 @@ func GetInitials(str string) string {
 	}
 	return string(res)
 }
+
+func RemoveEmptyStrings(input []string) []string {
+	var res []string
+	for _, val := range input {
+		if val != "" {
+			res = append(res, val)
+		}
+	}
+	return res
+}
