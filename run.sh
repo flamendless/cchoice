@@ -48,6 +48,7 @@ customrun() {
 setup() {
 	if [ ! -f "./.git/hooks/pre-commit" ]; then
 		cp "./scripts/pre-commit-unit-test.sh" "./.git/hooks/pre-commit"
+		chmod +x "./.git/hooks/pre-commit"
 	fi
 }
 
