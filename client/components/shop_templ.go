@@ -13,7 +13,7 @@ import "bytes"
 import "cchoice/proto"
 import "fmt"
 
-const MAX_BRANDS_DISPLAY = 5
+const MAX_BRANDS_DISPLAY = 6
 
 func ShopHome() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
@@ -33,7 +33,9 @@ func ShopHome() templ.Component {
 			WideCenterCard(
 				ShopHeader(),
 				ShopBanner(),
+				HorLineWithText("Brands"),
 				ShopBrands([]*pb.Brand{}),
+				HorLineWithText("Products"),
 			),
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -79,15 +81,15 @@ func ShopHeader() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = Cart().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div class=\"w-1/3 flex place-content-end items-center mr-4\" hx-trigger=\"load once\" hx-get=\"/auth/avatar\" hx-swap=\"outerHTML\" hx-target=\"#user_avatar\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = UserAvatar("").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = Cart().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -139,20 +141,20 @@ func ShopBrands(brands []*pb.Brand) templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"m-4 flex flex-col items-center place-content-center\" hx-trigger=\"load\" hx-get=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"m-2 flex flex-col items-center place-content-center\" hx-trigger=\"load\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/brand-logos?limit=%d", MAX_BRANDS_DISPLAY*2))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop.templ`, Line: 60, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop.templ`, Line: 62, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-swap=\"innerHTML\" hx-target=\"#brand_logos\" hx-select=\"#brand_logos\"><a href=\"/all-brands\" class=\"place-self-start text-cchoice\">View all brands</a><div id=\"brand_logos\" class=\"flex flex-row flex-wrap place-content-center justify-around w-full items-center\" hx-boost=\"true\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-swap=\"innerHTML\" hx-target=\"#brand_logos\" hx-select=\"#brand_logos\"><div id=\"brand_logos\" class=\"flex flex-row flex-wrap place-content-center justify-evenly w-full items-center\" hx-boost=\"true\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -166,27 +168,27 @@ func ShopBrands(brands []*pb.Brand) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"m-4 max-w-xs w-1/6\"><img src=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"m-2\"><img src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(brands[i].MainImage.Path)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop.templ`, Line: 84, Col: 36}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop.templ`, Line: 79, Col: 36}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" alt=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"max-w-32 max-h-32 mx-auto\" alt=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs("logo of " + brands[i].MainImage.Id)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop.templ`, Line: 85, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop.templ`, Line: 81, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -197,7 +199,7 @@ func ShopBrands(brands []*pb.Brand) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><a href=\"/all-brands\" class=\"place-self-center text-cchoice text-center mt-4 mb-1\">View all brands</a></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
