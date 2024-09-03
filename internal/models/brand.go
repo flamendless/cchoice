@@ -2,14 +2,18 @@ package models
 
 import (
 	"cchoice/cchoice_db"
+	"cchoice/internal/constants"
 	"cchoice/internal/ctx"
 	"context"
 	"time"
 )
 
 type Brand struct {
-	ID   int64
-	Name string
+	ID        int64
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
 }
 
 type BrandImage struct {
@@ -23,8 +27,12 @@ type BrandImage struct {
 }
 
 func NewBrand(brandName string) *Brand {
+	now := time.Now().UTC()
 	return &Brand{
-		Name: brandName,
+		Name:      brandName,
+		CreatedAt: now,
+		UpdatedAt: now,
+		DeletedAt: constants.DT_BEGINNING,
 	}
 }
 
@@ -40,7 +48,12 @@ func (brand *Brand) GetDBID(ctxDB *ctx.Database) int64 {
 
 func (brand *Brand) InsertToDB(ctxDB *ctx.Database) (int64, error) {
 	ctx := context.Background()
-	newBrandID, err := ctxDB.Queries.CreateBrand(ctx, brand.Name)
+	newBrandID, err := ctxDB.Queries.CreateBrand(ctx, cchoice_db.CreateBrandParams{
+		Name:      brand.Name,
+		CreatedAt: brand.CreatedAt,
+		UpdatedAt: brand.UpdatedAt,
+		DeletedAt: brand.UpdatedAt,
+	})
 	if err != nil {
 		return 0, err
 	}

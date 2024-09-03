@@ -19,8 +19,11 @@ type TblAuth struct {
 }
 
 type TblBrand struct {
-	ID   int64
-	Name string
+	ID        int64
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
 }
 
 type TblBrandImage struct {

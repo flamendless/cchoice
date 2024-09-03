@@ -62,7 +62,7 @@ func CreateTemplate(kind TemplateKind) *Template {
 			ProcessRows:      BoschProcessRows,
 		}
 
-	case TEMPLATE_SPARTA:
+	case TEMPLATE_SPARTAN:
 		return &Template{BrandOnly: true}
 	case TEMPLATE_SHINSETSU:
 		return &Template{BrandOnly: true}

@@ -57,7 +57,7 @@ templ ShopBanner() {
 
 templ ShopBrands(brands []*pb.Brand) {
 	<div
-		class="m-2 flex flex-col items-center place-content-center"
+		class="m-1 flex flex-col items-center place-content-center"
 		hx-trigger="load"
 		hx-get={ fmt.Sprintf("/brand-logos?limit=%d", MAX_BRANDS_DISPLAY*2) }
 		hx-swap="innerHTML"
@@ -73,11 +73,11 @@ templ ShopBrands(brands []*pb.Brand) {
 			for i := 0; i < min(len(brands), MAX_BRANDS_DISPLAY); i++ {
 				<a
 					href={ templ.SafeURL("/brand/" + brands[i].Id) }
-					class="m-2"
+					class="mx-1"
 				>
 					<img
 						src={ brands[i].MainImage.Path }
-						class="max-w-32 max-h-32 mx-auto"
+						class="max-w-48 max-h-32 mx-auto"
 						alt={ "logo of " + brands[i].MainImage.Id }
 					/>
 				</a>
