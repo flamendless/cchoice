@@ -200,7 +200,7 @@ func ShopBrands(brands []*pb.Brand) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><a href=\"/all-brands\" class=\"place-self-center text-cchoice text-center mt-4 mb-1\">View all brands</a></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

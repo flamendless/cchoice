@@ -6,6 +6,7 @@ module.exports = {
       colors: {
         cchoice: '#F6742F',
         searchbar: '#F7EFEA',
+        cchoicesoft: '#F7EFEA',
       }
     },
   },
