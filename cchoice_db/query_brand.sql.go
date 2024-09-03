@@ -12,14 +12,29 @@ import (
 
 const createBrand = `-- name: CreateBrand :one
 INSERT INTO tbl_brand (
-	name
+	name,
+	created_at,
+	updated_at,
+	deleted_at
 ) VALUES (
-	?
+	?, ?, ?, ?
 ) RETURNING id
 `
 
-func (q *Queries) CreateBrand(ctx context.Context, name string) (int64, error) {
-	row := q.db.QueryRowContext(ctx, createBrand, name)
+type CreateBrandParams struct {
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
+}
+
+func (q *Queries) CreateBrand(ctx context.Context, arg CreateBrandParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createBrand,
+		arg.Name,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+		arg.DeletedAt,
+	)
 	var id int64
 	err := row.Scan(&id)
 	return id, err
@@ -64,7 +79,7 @@ func (q *Queries) CreateBrandImage(ctx context.Context, arg CreateBrandImagePara
 
 const getBrandByID = `-- name: GetBrandByID :one
 SELECT
-	tbl_brand.id, tbl_brand.name,
+	tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
 	tbl_brand_image.id AS brand_image_id,
 	tbl_brand_image.path AS path
 FROM tbl_brand
@@ -77,6 +92,9 @@ LIMIT 1
 type GetBrandByIDRow struct {
 	ID           int64
 	Name         string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    time.Time
 	BrandImageID int64
 	Path         string
 }
@@ -87,6 +105,9 @@ func (q *Queries) GetBrandByID(ctx context.Context, id int64) (GetBrandByIDRow, 
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
 		&i.BrandImageID,
 		&i.Path,
 	)
@@ -118,7 +139,7 @@ FROM tbl_brand
 INNER JOIN tbl_brand_image ON tbl_brand_image.brand_id = tbl_brand.id
 WHERE
 	tbl_brand_image.is_main = true
-ORDER BY tbl_brand.name ASC
+ORDER BY tbl_brand.created_at DESC
 LIMIT ?
 `
 

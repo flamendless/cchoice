@@ -26,14 +26,17 @@ FROM tbl_brand
 INNER JOIN tbl_brand_image ON tbl_brand_image.brand_id = tbl_brand.id
 WHERE
 	tbl_brand_image.is_main = true
-ORDER BY tbl_brand.name ASC
+ORDER BY tbl_brand.created_at DESC
 LIMIT ?;
 
 -- name: CreateBrand :one
 INSERT INTO tbl_brand (
-	name
+	name,
+	created_at,
+	updated_at,
+	deleted_at
 ) VALUES (
-	?
+	?, ?, ?, ?
 ) RETURNING id;
 
 -- name: CreateBrandImage :one

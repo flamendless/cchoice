@@ -70,7 +70,7 @@ cleandb() {
 	genall
 	gensql
 
-	local otherbrands=("SPARTA" "SHINSETSU" "REDMAX" "BRADFORD" "KOBEWEL")
+	local otherbrands=("BRADFORD" "SPARTAN" "SHINSETSU" "REDMAX" "KOBEWEL")
 	for brand in "${otherbrands[@]}"; do
 		go run ./main.go parse_xlsx -p "assets/xlsx/sample.xlsx" -t "${brand}" --use_db --db_path "${DBPATH}" --panic_on_error=1
 	done
