@@ -106,13 +106,13 @@ genproto() {
 
 gentempl() {
 	echo "running gentempl..."
+	npx tailwindcss build -i client/static/css/style.css -o client/static/css/tailwind.css -m
 	templ generate templ
 }
 
 genall() {
 	echo "running genall..."
 	go generate ./...
-	npx tailwindcss build -i client/static/css/style.css -o client/static/css/tailwind.css -m
 	gensql
 	genproto
 	gentempl

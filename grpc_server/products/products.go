@@ -99,7 +99,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 	if sortBy == nil {
 		fetched, err := s.CtxDB.QueriesRead.GetProductsByStatus(ctx, status.String())
 		if err != nil {
-			return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
+			return nil, errs.NewGRPCError(errs.QueryFailed, err.Error())
 		}
 		for _, f := range fetched {
 			products = append(products, ProductsRow(f).ToPBProduct())
@@ -109,7 +109,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 			if sortBy.Dir == pb.SortDir_ASC {
 				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByNameAsc(ctx, status.String())
 				if err != nil {
-					return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
+					return nil, errs.NewGRPCError(errs.QueryFailed, err.Error())
 				}
 				for _, f := range fetched {
 					products = append(products, ProductsRow(f).ToPBProduct())
@@ -118,7 +118,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 			} else if sortBy.Dir == pb.SortDir_DESC {
 				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByNameDesc(ctx, status.String())
 				if err != nil {
-					return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
+					return nil, errs.NewGRPCError(errs.QueryFailed, err.Error())
 				}
 				for _, f := range fetched {
 					products = append(products, ProductsRow(f).ToPBProduct())
@@ -128,7 +128,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 			if sortBy.Dir == pb.SortDir_ASC {
 				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByCreationDateDesc(ctx, status.String())
 				if err != nil {
-					return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
+					return nil, errs.NewGRPCError(errs.QueryFailed, err.Error())
 				}
 				for _, f := range fetched {
 					products = append(products, ProductsRow(f).ToPBProduct())
@@ -137,7 +137,7 @@ func (s *ProductServer) ListProductsByProductStatus(
 			} else if sortBy.Dir == pb.SortDir_DESC {
 				fetched, err := s.CtxDB.QueriesRead.GetProductsByStatusSortByCreationDateDesc(ctx, status.String())
 				if err != nil {
-					return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
+					return nil, errs.NewGRPCError(errs.QueryFailed, err.Error())
 				}
 				for _, f := range fetched {
 					products = append(products, ProductsRow(f).ToPBProduct())
@@ -151,5 +151,48 @@ func (s *ProductServer) ListProductsByProductStatus(
 		Products: products,
 	}
 
+	return res, nil
+}
+
+func (s *ProductServer) GetProductsListing(
+	ctx context.Context,
+	in *pb.GetProductsListingRequest,
+) (*pb.GetProductsListingResponse, error) {
+	limit := in.GetLimit()
+	if limit <= 0 {
+		limit = 100
+	}
+
+	fetched, err := s.CtxDB.QueriesRead.GetProductsListing(ctx, limit)
+	if err != nil {
+		return nil, errs.NewGRPCError(errs.QueryFailed, err.Error())
+	}
+
+	//TODO: (Brandon)
+	thumbnail := "static/images/empty.png"
+
+	products := make([]*pb.ProductListing, 0, limit)
+	for _, f := range fetched {
+		unitPriceWithVat := decimal.NewFromInt(f.UnitPriceWithVat / 100)
+		moneyWithVat := money.New(
+			unitPriceWithVat.CoefficientInt64(),
+			f.UnitPriceWithVatCurrency,
+		)
+
+		products = append(products, &pb.ProductListing{
+			Id:                      serialize.EncDBID(f.ID),
+			Name:                    f.Name,
+			Description:             f.Description.String,
+			BrandName:               f.BrandName,
+			UnitPriceWithVatDisplay: moneyWithVat.Display(),
+			Thumbnail:               thumbnail,
+			Rating:                  0,
+		})
+	}
+
+	res := &pb.GetProductsListingResponse{
+		Length: int64(len(products)),
+		Data:   products,
+	}
 	return res, nil
 }

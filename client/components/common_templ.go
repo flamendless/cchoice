@@ -329,7 +329,7 @@ func HorLineWithText(text string) templ.Component {
 			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"inline-flex items-center justify-center w-full\"><hr class=\"w-8/12 h-px my-8 bg-cchoice border-0 dark:bg-cchoice\"><span class=\"absolute px-3 font-medium text-cchoice -translate-x-1/2 bg-white left-1/2 dark:text-cchoice dark:bg-white\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"inline-flex items-center justify-center w-full mb-4\"><hr class=\"w-8/12 h-px my-8 bg-cchoice border-0 dark:bg-cchoice\"><span class=\"absolute px-3 font-medium text-cchoice -translate-x-1/2 bg-white left-1/2 dark:text-cchoice dark:bg-white\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

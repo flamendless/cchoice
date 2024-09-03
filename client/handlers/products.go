@@ -6,14 +6,16 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	pb "cchoice/proto"
+	"context"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"go.uber.org/zap"
 )
 
 type ProductService interface {
-	GetProductsWithSorting(pb.SortField_SortField, pb.SortDir_SortDir) (*pb.ProductsResponse, error)
+	pb.ProductServiceClient
 }
 
 type ProductHandler struct {
@@ -74,12 +76,35 @@ func (h ProductHandler) ProductTablePage(
 		}
 	}
 
-	res, err := h.ProductService.GetProductsWithSorting(sortField, sortDir)
-	if err != nil {
-		return &common.HandlerRes{Error: err, StatusCode: http.StatusInternalServerError}
-	}
+	// res, err := h.ProductService.GetProductsWithSorting(sortField, sortDir)
+	// if err != nil {
+	// 	return &common.HandlerRes{Error: err, StatusCode: http.StatusInternalServerError}
+	// }
 
 	return &common.HandlerRes{
-		Component: components.Base("Products", components.ProductTableView(res)),
+		// Component: components.Base("Products", components.ProductTableView(res)),
+	}
+}
+
+func (h ProductHandler) ProductsListing(
+	w http.ResponseWriter,
+	r *http.Request,
+) *common.HandlerRes {
+	qlimit := r.URL.Query().Get("limit")
+	if qlimit == "" {
+		qlimit = "100"
+	}
+	limit, err := strconv.Atoi(qlimit)
+	if err != nil {
+		return &common.HandlerRes{Error: errs.ERR_INVALID_PARAMS}
+	}
+	res, err := h.ProductService.GetProductsListing(context.Background(), &pb.GetProductsListingRequest{
+		Limit: int64(limit),
+	})
+	if err != nil {
+		return &common.HandlerRes{Error: err}
+	}
+	return &common.HandlerRes{
+		Component: components.ProductsListing(res),
 	}
 }
