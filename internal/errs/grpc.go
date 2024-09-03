@@ -8,6 +8,7 @@ import (
 type GRPCErrorCode string
 
 const (
+	QueryFailed           GRPCErrorCode = "QUERY_FAILED"
 	IDNotFound            GRPCErrorCode = "ID_NOT_FOUND"
 	UnimplementedFunction GRPCErrorCode = "UNIMPLEMENTED_FUNC"
 )

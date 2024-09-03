@@ -1003,6 +1003,59 @@ func (q *Queries) GetProductsByStatusSortByNameDesc(ctx context.Context, status 
 	return items, nil
 }
 
+const getProductsListing = `-- name: GetProductsListing :many
+SELECT
+	tbl_product.id,
+	tbl_product.name,
+	tbl_product.description,
+	tbl_product.unit_price_with_vat,
+	tbl_product.unit_price_with_vat_currency,
+	tbl_brand.name AS brand_name
+FROM tbl_product
+INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
+ORDER BY tbl_product.created_at DESC
+LIMIT ?
+`
+
+type GetProductsListingRow struct {
+	ID                       int64
+	Name                     string
+	Description              sql.NullString
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	BrandName                string
+}
+
+func (q *Queries) GetProductsListing(ctx context.Context, limit int64) ([]GetProductsListingRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductsListing, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductsListingRow
+	for rows.Next() {
+		var i GetProductsListingRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
+			&i.BrandName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProductsWithSort = `-- name: GetProductsWithSort :many
 SELECT id, serial, name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at
 FROM tbl_product

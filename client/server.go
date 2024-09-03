@@ -45,19 +45,18 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	authService := pb.NewAuthServiceClient(grpcConn)
 	brandService := pb.NewBrandServiceClient(grpcConn)
-	userService := pb.NewUserServiceClient(grpcConn)
 	otpService := pb.NewOTPServiceClient(grpcConn)
+	productService := pb.NewProductServiceClient(grpcConn)
 	shopService := pb.NewShopServiceClient(grpcConn)
+	userService := pb.NewUserServiceClient(grpcConn)
 
 	errHandler := handlers.NewErrorHandler(logger)
 	authHandler := handlers.NewAuthHandler(logger, authService, sessionManager, mwAuth)
 	brandHandler := handlers.NewBrandHandler(logger, brandService)
-	userHandler := handlers.NewUserHandler(logger, userService, sessionManager)
 	otpHandler := handlers.NewOTPHandler(logger, otpService, authService, sessionManager, mwAuth)
+	productHandler := handlers.NewProductHandler(logger, productService, authService)
 	shopHandler := handlers.NewShopHandler(logger, shopService, sessionManager)
-
-	// productService := services.NewProductService(grpcConn)
-	// productHandler := handlers.NewProductHandler(logger, &productService, &authService)
+	userHandler := handlers.NewUserHandler(logger, userService, sessionManager)
 
 	mux := http.NewServeMux()
 	mux.Handle("GET /static/", http.FileServer(http.FS(static)))
@@ -83,7 +82,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	mux.HandleFunc("POST /otp-enroll", errHandler.Default(otpHandler.OTPEnrollFinish))
 
 	//PRODUCTS
-	// mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductTablePage))
+	mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductsListing))
 
 	//SHOP
 	mux.HandleFunc("GET /", errHandler.Default(shopHandler.HomePage))
