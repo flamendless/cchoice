@@ -82,7 +82,8 @@ var JWTCmd = &cobra.Command{
 	Use:   "jwt",
 	Short: "JWT",
 	Run: func(cmd *cobra.Command, args []string) {
-		if subcmd == "issue" {
+		switch subcmd {
+		case "issue":
 			tokenString := issue()
 			logs.Log().Info(
 				"issued token",
@@ -92,12 +93,10 @@ var JWTCmd = &cobra.Command{
 			if tokenOnly {
 				fmt.Println(tokenString)
 			}
-
-		} else if subcmd == "validate" {
+		case "validate":
 			token := validate(tokenString)
 			logs.Log().Info("validated token", zap.Any("token", token))
-
-		} else if subcmd == "both" {
+		case "both":
 			tokenString := issue()
 			logs.Log().Info(
 				"issued token",
@@ -111,8 +110,7 @@ var JWTCmd = &cobra.Command{
 			if !token.Valid {
 				panic("Not valid token")
 			}
-
-		} else {
+		default:
 			panic("must pass a subcommand: issue, validate, both")
 		}
 	},

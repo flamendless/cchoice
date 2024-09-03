@@ -2,6 +2,7 @@ package brand
 
 import (
 	"cchoice/internal/ctx"
+	"cchoice/internal/logs"
 	"cchoice/internal/serialize"
 	pb "cchoice/proto"
 	"context"
@@ -57,6 +58,7 @@ func (s *BrandServer) GetBrandLogos(
 
 		_, err := os.Stat("client/" + brandLogo.Path)
 		if errors.Is(err, os.ErrNotExist) {
+			logs.Log().Debug("Image path does not exists: "+brandLogo.Path)
 			continue
 		}
 
