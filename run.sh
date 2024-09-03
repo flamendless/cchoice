@@ -45,6 +45,12 @@ customrun() {
 	go run ./main.go "${@:2}"
 }
 
+setup() {
+	if [ ! -f "./.git/hooks/pre-commit" ]; then
+		cp "./scripts/pre-commit-unit-test.sh" "./.git/hooks/pre-commit"
+	fi
+}
+
 clean() {
 	echo "cleaning ${DBNAME}..."
 	if [ -f "./${DBNAME}" ]; then
@@ -136,6 +142,7 @@ if [ "$#" -eq 0 ]; then
 	echo "First use: chmod +x ${0}"
 	echo "Usage: ${0}"
 	echo "Commands:"
+	echo "    setup"
 	echo "    check"
 	echo "    clean"
 	echo "    genall"
