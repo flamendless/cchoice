@@ -6,6 +6,7 @@ import (
 	"cchoice/internal/logs"
 	"cchoice/internal/models"
 	"cchoice/internal/utils"
+	"strings"
 
 	"github.com/Rhymond/go-money"
 	"github.com/xuri/excelize/v2"
@@ -93,9 +94,18 @@ func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 
 	status := enums.PRODUCT_STATUS_ACTIVE
 
+	descriptions := []string{
+		strings.TrimSpace(row[tpl.Columns["Part Number"].Index]),
+		strings.TrimSpace(row[tpl.Columns["Power"].Index]),
+		strings.TrimSpace(row[tpl.Columns["Capacity"].Index]),
+		strings.TrimSpace(row[tpl.Columns["Scope of supply"].Index]),
+	}
+	descriptions = utils.RemoveEmptyStrings(descriptions)
+
 	return &models.Product{
 		Name:                name,
 		Brand:               tpl.Brand,
+		Description:         strings.Join(descriptions, " - "),
 		Status:              status,
 		UnitPriceWithoutVat: prices[0],
 		UnitPriceWithVat:    prices[1],
