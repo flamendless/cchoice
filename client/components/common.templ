@@ -9,12 +9,7 @@ templ Logo(width string, height string) {
 	if height == "" {
 		height = "100%"
 	}
-	<img
-		src="/static/svg/logo.svg"
-		alt="cchoice logo"
-		width={ width }
-		width={ height }
-	/>
+	<img src="/static/svg/logo.svg" alt="cchoice logo" width={ width } width={ height }/>
 }
 
 templ LogoWithText(width string, height string) {
@@ -38,8 +33,20 @@ templ SearchBar() {
 		<label for="search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
 		<div class="relative">
 			<div class="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none">
-				<svg class="w-4 h-4 text-cchoice" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-					<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"></path>
+				<svg
+					class="w-4 h-4 text-cchoice"
+					aria-hidden="true"
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 20 20"
+				>
+					<path
+						stroke="currentColor"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+					></path>
 				</svg>
 			</div>
 			<input
@@ -68,7 +75,7 @@ templ SideMenu() {
 }
 
 templ Cart() {
-	<div class="m-4 flex flex-col place-conter-center">
+	<div class="m-2 flex flex-col place-conter-center">
 		<button>
 			@svg.Cart()
 		</button>
@@ -76,15 +83,11 @@ templ Cart() {
 }
 
 templ UserAvatar(name string) {
-	<div
-		id="user_avatar"
-		class="m-4 flex flex-row place-conter-center items-center"
-	>
+	<div id="user_avatar" class="m-2 flex flex-row place-conter-center items-center">
 		if name == "" {
 			<h2 class="ml-4 mr-2">
 				Guest
 			</h2>
-
 			<button>
 				@svg.User()
 			</button>
@@ -92,11 +95,25 @@ templ UserAvatar(name string) {
 			<h2 class="ml-4 mr-2">
 				{ name }
 			</h2>
-
 			//TODO: (Brandon) - use user image
 			<button>
 				@svg.User()
 			</button>
 		}
+	</div>
+}
+
+templ HorLine() {
+	<hr class="w-8/12 h-1 mx-auto my-4 bg-cchoice border-0 rounded md:my-10 dark:bg-cchoice"/>
+}
+
+templ HorLineWithText(text string) {
+	<div class="inline-flex items-center justify-center w-full">
+		<hr class="w-8/12 h-px my-8 bg-cchoice border-0 dark:bg-cchoice"/>
+		<span
+			class="absolute px-3 font-medium text-cchoice -translate-x-1/2 bg-white left-1/2 dark:text-cchoice dark:bg-white"
+		>
+			{ text }
+		</span>
 	</div>
 }

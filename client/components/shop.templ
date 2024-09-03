@@ -3,7 +3,7 @@ package components
 import "cchoice/proto"
 import "fmt"
 
-const MAX_BRANDS_DISPLAY = 5
+const MAX_BRANDS_DISPLAY = 6
 
 templ ShopHome() {
 	@Base(
@@ -11,7 +11,9 @@ templ ShopHome() {
 		WideCenterCard(
 			ShopHeader(),
 			ShopBanner(),
+			HorLineWithText("Brands"),
 			ShopBrands([]*pb.Brand{}),
+			HorLineWithText("Products"),
 		),
 	)
 }
@@ -28,7 +30,6 @@ templ ShopHeader() {
 		<div class="m-2 flex flex-row w-screen items-center ml-8">
 			@SideMenu()
 			@SearchBar()
-			@Cart()
 		</div>
 
 		<div
@@ -39,6 +40,7 @@ templ ShopHeader() {
 			hx-target="#user_avatar"
 		>
 			@UserAvatar("")
+			@Cart()
 		</div>
 	</div>
 }
@@ -55,7 +57,7 @@ templ ShopBanner() {
 
 templ ShopBrands(brands []*pb.Brand) {
 	<div
-		class="m-4 flex flex-col items-center place-content-center"
+		class="m-2 flex flex-col items-center place-content-center"
 		hx-trigger="load"
 		hx-get={ fmt.Sprintf("/brand-logos?limit=%d", MAX_BRANDS_DISPLAY*2) }
 		hx-swap="innerHTML"
@@ -63,29 +65,31 @@ templ ShopBrands(brands []*pb.Brand) {
 		hx-select="#brand_logos"
 	>
 
-		<a
-			href="/all-brands"
-			class="place-self-start text-cchoice"
-		>
-			View all brands
-		</a>
-
 		<div
 			id="brand_logos"
-			class="flex flex-row flex-wrap place-content-center justify-around w-full items-center"
+			class="flex flex-row flex-wrap place-content-center justify-evenly w-full items-center"
 			hx-boost="true"
 		>
 			for i := 0; i < min(len(brands), MAX_BRANDS_DISPLAY); i++ {
 				<a
 					href={ templ.SafeURL("/brand/" + brands[i].Id) }
-					class="m-4 max-w-xs w-1/6"
+					class="m-2"
 				>
 					<img
 						src={ brands[i].MainImage.Path }
+						class="max-w-32 max-h-32 mx-auto"
 						alt={ "logo of " + brands[i].MainImage.Id }
 					/>
 				</a>
 			}
 		</div>
+
+		<a
+			href="/all-brands"
+			class="place-self-center text-cchoice text-center mt-4 mb-1"
+		>
+			View all brands
+		</a>
+
 	</div>
 }
