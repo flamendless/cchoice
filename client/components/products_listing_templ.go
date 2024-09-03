@@ -27,17 +27,7 @@ func ProductsListing(products *pb.GetProductsListingResponse) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"m-1 flex flex-col items-center place-content-center\" hx-trigger=\"load\" hx-get=\"/products\" hx-swap=\"innerHTML\" hx-target=\"#products_listing\" hx-select=\"#products_listing\"><div id=\"products_listing\" class=\"flex flex-row flex-wrap place-content-center justify-evenly w-full items-stretch mt-2 mb-2\" hx-boost=\"true\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		for _, product := range products.Data {
-			templ_7745c5c3_Err = ProductsListingCard(product).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"m-1 flex flex-col items-center place-content-center\" hx-trigger=\"load\" hx-get=\"/products\" hx-swap=\"innerHTML\" hx-target=\"#products_listing\" hx-select=\"#products_listing\"><div id=\"products_listing\" class=\"flex flex-row flex-wrap place-content-center justify-evenly w-full items-stretch mt-2 mb-2\" hx-boost=\"true\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

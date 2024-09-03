@@ -2,23 +2,11 @@ package components
 
 import "cchoice/client/components/svg"
 
-templ Logo(width string, height string) {
-	if width == "" {
-		width = "100%"
-	}
-	if height == "" {
-		height = "100%"
-	}
-	<img src="/static/svg/logo.svg" alt="cchoice logo" width={ width } width={ height }/>
+templ Logo(class string) {
+	<img src="/static/svg/logo.svg" alt="cchoice logo" class={ class } />
 }
 
 templ LogoWithText(width string, height string) {
-	if width == "" {
-		width = "100%"
-	}
-	if height == "" {
-		height = "100%"
-	}
 	<img
 		src="/static/svg/logo_with_text.svg"
 		alt="cchoice logo and text"
