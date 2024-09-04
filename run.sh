@@ -11,6 +11,7 @@ DBNAME="test.db"
 DBPATH="file:./${DBNAME}"
 
 GRPC_SERVER_ADDR=":50051"
+CLIENTPORT="3001"
 
 WIN_PATH=/mnt/c/Windows/System32
 alias cmd.exe="$WIN_PATH"/cmd.exe
@@ -35,10 +36,10 @@ grpc() {
 }
 
 client() {
-	local clientport="3001"
-	cmd.exe /c "start vivaldi http://localhost:${clientport}/"
+	cmd.exe /c "start vivaldi http://localhost:7331/"
+	templ generate --watch --proxy="http://localhost:${CLIENTPORT}" --open-browser=false &
 	air -c ".air.client.toml" serve_client \
-		-p ":${clientport}" --grpc_address "${GRPC_SERVER_ADDR}"
+		-p ":${CLIENTPORT}" --grpc_address "${GRPC_SERVER_ADDR}"
 }
 
 customrun() {
@@ -107,7 +108,12 @@ genproto() {
 gentempl() {
 	echo "running gentempl..."
 	npx tailwindcss build -i client/static/css/style.css -o client/static/css/tailwind.css -m
-	templ generate templ
+	templ generate templ -v
+}
+
+templlr() {
+	echo "running templlr..."
+	templ generate --notify-proxy -v
 }
 
 genall() {

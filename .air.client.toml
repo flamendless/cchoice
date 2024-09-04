@@ -5,8 +5,8 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./tmp/main"
-  cmd = "./run.sh gentempl && go build -o ./tmp/main ."
-  delay = 1000
+  cmd = "go build -o ./tmp/main ."
+  delay = 100
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "cchoice_db", "xlsx", "migrations", "node_modules", "scripts"]
   exclude_file = []
   exclude_regex = ["_test.go", ".pb.go", ".sql.go", ".*_templ.go"]

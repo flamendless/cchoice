@@ -20,9 +20,10 @@ templ Footer() {
 				MORE
 			</span>
 		</div>
+
 		<div class="mx-auto mt-2 max-w-screen-xl">
 			<div class="p-4">
-				<div class="grid grid-cols-4 gap-4 justify-evenly">
+				<div class="grid grid-cols-5 gap-4 justify-evenly">
 					<div>
 						<h2 class="mb-6 text-sm font-semibold text-black-900 uppercase dark:text-black">GET IN TOUCH</h2>
 						<ul class="text-black-600 dark:text-black-400">
@@ -62,6 +63,7 @@ templ Footer() {
 							</li>
 						</ul>
 					</div>
+
 					<div>
 						<h2 class="mb-6 text-sm font-semibold text-black-900 uppercase dark:text-black">Follow us</h2>
 						<ul class="text-black-600 dark:text-black-400">
@@ -79,7 +81,12 @@ templ Footer() {
 							</li>
 						</ul>
 					</div>
-					<div>
+
+					<div class="text-center content-center">
+						@Logo("w-fit h-fit mx-auto")
+					</div>
+
+					<div class="text-end">
 						<h2 class="mb-6 text-sm font-semibold text-black-900 uppercase dark:text-black">Legal</h2>
 						<ul class="text-black-600 dark:text-black-400">
 							<li class="mb-4">
@@ -93,7 +100,8 @@ templ Footer() {
 							</li>
 						</ul>
 					</div>
-					<div>
+
+					<div class="text-end">
 						<h2 class="mb-6 text-sm font-semibold text-black-900 uppercase dark:text-black">Certification</h2>
 						<ul class="text-black-600 dark:text-black-400">
 							<li class="mb-4">
