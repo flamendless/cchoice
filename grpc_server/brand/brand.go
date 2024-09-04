@@ -58,7 +58,7 @@ func (s *BrandServer) GetBrandLogos(
 
 		_, err := os.Stat("client/" + brandLogo.Path)
 		if errors.Is(err, os.ErrNotExist) {
-			logs.Log().Debug("Image path does not exists: "+brandLogo.Path)
+			logs.Log().Debug("Image path does not exists: " + brandLogo.Path)
 			continue
 		}
 

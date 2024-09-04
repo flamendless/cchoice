@@ -11,4 +11,5 @@ type ParseXLSXFlags struct {
 	DBPath                 string
 	UseDB                  bool
 	PanicOnFirstDBError    bool
+	ImagesBasePath         string
 }

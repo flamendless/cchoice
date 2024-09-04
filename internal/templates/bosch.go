@@ -6,6 +6,8 @@ import (
 	"cchoice/internal/logs"
 	"cchoice/internal/models"
 	"cchoice/internal/utils"
+	"fmt"
+	"os"
 	"strings"
 
 	"github.com/Rhymond/go-money"
@@ -200,4 +202,22 @@ LoopProductProces:
 	)
 
 	return products
+}
+
+func BoschProcessProductImage(tpl *Template, product *models.Product) (*models.ProductImage, error) {
+	basepath := strings.TrimLeft(tpl.AppFlags.ImagesBasePath, "./client/")
+	basepath = strings.TrimRight(basepath, "/")
+	path := fmt.Sprintf("%s/%s.png", basepath, product.Name)
+
+	_, err := os.Stat("client/" + path)
+	if err != nil {
+		logs.Log().Debug("Image path does not exists: " + path)
+		return nil, err
+	}
+
+	res := &models.ProductImage{
+		Product:   product,
+		Path:      path,
+	}
+	return res, nil
 }

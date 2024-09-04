@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"os"
 	"runtime"
 	"strings"
 	"sync"
@@ -27,6 +29,7 @@ func init() {
 	f().StringVarP(&ctxParseXLSX.Filepath, "filepath", "p", "", "Filepath to the XLSX file")
 	f().StringVarP(&ctxParseXLSX.Sheet, "sheet", "s", "", "Sheet name to use")
 	f().StringVarP(&ctxParseXLSX.DBPath, "db_path", "", ":memory:", "Path to database")
+	f().StringVarP(&ctxParseXLSX.ImagesBasePath, "images_basepath", "", "", "Base path to the images")
 	f().BoolVarP(&ctxParseXLSX.Strict, "strict", "x", false, "Panic upon first product error")
 	f().BoolVarP(&ctxParseXLSX.PrintProcessedProducts, "print_processed_products", "v", false, "Print processed products")
 	f().BoolVarP(&ctxParseXLSX.UseDB, "use_db", "", false, "Use DB to save processed data")
@@ -253,6 +256,20 @@ var parseXLSXCmd = &cobra.Command{
 						} else {
 							insertedIds = append(insertedIds, productID)
 							insertMetrics += int64(time.Since(now))
+
+							if tpl.AppFlags.ImagesBasePath != "" {
+								productImageID, err := ProcessProductImage(tpl, product)
+								if err != nil && !errors.Is(err, os.ErrNotExist) {
+									logs.Log().Info(
+										"product image insert to DB",
+										zap.Int64("id", productImageID),
+										zap.Error(err),
+									)
+									if tpl.AppFlags.PanicOnFirstDBError {
+										panic(1)
+									}
+								}
+							}
 						}
 					}
 				}
@@ -331,4 +348,16 @@ var parseXLSXCmd = &cobra.Command{
 
 		tpl.CtxApp.Metrics.LogTime(logs.Log())
 	},
+}
+
+func ProcessProductImage(tpl *templates.Template, product *models.Product) (int64, error) {
+	productImage, err := tpl.ProcessProductImage(tpl, product)
+	if err != nil {
+		return 0, err
+	}
+	productImageID, err := productImage.InsertToDB(tpl.CtxApp.DB)
+	if err != nil {
+		return 0, err
+	}
+	return productImageID, err
 }
