@@ -8,21 +8,19 @@ const MAX_BRANDS_DISPLAY = 6
 templ ShopHome() {
 	@Base(
 		"Shop",
-		WideCenterCard(
-			ShopHeader(),
-			ShopBanner(),
-			HorLineWithText("Brands"),
-			ShopBrands([]*pb.Brand{}),
-			HorLineWithText("Products"),
-			ProductsListing(&pb.GetProductsListingResponse{}),
-		),
+		ShopHeader(),
+		ShopBanner(),
+		HorLineWithText("Brands"),
+		ShopBrands([]*pb.Brand{}),
+		HorLineWithText("Products"),
+		ProductsListing(&pb.GetProductsListingResponse{}),
 	)
 }
 
 templ ShopHeader() {
-	<div class="m-2 flex flex-row w-auto">
+	<div class="flex flex-row w-auto bg-cchoice_c">
 		<div
-			class="w-1/3 flex place-content-end"
+			class="w-1/3 flex place-content-end mt-2"
 			hx-get="/"
 		>
 			@LogoWithText("10%", "10%")
@@ -47,7 +45,7 @@ templ ShopHeader() {
 }
 
 templ ShopBanner() {
-	<div class="m-4 flex flex-row items-center place-content-center bg-searchbar">
+	<div class="m-4 flex flex-row items-center place-content-center bg-cchoicesoft">
 		<img
 			src="/static/images/banner.png"
 			alt="banner"

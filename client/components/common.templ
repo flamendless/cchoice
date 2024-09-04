@@ -40,9 +40,9 @@ templ SearchBar() {
 			<input
 				type="search"
 				id="search"
-				placeholder="Search products..."
+				placeholder="Search any term..."
 				required
-				class="block w-full p-3 ps-10 text-sm text-black border border-searchbar rounded-lg bg-searchbar focus:ring-cchoice focus:border-cchoice"
+				class="block w-full p-3 ps-10 text-sm text-white border border-searchbar rounded-lg bg-searchbar focus:ring-cchoice focus:border-cchoice"
 			/>
 			<button
 				type="submit"
@@ -73,14 +73,14 @@ templ Cart() {
 templ UserAvatar(name string) {
 	<div id="user_avatar" class="m-2 flex flex-row place-conter-center items-center">
 		if name == "" {
-			<h2 class="ml-4 mr-2">
+			<h2 class="ml-4 mr-2 text-white">
 				Guest
 			</h2>
 			<button>
 				@svg.User()
 			</button>
 		} else {
-			<h2 class="ml-4 mr-2">
+			<h2 class="ml-4 mr-2 text-white">
 				{ name }
 			</h2>
 			//TODO: (Brandon) - use user image

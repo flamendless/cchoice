@@ -30,14 +30,12 @@ func ShopHome() templ.Component {
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = Base(
 			"Shop",
-			WideCenterCard(
-				ShopHeader(),
-				ShopBanner(),
-				HorLineWithText("Brands"),
-				ShopBrands([]*pb.Brand{}),
-				HorLineWithText("Products"),
-				ProductsListing(&pb.GetProductsListingResponse{}),
-			),
+			ShopHeader(),
+			ShopBanner(),
+			HorLineWithText("Brands"),
+			ShopBrands([]*pb.Brand{}),
+			HorLineWithText("Products"),
+			ProductsListing(&pb.GetProductsListingResponse{}),
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -62,7 +60,7 @@ func ShopHeader() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"m-2 flex flex-row w-auto\"><div class=\"w-1/3 flex place-content-end\" hx-get=\"/\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-row w-auto bg-cchoice_c\"><div class=\"w-1/3 flex place-content-end mt-2\" hx-get=\"/\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -118,7 +116,7 @@ func ShopBanner() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"m-4 flex flex-row items-center place-content-center bg-searchbar\"><img src=\"/static/images/banner.png\" alt=\"banner\" class=\"h-80\"></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"m-4 flex flex-row items-center place-content-center bg-cchoicesoft\"><img src=\"/static/images/banner.png\" alt=\"banner\" class=\"h-80\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -149,7 +147,7 @@ func ShopBrands(brands []*pb.Brand) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/brand-logos?limit=%d", MAX_BRANDS_DISPLAY*2))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop.templ`, Line: 63, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop.templ`, Line: 61, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -176,7 +174,7 @@ func ShopBrands(brands []*pb.Brand) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(brands[i].MainImage.Path)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop.templ`, Line: 80, Col: 36}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop.templ`, Line: 78, Col: 36}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -189,7 +187,7 @@ func ShopBrands(brands []*pb.Brand) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs("logo of " + brands[i].MainImage.Id)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop.templ`, Line: 82, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop.templ`, Line: 80, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
