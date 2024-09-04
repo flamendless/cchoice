@@ -19,13 +19,14 @@ type Template struct {
 	CtxApp   *ctx.App
 	Brand    *models.Brand
 
-	SkipInitialRows  int
-	AssumedRowsCount int
-	BrandOnly        bool
-	Columns          map[string]*Column
-	RowToProduct     func(*Template, []string) (*models.Product, []error)
-	RowToSpecs       func(*Template, []string) *models.ProductSpecs
-	ProcessRows      func(*Template, *excelize.Rows) []*models.Product
+	SkipInitialRows     int
+	AssumedRowsCount    int
+	BrandOnly           bool
+	Columns             map[string]*Column
+	RowToProduct        func(*Template, []string) (*models.Product, []error)
+	RowToSpecs          func(*Template, []string) *models.ProductSpecs
+	ProcessProductImage func(*Template, *models.Product) (*models.ProductImage, error)
+	ProcessRows         func(*Template, *excelize.Rows) []*models.Product
 }
 
 func CreateTemplate(kind TemplateKind) *Template {
@@ -54,12 +55,13 @@ func CreateTemplate(kind TemplateKind) *Template {
 
 	case TEMPLATE_BOSCH:
 		return &Template{
-			SkipInitialRows:  2,
-			AssumedRowsCount: 256,
-			Columns:          BoschColumns,
-			RowToProduct:     BoschRowToProduct,
-			RowToSpecs:       BoschRowToSpecs,
-			ProcessRows:      BoschProcessRows,
+			SkipInitialRows:     2,
+			AssumedRowsCount:    256,
+			Columns:             BoschColumns,
+			RowToProduct:        BoschRowToProduct,
+			RowToSpecs:          BoschRowToSpecs,
+			ProcessRows:         BoschProcessRows,
+			ProcessProductImage: BoschProcessProductImage,
 		}
 
 	case TEMPLATE_SPARTAN:

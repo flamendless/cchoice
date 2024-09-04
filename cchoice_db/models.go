@@ -60,6 +60,15 @@ type TblProductCategory struct {
 	Subcategory sql.NullString
 }
 
+type TblProductImage struct {
+	ID        int64
+	ProductID int64
+	Path      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
+}
+
 type TblProductSpec struct {
 	ID            int64
 	Colours       sql.NullString
