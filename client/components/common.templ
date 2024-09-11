@@ -2,18 +2,25 @@ package components
 
 import "cchoice/client/components/svg"
 
-templ Logo(class string) {
-	<img src="/static/svg/logo.svg" alt="cchoice logo" class={ class } />
+var logoHandlerOnce = templ.NewOnceHandle()
+var logoWithTextHandlerOnce = templ.NewOnceHandle()
+
+templ Logo() {
+	@logoWithTextHandlerOnce.Once() {
+		<img src="/static/svg/logo.svg" alt="cchoice logo" class="w-fit h-fit mx-auto" />
+	}
 }
 
 templ LogoWithText(width string, height string) {
-	<img
-		src="/static/svg/logo_with_text.svg"
-		alt="cchoice logo and text"
-		class="-mt-8 -mb-4 w-fit cursor-pointer"
-		width={ width }
-		width={ height }
-	/>
+	@logoWithTextHandlerOnce.Once() {
+		<img
+			src="/static/svg/logo_with_text.svg"
+			alt="cchoice logo and text"
+			class="-mt-8 -mb-4 w-fit cursor-pointer"
+			width={ width }
+			width={ height }
+		/>
+	}
 }
 
 templ SearchBar() {
