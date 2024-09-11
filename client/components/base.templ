@@ -1,5 +1,7 @@
 package components
 
+var errorHandlerOnce = templ.NewOnceHandle()
+
 templ Base(title string, children ...templ.Component) {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -34,7 +36,9 @@ templ Base(title string, children ...templ.Component) {
 				@child
 			}
 
-			<script type="text/javascript" src="/static/js/error_handler.js"></script>
+			@errorHandlerOnce.Once() {
+				<script type="text/javascript" src="/static/js/error_handler.js"></script>
+			}
 		</body>
 
 		@Footer()
