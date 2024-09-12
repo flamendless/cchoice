@@ -146,6 +146,10 @@ testall() {
 	go test ./...
 }
 
+benchmark() {
+	go test -bench=. -benchmem ./...
+}
+
 if [ "$#" -eq 0 ]; then
 	echo "First use: chmod +x ${0}"
 	echo "Usage: ${0}"
@@ -162,6 +166,7 @@ if [ "$#" -eq 0 ]; then
 	echo "    cleandb"
 	echo "    customrun"
 	echo "    testall"
+	echo "    benchmark"
 else
 	"$1" "$@"
 fi

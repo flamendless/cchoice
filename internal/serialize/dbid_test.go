@@ -15,3 +15,12 @@ func TestEncDecDBID(t *testing.T) {
 		t.Fatalf("Fail: %d = %s = %d", test, enc, dec)
 	}
 }
+
+func BenchmarkEncDecDBID(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		r := rand.New(rand.NewSource(time.Now().UnixNano()))
+		test := int64(r.Uint64())
+		enc := EncDBID(test)
+		_ = DecDBID(enc)
+	}
+}
