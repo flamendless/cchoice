@@ -50,7 +50,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	shopService := pb.NewShopServiceClient(grpcConn)
 	userService := pb.NewUserServiceClient(grpcConn)
 
-	errHandler := handlers.NewErrorHandler(logger)
+	errHandler := handlers.NewBaseHandler(logger)
 	authHandler := handlers.NewAuthHandler(logger, authService, sessionManager, mwAuth)
 	brandHandler := handlers.NewBrandHandler(logger, brandService)
 	otpHandler := handlers.NewOTPHandler(logger, otpService, authService, sessionManager, mwAuth)

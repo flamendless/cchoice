@@ -6,23 +6,24 @@ import (
 	"cchoice/internal/logs"
 	"net/http"
 
+	"github.com/a-h/templ"
 	"go.uber.org/zap"
 )
 
 type FnHTTP = func(http.ResponseWriter, *http.Request)
 type FnHandler = func(http.ResponseWriter, *http.Request) *common.HandlerRes
 
-type ErrorHandler struct {
+type BaseHandler struct {
 	Logger *zap.Logger
 }
 
-func NewErrorHandler(logger *zap.Logger) *ErrorHandler {
-	return &ErrorHandler{
+func NewBaseHandler(logger *zap.Logger) *BaseHandler {
+	return &BaseHandler{
 		Logger: logger,
 	}
 }
 
-func (h *ErrorHandler) Default(fn FnHandler) FnHTTP {
+func (h *BaseHandler) Default(fn FnHandler) FnHTTP {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res := fn(w, r)
 		if res == nil {
@@ -52,7 +53,6 @@ func (h *ErrorHandler) Default(fn FnHandler) FnHTTP {
 
 					http.Error(w, res.Error.Error(), res.StatusCode)
 				} else {
-					// http.Redirect(w, r, res.RedirectTo, http.StatusTemporaryRedirect)
 					w.Header().Add("HX-Redirect", res.RedirectTo)
 				}
 			}
@@ -63,6 +63,10 @@ func (h *ErrorHandler) Default(fn FnHandler) FnHTTP {
 			panic("Returned component in HandlerRes is nil")
 		}
 
-		res.Component.Render(r.Context(), w)
+		if res.Streaming {
+			templ.Handler(res.Component, templ.WithStreaming()).ServeHTTP(w, r)
+		} else {
+			res.Component.Render(r.Context(), w)
+		}
 	}
 }
