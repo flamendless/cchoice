@@ -5,3 +5,4 @@
 - `./run.sh deps`
 - `./run.sh genall`
 - `./run.sh testall`
+- `./run.sh benchmark`

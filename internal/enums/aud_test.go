@@ -26,3 +26,19 @@ func TestParseAudEnum(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkAudToString(b *testing.B) {
+	for aud := range tblAud {
+		for i := 0; i < b.N; i++ {
+			_ = aud.String()
+		}
+	}
+}
+
+func BenchmarkParseAudEnum(b *testing.B) {
+	for _, val := range tblAud {
+		for i := 0; i < b.N; i++ {
+			_ = ParseAudEnum(val)
+		}
+	}
+}

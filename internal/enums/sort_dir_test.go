@@ -41,3 +41,32 @@ func TestParseSortDirEnumPB(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkSortDirToString(b *testing.B) {
+	for sortdir := range tblSortDir {
+		for i := 0; i < b.N; i++ {
+			_ = sortdir.String()
+		}
+	}
+}
+
+func BenchmarkParseSortDirEnum(b *testing.B) {
+	for _, val := range tblSortDir {
+		for i := 0; i < b.N; i++ {
+			_ = ParseSortDirEnum(val)
+		}
+	}
+}
+
+func BenchmarkParseSortDirEnumPB(b *testing.B) {
+	tbl := map[string]pb.SortDir_SortDir{
+		"UNDEFINED": pb.SortDir_UNDEFINED,
+		"ASC":       pb.SortDir_ASC,
+		"DESC":      pb.SortDir_DESC,
+	}
+	for val := range tbl {
+		for i := 0; i < b.N; i++ {
+			_ = StringToPBEnum(val, pb.SortDir_SortDir_value, pb.SortDir_UNDEFINED)
+		}
+	}
+}

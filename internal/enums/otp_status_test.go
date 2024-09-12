@@ -28,3 +28,19 @@ func TestParseOTPStatusEnum(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkOTPStatusToString(b *testing.B) {
+	for otpstatus := range tblOTPStatus {
+		for i := 0; i < b.N; i++ {
+			_ = otpstatus.String()
+		}
+	}
+}
+
+func BenchmarkParseOTPStatusEnum(b *testing.B) {
+	for _, val := range tblOTPStatus {
+		for i := 0; i < b.N; i++ {
+			_ = ParseOTPStatusEnum(val)
+		}
+	}
+}
