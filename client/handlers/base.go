@@ -6,7 +6,6 @@ import (
 	"cchoice/internal/logs"
 	"net/http"
 
-	"github.com/a-h/templ"
 	"go.uber.org/zap"
 )
 
@@ -63,10 +62,6 @@ func (h *BaseHandler) Default(fn FnHandler) FnHTTP {
 			panic("Returned component in HandlerRes is nil")
 		}
 
-		if res.Streaming {
-			templ.Handler(res.Component, templ.WithStreaming()).ServeHTTP(w, r)
-		} else {
-			res.Component.Render(r.Context(), w)
-		}
+		res.Component.Render(r.Context(), w)
 	}
 }
