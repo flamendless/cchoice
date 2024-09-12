@@ -81,9 +81,6 @@ templ Cart() {
 templ UserAvatar(name string) {
 	<div id="user_avatar" class="m-2 flex flex-row place-conter-center items-center">
 		if name == "" {
-			<h2 class="ml-4 mr-2 text-white">
-				Guest
-			</h2>
 			<button>
 				@svg.User()
 			</button>

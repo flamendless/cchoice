@@ -263,7 +263,7 @@ func UserAvatar(name string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if name == "" {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h2 class=\"ml-4 mr-2 text-white\">Guest</h2><button>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -283,7 +283,7 @@ func UserAvatar(name string) templ.Component {
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/common.templ`, Line: 92, Col: 10}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/common.templ`, Line: 89, Col: 10}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -385,7 +385,7 @@ func HorLineWithText(text string) templ.Component {
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(text)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/common.templ`, Line: 114, Col: 9}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/common.templ`, Line: 111, Col: 9}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
