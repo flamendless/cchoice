@@ -216,8 +216,8 @@ func BoschProcessProductImage(tpl *Template, product *models.Product) (*models.P
 	}
 
 	res := &models.ProductImage{
-		Product:   product,
-		Path:      path,
+		Product: product,
+		Path:    path,
 	}
 	return res, nil
 }

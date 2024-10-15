@@ -137,7 +137,6 @@ check() {
 }
 
 testall() {
-	genall
 	gotestsum \
 		--format=pkgname-and-test-fails \
 		--format-icons=text \
