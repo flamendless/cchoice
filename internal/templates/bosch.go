@@ -47,10 +47,12 @@ var BoschColumns map[string]*Column = map[string]*Column{
 }
 
 func BoschProcessPrices(tpl *Template, row []string) ([]*money.Money, []error) {
-	idxPriceWithoutVat := tpl.Columns["Retail Price (Local Currency)"].Index
-	idxPriceWithVat := tpl.Columns["Retail Price (Local Currency)"].Index
-	priceWithoutVat := row[idxPriceWithoutVat]
-	priceWithVat := row[idxPriceWithVat]
+	colRP, ok := tpl.Columns["Retail Price (Local Currency)"]
+	if !ok {
+		panic("missing column")
+	}
+	priceWithoutVat := row[colRP.Index]
+	priceWithVat := row[colRP.Index]
 
 	prices := make([]*money.Money, 0, 8)
 	errs := make([]error, 0, 8)
@@ -74,11 +76,33 @@ func BoschProcessPrices(tpl *Template, row []string) ([]*money.Money, []error) {
 }
 
 func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
+	colPartNumber, ok := tpl.Columns["Part Number"]
+	if !ok {
+		panic("missing column")
+	}
+
+	colPower, ok := tpl.Columns["Power"]
+	if !ok {
+		panic("missing column")
+	}
+
+	colCapacity, ok := tpl.Columns["Capacity"]
+	if !ok {
+		panic("missing column")
+	}
+
+	colScopeOfSupply, ok := tpl.Columns["Scope of supply"]
+	if !ok {
+		panic("missing column")
+	}
+
+	colModel, ok := tpl.Columns["Model"]
+	if !ok {
+		panic("missing column")
+	}
+
 	errsRes := make([]error, 0, 8)
-
-	idxModel := tpl.Columns["Model"].Index
-
-	name := row[idxModel]
+	name := row[colModel.Index]
 	errProductName := utils.ValidateNotBlank(name, "Model")
 	if errProductName != nil {
 		parserErr := errs.NewParserError(errs.BlankProductName, errProductName.Error())
@@ -86,6 +110,9 @@ func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 	}
 
 	prices, errMonies := BoschProcessPrices(tpl, row)
+	if len(prices) < 2 {
+		panic("invalid prices")
+	}
 	if len(errMonies) > 0 {
 		errsRes = append(errsRes, errMonies...)
 	}
@@ -97,10 +124,10 @@ func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 	status := enums.PRODUCT_STATUS_ACTIVE
 
 	descriptions := []string{
-		strings.TrimSpace(row[tpl.Columns["Part Number"].Index]),
-		strings.TrimSpace(row[tpl.Columns["Power"].Index]),
-		strings.TrimSpace(row[tpl.Columns["Capacity"].Index]),
-		strings.TrimSpace(row[tpl.Columns["Scope of supply"].Index]),
+		strings.TrimSpace(row[colPartNumber.Index]),
+		strings.TrimSpace(row[colPower.Index]),
+		strings.TrimSpace(row[colCapacity.Index]),
+		strings.TrimSpace(row[colScopeOfSupply.Index]),
 	}
 	descriptions = utils.RemoveEmptyStrings(descriptions)
 
@@ -115,15 +142,30 @@ func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 }
 
 func BoschRowToSpecs(tpl *Template, row []string) *models.ProductSpecs {
-	idxPartNumber := tpl.Columns["Part Number"].Index
-	idxPower := tpl.Columns["Power"].Index
-	idxCapacity := tpl.Columns["Capacity"].Index
-	idxScopeOfSupply := tpl.Columns["Scope of supply"].Index
+	colPartNumber, ok := tpl.Columns["Part Number"]
+	if !ok {
+		panic("missing column")
+	}
 
-	partNumber := row[idxPartNumber]
-	power := row[idxPower]
-	capacity := row[idxCapacity]
-	scopeOfSupply := row[idxScopeOfSupply]
+	colPower, ok := tpl.Columns["Power"]
+	if !ok {
+		panic("missing column")
+	}
+
+	colCapacity, ok := tpl.Columns["Capacity"]
+	if !ok {
+		panic("missing column")
+	}
+
+	colScopeOfSupply, ok := tpl.Columns["Scope of supply"]
+	if !ok {
+		panic("missing column")
+	}
+
+	partNumber := row[colPartNumber.Index]
+	power := row[colPower.Index]
+	capacity := row[colCapacity.Index]
+	scopeOfSupply := row[colScopeOfSupply.Index]
 
 	return &models.ProductSpecs{
 		PartNumber:    partNumber,
@@ -159,6 +201,9 @@ LoopProductProces:
 
 		row = tpl.AlignRow(row)
 		product, errs := tpl.RowToProduct(tpl, row)
+		if product == nil {
+			continue
+		}
 		specs := tpl.RowToSpecs(tpl, row)
 
 		if len(errs) > 0 {
@@ -178,8 +223,11 @@ LoopProductProces:
 			}
 		}
 
-		idxCategory := tpl.Columns["Category"].Index
-		category := row[idxCategory]
+		colCategory, ok := tpl.Columns["Category"]
+		if !ok {
+			panic("missing column")
+		}
+		category := row[colCategory.Index]
 
 		product.ProductCategory = &models.ProductCategory{Category: category}
 		product.ProductSpecs = specs

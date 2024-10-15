@@ -68,6 +68,7 @@ clean() {
 
 cleandb() {
 	clean
+	sql-migrate up
 
 	local otherbrands=("BRADFORD" "SPARTAN" "SHINSETSU" "REDMAX" "KOBEWEL")
 	for brand in "${otherbrands[@]}"; do
@@ -88,6 +89,7 @@ deps() {
 	go install github.com/nikolaydubina/smrcptr@latest
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 	go install gotest.tools/gotestsum@latest
+	go install go.uber.org/nilaway/cmd/nilaway@latest
 
 	local VER="27.0"
 	local PB_REL="https://github.com/protocolbuffers/protobuf/releases"
@@ -134,6 +136,7 @@ check() {
 	go vet ./...
 	prealloc ./...
 	smrcptr ./...
+	nilaway ./...
 }
 
 testall() {

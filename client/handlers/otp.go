@@ -84,6 +84,12 @@ func (h OTPHandler) OTPView(
 			OtpMethod: otpMethod.String(),
 		},
 	)
+	if err != nil {
+		return &common.HandlerRes{
+			Error:      err,
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
 
 	if otpMethod == pb.OTPMethod_AUTHENTICATOR {
 		return &common.HandlerRes{
