@@ -68,7 +68,6 @@ clean() {
 
 cleandb() {
 	clean
-	genall
 
 	local otherbrands=("BRADFORD" "SPARTAN" "SHINSETSU" "REDMAX" "KOBEWEL")
 	for brand in "${otherbrands[@]}"; do

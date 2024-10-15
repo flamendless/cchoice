@@ -346,6 +346,15 @@ var parseXLSXCmd = &cobra.Command{
 			zap.Int("updated ids count", len(updatedIds)),
 		)
 
+		promotedCategoryIDs, err := tpl.CtxApp.DB.Queries.SetInitialPromotedProductCategory(context.Background())
+		if err != nil {
+			panic(err)
+		}
+		logs.Log().Debug(
+			"Set initial promoted categories",
+			zap.Int("promoted categories count", len(promotedCategoryIDs)),
+		)
+
 		tpl.CtxApp.Metrics.LogTime(logs.Log())
 	},
 }

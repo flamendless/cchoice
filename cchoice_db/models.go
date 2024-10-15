@@ -54,10 +54,10 @@ type TblProduct struct {
 }
 
 type TblProductCategory struct {
-	ID          int64
-	ProductID   int64
-	Category    sql.NullString
-	Subcategory sql.NullString
+	ID                 int64
+	Category           sql.NullString
+	Subcategory        sql.NullString
+	PromotedAtHomepage sql.NullBool
 }
 
 type TblProductImage struct {
@@ -78,6 +78,12 @@ type TblProductSpec struct {
 	Power         sql.NullString
 	Capacity      sql.NullString
 	ScopeOfSupply sql.NullString
+}
+
+type TblProductsCategory struct {
+	ID         int64
+	CategoryID int64
+	ProductID  int64
 }
 
 type TblSetting struct {

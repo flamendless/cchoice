@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProductCategoryServiceClient interface {
 	GetProductCategoryByID(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*ProductCategory, error)
-	GetProductCategoryByProductID(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*ProductCategory, error)
+	GetProductCategoriesByPromoted(ctx context.Context, in *GetProductCategoriesByPromotedRequest, opts ...grpc.CallOption) (*ProductCategories, error)
 }
 
 type productCategoryServiceClient struct {
@@ -43,9 +43,9 @@ func (c *productCategoryServiceClient) GetProductCategoryByID(ctx context.Contex
 	return out, nil
 }
 
-func (c *productCategoryServiceClient) GetProductCategoryByProductID(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*ProductCategory, error) {
-	out := new(ProductCategory)
-	err := c.cc.Invoke(ctx, "/proto.ProductCategoryService/GetProductCategoryByProductID", in, out, opts...)
+func (c *productCategoryServiceClient) GetProductCategoriesByPromoted(ctx context.Context, in *GetProductCategoriesByPromotedRequest, opts ...grpc.CallOption) (*ProductCategories, error) {
+	out := new(ProductCategories)
+	err := c.cc.Invoke(ctx, "/proto.ProductCategoryService/GetProductCategoriesByPromoted", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *productCategoryServiceClient) GetProductCategoryByProductID(ctx context
 // for forward compatibility
 type ProductCategoryServiceServer interface {
 	GetProductCategoryByID(context.Context, *IDRequest) (*ProductCategory, error)
-	GetProductCategoryByProductID(context.Context, *IDRequest) (*ProductCategory, error)
+	GetProductCategoriesByPromoted(context.Context, *GetProductCategoriesByPromotedRequest) (*ProductCategories, error)
 	mustEmbedUnimplementedProductCategoryServiceServer()
 }
 
@@ -68,8 +68,8 @@ type UnimplementedProductCategoryServiceServer struct {
 func (UnimplementedProductCategoryServiceServer) GetProductCategoryByID(context.Context, *IDRequest) (*ProductCategory, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProductCategoryByID not implemented")
 }
-func (UnimplementedProductCategoryServiceServer) GetProductCategoryByProductID(context.Context, *IDRequest) (*ProductCategory, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetProductCategoryByProductID not implemented")
+func (UnimplementedProductCategoryServiceServer) GetProductCategoriesByPromoted(context.Context, *GetProductCategoriesByPromotedRequest) (*ProductCategories, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProductCategoriesByPromoted not implemented")
 }
 func (UnimplementedProductCategoryServiceServer) mustEmbedUnimplementedProductCategoryServiceServer() {
 }
@@ -103,20 +103,20 @@ func _ProductCategoryService_GetProductCategoryByID_Handler(srv interface{}, ctx
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ProductCategoryService_GetProductCategoryByProductID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IDRequest)
+func _ProductCategoryService_GetProductCategoriesByPromoted_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProductCategoriesByPromotedRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProductCategoryServiceServer).GetProductCategoryByProductID(ctx, in)
+		return srv.(ProductCategoryServiceServer).GetProductCategoriesByPromoted(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.ProductCategoryService/GetProductCategoryByProductID",
+		FullMethod: "/proto.ProductCategoryService/GetProductCategoriesByPromoted",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProductCategoryServiceServer).GetProductCategoryByProductID(ctx, req.(*IDRequest))
+		return srv.(ProductCategoryServiceServer).GetProductCategoriesByPromoted(ctx, req.(*GetProductCategoriesByPromotedRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -133,8 +133,8 @@ var ProductCategoryService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ProductCategoryService_GetProductCategoryByID_Handler,
 		},
 		{
-			MethodName: "GetProductCategoryByProductID",
-			Handler:    _ProductCategoryService_GetProductCategoryByProductID_Handler,
+			MethodName: "GetProductCategoriesByPromoted",
+			Handler:    _ProductCategoryService_GetProductCategoriesByPromoted_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

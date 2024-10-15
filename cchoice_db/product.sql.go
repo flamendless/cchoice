@@ -88,7 +88,7 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (T
 
 const getProductByID = `-- name: GetProductByID :one
 SELECT
-	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, product_id, category, subcategory, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
+	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
 	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
@@ -114,9 +114,9 @@ type GetProductByIDRow struct {
 	UpdatedAt                   time.Time
 	DeletedAt                   time.Time
 	ID_2                        int64
-	ProductID                   int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
+	PromotedAtHomepage          sql.NullBool
 	ID_3                        int64
 	Colours                     sql.NullString
 	Sizes                       sql.NullString
@@ -152,9 +152,9 @@ func (q *Queries) GetProductByID(ctx context.Context, id int64) (GetProductByIDR
 		&i.UpdatedAt,
 		&i.DeletedAt,
 		&i.ID_2,
-		&i.ProductID,
 		&i.Category,
 		&i.Subcategory,
+		&i.PromotedAtHomepage,
 		&i.ID_3,
 		&i.Colours,
 		&i.Sizes,
@@ -175,7 +175,7 @@ func (q *Queries) GetProductByID(ctx context.Context, id int64) (GetProductByIDR
 
 const getProductBySerial = `-- name: GetProductBySerial :one
 SELECT
-	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, product_id, category, subcategory, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
+	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
 	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
@@ -201,9 +201,9 @@ type GetProductBySerialRow struct {
 	UpdatedAt                   time.Time
 	DeletedAt                   time.Time
 	ID_2                        int64
-	ProductID                   int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
+	PromotedAtHomepage          sql.NullBool
 	ID_3                        int64
 	Colours                     sql.NullString
 	Sizes                       sql.NullString
@@ -239,9 +239,9 @@ func (q *Queries) GetProductBySerial(ctx context.Context, serial string) (GetPro
 		&i.UpdatedAt,
 		&i.DeletedAt,
 		&i.ID_2,
-		&i.ProductID,
 		&i.Category,
 		&i.Subcategory,
+		&i.PromotedAtHomepage,
 		&i.ID_3,
 		&i.Colours,
 		&i.Sizes,
@@ -278,7 +278,7 @@ func (q *Queries) GetProductIDBySerial(ctx context.Context, serial string) (int6
 
 const getProducts = `-- name: GetProducts :many
 SELECT
-	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, product_id, category, subcategory, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
+	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
 	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
@@ -303,9 +303,9 @@ type GetProductsRow struct {
 	UpdatedAt                   time.Time
 	DeletedAt                   time.Time
 	ID_2                        int64
-	ProductID                   int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
+	PromotedAtHomepage          sql.NullBool
 	ID_3                        int64
 	Colours                     sql.NullString
 	Sizes                       sql.NullString
@@ -347,9 +347,9 @@ func (q *Queries) GetProducts(ctx context.Context) ([]GetProductsRow, error) {
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.ID_2,
-			&i.ProductID,
 			&i.Category,
 			&i.Subcategory,
+			&i.PromotedAtHomepage,
 			&i.ID_3,
 			&i.Colours,
 			&i.Sizes,
@@ -380,7 +380,7 @@ func (q *Queries) GetProducts(ctx context.Context) ([]GetProductsRow, error) {
 
 const getProductsByFilter = `-- name: GetProductsByFilter :many
 SELECT
-	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, product_id, category, subcategory, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
+	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
 	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
@@ -413,9 +413,9 @@ type GetProductsByFilterRow struct {
 	UpdatedAt                   time.Time
 	DeletedAt                   time.Time
 	ID_2                        int64
-	ProductID                   int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
+	PromotedAtHomepage          sql.NullBool
 	ID_3                        int64
 	Colours                     sql.NullString
 	Sizes                       sql.NullString
@@ -457,9 +457,9 @@ func (q *Queries) GetProductsByFilter(ctx context.Context, arg GetProductsByFilt
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.ID_2,
-			&i.ProductID,
 			&i.Category,
 			&i.Subcategory,
+			&i.PromotedAtHomepage,
 			&i.ID_3,
 			&i.Colours,
 			&i.Sizes,
@@ -490,7 +490,7 @@ func (q *Queries) GetProductsByFilter(ctx context.Context, arg GetProductsByFilt
 
 const getProductsByStatus = `-- name: GetProductsByStatus :many
 SELECT
-	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, product_id, category, subcategory, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
+	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
 	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
@@ -516,9 +516,9 @@ type GetProductsByStatusRow struct {
 	UpdatedAt                   time.Time
 	DeletedAt                   time.Time
 	ID_2                        int64
-	ProductID                   int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
+	PromotedAtHomepage          sql.NullBool
 	ID_3                        int64
 	Colours                     sql.NullString
 	Sizes                       sql.NullString
@@ -560,9 +560,9 @@ func (q *Queries) GetProductsByStatus(ctx context.Context, status string) ([]Get
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.ID_2,
-			&i.ProductID,
 			&i.Category,
 			&i.Subcategory,
+			&i.PromotedAtHomepage,
 			&i.ID_3,
 			&i.Colours,
 			&i.Sizes,
@@ -593,7 +593,7 @@ func (q *Queries) GetProductsByStatus(ctx context.Context, status string) ([]Get
 
 const getProductsByStatusSortByCreationDateAsc = `-- name: GetProductsByStatusSortByCreationDateAsc :many
 SELECT
-	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, product_id, category, subcategory, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
+	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
 	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
@@ -619,9 +619,9 @@ type GetProductsByStatusSortByCreationDateAscRow struct {
 	UpdatedAt                   time.Time
 	DeletedAt                   time.Time
 	ID_2                        int64
-	ProductID                   int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
+	PromotedAtHomepage          sql.NullBool
 	ID_3                        int64
 	Colours                     sql.NullString
 	Sizes                       sql.NullString
@@ -663,9 +663,9 @@ func (q *Queries) GetProductsByStatusSortByCreationDateAsc(ctx context.Context, 
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.ID_2,
-			&i.ProductID,
 			&i.Category,
 			&i.Subcategory,
+			&i.PromotedAtHomepage,
 			&i.ID_3,
 			&i.Colours,
 			&i.Sizes,
@@ -696,7 +696,7 @@ func (q *Queries) GetProductsByStatusSortByCreationDateAsc(ctx context.Context, 
 
 const getProductsByStatusSortByCreationDateDesc = `-- name: GetProductsByStatusSortByCreationDateDesc :many
 SELECT
-	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, product_id, category, subcategory, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
+	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
 	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
@@ -722,9 +722,9 @@ type GetProductsByStatusSortByCreationDateDescRow struct {
 	UpdatedAt                   time.Time
 	DeletedAt                   time.Time
 	ID_2                        int64
-	ProductID                   int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
+	PromotedAtHomepage          sql.NullBool
 	ID_3                        int64
 	Colours                     sql.NullString
 	Sizes                       sql.NullString
@@ -766,9 +766,9 @@ func (q *Queries) GetProductsByStatusSortByCreationDateDesc(ctx context.Context,
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.ID_2,
-			&i.ProductID,
 			&i.Category,
 			&i.Subcategory,
+			&i.PromotedAtHomepage,
 			&i.ID_3,
 			&i.Colours,
 			&i.Sizes,
@@ -799,7 +799,7 @@ func (q *Queries) GetProductsByStatusSortByCreationDateDesc(ctx context.Context,
 
 const getProductsByStatusSortByNameAsc = `-- name: GetProductsByStatusSortByNameAsc :many
 SELECT
-	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, product_id, category, subcategory, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
+	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
 	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
@@ -825,9 +825,9 @@ type GetProductsByStatusSortByNameAscRow struct {
 	UpdatedAt                   time.Time
 	DeletedAt                   time.Time
 	ID_2                        int64
-	ProductID                   int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
+	PromotedAtHomepage          sql.NullBool
 	ID_3                        int64
 	Colours                     sql.NullString
 	Sizes                       sql.NullString
@@ -869,9 +869,9 @@ func (q *Queries) GetProductsByStatusSortByNameAsc(ctx context.Context, status s
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.ID_2,
-			&i.ProductID,
 			&i.Category,
 			&i.Subcategory,
+			&i.PromotedAtHomepage,
 			&i.ID_3,
 			&i.Colours,
 			&i.Sizes,
@@ -902,7 +902,7 @@ func (q *Queries) GetProductsByStatusSortByNameAsc(ctx context.Context, status s
 
 const getProductsByStatusSortByNameDesc = `-- name: GetProductsByStatusSortByNameDesc :many
 SELECT
-	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, product_id, category, subcategory, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
+	tbl_product.id, serial, tbl_product.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_product.created_at, tbl_product.updated_at, tbl_product.deleted_at, tbl_product_category.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
 	tbl_brand.name AS brand_name
 FROM tbl_product
 INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
@@ -928,9 +928,9 @@ type GetProductsByStatusSortByNameDescRow struct {
 	UpdatedAt                   time.Time
 	DeletedAt                   time.Time
 	ID_2                        int64
-	ProductID                   int64
 	Category                    sql.NullString
 	Subcategory                 sql.NullString
+	PromotedAtHomepage          sql.NullBool
 	ID_3                        int64
 	Colours                     sql.NullString
 	Sizes                       sql.NullString
@@ -972,9 +972,9 @@ func (q *Queries) GetProductsByStatusSortByNameDesc(ctx context.Context, status 
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.ID_2,
-			&i.ProductID,
 			&i.Category,
 			&i.Subcategory,
+			&i.PromotedAtHomepage,
 			&i.ID_3,
 			&i.Colours,
 			&i.Sizes,
