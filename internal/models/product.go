@@ -54,11 +54,16 @@ type Product struct {
 }
 
 func (product *Product) PostProcess(rowIdx int) {
+	if product == nil {
+		panic("nil product")
+	}
 	brandInitials := utils.GetInitials(product.Brand.Name)
 	nameInitials := utils.GetInitials(product.Name)
 	product.Serial = fmt.Sprintf("%s-%s-%d-%d", brandInitials, nameInitials, rowIdx, product.ID)
-	product.ProductCategory.Category = slug.Make(product.ProductCategory.Category)
-	product.ProductCategory.Subcategory = slug.Make(product.ProductCategory.Subcategory)
+	if product.ProductCategory != nil {
+		product.ProductCategory.Category = slug.Make(product.ProductCategory.Category)
+		product.ProductCategory.Subcategory = slug.Make(product.ProductCategory.Subcategory)
+	}
 }
 
 func (product *Product) Print() {

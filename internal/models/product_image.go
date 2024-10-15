@@ -18,6 +18,12 @@ type ProductImage struct {
 }
 
 func (pi *ProductImage) InsertToDB(ctxDB *ctx.Database) (int64, error) {
+	if pi == nil {
+		panic("nil ProductImage")
+	}
+	if pi.Product == nil {
+		panic("nil ProductImage.Product")
+	}
 	ctx := context.Background()
 	now := time.Now().UTC()
 	insertedProductImage, err := ctxDB.Queries.CreateProductImage(ctx, cchoice_db.CreateProductImageParams{

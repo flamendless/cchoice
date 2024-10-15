@@ -45,10 +45,17 @@ var DeltaPlusColumns map[string]*Column = map[string]*Column{
 }
 
 func DeltaPlusProcessPrices(tpl *Template, row []string) ([]*money.Money, []error) {
-	idxPriceWithoutVat := tpl.Columns["END USER UNIT PRICE PHP WITHOUT VAT*"].Index
-	idxPriceWithVat := tpl.Columns["END USER UNIT PRICE PHP WITH VAT* (SRP)"].Index
-	priceWithoutVat := row[idxPriceWithoutVat]
-	priceWithVat := row[idxPriceWithVat]
+	colPrice, ok := tpl.Columns["END USER UNIT PRICE PHP WITHOUT VAT*"]
+	if !ok {
+		panic("missing column")
+	}
+	colPriceVAT, ok := tpl.Columns["END USER UNIT PRICE PHP WITH VAT* (SRP)"]
+	if !ok {
+		panic("missing column")
+	}
+
+	priceWithoutVat := row[colPrice.Index]
+	priceWithVat := row[colPriceVAT.Index]
 
 	prices := make([]*money.Money, 0, 8)
 	errs := make([]error, 0, 8)
@@ -72,11 +79,18 @@ func DeltaPlusProcessPrices(tpl *Template, row []string) ([]*money.Money, []erro
 }
 
 func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
-	errsRes := make([]error, 0, 8)
+	colArticle, ok := tpl.Columns["ARTICLE"]
+	if !ok {
+		panic("missing column")
+	}
 
-	idxArticle := tpl.Columns["ARTICLE"].Index
-	idxDesc := tpl.Columns["DESCRIPTION"].Index
-	name := row[idxArticle]
+	colDescription, ok := tpl.Columns["DESCRIPTION"]
+	if !ok {
+		panic("missing column")
+	}
+
+	errsRes := make([]error, 0, 8)
+	name := row[colArticle.Index]
 
 	var status enums.ProductStatus
 	if strings.Contains(strings.ToLower(name), "discontinued") {
@@ -88,7 +102,7 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 		status = enums.PRODUCT_STATUS_ACTIVE
 	}
 
-	desc := row[idxDesc]
+	desc := row[colDescription.Index]
 
 	errProductName := utils.ValidateNotBlank(name, "article")
 	if errProductName != nil {
@@ -105,6 +119,10 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 		return nil, errsRes
 	}
 
+	if len(prices) < 2 {
+		panic("Invalid prices")
+	}
+
 	return &models.Product{
 		Name:                name,
 		Description:         desc,
@@ -116,9 +134,22 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 }
 
 func DeltaPlusRowToSpecs(tpl *Template, row []string) *models.ProductSpecs {
-	idxColours := tpl.Columns["COLOURS"].Index
-	idxSizes := tpl.Columns["SIZES"].Index
-	idxSegmentation := tpl.Columns["SEGMENTATION"].Index
+	colColors, ok := tpl.Columns["COLOURS"]
+	if !ok {
+		panic("missing column")
+	}
+	colSizes, ok := tpl.Columns["SIZES"]
+	if !ok {
+		panic("missing column")
+	}
+	colSegmentation, ok := tpl.Columns["SEGMENTATION"]
+	if !ok {
+		panic("missing column")
+	}
+
+	idxColours := colColors.Index
+	idxSizes := colSizes.Index
+	idxSegmentation := colSegmentation.Index
 	colours := utils.SanitizeColours(row[idxColours])
 	sizes := utils.SanitizeSize(row[idxSizes])
 	segmentation := row[idxSegmentation]
@@ -176,11 +207,12 @@ LoopProductProces:
 
 		row = tpl.AlignRow(row)
 		product, errsRes := tpl.RowToProduct(tpl, row)
-
-		if product != nil {
-			specs := tpl.RowToSpecs(tpl, row)
-			product.ProductSpecs = specs
+		if product == nil {
+			continue
 		}
+
+		specs := tpl.RowToSpecs(tpl, row)
+		product.ProductSpecs = specs
 
 		if len(errsRes) > 0 {
 			proceedToError := true

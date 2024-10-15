@@ -29,15 +29,27 @@ var SampleColumns map[string]*Column = map[string]*Column{
 }
 
 func SampleRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
-	idxSerial := tpl.Columns["Product Number"].Index
-	idxProductName := tpl.Columns["Product Name"].Index
-	idxDesc := tpl.Columns["Description"].Index
-	idxUnitPrice := tpl.Columns["Unit Price"].Index
+	colProductNumber, ok := tpl.Columns["Product Number"]
+	if !ok {
+		panic("missing column")
+	}
+	colProductName, ok := tpl.Columns["Product Name"]
+	if !ok {
+		panic("missing column")
+	}
+	colDescription, ok := tpl.Columns["Description"]
+	if !ok {
+		panic("missing column")
+	}
+	colUnitPrice, ok := tpl.Columns["Unit Price"]
+	if !ok {
+		panic("missing column")
+	}
 
-	serial := row[idxSerial]
-	name := row[idxProductName]
-	desc := row[idxDesc]
-	price := row[idxUnitPrice]
+	serial := row[colProductNumber.Index]
+	name := row[colProductName.Index]
+	desc := row[colDescription.Index]
+	price := row[colUnitPrice.Index]
 
 	errs := make([]error, 0, 4)
 
