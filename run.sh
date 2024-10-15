@@ -69,7 +69,6 @@ clean() {
 cleandb() {
 	clean
 	genall
-	gensql
 
 	local otherbrands=("BRADFORD" "SPARTAN" "SHINSETSU" "REDMAX" "KOBEWEL")
 	for brand in "${otherbrands[@]}"; do
@@ -84,41 +83,37 @@ cleandb() {
 }
 
 deps() {
-	VER="27.0"
-	PB_REL="https://github.com/protocolbuffers/protobuf/releases"
+	go install github.com/rubenv/sql-migrate/...@latest
+	go install github.com/air-verse/air@latest
+	go install github.com/alexkohler/prealloc@latest
+	go install github.com/nikolaydubina/smrcptr@latest
+	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+	go install gotest.tools/gotestsum@latest
+
+	local VER="27.0"
+	local PB_REL="https://github.com/protocolbuffers/protobuf/releases"
 	curl -L "$PB_REL/download/v${VER}/protoc-${VER}-linux-x86_64.zip" -o "$HOME/protoc_${VER}.zip"
 	unzip "$HOME/protoc_${VER}.zip" -d "$HOME/.local"
 	export PATH="$PATH:$HOME/.local/bin"
 }
 
 gensql() {
-	echo "running gensql..."
-	echo "running sqlc..."
 	sqlc generate
-	echo "running sql-migrate..."
 	sql-migrate up
 }
 
 genproto() {
-	echo "running genproto..."
 	set +f
 	protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/*.proto
 	set -f
 }
 
 gentempl() {
-	echo "running gentempl..."
 	npx tailwindcss build -i client/static/css/style.css -o client/static/css/tailwind.css -m
 	templ generate templ -v
 }
 
-templlr() {
-	echo "running templlr..."
-	templ generate --notify-proxy -v
-}
-
 genall() {
-	echo "running genall..."
 	go generate ./...
 	gensql
 	genproto
@@ -126,7 +121,7 @@ genall() {
 }
 
 check() {
-	echo "running check..."
+	genall
 	go mod tidy
 
 	set +f
@@ -143,10 +138,16 @@ check() {
 
 testall() {
 	genall
-	go test ./...
+	gotestsum \
+		--format=pkgname-and-test-fails \
+		--format-icons=text \
+		--format-hide-empty-pkg \
+		--hide-summary=skipped \
+		-- -cover -shuffle=on -race -test.v ./...
 }
 
 benchmark() {
+	genall
 	go test -bench=. -benchmem ./...
 }
 
@@ -154,19 +155,20 @@ if [ "$#" -eq 0 ]; then
 	echo "First use: chmod +x ${0}"
 	echo "Usage: ${0}"
 	echo "Commands:"
-	echo "    setup"
+	echo "    benchmark"
 	echo "    check"
 	echo "    clean"
+	echo "    cleandb"
+	echo "    customrun"
 	echo "    genall"
 	echo "    genproto"
 	echo "    gensql"
+	echo "    gentempl"
 	echo "    grpc"
 	echo "    grpc_ui"
-	echo "    gentempl"
-	echo "    cleandb"
-	echo "    customrun"
+	echo "    setup"
 	echo "    testall"
-	echo "    benchmark"
 else
+	echo "Running ${1}"
 	"$1" "$@"
 fi

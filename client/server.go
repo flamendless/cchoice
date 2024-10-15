@@ -47,6 +47,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	brandService := pb.NewBrandServiceClient(grpcConn)
 	otpService := pb.NewOTPServiceClient(grpcConn)
 	productService := pb.NewProductServiceClient(grpcConn)
+	settingsService := pb.NewSettingsServiceClient(grpcConn)
 	shopService := pb.NewShopServiceClient(grpcConn)
 	userService := pb.NewUserServiceClient(grpcConn)
 
@@ -55,6 +56,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	brandHandler := handlers.NewBrandHandler(logger, brandService)
 	otpHandler := handlers.NewOTPHandler(logger, otpService, authService, sessionManager, mwAuth)
 	productHandler := handlers.NewProductHandler(logger, productService, authService)
+	settingsHandler := handlers.NewSettingsHandler(logger, settingsService)
 	shopHandler := handlers.NewShopHandler(logger, shopService, sessionManager)
 	userHandler := handlers.NewUserHandler(logger, userService, sessionManager)
 
@@ -69,7 +71,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	//AUTH
 	mux.HandleFunc("GET /auth", errHandler.Default(authHandler.AuthPage))
 	mux.HandleFunc("POST /auth", errHandler.Default(authHandler.Authenticate))
-	mux.HandleFunc("GET /auth/avatar",  errHandler.Default(authHandler.Avatar))
+	mux.HandleFunc("GET /auth/avatar", errHandler.Default(authHandler.Avatar))
 
 	//REGISTER
 	mux.HandleFunc("GET /register", errHandler.Default(userHandler.RegisterPage))
@@ -87,6 +89,9 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	//SHOP
 	mux.HandleFunc("GET /", errHandler.Default(shopHandler.HomePage))
 	mux.HandleFunc("GET /home", errHandler.Default(shopHandler.HomePage))
+
+	//SETTINGS
+	mux.HandleFunc("GET /footer-details", errHandler.Default(settingsHandler.FooterDetails))
 
 	//BRAND
 	mux.HandleFunc("GET /brand/{id}", errHandler.Default(brandHandler.BrandPage))

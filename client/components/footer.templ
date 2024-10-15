@@ -1,17 +1,20 @@
 package components
 
-import "cchoice/client/components/svg"
-
-const (
-	URL_TIKTOK = "https://www.tiktok.com/@cchoicesales?_t=8pPsHyIgtF4&_r=1"
-	URL_FB     = "https://www.facebook.com/profile.php?id=61553625688578&mibextid=ZbWKwL"
-	URL_GMAP   = "https://maps.app.goo.gl/JZCZfbseZuh7eYZg7"
-	EMAIL      = "cchoicesales23@gmail.com"
-	MOBILE_NO  = "09976894824"
+import (
+	"cchoice/client/common"
+	"cchoice/client/components/svg"
 )
 
-templ Footer() {
-	<footer class="p-2 bg-cchoicesoft dark:bg-cchoicesoft">
+templ Footer(details common.FooterDetails) {
+	<div
+		hx-get="/footer-details"
+		hx-trigger="load once"
+		hx-swap-oob="#footer"
+		hx-select-oob="#footer"
+	>
+	</div>
+
+	<footer id="footer" class="p-2 bg-cchoicesoft dark:bg-cchoicesoft">
 		<div class="inline-flex items-center justify-center w-full mb-1">
 			<hr class="w-8/12 h-px my-6 bg-cchoice border-0 dark:bg-cchoice"/>
 			<span
@@ -20,7 +23,6 @@ templ Footer() {
 				MORE
 			</span>
 		</div>
-
 		<div class="mx-auto mt-2 max-w-screen-xl">
 			<div class="p-4">
 				<div class="grid grid-cols-5 gap-4 justify-evenly">
@@ -28,10 +30,7 @@ templ Footer() {
 						<h2 class="mb-6 text-sm font-semibold text-black-900 uppercase dark:text-black">GET IN TOUCH</h2>
 						<ul class="text-black-600 dark:text-black-400">
 							<li class="mb-2">
-								<a
-									href={ URL_GMAP }
-									class="hover:underline decoration-cchoice flex items-center"
-								>
+								<a href={ details.URLGMap } class="hover:underline decoration-cchoice flex items-center">
 									@svg.Map()
 									<p class="ml-4 max-w-48">
 										General Trias, Cavite, 4107
@@ -40,52 +39,42 @@ templ Footer() {
 							</li>
 							<li class="mb-2">
 								<a
-									href={ "mailto:"+EMAIL }
+									href={ "mailto:" + details.Email }
 									class="hover:underline decoration-cchoice flex items-center"
 								>
 									@svg.Mail()
 									<p class="ml-4 max-w-48">
-										{ EMAIL }
+										{ string(details.Email) }
 									</p>
 								</a>
 							</li>
 							<li class="mb-2">
 								<a
-									href="viber://chat?number=09976894824"
-									href={ "viber://chat?number="+MOBILE_NO }
+									href={ "viber://chat?number=" + details.MobileNo }
 									class="hover:underline decoration-cchoice flex items-center"
 								>
 									@svg.Phone()
 									<p class="ml-4 max-w-48">
-										{ MOBILE_NO } (Viber)
+										{ string(details.MobileNo) } (Viber)
 									</p>
 								</a>
 							</li>
 						</ul>
 					</div>
-
 					<div>
 						<h2 class="mb-6 text-sm font-semibold text-black-900 uppercase dark:text-black">Follow us</h2>
 						<ul class="text-black-600 dark:text-black-400">
 							<li class="mb-4">
-								<a
-									href={ URL_FB }
-									class="hover:underline decoration-cchoice "
-								>Facebook</a>
+								<a href={ details.URLFacebook } class="hover:underline decoration-cchoice ">Facebook</a>
 							</li>
 							<li class="mb-4">
-								<a
-									href={ URL_TIKTOK }
-									class="hover:underline decoration-cchoice "
-								>TikTok</a>
+								<a href={ details.URLTikTok } class="hover:underline decoration-cchoice ">TikTok</a>
 							</li>
 						</ul>
 					</div>
-
 					<div class="text-center content-center">
 						@Logo()
 					</div>
-
 					<div class="text-end">
 						<h2 class="mb-6 text-sm font-semibold text-black-900 uppercase dark:text-black">Legal</h2>
 						<ul class="text-black-600 dark:text-black-400">
@@ -100,7 +89,6 @@ templ Footer() {
 							</li>
 						</ul>
 					</div>
-
 					<div class="text-end">
 						<h2 class="mb-6 text-sm font-semibold text-black-900 uppercase dark:text-black">Certification</h2>
 						<ul class="text-black-600 dark:text-black-400">
@@ -118,16 +106,10 @@ templ Footer() {
 					Reserved.
 				</span>
 				<div class="flex mt-4 space-x-6 sm:justify-center sm:mt-0">
-					<a
-						href={ URL_TIKTOK }
-						class="text-black-500 hover:text-cchoice dark:hover:text-cchoice"
-					>
+					<a href={ details.URLTikTok } class="text-black-500 hover:text-cchoice dark:hover:text-cchoice">
 						@svg.TikTok()
 					</a>
-					<a
-						href={ URL_FB }
-						class="text-black-500 hover:text-cchoice dark:hover:text-cchoice"
-					>
+					<a href={ details.URLFacebook } class="text-black-500 hover:text-cchoice dark:hover:text-cchoice">
 						@svg.FB()
 					</a>
 				</div>

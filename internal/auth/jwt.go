@@ -24,7 +24,8 @@ type ValidToken struct {
 }
 
 type Issuer struct {
-	key crypto.PrivateKey
+	key    crypto.PrivateKey
+	issuer string
 }
 
 type Validator struct {
@@ -40,7 +41,8 @@ func NewIssuer() (*Issuer, error) {
 	}
 
 	return &Issuer{
-		key: key,
+		key:    key,
+		issuer: conf.Issuer,
 	}, nil
 }
 
@@ -55,7 +57,7 @@ func (i *Issuer) IssueToken(
 		"nbf": now.Unix(),
 		"iat": now.Unix(),
 		"exp": now.Add(conf.TokenExp).Unix(),
-		"iss": "http://localhost:8081", //TODO: (Brandon)
+		"iss": i.issuer,
 
 		// other fields
 		"username": username,
