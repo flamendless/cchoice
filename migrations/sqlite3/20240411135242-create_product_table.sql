@@ -48,7 +48,7 @@ CREATE TABLE tbl_product (
 CREATE INDEX idx_tbl_product_serial ON tbl_product(serial);
 
 -- +migrate Down
-DROP TABLE tbl_product;
-DROP TABLE tbl_product_category;
-DROP TABLE tbl_product_specs;
 DROP INDEX idx_tbl_product_serial;
+DROP TABLE tbl_product_specs;
+DROP TABLE tbl_product_category;
+DROP TABLE tbl_product;

@@ -13,5 +13,5 @@ CREATE TABLE tbl_brand (
 CREATE INDEX idx_tbl_brand_name ON tbl_brand(name);
 
 -- +migrate Down
-DROP TABLE tbl_brand;
 DROP INDEX idx_tbl_brand_name;
+DROP TABLE tbl_brand;

@@ -23,6 +23,6 @@ CREATE INDEX idx_tbl_user_user_type ON tbl_user(user_type);
 CREATE INDEX idx_tbl_user_status ON tbl_user(status);
 
 -- +migrate Down
-DROP TABLE tbl_user;
-DROP INDEX idx_tbl_user_user_type;
 DROP INDEX idx_tbl_user_status;
+DROP INDEX idx_tbl_user_user_type;
+DROP TABLE tbl_user;

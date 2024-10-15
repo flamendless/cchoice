@@ -14,5 +14,5 @@ CREATE TABLE tbl_auth (
 CREATE INDEX idx_tbl_auth_otp_enabled ON tbl_auth(otp_enabled);
 
 -- +migrate Down
-DROP TABLE tbl_auth;
 DROP INDEX idx_tbl_auth_otp_enabled;
+DROP TABLE tbl_auth;

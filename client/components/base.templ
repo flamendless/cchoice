@@ -1,5 +1,7 @@
 package components
 
+import "cchoice/client/common"
+
 var errorHandlerOnce = templ.NewOnceHandle()
 
 templ Base(title string, children ...templ.Component) {
@@ -41,6 +43,6 @@ templ Base(title string, children ...templ.Component) {
 			}
 		</body>
 
-		@Footer()
+		@Footer(common.FooterDetails{})
 	</html>
 }

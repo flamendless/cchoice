@@ -11,8 +11,9 @@ import (
 type config struct {
 	PrivKey        string        `env:"PRIVKEY,required"`
 	PubKey         string        `env:"PUBKEY,required"`
-	TokenExp       time.Duration `env:"TokenExp"`
-	ClientUsername string        `env:"ClientUsername,required"`
+	TokenExp       time.Duration `env:"TOKENEXP"`
+	ClientUsername string        `env:"CLIENTUSERNAME,required"`
+	Issuer         string        `env:"ISSUER,required"`
 }
 
 type Config struct {
@@ -20,6 +21,7 @@ type Config struct {
 	PubKey         []byte
 	TokenExp       time.Duration
 	ClientUsername string
+	Issuer         string
 }
 
 var conf Config
@@ -42,6 +44,7 @@ func LoadConf() {
 		PubKey:         []byte(configMd.PubKey),
 		TokenExp:       configMd.TokenExp,
 		ClientUsername: configMd.ClientUsername,
+		Issuer:         configMd.Issuer,
 	}
 
 	if logs.Log() == nil {
