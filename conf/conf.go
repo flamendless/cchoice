@@ -1,16 +1,15 @@
 package conf
 
 import (
-	"cchoice/internal/logs"
 	"time"
 
 	"github.com/caarlos0/env/v11"
-	"go.uber.org/zap"
 )
 
 type config struct {
 	PrivKey        string        `env:"PRIVKEY,required"`
 	PubKey         string        `env:"PUBKEY,required"`
+	Mode           string        `env:"MODE"`
 	TokenExp       time.Duration `env:"TOKENEXP"`
 	ClientUsername string        `env:"CLIENTUSERNAME,required"`
 	Issuer         string        `env:"ISSUER,required"`
@@ -19,6 +18,7 @@ type config struct {
 type Config struct {
 	PrivKey        []byte
 	PubKey         []byte
+	Mode           string
 	TokenExp       time.Duration
 	ClientUsername string
 	Issuer         string
@@ -42,19 +42,11 @@ func LoadConf() {
 	conf = Config{
 		PrivKey:        []byte(configMd.PrivKey),
 		PubKey:         []byte(configMd.PubKey),
+		Mode:           configMd.Mode,
 		TokenExp:       configMd.TokenExp,
 		ClientUsername: configMd.ClientUsername,
 		Issuer:         configMd.Issuer,
 	}
-
-	if logs.Log() == nil {
-		logs.InitLog()
-	}
-
-	logs.Log().Info(
-		"conf",
-		zap.Duration("token exp", conf.TokenExp),
-	)
 }
 
 func GetConf() Config {

@@ -98,7 +98,6 @@ deps() {
 
 gensql() {
 	sqlc generate
-	sql-migrate up
 }
 
 genproto() {
@@ -124,9 +123,11 @@ check() {
 	go mod tidy
 
 	set +f
-	local gofiles=( internal/**/*.go conf/*.go grpc_server/**/*.go cmd/*.go )
+	local gofiles=( internal/**/*.go conf/*.go grpc_server/**/*.go cmd/*.go client/*.go client/**/*.go )
 	for file in "${gofiles[@]}"; do
-		goimports -w -local -v "$file"
+		if [[ ! $file == *_templ.go ]]; then
+			goimports -w -local -v "$file"
+		fi
 	done
 	set -f
 
