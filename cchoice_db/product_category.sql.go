@@ -12,88 +12,81 @@ import (
 
 const createProductCategory = `-- name: CreateProductCategory :one
 INSERT INTO tbl_product_category (
-	product_id,
 	category,
 	subcategory
 ) VALUES (
-	?, ?, ?
-) RETURNING id, product_id, category, subcategory
+	?, ?
+) RETURNING id, category, subcategory, promoted_at_homepage
 `
 
 type CreateProductCategoryParams struct {
-	ProductID   int64
 	Category    sql.NullString
 	Subcategory sql.NullString
 }
 
 func (q *Queries) CreateProductCategory(ctx context.Context, arg CreateProductCategoryParams) (TblProductCategory, error) {
-	row := q.db.QueryRowContext(ctx, createProductCategory, arg.ProductID, arg.Category, arg.Subcategory)
+	row := q.db.QueryRowContext(ctx, createProductCategory, arg.Category, arg.Subcategory)
 	var i TblProductCategory
 	err := row.Scan(
 		&i.ID,
-		&i.ProductID,
 		&i.Category,
 		&i.Subcategory,
+		&i.PromotedAtHomepage,
 	)
 	return i, err
 }
 
-const getProductCategories = `-- name: GetProductCategories :many
-SELECT id, product_id, category, subcategory
-FROM tbl_product_category
-ORDER BY category DESC
+const createProductsCategories = `-- name: CreateProductsCategories :one
+INSERT INTO tbl_products_categories (
+	product_id,
+	category_id
+) VALUES (
+	?, ?
+) RETURNING id, category_id, product_id
 `
 
-func (q *Queries) GetProductCategories(ctx context.Context) ([]TblProductCategory, error) {
-	rows, err := q.db.QueryContext(ctx, getProductCategories)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []TblProductCategory
-	for rows.Next() {
-		var i TblProductCategory
-		if err := rows.Scan(
-			&i.ID,
-			&i.ProductID,
-			&i.Category,
-			&i.Subcategory,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+type CreateProductsCategoriesParams struct {
+	ProductID  int64
+	CategoryID int64
 }
 
-const getProductCategoriesByProductID = `-- name: GetProductCategoriesByProductID :many
-SELECT id, product_id, category, subcategory
+func (q *Queries) CreateProductsCategories(ctx context.Context, arg CreateProductsCategoriesParams) (TblProductsCategory, error) {
+	row := q.db.QueryRowContext(ctx, createProductsCategories, arg.ProductID, arg.CategoryID)
+	var i TblProductsCategory
+	err := row.Scan(&i.ID, &i.CategoryID, &i.ProductID)
+	return i, err
+}
+
+const getProductCategoriesByPromoted = `-- name: GetProductCategoriesByPromoted :many
+;
+
+SELECT id, category, subcategory
 FROM tbl_product_category
-WHERE product_id = ?
-ORDER BY id
+WHERE promoted_at_homepage = ?
+LIMIT ?
 `
 
-func (q *Queries) GetProductCategoriesByProductID(ctx context.Context, productID int64) ([]TblProductCategory, error) {
-	rows, err := q.db.QueryContext(ctx, getProductCategoriesByProductID, productID)
+type GetProductCategoriesByPromotedParams struct {
+	PromotedAtHomepage sql.NullBool
+	Limit              int64
+}
+
+type GetProductCategoriesByPromotedRow struct {
+	ID          int64
+	Category    sql.NullString
+	Subcategory sql.NullString
+}
+
+func (q *Queries) GetProductCategoriesByPromoted(ctx context.Context, arg GetProductCategoriesByPromotedParams) ([]GetProductCategoriesByPromotedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductCategoriesByPromoted, arg.PromotedAtHomepage, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblProductCategory
+	var items []GetProductCategoriesByPromotedRow
 	for rows.Next() {
-		var i TblProductCategory
-		if err := rows.Scan(
-			&i.ID,
-			&i.ProductID,
-			&i.Category,
-			&i.Subcategory,
-		); err != nil {
+		var i GetProductCategoriesByPromotedRow
+		if err := rows.Scan(&i.ID, &i.Category, &i.Subcategory); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -108,7 +101,7 @@ func (q *Queries) GetProductCategoriesByProductID(ctx context.Context, productID
 }
 
 const getProductCategoryByCategory = `-- name: GetProductCategoryByCategory :one
-SELECT id, product_id, category, subcategory
+SELECT id, category, subcategory, promoted_at_homepage
 FROM tbl_product_category
 WHERE category = ?
 LIMIT 1
@@ -119,15 +112,15 @@ func (q *Queries) GetProductCategoryByCategory(ctx context.Context, category sql
 	var i TblProductCategory
 	err := row.Scan(
 		&i.ID,
-		&i.ProductID,
 		&i.Category,
 		&i.Subcategory,
+		&i.PromotedAtHomepage,
 	)
 	return i, err
 }
 
 const getProductCategoryByCategoryAndSubcategory = `-- name: GetProductCategoryByCategoryAndSubcategory :one
-SELECT id, product_id, category, subcategory
+SELECT id, category, subcategory, promoted_at_homepage
 FROM tbl_product_category
 WHERE category = ? AND subcategory = ?
 LIMIT 1
@@ -143,15 +136,15 @@ func (q *Queries) GetProductCategoryByCategoryAndSubcategory(ctx context.Context
 	var i TblProductCategory
 	err := row.Scan(
 		&i.ID,
-		&i.ProductID,
 		&i.Category,
 		&i.Subcategory,
+		&i.PromotedAtHomepage,
 	)
 	return i, err
 }
 
 const getProductCategoryByID = `-- name: GetProductCategoryByID :one
-SELECT id, product_id, category, subcategory
+SELECT id, category, subcategory, promoted_at_homepage
 FROM tbl_product_category
 WHERE id = ?
 LIMIT 1
@@ -162,47 +155,47 @@ func (q *Queries) GetProductCategoryByID(ctx context.Context, id int64) (TblProd
 	var i TblProductCategory
 	err := row.Scan(
 		&i.ID,
-		&i.ProductID,
 		&i.Category,
 		&i.Subcategory,
+		&i.PromotedAtHomepage,
 	)
 	return i, err
 }
 
-const getProductCategoryByProductID = `-- name: GetProductCategoryByProductID :one
-SELECT id, product_id, category, subcategory
-FROM tbl_product_category
-WHERE product_id = ?
-LIMIT 1
+const setInitialPromotedProductCategory = `-- name: SetInitialPromotedProductCategory :many
+UPDATE tbl_product_category
+SET promoted_at_homepage = true
+WHERE
+	category LIKE '%grinder%' OR
+	category LIKE '%jigsaw%' OR
+	category LIKE '%circular-saw%' OR
+	category LIKE '%drill%' OR
+	category LIKE '%cut-off%' OR
+	category LIKE '%mitre-saw%' OR
+	category LIKE '%rotary-hammer%' OR
+	category LIKE '%demolition-hammer%'
+RETURNING id
 `
 
-func (q *Queries) GetProductCategoryByProductID(ctx context.Context, productID int64) (TblProductCategory, error) {
-	row := q.db.QueryRowContext(ctx, getProductCategoryByProductID, productID)
-	var i TblProductCategory
-	err := row.Scan(
-		&i.ID,
-		&i.ProductID,
-		&i.Category,
-		&i.Subcategory,
-	)
-	return i, err
-}
-
-const getProductCategoryBySubcategory = `-- name: GetProductCategoryBySubcategory :one
-SELECT id, product_id, category, subcategory
-FROM tbl_product_category
-WHERE subcategory = ?
-LIMIT 1
-`
-
-func (q *Queries) GetProductCategoryBySubcategory(ctx context.Context, subcategory sql.NullString) (TblProductCategory, error) {
-	row := q.db.QueryRowContext(ctx, getProductCategoryBySubcategory, subcategory)
-	var i TblProductCategory
-	err := row.Scan(
-		&i.ID,
-		&i.ProductID,
-		&i.Category,
-		&i.Subcategory,
-	)
-	return i, err
+func (q *Queries) SetInitialPromotedProductCategory(ctx context.Context) ([]int64, error) {
+	rows, err := q.db.QueryContext(ctx, setInitialPromotedProductCategory)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []int64
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

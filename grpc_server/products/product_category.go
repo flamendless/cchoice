@@ -8,6 +8,7 @@ import (
 	"cchoice/internal/serialize"
 	pb "cchoice/proto"
 	"context"
+	"database/sql"
 
 	"go.uber.org/zap"
 )
@@ -15,15 +16,6 @@ import (
 type ProductCategoryServer struct {
 	pb.UnimplementedProductCategoryServiceServer
 	CtxDB *ctx.Database
-}
-
-func productCategoryFromRow(row *cchoice_db.TblProductCategory) *pb.ProductCategory {
-	return &pb.ProductCategory{
-		Id:          serialize.EncDBID(row.ID),
-		ProductId:   serialize.EncDBID(row.ProductID),
-		Category:    row.Category.String,
-		Subcategory: row.Subcategory.String,
-	}
 }
 
 func (s *ProductCategoryServer) GetProductCategoryByID(
@@ -40,22 +32,43 @@ func (s *ProductCategoryServer) GetProductCategoryByID(
 	if err != nil {
 		return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
 	}
-	return productCategoryFromRow(&existingProductCategory), nil
+	return &pb.ProductCategory{
+		Id:          serialize.EncDBID(existingProductCategory.ID),
+		Category:    existingProductCategory.Category.String,
+		Subcategory: existingProductCategory.Subcategory.String,
+	}, nil
 }
 
-func (s *ProductCategoryServer) GetProductCategoryByProductID(
+func (s *ProductCategoryServer) GetProductCategoriesByPromoted(
 	ctx context.Context,
-	in *pb.IDRequest,
-) (*pb.ProductCategory, error) {
-	encid := in.GetId()
-	logs.Log().Debug("GetProductCategoryByProductID", zap.String("encid", encid))
-
-	existingProductCategory, err := s.CtxDB.QueriesRead.GetProductCategoryByProductID(
+	in *pb.GetProductCategoriesByPromotedRequest,
+) (*pb.ProductCategories, error) {
+	logs.Log().Debug("GetProductCategoriesByPromoted", zap.Bool("promoted at homepage", in.PromotedAtHomepage))
+	promotedProductCategories, err := s.CtxDB.QueriesRead.GetProductCategoriesByPromoted(
 		ctx,
-		serialize.DecDBID(encid),
+		cchoice_db.GetProductCategoriesByPromotedParams{
+			Limit: in.Limit,
+			PromotedAtHomepage: sql.NullBool{
+				Bool:  in.PromotedAtHomepage,
+				Valid: true,
+			},
+		},
 	)
 	if err != nil {
-		return nil, errs.NewGRPCError(errs.IDNotFound, err.Error())
+		return nil, errs.NewGRPCError(errs.QueryFailed, err.Error())
 	}
-	return productCategoryFromRow(&existingProductCategory), nil
+
+	productCategories := make([]*pb.ProductCategory, 0, len(promotedProductCategories))
+	for _, pc := range promotedProductCategories {
+		productCategories = append(productCategories, &pb.ProductCategory{
+			Id:          serialize.EncDBID(pc.ID),
+			Category:    pc.Category.String,
+			Subcategory: pc.Subcategory.String,
+		})
+	}
+
+	return &pb.ProductCategories{
+		Length:          int64(len(promotedProductCategories)),
+		ProductCategory: productCategories,
+	}, nil
 }

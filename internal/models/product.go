@@ -9,6 +9,7 @@ import (
 	"cchoice/internal/utils"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -21,7 +22,6 @@ import (
 
 type ProductCategory struct {
 	ID          int64
-	ProductID   int64
 	Category    string
 	Subcategory string
 }
@@ -126,9 +126,6 @@ func (product *Product) GetDBID(ctxDB *ctx.Database) int64 {
 func (product *Product) GetOrInsertCategoryID(ctxDB *ctx.Database) (int64, error) {
 	ctx := context.Background()
 	var categoryID int64
-	if product.ProductCategory.ID != 0 {
-		return 0, nil
-	}
 
 	existingProductCategory, err := ctxDB.QueriesRead.GetProductCategoryByCategoryAndSubcategory(
 		ctx,
@@ -145,18 +142,17 @@ func (product *Product) GetOrInsertCategoryID(ctxDB *ctx.Database) (int64, error
 	)
 	if err == nil {
 		categoryID = existingProductCategory.ID
-	} else {
+	} else if errors.Is(err, sql.ErrNoRows) {
 		newProductCategory, err := ctxDB.Queries.CreateProductCategory(
 			ctx,
 			cchoice_db.CreateProductCategoryParams{
-				ProductID: product.ID,
 				Category: sql.NullString{
 					String: product.ProductCategory.Category,
 					Valid:  true,
 				},
 				Subcategory: sql.NullString{
 					String: product.ProductCategory.Subcategory,
-					Valid:  product.ProductCategory.Subcategory != "",
+					Valid:  true,
 				},
 			},
 		)
@@ -165,8 +161,24 @@ func (product *Product) GetOrInsertCategoryID(ctxDB *ctx.Database) (int64, error
 				"Insert product category",
 				zap.Error(err),
 			)
+			return 0, err
 		}
 		categoryID = newProductCategory.ID
+
+		_, err = ctxDB.Queries.CreateProductsCategories(
+			ctx,
+			cchoice_db.CreateProductsCategoriesParams{
+				CategoryID: categoryID,
+				ProductID:  product.ID,
+			},
+		)
+		if err != nil {
+			logs.Log().Warn(
+				"Insert products categories",
+				zap.Error(err),
+			)
+			return 0, err
+		}
 	}
 	return categoryID, nil
 }
@@ -174,10 +186,6 @@ func (product *Product) GetOrInsertCategoryID(ctxDB *ctx.Database) (int64, error
 func (product *Product) GetOrInsertProductSpecsID(ctxDB *ctx.Database) (int64, error) {
 	ctx := context.Background()
 	var productSpecsID int64
-
-	if product.ProductSpecs.ID != 0 {
-		return productSpecsID, nil
-	}
 
 	existingProductSpecs, err := ctxDB.QueriesRead.GetProductSpecsByProductID(ctx, product.ID)
 	if err == nil {
@@ -234,6 +242,7 @@ func (product *Product) InsertToDB(ctxDB *ctx.Database) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
+	product.ProductSpecs.ID = productSpecsID
 
 	now := time.Now().UTC()
 	insertedProduct, err := ctxDB.Queries.CreateProduct(
@@ -269,10 +278,11 @@ func (product *Product) InsertToDB(ctxDB *ctx.Database) (int64, error) {
 
 	product.ID = insertedProduct.ID
 
-	_, err = product.GetOrInsertCategoryID(ctxDB)
+	categoryID, err := product.GetOrInsertCategoryID(ctxDB)
 	if err != nil {
 		return 0, err
 	}
+	product.ProductCategory.ID = categoryID
 
 	return insertedProduct.ID, nil
 }
@@ -280,6 +290,10 @@ func (product *Product) InsertToDB(ctxDB *ctx.Database) (int64, error) {
 func (product *Product) UpdateToDB(ctxDB *ctx.Database) (int64, error) {
 	ctx := context.Background()
 	productSpecsID, err := product.GetOrInsertProductSpecsID(ctxDB)
+	if err != nil {
+		return 0, err
+	}
+	product.ProductSpecs.ID = productSpecsID
 
 	now := time.Now().UTC()
 	updatedID, err := ctxDB.Queries.UpdateProduct(
@@ -308,7 +322,11 @@ func (product *Product) UpdateToDB(ctxDB *ctx.Database) (int64, error) {
 	)
 
 	product.ID = updatedID
-	_, err = product.GetOrInsertCategoryID(ctxDB)
+	categoryID, err := product.GetOrInsertCategoryID(ctxDB)
+	if err != nil {
+		return 0, err
+	}
+	product.ProductCategory.ID = categoryID
 
 	return updatedID, err
 }

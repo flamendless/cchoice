@@ -181,9 +181,7 @@ LoopProductProces:
 		idxCategory := tpl.Columns["Category"].Index
 		category := row[idxCategory]
 
-		product.ProductCategory = &models.ProductCategory{
-			Category: category,
-		}
+		product.ProductCategory = &models.ProductCategory{Category: category}
 		product.ProductSpecs = specs
 		product.PostProcess(rowIdx)
 
