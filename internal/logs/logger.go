@@ -1,6 +1,7 @@
 package logs
 
 import (
+	"cchoice/conf"
 	"fmt"
 	"net/http"
 
@@ -15,7 +16,15 @@ func init() {
 }
 
 func InitLog() {
-	config := zap.NewDevelopmentConfig()
+	conf := conf.GetConf()
+
+	var config zap.Config
+	if conf.Mode == "prod" {
+		config = zap.NewProductionConfig()
+	} else {
+		config = zap.NewDevelopmentConfig()
+	}
+
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 
 	newLogger, err := config.Build()
