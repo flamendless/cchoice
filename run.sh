@@ -69,6 +69,7 @@ clean() {
 
 cleandb() {
 	clean
+	gensql
 	sql-migrate up
 
 	local otherbrands=("BRADFORD" "SPARTAN" "SHINSETSU" "REDMAX" "KOBEWEL")
