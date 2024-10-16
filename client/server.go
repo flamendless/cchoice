@@ -89,6 +89,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductsListing))
 
 	//PRODUCT CATEGORY
+	mux.HandleFunc("GET /product-category/{id}/prooducts", errHandler.Default(productCategoryHandler.ProductsCategories))
 
 	//SHOP
 	mux.HandleFunc("GET /", errHandler.Default(shopHandler.HomePage))

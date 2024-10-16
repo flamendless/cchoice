@@ -72,3 +72,38 @@ func (s *ProductCategoryServer) GetProductCategoriesByPromoted(
 		ProductsCategories: productsCategories,
 	}, nil
 }
+
+func (s *ProductCategoryServer) GetProductsByCategoryID(
+	ctx context.Context,
+	in *pb.GetProductsByCategoryIDRequest,
+) (*pb.GetProductsByCategoryIDResponse, error) {
+	logs.Log().Debug("GetProductCategoryByID", zap.Int64("category id", in.CategoryId))
+	res, err := s.CtxDB.QueriesRead.GetProductsByCategoryID(
+		ctx,
+		cchoice_db.GetProductsByCategoryIDParams{
+			Limit:      in.Limit,
+			CategoryID: in.CategoryId,
+		},
+	)
+	if err != nil {
+		return nil, errs.NewGRPCError(errs.QueryFailed, err.Error())
+	}
+
+	data := make([]*pb.ProductByCategory, 0, len(res))
+	for _, productByCategory := range res {
+		data = append(data, &pb.ProductByCategory{
+			Id:                      serialize.EncDBID(productByCategory.ID),
+			CategoryId:              serialize.EncDBID(in.CategoryId),
+			Name:                    productByCategory.Name,
+			Description:             productByCategory.Description.String,
+			BrandName:               productByCategory.BrandName,
+			UnitPriceWithVatDisplay: productByCategory.UnitPriceWithVatCurrency,
+			Thumbnail:               "", //TODO: (Brandon)
+		})
+	}
+
+	return &pb.GetProductsByCategoryIDResponse{
+		Length:   int64(len(res)),
+		Products: data,
+	}, nil
+}

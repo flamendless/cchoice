@@ -57,8 +57,15 @@ templ ShopProductsCategories(productCategories []*common.ShopProductCategory) {
 						</a>
 					</div>
 
-					<div class={ styleProductsCategoriesElem(i%2!=0, false) }>
-						<h1>
+					<div
+						class={ styleProductsCategoriesElem(i%2!=0, false) }
+						hx-get={ fmt.Sprintf("/product-category/%s/products?limit=%d", productCategories[i].ID, 10) }
+						hx-swap="outerHTML"
+						hx-trigger="load once"
+						hx-target="#products_categories_products"
+						hx-select="#products_categories_products"
+					>
+						<h1 id="products_categories_products">
 							TEST
 						</h1>
 					</div>
