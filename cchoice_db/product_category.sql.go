@@ -40,9 +40,9 @@ const createProductsCategories = `-- name: CreateProductsCategories :one
 INSERT INTO tbl_products_categories (
 	product_id,
 	category_id
-) VALUES (
-	?, ?
-) RETURNING id, category_id, product_id
+) VALUES (?, ?)
+ON CONFLICT (product_id, category_id) DO NOTHING
+RETURNING id, category_id, product_id
 `
 
 type CreateProductsCategoriesParams struct {
@@ -60,9 +60,16 @@ func (q *Queries) CreateProductsCategories(ctx context.Context, arg CreateProduc
 const getProductCategoriesByPromoted = `-- name: GetProductCategoriesByPromoted :many
 ;
 
-SELECT id, category, subcategory
+SELECT
+	tbl_product_category.id,
+	tbl_product_category.category,
+	COUNT(tbl_products_categories.product_id) AS products_count
 FROM tbl_product_category
+INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_category.id
 WHERE promoted_at_homepage = ?
+GROUP BY tbl_products_categories.category_id
+HAVING tbl_products_categories.product_id
+ORDER BY products_count ASC
 LIMIT ?
 `
 
@@ -72,9 +79,9 @@ type GetProductCategoriesByPromotedParams struct {
 }
 
 type GetProductCategoriesByPromotedRow struct {
-	ID          int64
-	Category    sql.NullString
-	Subcategory sql.NullString
+	ID            int64
+	Category      sql.NullString
+	ProductsCount int64
 }
 
 func (q *Queries) GetProductCategoriesByPromoted(ctx context.Context, arg GetProductCategoriesByPromotedParams) ([]GetProductCategoriesByPromotedRow, error) {
@@ -86,7 +93,7 @@ func (q *Queries) GetProductCategoriesByPromoted(ctx context.Context, arg GetPro
 	var items []GetProductCategoriesByPromotedRow
 	for rows.Next() {
 		var i GetProductCategoriesByPromotedRow
-		if err := rows.Scan(&i.ID, &i.Category, &i.Subcategory); err != nil {
+		if err := rows.Scan(&i.ID, &i.Category, &i.ProductsCount); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -160,6 +167,24 @@ func (q *Queries) GetProductCategoryByID(ctx context.Context, id int64) (TblProd
 		&i.PromotedAtHomepage,
 	)
 	return i, err
+}
+
+const getProductsCategoriesByIDs = `-- name: GetProductsCategoriesByIDs :one
+SELECT id FROM tbl_products_categories
+WHERE product_id = ? AND category_id = ?
+LIMIT 1
+`
+
+type GetProductsCategoriesByIDsParams struct {
+	ProductID  int64
+	CategoryID int64
+}
+
+func (q *Queries) GetProductsCategoriesByIDs(ctx context.Context, arg GetProductsCategoriesByIDsParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getProductsCategoriesByIDs, arg.ProductID, arg.CategoryID)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const setInitialPromotedProductCategory = `-- name: SetInitialPromotedProductCategory :many

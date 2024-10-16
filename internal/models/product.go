@@ -169,7 +169,16 @@ func (product *Product) GetOrInsertCategoryID(ctxDB *ctx.Database) (int64, error
 			return 0, err
 		}
 		categoryID = newProductCategory.ID
+	}
 
+	_, err = ctxDB.QueriesRead.GetProductsCategoriesByIDs(
+		ctx,
+		cchoice_db.GetProductsCategoriesByIDsParams{
+			CategoryID: categoryID,
+			ProductID:  product.ID,
+		},
+	)
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
 		_, err = ctxDB.Queries.CreateProductsCategories(
 			ctx,
 			cchoice_db.CreateProductsCategoriesParams{
@@ -177,7 +186,7 @@ func (product *Product) GetOrInsertCategoryID(ctxDB *ctx.Database) (int64, error
 				ProductID:  product.ID,
 			},
 		)
-		if err != nil {
+		if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			logs.Log().Warn(
 				"Insert products categories",
 				zap.Error(err),
@@ -185,6 +194,7 @@ func (product *Product) GetOrInsertCategoryID(ctxDB *ctx.Database) (int64, error
 			return 0, err
 		}
 	}
+
 	return categoryID, nil
 }
 

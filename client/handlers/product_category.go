@@ -54,10 +54,11 @@ func (h ProductCategoryHandler) ProductsCategories(w http.ResponseWriter, r *htt
 	}
 
 	data := make([]*common.ShopProductCategory, 0, res.Length)
-	for _, productCategory := range res.ProductCategory {
+	for _, productCategory := range res.ProductsCategories {
 		data = append(data, &common.ShopProductCategory{
-			ID:       productCategory.Id,
-			Category: utils.SlugToTitle(productCategory.Category),
+			ID:            productCategory.Id,
+			Category:      utils.SlugToTitle(productCategory.Category),
+			ProductsCount: productCategory.ProductsCount,
 		})
 	}
 

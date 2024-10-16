@@ -24,13 +24,18 @@ INSERT INTO tbl_product_category (
 	?, ?
 ) RETURNING *;
 
+-- name: GetProductsCategoriesByIDs :one
+SELECT id FROM tbl_products_categories
+WHERE product_id = ? AND category_id = ?
+LIMIT 1;
+
 -- name: CreateProductsCategories :one
 INSERT INTO tbl_products_categories (
 	product_id,
 	category_id
-) VALUES (
-	?, ?
-) RETURNING *;
+) VALUES (?, ?)
+ON CONFLICT (product_id, category_id) DO NOTHING
+RETURNING *;
 
 -- name: SetInitialPromotedProductCategory :many
 UPDATE tbl_product_category
@@ -49,7 +54,14 @@ RETURNING id
 ;
 
 -- name: GetProductCategoriesByPromoted :many
-SELECT id, category, subcategory
+SELECT
+	tbl_product_category.id,
+	tbl_product_category.category,
+	COUNT(tbl_products_categories.product_id) AS products_count
 FROM tbl_product_category
+INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_category.id
 WHERE promoted_at_homepage = ?
+GROUP BY tbl_products_categories.category_id
+HAVING tbl_products_categories.product_id
+ORDER BY products_count ASC
 LIMIT ?;

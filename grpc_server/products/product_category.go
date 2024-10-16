@@ -42,7 +42,7 @@ func (s *ProductCategoryServer) GetProductCategoryByID(
 func (s *ProductCategoryServer) GetProductCategoriesByPromoted(
 	ctx context.Context,
 	in *pb.GetProductCategoriesByPromotedRequest,
-) (*pb.ProductCategories, error) {
+) (*pb.GetProductCategoriesByPromotedResponse, error) {
 	logs.Log().Debug("GetProductCategoriesByPromoted", zap.Bool("promoted at homepage", in.PromotedAtHomepage))
 	promotedProductCategories, err := s.CtxDB.QueriesRead.GetProductCategoriesByPromoted(
 		ctx,
@@ -58,17 +58,17 @@ func (s *ProductCategoryServer) GetProductCategoriesByPromoted(
 		return nil, errs.NewGRPCError(errs.QueryFailed, err.Error())
 	}
 
-	productCategories := make([]*pb.ProductCategory, 0, len(promotedProductCategories))
+	productsCategories := make([]*pb.ProductsCategories, 0, len(promotedProductCategories))
 	for _, pc := range promotedProductCategories {
-		productCategories = append(productCategories, &pb.ProductCategory{
-			Id:          serialize.EncDBID(pc.ID),
-			Category:    pc.Category.String,
-			Subcategory: pc.Subcategory.String,
+		productsCategories = append(productsCategories, &pb.ProductsCategories{
+			Id:            serialize.EncDBID(pc.ID),
+			Category:      pc.Category.String,
+			ProductsCount: pc.ProductsCount,
 		})
 	}
 
-	return &pb.ProductCategories{
-		Length:          int64(len(promotedProductCategories)),
-		ProductCategory: productCategories,
+	return &pb.GetProductCategoriesByPromotedResponse{
+		Length:             int64(len(promotedProductCategories)),
+		ProductsCategories: productsCategories,
 	}, nil
 }
