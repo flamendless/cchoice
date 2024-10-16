@@ -166,14 +166,15 @@ const setInitialPromotedProductCategory = `-- name: SetInitialPromotedProductCat
 UPDATE tbl_product_category
 SET promoted_at_homepage = true
 WHERE
-	category LIKE '%grinder%' OR
-	category LIKE '%jigsaw%' OR
-	category LIKE '%circular-saw%' OR
-	category LIKE '%drill%' OR
-	category LIKE '%cut-off%' OR
-	category LIKE '%mitre-saw%' OR
-	category LIKE '%rotary-hammer%' OR
-	category LIKE '%demolition-hammer%'
+	category IN (
+		'small-angle-grinders',
+		'impact-drills',
+		'cordless-drill-driver',
+		'cut-off-saw',
+		'circular-saws',
+		'demolition-hammer-hex',
+		'demolition-hammer-sds-max'
+	)
 RETURNING id
 `
 

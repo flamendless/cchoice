@@ -37,6 +37,13 @@ UPDATE tbl_product_category
 SET promoted_at_homepage = true
 WHERE
 	category IN (
+		'small-angle-grinders',
+		'impact-drills',
+		'cordless-drill-driver',
+		'cut-off-saw',
+		'circular-saws',
+		'demolition-hammer-hex',
+		'demolition-hammer-sds-max'
 	)
 RETURNING id
 ;
