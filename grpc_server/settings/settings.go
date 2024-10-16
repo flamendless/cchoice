@@ -25,7 +25,7 @@ func (s *SettingsServer) GetSettingsByNames(
 		return nil, errs.NewGRPCError(errs.QueryFailed, err.Error())
 	}
 
-	settings := map[string]string{}
+	settings := make(map[string]string, len(res))
 	for _, setting := range res {
 		settings[setting.Name] = setting.Value
 	}

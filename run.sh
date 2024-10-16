@@ -36,6 +36,7 @@ grpc() {
 }
 
 client() {
+	genall
 	cmd.exe /c "start vivaldi http://localhost:7331/"
 	templ generate --watch --proxy="http://localhost:${CLIENTPORT}" --open-browser=false &
 	air -c ".air.client.toml" serve_client \
@@ -90,6 +91,7 @@ deps() {
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 	go install gotest.tools/gotestsum@latest
 	go install go.uber.org/nilaway/cmd/nilaway@latest
+	go install github.com/kisielk/errcheck@latest
 
 	local VER="27.0"
 	local PB_REL="https://github.com/protocolbuffers/protobuf/releases"
@@ -121,7 +123,6 @@ genall() {
 }
 
 check() {
-	genall
 	go mod tidy
 
 	set +f
@@ -137,6 +138,7 @@ check() {
 	prealloc ./...
 	smrcptr ./...
 	nilaway ./...
+	errcheck ./...
 }
 
 testall() {

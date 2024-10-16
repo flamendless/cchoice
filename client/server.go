@@ -47,6 +47,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	brandService := pb.NewBrandServiceClient(grpcConn)
 	otpService := pb.NewOTPServiceClient(grpcConn)
 	productService := pb.NewProductServiceClient(grpcConn)
+	productCategoryService := pb.NewProductCategoryServiceClient(grpcConn)
 	settingsService := pb.NewSettingsServiceClient(grpcConn)
 	shopService := pb.NewShopServiceClient(grpcConn)
 	userService := pb.NewUserServiceClient(grpcConn)
@@ -56,6 +57,7 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	brandHandler := handlers.NewBrandHandler(logger, brandService)
 	otpHandler := handlers.NewOTPHandler(logger, otpService, authService, sessionManager, mwAuth)
 	productHandler := handlers.NewProductHandler(logger, productService, authService)
+	productCategoryHandler := handlers.NewProductCategoryHandler(logger, productCategoryService)
 	settingsHandler := handlers.NewSettingsHandler(logger, settingsService)
 	shopHandler := handlers.NewShopHandler(logger, shopService, sessionManager)
 	userHandler := handlers.NewUserHandler(logger, userService, sessionManager)
@@ -86,9 +88,12 @@ func Serve(ctxClient *ctx.ClientFlags) {
 	//PRODUCTS
 	mux.HandleFunc("GET /products", errHandler.Default(productHandler.ProductsListing))
 
+	//PRODUCT CATEGORY
+
 	//SHOP
 	mux.HandleFunc("GET /", errHandler.Default(shopHandler.HomePage))
 	mux.HandleFunc("GET /home", errHandler.Default(shopHandler.HomePage))
+	mux.HandleFunc("GET /home/product-category", errHandler.Default(productCategoryHandler.ProductsCategories))
 
 	//SETTINGS
 	mux.HandleFunc("GET /footer-details", errHandler.Default(settingsHandler.FooterDetails))

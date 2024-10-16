@@ -36,14 +36,8 @@ INSERT INTO tbl_products_categories (
 UPDATE tbl_product_category
 SET promoted_at_homepage = true
 WHERE
-	category LIKE '%grinder%' OR
-	category LIKE '%jigsaw%' OR
-	category LIKE '%circular-saw%' OR
-	category LIKE '%drill%' OR
-	category LIKE '%cut-off%' OR
-	category LIKE '%mitre-saw%' OR
-	category LIKE '%rotary-hammer%' OR
-	category LIKE '%demolition-hammer%'
+	category IN (
+	)
 RETURNING id
 ;
 
