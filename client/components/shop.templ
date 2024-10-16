@@ -1,5 +1,6 @@
 package components
 
+import "cchoice/client/common"
 import "cchoice/proto"
 import "fmt"
 
@@ -12,8 +13,9 @@ templ ShopHome() {
 		ShopBanner(),
 		HorLineWithText("Brands"),
 		ShopBrands([]*pb.Brand{}),
-		HorLineWithText("Products"),
-		ProductsListing(&pb.GetProductsListingResponse{}),
+		HorLineWithText("Categories"),
+		//ProductsListing(&pb.GetProductsListingResponse{}),
+		ShopProductsCategories([]*common.ShopProductCategory{}),
 	)
 }
 

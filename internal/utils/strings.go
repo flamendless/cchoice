@@ -1,6 +1,9 @@
 package utils
 
-import "unicode"
+import (
+	"strings"
+	"unicode"
+)
 
 func GetInitials(str string) string {
 	res := make([]rune, 0, len(str))
@@ -22,5 +25,11 @@ func RemoveEmptyStrings(input []string) []string {
 			res = append(res, val)
 		}
 	}
+	return res
+}
+
+func SlugToTitle(input string) string {
+	titled := strings.ToTitle(input)
+	res := strings.ReplaceAll(titled, "-", " ")
 	return res
 }

@@ -9,3 +9,8 @@ type FooterDetails struct {
 	Email       templ.SafeURL
 	MobileNo    templ.SafeURL
 }
+
+type ShopProductCategory struct {
+	ID       string
+	Category string
+}

@@ -1,0 +1,69 @@
+package components
+
+import "fmt"
+import "cchoice/client/common"
+
+const MAX_PRODUCTS_CATEGORIES_DISPLAY = 6
+
+func styleProductsCategoriesRow(even bool) string {
+	class := "flex items-center place-content-center"
+	if even {
+		class += " flex-row "
+	} else {
+		class += " flex-row-reverse "
+	}
+	return class
+}
+
+func styleProductsCategoriesElem(even bool, isCategory bool) string {
+	class := "px-8 py-20 w-1/2"
+	if even {
+		class += " text-right ml-7 "
+	} else {
+		class += " text-left mr-7 "
+	}
+
+	if isCategory {
+		class += " bg-cchoice "
+	}
+
+	return class
+}
+
+templ ShopProductsCategories(productCategories []*common.ShopProductCategory) {
+	<div
+		class="m-1 flex flex-col items-center place-content-center"
+		hx-trigger="load once"
+		hx-get={ fmt.Sprintf("/home/product-category?limit=%d", MAX_PRODUCTS_CATEGORIES_DISPLAY*2) }
+		hx-swap="outerHTML"
+		hx-target="#products_categories"
+		hx-select="#products_categories"
+	>
+		<div
+			id="products_categories"
+			class="w-screen"
+		>
+			for i := 0; i < min(len(productCategories), MAX_PRODUCTS_CATEGORIES_DISPLAY); i++ {
+				<div
+					id={ "product-category-" + productCategories[i].ID }
+					class={ styleProductsCategoriesRow(i%2==0) }
+				>
+					<div class={ styleProductsCategoriesElem(i%2==0, true) }>
+						<a
+							href={ templ.SafeURL("/product-category/" + productCategories[i].ID) }
+							class="text-white text-3xl font-bold"
+						>
+							{ productCategories[i].Category }
+						</a>
+					</div>
+
+					<div class={ styleProductsCategoriesElem(i%2!=0, false) }>
+						<h1>
+							TEST
+						</h1>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+}
