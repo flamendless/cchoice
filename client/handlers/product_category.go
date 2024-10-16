@@ -8,7 +8,6 @@ import (
 	"cchoice/internal/utils"
 	pb "cchoice/proto"
 	"context"
-	"fmt"
 	"net/http"
 
 	"go.uber.org/zap"
@@ -87,7 +86,7 @@ func (h ProductCategoryHandler) ProductCategoryProducts(w http.ResponseWriter, r
 		return &common.HandlerRes{Error: errs.ERR_INVALID_RESOURCE}
 	}
 
-	fmt.Println(res)
-
-	return &common.HandlerRes{}
+	return &common.HandlerRes{
+		Component: components.ShopCategoryProducts(id, res.Products),
+	}
 }

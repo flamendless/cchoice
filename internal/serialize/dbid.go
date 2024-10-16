@@ -4,17 +4,24 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
+	"strings"
 )
+
+//TODO: (Brandon) - implement prefix + id for safety
+
+const PADDING = "="
 
 func EncDBID(dbid int64) string {
 	idb := make([]byte, 8)
 	binary.LittleEndian.PutUint64(idb, uint64(dbid))
-	id := base64.StdEncoding.EncodeToString(idb)
+	id := base64.URLEncoding.EncodeToString(idb)
+	id = strings.TrimSuffix(id, PADDING)
 	return id
 }
 
 func DecDBID(dbid string) int64 {
-	decid, err := base64.StdEncoding.DecodeString(dbid)
+	dbid += PADDING
+	decid, err := base64.URLEncoding.DecodeString(dbid)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to decode string: '%s' %s", dbid, err.Error()))
 	}

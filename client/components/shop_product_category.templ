@@ -2,6 +2,7 @@ package components
 
 import "fmt"
 import "cchoice/client/common"
+import "cchoice/proto"
 
 const MAX_PRODUCTS_CATEGORIES_DISPLAY = 6
 
@@ -45,7 +46,7 @@ templ ShopProductsCategories(productCategories []*common.ShopProductCategory) {
 		>
 			for i := 0; i < min(len(productCategories), MAX_PRODUCTS_CATEGORIES_DISPLAY); i++ {
 				<div
-					id={ "product-category-" + productCategories[i].ID }
+					id={ "product_category-" + productCategories[i].ID }
 					class={ styleProductsCategoriesRow(i%2==0) }
 				>
 					<div class={ styleProductsCategoriesElem(i%2==0, true) }>
@@ -62,15 +63,23 @@ templ ShopProductsCategories(productCategories []*common.ShopProductCategory) {
 						hx-get={ fmt.Sprintf("/product-category/%s/products?limit=%d", productCategories[i].ID, 10) }
 						hx-swap="outerHTML"
 						hx-trigger="load once"
-						hx-target="#products_categories_products"
-						hx-select="#products_categories_products"
+						hx-target={ "#products_categories_products_" + productCategories[i].ID }
+						hx-select={ "#products_categories_products_" + productCategories[i].ID }
 					>
-						<h1 id="products_categories_products">
-							TEST
-						</h1>
+						@ShopCategoryProducts(productCategories[i].ID, []*pb.ProductByCategory{})
 					</div>
 				</div>
 			}
 		</div>
+	</div>
+}
+
+templ ShopCategoryProducts(categoryID string, categoryProducts []*pb.ProductByCategory) {
+	<div id={ "products_categories_products_" + categoryID }>
+		for i := 0; i < min(len(categoryProducts), MAX_PRODUCTS_CATEGORIES_DISPLAY); i++ {
+			<h1>
+				{ categoryProducts[i].Name }
+			</h1>
+		}
 	</div>
 }
