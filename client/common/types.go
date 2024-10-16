@@ -11,6 +11,7 @@ type FooterDetails struct {
 }
 
 type ShopProductCategory struct {
-	ID       string
-	Category string
+	ID            string
+	Category      string
+	ProductsCount int64
 }

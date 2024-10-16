@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProductCategoryServiceClient interface {
 	GetProductCategoryByID(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*ProductCategory, error)
-	GetProductCategoriesByPromoted(ctx context.Context, in *GetProductCategoriesByPromotedRequest, opts ...grpc.CallOption) (*ProductCategories, error)
+	GetProductCategoriesByPromoted(ctx context.Context, in *GetProductCategoriesByPromotedRequest, opts ...grpc.CallOption) (*GetProductCategoriesByPromotedResponse, error)
 }
 
 type productCategoryServiceClient struct {
@@ -43,8 +43,8 @@ func (c *productCategoryServiceClient) GetProductCategoryByID(ctx context.Contex
 	return out, nil
 }
 
-func (c *productCategoryServiceClient) GetProductCategoriesByPromoted(ctx context.Context, in *GetProductCategoriesByPromotedRequest, opts ...grpc.CallOption) (*ProductCategories, error) {
-	out := new(ProductCategories)
+func (c *productCategoryServiceClient) GetProductCategoriesByPromoted(ctx context.Context, in *GetProductCategoriesByPromotedRequest, opts ...grpc.CallOption) (*GetProductCategoriesByPromotedResponse, error) {
+	out := new(GetProductCategoriesByPromotedResponse)
 	err := c.cc.Invoke(ctx, "/proto.ProductCategoryService/GetProductCategoriesByPromoted", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (c *productCategoryServiceClient) GetProductCategoriesByPromoted(ctx contex
 // for forward compatibility
 type ProductCategoryServiceServer interface {
 	GetProductCategoryByID(context.Context, *IDRequest) (*ProductCategory, error)
-	GetProductCategoriesByPromoted(context.Context, *GetProductCategoriesByPromotedRequest) (*ProductCategories, error)
+	GetProductCategoriesByPromoted(context.Context, *GetProductCategoriesByPromotedRequest) (*GetProductCategoriesByPromotedResponse, error)
 	mustEmbedUnimplementedProductCategoryServiceServer()
 }
 
@@ -68,7 +68,7 @@ type UnimplementedProductCategoryServiceServer struct {
 func (UnimplementedProductCategoryServiceServer) GetProductCategoryByID(context.Context, *IDRequest) (*ProductCategory, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProductCategoryByID not implemented")
 }
-func (UnimplementedProductCategoryServiceServer) GetProductCategoriesByPromoted(context.Context, *GetProductCategoriesByPromotedRequest) (*ProductCategories, error) {
+func (UnimplementedProductCategoryServiceServer) GetProductCategoriesByPromoted(context.Context, *GetProductCategoriesByPromotedRequest) (*GetProductCategoriesByPromotedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProductCategoriesByPromoted not implemented")
 }
 func (UnimplementedProductCategoryServiceServer) mustEmbedUnimplementedProductCategoryServiceServer() {

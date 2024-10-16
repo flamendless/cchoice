@@ -12,17 +12,23 @@ message ProductCategory {
    string subcategory = 3;
 }
 
+message ProductsCategories {
+   string id = 1;
+   string category = 2;
+   int64 products_count = 3;
+}
+
 message GetProductCategoriesByPromotedRequest {
    int64 limit = 1;
    bool promoted_at_homepage = 2;
 }
 
-message ProductCategories {
+message GetProductCategoriesByPromotedResponse {
    int64 length = 1;
-   repeated ProductCategory product_category = 2;
+   repeated ProductsCategories products_categories = 2;
 }
 
 service ProductCategoryService {
    rpc GetProductCategoryByID(IDRequest) returns (ProductCategory) {}
-   rpc GetProductCategoriesByPromoted(GetProductCategoriesByPromotedRequest) returns (ProductCategories) {}
+   rpc GetProductCategoriesByPromoted(GetProductCategoriesByPromotedRequest) returns (GetProductCategoriesByPromotedResponse) {}
 }
