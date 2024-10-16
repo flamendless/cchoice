@@ -5,11 +5,11 @@ import (
 	"cchoice/client/components"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/utils"
 	pb "cchoice/proto"
 	"context"
 	"net/http"
 	"net/url"
-	"strconv"
 
 	"go.uber.org/zap"
 )
@@ -90,17 +90,11 @@ func (h ProductHandler) ProductsListing(
 	w http.ResponseWriter,
 	r *http.Request,
 ) *common.HandlerRes {
-	qlimit := r.URL.Query().Get("limit")
-	if qlimit == "" {
-		qlimit = "100"
-	}
-	limit, err := strconv.Atoi(qlimit)
+	limit, err := utils.GetLimit(r.URL.Query().Get("limit"))
 	if err != nil {
-		return &common.HandlerRes{Error: errs.ERR_INVALID_PARAMS}
+		return &common.HandlerRes{Error: err}
 	}
-	res, err := h.ProductService.GetProductsListing(context.Background(), &pb.GetProductsListingRequest{
-		Limit: int64(limit),
-	})
+	res, err := h.ProductService.GetProductsListing(context.Background(), &pb.GetProductsListingRequest{Limit: limit})
 	if err != nil {
 		return &common.HandlerRes{Error: err}
 	}

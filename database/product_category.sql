@@ -65,3 +65,20 @@ GROUP BY tbl_products_categories.category_id
 HAVING tbl_products_categories.product_id
 ORDER BY products_count ASC
 LIMIT ?;
+
+-- name: GetProductsByCategoryID :many
+SELECT
+	tbl_product.id,
+	tbl_product.name,
+	tbl_product.description,
+	tbl_product.unit_price_with_vat,
+	tbl_product.unit_price_with_vat_currency,
+	tbl_brand.name AS brand_name
+FROM tbl_product
+INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
+INNER JOIN
+	tbl_products_categories ON tbl_products_categories.product_id = tbl_product.id
+WHERE tbl_products_categories.category_id = ?
+ORDER BY tbl_product.created_at DESC
+LIMIT ?
+;

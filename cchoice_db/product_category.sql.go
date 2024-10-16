@@ -169,6 +169,67 @@ func (q *Queries) GetProductCategoryByID(ctx context.Context, id int64) (TblProd
 	return i, err
 }
 
+const getProductsByCategoryID = `-- name: GetProductsByCategoryID :many
+SELECT
+	tbl_product.id,
+	tbl_product.name,
+	tbl_product.description,
+	tbl_product.unit_price_with_vat,
+	tbl_product.unit_price_with_vat_currency,
+	tbl_brand.name AS brand_name
+FROM tbl_product
+INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
+INNER JOIN
+	tbl_products_categories ON tbl_products_categories.product_id = tbl_product.id
+WHERE tbl_products_categories.category_id = ?
+ORDER BY tbl_product.created_at DESC
+LIMIT ?
+`
+
+type GetProductsByCategoryIDParams struct {
+	CategoryID int64
+	Limit      int64
+}
+
+type GetProductsByCategoryIDRow struct {
+	ID                       int64
+	Name                     string
+	Description              sql.NullString
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	BrandName                string
+}
+
+func (q *Queries) GetProductsByCategoryID(ctx context.Context, arg GetProductsByCategoryIDParams) ([]GetProductsByCategoryIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductsByCategoryID, arg.CategoryID, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductsByCategoryIDRow
+	for rows.Next() {
+		var i GetProductsByCategoryIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
+			&i.BrandName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProductsCategoriesByIDs = `-- name: GetProductsCategoriesByIDs :one
 SELECT id FROM tbl_products_categories
 WHERE product_id = ? AND category_id = ?

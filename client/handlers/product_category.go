@@ -4,11 +4,12 @@ import (
 	"cchoice/client/common"
 	"cchoice/client/components"
 	"cchoice/internal/errs"
+	"cchoice/internal/serialize"
 	"cchoice/internal/utils"
 	pb "cchoice/proto"
 	"context"
+	"fmt"
 	"net/http"
-	"strconv"
 
 	"go.uber.org/zap"
 )
@@ -33,19 +34,15 @@ func NewProductCategoryHandler(
 }
 
 func (h ProductCategoryHandler) ProductsCategories(w http.ResponseWriter, r *http.Request) *common.HandlerRes {
-	qlimit := r.URL.Query().Get("limit")
-	if qlimit == "" {
-		qlimit = "100"
-	}
-	limit, err := strconv.Atoi(qlimit)
+	limit, err := utils.GetLimit(r.URL.Query().Get("limit"))
 	if err != nil {
-		return &common.HandlerRes{Error: errs.ERR_INVALID_PARAMS}
+		return &common.HandlerRes{Error: err}
 	}
 
 	res, err := h.ProductCategoryService.GetProductCategoriesByPromoted(
 		context.TODO(),
 		&pb.GetProductCategoriesByPromotedRequest{
-			Limit:              int64(limit),
+			Limit:              limit,
 			PromotedAtHomepage: true,
 		},
 	)
@@ -65,4 +62,32 @@ func (h ProductCategoryHandler) ProductsCategories(w http.ResponseWriter, r *htt
 	return &common.HandlerRes{
 		Component: components.ShopProductsCategories(data),
 	}
+}
+
+func (h ProductCategoryHandler) ProductCategoryProducts(w http.ResponseWriter, r *http.Request) *common.HandlerRes {
+	id := r.PathValue("id")
+	if id == "" {
+		return &common.HandlerRes{Error: errs.ERR_INVALID_RESOURCE}
+	}
+
+	limit, err := utils.GetLimit(r.URL.Query().Get("limit"))
+	if err != nil {
+		return &common.HandlerRes{Error: err}
+	}
+
+	ctx := context.TODO()
+	res, err := h.ProductCategoryService.GetProductsByCategoryID(
+		ctx,
+		&pb.GetProductsByCategoryIDRequest{
+			Limit:      limit,
+			CategoryId: serialize.DecDBID(id),
+		},
+	)
+	if err != nil {
+		return &common.HandlerRes{Error: errs.ERR_INVALID_RESOURCE}
+	}
+
+	fmt.Println(res)
+
+	return &common.HandlerRes{}
 }
