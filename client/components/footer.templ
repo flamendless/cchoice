@@ -11,9 +11,7 @@ templ Footer(details common.FooterDetails) {
 		hx-trigger="load once"
 		hx-swap-oob="#footer"
 		hx-select-oob="#footer"
-	>
-	</div>
-
+	></div>
 	<footer id="footer" class="p-2 bg-cchoicesoft dark:bg-cchoicesoft">
 		<div class="inline-flex items-center justify-center w-full mb-1">
 			<hr class="w-8/12 h-px my-6 bg-cchoice border-0 dark:bg-cchoice"/>
@@ -30,7 +28,7 @@ templ Footer(details common.FooterDetails) {
 						<h2 class="mb-6 text-sm font-semibold text-black-900 uppercase dark:text-black">GET IN TOUCH</h2>
 						<ul class="text-black-600 dark:text-black-400">
 							<li class="mb-2">
-								<a href={ details.URLGMap } class="hover:underline decoration-cchoice flex items-center">
+								<a href={ templ.URL(details.URLGMap) } class="hover:underline decoration-cchoice flex items-center">
 									@svg.Map()
 									<p class="ml-4 max-w-48">
 										General Trias, Cavite, 4107
@@ -39,7 +37,7 @@ templ Footer(details common.FooterDetails) {
 							</li>
 							<li class="mb-2">
 								<a
-									href={ "mailto:" + details.Email }
+									href={ templ.URL("mailto:" + details.Email) }
 									class="hover:underline decoration-cchoice flex items-center"
 								>
 									@svg.Mail()
@@ -50,7 +48,7 @@ templ Footer(details common.FooterDetails) {
 							</li>
 							<li class="mb-2">
 								<a
-									href={ "viber://chat?number=" + details.MobileNo }
+									href={ templ.URL("viber://chat?number=" + details.MobileNo) }
 									class="hover:underline decoration-cchoice flex items-center"
 								>
 									@svg.Phone()
@@ -65,10 +63,10 @@ templ Footer(details common.FooterDetails) {
 						<h2 class="mb-6 text-sm font-semibold text-black-900 uppercase dark:text-black">Follow us</h2>
 						<ul class="text-black-600 dark:text-black-400">
 							<li class="mb-4">
-								<a href={ details.URLFacebook } class="hover:underline decoration-cchoice ">Facebook</a>
+								<a href={ templ.URL(details.URLFacebook) } class="hover:underline decoration-cchoice ">Facebook</a>
 							</li>
 							<li class="mb-4">
-								<a href={ details.URLTikTok } class="hover:underline decoration-cchoice ">TikTok</a>
+								<a href={ templ.URL(details.URLTikTok) } class="hover:underline decoration-cchoice ">TikTok</a>
 							</li>
 						</ul>
 					</div>
@@ -106,10 +104,10 @@ templ Footer(details common.FooterDetails) {
 					Reserved.
 				</span>
 				<div class="flex mt-4 space-x-6 sm:justify-center sm:mt-0">
-					<a href={ details.URLTikTok } class="text-black-500 hover:text-cchoice dark:hover:text-cchoice">
+					<a href={ templ.URL(details.URLTikTok) } class="text-black-500 hover:text-cchoice dark:hover:text-cchoice">
 						@svg.TikTok()
 					</a>
-					<a href={ details.URLFacebook } class="text-black-500 hover:text-cchoice dark:hover:text-cchoice">
+					<a href={ templ.URL(details.URLFacebook) } class="text-black-500 hover:text-cchoice dark:hover:text-cchoice">
 						@svg.FB()
 					</a>
 				</div>

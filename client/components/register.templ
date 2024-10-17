@@ -6,41 +6,32 @@ templ RegisterView() {
 			Register
 		</h1>
 	</header>
-
 	<form
 		hx-post="/register"
 		hx-trigger="submit"
 		hx-target="body"
 	>
-
 		<div class="m-4">
 			@Input("first_name", "First Name", "text", "First Name")
 		</div>
-
 		<div class="m-4">
 			@Input("middle_name", "Middle Name", "text", "Middle Name")
 		</div>
-
 		<div class="m-4">
 			@Input("last_name", "Last Name", "text", "Last Name")
 		</div>
-
 		<div class="m-4">
 			@Input("email", "E-Mail", "email", "E-Mail")
 		</div>
-
 		<div class="m-4">
 			@Input("mobile_no", "Mobile Number", "text", "+639")
 		</div>
-
 		<div class="m-4">
 			@Input("password", "Password", "password", "********")
 		</div>
-
 		<div class="m-4">
 			@Input("confirm_password", "Confirm Password", "password", "********")
 		</div>
-
 		<div
 			hx-boost="true"
 			hx-target="body"
@@ -53,7 +44,6 @@ templ RegisterView() {
 			>
 				Register
 			</button>
-
 			<a
 				href="/auth"
 				class="inline-block align-baseline font-bold text-sm text-orange-500 hover:text-orange-800 mt-4"

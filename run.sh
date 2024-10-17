@@ -126,6 +126,7 @@ genall() {
 
 check() {
 	go mod tidy
+	templ fmt ./client/components
 
 	set +f
 	local gofiles=( internal/**/*.go conf/*.go grpc_server/**/*.go cmd/*.go client/*.go client/**/*.go )

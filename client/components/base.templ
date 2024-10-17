@@ -10,17 +10,14 @@ templ Base(title string, children ...templ.Component) {
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
 			if title == "" {
 				<title>CCHOICE</title>
 			} else {
 				<title>{ title }</title>
 			}
-
-			<link rel="icon" type="image/x-icon" href="/static/images/favicon.ico">
+			<link rel="icon" type="image/x-icon" href="/static/images/favicon.ico"/>
 			<link href="/static/css/tailwind.css" rel="stylesheet"/>
-			<script src="/static/js/htmx.min.js"></script>
-
+			<script src={ string(templ.URL("/static/js/htmx.min.js")) }></script>
 			<style>
 				html, body {
 					max-width: 100%;
@@ -28,21 +25,17 @@ templ Base(title string, children ...templ.Component) {
 				}
 			</style>
 		</head>
-
 		<body class="w-screen">
 			<div id="error_banner" hidden>
 				@ErrorBanner()
 			</div>
-
 			for _, child := range children {
 				@child
 			}
-
 			@errorHandlerOnce.Once() {
-				<script type="text/javascript" src="/static/js/error_handler.js"></script>
+				<script type="text/javascript" src={ string(templ.URL("/static/js/error_handler.js")) }></script>
 			}
 		</body>
-
 		@Footer(common.FooterDetails{})
 	</html>
 }

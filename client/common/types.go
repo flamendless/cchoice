@@ -1,13 +1,11 @@
 package common
 
-import "github.com/a-h/templ"
-
 type FooterDetails struct {
-	URLTikTok   templ.SafeURL
-	URLFacebook templ.SafeURL
-	URLGMap     templ.SafeURL
-	Email       templ.SafeURL
-	MobileNo    templ.SafeURL
+	URLTikTok   string
+	URLFacebook string
+	URLGMap     string
+	Email       string
+	MobileNo    string
 }
 
 type ShopProductCategory struct {

@@ -8,9 +8,11 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "fmt"
-import "cchoice/client/common"
-import "cchoice/proto"
+import (
+	"cchoice/client/common"
+	pb "cchoice/proto"
+	"fmt"
+)
 
 const MAX_PRODUCTS_CATEGORIES_DISPLAY = 6
 
@@ -67,7 +69,7 @@ func ShopProductsCategories(productCategories []*common.ShopProductCategory) tem
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/home/product-category?limit=%d", MAX_PRODUCTS_CATEGORIES_DISPLAY*2))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 38, Col: 92}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 40, Col: 92}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -90,7 +92,7 @@ func ShopProductsCategories(productCategories []*common.ShopProductCategory) tem
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs("product_category-" + productCategories[i].ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 49, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 51, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -135,7 +137,7 @@ func ShopProductsCategories(productCategories []*common.ShopProductCategory) tem
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var8 templ.SafeURL = templ.SafeURL("/product-category/" + productCategories[i].ID)
+			var templ_7745c5c3_Var8 templ.SafeURL = templ.URL("/product-category/" + productCategories[i].ID)
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var8)))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -147,7 +149,7 @@ func ShopProductsCategories(productCategories []*common.ShopProductCategory) tem
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(productCategories[i].Category)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 57, Col: 38}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 59, Col: 38}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -182,7 +184,7 @@ func ShopProductsCategories(productCategories []*common.ShopProductCategory) tem
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/product-category/%s/products?limit=%d", productCategories[i].ID, 10))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 63, Col: 97}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 64, Col: 97}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -195,7 +197,7 @@ func ShopProductsCategories(productCategories []*common.ShopProductCategory) tem
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs("#products_categories_products_" + productCategories[i].ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 66, Col: 76}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 67, Col: 76}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
@@ -208,7 +210,7 @@ func ShopProductsCategories(productCategories []*common.ShopProductCategory) tem
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs("#products_categories_products_" + productCategories[i].ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 67, Col: 76}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 68, Col: 76}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -263,7 +265,7 @@ func ShopCategoryProducts(categoryID string, categoryProducts []*pb.ProductByCat
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs("products_categories_products_" + categoryID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 78, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 79, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
@@ -281,7 +283,7 @@ func ShopCategoryProducts(categoryID string, categoryProducts []*pb.ProductByCat
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(categoryProducts[i].Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 81, Col: 30}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 82, Col: 30}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {

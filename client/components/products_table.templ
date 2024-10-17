@@ -1,8 +1,6 @@
 package components
 
-import (
-	pb "cchoice/proto"
-)
+import pb "cchoice/proto"
 
 templ ProductTableToolbar() {
 	<div class="m-4">
@@ -27,7 +25,6 @@ templ ProductTableToolbar() {
 					<option value="CREATED_AT">Creation Date</option>
 				</select>
 			</div>
-
 			<div class="m-4">
 				<label for="sort_dir">Sort Direction:</label>
 				<select
@@ -41,7 +38,6 @@ templ ProductTableToolbar() {
 					<option value="DESC">Descending</option>
 				</select>
 			</div>
-
 			<button
 				type="submit"
 				hx-indicator="#spinner"
@@ -68,16 +64,16 @@ templ ProductTableHead() {
 
 templ ProductTableBody(products []*pb.Product) {
 	<tbody id="product_table">
-	for _, product := range products {
-		<tr>
-			<td class="border border-slate-600">{ product.Serial }</td>
-			<td class="border border-slate-600">{ product.Name }</td>
-			<td class="border border-slate-600">{ product.Description }</td>
-			<td class="border border-slate-600">{ product.Brand.Name }</td>
-			<td class="border border-slate-600">{ product.UnitPriceWithoutVatDisplay }</td>
-			<td class="border border-slate-600">{ product.UnitPriceWithVatDisplay }</td>
-		</tr>
-	}
+		for _, product := range products {
+			<tr>
+				<td class="border border-slate-600">{ product.Serial }</td>
+				<td class="border border-slate-600">{ product.Name }</td>
+				<td class="border border-slate-600">{ product.Description }</td>
+				<td class="border border-slate-600">{ product.Brand.Name }</td>
+				<td class="border border-slate-600">{ product.UnitPriceWithoutVatDisplay }</td>
+				<td class="border border-slate-600">{ product.UnitPriceWithVatDisplay }</td>
+			</tr>
+		}
 	</tbody>
 }
 
@@ -87,9 +83,7 @@ templ ProductTableView(data *pb.ProductsResponse) {
 			Product Table
 		</h1>
 	</header>
-
 	@ProductTableToolbar()
-
 	<div class="m-4">
 		<table class="table-auto border-collapse border border-slate-500">
 			@ProductTableHead()
