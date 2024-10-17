@@ -68,7 +68,7 @@ func Base(title string, children ...templ.Component) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL("/static/js/htmx.min.js")))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/base.templ`, Line: 21, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/base.templ`, Line: 20, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -111,7 +111,7 @@ func Base(title string, children ...templ.Component) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL("/static/js/error_handler.js")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/base.templ`, Line: 38, Col: 89}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/base.templ`, Line: 36, Col: 89}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {

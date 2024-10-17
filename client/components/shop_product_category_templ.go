@@ -27,15 +27,15 @@ func styleProductsCategoriesRow(even bool) string {
 }
 
 func styleProductsCategoriesElem(even bool, isCategory bool) string {
-	class := "px-8 py-20 w-1/2"
+	class := "flex h-screen w-1/2 max-h-56"
 	if even {
-		class += " text-right ml-7 "
+		class += " text-right ml-7 flex-row-reverse"
 	} else {
-		class += " text-left mr-7 "
+		class += " text-left mr-7 flex-row"
 	}
 
 	if isCategory {
-		class += " bg-cchoice "
+		class += " bg-cchoice px-8 "
 	}
 
 	return class
@@ -67,9 +67,9 @@ func ShopProductsCategories(productCategories []*common.ShopProductCategory) tem
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/home/product-category?limit=%d", MAX_PRODUCTS_CATEGORIES_DISPLAY*2))
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL(fmt.Sprintf("/home/product-category?limit=%d", MAX_PRODUCTS_CATEGORIES_DISPLAY*2))))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 40, Col: 92}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 40, Col: 111}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -142,7 +142,7 @@ func ShopProductsCategories(productCategories []*common.ShopProductCategory) tem
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"text-white text-3xl font-bold\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"text-white text-3xl font-bold my-auto text-center\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -182,9 +182,9 @@ func ShopProductsCategories(productCategories []*common.ShopProductCategory) tem
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var12 string
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/product-category/%s/products?limit=%d", productCategories[i].ID, 10))
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL(fmt.Sprintf("/product-category/%s/products?row=%d&limit=%d", productCategories[i].ID, i, 10))))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 64, Col: 97}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 64, Col: 126}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -220,7 +220,7 @@ func ShopProductsCategories(productCategories []*common.ShopProductCategory) tem
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = ShopCategoryProducts(productCategories[i].ID, []*pb.ProductByCategory{}).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = ShopCategoryProducts(i, productCategories[i].ID, []*pb.ProductByCategory{}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -237,7 +237,7 @@ func ShopProductsCategories(productCategories []*common.ShopProductCategory) tem
 	})
 }
 
-func ShopCategoryProducts(categoryID string, categoryProducts []*pb.ProductByCategory) templ.Component {
+func ShopCategoryProducts(row int, categoryID string, categoryProducts []*pb.ProductByCategory) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -265,31 +265,72 @@ func ShopCategoryProducts(categoryID string, categoryProducts []*pb.ProductByCat
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs("products_categories_products_" + categoryID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 79, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 80, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for i := 0; i < min(len(categoryProducts), MAX_PRODUCTS_CATEGORIES_DISPLAY); i++ {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1>")
+		if row%2 == 0 {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"flex flex-row mx-2\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"flex flex-row-reverse mx-2\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for i := 0; i < min(len(categoryProducts), 3); i++ {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-col items-center place-content-center max-h-56\"><img class=\"min-h-48 max-h-48 mx-2 mb-auto\" src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var17 string
-			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(categoryProducts[i].Name)
+			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL(categoryProducts[i].Thumbnail)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 82, Col: 30}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 93, Col: 59}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" alt=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var18 string
+			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs("thumbnail of " + categoryProducts[i].Name)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 94, Col: 53}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <span class=\"text-sm font-semibold\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var19 string
+			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(categoryProducts[i].UnitPriceWithVatDisplay)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `client/components/shop_product_category.templ`, Line: 97, Col: 50}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

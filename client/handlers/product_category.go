@@ -9,6 +9,7 @@ import (
 	pb "cchoice/proto"
 	"context"
 	"net/http"
+	"strconv"
 
 	"go.uber.org/zap"
 )
@@ -69,6 +70,15 @@ func (h ProductCategoryHandler) ProductCategoryProducts(w http.ResponseWriter, r
 		return &common.HandlerRes{Error: errs.ERR_INVALID_RESOURCE}
 	}
 
+	row := r.URL.Query().Get("row")
+	if row == "" {
+		return &common.HandlerRes{Error: errs.ERR_INVALID_PARAM_ROW}
+	}
+	rowN, err := strconv.Atoi(row)
+	if err != nil {
+		return &common.HandlerRes{Error: err}
+	}
+
 	limit, err := utils.GetLimit(r.URL.Query().Get("limit"))
 	if err != nil {
 		return &common.HandlerRes{Error: err}
@@ -87,6 +97,6 @@ func (h ProductCategoryHandler) ProductCategoryProducts(w http.ResponseWriter, r
 	}
 
 	return &common.HandlerRes{
-		Component: components.ShopCategoryProducts(id, res.Products),
+		Component: components.ShopCategoryProducts(rowN, id, res.Products),
 	}
 }
