@@ -10,7 +10,7 @@ func GetLimit(limit string) (int64, error) {
 		limit = "100"
 	}
 	res, err := strconv.Atoi(limit)
-	if err != nil {
+	if err != nil || res <= 0 {
 		return 0, errs.ERR_INVALID_PARAMS
 	}
 	return int64(res), nil

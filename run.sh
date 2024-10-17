@@ -147,14 +147,13 @@ check() {
 testall() {
 	gotestsum \
 		--format=pkgname-and-test-fails \
-		--format-icons=text \
+		--format-icons=default \
 		--format-hide-empty-pkg \
 		--hide-summary=skipped \
 		-- -cover -shuffle=on -race -test.v ./...
 }
 
 benchmark() {
-	genall
 	go test -bench=. -benchmem ./...
 }
 

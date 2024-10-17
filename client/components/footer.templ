@@ -42,7 +42,7 @@ templ Footer(details common.FooterDetails) {
 								>
 									@svg.Mail()
 									<p class="ml-4 max-w-48">
-										{ string(details.Email) }
+										{ details.Email }
 									</p>
 								</a>
 							</li>
@@ -53,7 +53,7 @@ templ Footer(details common.FooterDetails) {
 								>
 									@svg.Phone()
 									<p class="ml-4 max-w-48">
-										{ string(details.MobileNo) } (Viber)
+										{ details.MobileNo } (Viber)
 									</p>
 								</a>
 							</li>

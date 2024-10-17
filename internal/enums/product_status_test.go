@@ -3,6 +3,8 @@ package enums
 import (
 	pb "cchoice/proto"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 var tblProductStatus = map[ProductStatus]string{
@@ -13,18 +15,17 @@ var tblProductStatus = map[ProductStatus]string{
 
 func TestProductStatusToString(t *testing.T) {
 	for productstatus, val := range tblProductStatus {
-		if productstatus.String() != val {
-			t.Fatalf("Mismatch: %s = %s", productstatus.String(), val)
-		}
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, val, productstatus.String())
+		})
 	}
 }
 
 func TestParseProductStatusEnum(t *testing.T) {
 	for productstatus, val := range tblProductStatus {
-		parsed := ParseProductStatusEnum(val)
-		if parsed != productstatus {
-			t.Fatalf("Mismatch: %s = %s", val, productstatus)
-		}
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, productstatus, ParseProductStatusEnum(val))
+		})
 	}
 }
 
@@ -35,10 +36,10 @@ func TestParseProductStatusEnumPB(t *testing.T) {
 		"DELETED":   pb.ProductStatus_DELETED,
 	}
 	for val, productstatus := range tbl {
-		enum := StringToPBEnum(val, pb.ProductStatus_ProductStatus_value, pb.ProductStatus_UNDEFINED)
-		if enum != productstatus {
-			t.Fatalf("Mismatch: %s = %s", enum, productstatus)
-		}
+		t.Run(val, func(t *testing.T) {
+			enum := StringToPBEnum(val, pb.ProductStatus_ProductStatus_value, pb.ProductStatus_UNDEFINED)
+			require.Equal(t, productstatus, enum)
+		})
 	}
 }
 

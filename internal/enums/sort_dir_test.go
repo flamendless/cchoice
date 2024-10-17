@@ -3,6 +3,8 @@ package enums
 import (
 	pb "cchoice/proto"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 var tblSortDir = map[SortDir]string{
@@ -13,18 +15,17 @@ var tblSortDir = map[SortDir]string{
 
 func TestSortDirToString(t *testing.T) {
 	for sortdir, val := range tblSortDir {
-		if sortdir.String() != val {
-			t.Fatalf("Mismatch: %s = %s", sortdir.String(), val)
-		}
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, val, sortdir.String())
+		})
 	}
 }
 
 func TestParseSortDirEnum(t *testing.T) {
 	for sortdir, val := range tblSortDir {
-		parsed := ParseSortDirEnum(val)
-		if parsed != sortdir {
-			t.Fatalf("Mismatch: %s = %s", val, sortdir)
-		}
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, sortdir, ParseSortDirEnum(val))
+		})
 	}
 }
 
@@ -35,10 +36,10 @@ func TestParseSortDirEnumPB(t *testing.T) {
 		"DESC":      pb.SortDir_DESC,
 	}
 	for val, sortdir := range tbl {
-		enum := StringToPBEnum(val, pb.SortDir_SortDir_value, pb.SortDir_UNDEFINED)
-		if enum != sortdir {
-			t.Fatalf("Mismatch: %s = %s", enum, sortdir)
-		}
+		t.Run(val, func(t *testing.T) {
+			enum := StringToPBEnum(val, pb.SortDir_SortDir_value, pb.SortDir_UNDEFINED)
+			require.Equal(t, sortdir, enum)
+		})
 	}
 }
 

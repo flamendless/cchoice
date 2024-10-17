@@ -4,6 +4,8 @@ import (
 	"math/rand"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestEncDecDBID(t *testing.T) {
@@ -11,9 +13,7 @@ func TestEncDecDBID(t *testing.T) {
 	test := int64(r.Uint64())
 	enc := EncDBID(test)
 	dec := DecDBID(enc)
-	if test != dec {
-		t.Fatalf("Fail: %d = %s = %d", test, enc, dec)
-	}
+	require.Equal(t, test, dec)
 }
 
 func BenchmarkEncDecDBID(b *testing.B) {
