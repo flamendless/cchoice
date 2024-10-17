@@ -8,14 +8,14 @@ var horLineHandlerOnce = templ.NewOnceHandle()
 
 templ Logo() {
 	@logoWithTextHandlerOnce.Once() {
-		<img src="/static/svg/logo.svg" alt="cchoice logo" class="w-fit h-fit mx-auto" />
+		<img src={ string(templ.URL("/static/svg/logo.svg")) } alt="cchoice logo" class="w-fit h-fit mx-auto"/>
 	}
 }
 
 templ LogoWithText(width string, height string) {
 	@logoWithTextHandlerOnce.Once() {
 		<img
-			src="/static/svg/logo_with_text.svg"
+			src={ string(templ.URL("/static/svg/logo_with_text.svg")) }
 			alt="cchoice logo and text"
 			class="-mt-8 -mb-4 w-fit cursor-pointer"
 			width={ width }

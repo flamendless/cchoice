@@ -45,11 +45,11 @@ func (h SettingsHandler) FooterDetails(w http.ResponseWriter, r *http.Request) *
 	}
 	return &common.HandlerRes{
 		Component: components.Footer(common.FooterDetails{
-			URLTikTok:   templ.SafeURL(res.Settings["url_tiktok"]),
-			URLFacebook: templ.SafeURL(res.Settings["url_facebook"]),
-			URLGMap:     templ.SafeURL(res.Settings["url_gmap"]),
-			Email:       templ.SafeURL(res.Settings["email"]),
-			MobileNo:    templ.SafeURL(res.Settings["mobile_no"]),
+			URLTikTok:   string(templ.URL(res.Settings["url_tiktok"])),
+			URLFacebook: string(templ.URL(res.Settings["url_facebook"])),
+			URLGMap:     string(templ.URL(res.Settings["url_gmap"])),
+			Email:       string(templ.URL(res.Settings["email"])),
+			MobileNo:    string(templ.URL(res.Settings["mobile_no"])),
 		}),
 	}
 }

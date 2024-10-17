@@ -6,25 +6,21 @@ templ OTPView(enroll bool) {
 			OTP
 		</h1>
 	</header>
-
 	@OTPMethodChoose(enroll)
 }
 
 templ OTPMethodChoose(forEnroll bool) {
 	<form
 		id="otp_method_form"
-
 		if forEnroll {
 			hx-get="/otp-enroll"
 		} else {
 			hx-get="/otp"
 		}
-
 		hx-trigger="submit"
 		hx-target="#otp_method_form"
 		hx-swap="outerHTML"
 	>
-
 		<div class="m-4 flex flex-col items-center">
 			<label for="otp_method">Choose OTP Method</label>
 			<select
@@ -37,7 +33,6 @@ templ OTPMethodChoose(forEnroll bool) {
 				<option value="EMAIL">E-Mail</option>
 				<option value="SMS">SMS</option>
 			</select>
-
 			<button
 				type="submit"
 				hx-indicator="#spinner"
@@ -52,7 +47,7 @@ templ OTPMethodChoose(forEnroll bool) {
 templ OTPQR(imgSrc string) {
 	<div class="flex flex-col justify-center m-4 items-center">
 		<img
-			src={ imgSrc }
+			src={ string(templ.SafeURL(imgSrc)) }
 			alt="QR code of OTP"
 		/>
 		<label
@@ -73,7 +68,6 @@ templ OTPRecoveryCodes(recoveryCodes string) {
 	</div>
 }
 
-
 templ OTPMethodAuthenticator() {
 	<form
 		id="otp_method_form"
@@ -81,11 +75,9 @@ templ OTPMethodAuthenticator() {
 		hx-trigger="submit"
 		hx-target="body"
 	>
-
 		<div class="m-4">
 			@Input("otp", "OTP", "text", "Enter OTP from your authenticator app")
 		</div>
-
 		<div
 			class="flex flex-col items-center justify-between m-4"
 		>
@@ -107,19 +99,16 @@ templ OTPMethodSMSOrEMail(label string, recipient string) {
 		hx-trigger="submit"
 		hx-target="body"
 	>
-
 		<div class="flex justify-center m-4 text-center">
 			<label
 				class="block text-gray-700 text-sm font-bold mb-2"
 			>
-				Check the OTP code sent to your {label}: { recipient }
+				Check the OTP code sent to your { label }: { recipient }
 			</label>
 		</div>
-
 		<div class="m-4">
-			@Input("otp", "OTP", "text", "Enter OTP from your " + label)
+			@Input("otp", "OTP", "text", "Enter OTP from your "+label)
 		</div>
-
 		<div
 			class="flex flex-col items-center justify-between m-4"
 		>

@@ -1,8 +1,10 @@
 package components
 
-import "fmt"
-import "cchoice/client/common"
-import "cchoice/proto"
+import (
+	"cchoice/client/common"
+	pb "cchoice/proto"
+	"fmt"
+)
 
 const MAX_PRODUCTS_CATEGORIES_DISPLAY = 6
 
@@ -47,19 +49,18 @@ templ ShopProductsCategories(productCategories []*common.ShopProductCategory) {
 			for i := 0; i < min(len(productCategories), MAX_PRODUCTS_CATEGORIES_DISPLAY); i++ {
 				<div
 					id={ "product_category-" + productCategories[i].ID }
-					class={ styleProductsCategoriesRow(i%2==0) }
+					class={ styleProductsCategoriesRow(i%2 == 0) }
 				>
-					<div class={ styleProductsCategoriesElem(i%2==0, true) }>
+					<div class={ styleProductsCategoriesElem(i%2 == 0, true) }>
 						<a
-							href={ templ.SafeURL("/product-category/" + productCategories[i].ID) }
+							href={ templ.URL("/product-category/" + productCategories[i].ID) }
 							class="text-white text-3xl font-bold"
 						>
 							{ productCategories[i].Category }
 						</a>
 					</div>
-
 					<div
-						class={ styleProductsCategoriesElem(i%2!=0, false) }
+						class={ styleProductsCategoriesElem(i%2 != 0, false) }
 						hx-get={ fmt.Sprintf("/product-category/%s/products?limit=%d", productCategories[i].ID, 10) }
 						hx-swap="outerHTML"
 						hx-trigger="load once"
