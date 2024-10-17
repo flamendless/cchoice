@@ -3,6 +3,8 @@ package enums
 import (
 	pb "cchoice/proto"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 var tblSortField = map[SortField]string{
@@ -13,18 +15,17 @@ var tblSortField = map[SortField]string{
 
 func TestSortFieldToString(t *testing.T) {
 	for sortfield, val := range tblSortField {
-		if sortfield.String() != val {
-			t.Fatalf("Mismatch: %s = %s", sortfield.String(), val)
-		}
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, val, sortfield.String())
+		})
 	}
 }
 
 func TestParseSortFieldEnum(t *testing.T) {
 	for sortfield, val := range tblSortField {
-		parsed := ParseSortFieldEnum(val)
-		if parsed != sortfield {
-			t.Fatalf("Mismatch: %s = %s", val, sortfield)
-		}
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, sortfield, ParseSortFieldEnum(val))
+		})
 	}
 }
 
@@ -35,10 +36,10 @@ func TestParseSortFieldEnumPB(t *testing.T) {
 		"CREATED_AT": pb.SortField_CREATED_AT,
 	}
 	for val, sortfield := range tbl {
-		enum := StringToPBEnum(val, pb.SortField_SortField_value, pb.SortField_UNDEFINED)
-		if enum != sortfield {
-			t.Fatalf("Mismatch: %s = %s", enum, sortfield)
-		}
+		t.Run(val, func(t *testing.T) {
+			enum := StringToPBEnum(val, pb.SortField_SortField_value, pb.SortField_UNDEFINED)
+			require.Equal(t, sortfield, enum)
+		})
 	}
 }
 

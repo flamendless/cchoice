@@ -2,6 +2,8 @@ package enums
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 var tblOTPStatus = map[OTPStatus]string{
@@ -14,18 +16,17 @@ var tblOTPStatus = map[OTPStatus]string{
 
 func TestOTPStatusToString(t *testing.T) {
 	for otpstatus, val := range tblOTPStatus {
-		if otpstatus.String() != val {
-			t.Fatalf("Mismatch: %s = %s", otpstatus.String(), val)
-		}
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, val, otpstatus.String())
+		})
 	}
 }
 
 func TestParseOTPStatusEnum(t *testing.T) {
 	for otpstatus, val := range tblOTPStatus {
-		parsed := ParseOTPStatusEnum(val)
-		if parsed != otpstatus {
-			t.Fatalf("Mismatch: %s = %s", val, otpstatus)
-		}
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, otpstatus, ParseOTPStatusEnum(val))
+		})
 	}
 }
 

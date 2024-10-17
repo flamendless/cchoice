@@ -2,6 +2,8 @@ package enums
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 var tblAud = map[AudKind]string{
@@ -12,18 +14,17 @@ var tblAud = map[AudKind]string{
 
 func TestAudToString(t *testing.T) {
 	for aud, val := range tblAud {
-		if aud.String() != val {
-			t.Fatalf("Mismatch: %s = %s", aud.String(), val)
-		}
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, aud.String(), val)
+		})
 	}
 }
 
 func TestParseAudEnum(t *testing.T) {
 	for aud, val := range tblAud {
-		parsed := ParseAudEnum(val)
-		if parsed != aud {
-			t.Fatalf("Mismatch: %s = %s", val, aud)
-		}
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, aud, ParseAudEnum(val))
+		})
 	}
 }
 

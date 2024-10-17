@@ -2,6 +2,8 @@ package templates
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 var tblTemplateKind = map[TemplateKind]string{
@@ -18,18 +20,17 @@ var tblTemplateKind = map[TemplateKind]string{
 
 func TestTemplateEnumToString(t *testing.T) {
 	for tpl, val := range tblTemplateKind {
-		if tpl.String() != val {
-			t.Fatalf("Mismatch: %s = %s", tpl.String(), val)
-		}
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, val, tpl.String())
+		})
 	}
 }
 
 func TestParseTemplateEnum(t *testing.T) {
 	for tpl, val := range tblTemplateKind {
-		parsed := ParseTemplateEnum(val)
-		if parsed != tpl {
-			t.Fatalf("Mismatch: %s = %s", val, tpl)
-		}
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, tpl, ParseTemplateEnum(val))
+		})
 	}
 }
 

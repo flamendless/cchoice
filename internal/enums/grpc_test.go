@@ -3,6 +3,8 @@ package enums
 import (
 	pb "cchoice/proto"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 var tblOTPMethod = map[string]pb.OTPMethod_OTPMethod{
@@ -14,14 +16,14 @@ var tblOTPMethod = map[string]pb.OTPMethod_OTPMethod{
 
 func TestParseOTPMethodEnumPB(t *testing.T) {
 	for val, otp := range tblOTPMethod {
-		enum := StringToPBEnum(
-			val,
-			pb.OTPMethod_OTPMethod_value,
-			pb.OTPMethod_UNDEFINED,
-		)
-		if enum != otp {
-			t.Fatalf("Mismatch: %s = %s", enum, val)
-		}
+		t.Run(val, func(t *testing.T) {
+			enum := StringToPBEnum(
+				val,
+				pb.OTPMethod_OTPMethod_value,
+				pb.OTPMethod_UNDEFINED,
+			)
+			require.Equal(t, otp, enum)
+		})
 	}
 }
 

@@ -3,6 +3,8 @@ package enums
 import (
 	pb "cchoice/proto"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 var tblUserType = map[UserType]string{
@@ -13,18 +15,17 @@ var tblUserType = map[UserType]string{
 
 func TestUserTypeToString(t *testing.T) {
 	for usertype, val := range tblUserType {
-		if usertype.String() != val {
-			t.Fatalf("Mismatch: %s = %s", usertype.String(), val)
-		}
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, val, usertype.String())
+		})
 	}
 }
 
 func TestParseUserTypeEnum(t *testing.T) {
 	for usertype, val := range tblUserType {
-		parsed := ParseUserTypeEnum(val)
-		if parsed != usertype {
-			t.Fatalf("Mismatch: %s = %s", val, usertype)
-		}
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, usertype, ParseUserTypeEnum(val))
+		})
 	}
 }
 
@@ -35,10 +36,10 @@ func TestParseUserTypeEnumPB(t *testing.T) {
 		"SYSTEM":    pb.UserType_SYSTEM,
 	}
 	for val, usertype := range tbl {
-		enum := StringToPBEnum(val, pb.UserType_UserType_value, pb.UserType_UNDEFINED)
-		if enum != usertype {
-			t.Fatalf("Mismatch: %s = %s", enum, usertype)
-		}
+		t.Run(val, func(t *testing.T) {
+			enum := StringToPBEnum(val, pb.UserType_UserType_value, pb.UserType_UNDEFINED)
+			require.Equal(t, usertype, enum)
+		})
 	}
 }
 
