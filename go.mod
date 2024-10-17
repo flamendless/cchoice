@@ -11,13 +11,14 @@ require (
 	github.com/cohesivestack/valgo v0.4.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/gosimple/slug v1.14.0
+	github.com/govalues/decimal v0.1.31
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/juju/ratelimit v1.0.2
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/pquerna/otp v1.4.0
 	github.com/segmentio/ksuid v1.0.4
-	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/cobra v1.8.1
+	github.com/stretchr/testify v1.9.0
 	github.com/xuri/excelize/v2 v2.9.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.67.1
@@ -34,7 +35,6 @@ require (
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.4 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/xuri/efp v0.0.0-20240408161823-9ad904a10d6d // indirect
