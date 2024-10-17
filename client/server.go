@@ -115,5 +115,8 @@ func Serve(ctxClient *ctx.ClientFlags) {
 
 	mw = sessionManager.LoadAndSave(mw)
 
-	http.ListenAndServe(addr, mw)
+	err := http.ListenAndServe(addr, mw)
+	if err != nil {
+		panic(err)
+	}
 }

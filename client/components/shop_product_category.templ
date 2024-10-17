@@ -19,15 +19,15 @@ func styleProductsCategoriesRow(even bool) string {
 }
 
 func styleProductsCategoriesElem(even bool, isCategory bool) string {
-	class := "px-8 py-20 w-1/2"
+	class := "flex h-screen w-1/2 max-h-56"
 	if even {
-		class += " text-right ml-7 "
+		class += " text-right ml-7 flex-row-reverse"
 	} else {
-		class += " text-left mr-7 "
+		class += " text-left mr-7 flex-row"
 	}
 
 	if isCategory {
-		class += " bg-cchoice "
+		class += " bg-cchoice px-8 "
 	}
 
 	return class
@@ -37,7 +37,7 @@ templ ShopProductsCategories(productCategories []*common.ShopProductCategory) {
 	<div
 		class="m-1 flex flex-col items-center place-content-center"
 		hx-trigger="load once"
-		hx-get={ fmt.Sprintf("/home/product-category?limit=%d", MAX_PRODUCTS_CATEGORIES_DISPLAY*2) }
+		hx-get={ string(templ.URL(fmt.Sprintf("/home/product-category?limit=%d", MAX_PRODUCTS_CATEGORIES_DISPLAY*2))) }
 		hx-swap="outerHTML"
 		hx-target="#products_categories"
 		hx-select="#products_categories"
@@ -54,20 +54,20 @@ templ ShopProductsCategories(productCategories []*common.ShopProductCategory) {
 					<div class={ styleProductsCategoriesElem(i%2 == 0, true) }>
 						<a
 							href={ templ.URL("/product-category/" + productCategories[i].ID) }
-							class="text-white text-3xl font-bold"
+							class="text-white text-3xl font-bold my-auto text-center"
 						>
 							{ productCategories[i].Category }
 						</a>
 					</div>
 					<div
 						class={ styleProductsCategoriesElem(i%2 != 0, false) }
-						hx-get={ fmt.Sprintf("/product-category/%s/products?limit=%d", productCategories[i].ID, 10) }
+						hx-get={ string(templ.URL(fmt.Sprintf("/product-category/%s/products?row=%d&limit=%d", productCategories[i].ID, i, 10))) }
 						hx-swap="outerHTML"
 						hx-trigger="load once"
 						hx-target={ "#products_categories_products_" + productCategories[i].ID }
 						hx-select={ "#products_categories_products_" + productCategories[i].ID }
 					>
-						@ShopCategoryProducts(productCategories[i].ID, []*pb.ProductByCategory{})
+						@ShopCategoryProducts(i, productCategories[i].ID, []*pb.ProductByCategory{})
 					</div>
 				</div>
 			}
@@ -75,12 +75,28 @@ templ ShopProductsCategories(productCategories []*common.ShopProductCategory) {
 	</div>
 }
 
-templ ShopCategoryProducts(categoryID string, categoryProducts []*pb.ProductByCategory) {
-	<div id={ "products_categories_products_" + categoryID }>
-		for i := 0; i < min(len(categoryProducts), MAX_PRODUCTS_CATEGORIES_DISPLAY); i++ {
-			<h1>
-				{ categoryProducts[i].Name }
-			</h1>
+templ ShopCategoryProducts(row int, categoryID string, categoryProducts []*pb.ProductByCategory) {
+	<div
+		id={ "products_categories_products_" + categoryID }
+		if row%2 == 0 {
+			class="flex flex-row mx-2"
+		} else {
+			class="flex flex-row-reverse mx-2"
+		}
+	>
+		for i := 0; i < min(len(categoryProducts), 3); i++ {
+			<div
+				class="flex flex-col items-center place-content-center max-h-56"
+			>
+				<img
+					class="min-h-48 max-h-48 mx-2 mb-auto"
+					src={ string(templ.URL(categoryProducts[i].Thumbnail)) }
+					alt={ "thumbnail of " + categoryProducts[i].Name }
+				/>
+				<span class="text-sm font-semibold">
+					{ categoryProducts[i].UnitPriceWithVatDisplay }
+				</span>
+			</div>
 		}
 	</div>
 }
