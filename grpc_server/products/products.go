@@ -6,11 +6,10 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/serialize"
+	"cchoice/internal/utils"
 	pb "cchoice/proto"
 	"context"
 
-	"github.com/Rhymond/go-money"
-	"github.com/shopspring/decimal"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -22,16 +21,8 @@ type ProductServer struct {
 type ProductsRow cchoice_db.GetProductsRow
 
 func (row ProductsRow) ToPBProduct() *pb.Product {
-	unitPriceWithoutVat := decimal.NewFromInt(row.UnitPriceWithoutVat / 100)
-	unitPriceWithVat := decimal.NewFromInt(row.UnitPriceWithVat / 100)
-	moneyWithoutVat := money.New(
-		unitPriceWithoutVat.CoefficientInt64(),
-		row.UnitPriceWithoutVatCurrency,
-	)
-	moneyWithVat := money.New(
-		unitPriceWithVat.CoefficientInt64(),
-		row.UnitPriceWithVatCurrency,
-	)
+	moneyWithoutVat := utils.NewMoney(row.UnitPriceWithoutVat, row.UnitPriceWithoutVatCurrency)
+	moneyWithVat := utils.NewMoney(row.UnitPriceWithVat, row.UnitPriceWithVatCurrency)
 
 	return &pb.Product{
 		Id:          serialize.EncDBID(row.ID),
@@ -173,12 +164,7 @@ func (s *ProductServer) GetProductsListing(
 
 	products := make([]*pb.ProductListing, 0, limit)
 	for _, f := range fetched {
-		unitPriceWithVat := decimal.NewFromInt(f.UnitPriceWithVat / 100)
-		moneyWithVat := money.New(
-			unitPriceWithVat.CoefficientInt64(),
-			f.UnitPriceWithVatCurrency,
-		)
-
+		moneyWithVat := utils.NewMoney(f.UnitPriceWithVat, f.UnitPriceWithVatCurrency)
 		products = append(products, &pb.ProductListing{
 			Id:                      serialize.EncDBID(f.ID),
 			Name:                    f.Name,

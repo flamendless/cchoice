@@ -16,7 +16,6 @@ import (
 
 	"github.com/Rhymond/go-money"
 	"github.com/gosimple/slug"
-	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
 )
 
@@ -347,8 +346,8 @@ func (product *Product) UpdateToDB(ctxDB *ctx.Database) (int64, error) {
 }
 
 func DBRowToProduct(row *cchoice_db.GetProductBySerialRow) *Product {
-	unitPriceWithoutVat := decimal.NewFromInt(row.UnitPriceWithoutVat / 100)
-	unitPriceWithVat := decimal.NewFromInt(row.UnitPriceWithVat / 100)
+	moneyWithoutVat := utils.NewMoney(row.UnitPriceWithoutVat, row.UnitPriceWithoutVatCurrency)
+	moneyWithVat := utils.NewMoney(row.UnitPriceWithVat, row.UnitPriceWithVatCurrency)
 
 	return &Product{
 		ID:          row.ID,
@@ -370,16 +369,10 @@ func DBRowToProduct(row *cchoice_db.GetProductBySerialRow) *Product {
 			Capacity:      row.Capacity.String,
 			ScopeOfSupply: row.ScopeOfSupply.String,
 		},
-		UnitPriceWithoutVat: money.New(
-			unitPriceWithoutVat.CoefficientInt64(),
-			row.UnitPriceWithoutVatCurrency,
-		),
-		UnitPriceWithVat: money.New(
-			unitPriceWithVat.CoefficientInt64(),
-			row.UnitPriceWithVatCurrency,
-		),
-		CreatedAt: row.CreatedAt,
-		UpdatedAt: row.UpdatedAt,
-		DeletedAt: row.DeletedAt,
+		UnitPriceWithoutVat: moneyWithoutVat,
+		UnitPriceWithVat:    moneyWithVat,
+		CreatedAt:           row.CreatedAt,
+		UpdatedAt:           row.UpdatedAt,
+		DeletedAt:           row.DeletedAt,
 	}
 }

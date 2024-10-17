@@ -18,3 +18,8 @@ var (
 	ERR_EXPIRED_REGISTRATION    = errors.New("Expired session. Register again")
 	ERR_EXPIRED_SESSION         = errors.New("Expired session. Log in again")
 )
+
+var (
+	ERR_INVALID_PARAM_LIMIT = errors.New("Invalid 'limit' param")
+	ERR_INVALID_PARAM_ROW   = errors.New("Invalid 'row' param")
+)

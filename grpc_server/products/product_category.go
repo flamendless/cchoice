@@ -6,6 +6,7 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/serialize"
+	"cchoice/internal/utils"
 	pb "cchoice/proto"
 	"context"
 	"database/sql"
@@ -92,13 +93,16 @@ func (s *ProductCategoryServer) GetProductsByCategoryID(
 	data := make([]*pb.ProductByCategory, 0, len(res))
 	for _, productByCategory := range res {
 		data = append(data, &pb.ProductByCategory{
-			Id:                      serialize.EncDBID(productByCategory.ID),
-			CategoryId:              serialize.EncDBID(in.CategoryId),
-			Name:                    productByCategory.Name,
-			Description:             productByCategory.Description.String,
-			BrandName:               productByCategory.BrandName,
-			UnitPriceWithVatDisplay: productByCategory.UnitPriceWithVatCurrency,
-			Thumbnail:               "", //TODO: (Brandon)
+			Id:          serialize.EncDBID(productByCategory.ID),
+			CategoryId:  serialize.EncDBID(in.CategoryId),
+			Name:        productByCategory.Name,
+			Description: productByCategory.Description.String,
+			BrandName:   productByCategory.BrandName,
+			Thumbnail:   productByCategory.Thumbnail,
+			UnitPriceWithVatDisplay: utils.NewMoney(
+				productByCategory.UnitPriceWithVat,
+				productByCategory.UnitPriceWithVatCurrency,
+			).Display(),
 		})
 	}
 
