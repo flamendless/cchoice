@@ -1,0 +1,51 @@
+html,
+body {
+	max-width: 100%;
+	overflow-x: hidden;
+}
+
+.custom-mask-image-right {
+	mask-image: linear-gradient(to right, rgba(0, 0, 0, 1.0) 0%, transparent 100%);
+}
+
+.custom-mask-image-left {
+	mask-image: linear-gradient(to left, rgba(0, 0, 0, 1.0) 0%, transparent 100%);
+}
+
+*::-webkit-scrollbar {
+	height: 10px;
+	width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+	border-radius: 5px;
+	background-color: #F7EFEA;
+}
+
+*::-webkit-scrollbar-track:hover {
+	background-color: #EDE6E1;
+}
+
+*::-webkit-scrollbar-track:active {
+	background-color: #EDE6E1;
+}
+
+*::-webkit-scrollbar-thumb {
+	border-radius: 5px;
+	background-color: #F6742F;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+	background-color: #DF692B;
+}
+
+*::-webkit-scrollbar-thumb:active {
+	background-color: #DF692B;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
+	height: 0px;
+	width: 0px;
+	background: transparent;
+}
