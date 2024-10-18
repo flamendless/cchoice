@@ -8,6 +8,8 @@ import (
 
 const MAX_PRODUCTS_CATEGORIES_DISPLAY = 6
 
+var onceProductCategoryImageJS = templ.NewOnceHandle()
+
 func styleProductsCategoriesRow(even bool) string {
 	class := "flex items-center place-content-center"
 	if even {
@@ -19,15 +21,15 @@ func styleProductsCategoriesRow(even bool) string {
 }
 
 func styleProductsCategoriesElem(even bool, isCategory bool) string {
-	class := "flex h-screen w-1/2 max-h-56"
+	class := "flex h-screen w-1/2 min-w-1/2 max-w-1/2 max-h-56"
 	if even {
-		class += " text-right ml-7 flex-row-reverse"
+		class += " text-right flex-row-reverse"
 	} else {
-		class += " text-left mr-7 flex-row"
+		class += " text-left flex-row"
 	}
 
 	if isCategory {
-		class += " bg-cchoice px-8 "
+		class += " bg-cchoice "
 	}
 
 	return class
@@ -54,14 +56,14 @@ templ ShopProductsCategories(productCategories []*common.ShopProductCategory) {
 					<div class={ styleProductsCategoriesElem(i%2 == 0, true) }>
 						<a
 							href={ templ.URL("/product-category/" + productCategories[i].ID) }
-							class="text-white text-3xl font-bold my-auto text-center"
+							class="text-white text-3xl font-bold my-auto text-center mx-10"
 						>
 							{ productCategories[i].Category }
 						</a>
 					</div>
 					<div
 						class={ styleProductsCategoriesElem(i%2 != 0, false) }
-						hx-get={ string(templ.URL(fmt.Sprintf("/product-category/%s/products?row=%d&limit=%d", productCategories[i].ID, i, 10))) }
+						hx-get={ string(templ.URL(fmt.Sprintf("/product-category/%s/products?row=%d&limit=%d", productCategories[i].ID, i, MAX_PRODUCTS_CATEGORIES_DISPLAY))) }
 						hx-swap="outerHTML"
 						hx-trigger="load once"
 						hx-target={ "#products_categories_products_" + productCategories[i].ID }
@@ -73,27 +75,30 @@ templ ShopProductsCategories(productCategories []*common.ShopProductCategory) {
 			}
 		</div>
 	</div>
+	@onceProductCategoryImageJS.Once() {
+		<script type="text/javascript" src={ string(templ.URL("/static/js/product_category_images.js")) }></script>
+	}
 }
 
 templ ShopCategoryProducts(row int, categoryID string, categoryProducts []*pb.ProductByCategory) {
 	<div
 		id={ "products_categories_products_" + categoryID }
 		if row%2 == 0 {
-			class="flex flex-row mx-2"
+			class="flex flex-row mx-2 overflow-x-scroll overflow-y-hidden no-scrollbar auto-scroll"
 		} else {
-			class="flex flex-row-reverse mx-2"
+			class="flex flex-row-reverse mx-2 overflow-x-scroll overflow-y-hidden no-scrollbar auto-scroll"
 		}
 	>
-		for i := 0; i < min(len(categoryProducts), 3); i++ {
+		for i := 0; i < min(len(categoryProducts), MAX_PRODUCTS_CATEGORIES_DISPLAY); i++ {
 			<div
-				class="flex flex-col items-center place-content-center max-h-56"
+				class="flex flex-col items-center place-content-center max-h-56 mb-auto my-2"
 			>
 				<img
-					class="min-h-48 max-h-48 mx-2 mb-auto"
+					class="max-w-48 min-h-48 max-h-48 mx-2"
 					src={ string(templ.URL(categoryProducts[i].Thumbnail)) }
 					alt={ "thumbnail of " + categoryProducts[i].Name }
 				/>
-				<span class="text-sm font-semibold">
+				<span class="text-sm font-semibold m-auto text-cchoice">
 					{ categoryProducts[i].UnitPriceWithVatDisplay }
 				</span>
 			</div>
