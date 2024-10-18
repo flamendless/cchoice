@@ -49,3 +49,25 @@ body {
 	width: 0px;
 	background: transparent;
 }
+
+.auto-scroll {
+	scroll-behavior: smooth;
+}
+
+.btn-next-right {
+	position: absolute;
+	right: 0%;
+	padding-right: 0.5rem;
+	padding-top: 0.5rem;
+	padding-bottom: 0.5rem;
+	background-image: linear-gradient(to left, #F7EFEA 0%, transparent 100%);
+}
+
+.btn-next-left {
+	position: absolute;
+	left: 0%;
+	padding-left: 0.5rem;
+	padding-top: 0.5rem;
+	padding-bottom: 0.5rem;
+	background-image: linear-gradient(to right, #F7EFEA 0%, transparent 100%);
+}

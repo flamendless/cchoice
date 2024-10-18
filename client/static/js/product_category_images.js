@@ -25,23 +25,5 @@ document.body.addEventListener("htmx:afterProcessNode", function(evt) {
 	if (!targetID.startsWith("products_categories_products_")) {
 		return
 	}
-
 	// add_fade(targetID);
-
-	let scroll_amount = 0;
-	const scroll_inc = 64;
-	const el = document.getElementById(targetID);
-	const is_right = el.classList.contains("flex-row-reverse");
-	const slide_timer = setInterval(function() {
-		if (is_right) {
-			scroll_amount -= scroll_inc;
-		} else {
-			scroll_amount += scroll_inc;
-		}
-		el.scrollTo({
-			top: 0,
-			left: scroll_amount,
-			behavior: "smooth",
-		});
-	}, 1000);
 });
