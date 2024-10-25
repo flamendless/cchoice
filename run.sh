@@ -94,6 +94,7 @@ deps() {
 	go install gotest.tools/gotestsum@latest
 	go install go.uber.org/nilaway/cmd/nilaway@latest
 	go install github.com/kisielk/errcheck@latest
+	go install golang.org/x/vuln/cmd/govulncheck@latest
 
 	local VER="27.0"
 	local PB_REL="https://github.com/protocolbuffers/protobuf/releases"
@@ -142,6 +143,7 @@ check() {
 	smrcptr ./...
 	nilaway ./...
 	errcheck ./...
+	govulncheck ./...
 }
 
 testall() {
