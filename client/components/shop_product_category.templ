@@ -2,14 +2,14 @@ package components
 
 import (
 	"cchoice/client/common"
+	"cchoice/client/components/svg"
 	pb "cchoice/proto"
 	"fmt"
-	"cchoice/client/components/svg"
 )
 
 const (
 	MAX_PRODUCTS_CATEGORIES_DISPLAY = 6
-	MAX_PRODUCTS_CATEGORY_PRODUCTS = 24
+	MAX_PRODUCTS_CATEGORY_PRODUCTS  = 24
 )
 
 var onceProductCategoryImageJS = templ.NewOnceHandle()
@@ -107,7 +107,6 @@ templ ShopCategoryProducts(row int, categoryID string, categoryProducts []*pb.Pr
 				</span>
 			</div>
 		}
-
 		<div
 			if row%2 == 0 {
 				class="btn-next-right self-center place-self-center m-auto"
