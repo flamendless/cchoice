@@ -4,14 +4,14 @@ go 1.23.2
 
 require (
 	github.com/Rhymond/go-money v1.0.14
-	github.com/a-h/templ v0.2.778
+	github.com/a-h/templ v0.2.793
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/alexedwards/scs/v2 v2.8.0
 	github.com/caarlos0/env/v11 v11.2.2
 	github.com/cohesivestack/valgo v0.4.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/gosimple/slug v1.14.0
-	github.com/govalues/decimal v0.1.31
+	github.com/govalues/decimal v0.1.32
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/juju/ratelimit v1.0.2
 	github.com/mattn/go-sqlite3 v1.14.24
@@ -21,8 +21,8 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/xuri/excelize/v2 v2.9.0
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.67.1
-	google.golang.org/protobuf v1.35.1
+	google.golang.org/grpc v1.68.0
+	google.golang.org/protobuf v1.35.2
 )
 
 require (
@@ -40,10 +40,10 @@ require (
 	github.com/xuri/efp v0.0.0-20240408161823-9ad904a10d6d // indirect
 	github.com/xuri/nfp v0.0.0-20240318013403-ab9948c2c4a7 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.28.0 // indirect
-	golang.org/x/net v0.30.0 // indirect
-	golang.org/x/sys v0.26.0 // indirect
-	golang.org/x/text v0.19.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241015192408-796eee8c2d53 // indirect
+	golang.org/x/crypto v0.29.0 // indirect
+	golang.org/x/net v0.31.0 // indirect
+	golang.org/x/sys v0.27.0 // indirect
+	golang.org/x/text v0.20.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241113202542-65e8d215514f // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
