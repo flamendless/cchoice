@@ -31,7 +31,12 @@ func InitLog() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	defer newLogger.Sync()
+	defer func() {
+		err := newLogger.Sync()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
 	logger = newLogger
 }
 
