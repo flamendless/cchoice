@@ -12,7 +12,10 @@ const (
 	MAX_PRODUCTS_CATEGORY_PRODUCTS  = 24
 )
 
-var onceProductCategoryImageJS = templ.NewOnceHandle()
+var (
+	onceProductCategoryImageJS = templ.NewOnceHandle()
+	onceOnClickNav             = templ.NewOnceHandle()
+)
 
 func styleProductsCategoriesRow(even bool) string {
 	class := "flex items-center place-content-center"
@@ -31,11 +34,19 @@ func styleProductsCategoriesElem(even bool, isCategory bool) string {
 	} else {
 		class += " text-left flex-row"
 	}
-
 	if isCategory {
 		class += " bg-cchoice "
 	}
+	return class
+}
 
+func styleButtonNav(even bool) string {
+	class := "max-h-48 h-48"
+	if even {
+		class += " btn-nav-right"
+	} else {
+		class += " btn-nav-left"
+	}
 	return class
 }
 
@@ -80,11 +91,25 @@ templ ShopProductsCategories(productCategories []*common.ShopProductCategory) {
 		</div>
 	</div>
 	@onceProductCategoryImageJS.Once() {
+		<script type="text/javascript" src={ string(templ.URL("/static/js/easytimer.min.js")) }></script>
 		<script type="text/javascript" src={ string(templ.URL("/static/js/product_category_images.js")) }></script>
 	}
 }
 
 templ ShopCategoryProducts(row int, categoryID string, categoryProducts []*pb.ProductByCategory) {
+	@onceOnClickNav.Once() {
+		<script type="text/javascript">
+			function onClickNav(btn) {
+				console.log(btn.srcElement)
+				const is_right = btn.className.includes("btn-nav-right");
+				if (is_right) {
+					alert("right");
+				} else {
+					alert("left");
+				}
+			}
+		</script>
+	}
 	<div
 		id={ "products_categories_products_" + categoryID }
 		if row%2 == 0 {
@@ -114,7 +139,10 @@ templ ShopCategoryProducts(row int, categoryID string, categoryProducts []*pb.Pr
 				class="btn-next-left self-center place-self-center m-auto"
 			}
 		>
-			<button class="max-h-48 h-48">
+			<button
+				class={ styleButtonNav(row%2 == 0) }
+				onclick="onClickNav(this)"
+			>
 				if row%2 == 0 {
 					@svg.Right()
 				} else {
