@@ -20,10 +20,39 @@ function add_fade(targetID) {
 	}
 }
 
+function add_auto_scroll(targetID) {
+	const el = document.getElementById(targetID);
+
+	const main_timer = new easytimer.Timer();
+	const sub_timer = new easytimer.Timer();
+
+	main_timer.start({ countdown: true, startValues: { seconds: 3 } });
+	main_timer.addEventListener("targetAchieved", function(e) {
+		sub_timer.reset();
+	});
+
+	let x = 1;
+	sub_timer.start({ precision: "secondTenths", startValues: { seconds: 0 }, target: { seconds: 1 } });
+	sub_timer.stop();
+	sub_timer.addEventListener("secondTenthsUpdated", function(e) {
+		const is_right = el.classList.contains("flex-row");
+		if (is_right) {
+			el.scroll(x, 0);
+		} else {
+			el.scroll(-x, 0);
+		}
+		x += 16;
+	});
+	sub_timer.addEventListener("targetAchieved", function(e) {
+		main_timer.reset();
+	});
+}
+
 document.body.addEventListener("htmx:afterProcessNode", function(evt) {
 	const targetID = evt.detail.elt.id;
 	if (!targetID.startsWith("products_categories_products_")) {
 		return
 	}
 	// add_fade(targetID);
+	add_auto_scroll(targetID);
 });
