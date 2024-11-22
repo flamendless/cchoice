@@ -31,17 +31,24 @@ function add_auto_scroll(targetID) {
 		sub_timer.reset();
 	});
 
-	let x = 1;
-	sub_timer.start({ precision: "secondTenths", startValues: { seconds: 0 }, target: { seconds: 1 } });
+	sub_timer.start({ precision: "secondTenths", startValues: { seconds: 0 }, target: { seconds: 2 } });
 	sub_timer.stop();
 	sub_timer.addEventListener("secondTenthsUpdated", function(e) {
 		const is_right = el.classList.contains("flex-row");
+		const x = 8;
 		if (is_right) {
-			el.scroll(x, 0);
+			el.scrollBy({
+				top: 0,
+				left: x,
+				behavior: "smooth",
+			});
 		} else {
-			el.scroll(-x, 0);
+			el.scrollBy({
+				top: 0,
+				left: -x,
+				behavior: "smooth",
+			});
 		}
-		x += 16;
 	});
 	sub_timer.addEventListener("targetAchieved", function(e) {
 		main_timer.reset();
