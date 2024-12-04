@@ -11,14 +11,14 @@ require (
 	github.com/cohesivestack/valgo v0.4.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/gosimple/slug v1.14.0
-	github.com/govalues/decimal v0.1.32
+	github.com/govalues/decimal v0.1.33
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/juju/ratelimit v1.0.2
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/pquerna/otp v1.4.0
 	github.com/segmentio/ksuid v1.0.4
 	github.com/spf13/cobra v1.8.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/xuri/excelize/v2 v2.9.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.68.0
@@ -44,6 +44,6 @@ require (
 	golang.org/x/net v0.31.0 // indirect
 	golang.org/x/sys v0.27.0 // indirect
 	golang.org/x/text v0.20.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241113202542-65e8d215514f // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241202173237-19429a94021a // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
