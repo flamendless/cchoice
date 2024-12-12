@@ -13,11 +13,16 @@ DBPATH="file:./${DBNAME}"
 GRPC_SERVER_ADDR=":50051"
 CLIENTPORT="3001"
 
-WIN_PATH=/mnt/c/Windows/System32
-alias cmd.exe="$WIN_PATH"/cmd.exe
+BROWSER="${BROWSER:-vivaldi}"
+ISWSL=false
+if [[ $(grep -i Microsoft /proc/version) ]]; then
+	ISWSL=true
+fi
 
 grpc_ui() {
-	cmd.exe /c "start vivaldi http://127.0.0.1:36477/"
+	if "${ISWSL}"; then
+		cmd.exe /c "start ${BROWSER} http://127.0.0.1:36477/"
+	fi
 	local token=$(go run ./main.go jwt -s "issue" -a "API" -o "true" -u "client@cchoice.com")
 	local auth="authorization: bearer ${token}"
 	grpcui \
