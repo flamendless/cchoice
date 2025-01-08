@@ -1,6 +1,8 @@
 package ctx
 
+import "cchoice/internal/database"
+
 type App struct {
-	DB      *Database
+	DB      database.Service
 	Metrics *Metrics
 }
