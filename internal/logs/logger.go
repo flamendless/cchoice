@@ -1,9 +1,9 @@
 package logs
 
 import (
-	"cchoice/conf"
 	"fmt"
 	"net/http"
+	"os"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -16,10 +16,9 @@ func init() {
 }
 
 func InitLog() {
-	conf := conf.GetConf()
-
 	var config zap.Config
-	if conf.Mode == "prod" {
+	env := os.Getenv("APP_ENV")
+	if env == "prod" {
 		config = zap.NewProductionConfig()
 	} else {
 		config = zap.NewDevelopmentConfig()

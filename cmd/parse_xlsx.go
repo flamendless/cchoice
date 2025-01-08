@@ -14,14 +14,15 @@ import (
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 
+	"cchoice/cmd/parse_xlsx/models"
+	"cchoice/cmd/parse_xlsx/templates"
 	"cchoice/internal/constants"
 	"cchoice/internal/ctx"
+	"cchoice/internal/database"
 	"cchoice/internal/logs"
-	"cchoice/internal/models"
-	"cchoice/internal/templates"
 )
 
-var ctxParseXLSX ctx.ParseXLSXFlags
+var ctxParseXLSX models.ParseXLSXFlags
 
 func init() {
 	f := parseXLSXCmd.Flags
@@ -156,7 +157,7 @@ var parseXLSXCmd = &cobra.Command{
 			return
 		}
 
-		tpl.CtxApp.DB = ctx.NewDatabaseCtx(tpl.AppFlags.DBPath)
+		tpl.CtxApp.DB = database.New(database.DB_MODE_RW)
 		defer tpl.CtxApp.DB.Close()
 
 		logs.Log().Debug("Getting brand...")
@@ -307,7 +308,7 @@ var parseXLSXCmd = &cobra.Command{
 					continue
 				}
 
-				row, err := tpl.CtxApp.DB.Queries.GetProductBySerial(context.Background(), product.Serial)
+				row, err := tpl.CtxApp.DB.GetQueries().GetProductBySerial(context.Background(), product.Serial)
 				if err != nil {
 					continue
 				}
@@ -346,7 +347,7 @@ var parseXLSXCmd = &cobra.Command{
 			zap.Int("updated ids count", len(updatedIds)),
 		)
 
-		promotedCategoryIDs, err := tpl.CtxApp.DB.Queries.SetInitialPromotedProductCategory(context.Background())
+		promotedCategoryIDs, err := tpl.CtxApp.DB.GetQueries().SetInitialPromotedProductCategory(context.Background())
 		if err != nil {
 			panic(err)
 		}

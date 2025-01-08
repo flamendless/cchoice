@@ -1,10 +1,9 @@
 version: "2"
 sql:
   - engine: "sqlite"
-    # schema: "database/schema.sql"
     schema: "migrations/sqlite3/"
-    queries: "database/"
+    queries: "internal/database/sql"
     gen:
       go:
-        package: "cchoice_db"
-        out: "cchoice_db"
+        package: "queries"
+        out: "internal/database/queries"

@@ -4,14 +4,10 @@
 # @Brandon Blanker Lim-it
 
 set -euf -o pipefail
-source .env
 
 GOOS="linux"
 DBNAME="test.db"
 DBPATH="file:./${DBNAME}"
-
-GRPC_SERVER_ADDR=":50051"
-CLIENTPORT="3001"
 
 BROWSER="${BROWSER:-vivaldi}"
 ISWSL=false
@@ -19,33 +15,13 @@ if [[ $(grep -i Microsoft /proc/version) ]]; then
 	ISWSL=true
 fi
 
-grpc_ui() {
-	if "${ISWSL}"; then
-		cmd.exe /c "start ${BROWSER} http://127.0.0.1:36477/"
-	fi
-	local token=$(go run ./main.go jwt -s "issue" -a "API" -o "true" -u "client@cchoice.com")
-	local auth="authorization: bearer ${token}"
-	grpcui \
-		-authority "bearer" \
-		-reflect-header "${auth}" \
-		-rpc-header "${auth}" \
-		-port 36477 \
-		-plaintext "${GRPC_SERVER_ADDR}"
-}
-
-grpc() {
-	air -c ".air.grpc.toml" serve_grpc \
-		-r=1 --db_path "${DBPATH}" \
-		--address "${GRPC_SERVER_ADDR}" \
-		--log_payload_received=true
-}
-
-client() {
+run() {
 	genall
-	cmd.exe /c "start vivaldi http://localhost:7331/"
-	templ generate --watch --proxy="http://localhost:${CLIENTPORT}" --open-browser=false &
-	air -c ".air.client.toml" serve_client \
-		-p ":${CLIENTPORT}" --grpc_address "${GRPC_SERVER_ADDR}"
+	if "${ISWSL}"; then
+		cmd.exe /c "start vivaldi http://localhost:7331/"
+	fi
+	templ generate --watch --proxy="http://localhost:8080" --open-browser=false &
+	air -c ".air.api.toml" api
 }
 
 customrun() {
@@ -85,8 +61,8 @@ cleandb() {
 	# TODO: (Brandon) - there is a bug with update where the newly inserted tbl_products_categories.product_id are incorrect
 	go run ./main.go parse_xlsx -p "assets/xlsx/Price_List_effective_25_August_2023_r2.xlsx" -s "2023 PRICE LIST" -t "DELTAPLUS" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
 	# go run ./main.go parse_xlsx -p "assets/xlsx/Price_List_effective_25_August_2023_r2.xlsx" -s "2023 PRICE LIST" -t "DELTAPLUS" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
-	go run ./main.go parse_xlsx -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./client/static/images/product_images/bosch/"
-	# go run ./main.go parse_xlsx -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./client/static/images/product_images/bosch/"
+	go run ./main.go parse_xlsx -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./cmd/web/static/images/product_images/bosch/"
+	# go run ./main.go parse_xlsx -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./cmd/web/static/images/product_images/bosch/"
 
 }
 
@@ -101,48 +77,28 @@ deps() {
 	go install go.uber.org/nilaway/cmd/nilaway@latest
 	go install github.com/kisielk/errcheck@latest
 	go install golang.org/x/vuln/cmd/govulncheck@latest
-
-	local VER="27.0"
-	local PB_REL="https://github.com/protocolbuffers/protobuf/releases"
-	curl -L "$PB_REL/download/v${VER}/protoc-${VER}-linux-x86_64.zip" -o "$HOME/protoc_${VER}.zip"
-	unzip "$HOME/protoc_${VER}.zip" -d "$HOME/.local"
-	export PATH="$PATH:$HOME/.local/bin"
+	go install github.com/dkorunic/betteralign/cmd/betteralign@latest
 }
 
 gensql() {
 	sqlc generate
 }
 
-genproto() {
-	set +f
-	protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/*.proto
-	set -f
-}
-
 gentempl() {
-	npx tailwindcss build -i client/static/css/style.css -o client/static/css/tailwind.css -m
+	npx tailwindcss build -i cmd/web/static/css/style.css -o cmd/web/static/css/tailwind.css -m
+	# npx tailwindcss -i cmd/web/styles/input.css -o cmd/web/assets/css/output.css
 	templ generate templ -v
 }
 
 genall() {
 	go generate ./...
 	gensql
-	genproto
 	gentempl
 }
 
-check() {
+sc() {
 	go mod tidy
-	templ fmt ./client/components
-
-	set +f
-	local gofiles=( internal/**/*.go conf/*.go grpc_server/**/*.go cmd/*.go client/*.go client/**/*.go )
-	for file in "${gofiles[@]}"; do
-		if [[ ! $file == *_templ.go ]]; then
-			goimports -w -local -v "$file"
-		fi
-	done
-	set -f
+	templ fmt ./cmd/web/components
 
 	go vet ./...
 	prealloc ./...
@@ -150,6 +106,16 @@ check() {
 	nilaway ./...
 	errcheck ./...
 	govulncheck ./...
+	betteralign -apply ./...
+
+	set +f
+	local gofiles=( internal/**/*.go conf/*.go cmd/*.go cmd/**/*.go )
+	for file in "${gofiles[@]}"; do
+		if [[ ! $file == *_templ.go ]]; then
+			goimports -w -local -v "$file"
+		fi
+	done
+	set -f
 }
 
 testall() {
@@ -170,16 +136,14 @@ if [ "$#" -eq 0 ]; then
 	echo "Usage: ${0}"
 	echo "Commands:"
 	echo "    benchmark"
-	echo "    check"
 	echo "    clean"
 	echo "    cleandb"
 	echo "    customrun"
 	echo "    genall"
-	echo "    genproto"
 	echo "    gensql"
 	echo "    gentempl"
-	echo "    grpc"
-	echo "    grpc_ui"
+	echo "    run"
+	echo "    sc"
 	echo "    setup"
 	echo "    testall"
 else

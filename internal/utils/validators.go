@@ -1,7 +1,6 @@
 package utils
 
 import (
-	pb "cchoice/proto"
 	"errors"
 	"fmt"
 	"net/mail"
@@ -60,7 +59,17 @@ func ValidatePW(pw string) error {
 	return nil
 }
 
-func ValidateUserReg(data *pb.RegisterRequest) error {
+type ValidateUserRegInput struct {
+	FirstName       string
+	MiddleName      string
+	LastName        string
+	Email           string
+	Password        string
+	ConfirmPassword string
+	MobileNo        string
+}
+
+func ValidateUserReg(data ValidateUserRegInput) error {
 	val := v.Check(
 		v.String(data.FirstName, "first name").Not().Blank(),
 		v.String(data.MiddleName, "middle name").Not().Blank(),
