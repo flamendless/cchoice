@@ -85,8 +85,7 @@ gensql() {
 }
 
 gentempl() {
-	npx tailwindcss build -i cmd/web/static/css/style.css -o cmd/web/static/css/tailwind.css -m
-	# npx tailwindcss -i cmd/web/styles/input.css -o cmd/web/assets/css/output.css
+	pnpm tailwindcss build -i cmd/web/static/css/style.css -o cmd/web/static/css/tailwind.css -m
 	templ generate templ -v
 }
 

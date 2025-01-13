@@ -1,9 +1,11 @@
 package logs
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
+	"syscall"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -31,8 +33,7 @@ func InitLog() {
 		fmt.Println(err)
 	}
 	defer func() {
-		err := newLogger.Sync()
-		if err != nil {
+		if err := newLogger.Sync(); !errors.Is(err, syscall.EINVAL) {
 			fmt.Println(err)
 		}
 	}()

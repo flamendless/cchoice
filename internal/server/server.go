@@ -8,8 +8,10 @@ import (
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
+	"go.uber.org/zap"
 
 	"cchoice/internal/database"
+	"cchoice/internal/logs"
 )
 
 type Server struct {
@@ -21,7 +23,7 @@ type Server struct {
 
 func NewServer() *http.Server {
 	address := os.Getenv("ADDRESS")
-	if address != "" {
+	if address == "" {
 		panic("No ADDRESS set")
 	}
 
@@ -37,12 +39,23 @@ func NewServer() *http.Server {
 		dbRW:    database.New(database.DB_MODE_RW),
 	}
 
+	addr := fmt.Sprintf("%s:%d", NewServer.address, NewServer.port)
+	readTimeout := 10 * time.Second
+	writeTimeout := 30 * time.Second
+
+	logs.Log().Info(
+		"Server",
+		zap.String("address", addr),
+		zap.Duration("read timeout", readTimeout),
+		zap.Duration("write timeout", writeTimeout),
+	)
+
 	server := &http.Server{
-		Addr:         fmt.Sprintf("%s:%d", NewServer.address, NewServer.port),
+		Addr:         addr,
 		Handler:      NewServer.RegisterRoutes(),
 		IdleTimeout:  time.Minute,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 30 * time.Second,
+		ReadTimeout:  readTimeout,
+		WriteTimeout: writeTimeout,
 	}
 
 	return server
