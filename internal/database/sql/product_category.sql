@@ -86,3 +86,9 @@ WHERE tbl_products_categories.category_id = ?
 ORDER BY tbl_product.created_at DESC
 LIMIT ?
 ;
+
+-- name: GetProductCategoriesForSidePanel :many
+SELECT DISTINCT tbl_product_category.category
+FROM tbl_product_category
+ORDER BY tbl_product_category.category ASC
+LIMIT 256;

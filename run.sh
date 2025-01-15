@@ -15,7 +15,7 @@ if [[ $(grep -i Microsoft /proc/version) ]]; then
 	ISWSL=true
 fi
 
-run() {
+serve() {
 	genall
 	if "${ISWSL}"; then
 		cmd.exe /c "start vivaldi http://localhost:7331/"
@@ -141,7 +141,7 @@ if [ "$#" -eq 0 ]; then
 	echo "    genall"
 	echo "    gensql"
 	echo "    gentempl"
-	echo "    run"
+	echo "    serve"
 	echo "    sc"
 	echo "    setup"
 	echo "    testall"

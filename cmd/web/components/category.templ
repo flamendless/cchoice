@@ -1,0 +1,31 @@
+package components
+
+import "cchoice/cmd/web/models"
+
+templ CategoriesList(categories []models.CategorySidePanelText) {
+	<div id="categories-list" class="flex flex-col h-screen overflow-y-scroll scrollbar-hide">
+		for _, category := range categories {
+			<a href={ templ.SafeURL(category.URL) } class="text-sm font-light ml-2 my-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft">
+				{ category.Label }
+			</a>
+		}
+	</div>
+}
+
+templ CategoriesSidePanel() {
+	<div
+		id="categories-side-panel"
+		class="sticky w-1/4 ml-0.5 border-r-2 border-cchoice_border"
+		hx-trigger="load once"
+		hx-get="/product-categories/list"
+		hx-select="#categories-list"
+		hx-target="#categories-list"
+		hx-swap="outerHTML"
+	>
+		<p class="text-sm font-medium m-2">
+			Choose a Category
+		</p>
+		<hr class="border-2 border-cchoice_border ml-1 mr-6 my-0.5"/>
+		@CategoriesList(nil)
+	</div>
+}
