@@ -210,6 +210,7 @@ var parseXLSXCmd = &cobra.Command{
 		var wg sync.WaitGroup
 
 		startWG := time.Now()
+		foundImages := 0
 		for start, end := 0, 0; start <= len(products)-1; start = end {
 			end = start + batchsize
 			if end > len(products) {
@@ -270,6 +271,9 @@ var parseXLSXCmd = &cobra.Command{
 										panic(1)
 									}
 								}
+								if err == nil {
+									foundImages++
+								}
 							}
 						}
 					}
@@ -298,6 +302,7 @@ var parseXLSXCmd = &cobra.Command{
 				time.Duration(updateMetrics/int64(len(updatedIds))),
 			)
 		}
+		logs.Log().Info("Images", zap.Int("found images", foundImages), zap.Int("products count", len(products)))
 
 		if tpl.AppFlags.VerifyPrices {
 			hasError := false

@@ -251,13 +251,14 @@ LoopProductProces:
 }
 
 func BoschProcessProductImage(tpl *Template, product *models.Product) (*models.ProductImage, error) {
-	basepath := strings.TrimLeft(tpl.AppFlags.ImagesBasePath, "./client/")
-	basepath = strings.TrimRight(basepath, "/")
+	basepath := strings.TrimPrefix(tpl.AppFlags.ImagesBasePath, "./cmd/web/")
+	basepath = strings.TrimSuffix(basepath, "/")
 	path := fmt.Sprintf("%s/%s.png", basepath, product.Name)
 
-	_, err := os.Stat("client/" + path)
+	imagePath := "./cmd/web/" + path
+	_, err := os.Stat(imagePath)
 	if err != nil {
-		logs.Log().Debug("Image path does not exists: " + path)
+		logs.Log().Debug("Image path does not exists: " + imagePath)
 		return nil, err
 	}
 
