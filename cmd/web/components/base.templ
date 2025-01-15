@@ -46,21 +46,23 @@ templ Base(title string, children ...templ.Component) {
 				<link rel="icon" type="image/png" sizes="180x180" href="/static/images/favicon/180x180.png"/>
 				<link rel="icon" type="image/png" sizes="192x192" href="/static/images/favicon/192x192.png"/>
 				<link href="/static/css/tailwind.css" rel="stylesheet"/>
-				<link href="/static/css/custom.css" rel="stylesheet"/>
 				<script type="text/javascript" src={ string(templ.URL("/static/js/htmx.min.js")) }></script>
 			}
 		</head>
-		<body class="w-screen">
-			<div id="error_banner" hidden>
-				@ErrorBanner()
-			</div>
-			<img src="/static/images/logo.svg" class="w-32 h-32"/>
+		<body class="w-full h-full m-0 overflow-hidden">
+			@Header()
 			for _, child := range children {
 				@child
 			}
+			<div id="error_banner" hidden>
+				@ErrorBanner()
+			</div>
 			@onceErrorHandler.Once() {
 				<script type="text/javascript" src={ string(templ.URL("/static/js/error_handler.js")) }></script>
 			}
+			<div>
+				@CategoriesSidePanel()
+			</div>
 		</body>
 	</html>
 }

@@ -107,6 +107,38 @@ func (q *Queries) GetProductCategoriesByPromoted(ctx context.Context, arg GetPro
 	return items, nil
 }
 
+const getProductCategoriesForSidePanel = `-- name: GetProductCategoriesForSidePanel :many
+;
+
+SELECT DISTINCT tbl_product_category.category
+FROM tbl_product_category
+ORDER BY tbl_product_category.category ASC
+LIMIT 256
+`
+
+func (q *Queries) GetProductCategoriesForSidePanel(ctx context.Context) ([]sql.NullString, error) {
+	rows, err := q.db.QueryContext(ctx, getProductCategoriesForSidePanel)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []sql.NullString
+	for rows.Next() {
+		var category sql.NullString
+		if err := rows.Scan(&category); err != nil {
+			return nil, err
+		}
+		items = append(items, category)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProductCategoryByCategory = `-- name: GetProductCategoryByCategory :one
 SELECT id, category, subcategory, promoted_at_homepage
 FROM tbl_product_category

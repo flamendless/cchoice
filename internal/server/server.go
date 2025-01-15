@@ -9,6 +9,8 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 	"go.uber.org/zap"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 
 	"cchoice/internal/database"
 	"cchoice/internal/logs"
@@ -32,11 +34,13 @@ func NewServer() *http.Server {
 		panic(err)
 	}
 
+	dbRO := database.New(database.DB_MODE_RO)
+	dbRW := database.New(database.DB_MODE_RW)
 	NewServer := &Server{
 		address: address,
 		port:    port,
-		dbRO:    database.New(database.DB_MODE_RO),
-		dbRW:    database.New(database.DB_MODE_RW),
+		dbRO:    dbRO,
+		dbRW:    dbRW,
 	}
 
 	addr := fmt.Sprintf("%s:%d", NewServer.address, NewServer.port)
@@ -50,9 +54,11 @@ func NewServer() *http.Server {
 		zap.Duration("write timeout", writeTimeout),
 	)
 
+	h2s := &http2.Server{MaxConcurrentStreams: 256}
+	h2cHandler := h2c.NewHandler(NewServer.RegisterRoutes(), h2s)
 	server := &http.Server{
 		Addr:         addr,
-		Handler:      NewServer.RegisterRoutes(),
+		Handler:      h2cHandler,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  readTimeout,
 		WriteTimeout: writeTimeout,
