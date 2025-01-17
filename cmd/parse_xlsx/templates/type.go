@@ -2,7 +2,6 @@ package templates
 
 import (
 	"cchoice/cmd/parse_xlsx/models"
-	"cchoice/internal/ctx"
 	"fmt"
 	"strings"
 
@@ -16,7 +15,7 @@ type Column struct {
 
 type Template struct {
 	AppFlags *models.ParseXLSXFlags
-	CtxApp   *ctx.App
+	CtxApp   *models.ParseXLSX
 	Brand    *models.Brand
 
 	SkipInitialRows     int

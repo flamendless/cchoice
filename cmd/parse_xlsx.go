@@ -17,7 +17,6 @@ import (
 	"cchoice/cmd/parse_xlsx/models"
 	"cchoice/cmd/parse_xlsx/templates"
 	"cchoice/internal/constants"
-	"cchoice/internal/ctx"
 	"cchoice/internal/database"
 	"cchoice/internal/logs"
 )
@@ -122,8 +121,8 @@ var parseXLSXCmd = &cobra.Command{
 		}
 
 		tpl.AppFlags = &ctxParseXLSX
-		tpl.CtxApp = &ctx.App{}
-		tpl.CtxApp.Metrics = &ctx.Metrics{}
+		tpl.CtxApp = &models.ParseXLSX{}
+		tpl.CtxApp.Metrics = &models.Metrics{}
 
 		startProcessColumns := time.Now()
 		success := ProcessColumns(tpl, file)
