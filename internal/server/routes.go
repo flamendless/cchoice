@@ -4,21 +4,20 @@ import (
 	"context"
 	"database/sql"
 	"net/http"
-	"strings"
 
 	"cchoice/cmd/web"
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/logs"
+	"cchoice/internal/serialize"
+	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -38,8 +37,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/", s.indexHandler)
 	r.Get("/settings/header-texts", s.headerTextsHandler)
 	r.Get("/settings/footer-texts", s.footerTextsHandler)
-	r.Get("/product-categories/list", s.categoriesListHandler)
-	r.Get("/product-categories/subcategories/list", s.categoriesSubcategoriesListHandler)
+	r.Get("/product-categories/side-panel/list", s.categoriesSidePanelHandler)
+	r.Get("/product-categories/sections", s.categorySectionHandler)
+	r.Get("/product-categories/{category_id}/products", s.categoryProductsHandler)
 	r.Get("/health", s.healthHandler)
 
 	return r
@@ -154,7 +154,7 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) categoriesListHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Request) {
 	res, err := s.dbRO.GetQueries().GetProductCategoriesByPromoted(
 		context.TODO(),
 		queries.GetProductCategoriesByPromotedParams{
@@ -164,59 +164,88 @@ func (s *Server) categoriesListHandler(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logs.Log().Fatal("categories list handler", zap.Error(err))
+		logs.Log().Fatal("categories side panel list handler", zap.Error(err))
 		return
 	}
 
+	found := map[string]bool{}
 	categories := make([]models.CategorySidePanelText, 0, len(res))
-	caser := cases.Title(language.English)
 	for _, v := range res {
-		name := v.Category.String
-		keywords := strings.Split(name, "-")
-		name = strings.Join(keywords, " ")
-		name = caser.String(name)
-
+		label := utils.SlugToTile(v.Category.String)
+		if _, exists := found[label]; exists {
+			continue
+		}
 		categories = append(categories, models.CategorySidePanelText{
-			Label: name,
+			Label: label,
 			URL:   "/product-category/" + v.Category.String,
 		})
+		found[label] = true
 	}
 
-	if err := components.CategoriesList(categories).Render(r.Context(), w); err != nil {
+	if err := components.CategoriesSidePanelList(categories).Render(r.Context(), w); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logs.Log().Fatal("categories list handler", zap.Error(err))
+		logs.Log().Fatal("categories side panel list handler", zap.Error(err))
 	}
 }
 
-func (s *Server) categoriesSubcategoriesListHandler(w http.ResponseWriter, r *http.Request) {
-	res, err := s.dbRO.GetQueries().GetProductCategoriesByPromoted(
-		context.TODO(),
-		queries.GetProductCategoriesByPromotedParams{
-			PromotedAtHomepage: sql.NullBool{Bool: true, Valid: true},
-			Limit:              100,
-		},
-	)
+func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) {
+	res, err := s.dbRO.GetQueries().GetProductCategoriesForSections(context.TODO())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logs.Log().Fatal("subcategories list handler", zap.Error(err))
+		logs.Log().Fatal("category section list handler", zap.Error(err))
 		return
 	}
 
-	subcategories := make([]models.Subcategory, 0, len(res))
-	caser := cases.Title(language.English)
+	categorySections := make([]models.CategorySection, 0, len(res))
 	for _, v := range res {
-		name := v.Category.String
-		keywords := strings.Split(name, "-")
-		name = strings.Join(keywords, " ")
-		name = caser.String(name)
-
-		subcategories = append(subcategories, models.Subcategory{
-			Label: name,
+		categorySections = append(categorySections, models.CategorySection{
+			ID:    serialize.EncDBID(v.ID),
+			Label: utils.SlugToTile(v.Category.String),
 		})
 	}
 
-	if err := components.SubcategoriesList(subcategories).Render(r.Context(), w); err != nil {
+	if err := components.CategorySection(categorySections).Render(r.Context(), w); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logs.Log().Fatal("subcategories list handler", zap.Error(err))
+		logs.Log().Fatal("category section list handler", zap.Error(err))
+	}
+}
+
+func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request) {
+	categoryID := chi.URLParam(r, "category_id")
+	if categoryID == "" {
+		http.Error(w, "Invalid url parameter", http.StatusBadRequest)
+		logs.Log().Fatal("category products list handler")
+		return
+	}
+
+	categoryDBID := serialize.DecDBID(categoryID)
+
+	category, err := s.dbRO.GetQueries().GetProductCategoryByID(context.TODO(), categoryDBID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		logs.Log().Fatal("category section list handler", zap.Error(err))
+		return
+	}
+
+	products, err := s.dbRO.GetQueries().GetProductsByCategoryID(r.Context(), queries.GetProductsByCategoryIDParams{
+		CategoryID: categoryDBID,
+		Limit:      16,
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		logs.Log().Fatal("category section list handler", zap.Error(err))
+		return
+	}
+
+	categorySectionProducts := models.CategorySectionProducts{
+		ID:          categoryID,
+		Category:    utils.SlugToTile(category.Category.String),
+		Subcategory: utils.SlugToTile(category.Subcategory.String),
+		Products:    models.ToCategorySectionProducts(products),
+	}
+
+	if err := components.CategorySectionProducts(categorySectionProducts).Render(r.Context(), w); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		logs.Log().Fatal("category section list handler", zap.Error(err))
 	}
 }

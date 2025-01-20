@@ -53,3 +53,10 @@ func SanitizeSize(size string) string {
 	}
 	return size
 }
+
+func SanitizeCategory(input string) string {
+	input = strings.ReplaceAll(input, "\n", " ")
+	input = strings.ReplaceAll(input, "  ", " ")
+	input = strings.Trim(input, "  ")
+	return input
+}

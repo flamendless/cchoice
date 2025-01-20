@@ -1,0 +1,72 @@
+package components
+
+import "cchoice/cmd/web/models"
+
+templ CategorySectionProducts(data models.CategorySectionProducts) {
+	<div id={ "category-sections-" + data.ID }>
+		if data.Subcategory != data.Category {
+			<p class="text-sm font-normal text-cchoice_dark m-2 my-0">
+				{ data.Subcategory }
+			</p>
+		}
+		<div class="flex flex-row">
+			for _, product := range data.Products {
+				<div class="flex flex-col items-center m-2">
+					<img
+						src={ string(templ.SafeURL(product.Thumbnail)) }
+						class="w-24 h-24"
+					/>
+					<p class="text-xs font-normal">
+						{ product.Name }
+					</p>
+					<p class="text-xs font-light">
+						{ product.BrandName }
+					</p>
+				</div>
+			}
+		</div>
+	</div>
+}
+
+templ CategorySection(categories []models.CategorySection) {
+	<div
+		id="category-sections"
+		class="w-full"
+	>
+		for _, category := range categories {
+			<div>
+				<p class="text-base font-medium text-cchoice_dark m-2 my-0">
+					{ category.Label }
+				</p>
+				<div
+					class="w-full ml-0.5 pr-6 border-r-2 border-cchoice_border"
+					hx-trigger="load once"
+					hx-get={ "/product-categories/" + category.ID + "/products" }
+					hx-select={ "#category-sections-" + category.ID }
+					hx-target={ "#category-sections-" + category.ID }
+					hx-swap="outerHTML"
+				>
+					@CategorySectionProducts(models.CategorySectionProducts{ID: category.ID})
+				</div>
+				@HR()
+			</div>
+		}
+	</div>
+}
+
+templ AllCategorySections() {
+	<div
+		class="w-full"
+		hx-trigger="load once"
+		hx-get="/product-categories/sections"
+		hx-select="#category-sections"
+		hx-target="#category-sections"
+		hx-swap="outerHTML"
+	>
+		<p class="text-xs font-normal m-2 my-0">
+			All Categories
+		</p>
+		@HR()
+		@CategorySection(nil)
+	</div>
+}
