@@ -63,7 +63,7 @@ INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_
 WHERE promoted_at_homepage = ?
 GROUP BY tbl_products_categories.category_id
 HAVING tbl_products_categories.product_id
-ORDER BY products_count DESC
+ORDER BY tbl_product_category.category ASC
 LIMIT ?;
 
 -- name: GetProductsByCategoryID :many

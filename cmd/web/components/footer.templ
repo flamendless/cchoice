@@ -1,0 +1,45 @@
+package components
+
+import "cchoice/cmd/web/models"
+
+templ FooterRow1Texts(texts []models.FooterRowText) {
+	<div
+		id="footer-row1-texts"
+		class="flex flex-row text-xs"
+	>
+		for i, hrt := range texts {
+			<a href={ templ.SafeURL(hrt.URL) } class="font-light mx-1 cursor-pointer hover:underline">
+				{ hrt.Label }
+			</a>
+			if i < len(texts)-1 {
+				<p class="font-normal mx-1">
+					|
+				</p>
+			}
+		}
+	</div>
+}
+
+templ Footer() {
+	<footer class="sticky bottom-0 py-2 px-1.5 w-full z-50 bg-white">
+		<hr class="border-2 border-cchoice_border my-0.5"/>
+		<div class="w-full flex flex-row">
+			<div
+				id="footer-row1"
+				class="flex flex-row grow"
+				hx-trigger="load once"
+				hx-get="/settings/footer-texts"
+				hx-select="#footer-row1-texts"
+				hx-target="#footer-row1-texts"
+				hx-swap="outerHTML"
+			>
+				@FooterRow1Texts(nil)
+			</div>
+			<div class="self-end">
+				<p class="px-2 font-light text-xs">
+					By using this website, you agree to our Terms and Conditions and Privacy Policy
+				</p>
+			</div>
+		</div>
+	</footer>
+}

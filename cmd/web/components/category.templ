@@ -3,10 +3,18 @@ package components
 import "cchoice/cmd/web/models"
 
 templ CategoriesList(categories []models.CategorySidePanelText) {
-	<div id="categories-list" class="flex flex-col h-screen overflow-y-scroll scrollbar-hide">
+	<div
+		id="categories-list"
+		class="flex flex-col h-screen overflow-y-scroll scrollbar-hide"
+	>
 		for _, category := range categories {
-			<a href={ templ.SafeURL(category.URL) } class="text-sm font-light ml-2 my-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft">
-				{ category.Label }
+			<a
+				href={ templ.SafeURL(category.URL) }
+				class="text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft"
+			>
+				<p class="text-ellipsis text-nowrap overflow-hidden">
+					{ category.Label }
+				</p>
 			</a>
 		}
 	</div>
@@ -14,18 +22,50 @@ templ CategoriesList(categories []models.CategorySidePanelText) {
 
 templ CategoriesSidePanel() {
 	<div
-		id="categories-side-panel"
-		class="sticky w-1/4 ml-0.5 border-r-2 border-cchoice_border"
+		class="sticky w-fit max-w-[13%] ml-0.5 pr-6 border-r-2 border-cchoice_border flex flex-col"
 		hx-trigger="load once"
 		hx-get="/product-categories/list"
 		hx-select="#categories-list"
 		hx-target="#categories-list"
 		hx-swap="outerHTML"
 	>
-		<p class="text-sm font-medium m-2">
+		<p class="text-xs font-normal m-2 my-0">
 			Choose a Category
 		</p>
 		<hr class="border-2 border-cchoice_border ml-1 mr-6 my-0.5"/>
 		@CategoriesList(nil)
+	</div>
+}
+
+templ SubcategoriesList(subcategories []models.Subcategory) {
+	<div
+		id="categories-subcategories"
+		class="w-full ml-0.5 pr-6 border-r-2 border-cchoice_border"
+	>
+		for _, subcategory := range subcategories {
+			<div>
+				<p class="text-lg font-medium text-cchoice_dark m-2 my-0">
+					{ subcategory.Label }
+				</p>
+				<hr class="border-2 border-cchoice_border ml-1 mr-6 my-0.5"/>
+			</div>
+		}
+	</div>
+}
+
+templ AllCategories() {
+	<div
+		class="w-full ml-0.5 pr-6 border-r-2 border-cchoice_border"
+		hx-trigger="load once"
+		hx-get="/product-categories/subcategories/list"
+		hx-select="#categories-subcategories"
+		hx-target="#categories-subcategories"
+		hx-swap="outerHTML"
+	>
+		<p class="text-xs font-normal m-2 my-0">
+			All Categories
+		</p>
+		<hr class="border-2 border-cchoice_border ml-1 mr-6 my-0.5"/>
+		@SubcategoriesList(nil)
 	</div>
 }
