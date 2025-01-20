@@ -5,11 +5,11 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./tmp/main"
-  cmd = "./run.sh gentempl && go build -o ./tmp/main ."
+  cmd = "./run.sh genall && go build -o ./tmp/main ."
   delay = 100
-  exclude_dir = []
+  exclude_dir = ["internal/database/queries"]
   exclude_file = []
-  exclude_regex = ["_test.go", ".sql.go", ".*_templ.go"]
+  exclude_regex = ["_test.go", ".sql.go", ".*_templ.go", "_string.go"]
   exclude_unchanged = false
   follow_symlink = false
   full_bin = ""

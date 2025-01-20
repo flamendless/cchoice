@@ -11,6 +11,7 @@ module.exports = {
         cchoice_border: '#f6b08a',
         searchbar: '#F7EFEA',
         cchoicesoft: '#F7EFEA',
+        cchoice_dark: '#f46133',
       }
     },
   },

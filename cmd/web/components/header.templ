@@ -63,13 +63,13 @@ templ Cart() {
 }
 
 templ HeaderRow1Texts(texts []models.HeaderRowText) {
-	<div id="header-row1-texts" class="w-full flex items-end place-content-end px-8">
+	<div id="header-row1-texts" class="w-full flex items-end place-content-end px-8 text-sm">
 		for i, hrt := range texts {
-			<a href={ templ.SafeURL(hrt.URL) } class="text-sm font-light mx-2 cursor-pointer hover:underline">
+			<a href={ templ.SafeURL(hrt.URL) } class="font-light mx-2 cursor-pointer hover:underline">
 				{ hrt.Label }
 			</a>
 			if i < len(texts)-1 {
-				<p class="text-sm font-normal mx-2">
+				<p class="font-normal mx-2">
 					|
 				</p>
 			}
