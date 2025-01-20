@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"os"
@@ -351,7 +352,13 @@ var parseXLSXCmd = &cobra.Command{
 			zap.Int("updated ids count", len(updatedIds)),
 		)
 
-		promotedCategoryIDs, err := tpl.CtxApp.DB.GetQueries().SetInitialPromotedProductCategory(context.Background())
+		params := make([]sql.NullString, 0, len(tpl.GetPromotedCategories()))
+		for _, v := range tpl.GetPromotedCategories() {
+			params = append(params, sql.NullString{String: v, Valid: true})
+
+		}
+
+		promotedCategoryIDs, err := tpl.CtxApp.DB.GetQueries().SetInitialPromotedProductCategory(context.Background(), params)
 		if err != nil {
 			panic(err)
 		}

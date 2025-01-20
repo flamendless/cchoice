@@ -139,3 +139,7 @@ func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 
 	return products
 }
+
+func SampleGetPromotedCategories() []string {
+	return nil
+}

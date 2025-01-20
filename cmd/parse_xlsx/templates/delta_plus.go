@@ -288,3 +288,7 @@ LoopProductProces:
 
 	return products
 }
+
+func DeltaPlusGetPromotedCategories() []string {
+	return nil
+}

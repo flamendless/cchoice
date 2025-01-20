@@ -41,15 +41,7 @@ RETURNING *;
 UPDATE tbl_product_category
 SET promoted_at_homepage = true
 WHERE
-	category IN (
-		'small-angle-grinders',
-		'impact-drills',
-		'cordless-drill-driver',
-		'cut-off-saw',
-		'circular-saws',
-		'demolition-hammer-hex',
-		'demolition-hammer-sds-max'
-	)
+	category IN (sqlc.slice('categories'))
 RETURNING id
 ;
 
@@ -87,8 +79,11 @@ ORDER BY tbl_product.created_at DESC
 LIMIT ?
 ;
 
--- name: GetProductCategoriesForSidePanel :many
-SELECT DISTINCT tbl_product_category.category
+-- name: GetProductCategoriesForSections :many
+SELECT
+	tbl_product_category.id,
+	tbl_product_category.category,
+	tbl_product_category.subcategory
 FROM tbl_product_category
 ORDER BY tbl_product_category.category ASC
 LIMIT 256;

@@ -18,14 +18,15 @@ type Template struct {
 	CtxApp   *models.ParseXLSX
 	Brand    *models.Brand
 
-	SkipInitialRows     int
-	AssumedRowsCount    int
-	BrandOnly           bool
-	Columns             map[string]*Column
-	RowToProduct        func(*Template, []string) (*models.Product, []error)
-	RowToSpecs          func(*Template, []string) *models.ProductSpecs
-	ProcessProductImage func(*Template, *models.Product) (*models.ProductImage, error)
-	ProcessRows         func(*Template, *excelize.Rows) []*models.Product
+	SkipInitialRows       int
+	AssumedRowsCount      int
+	BrandOnly             bool
+	Columns               map[string]*Column
+	RowToProduct          func(*Template, []string) (*models.Product, []error)
+	RowToSpecs            func(*Template, []string) *models.ProductSpecs
+	ProcessProductImage   func(*Template, *models.Product) (*models.ProductImage, error)
+	ProcessRows           func(*Template, *excelize.Rows) []*models.Product
+	GetPromotedCategories func() []string
 }
 
 func CreateTemplate(kind TemplateKind) *Template {
@@ -34,33 +35,36 @@ func CreateTemplate(kind TemplateKind) *Template {
 		panic("Can't use undefined template")
 	case TEMPLATE_SAMPLE:
 		return &Template{
-			SkipInitialRows:  0,
-			AssumedRowsCount: 128,
-			Columns:          SampleColumns,
-			RowToProduct:     SampleRowToProduct,
-			RowToSpecs:       SampleRowToSpecs,
-			ProcessRows:      SampleProcessRows,
+			SkipInitialRows:       0,
+			AssumedRowsCount:      128,
+			Columns:               SampleColumns,
+			RowToProduct:          SampleRowToProduct,
+			RowToSpecs:            SampleRowToSpecs,
+			ProcessRows:           SampleProcessRows,
+			GetPromotedCategories: SampleGetPromotedCategories,
 		}
 
 	case TEMPLATE_DELTAPLUS:
 		return &Template{
-			SkipInitialRows:  1,
-			AssumedRowsCount: 1024,
-			Columns:          DeltaPlusColumns,
-			RowToProduct:     DeltaPlusRowToProduct,
-			RowToSpecs:       DeltaPlusRowToSpecs,
-			ProcessRows:      DeltaPlusProcessRows,
+			SkipInitialRows:       1,
+			AssumedRowsCount:      1024,
+			Columns:               DeltaPlusColumns,
+			RowToProduct:          DeltaPlusRowToProduct,
+			RowToSpecs:            DeltaPlusRowToSpecs,
+			ProcessRows:           DeltaPlusProcessRows,
+			GetPromotedCategories: DeltaPlusGetPromotedCategories,
 		}
 
 	case TEMPLATE_BOSCH:
 		return &Template{
-			SkipInitialRows:     2,
-			AssumedRowsCount:    256,
-			Columns:             BoschColumns,
-			RowToProduct:        BoschRowToProduct,
-			RowToSpecs:          BoschRowToSpecs,
-			ProcessRows:         BoschProcessRows,
-			ProcessProductImage: BoschProcessProductImage,
+			SkipInitialRows:       2,
+			AssumedRowsCount:      256,
+			Columns:               BoschColumns,
+			RowToProduct:          BoschRowToProduct,
+			RowToSpecs:            BoschRowToSpecs,
+			ProcessRows:           BoschProcessRows,
+			ProcessProductImage:   BoschProcessProductImage,
+			GetPromotedCategories: BoschGetPromotedCategories,
 		}
 
 	case TEMPLATE_SPARTAN:

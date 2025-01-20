@@ -8,6 +8,7 @@ import (
 	"cchoice/internal/utils"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/Rhymond/go-money"
@@ -227,9 +228,21 @@ LoopProductProces:
 		if !ok {
 			panic("missing column")
 		}
-		category := row[colCategory.Index]
+		category := utils.SanitizeCategory(row[colCategory.Index])
+		subcategory := category
 
-		product.ProductCategory = &models.ProductCategory{Category: category}
+		keywords := strings.Split(category, " ")
+		if len(keywords) > 1 {
+			idx := len(keywords) - 1
+			category = keywords[idx]
+			keywords = slices.Delete(keywords, idx, idx+1)
+			subcategory = strings.Join(keywords, " ")
+		}
+
+		product.ProductCategory = &models.ProductCategory{
+			Category:    category,
+			Subcategory: subcategory,
+		}
 		product.ProductSpecs = specs
 		product.PostProcess(rowIdx)
 
@@ -267,4 +280,9 @@ func BoschProcessProductImage(tpl *Template, product *models.Product) (*models.P
 		Path:    path,
 	}
 	return res, nil
+}
+
+func BoschGetPromotedCategories() []string {
+	promoted := []string{"grinders", "drills", "drivers", "saws", "hammer"}
+	return promoted
 }

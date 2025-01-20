@@ -8,6 +8,7 @@ package queries
 import (
 	"context"
 	"database/sql"
+	"strings"
 )
 
 const createProductCategory = `-- name: CreateProductCategory :one
@@ -107,28 +108,37 @@ func (q *Queries) GetProductCategoriesByPromoted(ctx context.Context, arg GetPro
 	return items, nil
 }
 
-const getProductCategoriesForSidePanel = `-- name: GetProductCategoriesForSidePanel :many
+const getProductCategoriesForSections = `-- name: GetProductCategoriesForSections :many
 ;
 
-SELECT DISTINCT tbl_product_category.category
+SELECT
+	tbl_product_category.id,
+	tbl_product_category.category,
+	tbl_product_category.subcategory
 FROM tbl_product_category
 ORDER BY tbl_product_category.category ASC
 LIMIT 256
 `
 
-func (q *Queries) GetProductCategoriesForSidePanel(ctx context.Context) ([]sql.NullString, error) {
-	rows, err := q.db.QueryContext(ctx, getProductCategoriesForSidePanel)
+type GetProductCategoriesForSectionsRow struct {
+	ID          int64
+	Category    sql.NullString
+	Subcategory sql.NullString
+}
+
+func (q *Queries) GetProductCategoriesForSections(ctx context.Context) ([]GetProductCategoriesForSectionsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductCategoriesForSections)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []sql.NullString
+	var items []GetProductCategoriesForSectionsRow
 	for rows.Next() {
-		var category sql.NullString
-		if err := rows.Scan(&category); err != nil {
+		var i GetProductCategoriesForSectionsRow
+		if err := rows.Scan(&i.ID, &i.Category, &i.Subcategory); err != nil {
 			return nil, err
 		}
-		items = append(items, category)
+		items = append(items, i)
 	}
 	if err := rows.Close(); err != nil {
 		return nil, err
@@ -290,20 +300,22 @@ const setInitialPromotedProductCategory = `-- name: SetInitialPromotedProductCat
 UPDATE tbl_product_category
 SET promoted_at_homepage = true
 WHERE
-	category IN (
-		'small-angle-grinders',
-		'impact-drills',
-		'cordless-drill-driver',
-		'cut-off-saw',
-		'circular-saws',
-		'demolition-hammer-hex',
-		'demolition-hammer-sds-max'
-	)
+	category IN (/*SLICE:categories*/?)
 RETURNING id
 `
 
-func (q *Queries) SetInitialPromotedProductCategory(ctx context.Context) ([]int64, error) {
-	rows, err := q.db.QueryContext(ctx, setInitialPromotedProductCategory)
+func (q *Queries) SetInitialPromotedProductCategory(ctx context.Context, categories []sql.NullString) ([]int64, error) {
+	query := setInitialPromotedProductCategory
+	var queryParams []interface{}
+	if len(categories) > 0 {
+		for _, v := range categories {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:categories*/?", strings.Repeat(",?", len(categories))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:categories*/?", "NULL", 1)
+	}
+	rows, err := q.db.QueryContext(ctx, query, queryParams...)
 	if err != nil {
 		return nil, err
 	}
