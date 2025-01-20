@@ -266,7 +266,8 @@ LoopProductProces:
 func BoschProcessProductImage(tpl *Template, product *models.Product) (*models.ProductImage, error) {
 	basepath := strings.TrimPrefix(tpl.AppFlags.ImagesBasePath, "./cmd/web/")
 	basepath = strings.TrimSuffix(basepath, "/")
-	path := fmt.Sprintf("%s/%s.png", basepath, product.Name)
+	filename := strings.ReplaceAll(product.Name, " ", "_")
+	path := fmt.Sprintf("%s/%s.png", basepath, filename)
 
 	imagePath := "./cmd/web/" + path
 	_, err := os.Stat(imagePath)
