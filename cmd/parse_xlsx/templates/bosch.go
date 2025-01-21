@@ -228,7 +228,7 @@ LoopProductProces:
 		if !ok {
 			panic("missing column")
 		}
-		category := utils.SanitizeCategory(row[colCategory.Index])
+		category := row[colCategory.Index]
 		subcategory := category
 
 		keywords := strings.Split(category, " ")
@@ -240,8 +240,8 @@ LoopProductProces:
 		}
 
 		product.ProductCategory = &models.ProductCategory{
-			Category:    category,
-			Subcategory: subcategory,
+			Category:    utils.SanitizeCategory(category),
+			Subcategory: utils.SanitizeCategory(subcategory),
 		}
 		product.ProductSpecs = specs
 		product.PostProcess(rowIdx)
@@ -284,6 +284,20 @@ func BoschProcessProductImage(tpl *Template, product *models.Product) (*models.P
 }
 
 func BoschGetPromotedCategories() []string {
-	promoted := []string{"grinders", "drills", "drivers", "saws", "hammer"}
+	promoted := []string{
+		"chargers",
+		"cleaner",
+		"cutter",
+		"drills",
+		"drivers",
+		"grinders",
+		"hammers",
+		"mixer",
+		"sander",
+		"saws",
+		"solution",
+		"system",
+		"wrench",
+	}
 	return promoted
 }

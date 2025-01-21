@@ -57,6 +57,17 @@ func SanitizeSize(size string) string {
 func SanitizeCategory(input string) string {
 	input = strings.ReplaceAll(input, "\n", " ")
 	input = strings.ReplaceAll(input, "  ", " ")
+	input = strings.ReplaceAll(input, "\\", " ")
+	input = strings.ReplaceAll(input, "/", " ")
+	if strings.Contains(input, "(") {
+		idxLeft := strings.Index(input, "(")
+		input = input[0:idxLeft]
+	}
+	input = strings.TrimSuffix(input, "AND")
 	input = strings.Trim(input, "  ")
+	input = strings.TrimSpace(input)
+	input = strings.ReplaceAll(input, "- ", "-")
+	input = strings.ReplaceAll(input, " - ", "-")
+	input = strings.ReplaceAll(input, " -", "-")
 	return input
 }
