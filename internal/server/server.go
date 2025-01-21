@@ -7,20 +7,26 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/VictoriaMetrics/fastcache"
 	_ "github.com/joho/godotenv/autoload"
 	"go.uber.org/zap"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+	"golang.org/x/sync/singleflight"
 
 	"cchoice/internal/database"
 	"cchoice/internal/logs"
 )
+
+const CACHE_MAX_BYTES int = 1024
 
 type Server struct {
 	address string
 	port    int
 	dbRO    database.Service
 	dbRW    database.Service
+	Cache   *fastcache.Cache
+	SF      singleflight.Group
 }
 
 func NewServer() *http.Server {
@@ -41,6 +47,7 @@ func NewServer() *http.Server {
 		port:    port,
 		dbRO:    dbRO,
 		dbRW:    dbRW,
+		Cache:   fastcache.New(CACHE_MAX_BYTES),
 	}
 
 	addr := fmt.Sprintf("%s:%d", NewServer.address, NewServer.port)

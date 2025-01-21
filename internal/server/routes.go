@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"database/sql"
 	"net/http"
 
@@ -10,6 +9,7 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/logs"
+	"cchoice/internal/requests"
 	"cchoice/internal/serialize"
 	"cchoice/internal/utils"
 
@@ -34,13 +34,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Handle("/static/*", http.FileServer(http.FS(web.Files)))
 
+	r.Get("/health", s.healthHandler)
 	r.Get("/", s.indexHandler)
 	r.Get("/settings/header-texts", s.headerTextsHandler)
 	r.Get("/settings/footer-texts", s.footerTextsHandler)
 	r.Get("/product-categories/side-panel/list", s.categoriesSidePanelHandler)
 	r.Get("/product-categories/sections", s.categorySectionHandler)
 	r.Get("/product-categories/{category_id}/products", s.categoryProductsHandler)
-	r.Get("/health", s.healthHandler)
 
 	return r
 }
@@ -63,19 +63,18 @@ func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
-	res, err := s.dbRO.GetQueries().GetSettingsByNames(
-		context.TODO(),
+	settings, err := requests.GetSettingsData(
+		r.Context(),
+		s.Cache,
+		&s.SF,
+		s.dbRO,
+		[]byte("key_header_texts"),
 		[]string{"email", "mobile_no"},
 	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("header texts handler", zap.Error(err))
 		return
-	}
-
-	settings := make(map[string]string, len(res))
-	for _, setting := range res {
-		settings[setting.Name] = setting.Value
 	}
 
 	texts := []models.HeaderRowText{
@@ -100,25 +99,18 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
-	res, err := s.dbRO.GetQueries().GetSettingsByNames(
-		context.TODO(),
-		[]string{
-			"mobile_no",
-			"email",
-			"url_gmap",
-			"url_facebook",
-			"url_tiktok",
-		},
+	settings, err := requests.GetSettingsData(
+		r.Context(),
+		s.Cache,
+		&s.SF,
+		s.dbRO,
+		[]byte("key_footer_texts"),
+		[]string{"mobile_no", "email", "url_gmap", "url_facebook", "url_tiktok"},
 	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logs.Log().Fatal("footer texts handler", zap.Error(err))
+		logs.Log().Fatal("header texts handler", zap.Error(err))
 		return
-	}
-
-	settings := make(map[string]string, len(res))
-	for _, setting := range res {
-		settings[setting.Name] = setting.Value
 	}
 
 	texts := []models.FooterRowText{
@@ -155,8 +147,12 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Request) {
-	res, err := s.dbRO.GetQueries().GetProductCategoriesByPromoted(
-		context.TODO(),
+	categories, err := requests.GetCategoriesSidePanel(
+		r.Context(),
+		s.Cache,
+		&s.SF,
+		s.dbRO,
+		[]byte("key_categories_side_panel"),
 		queries.GetProductCategoriesByPromotedParams{
 			PromotedAtHomepage: sql.NullBool{Bool: true, Valid: true},
 			Limit:              100,
@@ -168,20 +164,6 @@ func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	found := map[string]bool{}
-	categories := make([]models.CategorySidePanelText, 0, len(res))
-	for _, v := range res {
-		label := utils.SlugToTile(v.Category.String)
-		if _, exists := found[label]; exists {
-			continue
-		}
-		categories = append(categories, models.CategorySidePanelText{
-			Label: label,
-			URL:   "/product-category/" + v.Category.String,
-		})
-		found[label] = true
-	}
-
 	if err := components.CategoriesSidePanelList(categories).Render(r.Context(), w); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("categories side panel list handler", zap.Error(err))
@@ -189,7 +171,7 @@ func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Reque
 }
 
 func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) {
-	res, err := s.dbRO.GetQueries().GetProductCategoriesForSections(context.TODO())
+	res, err := s.dbRO.GetQueries().GetProductCategoriesForSections(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("category section list handler", zap.Error(err))
@@ -220,7 +202,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 
 	categoryDBID := serialize.DecDBID(categoryID)
 
-	category, err := s.dbRO.GetQueries().GetProductCategoryByID(context.TODO(), categoryDBID)
+	category, err := s.dbRO.GetQueries().GetProductCategoryByID(r.Context(), categoryDBID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("category section list handler", zap.Error(err))

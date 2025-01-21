@@ -143,3 +143,5 @@ func (s *service) Close() error {
 	logs.Log().Info("Disconnected from database", zap.String("db url", dburl))
 	return s.db.Close()
 }
+
+var _ Service = (*service)(nil)
