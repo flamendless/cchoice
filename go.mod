@@ -7,6 +7,7 @@ require (
 	github.com/VictoriaMetrics/fastcache v1.12.2
 	github.com/a-h/templ v0.3.819
 	github.com/cohesivestack/valgo v0.4.1
+	github.com/gertd/go-pluralize v0.2.1
 	github.com/go-chi/chi/v5 v5.2.0
 	github.com/go-chi/cors v1.2.1
 	github.com/goccy/go-json v0.10.4
