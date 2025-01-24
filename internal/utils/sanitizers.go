@@ -2,9 +2,14 @@ package utils
 
 import (
 	"strings"
+	"sync"
 
 	"github.com/Rhymond/go-money"
+	"github.com/gertd/go-pluralize"
 )
+
+var pluralizerOnce sync.Once
+var pluralizer *pluralize.Client
 
 func SanitizePrice(price string) (*money.Money, []error) {
 	var errsRes []error = make([]error, 0, 2)
@@ -69,5 +74,13 @@ func SanitizeCategory(input string) string {
 	input = strings.ReplaceAll(input, "- ", "-")
 	input = strings.ReplaceAll(input, " - ", "-")
 	input = strings.ReplaceAll(input, " -", "-")
+
+	pluralizerOnce.Do(func() {
+		pluralizer = pluralize.NewClient()
+	})
+	if !pluralizer.IsPlural(input) {
+		input = pluralizer.Plural(input)
+	}
+
 	return input
 }
