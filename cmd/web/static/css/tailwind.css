@@ -769,6 +769,9 @@
   .py-2 {
     padding-block: calc(var(--spacing) * 2);
   }
+  .py-32 {
+    padding-block: calc(var(--spacing) * 32);
+  }
   .ps-2 {
     padding-inline-start: calc(var(--spacing) * 2);
   }
@@ -816,6 +819,9 @@
   }
   .text-ellipsis {
     text-overflow: ellipsis;
+  }
+  .text-black {
+    color: var(--color-black);
   }
   .text-cchoice {
     color: #F6742F;

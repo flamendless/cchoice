@@ -209,6 +209,15 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	if category.Category.String == "" {
+		logs.Log().Warn(
+			"category has no category value",
+			zap.Int64("category id", category.ID),
+			zap.String("subcategory", category.Subcategory.String),
+		)
+		return
+	}
+
 	products, err := s.dbRO.GetQueries().GetProductsByCategoryID(r.Context(), queries.GetProductsByCategoryIDParams{
 		CategoryID: categoryDBID,
 		Limit:      16,
@@ -216,6 +225,14 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("category section list handler", zap.Error(err))
+		return
+	}
+	if len(products) == 0 {
+		logs.Log().Debug(
+			"category has no product",
+			zap.Int64("category id", category.ID),
+			zap.String("category name", category.Category.String),
+		)
 		return
 	}
 

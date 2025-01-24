@@ -35,7 +35,7 @@ func CategoriesSidePanelList(categories []models.CategorySidePanelText) templ.Co
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, category := range categories {
+		for i, category := range categories {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -58,12 +58,18 @@ func CategoriesSidePanelList(categories []models.CategorySidePanelText) templ.Co
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</p></a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</p></a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+			if i == len(categories)-1 {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"py-32\"></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -92,7 +98,7 @@ func CategoriesSidePanel() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"sticky w-fit max-w-[13%] ml-0.5 pr-6 border-r-2 border-cchoice_border flex flex-col\" hx-trigger=\"load once\" hx-get=\"/product-categories/side-panel/list\" hx-select=\"#categories-side-panel-list\" hx-target=\"#categories-side-panel-list\" hx-swap=\"outerHTML\"><p class=\"text-xs font-normal m-2 my-0 text-nowrap\">Choose a Category</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"sticky w-fit max-w-[13%] ml-0.5 pr-6 border-r-2 border-cchoice_border flex flex-col\" hx-trigger=\"load once\" hx-get=\"/product-categories/side-panel/list\" hx-select=\"#categories-side-panel-list\" hx-target=\"#categories-side-panel-list\" hx-swap=\"outerHTML\"><p class=\"text-xs font-normal m-2 my-0 text-nowrap\">Choose a Category</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -104,7 +110,7 @@ func CategoriesSidePanel() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

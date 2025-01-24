@@ -7,7 +7,7 @@ templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 		id="categories-side-panel-list"
 		class="flex flex-col h-screen overflow-y-scroll scrollbar-hide"
 	>
-		for _, category := range categories {
+		for i, category := range categories {
 			<a
 				href={ templ.SafeURL(category.URL) }
 				class="text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft"
@@ -16,6 +16,9 @@ templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 					{ category.Label }
 				</p>
 			</a>
+			if i == len(categories)-1 {
+				<div class="py-32"></div>
+			}
 		}
 	</div>
 }
