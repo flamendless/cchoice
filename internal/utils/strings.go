@@ -9,9 +9,8 @@ import (
 	"golang.org/x/text/language"
 )
 
-var caserPool = sync.Pool{
-	New: func() any { return cases.Title(language.English) },
-}
+var caserOnce sync.Once
+var caser cases.Caser
 
 func GetInitials(str string) string {
 	res := make([]rune, 0, len(str))
@@ -37,10 +36,11 @@ func RemoveEmptyStrings(input []string) []string {
 }
 
 func SlugToTile(input string) string {
-	caser := caserPool.Get().(cases.Caser)
+	caserOnce.Do(func() {
+		caser = cases.Title(language.English)
+	})
 	keywords := strings.Split(input, "-")
 	res := strings.Join(keywords, " ")
 	res = caser.String(res)
-	caserPool.Put(caser)
 	return res
 }
