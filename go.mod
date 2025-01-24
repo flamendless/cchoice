@@ -11,7 +11,7 @@ require (
 	github.com/go-chi/cors v1.2.1
 	github.com/goccy/go-json v0.10.4
 	github.com/gosimple/slug v1.15.0
-	github.com/govalues/decimal v0.1.35
+	github.com/govalues/decimal v0.1.36
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/spf13/cobra v1.8.1
@@ -24,7 +24,7 @@ require (
 )
 
 require (
-	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
