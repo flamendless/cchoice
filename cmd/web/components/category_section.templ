@@ -31,9 +31,9 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 templ CategorySection(categories []models.CategorySection) {
 	<div
 		id="category-sections"
-		class="w-full"
+		class="w-full flex flex-col h-screen overflow-y-scroll scrollbar-hide"
 	>
-		for _, category := range categories {
+		for i, category := range categories {
 			<div>
 				<p class="text-base font-medium text-cchoice_dark m-2 my-0">
 					{ category.Label }
@@ -48,8 +48,13 @@ templ CategorySection(categories []models.CategorySection) {
 				>
 					@CategorySectionProducts(models.CategorySectionProducts{ID: category.ID})
 				</div>
-				@HR()
+				if category.Label != "" {
+					@HR()
+				}
 			</div>
+			if i == len(categories)-1 {
+				<div class="py-32"></div>
+			}
 		}
 	</div>
 }

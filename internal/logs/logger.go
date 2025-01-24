@@ -5,17 +5,15 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"sync"
 	"syscall"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
+var loggerOnce sync.Once
 var logger *zap.Logger
-
-func init() {
-	InitLog()
-}
 
 func InitLog() {
 	var config zap.Config
@@ -41,6 +39,9 @@ func InitLog() {
 }
 
 func Log() *zap.Logger {
+	loggerOnce.Do(func() {
+		InitLog()
+	})
 	return logger
 }
 
