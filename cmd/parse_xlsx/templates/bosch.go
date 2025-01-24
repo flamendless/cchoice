@@ -228,7 +228,7 @@ LoopProductProces:
 		if !ok {
 			panic("missing column")
 		}
-		category := row[colCategory.Index]
+		category := utils.SanitizeCategory(row[colCategory.Index])
 		subcategory := category
 
 		keywords := strings.Split(category, " ")
@@ -242,6 +242,12 @@ LoopProductProces:
 		product.ProductCategory = &models.ProductCategory{
 			Category:    utils.SanitizeCategory(category),
 			Subcategory: utils.SanitizeCategory(subcategory),
+		}
+		if product.ProductCategory.Category == "" {
+			panic(fmt.Sprintf("product '%s' has no category value", product.Name))
+		}
+		if product.ProductCategory.Subcategory == "" {
+			panic(fmt.Sprintf("product '%s' has no subcategory value", product.Name))
 		}
 		product.ProductSpecs = specs
 		product.PostProcess(rowIdx)
