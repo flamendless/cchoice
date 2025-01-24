@@ -239,8 +239,15 @@ LoopProductProces:
 			subcategory = strings.Join(keywords, " ")
 		}
 
+		category = utils.SanitizeCategory(category)
+		if category == "GRIDNERS" {
+			category = "GRINDERS"
+		} else if category == "PPRUNERS" {
+			category = "PRUNERS"
+		}
+
 		product.ProductCategory = &models.ProductCategory{
-			Category:    utils.SanitizeCategory(category),
+			Category:    category,
 			Subcategory: utils.SanitizeCategory(subcategory),
 		}
 		if product.ProductCategory.Category == "" {
