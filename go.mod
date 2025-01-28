@@ -1,6 +1,6 @@
 module cchoice
 
-go 1.23.2
+go 1.23.5
 
 require (
 	github.com/Rhymond/go-money v1.0.14
@@ -10,7 +10,7 @@ require (
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/go-chi/chi/v5 v5.2.0
 	github.com/go-chi/cors v1.2.1
-	github.com/goccy/go-json v0.10.4
+	github.com/goccy/go-json v0.10.5
 	github.com/gosimple/slug v1.15.0
 	github.com/govalues/decimal v0.1.36
 	github.com/joho/godotenv v1.5.1

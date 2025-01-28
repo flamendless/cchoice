@@ -21,12 +21,12 @@ import (
 const CACHE_MAX_BYTES int = 1024
 
 type Server struct {
-	address string
-	port    int
 	dbRO    database.Service
 	dbRW    database.Service
-	Cache   *fastcache.Cache
 	SF      singleflight.Group
+	Cache   *fastcache.Cache
+	address string
+	port    int
 }
 
 func NewServer() *http.Server {

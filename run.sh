@@ -78,6 +78,7 @@ deps() {
 	go install github.com/kisielk/errcheck@latest
 	go install golang.org/x/vuln/cmd/govulncheck@latest
 	go install github.com/dkorunic/betteralign/cmd/betteralign@latest
+	go install github.com/mdempsky/unconvert@latest
 }
 
 gensql() {
@@ -100,15 +101,18 @@ sc() {
 	templ fmt ./cmd/web/components
 
 	go vet ./...
+	unconvert ./...
 	prealloc ./...
 	smrcptr ./...
 	nilaway ./...
-	errcheck ./...
 	govulncheck ./...
 	betteralign -apply ./...
 
+	local PKGS=$(go list ./... | grep -v "internal/database/queries")
+	errcheck $PKGS
+
 	set +f
-	local gofiles=( internal/**/*.go conf/*.go cmd/*.go cmd/**/*.go )
+	local gofiles=( internal/**/*.go cmd/*.go cmd/**/*.go )
 	for file in "${gofiles[@]}"; do
 		if [[ ! $file == *_templ.go ]]; then
 			goimports -w -local -v "$file"
@@ -147,5 +151,5 @@ if [ "$#" -eq 0 ]; then
 	echo "    testall"
 else
 	echo "Running ${1}"
-	"$1" "$@"
+	time "$1" "$@"
 fi

@@ -18,15 +18,16 @@ type Template struct {
 	CtxApp   *models.ParseXLSX
 	Brand    *models.Brand
 
-	SkipInitialRows       int
-	AssumedRowsCount      int
-	BrandOnly             bool
 	Columns               map[string]*Column
 	RowToProduct          func(*Template, []string) (*models.Product, []error)
 	RowToSpecs            func(*Template, []string) *models.ProductSpecs
 	ProcessProductImage   func(*Template, *models.Product) (*models.ProductImage, error)
 	ProcessRows           func(*Template, *excelize.Rows) []*models.Product
 	GetPromotedCategories func() []string
+
+	SkipInitialRows  int
+	AssumedRowsCount int
+	BrandOnly        bool
 }
 
 func CreateTemplate(kind TemplateKind) *Template {

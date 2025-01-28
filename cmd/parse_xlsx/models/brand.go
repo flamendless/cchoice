@@ -9,21 +9,21 @@ import (
 )
 
 type Brand struct {
-	ID        int64
-	Name      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time
+	Name      string
+	ID        int64
 }
 
 type BrandImage struct {
-	ID        int64
-	BrandID   int64
-	Path      string
-	IsMain    bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time
+	Path      string
+	ID        int64
+	BrandID   int64
+	IsMain    bool
 }
 
 func NewBrand(brandName string) *Brand {
