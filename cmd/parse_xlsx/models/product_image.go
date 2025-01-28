@@ -9,12 +9,12 @@ import (
 )
 
 type ProductImage struct {
-	ID        int64
-	Product   *Product
-	Path      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time
+	Product   *Product
+	Path      string
+	ID        int64
 }
 
 func (pi *ProductImage) InsertToDB(db database.Service) (int64, error) {

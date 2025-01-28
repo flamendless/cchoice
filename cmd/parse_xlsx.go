@@ -38,8 +38,12 @@ func init() {
 	f().BoolVarP(&ctxParseXLSX.PanicOnFirstDBError, "panic_on_error", "", false, "Whether to panic immediately on first DB error or not")
 	f().IntVarP(&ctxParseXLSX.Limit, "limit", "l", 0, "Limit number of rows to process")
 
-	parseXLSXCmd.MarkFlagRequired("template")
-	parseXLSXCmd.MarkFlagRequired("filepath")
+	if err := parseXLSXCmd.MarkFlagRequired("template"); err != nil {
+		panic(err)
+	}
+	if err := parseXLSXCmd.MarkFlagRequired("filepath"); err != nil {
+		panic(err)
+	}
 
 	rootCmd.AddCommand(parseXLSXCmd)
 }
@@ -158,7 +162,11 @@ var parseXLSXCmd = &cobra.Command{
 		}
 
 		tpl.CtxApp.DB = database.New(database.DB_MODE_RW)
-		defer tpl.CtxApp.DB.Close()
+		defer func() {
+			if err := tpl.CtxApp.DB.Close(); err != nil {
+				panic(err)
+			}
+		}()
 
 		logs.Log().Debug("Getting brand...")
 		brand := models.NewBrand(ctxParseXLSX.Template)

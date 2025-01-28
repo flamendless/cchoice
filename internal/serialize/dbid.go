@@ -25,6 +25,6 @@ func DecDBID(dbid string) int64 {
 	if err != nil {
 		panic(fmt.Sprintf("Failed to decode string: '%s' %s", dbid, err.Error()))
 	}
-	id := int64(binary.LittleEndian.Uint64([]byte(decid)))
+	id := int64(binary.LittleEndian.Uint64(decid))
 	return id
 }

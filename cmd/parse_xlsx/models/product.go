@@ -20,13 +20,12 @@ import (
 )
 
 type ProductCategory struct {
-	ID          int64
 	Category    string
 	Subcategory string
+	ID          int64
 }
 
 type ProductSpecs struct {
-	ID            int64
 	Colours       string
 	Sizes         string
 	Segmentation  string
@@ -34,22 +33,23 @@ type ProductSpecs struct {
 	Power         string
 	Capacity      string
 	ScopeOfSupply string
+	ID            int64
 }
 
 type Product struct {
-	ID                  int64
-	Serial              string
-	Name                string
-	Description         string
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	DeletedAt           time.Time
 	Brand               *Brand
-	Status              enums.ProductStatus
 	ProductCategory     *ProductCategory
 	ProductSpecs        *ProductSpecs
 	UnitPriceWithoutVat *money.Money
 	UnitPriceWithVat    *money.Money
-	CreatedAt           time.Time
-	UpdatedAt           time.Time
-	DeletedAt           time.Time
+	Serial              string
+	Name                string
+	Description         string
+	ID                  int64
+	Status              enums.ProductStatus
 }
 
 func (product *Product) PostProcess(rowIdx int) {

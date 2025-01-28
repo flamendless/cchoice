@@ -11,12 +11,12 @@ type ParseXLSXFlags struct {
 	Template               string
 	Filepath               string
 	Sheet                  string
-	Strict                 bool
+	DBPath                 string
+	ImagesBasePath         string
 	Limit                  int
+	Strict                 bool
 	PrintProcessedProducts bool
 	VerifyPrices           bool
-	DBPath                 string
 	UseDB                  bool
 	PanicOnFirstDBError    bool
-	ImagesBasePath         string
 }
