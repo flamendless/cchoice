@@ -106,5 +106,11 @@ func GetCategoriesSidePanel(
 		found[label] = true
 	}
 
+	buf := new(bytes.Buffer)
+	if err := gob.NewEncoder(buf).Encode(categories); err == nil {
+		cache.Set(cacheKey, buf.Bytes())
+		logs.Log().Debug("stored data to cache")
+	}
+
 	return categories, nil
 }
