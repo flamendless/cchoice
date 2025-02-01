@@ -244,6 +244,8 @@ LoopProductProces:
 			category = "GRINDERS"
 		} else if category == "PPRUNERS" {
 			category = "PRUNERS"
+		} else if category == "CUTERS" {
+			category = "CUTTERS"
 		}
 
 		product.ProductCategory = &models.ProductCategory{
@@ -285,7 +287,12 @@ func BoschProcessProductImage(tpl *Template, product *models.Product) (*models.P
 	imagePath := "./cmd/web/" + path
 	_, err := os.Stat(imagePath)
 	if err != nil {
-		logs.Log().Debug("Image path does not exists: " + imagePath)
+		logs.Log().Debug(
+			"Image path does not exists",
+			zap.Int64("product id", product.ID),
+			zap.String("product name", product.Name),
+			zap.String("image path", imagePath),
+		)
 		return nil, err
 	}
 
