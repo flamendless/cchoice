@@ -18,10 +18,13 @@ var logger *zap.Logger
 func InitLog() {
 	var config zap.Config
 	env := os.Getenv("APP_ENV")
-	if env == "prod" {
+	switch env {
+	case "prod":
 		config = zap.NewProductionConfig()
-	} else {
+	case "local":
 		config = zap.NewDevelopmentConfig()
+	default:
+		panic("Invalid app env")
 	}
 
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
