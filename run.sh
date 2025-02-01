@@ -136,6 +136,12 @@ benchmark() {
 	go test -bench=. -benchmem ./...
 }
 
+prod() {
+	genall
+	templ generate
+	air -c ".air.api.toml" api
+}
+
 if [ "$#" -eq 0 ]; then
 	echo "First use: chmod +x ${0}"
 	echo "Usage: ${0}"
