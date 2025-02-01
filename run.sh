@@ -80,6 +80,8 @@ deps() {
 	go install github.com/dkorunic/betteralign/cmd/betteralign@latest
 	go install github.com/mdempsky/unconvert@latest
 	go install golang.org/x/tools/cmd/stringer@latest
+	curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=10.0.0 sh -
+	pnpm install tailwindcss @tailwindcss/cli
 }
 
 gensql() {
