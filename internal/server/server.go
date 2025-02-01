@@ -59,6 +59,7 @@ func NewServer() *http.Server {
 	logs.Log().Info(
 		"Server",
 		zap.String("address", addr),
+		zap.String("basepath", NewServer.basepath),
 		zap.Duration("read timeout", readTimeout),
 		zap.Duration("write timeout", writeTimeout),
 	)
