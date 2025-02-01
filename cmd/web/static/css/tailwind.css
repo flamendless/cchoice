@@ -663,6 +663,9 @@
   .w-screen {
     width: 100vw;
   }
+  .max-w-24 {
+    max-width: calc(var(--spacing) * 24);
+  }
   .max-w-\[13\%\] {
     max-width: 13%;
   }

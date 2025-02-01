@@ -14,9 +14,12 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 				<div class="flex flex-col items-center m-2">
 					<img
 						src={ string(templ.SafeURL(product.Thumbnail)) }
-						class="w-24 h-24"
+						class="w-24 max-w-24 h-24"
 					/>
-					<p class="text-xs font-normal">
+					<p
+						title={ product.Name }
+						class="max-w-24 text-xs font-normal text-ellipsis text-nowrap overflow-hidden"
+					>
 						{ product.Name }
 					</p>
 					<p class="text-xs font-light">

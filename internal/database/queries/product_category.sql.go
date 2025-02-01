@@ -114,16 +114,21 @@ const getProductCategoriesForSections = `-- name: GetProductCategoriesForSection
 SELECT
 	tbl_product_category.id,
 	tbl_product_category.category,
-	tbl_product_category.subcategory
+	tbl_product_category.subcategory,
+	COUNT(tbl_products_categories.product_id) AS products_count
 FROM tbl_product_category
+INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_category.id
+GROUP BY tbl_products_categories.category_id
+HAVING tbl_products_categories.product_id
 ORDER BY tbl_product_category.category ASC
 LIMIT 256
 `
 
 type GetProductCategoriesForSectionsRow struct {
-	ID          int64
-	Category    sql.NullString
-	Subcategory sql.NullString
+	ID            int64
+	Category      sql.NullString
+	Subcategory   sql.NullString
+	ProductsCount int64
 }
 
 func (q *Queries) GetProductCategoriesForSections(ctx context.Context) ([]GetProductCategoriesForSectionsRow, error) {
@@ -135,7 +140,12 @@ func (q *Queries) GetProductCategoriesForSections(ctx context.Context) ([]GetPro
 	var items []GetProductCategoriesForSectionsRow
 	for rows.Next() {
 		var i GetProductCategoriesForSectionsRow
-		if err := rows.Scan(&i.ID, &i.Category, &i.Subcategory); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Category,
+			&i.Subcategory,
+			&i.ProductsCount,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -219,13 +229,13 @@ SELECT
 	tbl_product.unit_price_with_vat,
 	tbl_product.unit_price_with_vat_currency,
 	tbl_brand.name AS brand_name,
-	tbl_product_image.path AS thumbnail
+	COALESCE(tbl_product_image.path, 'static/images/empty.png') AS thumbnail
 FROM tbl_product
 INNER JOIN
 	tbl_brand ON tbl_brand.id = tbl_product.brand_id
 INNER JOIN
 	tbl_products_categories ON tbl_products_categories.product_id = tbl_product.id
-INNER JOIN
+LEFT JOIN
 	tbl_product_image ON tbl_product_image.product_id = tbl_product.id
 WHERE tbl_products_categories.category_id = ?
 ORDER BY tbl_product.created_at DESC

@@ -180,6 +180,13 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 
 	categorySections := make([]models.CategorySection, 0, len(res))
 	for _, v := range res {
+		if v.ProductsCount == 0 {
+			logs.Log().Debug(
+				"category section has no prododuct. Skipping...",
+				zap.String("category name", v.Category.String),
+			)
+			continue
+		}
 		categorySections = append(categorySections, models.CategorySection{
 			ID:    serialize.EncDBID(v.ID),
 			Label: utils.SlugToTile(v.Category.String),
