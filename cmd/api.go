@@ -45,6 +45,7 @@ var apiCmd = &cobra.Command{
 		done := make(chan bool, 1)
 		go gracefulShutdown(server, done)
 
+		logs.Log().Info("Serving HTTP")
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			panic(fmt.Sprintf("http server error: %s", err))
 		}
