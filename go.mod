@@ -5,7 +5,7 @@ go 1.23.5
 require (
 	github.com/Rhymond/go-money v1.0.14
 	github.com/VictoriaMetrics/fastcache v1.12.2
-	github.com/a-h/templ v0.3.819
+	github.com/a-h/templ v0.3.833
 	github.com/cohesivestack/valgo v0.4.1
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/go-chi/chi/v5 v5.2.0
