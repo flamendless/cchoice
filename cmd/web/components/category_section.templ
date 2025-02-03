@@ -44,7 +44,7 @@ templ CategorySection(categories []models.CategorySection) {
 				<div
 					class="w-full ml-0.5 pr-6 border-r-2 border-cchoice_border"
 					hx-trigger="load once"
-					hx-get={ "/product-categories/" + category.ID + "/products" }
+					hx-get={ "/cchoice/product-categories/" + category.ID + "/products" }
 					hx-select={ "#category-sections-" + category.ID }
 					hx-target={ "#category-sections-" + category.ID }
 					hx-swap="outerHTML"
@@ -66,7 +66,7 @@ templ AllCategorySections() {
 	<div
 		class="w-full"
 		hx-trigger="load once"
-		hx-get="/product-categories/sections"
+		hx-get="/cchoice/product-categories/sections"
 		hx-select="#category-sections"
 		hx-target="#category-sections"
 		hx-swap="outerHTML"

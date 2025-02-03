@@ -181,9 +181,9 @@ func CategorySection(categories []models.CategorySection) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var10 string
-			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs("/product-categories/" + category.ID + "/products")
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs("/cchoice/product-categories/" + category.ID + "/products")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 47, Col: 64}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 47, Col: 72}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -273,7 +273,7 @@ func AllCategorySections() templ.Component {
 			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"w-full\" hx-trigger=\"load once\" hx-get=\"/product-categories/sections\" hx-select=\"#category-sections\" hx-target=\"#category-sections\" hx-swap=\"outerHTML\"><p class=\"text-xs font-normal m-2 my-0\">All Categories</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"w-full\" hx-trigger=\"load once\" hx-get=\"/cchoice/product-categories/sections\" hx-select=\"#category-sections\" hx-target=\"#category-sections\" hx-swap=\"outerHTML\"><p class=\"text-xs font-normal m-2 my-0\">All Categories</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
