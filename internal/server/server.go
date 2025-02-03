@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/VictoriaMetrics/fastcache"
@@ -61,26 +62,18 @@ func NewServer() *http.Server {
 		zap.Duration("write timeout", writeTimeout),
 	)
 
-	useHTTP2 := os.Getenv("USEHTTP2")
+	handler := NewServer.RegisterRoutes()
+
+	useHTTP2 := strings.ToLower(os.Getenv("USEHTTP2"))
 	if useHTTP2 == "true" || useHTTP2 == "1" {
 		logs.Log().Info("Using HTTP2")
 		h2s := &http2.Server{MaxConcurrentStreams: 256}
-		h2cHandler := h2c.NewHandler(NewServer.RegisterRoutes(), h2s)
-		server := &http.Server{
-			Addr:         addr,
-			Handler:      h2cHandler,
-			IdleTimeout:  time.Minute,
-			ReadTimeout:  readTimeout,
-			WriteTimeout: writeTimeout,
-		}
-
-		return server
+		handler = h2c.NewHandler(handler, h2s)
 	}
 
-	logs.Log().Info("Using HTTP1")
 	server := &http.Server{
 		Addr:         addr,
-		Handler:      NewServer.RegisterRoutes(),
+		Handler:      handler,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  readTimeout,
 		WriteTimeout: writeTimeout,
