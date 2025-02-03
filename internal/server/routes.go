@@ -24,10 +24,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	if s.basepath != "" {
-		r.Use(middleware.StripPrefix(s.basepath))
-	}
-
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST"},

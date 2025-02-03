@@ -21,13 +21,12 @@ import (
 const CACHE_MAX_BYTES int = 1024
 
 type Server struct {
-	dbRO     database.Service
-	dbRW     database.Service
-	SF       singleflight.Group
-	Cache    *fastcache.Cache
-	address  string
-	basepath string
-	port     int
+	dbRO    database.Service
+	dbRW    database.Service
+	SF      singleflight.Group
+	Cache   *fastcache.Cache
+	address string
+	port    int
 }
 
 func NewServer() *http.Server {
@@ -44,12 +43,11 @@ func NewServer() *http.Server {
 	dbRO := database.New(database.DB_MODE_RO)
 	dbRW := database.New(database.DB_MODE_RW)
 	NewServer := &Server{
-		address:  address,
-		basepath: os.Getenv("BASEPATH"),
-		port:     port,
-		dbRO:     dbRO,
-		dbRW:     dbRW,
-		Cache:    fastcache.New(CACHE_MAX_BYTES),
+		address: address,
+		port:    port,
+		dbRO:    dbRO,
+		dbRW:    dbRW,
+		Cache:   fastcache.New(CACHE_MAX_BYTES),
 	}
 
 	addr := fmt.Sprintf("%s:%d", NewServer.address, NewServer.port)
@@ -59,7 +57,6 @@ func NewServer() *http.Server {
 	logs.Log().Info(
 		"Server",
 		zap.String("address", addr),
-		zap.String("basepath", NewServer.basepath),
 		zap.Duration("read timeout", readTimeout),
 		zap.Duration("write timeout", writeTimeout),
 	)
