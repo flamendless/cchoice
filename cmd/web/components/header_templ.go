@@ -252,7 +252,7 @@ func Header() templ.Component {
 			templ_7745c5c3_Var11 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<header class=\"sticky pt-2 pb-1.5 w-full z-50\"><div class=\"w-full flex flex-col\"><div id=\"header-row1\" class=\"w-full flex flex-row\" hx-trigger=\"load once\" hx-get=\"/settings/header-texts\" hx-select=\"#header-row1-texts\" hx-target=\"#header-row1-texts\" hx-swap=\"outerHTML\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<header class=\"sticky pt-2 pb-1.5 w-full z-50\"><div class=\"w-full flex flex-col\"><div id=\"header-row1\" class=\"w-full flex flex-row\" hx-trigger=\"load once\" hx-get=\"/cchoice/settings/header-texts\" hx-select=\"#header-row1-texts\" hx-target=\"#header-row1-texts\" hx-swap=\"outerHTML\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

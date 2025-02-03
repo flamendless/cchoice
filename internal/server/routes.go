@@ -34,13 +34,16 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Handle("/static/*", http.FileServer(http.FS(web.Files)))
 
-	r.Get("/health", s.healthHandler)
-	r.Get("/", s.indexHandler)
-	r.Get("/settings/header-texts", s.headerTextsHandler)
-	r.Get("/settings/footer-texts", s.footerTextsHandler)
-	r.Get("/product-categories/side-panel/list", s.categoriesSidePanelHandler)
-	r.Get("/product-categories/sections", s.categorySectionHandler)
-	r.Get("/product-categories/{category_id}/products", s.categoryProductsHandler)
+	r.Route("/cchoice", func(r chi.Router) {
+		r.Use(middleware.StripPrefix("/cchoice"))
+		r.Get("/health", s.healthHandler)
+		r.Get("/", s.indexHandler)
+		r.Get("/settings/header-texts", s.headerTextsHandler)
+		r.Get("/settings/footer-texts", s.footerTextsHandler)
+		r.Get("/product-categories/side-panel/list", s.categoriesSidePanelHandler)
+		r.Get("/product-categories/sections", s.categorySectionHandler)
+		r.Get("/product-categories/{category_id}/products", s.categoryProductsHandler)
+	})
 
 	return r
 }

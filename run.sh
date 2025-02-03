@@ -18,7 +18,7 @@ fi
 serve() {
 	genall
 	if "${ISWSL}"; then
-		cmd.exe /c "start vivaldi http://localhost:7331/"
+		cmd.exe /c "start vivaldi http://localhost:7331/cchoice"
 	fi
 	templ generate --watch --proxy="http://localhost:8080" --open-browser=false &
 	air -c ".air.api.toml" api
