@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(apiCmd)
+	rootCmd.AddCommand(cmdAPI)
 }
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {
@@ -37,7 +37,7 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 	done <- true
 }
 
-var apiCmd = &cobra.Command{
+var cmdAPI = &cobra.Command{
 	Use:   "api",
 	Short: "Run the api",
 	Run: func(cmd *cobra.Command, args []string) {

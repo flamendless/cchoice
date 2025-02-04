@@ -22,30 +22,30 @@ import (
 	"cchoice/internal/logs"
 )
 
-var ctxParseXLSX models.ParseXLSXFlags
+var parseXLSXFlags models.ParseXLSXFlags
 
 func init() {
-	f := parseXLSXCmd.Flags
-	f().StringVarP(&ctxParseXLSX.Template, "template", "t", "", "Template to use")
-	f().StringVarP(&ctxParseXLSX.Filepath, "filepath", "p", "", "Filepath to the XLSX file")
-	f().StringVarP(&ctxParseXLSX.Sheet, "sheet", "s", "", "Sheet name to use")
-	f().StringVarP(&ctxParseXLSX.DBPath, "db_path", "", ":memory:", "Path to database")
-	f().StringVarP(&ctxParseXLSX.ImagesBasePath, "images_basepath", "", "", "Base path to the images")
-	f().BoolVarP(&ctxParseXLSX.Strict, "strict", "x", false, "Panic upon first product error")
-	f().BoolVarP(&ctxParseXLSX.PrintProcessedProducts, "print_processed_products", "v", false, "Print processed products")
-	f().BoolVarP(&ctxParseXLSX.UseDB, "use_db", "", false, "Use DB to save processed data")
-	f().BoolVarP(&ctxParseXLSX.VerifyPrices, "verify_prices", "", true, "Verify prices processed and saved to DB")
-	f().BoolVarP(&ctxParseXLSX.PanicOnFirstDBError, "panic_on_error", "", false, "Whether to panic immediately on first DB error or not")
-	f().IntVarP(&ctxParseXLSX.Limit, "limit", "l", 0, "Limit number of rows to process")
+	f := cmdParseXLSX.Flags
+	f().StringVarP(&parseXLSXFlags.Template, "template", "t", "", "Template to use")
+	f().StringVarP(&parseXLSXFlags.Filepath, "filepath", "p", "", "Filepath to the XLSX file")
+	f().StringVarP(&parseXLSXFlags.Sheet, "sheet", "s", "", "Sheet name to use")
+	f().StringVarP(&parseXLSXFlags.DBPath, "db_path", "", ":memory:", "Path to database")
+	f().StringVarP(&parseXLSXFlags.ImagesBasePath, "images_basepath", "", "", "Base path to the images")
+	f().BoolVarP(&parseXLSXFlags.Strict, "strict", "x", false, "Panic upon first product error")
+	f().BoolVarP(&parseXLSXFlags.PrintProcessedProducts, "print_processed_products", "v", false, "Print processed products")
+	f().BoolVarP(&parseXLSXFlags.UseDB, "use_db", "", false, "Use DB to save processed data")
+	f().BoolVarP(&parseXLSXFlags.VerifyPrices, "verify_prices", "", true, "Verify prices processed and saved to DB")
+	f().BoolVarP(&parseXLSXFlags.PanicOnFirstDBError, "panic_on_error", "", false, "Whether to panic immediately on first DB error or not")
+	f().IntVarP(&parseXLSXFlags.Limit, "limit", "l", 0, "Limit number of rows to process")
 
-	if err := parseXLSXCmd.MarkFlagRequired("template"); err != nil {
+	if err := cmdParseXLSX.MarkFlagRequired("template"); err != nil {
 		panic(err)
 	}
-	if err := parseXLSXCmd.MarkFlagRequired("filepath"); err != nil {
+	if err := cmdParseXLSX.MarkFlagRequired("filepath"); err != nil {
 		panic(err)
 	}
 
-	rootCmd.AddCommand(parseXLSXCmd)
+	rootCmd.AddCommand(cmdParseXLSX)
 }
 
 func ProcessColumns(tpl *templates.Template, file *excelize.File) bool {
@@ -92,23 +92,23 @@ func ProcessColumns(tpl *templates.Template, file *excelize.File) bool {
 	return tpl.ValidateColumns()
 }
 
-var parseXLSXCmd = &cobra.Command{
+var cmdParseXLSX = &cobra.Command{
 	Use:   "parse_xlsx",
 	Short: "Parse XLSX file",
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.Log().Info(
 			"Parsing XLSX",
-			zap.String("template", ctxParseXLSX.Template),
-			zap.String("filepath", ctxParseXLSX.Filepath),
-			zap.String("sheet", ctxParseXLSX.Sheet),
-			zap.Bool("strict", ctxParseXLSX.Strict),
-			zap.Int("limit", ctxParseXLSX.Limit),
+			zap.String("template", parseXLSXFlags.Template),
+			zap.String("filepath", parseXLSXFlags.Filepath),
+			zap.String("sheet", parseXLSXFlags.Sheet),
+			zap.Bool("strict", parseXLSXFlags.Strict),
+			zap.Int("limit", parseXLSXFlags.Limit),
 		)
 
-		templateKind := templates.ParseTemplateEnum(ctxParseXLSX.Template)
+		templateKind := templates.ParseTemplateEnum(parseXLSXFlags.Template)
 		tpl := templates.CreateTemplate(templateKind)
 
-		file, err := excelize.OpenFile(ctxParseXLSX.Filepath)
+		file, err := excelize.OpenFile(parseXLSXFlags.Filepath)
 		if err != nil {
 			logs.Log().Error(err.Error())
 			return
@@ -121,11 +121,11 @@ var parseXLSXCmd = &cobra.Command{
 			}
 		}()
 
-		if ctxParseXLSX.Sheet == "" {
-			ctxParseXLSX.Sheet = file.GetSheetName(0)
+		if parseXLSXFlags.Sheet == "" {
+			parseXLSXFlags.Sheet = file.GetSheetName(0)
 		}
 
-		tpl.AppFlags = &ctxParseXLSX
+		tpl.AppFlags = &parseXLSXFlags
 		tpl.CtxApp = &models.ParseXLSX{}
 		tpl.CtxApp.Metrics = &models.Metrics{}
 
@@ -136,7 +136,7 @@ var parseXLSXCmd = &cobra.Command{
 		}
 		tpl.CtxApp.Metrics.Add("process column time", time.Since(startProcessColumns))
 
-		rows, err := file.Rows(ctxParseXLSX.Sheet)
+		rows, err := file.Rows(parseXLSXFlags.Sheet)
 		if err != nil {
 			logs.Log().Error(err.Error())
 			return
@@ -169,7 +169,7 @@ var parseXLSXCmd = &cobra.Command{
 		}()
 
 		logs.Log().Debug("Getting brand...")
-		brand := models.NewBrand(ctxParseXLSX.Template)
+		brand := models.NewBrand(parseXLSXFlags.Template)
 		brandID := brand.GetDBID(tpl.CtxApp.DB)
 		if brandID == 0 {
 			brandID, err := brand.InsertToDB(tpl.CtxApp.DB)
@@ -179,7 +179,7 @@ var parseXLSXCmd = &cobra.Command{
 			now := time.Now().UTC()
 			brandImage := models.BrandImage{
 				BrandID:   brandID,
-				Path:      "static/images/brand_logos/" + ctxParseXLSX.Template + ".png",
+				Path:      "static/images/brand_logos/" + parseXLSXFlags.Template + ".png",
 				IsMain:    true,
 				CreatedAt: now,
 				UpdatedAt: now,
