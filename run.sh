@@ -100,7 +100,7 @@ gentempl() {
 }
 
 genall() {
-	go generate ./internal/enums ./cmd/parse_xlsx/templates
+	go generate ./...
 	gensql
 	gentempl
 }
