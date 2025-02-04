@@ -57,13 +57,17 @@ func NewServer() *http.Server {
 	readTimeout := 10 * time.Second
 	writeTimeout := 30 * time.Second
 
-	useSSL := utils.GetBoolFlag(os.Getenv("USESSL"))
 	var tlsConfig *tls.Config
+	useSSL := utils.GetBoolFlag(os.Getenv("USESSL"))
 	if useSSL {
-		serverTLSCert, err := tls.LoadX509KeyPair(
-			fmt.Sprintf("/etc/letsencrypt/live/%s/fullchain.pem", NewServer.address),
-			fmt.Sprintf("/etc/letsencrypt/live/%s/privkey.pem", NewServer.address),
+		certPath := fmt.Sprintf("/etc/letsencrypt/live/%s/fullchain.pem", NewServer.address)
+		keyPath := fmt.Sprintf("/etc/letsencrypt/live/%s/privkey.pem", NewServer.address)
+		logs.Log().Info(
+			"SSL: opening files",
+			zap.String("cert", certPath),
+			zap.String("key", keyPath),
 		)
+		serverTLSCert, err := tls.LoadX509KeyPair(certPath, keyPath)
 		if err != nil {
 			panic(err)
 		}
@@ -82,7 +86,6 @@ func NewServer() *http.Server {
 
 	handler := NewServer.RegisterRoutes()
 	if utils.GetBoolFlag(os.Getenv("USEHTTP2")) {
-		logs.Log().Info("Using HTTP2")
 		h2s := &http2.Server{MaxConcurrentStreams: 256}
 		handler = h2c.NewHandler(handler, h2s)
 	}
