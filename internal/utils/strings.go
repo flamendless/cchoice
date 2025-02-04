@@ -44,3 +44,7 @@ func SlugToTile(input string) string {
 	res = caser.String(res)
 	return res
 }
+
+func GetBoolFlag(flag string) bool {
+	return flag == "true" || flag == "1"
+}

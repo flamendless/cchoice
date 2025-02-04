@@ -1,11 +1,11 @@
 package server
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/VictoriaMetrics/fastcache"
@@ -17,6 +17,7 @@ import (
 
 	"cchoice/internal/database"
 	"cchoice/internal/logs"
+	"cchoice/internal/utils"
 )
 
 const CACHE_MAX_BYTES int = 1024
@@ -28,6 +29,7 @@ type Server struct {
 	Cache   *fastcache.Cache
 	address string
 	port    int
+	secure  bool
 }
 
 func NewServer() *http.Server {
@@ -55,17 +57,31 @@ func NewServer() *http.Server {
 	readTimeout := 10 * time.Second
 	writeTimeout := 30 * time.Second
 
+	useSSL := utils.GetBoolFlag(os.Getenv("USESSL"))
+	var tlsConfig *tls.Config
+	if useSSL {
+		serverTLSCert, err := tls.LoadX509KeyPair(
+			fmt.Sprintf("/etc/letsencrypt/live/%s/fullchain.pem", addr),
+			fmt.Sprintf("/etc/letsencrypt/live/%s/privkey.pem", addr),
+		)
+		if err != nil {
+			panic(err)
+		}
+		tlsConfig = &tls.Config{
+			Certificates: []tls.Certificate{serverTLSCert},
+		}
+	}
+
 	logs.Log().Info(
 		"Server",
 		zap.String("address", addr),
+		zap.Bool("SSL", useSSL),
 		zap.Duration("read timeout", readTimeout),
 		zap.Duration("write timeout", writeTimeout),
 	)
 
 	handler := NewServer.RegisterRoutes()
-
-	useHTTP2 := strings.ToLower(os.Getenv("USEHTTP2"))
-	if useHTTP2 == "true" || useHTTP2 == "1" {
+	if utils.GetBoolFlag(os.Getenv("USEHTTP2")) {
 		logs.Log().Info("Using HTTP2")
 		h2s := &http2.Server{MaxConcurrentStreams: 256}
 		handler = h2c.NewHandler(handler, h2s)
@@ -77,6 +93,7 @@ func NewServer() *http.Server {
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  readTimeout,
 		WriteTimeout: writeTimeout,
+		TLSConfig:    tlsConfig,
 	}
 	return server
 }
