@@ -32,10 +32,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 		MaxAge:           300,
 	}))
 
-	r.Handle("/static/*", http.FileServer(http.FS(web.Files)))
-
 	r.Route("/cchoice", func(r chi.Router) {
 		r.Use(middleware.StripPrefix("/cchoice"))
+		r.Handle("/static/*", http.FileServer(http.FS(web.Files)))
 		r.Get("/health", s.healthHandler)
 		r.Get("/", s.indexHandler)
 		r.Get("/settings/header-texts", s.headerTextsHandler)
