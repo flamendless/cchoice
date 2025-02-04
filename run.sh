@@ -63,6 +63,7 @@ cleandb() {
 	# go run ./main.go parse_xlsx -p "assets/xlsx/Price_List_effective_25_August_2023_r2.xlsx" -s "2023 PRICE LIST" -t "DELTAPLUS" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
 	go run ./main.go parse_xlsx -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./cmd/web/static/images/product_images/bosch/"
 	# go run ./main.go parse_xlsx -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./cmd/web/static/images/product_images/bosch/"
+	go run ./main.go create_thumbnails --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/thumbnails/product_images/bosch"
 
 }
 
@@ -80,8 +81,13 @@ deps() {
 	go install github.com/dkorunic/betteralign/cmd/betteralign@latest
 	go install github.com/mdempsky/unconvert@latest
 	go install golang.org/x/tools/cmd/stringer@latest
-	curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=10.0.0 sh -
-	pnpm install tailwindcss @tailwindcss/cli
+
+	# Tailwind https://tailwindcss.com/docs/installation/tailwind-cli
+	# curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=10.0.0 sh -
+	# pnpm install tailwindcss @tailwindcss/cli
+
+	# libvips https://www.libvips.org/install.html (I use Arch BTW)
+	# yay -S base-devel glib2 expat1 libvips
 }
 
 gensql() {
@@ -94,7 +100,7 @@ gentempl() {
 }
 
 genall() {
-	go generate ./...
+	# go generate ./...
 	gensql
 	gentempl
 }
