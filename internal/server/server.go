@@ -30,6 +30,7 @@ type Server struct {
 	address string
 	port    int
 	secure  bool
+	fs      http.Handler
 }
 
 func NewServer() *http.Server {

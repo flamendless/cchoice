@@ -87,7 +87,7 @@ deps() {
 	# pnpm install tailwindcss @tailwindcss/cli
 
 	# libvips https://www.libvips.org/install.html (I use Arch BTW)
-	# yay -S base-devel glib2 expat1 libvips
+	# yay -S base-devel glib2 expat1 libdeflate libvips
 }
 
 gensql() {
@@ -100,7 +100,7 @@ gentempl() {
 }
 
 genall() {
-	# go generate ./...
+	go generate ./internal/enums ./cmd/parse_xlsx/templates
 	gensql
 	gentempl
 }
