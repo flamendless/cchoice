@@ -34,7 +34,7 @@ func Base(title string, children ...templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><base href=\"/\"><meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\"><meta name=\"description\" content=\"C-Choice is the correct choice for your power\"><meta name=\"google\" content=\"nositelinkssearchbox\"><meta name=\"robots\" content=\"noarchive, noimageindex\"><meta name=\"keywords\" content=\"cchoice, c-choice, construction, power tools\"><meta name=\"viewport\" content=\"width=1024\"><link rel=\"dns-prefetch\" href=\"https://images1.cchoice.com\"><link rel=\"preload\" href=\"/static/svg/logo_with_text.svg\" as=\"image\" type=\"image/svg+xml\"><link rel=\"preload\" href=\"/static/images/empty.png\" as=\"image\" type=\"image/png\"><!-- TODO: (Brandon) - preload product images here --><link rel=\"preload\" href=\"/static/images/product_images/bosch/\" as=\"image\" type=\"image/png\"><meta property=\"og:title\" content=\"C-Choice Construction Supplies\"><meta property=\"og:description\" content=\"C-Choice is the correct choice for your power\"><meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"https://www.cchoice.com/\"><meta property=\"og:image\" content=\"https://images1.cchoice.com/static/images/favicons/192x192.png\"><meta property=\"og:image:secure_url\" content=\"https://images1.cchoice.com/static/images/favicons/192x192.png\"><meta name=\"twitter:card\" content=\"summary\"><meta charset=\"UTF-8\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><base href=\"/\"><meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\"><meta name=\"description\" content=\"C-Choice is the correct choice for your power\"><meta name=\"google\" content=\"nositelinkssearchbox\"><meta name=\"robots\" content=\"noarchive, noimageindex\"><meta name=\"keywords\" content=\"cchoice, c-choice, construction, power tools\"><meta name=\"viewport\" content=\"width=1024\"><link rel=\"dns-prefetch\" href=\"https://images1.cchoice.com\"><link rel=\"preload\" href=\"/cchoice/static/svg/logo_with_text.svg\" as=\"image\" type=\"image/svg+xml\"><link rel=\"preload\" href=\"/cchoice/static/images/empty.png\" as=\"image\" type=\"image/png\"><!-- TODO: (Brandon) - preload product images here --><link rel=\"preload\" href=\"/cchoice/static/images/product_images/bosch/\" as=\"image\" type=\"image/png\"><meta property=\"og:title\" content=\"C-Choice Construction Supplies\"><meta property=\"og:description\" content=\"C-Choice is the correct choice for your power\"><meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"https://www.cchoice.com/\"><meta property=\"og:image\" content=\"https://images1.cchoice.com/cchoice/static/images/favicons/192x192.png\"><meta property=\"og:image:secure_url\" content=\"https://images1.cchoice.com/cchoice/static/images/favicons/192x192.png\"><meta name=\"twitter:card\" content=\"summary\"><meta charset=\"UTF-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -74,14 +74,14 @@ func Base(title string, children ...templ.Component) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<link rel=\"icon\" type=\"image/x-icon\" sizes=\"96x96\" href=\"/static/images/favicons/favicon.ico\"><link rel=\"icon\" type=\"image/png\" sizes=\"114x114\" href=\"/static/images/favicons/114x114.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"128x128\" href=\"/static/images/favicons/128x128.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"152x152\" href=\"/static/images/favicons/152x152.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"167x167\" href=\"/static/images/favicons/167x167.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"180x180\" href=\"/static/images/favicons/180x180.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"192x192\" href=\"/static/images/favicons/192x192.png\"><link href=\"/static/css/tailwind.css\" rel=\"stylesheet\"><script type=\"text/javascript\" src=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<link rel=\"icon\" type=\"image/x-icon\" sizes=\"96x96\" href=\"/cchoice/static/images/favicons/favicon.ico\"><link rel=\"icon\" type=\"image/png\" sizes=\"114x114\" href=\"/cchoice/static/images/favicons/114x114.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"128x128\" href=\"/cchoice/static/images/favicons/128x128.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"152x152\" href=\"/cchoice/static/images/favicons/152x152.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"167x167\" href=\"/cchoice/static/images/favicons/167x167.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"180x180\" href=\"/cchoice/static/images/favicons/180x180.png\"><link rel=\"icon\" type=\"image/png\" sizes=\"192x192\" href=\"/cchoice/static/images/favicons/192x192.png\"><link href=\"/cchoice/static/css/tailwind.css\" rel=\"stylesheet\"><script type=\"text/javascript\" src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL("/static/js/htmx.min.js")))
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL("/cchoice/static/js/htmx.min.js")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/base.templ`, Line: 52, Col: 84}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/base.templ`, Line: 52, Col: 92}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -140,9 +140,9 @@ func Base(title string, children ...templ.Component) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL("/static/js/error_handler.js")))
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL("/cchoice/static/js/error_handler.js")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/base.templ`, Line: 64, Col: 89}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/base.templ`, Line: 64, Col: 97}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
