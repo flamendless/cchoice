@@ -3,6 +3,8 @@ package server
 import (
 	"database/sql"
 	"net/http"
+	"net/url"
+	"strings"
 
 	"cchoice/cmd/web"
 	"cchoice/cmd/web/components"
@@ -34,7 +36,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Route("/cchoice", func(r chi.Router) {
 		r.Use(middleware.StripPrefix("/cchoice"))
-		r.Handle("/static/*", http.FileServer(http.FS(web.Files)))
+
+		// r.Handle("/static/*", http.FileServer(http.FS(web.Files)))
+		s.fs = http.FileServer(http.FS(web.Files))
+		r.Get("/static/*", s.staticHandler)
+
 		r.Get("/health", s.healthHandler)
 		r.Get("/", s.indexHandler)
 		r.Get("/settings/header-texts", s.headerTextsHandler)
@@ -45,6 +51,22 @@ func (s *Server) RegisterRoutes() http.Handler {
 	})
 
 	return r
+}
+
+func (s *Server) staticHandler(w http.ResponseWriter, r *http.Request) {
+	thumbnail := r.URL.Query().Get("thumbnail")
+	if thumbnail == "1" {
+		currentURL := r.URL.Path
+		if strings.HasPrefix(currentURL, "/static/images/product_images/") {
+			currentURL = strings.Replace(currentURL, "/images/", "/thumbnails/", 1)
+			newURL, err := url.Parse(currentURL)
+			if err != nil {
+				panic(err)
+			}
+			r.URL = newURL
+		}
+	}
+	s.fs.ServeHTTP(w, r)
 }
 
 func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
