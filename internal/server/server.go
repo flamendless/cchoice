@@ -61,8 +61,8 @@ func NewServer() *http.Server {
 	var tlsConfig *tls.Config
 	if useSSL {
 		serverTLSCert, err := tls.LoadX509KeyPair(
-			fmt.Sprintf("/etc/letsencrypt/live/%s/fullchain.pem", addr),
-			fmt.Sprintf("/etc/letsencrypt/live/%s/privkey.pem", addr),
+			fmt.Sprintf("/etc/letsencrypt/live/%s/fullchain.pem", NewServer.address),
+			fmt.Sprintf("/etc/letsencrypt/live/%s/privkey.pem", NewServer.address),
 		)
 		if err != nil {
 			panic(err)
