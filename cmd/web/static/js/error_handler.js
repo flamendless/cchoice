@@ -1,4 +1,11 @@
-document.body.addEventListener("htmx:afterRequest", function (evt) {
+window.onload = function() {
+	const mobile = (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(navigator.userAgent.toLowerCase()));
+	if (mobile) {
+		alert("This site is still in development. Visit this on a computer for better view.");
+	}
+};
+
+document.body.addEventListener("htmx:afterRequest", function(evt) {
 	const el_error_banner = document.getElementById("error_banner");
 	if (el_error_banner === null) {
 		console.warn("no element for handling error banner found");
