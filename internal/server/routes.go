@@ -38,7 +38,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Use(middleware.StripPrefix("/cchoice"))
 
 		// r.Handle("/static/*", http.FileServer(http.FS(web.Files)))
-		s.fs = http.FileServer(http.FS(web.Files))
+		s.fs = http.FS(web.Files)
 		r.Get("/static/*", s.staticHandler)
 
 		r.Get("/health", s.healthHandler)
@@ -48,25 +48,33 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/product-categories/side-panel/list", s.categoriesSidePanelHandler)
 		r.Get("/product-categories/sections", s.categorySectionHandler)
 		r.Get("/product-categories/{category_id}/products", s.categoryProductsHandler)
+		r.Get("/thumbnail", s.thumbnailifyHandler)
 	})
 
 	return r
 }
 
 func (s *Server) staticHandler(w http.ResponseWriter, r *http.Request) {
-	thumbnail := r.URL.Query().Get("thumbnail")
-	if thumbnail == "1" {
-		currentURL := r.URL.Path
-		if strings.HasPrefix(currentURL, "/static/images/product_images/") {
-			currentURL = strings.Replace(currentURL, "/images/", "/thumbnails/", 1)
-			newURL, err := url.Parse(currentURL)
-			if err != nil {
-				panic(err)
-			}
-			r.URL = newURL
+	fs := http.FileServer(s.fs)
+	fs.ServeHTTP(w, r)
+}
+
+func (s *Server) thumbnailifyHandler(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Query().Get("path")
+	if path == "" {
+		return
+	}
+
+	if strings.HasPrefix(path, "/cchoice/static/images/product_images/") {
+		path = strings.Replace(path, "/images/", "/thumbnails/", 1)
+		newPath, err := url.Parse(path)
+		if err != nil {
+			panic(err)
+		}
+		if _, err := w.Write([]byte(newPath.String())); err != nil {
+			panic(err)
 		}
 	}
-	s.fs.ServeHTTP(w, r)
 }
 
 func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
