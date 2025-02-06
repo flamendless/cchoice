@@ -2,6 +2,8 @@ package components
 
 import "cchoice/cmd/web/models"
 
+const EMPTY = "static/images/empty.png"
+
 templ CategorySectionProducts(data models.CategorySectionProducts) {
 	<div id={ "category-sections-" + data.ID }>
 		if data.Subcategory != data.Category {
@@ -12,10 +14,22 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 		<div class="flex flex-row">
 			for _, product := range data.Products {
 				<div class="flex flex-col items-center m-2">
-					<img
-						src={ string(templ.SafeURL("/cchoice/" + product.Thumbnail + "?thumbnail=1")) }
-						class="w-24 max-w-24 h-24"
-					/>
+					if product.Thumbnail == EMPTY {
+						<img
+							class="w-24 max-w-24 h-24"
+							src="/cchoice/static/images/empty.png"
+						/>
+					} else {
+						<img
+							class="w-24 max-w-24 h-24"
+							src="/cchoice/static/images/empty.png"
+							hx-get={ string(templ.SafeURL("/cchoice/thumbnail?path=/cchoice/" + product.Thumbnail)) }
+							hx-swap="none"
+							hx-target="this"
+							hx-on::after-request="event.detail.target.src=event.detail.xhr.responseText"
+							hx-trigger="intersect"
+						/>
+					}
 					<p
 						title={ product.Name }
 						class="max-w-24 text-xs font-normal text-ellipsis text-nowrap overflow-hidden"

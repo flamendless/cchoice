@@ -100,7 +100,7 @@ gentempl() {
 }
 
 genall() {
-	go generate ./...
+	# go generate ./...
 	gensql
 	gentempl
 }
