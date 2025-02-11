@@ -117,8 +117,7 @@ func (product *Product) Duplicate() *Product {
 	return &newProduct
 }
 
-func (product *Product) GetDBID(db database.Service) int64 {
-	ctx := context.Background()
+func (product *Product) GetDBID(ctx context.Context, db database.Service) int64 {
 	existingProductID, err := db.GetQueries().GetProductIDBySerial(ctx, product.Serial)
 	if err != nil {
 		return 0
@@ -127,8 +126,7 @@ func (product *Product) GetDBID(db database.Service) int64 {
 	return existingProductID
 }
 
-func (product *Product) GetOrInsertCategoryID(db database.Service) (int64, error) {
-	ctx := context.Background()
+func (product *Product) GetOrInsertCategoryID(ctx context.Context, db database.Service) (int64, error) {
 	var categoryID int64
 
 	existingProductCategory, err := db.GetQueries().GetProductCategoryByCategoryAndSubcategory(
@@ -197,8 +195,7 @@ func (product *Product) GetOrInsertCategoryID(db database.Service) (int64, error
 	return categoryID, nil
 }
 
-func (product *Product) GetOrInsertProductSpecsID(db database.Service) (int64, error) {
-	ctx := context.Background()
+func (product *Product) GetOrInsertProductSpecsID(ctx context.Context, db database.Service) (int64, error) {
 	var productSpecsID int64
 
 	existingProductSpecs, err := db.GetQueries().GetProductSpecsByProductID(ctx, product.ID)
@@ -249,10 +246,8 @@ func (product *Product) GetOrInsertProductSpecsID(db database.Service) (int64, e
 	return productSpecsID, nil
 }
 
-func (product *Product) InsertToDB(db database.Service) (int64, error) {
-	ctx := context.Background()
-
-	productSpecsID, err := product.GetOrInsertProductSpecsID(db)
+func (product *Product) InsertToDB(ctx context.Context, db database.Service) (int64, error) {
+	productSpecsID, err := product.GetOrInsertProductSpecsID(ctx, db)
 	if err != nil {
 		return 0, err
 	}
@@ -292,7 +287,7 @@ func (product *Product) InsertToDB(db database.Service) (int64, error) {
 
 	product.ID = insertedProduct.ID
 
-	categoryID, err := product.GetOrInsertCategoryID(db)
+	categoryID, err := product.GetOrInsertCategoryID(ctx, db)
 	if err != nil {
 		return 0, err
 	}
@@ -301,9 +296,8 @@ func (product *Product) InsertToDB(db database.Service) (int64, error) {
 	return insertedProduct.ID, nil
 }
 
-func (product *Product) UpdateToDB(db database.Service) (int64, error) {
-	ctx := context.Background()
-	productSpecsID, err := product.GetOrInsertProductSpecsID(db)
+func (product *Product) UpdateToDB(ctx context.Context, db database.Service) (int64, error) {
+	productSpecsID, err := product.GetOrInsertProductSpecsID(ctx, db)
 	if err != nil {
 		return 0, err
 	}
@@ -336,7 +330,7 @@ func (product *Product) UpdateToDB(db database.Service) (int64, error) {
 	)
 
 	product.ID = updatedID
-	categoryID, err := product.GetOrInsertCategoryID(db)
+	categoryID, err := product.GetOrInsertCategoryID(ctx, db)
 	if err != nil {
 		return 0, err
 	}

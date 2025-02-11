@@ -170,9 +170,9 @@ var cmdParseXLSX = &cobra.Command{
 
 		logs.Log().Debug("Getting brand...")
 		brand := models.NewBrand(parseXLSXFlags.Template)
-		brandID := brand.GetDBID(tpl.CtxApp.DB)
+		brandID := brand.GetDBID(cmd.Context(), tpl.CtxApp.DB)
 		if brandID == 0 {
-			brandID, err := brand.InsertToDB(tpl.CtxApp.DB)
+			brandID, err := brand.InsertToDB(cmd.Context(), tpl.CtxApp.DB)
 			if err != nil {
 				panic(err)
 			}
@@ -185,7 +185,7 @@ var cmdParseXLSX = &cobra.Command{
 				UpdatedAt: now,
 				DeletedAt: constants.DT_BEGINNING,
 			}
-			_, err = brandImage.InsertToDB(tpl.CtxApp.DB)
+			_, err = brandImage.InsertToDB(cmd.Context(), tpl.CtxApp.DB)
 			if err != nil {
 				panic(err)
 			}
@@ -231,10 +231,10 @@ var cmdParseXLSX = &cobra.Command{
 			go func() {
 				defer wg.Done()
 				for _, product := range batch {
-					existingProductId := product.GetDBID(tpl.CtxApp.DB)
+					existingProductId := product.GetDBID(cmd.Context(), tpl.CtxApp.DB)
 					if existingProductId != 0 {
 						now := time.Now()
-						_, err := product.UpdateToDB(tpl.CtxApp.DB)
+						_, err := product.UpdateToDB(cmd.Context(), tpl.CtxApp.DB)
 						if err != nil {
 							logs.Log().Info(
 								"product update to DB",
@@ -252,7 +252,7 @@ var cmdParseXLSX = &cobra.Command{
 
 					} else {
 						now := time.Now()
-						productID, err := product.InsertToDB(tpl.CtxApp.DB)
+						productID, err := product.InsertToDB(cmd.Context(), tpl.CtxApp.DB)
 						if err != nil {
 							logs.Log().Info(
 								"product insert to DB",
@@ -268,7 +268,7 @@ var cmdParseXLSX = &cobra.Command{
 							insertMetrics += int64(time.Since(now))
 
 							if tpl.AppFlags.ImagesBasePath != "" {
-								productImageID, err := ProcessProductImage(tpl, product)
+								productImageID, err := ProcessProductImage(cmd.Context(), tpl, product)
 								if err != nil && !errors.Is(err, os.ErrNotExist) {
 									logs.Log().Info(
 										"product image insert to DB",
@@ -321,7 +321,7 @@ var cmdParseXLSX = &cobra.Command{
 					continue
 				}
 
-				row, err := tpl.CtxApp.DB.GetQueries().GetProductBySerial(context.Background(), product.Serial)
+				row, err := tpl.CtxApp.DB.GetQueries().GetProductBySerial(cmd.Context(), product.Serial)
 				if err != nil {
 					continue
 				}
@@ -329,7 +329,7 @@ var cmdParseXLSX = &cobra.Command{
 				dbp := models.DBRowToProduct(&row)
 
 				brand := models.NewBrand(row.BrandName)
-				_ = brand.GetDBID(tpl.CtxApp.DB)
+				_ = brand.GetDBID(cmd.Context(), tpl.CtxApp.DB)
 				dbp.Brand = brand
 
 				cmp, _ := product.UnitPriceWithoutVat.Compare(dbp.UnitPriceWithoutVat)
@@ -366,7 +366,7 @@ var cmdParseXLSX = &cobra.Command{
 
 		}
 
-		promotedCategoryIDs, err := tpl.CtxApp.DB.GetQueries().SetInitialPromotedProductCategory(context.Background(), params)
+		promotedCategoryIDs, err := tpl.CtxApp.DB.GetQueries().SetInitialPromotedProductCategory(cmd.Context(), params)
 		if err != nil {
 			panic(err)
 		}
@@ -379,12 +379,12 @@ var cmdParseXLSX = &cobra.Command{
 	},
 }
 
-func ProcessProductImage(tpl *templates.Template, product *models.Product) (int64, error) {
+func ProcessProductImage(ctx context.Context, tpl *templates.Template, product *models.Product) (int64, error) {
 	productImage, err := tpl.ProcessProductImage(tpl, product)
 	if err != nil {
 		return 0, err
 	}
-	productImageID, err := productImage.InsertToDB(tpl.CtxApp.DB)
+	productImageID, err := productImage.InsertToDB(ctx, tpl.CtxApp.DB)
 	if err != nil {
 		return 0, err
 	}
