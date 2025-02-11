@@ -17,14 +17,13 @@ type ProductImage struct {
 	ID        int64
 }
 
-func (pi *ProductImage) InsertToDB(db database.Service) (int64, error) {
+func (pi *ProductImage) InsertToDB(ctx context.Context, db database.Service) (int64, error) {
 	if pi == nil {
 		panic("nil ProductImage")
 	}
 	if pi.Product == nil {
 		panic("nil ProductImage.Product")
 	}
-	ctx := context.Background()
 	now := time.Now().UTC()
 	insertedProductImage, err := db.GetQueries().CreateProductImage(ctx, queries.CreateProductImageParams{
 		ProductID: pi.Product.ID,
