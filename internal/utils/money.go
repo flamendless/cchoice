@@ -17,7 +17,7 @@ func NewMoney(price int64, currency string) *money.Money {
 func NewMoneyFromString(price string, currency string) (*money.Money, error) {
 	unitPrice, err := decimal.Parse(price)
 	if err != nil {
-		parserErr := errs.NewParserError(errs.CantCovert, err.Error())
+		parserErr := errs.NewParserError(errs.CantCovert, "%s", err.Error())
 		return nil, parserErr
 	}
 	m := money.New(int64(unitPrice.Coef()), currency)

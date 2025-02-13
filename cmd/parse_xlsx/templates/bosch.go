@@ -106,7 +106,7 @@ func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 	name := row[colModel.Index]
 	errProductName := utils.ValidateNotBlank(name, "Model")
 	if errProductName != nil {
-		parserErr := errs.NewParserError(errs.BlankProductName, errProductName.Error())
+		parserErr := errs.NewParserError(errs.BlankProductName, "%s", errProductName.Error())
 		errsRes = append(errsRes, parserErr)
 	}
 
