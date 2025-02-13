@@ -1,5 +1,7 @@
 # Setup
 
+- `go mod download`
+- `go mod tidy`
 - `chmod +x ./run.sh`
 - `./run.sh deps`
 - `./run.sh setup`

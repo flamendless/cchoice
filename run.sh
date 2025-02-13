@@ -68,26 +68,12 @@ cleandb() {
 }
 
 deps() {
-	go install github.com/a-h/templ/cmd/templ@latest
-	go install github.com/rubenv/sql-migrate/...@latest
-	go install github.com/air-verse/air@latest
-	go install github.com/alexkohler/prealloc@latest
-	go install github.com/nikolaydubina/smrcptr@latest
-	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
-	go install gotest.tools/gotestsum@latest
-	go install go.uber.org/nilaway/cmd/nilaway@latest
-	go install github.com/kisielk/errcheck@latest
-	go install golang.org/x/vuln/cmd/govulncheck@latest
-	go install github.com/dkorunic/betteralign/cmd/betteralign@latest
-	go install github.com/mdempsky/unconvert@latest
-	go install golang.org/x/tools/cmd/stringer@latest
-
 	# Tailwind https://tailwindcss.com/docs/installation/tailwind-cli
-	# curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=10.0.0 sh -
-	# pnpm install tailwindcss @tailwindcss/cli
+	curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=10.0.0 sh -
+	pnpm install tailwindcss @tailwindcss/cli
 
 	# libvips https://www.libvips.org/install.html (I use Arch BTW)
-	# yay -S base-devel glib2 expat1 libdeflate libvips
+	yay -S base-devel glib2 expat1 libdeflate libvips
 }
 
 gensql() {
