@@ -106,7 +106,7 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 
 	errProductName := utils.ValidateNotBlank(name, "article")
 	if errProductName != nil {
-		parserErr := errs.NewParserError(errs.BlankProductName, errProductName.Error())
+		parserErr := errs.NewParserError(errs.BlankProductName, "%s", errProductName.Error())
 		errsRes = append(errsRes, parserErr)
 	}
 

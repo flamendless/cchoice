@@ -134,6 +134,7 @@ sc() {
 
 testall() {
 	gotestsum \
+		--debug \
 		--format=pkgname-and-test-fails \
 		--format-icons=default \
 		--format-hide-empty-pkg \
