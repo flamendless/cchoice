@@ -17,7 +17,7 @@ func TestEncDecDBID(t *testing.T) {
 }
 
 func BenchmarkEncDecDBID(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		r := rand.New(rand.NewSource(time.Now().UnixNano()))
 		test := int64(r.Uint64())
 		enc := EncDBID(test)
