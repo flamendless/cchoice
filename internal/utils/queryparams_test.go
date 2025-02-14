@@ -43,7 +43,7 @@ func TestGetLimit(t *testing.T) {
 }
 
 func BenchmarkGetLimit(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for i := range b.N {
 		_, _ = GetLimit(strconv.Itoa(i))
 	}
 }

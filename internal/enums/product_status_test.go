@@ -30,7 +30,7 @@ func TestParseProductStatusEnum(t *testing.T) {
 
 func BenchmarkProductStatusToString(b *testing.B) {
 	for sortfield := range tblProductStatus {
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			_ = sortfield.String()
 		}
 	}
@@ -38,7 +38,7 @@ func BenchmarkProductStatusToString(b *testing.B) {
 
 func BenchmarkParseProductStatusEnum(b *testing.B) {
 	for _, val := range tblProductStatus {
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			_ = ParseProductStatusEnum(val)
 		}
 	}
