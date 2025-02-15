@@ -85,10 +85,17 @@ func NewServer() *http.Server {
 		zap.Duration("write timeout", writeTimeout),
 	)
 
+	var protocol *http.Protocols
 	handler := NewServer.RegisterRoutes()
 	if utils.GetBoolFlag(os.Getenv("USEHTTP2")) {
 		h2s := &http2.Server{MaxConcurrentStreams: 256}
 		handler = h2c.NewHandler(handler, h2s)
+
+		t := http.DefaultTransport.(*http.Transport).Clone()
+		t.Protocols = new(http.Protocols)
+		t.Protocols.SetHTTP1(true)
+		t.Protocols.SetHTTP2(true)
+		protocol = t.Protocols
 	}
 
 	server := &http.Server{
@@ -98,6 +105,7 @@ func NewServer() *http.Server {
 		ReadTimeout:  readTimeout,
 		WriteTimeout: writeTimeout,
 		TLSConfig:    tlsConfig,
+		Protocols:    protocol,
 	}
 	return server
 }
