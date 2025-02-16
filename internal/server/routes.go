@@ -24,6 +24,7 @@ import (
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
+	r.Use(middleware.CleanPath)
 	r.Use(middleware.Logger)
 
 	r.Use(cors.Handler(cors.Options{
@@ -61,34 +62,50 @@ func (s *Server) staticHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) thumbnailifyHandler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Query().Get("path")
-	if path == "" {
+	if path == "" || !strings.HasPrefix(path, "/cchoice/static/images/product_images/") {
 		return
 	}
 
-	if strings.HasPrefix(path, "/cchoice/static/images/product_images/") {
-		path = strings.Replace(path, "/images/", "/thumbnails/", 1)
-		newPath, err := url.Parse(path)
-		if err != nil {
-			panic(err)
+	cacheKey := []byte("thumbnailify_" + path)
+	if data, ok := s.Cache.HasGet(nil, cacheKey); ok {
+		if _, err := w.Write(data); err != nil {
+			logs.Log().Fatal("Thumbnailify handler", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
-		if _, err := w.Write([]byte(newPath.String())); err != nil {
-			panic(err)
-		}
+		logs.Log().Debug("got thumbnailify value from cache")
+		return
 	}
+
+	path = strings.Replace(path, "/images/", "/thumbnails/", 1)
+	newPath, err := url.Parse(path)
+	if err != nil {
+		logs.Log().Fatal("Thumbnailify handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if _, err := w.Write([]byte(newPath.String())); err != nil {
+		logs.Log().Fatal("Thumbnailify handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	s.Cache.Set(cacheKey, []byte(newPath.String()))
 }
 
 func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	if err := components.Base("C-CHOICE").Render(r.Context(), w); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("Index handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 	jsonResp, err := json.Marshal(s.dbRO.Health())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("Health handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	_, _ = w.Write(jsonResp)
@@ -104,8 +121,8 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		[]string{"email", "mobile_no"},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("header texts handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -125,8 +142,8 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := components.HeaderRow1Texts(texts).Render(r.Context(), w); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("header texts handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -140,8 +157,8 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		[]string{"mobile_no", "email", "url_gmap", "url_facebook", "url_tiktok"},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("header texts handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -173,8 +190,8 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := components.FooterRow1Texts(texts).Render(r.Context(), w); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("footer texts handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -191,22 +208,22 @@ func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Reque
 		},
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("categories side panel list handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if err := components.CategoriesSidePanelList(categories).Render(r.Context(), w); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("categories side panel list handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) {
 	res, err := s.dbRO.GetQueries().GetProductCategoriesForSections(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("category section list handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -226,16 +243,16 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if err := components.CategorySection(categorySections).Render(r.Context(), w); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("category section list handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request) {
 	categoryID := chi.URLParam(r, "category_id")
 	if categoryID == "" {
-		http.Error(w, "Invalid url parameter", http.StatusBadRequest)
 		logs.Log().Fatal("category products list handler")
+		http.Error(w, "Invalid url parameter", http.StatusBadRequest)
 		return
 	}
 
@@ -243,8 +260,8 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 
 	category, err := s.dbRO.GetQueries().GetProductCategoryByID(r.Context(), categoryDBID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("category section list handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -262,8 +279,8 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		Limit:      16,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("category section list handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if len(products) == 0 {
@@ -283,7 +300,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	if err := components.CategorySectionProducts(categorySectionProducts).Render(r.Context(), w); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logs.Log().Fatal("category section list handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

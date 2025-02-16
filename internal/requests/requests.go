@@ -25,7 +25,7 @@ func GetSettingsData(
 	keys []string,
 ) (map[string]string, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
-		logs.Log().Debug("got value from cache")
+		logs.Log().Debug("got settings data value from cache")
 		buf := bytes.NewBuffer(data)
 		var res map[string]string
 		if err := gob.NewDecoder(buf).Decode(&res); err != nil {
@@ -70,7 +70,7 @@ func GetCategoriesSidePanel(
 	params queries.GetProductCategoriesByPromotedParams,
 ) ([]models.CategorySidePanelText, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
-		logs.Log().Debug("got value from cache")
+		logs.Log().Debug("got categories side panel value from cache")
 		buf := bytes.NewBuffer(data)
 		var res []models.CategorySidePanelText
 		if err := gob.NewDecoder(buf).Decode(&res); err != nil {
