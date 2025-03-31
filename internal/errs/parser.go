@@ -43,7 +43,7 @@ func ParserErrorCodeCode(err error) ParserErrorCode {
 	return ""
 }
 
-func NewParserError(errorCode ParserErrorCode, format string, args ...interface{}) error {
+func NewParserError(errorCode ParserErrorCode, format string, args ...any) error {
 	return parserError{
 		error:     fmt.Errorf(format, args...),
 		errorCode: errorCode,
