@@ -34,7 +34,7 @@ func GetSettingsData(
 		return res, nil
 	}
 
-	sfRes, err, shared := sf.Do(string(cacheKey), func() (interface{}, error) {
+	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
 		res, err := dbRO.GetQueries().GetSettingsByNames(ctx, keys)
 		if err != nil {
 			return nil, err
@@ -79,7 +79,7 @@ func GetCategoriesSidePanel(
 		return res, nil
 	}
 
-	sfRes, err, shared := sf.Do(string(cacheKey), func() (interface{}, error) {
+	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
 		res, err := dbRO.GetQueries().GetProductCategoriesByPromoted(ctx, params)
 		if err != nil {
 			return nil, err

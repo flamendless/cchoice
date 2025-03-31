@@ -43,7 +43,7 @@ func GRPCErrorCodeCode(err error) GRPCErrorCode {
 	return ""
 }
 
-func NewGRPCError(errorCode GRPCErrorCode, format string, args ...interface{}) error {
+func NewGRPCError(errorCode GRPCErrorCode, format string, args ...any) error {
 	return grpcError{
 		error:     fmt.Errorf(format, args...),
 		errorCode: errorCode,

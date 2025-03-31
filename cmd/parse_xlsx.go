@@ -66,7 +66,7 @@ func ProcessColumns(tpl *templates.Template, file *excelize.File) bool {
 	}()
 
 	rows.Next()
-	for i := 0; i < tpl.SkipInitialRows; i++ {
+	for range tpl.SkipInitialRows {
 		rows.Next()
 	}
 
@@ -220,11 +220,7 @@ var cmdParseXLSX = &cobra.Command{
 		startWG := time.Now()
 		foundImages := 0
 		for start, end := 0, 0; start <= len(products)-1; start = end {
-			end = start + batchsize
-			if end > len(products) {
-				end = len(products)
-			}
-
+			end = min(start + batchsize, len(products))
 			batch := products[start:end]
 			wg.Add(1)
 
@@ -315,7 +311,7 @@ var cmdParseXLSX = &cobra.Command{
 		if tpl.AppFlags.VerifyPrices {
 			hasError := false
 			logs.Log().Debug("Verifying prices...")
-			for i := 0; i < len(products); i++ {
+			for i := range len(products) {
 				product := products[i]
 				if product.ID == 0 {
 					continue

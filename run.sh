@@ -135,7 +135,7 @@ benchmark() {
 prod() {
 	genall
 	templ generate
-	air -c ".air.api.toml" api
+	echo "Run: ./tmp/main api > out 2>&1 &"
 }
 
 if [ "$#" -eq 0 ]; then

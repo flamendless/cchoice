@@ -180,7 +180,7 @@ func BoschProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 	var products []*models.Product = make([]*models.Product, 0, tpl.AssumedRowsCount)
 
 	rowIdx := 0
-	for i := 0; i < tpl.SkipInitialRows+1; i++ {
+	for range tpl.SkipInitialRows+1 {
 		rows.Next()
 		rowIdx++
 	}
