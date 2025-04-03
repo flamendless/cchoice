@@ -71,7 +71,8 @@ func (s *Server) staticHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) thumbnailifyHandler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Query().Get("path")
-	if path == "" || !strings.HasPrefix(path, "/cchoice/static/images/product_images/") {
+	const basepath = "/cchoice/static/images/product_images/"
+	if path == "" || !strings.HasPrefix(path, basepath) {
 		return
 	}
 
