@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -16,6 +17,7 @@ import (
 type createThumbnailsFlags struct {
 	inpath  string
 	outpath string
+	format  string
 	width   int
 	height  int
 }
@@ -26,6 +28,7 @@ func init() {
 	f := cmdCreateThumbnails.Flags
 	f().StringVarP(&createThumbnailFlags.inpath, "inpath", "p", "", "Path to the images to process")
 	f().StringVarP(&createThumbnailFlags.outpath, "outpath", "o", "", "Output path to the images to store")
+	f().StringVarP(&createThumbnailFlags.format, "format", "f", "png", "Format of the images to store")
 	f().IntVarP(&createThumbnailFlags.width, "width", "", 160, "Width of the output thumbnail")
 	f().IntVarP(&createThumbnailFlags.height, "height", "", 160, "Height of the output thumbnail")
 	if err := cmdCreateThumbnails.MarkFlagRequired("inpath"); err != nil {
@@ -75,13 +78,24 @@ var cmdCreateThumbnails = &cobra.Command{
 				return nil
 			}
 
-			ep := vips.NewDefaultPNGExportParams()
+			var ep *vips.ExportParams
+			switch createThumbnailFlags.format {
+			case "png":
+				ep = vips.NewDefaultPNGExportParams()
+			case "jpg", "jpeg":
+				ep = vips.NewDefaultJPEGExportParams()
+			case "webp":
+				ep = vips.NewDefaultWEBPExportParams()
+			default:
+				panic("Invalid format: " + createThumbnailFlags.format)
+			}
 			imgbytes, _, err := img.Export(ep)
 			if err != nil {
 				return err
 			}
 
-			output := fmt.Sprintf("%s/%s", createThumbnailFlags.outpath, info.Name())
+			filename := strings.TrimSuffix(info.Name(), filepath.Ext(info.Name()))
+			output := fmt.Sprintf("%s/%s.%s", createThumbnailFlags.outpath, filename, createThumbnailFlags.format)
 			if err := os.WriteFile(output, imgbytes, 0644); err != nil {
 				return err
 			}

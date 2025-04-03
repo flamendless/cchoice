@@ -180,7 +180,7 @@ func BoschProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 	var products []*models.Product = make([]*models.Product, 0, tpl.AssumedRowsCount)
 
 	rowIdx := 0
-	for range tpl.SkipInitialRows+1 {
+	for range tpl.SkipInitialRows + 1 {
 		rows.Next()
 		rowIdx++
 	}
@@ -296,9 +296,24 @@ func BoschProcessProductImage(tpl *Template, product *models.Product) (*models.P
 		return nil, err
 	}
 
+	var thumbnail string
+	switch tpl.AppFlags.ImagesFormat {
+	case "png":
+		thumbnail = path
+	case "webp":
+		path := fmt.Sprintf("%s/%s.webp", basepath, filename)
+		thumbnailPath := "./cmd/web/" + path
+		_, err := os.Stat(thumbnailPath)
+		if err != nil {
+			logs.Log().Debug("Image thumbnail path does not exists", zap.String("path", thumbnailPath))
+		}
+		thumbnail = path
+	}
+
 	res := &models.ProductImage{
-		Product: product,
-		Path:    path,
+		Product:   product,
+		Path:      path,
+		Thumbnail: thumbnail,
 	}
 	return res, nil
 }

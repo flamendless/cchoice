@@ -64,6 +64,7 @@ type TblProductImage struct {
 	ID        int64
 	ProductID int64
 	Path      string
+	Thumbnail sql.NullString
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time

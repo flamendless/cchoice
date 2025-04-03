@@ -31,6 +31,7 @@ func init() {
 	f().StringVarP(&parseXLSXFlags.Sheet, "sheet", "s", "", "Sheet name to use")
 	f().StringVarP(&parseXLSXFlags.DBPath, "db_path", "", ":memory:", "Path to database")
 	f().StringVarP(&parseXLSXFlags.ImagesBasePath, "images_basepath", "", "", "Base path to the images")
+	f().StringVarP(&parseXLSXFlags.ImagesFormat, "images_format", "", "webp", "Format of the images")
 	f().BoolVarP(&parseXLSXFlags.Strict, "strict", "x", false, "Panic upon first product error")
 	f().BoolVarP(&parseXLSXFlags.PrintProcessedProducts, "print_processed_products", "v", false, "Print processed products")
 	f().BoolVarP(&parseXLSXFlags.UseDB, "use_db", "", false, "Use DB to save processed data")
@@ -103,6 +104,8 @@ var cmdParseXLSX = &cobra.Command{
 			zap.String("sheet", parseXLSXFlags.Sheet),
 			zap.Bool("strict", parseXLSXFlags.Strict),
 			zap.Int("limit", parseXLSXFlags.Limit),
+			zap.String("images path", parseXLSXFlags.ImagesBasePath),
+			zap.String("images format", parseXLSXFlags.ImagesFormat),
 		)
 
 		templateKind := templates.ParseTemplateEnum(parseXLSXFlags.Template)
@@ -179,7 +182,7 @@ var cmdParseXLSX = &cobra.Command{
 			now := time.Now().UTC()
 			brandImage := models.BrandImage{
 				BrandID:   brandID,
-				Path:      "static/images/brand_logos/" + parseXLSXFlags.Template + ".png",
+				Path:      "static/images/brand_logos/" + parseXLSXFlags.Template + "." + parseXLSXFlags.ImagesFormat,
 				IsMain:    true,
 				CreatedAt: now,
 				UpdatedAt: now,
@@ -220,7 +223,7 @@ var cmdParseXLSX = &cobra.Command{
 		startWG := time.Now()
 		foundImages := 0
 		for start, end := 0, 0; start <= len(products)-1; start = end {
-			end = min(start + batchsize, len(products))
+			end = min(start+batchsize, len(products))
 			batch := products[start:end]
 			wg.Add(1)
 

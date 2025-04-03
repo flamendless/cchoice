@@ -13,6 +13,7 @@ type ParseXLSXFlags struct {
 	Sheet                  string
 	DBPath                 string
 	ImagesBasePath         string
+	ImagesFormat           string
 	Limit                  int
 	Strict                 bool
 	PrintProcessedProducts bool

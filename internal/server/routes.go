@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -20,13 +21,13 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
+	"gopkg.in/kothar/brotli-go.v0/enc"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.CleanPath)
 	r.Use(middleware.Logger)
-
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST"},
@@ -34,6 +35,14 @@ func (s *Server) RegisterRoutes() http.Handler {
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))
+
+	compressor := middleware.NewCompressor(5, "/*")
+	compressor.SetEncoder("br", func(w io.Writer, level int) io.Writer {
+		params := enc.NewBrotliParams()
+		params.SetQuality(level)
+		return enc.NewBrotliWriter(params, w)
+	})
+	r.Use(compressor.Handler)
 
 	r.Route("/cchoice", func(r chi.Router) {
 		r.Use(middleware.StripPrefix("/cchoice"))

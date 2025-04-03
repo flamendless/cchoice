@@ -26,11 +26,11 @@ type Server struct {
 	dbRO    database.Service
 	dbRW    database.Service
 	SF      singleflight.Group
+	fs      http.FileSystem
 	Cache   *fastcache.Cache
 	address string
 	port    int
 	secure  bool
-	fs      http.FileSystem
 }
 
 func NewServer() *http.Server {
@@ -77,17 +77,19 @@ func NewServer() *http.Server {
 		}
 	}
 
+	useHTTP2 := utils.GetBoolFlag(os.Getenv("USEHTTP2"))
 	logs.Log().Info(
 		"Server",
 		zap.String("address", addr),
 		zap.Bool("SSL", useSSL),
+		zap.Bool("HTTP2", useHTTP2),
 		zap.Duration("read timeout", readTimeout),
 		zap.Duration("write timeout", writeTimeout),
 	)
 
 	var protocol *http.Protocols
 	handler := NewServer.RegisterRoutes()
-	if utils.GetBoolFlag(os.Getenv("USEHTTP2")) {
+	if useHTTP2 {
 		h2s := &http2.Server{MaxConcurrentStreams: 256}
 		handler = h2c.NewHandler(handler, h2s)
 

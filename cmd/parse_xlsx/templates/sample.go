@@ -85,7 +85,7 @@ func SampleProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
 	var products []*models.Product = make([]*models.Product, 0, tpl.AssumedRowsCount)
 
 	rowIdx := 0
-	for range tpl.SkipInitialRows+1 {
+	for range tpl.SkipInitialRows + 1 {
 		rows.Next()
 		rowIdx++
 	}
