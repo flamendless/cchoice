@@ -7,6 +7,7 @@ package queries
 
 import (
 	"context"
+	"database/sql"
 	"time"
 )
 
@@ -14,17 +15,19 @@ const createProductImage = `-- name: CreateProductImage :one
 INSERT INTO tbl_product_image (
 	product_id,
 	path,
+	thumbnail,
 	created_at,
 	updated_at,
 	deleted_at
 ) VALUES (
-	?, ?, ?, ?, ?
-) RETURNING id, product_id, path, created_at, updated_at, deleted_at
+	?, ?, ?, ?, ?, ?
+) RETURNING id, product_id, path, thumbnail, created_at, updated_at, deleted_at
 `
 
 type CreateProductImageParams struct {
 	ProductID int64
 	Path      string
+	Thumbnail sql.NullString
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time
@@ -34,6 +37,7 @@ func (q *Queries) CreateProductImage(ctx context.Context, arg CreateProductImage
 	row := q.db.QueryRowContext(ctx, createProductImage,
 		arg.ProductID,
 		arg.Path,
+		arg.Thumbnail,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.DeletedAt,
@@ -43,6 +47,7 @@ func (q *Queries) CreateProductImage(ctx context.Context, arg CreateProductImage
 		&i.ID,
 		&i.ProductID,
 		&i.Path,
+		&i.Thumbnail,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,

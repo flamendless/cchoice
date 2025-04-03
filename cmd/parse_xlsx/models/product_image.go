@@ -5,6 +5,7 @@ import (
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"context"
+	"database/sql"
 	"time"
 )
 
@@ -14,6 +15,7 @@ type ProductImage struct {
 	DeletedAt time.Time
 	Product   *Product
 	Path      string
+	Thumbnail string
 	ID        int64
 }
 
@@ -28,6 +30,7 @@ func (pi *ProductImage) InsertToDB(ctx context.Context, db database.Service) (in
 	insertedProductImage, err := db.GetQueries().CreateProductImage(ctx, queries.CreateProductImageParams{
 		ProductID: pi.Product.ID,
 		Path:      pi.Path,
+		Thumbnail: sql.NullString{Valid: pi.Thumbnail != "", String: pi.Thumbnail},
 		CreatedAt: now,
 		UpdatedAt: now,
 		DeletedAt: constants.DT_BEGINNING,
