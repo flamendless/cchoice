@@ -9,7 +9,7 @@ templ LogoWithText(width string, height string) {
 		<img
 			src={ string(templ.URL("/cchoice/static/svg/logo_with_text.svg")) }
 			alt="cchoice logo and text"
-			class="max-w-64 max-h-32 -mt-8 -mb-4 w-fit cursor-pointer"
+			class="-mt-8 -mb-4 w-fit cursor-pointer"
 			width={ width }
 			height={ height }
 		/>
@@ -99,7 +99,7 @@ templ Header() {
 				@HeaderRow1Texts(nil)
 			</div>
 			<div id="header-row2" class="w-full flex flex-row">
-				@LogoWithText("256px", "128px")
+				@LogoWithText("256", "128")
 				<div class="w-full flex items-center place-content-center px-8 py-2">
 					@SearchBar()
 				</div>
