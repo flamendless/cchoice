@@ -136,6 +136,7 @@ benchmark() {
 prod() {
 	genall
 	templ generate
+	go build -o ./tmp/main .
 	echo "Run: ./tmp/main api > out 2>&1 &"
 }
 
