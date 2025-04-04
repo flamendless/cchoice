@@ -159,6 +159,61 @@ func (q *Queries) GetProductCategoriesForSections(ctx context.Context) ([]GetPro
 	return items, nil
 }
 
+const getProductCategoriesForSectionsPagination = `-- name: GetProductCategoriesForSectionsPagination :many
+SELECT
+	tbl_product_category.id,
+	tbl_product_category.category,
+	tbl_product_category.subcategory,
+	COUNT(tbl_products_categories.product_id) AS products_count
+FROM tbl_product_category
+INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_category.id
+GROUP BY tbl_products_categories.category_id
+HAVING tbl_products_categories.product_id
+ORDER BY tbl_product_category.category ASC
+LIMIT ?
+OFFSET ?
+`
+
+type GetProductCategoriesForSectionsPaginationParams struct {
+	Limit  int64
+	Offset int64
+}
+
+type GetProductCategoriesForSectionsPaginationRow struct {
+	ID            int64
+	Category      sql.NullString
+	Subcategory   sql.NullString
+	ProductsCount int64
+}
+
+func (q *Queries) GetProductCategoriesForSectionsPagination(ctx context.Context, arg GetProductCategoriesForSectionsPaginationParams) ([]GetProductCategoriesForSectionsPaginationRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductCategoriesForSectionsPagination, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductCategoriesForSectionsPaginationRow
+	for rows.Next() {
+		var i GetProductCategoriesForSectionsPaginationRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Category,
+			&i.Subcategory,
+			&i.ProductsCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProductCategoryByCategory = `-- name: GetProductCategoryByCategory :one
 SELECT id, category, subcategory, promoted_at_homepage
 FROM tbl_product_category

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"cchoice/cmd/web"
@@ -237,7 +238,27 @@ func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Reque
 }
 
 func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) {
-	res, err := s.dbRO.GetQueries().GetProductCategoriesForSections(r.Context())
+	limit := 8
+	if paramLimit := r.URL.Query().Get("limit"); paramLimit != "" {
+		if parsed, err := strconv.Atoi(paramLimit); err == nil {
+			limit = parsed
+		}
+	}
+
+	page := 0
+	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
+		if parsed, err := strconv.Atoi(paramPage); err == nil {
+			page = parsed
+		}
+	}
+
+	res, err := s.dbRO.GetQueries().GetProductCategoriesForSectionsPagination(
+		r.Context(),
+		queries.GetProductCategoriesForSectionsPaginationParams{
+			Limit:  int64(limit),
+			Offset: int64(page) * int64(limit),
+		},
+	)
 	if err != nil {
 		logs.Log().Fatal("category section list handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -259,7 +280,7 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 		})
 	}
 
-	if err := components.CategorySection(categorySections).Render(r.Context(), w); err != nil {
+	if err := components.CategorySection(page, categorySections).Render(r.Context(), w); err != nil {
 		logs.Log().Fatal("category section list handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
