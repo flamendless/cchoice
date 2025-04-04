@@ -58,7 +58,7 @@ func LogoWithText(width string, height string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" alt=\"cchoice logo and text\" class=\"max-w-64 max-h-32 -mt-8 -mb-4 w-fit cursor-pointer\" width=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" alt=\"cchoice logo and text\" class=\"-mt-8 -mb-4 w-fit cursor-pointer\" width=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -264,7 +264,7 @@ func Header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = LogoWithText("256px", "128px").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = LogoWithText("256", "128").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
