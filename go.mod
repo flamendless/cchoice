@@ -23,7 +23,6 @@ require (
 	golang.org/x/net v0.35.0
 	golang.org/x/sync v0.11.0
 	golang.org/x/text v0.22.0
-	gopkg.in/kothar/brotli-go.v0 v0.0.0-20170728081549-771231d473d6
 )
 
 require (
