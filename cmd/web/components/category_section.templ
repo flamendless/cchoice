@@ -1,8 +1,12 @@
 package components
 
-import "cchoice/cmd/web/models"
+import (
+	"cchoice/cmd/web/models"
+	"fmt"
+)
 
 const EMPTY = "static/images/empty_96x96.webp"
+const MAX_CATEGORIES = 8
 
 templ CategorySectionProducts(data models.CategorySectionProducts) {
 	<div id={ "category-sections-" + data.ID }>
@@ -28,7 +32,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 							hx-swap="none"
 							hx-target="this"
 							hx-on::after-request="event.detail.target.src=event.detail.xhr.responseText"
-							hx-trigger="intersect"
+							hx-trigger="intersect once"
 							alt="empty placeholder image"
 						/>
 					}
@@ -47,50 +51,61 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 	</div>
 }
 
-templ CategorySection(categories []models.CategorySection) {
-	<div
-		id="category-sections"
-		class="w-full flex flex-col h-screen overflow-y-scroll scrollbar-hide"
-	>
-		for i, category := range categories {
-			<div>
-				<p class="text-base font-medium text-cchoice_dark m-2 my-0">
-					{ category.Label }
-				</p>
-				<div
-					class="w-full ml-0.5 pr-6 border-r-2 border-cchoice_border"
-					hx-trigger="load once"
-					hx-get={ "/cchoice/product-categories/" + category.ID + "/products" }
-					hx-select={ "#category-sections-" + category.ID }
-					hx-target={ "#category-sections-" + category.ID }
-					hx-swap="outerHTML"
-				>
-					@CategorySectionProducts(models.CategorySectionProducts{ID: category.ID})
-				</div>
-				if category.Label != "" {
-					@HR()
-				}
+templ CategorySection(page int, categories []models.CategorySection) {
+	for i := 0; i < min(MAX_CATEGORIES, len(categories)); i++ {
+		<div>
+			<p class="text-base font-medium text-cchoice_dark m-2 my-0">
+				{ categories[i].Label }
+			</p>
+			<div
+				class="w-full ml-0.5 pr-6 border-r-2 border-cchoice_border"
+				hx-trigger="load once"
+				hx-get={ "/cchoice/product-categories/" + categories[i].ID + "/products" }
+				hx-select={ "#category-sections-" + categories[i].ID }
+				hx-target={ "#category-sections-" + categories[i].ID }
+				hx-swap="outerHTML"
+			>
+				@CategorySectionProducts(models.CategorySectionProducts{ID: categories[i].ID})
 			</div>
-			if i == len(categories)-1 {
-				<div class="py-32"></div>
+			if categories[i].Label != "" {
+				@HR()
 			}
+		</div>
+
+		if i == min(MAX_CATEGORIES, len(categories))-1 {
+			<div
+				class="category-sections-sep py-32"
+				hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?limit=%d&page=%d", MAX_CATEGORIES, page+1) }
+				hx-target=".category-sections-sep"
+				hx-swap="outerHTML"
+				hx-trigger="intersect once"
+			>
+			</div>
 		}
-	</div>
+	}
+	if len(categories) != 0 {
+		<div class="py-4"></div>
+	}
 }
 
 templ AllCategorySections() {
 	<div
 		class="w-full"
 		hx-trigger="load once"
-		hx-get="/cchoice/product-categories/sections"
-		hx-select="#category-sections"
+		hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?limit=%d&page=%d", MAX_CATEGORIES, 0) }
 		hx-target="#category-sections"
-		hx-swap="outerHTML"
+		hx-swap="beforeend"
 	>
 		<p class="text-xs font-normal m-2 my-0">
 			All Categories
 		</p>
 		@HR()
-		@CategorySection(nil)
+
+		<div
+			id="category-sections"
+			class="w-full flex flex-col h-screen overflow-y-scroll scrollbar-hide"
+		>
+			@CategorySection(0, nil)
+		</div>
 	</div>
 }

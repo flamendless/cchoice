@@ -91,3 +91,18 @@ GROUP BY tbl_products_categories.category_id
 HAVING tbl_products_categories.product_id
 ORDER BY tbl_product_category.category ASC
 LIMIT 256;
+
+-- name: GetProductCategoriesForSectionsPagination :many
+SELECT
+	tbl_product_category.id,
+	tbl_product_category.category,
+	tbl_product_category.subcategory,
+	COUNT(tbl_products_categories.product_id) AS products_count
+FROM tbl_product_category
+INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_category.id
+GROUP BY tbl_products_categories.category_id
+HAVING tbl_products_categories.product_id
+ORDER BY tbl_product_category.category ASC
+LIMIT ?
+OFFSET ?
+;
