@@ -23,7 +23,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 						<img
 							class="w-24 max-w-24 h-24"
 							src="/cchoice/static/images/empty.png"
-							hx-get={ string(templ.SafeURL("/cchoice/thumbnail?path=/cchoice/" + product.Thumbnail)) }
+							hx-get={ string(templ.SafeURL("/cchoice/thumbnail?size=96x96&path=/cchoice/" + product.Thumbnail)) }
 							hx-swap="none"
 							hx-target="this"
 							hx-on::after-request="event.detail.target.src=event.detail.xhr.responseText"

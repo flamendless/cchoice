@@ -2,8 +2,10 @@ package server
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"strings"
 
 	"cchoice/cmd/web"
@@ -68,7 +70,20 @@ func (s *Server) thumbnailifyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cacheKey := []byte("thumbnailify_" + path)
+	size := r.URL.Query().Get("size")
+	if size == "" {
+		size = "160x160"
+	}
+
+	ext := filepath.Ext(path)
+	path = fmt.Sprintf(
+		"%s_%s%s",
+		strings.TrimRight(path, ext),
+		size,
+		ext,
+	)
+
+	cacheKey := []byte("thumbnailify_" + path + size)
 	if data, ok := s.Cache.HasGet(nil, cacheKey); ok {
 		if _, err := w.Write(data); err != nil {
 			logs.Log().Fatal("Thumbnailify handler", zap.Error(err))

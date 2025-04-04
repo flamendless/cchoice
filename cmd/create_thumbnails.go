@@ -95,7 +95,14 @@ var cmdCreateThumbnails = &cobra.Command{
 			}
 
 			filename := strings.TrimSuffix(info.Name(), filepath.Ext(info.Name()))
-			output := fmt.Sprintf("%s/%s.%s", createThumbnailFlags.outpath, filename, createThumbnailFlags.format)
+			output := fmt.Sprintf(
+				"%s/%s_%dx%d.%s",
+				createThumbnailFlags.outpath,
+				filename,
+				createThumbnailFlags.width,
+				createThumbnailFlags.height,
+				createThumbnailFlags.format,
+			)
 			if err := os.WriteFile(output, imgbytes, 0644); err != nil {
 				return err
 			}
