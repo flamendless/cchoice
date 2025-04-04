@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "cchoice/cmd/web/models"
 
-const EMPTY = "static/images/empty.png"
+const EMPTY = "static/images/empty_96x96.webp"
 
 func CategorySectionProducts(data models.CategorySectionProducts) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -79,12 +79,12 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 				return templ_7745c5c3_Err
 			}
 			if product.Thumbnail == EMPTY {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<img class=\"w-24 max-w-24 h-24\" src=\"/cchoice/static/images/empty.png\" alt=\"empty placeholder image\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<img class=\"w-24 max-w-24 h-24\" src=\"/cchoice/static/images/empty_96x96.webp\" alt=\"empty placeholder image\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<img class=\"w-24 max-w-24 h-24\" src=\"/cchoice/static/images/empty.png\" hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<img class=\"w-24 max-w-24 h-24\" src=\"/cchoice/static/images/empty_96x96.webp\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

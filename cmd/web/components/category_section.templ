@@ -2,7 +2,7 @@ package components
 
 import "cchoice/cmd/web/models"
 
-const EMPTY = "static/images/empty.png"
+const EMPTY = "static/images/empty_96x96.webp"
 
 templ CategorySectionProducts(data models.CategorySectionProducts) {
 	<div id={ "category-sections-" + data.ID }>
@@ -17,13 +17,13 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 					if product.Thumbnail == EMPTY {
 						<img
 							class="w-24 max-w-24 h-24"
-							src="/cchoice/static/images/empty.png"
+							src="/cchoice/static/images/empty_96x96.webp"
 							alt="empty placeholder image"
 						/>
 					} else {
 						<img
 							class="w-24 max-w-24 h-24"
-							src="/cchoice/static/images/empty.png"
+							src="/cchoice/static/images/empty_96x96.webp"
 							hx-get={ string(templ.SafeURL("/cchoice/thumbnail?size=96x96&path=/cchoice/" + product.Thumbnail)) }
 							hx-swap="none"
 							hx-target="this"
