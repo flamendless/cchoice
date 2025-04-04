@@ -18,6 +18,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 						<img
 							class="w-24 max-w-24 h-24"
 							src="/cchoice/static/images/empty.png"
+							alt="empty placeholder image"
 						/>
 					} else {
 						<img
@@ -28,6 +29,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 							hx-target="this"
 							hx-on::after-request="event.detail.target.src=event.detail.xhr.responseText"
 							hx-trigger="intersect"
+							alt="empty placeholder image"
 						/>
 					}
 					<p

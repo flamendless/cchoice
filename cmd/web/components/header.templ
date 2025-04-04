@@ -9,9 +9,9 @@ templ LogoWithText(width string, height string) {
 		<img
 			src={ string(templ.URL("/cchoice/static/svg/logo_with_text.svg")) }
 			alt="cchoice logo and text"
-			class="-mt-8 -mb-4 w-fit cursor-pointer"
+			class="max-w-64 max-h-32 -mt-8 -mb-4 w-fit cursor-pointer"
 			width={ width }
-			width={ height }
+			height={ height }
 		/>
 	}
 }
@@ -47,6 +47,7 @@ templ SearchBar() {
 			<button
 				type="submit"
 				class="text-white absolute end-2.5 bottom-2 bg-cchoice hover:bg-cchoice focus:ring-4 focus:outline-hidden focus:ring-cchoice font-medium rounded-lg text-sm px-2 py-1"
+				alt="search button"
 			>
 				Search
 			</button>
@@ -56,7 +57,9 @@ templ SearchBar() {
 
 templ Cart() {
 	<div class="m-2 flex flex-col place-conter-center">
-		<button>
+		<button
+			alt="cart logo"
+		>
 			@svgCart()
 		</button>
 	</div>
@@ -92,7 +95,7 @@ templ Header() {
 				@HeaderRow1Texts(nil)
 			</div>
 			<div id="header-row2" class="w-full flex flex-row">
-				@LogoWithText("256px", "256px")
+				@LogoWithText("256px", "128px")
 				<div class="w-full flex items-center place-content-center px-8 py-2">
 					@SearchBar()
 				</div>

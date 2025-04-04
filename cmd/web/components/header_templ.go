@@ -58,7 +58,7 @@ func LogoWithText(width string, height string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" alt=\"cchoice logo and text\" class=\"-mt-8 -mb-4 w-fit cursor-pointer\" width=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" alt=\"cchoice logo and text\" class=\"max-w-64 max-h-32 -mt-8 -mb-4 w-fit cursor-pointer\" width=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -71,14 +71,14 @@ func LogoWithText(width string, height string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" width=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" height=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(height)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 14, Col: 17}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 14, Col: 18}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -119,7 +119,7 @@ func SearchBar() templ.Component {
 			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form class=\"w-6/12\"><label for=\"search\" class=\"mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white\">Search</label><div class=\"relative\"><div class=\"absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none\"><svg class=\"w-4 h-4 text-cchoice\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 20 20\"><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z\"></path></svg></div><input type=\"search\" id=\"search\" placeholder=\"Search any term...\" required class=\"block w-full p-3 ps-10 text-sm text-black border border-searchbar rounded-lg bg-searchbar focus:ring-cchoice focus:border-cchoice\"> <button type=\"submit\" class=\"text-white absolute end-2.5 bottom-2 bg-cchoice hover:bg-cchoice focus:ring-4 focus:outline-hidden focus:ring-cchoice font-medium rounded-lg text-sm px-2 py-1\">Search</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form class=\"w-6/12\"><label for=\"search\" class=\"mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white\">Search</label><div class=\"relative\"><div class=\"absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none\"><svg class=\"w-4 h-4 text-cchoice\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 20 20\"><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z\"></path></svg></div><input type=\"search\" id=\"search\" placeholder=\"Search any term...\" required class=\"block w-full p-3 ps-10 text-sm text-black border border-searchbar rounded-lg bg-searchbar focus:ring-cchoice focus:border-cchoice\"> <button type=\"submit\" class=\"text-white absolute end-2.5 bottom-2 bg-cchoice hover:bg-cchoice focus:ring-4 focus:outline-hidden focus:ring-cchoice font-medium rounded-lg text-sm px-2 py-1\" alt=\"search button\">Search</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -148,7 +148,7 @@ func Cart() templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"m-2 flex flex-col place-conter-center\"><button>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"m-2 flex flex-col place-conter-center\"><button alt=\"cart logo\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -206,7 +206,7 @@ func HeaderRow1Texts(texts []models.HeaderRowText) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(hrt.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 69, Col: 15}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 72, Col: 15}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -264,7 +264,7 @@ func Header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = LogoWithText("256px", "256px").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = LogoWithText("256px", "128px").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
