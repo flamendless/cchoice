@@ -22,6 +22,16 @@ type CategorySection struct {
 	Label string
 }
 
+type Subcategory struct {
+	CategoryID string
+	Label      string
+}
+
+type GroupedCategorySection struct {
+	Label         string
+	Subcategories []Subcategory
+}
+
 type CategorySectionProduct queries.GetProductsByCategoryIDRow
 
 type CategorySectionProducts struct {
