@@ -10,13 +10,8 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"fmt"
-)
-
-const EMPTY = "static/images/empty_96x96.webp"
-const (
-	MAX_CATEGORIES    = 8
-	MAX_SUBCATEGORIES = 8
 )
 
 func CategorySectionProducts(data models.CategorySectionProducts) templ.Component {
@@ -47,7 +42,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("category-sections-" + data.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 15, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 10, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -65,7 +60,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Subcategory)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 18, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 13, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -85,7 +80,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if product.Thumbnail == EMPTY {
+			if product.Thumbnail == constants.PathEmptyImage {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<img class=\"w-24 max-w-24 h-24\" src=\"/cchoice/static/images/empty_96x96.webp\" alt=\"empty placeholder image\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -98,7 +93,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL("/cchoice/thumbnail?size=96x96&path=/cchoice/" + product.Thumbnail)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 34, Col: 101}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 29, Col: 101}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -116,7 +111,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(product.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 43, Col: 26}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 38, Col: 26}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -129,7 +124,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(product.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 46, Col: 20}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 41, Col: 20}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -142,7 +137,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(product.BrandName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 49, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 44, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -182,15 +177,15 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		for i := range min(MAX_CATEGORIES, len(categories)) {
+		for i, category := range categories {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div><p class=\"text-base font-medium text-cchoice_dark m-2 my-0\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var9 string
-			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(categories[i].Label)
+			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(category.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 61, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 56, Col: 20}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -200,15 +195,15 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			for j := range min(MAX_SUBCATEGORIES, len(categories[i].Subcategories)) {
+			for _, subcategory := range category.Subcategories {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"w-full ml-0.5 pr-6 border-cchoice_border\" hx-trigger=\"load once\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var10 string
-				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs("/cchoice/product-categories/" + categories[i].Subcategories[j].CategoryID + "/products")
+				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs("/cchoice/product-categories/" + subcategory.CategoryID + "/products")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 67, Col: 102}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 62, Col: 83}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -219,9 +214,9 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var11 string
-				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs("#category-sections-" + categories[i].Subcategories[j].CategoryID)
+				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs("#category-sections-" + subcategory.CategoryID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 68, Col: 82}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 63, Col: 63}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -232,9 +227,9 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var12 string
-				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs("#category-sections-" + categories[i].Subcategories[j].CategoryID)
+				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs("#category-sections-" + subcategory.CategoryID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 69, Col: 82}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 64, Col: 63}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -245,9 +240,9 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 					return templ_7745c5c3_Err
 				}
 				templ_7745c5c3_Err = CategorySectionProducts(models.CategorySectionProducts{
-					ID:          categories[i].Subcategories[j].CategoryID,
-					Category:    categories[i].Label,
-					Subcategory: categories[i].Subcategories[j].Label,
+					ID:          subcategory.CategoryID,
+					Category:    category.Label,
+					Subcategory: subcategory.Label,
 				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -261,7 +256,7 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if categories[i].Label != "" {
+			if category.Label != "" {
 				templ_7745c5c3_Err = HR().Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -271,15 +266,15 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if i == min(MAX_CATEGORIES, len(categories))-1 {
+			if i == len(categories)-1 {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"category-sections-inf-load py-32\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var13 string
-				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/cchoice/product-categories/sections?limit=%d&page=%d", MAX_CATEGORIES, page+1))
+				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/cchoice/product-categories/sections?page=%d", page+1))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 86, Col: 105}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 81, Col: 80}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
@@ -292,7 +287,7 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 				var templ_7745c5c3_Var14 string
 				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("load delay:%ds", page/4))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 89, Col: 54}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 84, Col: 54}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
@@ -340,9 +335,9 @@ func AllCategorySections() templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var16 string
-		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/cchoice/product-categories/sections?limit=%d&page=%d", MAX_CATEGORIES, 0))
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/cchoice/product-categories/sections?page=%d", 0))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 102, Col: 98}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 97, Col: 73}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {

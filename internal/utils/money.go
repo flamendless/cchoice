@@ -9,7 +9,7 @@ import (
 )
 
 func NewMoney(price int64, currency string) *money.Money {
-	dec := decimal.MustNew(price, constants.DEC_SCALE)
+	dec := decimal.MustNew(price, constants.DecimalScale)
 	m := money.New(int64(dec.Coef()), currency)
 	return m
 }

@@ -12,6 +12,7 @@ import (
 	"cchoice/cmd/web"
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
@@ -66,8 +67,7 @@ func (s *Server) staticHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) thumbnailifyHandler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Query().Get("path")
-	const basepath = "/cchoice/static/images/product_images/"
-	if path == "" || !strings.HasPrefix(path, basepath) {
+	if path == "" || !strings.HasPrefix(path, constants.PathProductImages) {
 		return
 	}
 
@@ -241,10 +241,10 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	limit := 8
+	limit := constants.DefaultLimitCategories
 	if paramLimit := r.URL.Query().Get("limit"); paramLimit != "" {
 		if parsed, err := strconv.Atoi(paramLimit); err == nil {
-			limit = parsed
+			limit = max(parsed, constants.DefaultLimitCategories)
 		}
 	}
 
@@ -297,7 +297,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 
 	products, err := s.dbRO.GetQueries().GetProductsByCategoryID(r.Context(), queries.GetProductsByCategoryIDParams{
 		CategoryID: categoryDBID,
-		Limit:      16,
+		Limit:      constants.DefaultLimitProducts,
 	})
 	if err != nil {
 		logs.Log().Fatal("category section list handler", zap.Error(err))

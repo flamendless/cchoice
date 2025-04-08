@@ -186,7 +186,7 @@ var cmdParseXLSX = &cobra.Command{
 				IsMain:    true,
 				CreatedAt: now,
 				UpdatedAt: now,
-				DeletedAt: constants.DT_BEGINNING,
+				DeletedAt: constants.DtBeginning,
 			}
 			_, err = brandImage.InsertToDB(cmd.Context(), tpl.CtxApp.DB)
 			if err != nil {
