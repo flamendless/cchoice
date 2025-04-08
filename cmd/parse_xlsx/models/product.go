@@ -278,7 +278,7 @@ func (product *Product) InsertToDB(ctx context.Context, db database.Service) (in
 
 			CreatedAt: now,
 			UpdatedAt: now,
-			DeletedAt: constants.DT_BEGINNING,
+			DeletedAt: constants.DtBeginning,
 		},
 	)
 	if err != nil {

@@ -33,7 +33,7 @@ func (pi *ProductImage) InsertToDB(ctx context.Context, db database.Service) (in
 		Thumbnail: sql.NullString{Valid: pi.Thumbnail != "", String: pi.Thumbnail},
 		CreatedAt: now,
 		UpdatedAt: now,
-		DeletedAt: constants.DT_BEGINNING,
+		DeletedAt: constants.DtBeginning,
 	})
 	if err != nil {
 		return 0, err

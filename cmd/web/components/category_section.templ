@@ -2,13 +2,8 @@ package components
 
 import (
 	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"fmt"
-)
-
-const EMPTY = "static/images/empty_96x96.webp"
-const (
-	MAX_CATEGORIES    = 8
-	MAX_SUBCATEGORIES = 8
 )
 
 templ CategorySectionProducts(data models.CategorySectionProducts) {
@@ -21,7 +16,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 		<div class="flex flex-row">
 			for _, product := range data.Products {
 				<div class="group flex flex-col items-center m-2 ml-4 hover:bg-cchoicesoft">
-					if product.Thumbnail == EMPTY {
+					if product.Thumbnail == constants.PathEmptyImage {
 						<img
 							class="w-24 max-w-24 h-24"
 							src="/cchoice/static/images/empty_96x96.webp"
@@ -55,35 +50,35 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 }
 
 templ CategorySection(page int, categories []models.GroupedCategorySection) {
-	for i := range min(MAX_CATEGORIES, len(categories)) {
+	for i, category := range categories {
 		<div>
 			<p class="text-base font-medium text-cchoice_dark m-2 my-0">
-				{ categories[i].Label }
+				{ category.Label }
 			</p>
-			for j := range min(MAX_SUBCATEGORIES, len(categories[i].Subcategories)) {
+			for _, subcategory := range category.Subcategories {
 				<div
 					class="w-full ml-0.5 pr-6 border-cchoice_border"
 					hx-trigger="load once"
-					hx-get={ "/cchoice/product-categories/" + categories[i].Subcategories[j].CategoryID + "/products" }
-					hx-select={ "#category-sections-" + categories[i].Subcategories[j].CategoryID }
-					hx-target={ "#category-sections-" + categories[i].Subcategories[j].CategoryID }
+					hx-get={ "/cchoice/product-categories/" + subcategory.CategoryID + "/products" }
+					hx-select={ "#category-sections-" + subcategory.CategoryID }
+					hx-target={ "#category-sections-" + subcategory.CategoryID }
 					hx-swap="outerHTML"
 				>
 					@CategorySectionProducts(models.CategorySectionProducts{
-						ID:          categories[i].Subcategories[j].CategoryID,
-						Category:    categories[i].Label,
-						Subcategory: categories[i].Subcategories[j].Label,
+						ID:          subcategory.CategoryID,
+						Category:    category.Label,
+						Subcategory: subcategory.Label,
 					})
 				</div>
 			}
 		</div>
-		if categories[i].Label != "" {
+		if category.Label != "" {
 			@HR()
 		}
-		if i == min(MAX_CATEGORIES, len(categories))-1 {
+		if i == len(categories)-1 {
 			<div
 				class="category-sections-inf-load py-32"
-				hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?limit=%d&page=%d", MAX_CATEGORIES, page+1) }
+				hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", page+1) }
 				hx-target=".category-sections-inf-load"
 				hx-swap="outerHTML"
 				hx-trigger={ fmt.Sprintf("load delay:%ds", page/4) }
@@ -99,7 +94,7 @@ templ AllCategorySections() {
 	<div
 		class="w-full"
 		hx-trigger="load once"
-		hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?limit=%d&page=%d", MAX_CATEGORIES, 0) }
+		hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", 0) }
 		hx-target="#category-sections"
 		hx-swap="beforeend"
 	>

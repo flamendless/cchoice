@@ -32,7 +32,7 @@ func NewBrand(brandName string) *Brand {
 		Name:      brandName,
 		CreatedAt: now,
 		UpdatedAt: now,
-		DeletedAt: constants.DT_BEGINNING,
+		DeletedAt: constants.DtBeginning,
 	}
 }
 
