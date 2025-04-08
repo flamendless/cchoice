@@ -79,7 +79,7 @@ func (s *Server) thumbnailifyHandler(w http.ResponseWriter, r *http.Request) {
 	ext := filepath.Ext(path)
 	path = fmt.Sprintf(
 		"%s_%s%s",
-		strings.TrimRight(path, ext),
+		strings.TrimSuffix(path, ext),
 		size,
 		ext,
 	)
