@@ -76,14 +76,6 @@ func (s *Server) thumbnailifyHandler(w http.ResponseWriter, r *http.Request) {
 		size = "160x160"
 	}
 
-	ext := filepath.Ext(path)
-	path = fmt.Sprintf(
-		"%s_%s%s",
-		strings.TrimSuffix(path, ext),
-		size,
-		ext,
-	)
-
 	cacheKey := []byte("thumbnailify_" + path + size)
 	if data, ok := s.Cache.HasGet(nil, cacheKey); ok {
 		if _, err := w.Write(data); err != nil {
@@ -91,10 +83,14 @@ func (s *Server) thumbnailifyHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		logs.Log().Debug("got thumbnailify value from cache")
+		logs.Log().Debug("cache hit", zap.ByteString("key", cacheKey))
 		return
+	} else {
+		logs.Log().Debug("cache miss", zap.ByteString("key", cacheKey))
 	}
 
+	ext := filepath.Ext(path)
+	path = fmt.Sprintf("%s_%s%s", strings.TrimSuffix(path, ext), size, ext)
 	path = strings.Replace(path, "/images/", "/thumbnails/", 1)
 	newPath, err := url.Parse(path)
 	if err != nil {
@@ -238,13 +234,6 @@ func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Reque
 }
 
 func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) {
-	limit := 8
-	if paramLimit := r.URL.Query().Get("limit"); paramLimit != "" {
-		if parsed, err := strconv.Atoi(paramLimit); err == nil {
-			limit = parsed
-		}
-	}
-
 	page := 0
 	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
 		if parsed, err := strconv.Atoi(paramPage); err == nil {
@@ -252,37 +241,31 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	res, err := s.dbRO.GetQueries().GetProductCategoriesForSectionsPagination(
+	limit := 8
+	if paramLimit := r.URL.Query().Get("limit"); paramLimit != "" {
+		if parsed, err := strconv.Atoi(paramLimit); err == nil {
+			limit = parsed
+		}
+	}
+
+	res, err := requests.GetCategorySectionHandler(
 		r.Context(),
-		queries.GetProductCategoriesForSectionsPaginationParams{
-			Limit:  int64(limit),
-			Offset: int64(page) * int64(limit),
-		},
+		s.Cache,
+		&s.SF,
+		s.dbRO,
+		[]byte(fmt.Sprintf("categorySectionHandler_p%d_l%d", page, limit)),
+		page,
+		limit,
 	)
 	if err != nil {
-		logs.Log().Fatal("category section list handler", zap.Error(err))
+		logs.Log().Fatal("category section handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	categorySections := make([]models.CategorySection, 0, len(res))
-	for _, v := range res {
-		if v.ProductsCount == 0 {
-			logs.Log().Debug(
-				"category section has no prododuct. Skipping...",
-				zap.String("category name", v.Category.String),
-			)
-			continue
-		}
-		categorySections = append(categorySections, models.CategorySection{
-			ID:    serialize.EncDBID(v.ID),
-			Label: utils.SlugToTile(v.Category.String),
-		})
-	}
-
-	if err := components.CategorySection(page, categorySections).Render(r.Context(), w); err != nil {
+	if err := components.CategorySection(page, res).Render(r.Context(), w); err != nil {
 		logs.Log().Fatal("category section list handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 

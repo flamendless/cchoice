@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/gob"
+	"sort"
 
 	"cchoice/cmd/web/models"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/logs"
+	"cchoice/internal/serialize"
 	"cchoice/internal/utils"
 
 	"github.com/VictoriaMetrics/fastcache"
@@ -25,10 +27,11 @@ func GetSettingsData(
 	keys []string,
 ) (map[string]string, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
-		logs.Log().Debug("got settings data value from cache")
+		logs.Log().Debug("cache hit", zap.ByteString("key", cacheKey))
 		buf := bytes.NewBuffer(data)
 		var res map[string]string
 		if err := gob.NewDecoder(buf).Decode(&res); err != nil {
+			logs.Log().Debug("cache miss", zap.ByteString("key", cacheKey))
 			return nil, err
 		}
 		return res, nil
@@ -44,7 +47,7 @@ func GetSettingsData(
 	if err != nil {
 		return nil, err
 	}
-	logs.Log().Debug("singleflight", zap.Bool("shared", shared))
+	logs.Log().Debug("sf", zap.ByteString("key", cacheKey), zap.Bool("shared", shared))
 	res := sfRes.([]queries.TblSetting)
 
 	settings := make(map[string]string, len(res))
@@ -55,7 +58,7 @@ func GetSettingsData(
 	buf := new(bytes.Buffer)
 	if err := gob.NewEncoder(buf).Encode(settings); err == nil {
 		cache.Set(cacheKey, buf.Bytes())
-		logs.Log().Debug("stored data to cache")
+		logs.Log().Debug("stored data to cache", zap.ByteString("key", cacheKey))
 	}
 
 	return settings, nil
@@ -70,10 +73,11 @@ func GetCategoriesSidePanel(
 	params queries.GetProductCategoriesByPromotedParams,
 ) ([]models.CategorySidePanelText, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
-		logs.Log().Debug("got categories side panel value from cache")
+		logs.Log().Debug("cache hit", zap.ByteString("key", cacheKey))
 		buf := bytes.NewBuffer(data)
 		var res []models.CategorySidePanelText
 		if err := gob.NewDecoder(buf).Decode(&res); err != nil {
+			logs.Log().Debug("cache miss", zap.ByteString("key", cacheKey))
 			return nil, err
 		}
 		return res, nil
@@ -89,7 +93,7 @@ func GetCategoriesSidePanel(
 	if err != nil {
 		return nil, err
 	}
-	logs.Log().Debug("singleflight", zap.Bool("shared", shared))
+	logs.Log().Debug("sf", zap.ByteString("key", cacheKey), zap.Bool("shared", shared))
 	res := sfRes.([]queries.GetProductCategoriesByPromotedRow)
 
 	found := map[string]bool{}
@@ -109,8 +113,92 @@ func GetCategoriesSidePanel(
 	buf := new(bytes.Buffer)
 	if err := gob.NewEncoder(buf).Encode(categories); err == nil {
 		cache.Set(cacheKey, buf.Bytes())
-		logs.Log().Debug("stored data to cache")
+		logs.Log().Debug("stored data to cache", zap.ByteString("key", cacheKey))
 	}
 
 	return categories, nil
+}
+
+func GetCategorySectionHandler(
+	ctx context.Context,
+	cache *fastcache.Cache,
+	sf *singleflight.Group,
+	dbRO database.Service,
+	cacheKey []byte,
+	page int,
+	limit int,
+) ([]models.GroupedCategorySection, error) {
+	if data, ok := cache.HasGet(nil, cacheKey); ok {
+		logs.Log().Debug("cache hit", zap.ByteString("key", cacheKey))
+		buf := bytes.NewBuffer(data)
+		var res []models.GroupedCategorySection
+		if err := gob.NewDecoder(buf).Decode(&res); err != nil {
+			logs.Log().Debug("cache miss", zap.ByteString("key", cacheKey))
+			return nil, err
+		}
+		return res, nil
+	}
+
+	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
+		res, err := dbRO.GetQueries().GetProductCategoriesForSectionsPagination(
+			ctx,
+			queries.GetProductCategoriesForSectionsPaginationParams{
+				Limit:  int64(limit),
+				Offset: int64(page) * int64(limit),
+			},
+		)
+		if err != nil {
+			return nil, err
+		}
+		return res, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	logs.Log().Debug("sf", zap.ByteString("key", cacheKey), zap.Bool("shared", shared))
+
+	res := sfRes.([]queries.GetProductCategoriesForSectionsPaginationRow)
+	categoriesSubcategories := map[string][]models.Subcategory{}
+	for _, v := range res {
+		if v.ProductsCount == 0 || v.Subcategory.String == "" {
+			logs.Log().Debug(
+				"category section has no prododuct or empty subcategory. Skipping...",
+				zap.String("category name", v.Category.String),
+				zap.String("subcategory name", v.Subcategory.String),
+			)
+			continue
+		}
+
+		category := utils.SlugToTile(v.Category.String)
+		if _, exists := categoriesSubcategories[category]; !exists {
+			categoriesSubcategories[category] = make([]models.Subcategory, 0, 8)
+		}
+
+		categoriesSubcategories[category] = append(categoriesSubcategories[category], models.Subcategory{
+			CategoryID: serialize.EncDBID(v.ID),
+			Label:      utils.SlugToTile(v.Subcategory.String),
+		})
+	}
+
+	categorySections := make([]models.GroupedCategorySection, 0, len(categoriesSubcategories))
+	for k, v := range categoriesSubcategories {
+		sort.Slice(v, func(i, j int) bool {
+			return v[i].Label < v[j].Label
+		})
+		categorySections = append(categorySections, models.GroupedCategorySection{
+			Label:         k,
+			Subcategories: v,
+		})
+	}
+	sort.Slice(categorySections, func(i, j int) bool {
+		return categorySections[i].Label < categorySections[j].Label
+	})
+
+	buf := new(bytes.Buffer)
+	if err := gob.NewEncoder(buf).Encode(categorySections); err == nil {
+		cache.Set(cacheKey, buf.Bytes())
+		logs.Log().Debug("stored data to cache", zap.ByteString("key", cacheKey))
+	}
+
+	return categorySections, nil
 }
