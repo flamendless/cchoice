@@ -58,7 +58,7 @@ templ CategorySection(page int, categories []models.CategorySection) {
 				{ categories[i].Label }
 			</p>
 			<div
-				class="w-full ml-0.5 pr-6 border-r-2 border-cchoice_border"
+				class="w-full ml-0.5 pr-6 border-cchoice_border"
 				hx-trigger="load once"
 				hx-get={ "/cchoice/product-categories/" + categories[i].ID + "/products" }
 				hx-select={ "#category-sections-" + categories[i].ID }
@@ -104,7 +104,7 @@ templ AllCategorySections() {
 
 		<div
 			id="category-sections"
-			class="w-full flex flex-col h-screen overflow-y-scroll scrollbar-hide"
+			class="w-full flex flex-col h-screen overflow-x-hidden overflow-y-scroll scrollbar-hide"
 		>
 			@CategorySection(0, nil)
 		</div>
