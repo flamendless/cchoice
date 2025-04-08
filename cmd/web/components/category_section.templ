@@ -28,12 +28,12 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 						<img
 							class="w-24 max-w-24 h-24"
 							src="/cchoice/static/images/empty_96x96.webp"
-							hx-get={ string(templ.SafeURL("/cchoice/thumbnail?size=96x96&path=/cchoice/" + product.Thumbnail)) }
+							hx-get={ string(templ.URL("/cchoice/thumbnail?size=96x96&path=/cchoice/" + product.Thumbnail)) }
 							hx-swap="none"
 							hx-target="this"
 							hx-on::after-request="event.detail.target.src=event.detail.xhr.responseText"
 							hx-trigger="intersect once"
-							alt="empty placeholder image"
+							alt="product thumbnail"
 						/>
 					}
 					<p
@@ -74,15 +74,16 @@ templ CategorySection(page int, categories []models.CategorySection) {
 
 		if i == min(MAX_CATEGORIES, len(categories))-1 {
 			<div
-				class="category-sections-sep py-32"
+				class="category-sections-inf-load py-32"
 				hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?limit=%d&page=%d", MAX_CATEGORIES, page+1) }
-				hx-target=".category-sections-sep"
+				hx-target=".category-sections-inf-load"
 				hx-swap="outerHTML"
 				hx-trigger="intersect once"
 			>
 			</div>
 		}
 	}
+
 	if len(categories) != 0 {
 		<div class="py-4"></div>
 	}
