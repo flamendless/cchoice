@@ -35,7 +35,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 							hx-swap="none"
 							hx-target="this"
 							hx-on::after-request="event.detail.target.src=event.detail.xhr.responseText"
-							hx-trigger="intersect once"
+							hx-trigger="load"
 							alt="product thumbnail"
 						/>
 					}
@@ -86,7 +86,7 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 				hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?limit=%d&page=%d", MAX_CATEGORIES, page+1) }
 				hx-target=".category-sections-inf-load"
 				hx-swap="outerHTML"
-				hx-trigger="intersect once"
+				hx-trigger={ fmt.Sprintf("load delay:%ds", page/4) }
 			></div>
 		}
 	}
