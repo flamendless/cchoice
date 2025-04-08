@@ -20,7 +20,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 		}
 		<div class="flex flex-row">
 			for _, product := range data.Products {
-				<div class="group flex flex-col items-center m-2 hover:bg-cchoicesoft">
+				<div class="group flex flex-col items-center m-2 ml-4 hover:bg-cchoicesoft">
 					if product.Thumbnail == EMPTY {
 						<img
 							class="w-24 max-w-24 h-24"
