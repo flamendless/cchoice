@@ -253,7 +253,7 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 		s.Cache,
 		&s.SF,
 		s.dbRO,
-		[]byte(fmt.Sprintf("categorySectionHandler_p%d_l%d", page, limit)),
+		fmt.Appendf([]byte{}, "categorySectionHandler_p%d_l%d", page, limit),
 		page,
 		limit,
 	)
