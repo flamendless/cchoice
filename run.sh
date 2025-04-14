@@ -20,8 +20,8 @@ serve() {
 	if "${ISWSL}"; then
 		cmd.exe /c "start vivaldi http://localhost:7331/cchoice"
 	fi
-	templ generate --watch --proxy="http://localhost:8080" --open-browser=false &
-	air -c ".air.api.toml" api
+	go tool templ generate --watch --proxy="http://localhost:8080" --open-browser=false &
+	go tool air -c ".air.api.toml" api
 }
 
 customrun() {
@@ -51,7 +51,7 @@ clean() {
 cleandb() {
 	clean
 	gensql
-	sql-migrate up
+	go tool sql-migrate up
 
 	# local otherbrands=("BRADFORD" "SPARTAN" "SHINSETSU" "REDMAX" "KOBEWEL")
 	# for brand in "${otherbrands[@]}"; do
@@ -78,12 +78,12 @@ deps() {
 }
 
 gensql() {
-	sqlc generate
+	go tool sqlc generate
 }
 
 gentempl() {
 	pnpx @tailwindcss/cli -m -i ./cmd/web/static/css/main.css -o ./cmd/web/static/css/tailwind.css
-	templ generate templ -v
+	go tool templ generate templ -v
 }
 
 genall() {
@@ -96,31 +96,31 @@ sc() {
 	go fmt ./...
 	go mod tidy
 	go vet ./...
-	templ fmt ./cmd/web/components
+	go tool templ fmt ./cmd/web/components
 
-	betteralign -apply ./...
-	nilaway ./...
-	prealloc ./...
-	smrcptr ./...
-	unconvert ./...
+	go tool betteralign -apply ./...
+	go tool nilaway ./...
+	go tool prealloc ./...
+	go tool smrcptr ./...
+	go tool unconvert ./...
 
 	local PKGS=$(go list ./... | grep -v "internal/database/queries" | tr "\n" " ")
-	errcheck $PKGS
+	go tool errcheck $PKGS
 
 	set +f
 	local GODIRS=$(go list -f {{.Dir}} ./...)
 	for d in "${GODIRS}"; do
 		if [[ ! $d == *"cmd/web/components"* ]]; then
-			goimports -w -local -v $d/*.go
+			go tool goimports -w -local -v $d/*.go
 		fi
 	done
 	set -f
 
-	govulncheck ./...
+	go tool govulncheck ./...
 }
 
 testall() {
-	gotestsum \
+	go tool gotestsum \
 		--debug \
 		--format=pkgname-and-test-fails \
 		--format-icons=default \
