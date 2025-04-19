@@ -20,7 +20,7 @@ serve() {
 	if "${ISWSL}"; then
 		cmd.exe /c "start vivaldi http://localhost:7331/cchoice"
 	fi
-	go tool templ generate --watch --proxy="http://localhost:8080" --open-browser=false &
+	go tool templ generate --watch --proxy="http://localhost:2626" --open-browser=false &
 	go tool air -c ".air.api.toml" api
 }
 
