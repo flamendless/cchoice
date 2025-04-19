@@ -44,7 +44,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Use(middleware.StripPrefix("/cchoice"))
 
 		// r.Handle("/static/*", http.FileServer(http.FS(web.Files)))
-		s.fs = http.FS(web.Files)
+		fs := http.FS(web.Files)
+		s.fs = http.FileServer(fs)
 		r.Get("/static/*", s.staticHandler)
 
 		r.Get("/health", s.healthHandler)
@@ -61,8 +62,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 }
 
 func (s *Server) staticHandler(w http.ResponseWriter, r *http.Request) {
-	fs := http.FileServer(s.fs)
-	fs.ServeHTTP(w, r)
+	s.fs.ServeHTTP(w, r)
 }
 
 func (s *Server) thumbnailifyHandler(w http.ResponseWriter, r *http.Request) {

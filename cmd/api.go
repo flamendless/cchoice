@@ -45,7 +45,7 @@ var cmdAPI = &cobra.Command{
 		done := make(chan bool, 1)
 		go gracefulShutdown(server, done)
 
-		if server.TLSConfig != nil {
+		if server.TLSConfig != nil && len(server.TLSConfig.Certificates) > 0 {
 			logs.Log().Info("Serving secure HTTP")
 			if err := server.ListenAndServeTLS("", ""); err != nil && err != http.ErrServerClosed {
 				panic(fmt.Sprintf("http server error: %s", err))

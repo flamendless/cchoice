@@ -12,7 +12,6 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"go.uber.org/zap"
 	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
 	"golang.org/x/sync/singleflight"
 
 	"cchoice/internal/database"
@@ -23,14 +22,18 @@ import (
 const CACHE_MAX_BYTES int = 1024
 
 type Server struct {
-	dbRO    database.Service
-	dbRW    database.Service
-	SF      singleflight.Group
-	fs      http.FileSystem
-	Cache   *fastcache.Cache
-	address string
-	port    int
-	secure  bool
+	dbRO     database.Service
+	dbRW     database.Service
+	SF       singleflight.Group
+	fs       http.Handler
+	fsServer *http.Server
+	Cache    *fastcache.Cache
+	address  string
+	port     int
+	portFS   int
+	secure   bool
+	useHTTP2 bool
+	useSSL   bool
 }
 
 func NewServer() *http.Server {
@@ -44,14 +47,22 @@ func NewServer() *http.Server {
 		panic(err)
 	}
 
+	portFS, err := strconv.Atoi(os.Getenv("PORT_FS"))
+	if err != nil {
+		panic(err)
+	}
+
 	dbRO := database.New(database.DB_MODE_RO)
 	dbRW := database.New(database.DB_MODE_RW)
 	NewServer := &Server{
-		address: address,
-		port:    port,
-		dbRO:    dbRO,
-		dbRW:    dbRW,
-		Cache:   fastcache.New(CACHE_MAX_BYTES),
+		address:  address,
+		port:     port,
+		portFS:   portFS,
+		dbRO:     dbRO,
+		dbRW:     dbRW,
+		Cache:    fastcache.New(CACHE_MAX_BYTES),
+		useHTTP2: utils.GetBoolFlag(os.Getenv("USEHTTP2")),
+		useSSL:   utils.GetBoolFlag(os.Getenv("USESSL")),
 	}
 
 	addr := fmt.Sprintf("%s:%d", NewServer.address, NewServer.port)
@@ -59,10 +70,15 @@ func NewServer() *http.Server {
 	writeTimeout := 30 * time.Second
 
 	var tlsConfig *tls.Config
-	useSSL := utils.GetBoolFlag(os.Getenv("USESSL"))
-	if useSSL {
-		certPath := fmt.Sprintf("/etc/letsencrypt/live/%s/fullchain.pem", NewServer.address)
-		keyPath := fmt.Sprintf("/etc/letsencrypt/live/%s/privkey.pem", NewServer.address)
+	if NewServer.useSSL {
+		var certPath, keyPath string
+		if os.Getenv("APP_ENV") == "local" {
+			certPath = os.Getenv("CERTPATH")
+			keyPath = os.Getenv("KEYPATH")
+		} else {
+			certPath = fmt.Sprintf("/etc/letsencrypt/live/%s/fullchain.pem", NewServer.address)
+			keyPath = fmt.Sprintf("/etc/letsencrypt/live/%s/privkey.pem", NewServer.address)
+		}
 		logs.Log().Info(
 			"SSL: opening files",
 			zap.String("cert", certPath),
@@ -77,37 +93,28 @@ func NewServer() *http.Server {
 		}
 	}
 
-	useHTTP2 := utils.GetBoolFlag(os.Getenv("USEHTTP2"))
-	logs.Log().Info(
-		"Server",
-		zap.String("address", addr),
-		zap.Bool("SSL", useSSL),
-		zap.Bool("HTTP2", useHTTP2),
-		zap.Duration("read timeout", readTimeout),
-		zap.Duration("write timeout", writeTimeout),
-	)
-
-	var protocol *http.Protocols
-	handler := NewServer.RegisterRoutes()
-	if useHTTP2 {
-		h2s := &http2.Server{MaxConcurrentStreams: 256}
-		handler = h2c.NewHandler(handler, h2s)
-
-		t := http.DefaultTransport.(*http.Transport).Clone()
-		t.Protocols = new(http.Protocols)
-		t.Protocols.SetHTTP1(true)
-		t.Protocols.SetHTTP2(true)
-		protocol = t.Protocols
-	}
-
 	server := &http.Server{
 		Addr:         addr,
-		Handler:      handler,
+		Handler:      NewServer.RegisterRoutes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  readTimeout,
 		WriteTimeout: writeTimeout,
 		TLSConfig:    tlsConfig,
-		Protocols:    protocol,
 	}
+	if NewServer.useHTTP2 {
+		http2.ConfigureServer(server, &http2.Server{
+			MaxConcurrentStreams: 256,
+		})
+	}
+
+	logs.Log().Info(
+		"Server",
+		zap.String("address", addr),
+		zap.Bool("SSL", NewServer.useSSL),
+		zap.Bool("HTTP2", NewServer.useHTTP2),
+		zap.Duration("read timeout", readTimeout),
+		zap.Duration("write timeout", writeTimeout),
+	)
+
 	return server
 }
