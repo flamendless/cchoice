@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+var onceProductImageScript = templ.NewOnceHandle()
+
 templ CategorySectionProducts(data models.CategorySectionProducts) {
 	<div id={ "category-sections-" + data.ID }>
 		if data.Subcategory != data.Category {
@@ -13,7 +15,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 				{ data.Subcategory }
 			</p>
 		}
-		<div class="flex flex-row">
+		<div class="flex flex-row flex-wrap">
 			for _, product := range data.Products {
 				<div class="group flex flex-col items-center m-2 ml-4 hover:bg-cchoicesoft">
 					if product.Thumbnail == constants.PathEmptyImage {
@@ -24,23 +26,19 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 						/>
 					} else {
 						<img
-							class="w-24 max-w-24 h-24"
-							src="/cchoice/static/images/empty_96x96.webp"
-							hx-get={ string(templ.URL("/cchoice/thumbnail?size=96x96&path=/cchoice/" + product.Thumbnail)) }
-							hx-swap="none"
-							hx-target="this"
-							hx-on::after-request="event.detail.target.src=event.detail.xhr.responseText"
-							hx-trigger="load"
+							onclick={ templ.JSFuncCall("toggle_product_image_viewer", templ.JSExpression("event"), product.Thumbnail) }
+							class="w-24 max-w-24 h-24 cursor-zoom-in"
+							src={ product.Thumbnail }
 							alt="product thumbnail"
 						/>
 					}
 					<p
 						title={ product.Name }
-						class="max-w-24 text-xs font-normal text-ellipsis text-nowrap overflow-hidden group-hover:font-bold"
+						class="max-w-24 text-xs font-normal text-ellipsis text-nowrap overflow-hidden group-hover:font-bold cursor-pointer"
 					>
 						{ product.Name }
 					</p>
-					<p class="text-xs font-light group-hover:font-semibold">
+					<p class="text-xs font-light group-hover:font-semibold cursor-pointer">
 						{ product.BrandName }
 					</p>
 				</div>
@@ -91,6 +89,7 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 }
 
 templ AllCategorySections() {
+	@ModalImageViewer("")
 	<div
 		class="w-full"
 		hx-trigger="load once"
