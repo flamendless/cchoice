@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"net/url"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -18,6 +16,7 @@ import (
 	"cchoice/internal/requests"
 	"cchoice/internal/serialize"
 	"cchoice/internal/utils"
+	"cchoice/internal/utils/images"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -44,8 +43,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Use(middleware.StripPrefix("/cchoice"))
 
 		// r.Handle("/static/*", http.FileServer(http.FS(web.Files)))
-		fs := http.FS(web.Files)
-		s.fs = http.FileServer(fs)
+		s.fs = http.FS(web.Files)
+		s.fsHandler = http.FileServer(s.fs)
 		r.Get("/static/*", s.staticHandler)
 
 		r.Get("/health", s.healthHandler)
@@ -56,13 +55,14 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/product-categories/sections", s.categorySectionHandler)
 		r.Get("/product-categories/{category_id}/products", s.categoryProductsHandler)
 		r.Get("/thumbnail", s.thumbnailifyHandler)
+		r.Get("/modal/image/{path}", s.modalImageHandler)
 	})
 
 	return r
 }
 
 func (s *Server) staticHandler(w http.ResponseWriter, r *http.Request) {
-	s.fs.ServeHTTP(w, r)
+	s.fsHandler.ServeHTTP(w, r)
 }
 
 func (s *Server) thumbnailifyHandler(w http.ResponseWriter, r *http.Request) {
@@ -81,7 +81,6 @@ func (s *Server) thumbnailifyHandler(w http.ResponseWriter, r *http.Request) {
 		if _, err := w.Write(data); err != nil {
 			logs.Log().Fatal("Thumbnailify handler", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		}
 		logs.Log().Debug("cache hit", zap.ByteString("key", cacheKey))
 		return
@@ -89,23 +88,55 @@ func (s *Server) thumbnailifyHandler(w http.ResponseWriter, r *http.Request) {
 		logs.Log().Debug("cache miss", zap.ByteString("key", cacheKey))
 	}
 
-	ext := filepath.Ext(path)
-	path = fmt.Sprintf("%s_%s%s", strings.TrimSuffix(path, ext), size, ext)
-	path = strings.Replace(path, "/images/", "/thumbnails/", 1)
-	newPath, err := url.Parse(path)
+	finalPath, _, err := images.GetThumbnailPath(path, size)
 	if err != nil {
 		logs.Log().Fatal("Thumbnailify handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if _, err := w.Write([]byte(newPath.String())); err != nil {
+	if _, err := w.Write([]byte(finalPath)); err != nil {
 		logs.Log().Fatal("Thumbnailify handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	s.Cache.Set(cacheKey, []byte(newPath.String()))
+	s.Cache.Set(cacheKey, []byte(finalPath))
+}
+
+func (s *Server) modalImageHandler(w http.ResponseWriter, r *http.Request) {
+	path := chi.URLParam(r, "path")
+	if path == "" || !strings.HasPrefix(path, constants.PathProductImages) {
+		logs.Log().Fatal("modal image handler")
+		http.Error(w, "Invalid url parameter", http.StatusBadRequest)
+		return
+	}
+
+	cacheKey := []byte("modal_image_viewer" + path)
+	if data, ok := s.Cache.HasGet(nil, cacheKey); ok {
+		if _, err := w.Write(data); err != nil {
+			logs.Log().Fatal("modal image viewer handler", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		logs.Log().Debug("cache hit", zap.ByteString("key", cacheKey))
+		return
+	} else {
+		logs.Log().Debug("cache miss", zap.ByteString("key", cacheKey))
+	}
+
+	src, err := images.GetImageData(s.Cache, s.fs, path, ".wepb")
+	if err != nil {
+		logs.Log().Fatal("modal image handler")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if err := components.ModalImageViewer(src).Render(r.Context(), w); err != nil {
+		logs.Log().Fatal("modal image viewer handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	s.Cache.Set(cacheKey, []byte(path))
 }
 
 func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -311,6 +342,29 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 			zap.String("category name", category.Category.String),
 		)
 		return
+	}
+
+	for i, product := range products {
+		if product.Thumbnail == constants.PathEmptyImage {
+			continue
+		}
+
+		origPath := product.Thumbnail
+		products[i].Thumbnail = constants.PathEmptyImage
+
+		finalPath, ext, err := images.GetThumbnailPath(origPath, "96x96")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			continue
+		}
+
+		imgData, err := images.GetImageData(s.Cache, s.fs, finalPath, ext)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			continue
+		}
+
+		products[i].Thumbnail = imgData
 	}
 
 	categorySectionProducts := models.CategorySectionProducts{

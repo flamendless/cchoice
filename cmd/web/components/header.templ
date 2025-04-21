@@ -6,13 +6,17 @@ var logoWithTextHandlerOnce = templ.NewOnceHandle()
 
 templ LogoWithText(width string, height string) {
 	@logoWithTextHandlerOnce.Once() {
-		<img
-			src={ string(templ.URL("/cchoice/static/svg/logo_with_text.svg")) }
-			alt="cchoice logo and text"
-			class="-mt-8 -mb-4 w-fit cursor-pointer"
-			width={ width }
-			height={ height }
-		/>
+		<a
+			href="/cchoice"
+			class="-mt-8 -mb-4 w-fit"
+		>
+			<img
+				src={ string(templ.URL("/cchoice/static/svg/logo_with_text.svg")) }
+				alt="cchoice logo and text"
+				width={ width }
+				height={ height }
+			/>
+		</a>
 	}
 }
 

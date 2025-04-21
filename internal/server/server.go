@@ -22,18 +22,19 @@ import (
 const CACHE_MAX_BYTES int = 1024
 
 type Server struct {
-	dbRO     database.Service
-	dbRW     database.Service
-	SF       singleflight.Group
-	fs       http.Handler
-	fsServer *http.Server
-	Cache    *fastcache.Cache
-	address  string
-	port     int
-	portFS   int
-	secure   bool
-	useHTTP2 bool
-	useSSL   bool
+	dbRO      database.Service
+	dbRW      database.Service
+	SF        singleflight.Group
+	fs        http.FileSystem
+	fsHandler http.Handler
+	fsServer  *http.Server
+	Cache     *fastcache.Cache
+	address   string
+	port      int
+	portFS    int
+	secure    bool
+	useHTTP2  bool
+	useSSL    bool
 }
 
 func NewServer() *http.Server {
