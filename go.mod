@@ -170,6 +170,7 @@ tool (
 	github.com/sqlc-dev/sqlc/cmd/sqlc
 	go.uber.org/nilaway/cmd/nilaway
 	golang.org/x/tools/cmd/goimports
+	golang.org/x/tools/cmd/stringer
 	golang.org/x/vuln/cmd/govulncheck
 	gotest.tools/gotestsum
 )
