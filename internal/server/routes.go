@@ -12,11 +12,11 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
 	"cchoice/internal/serialize"
 	"cchoice/internal/utils"
-	"cchoice/internal/utils/images"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -124,7 +124,7 @@ func (s *Server) modalImageHandler(w http.ResponseWriter, r *http.Request) {
 		logs.Log().Debug("cache miss", zap.ByteString("key", cacheKey))
 	}
 
-	src, err := images.GetImageData(s.Cache, s.fs, path, ".wepb")
+	src, err := images.GetImageDataB64(s.Cache, s.fs, path, ".wepb")
 	if err != nil {
 		logs.Log().Fatal("modal image handler")
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -358,7 +358,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 			continue
 		}
 
-		imgData, err := images.GetImageData(s.Cache, s.fs, finalPath, ext)
+		imgData, err := images.GetImageDataB64(s.Cache, s.fs, finalPath, ext)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			continue

@@ -1,7 +1,7 @@
 package images
 
 import (
-	"cchoice/internal/constants"
+	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/serialize"
 	"fmt"
@@ -15,31 +15,22 @@ import (
 	"go.uber.org/zap"
 )
 
-func PNGEncode(data []byte) string {
-	res := "data:image/png;base64,"
-	res += serialize.ToBase64(data)
-	return res
-}
+const (
+	PNG  = "data:image/png;base64,"
+	WEBP = "data:image/webp;base64,"
+)
 
-func WEBPEncode(data []byte) string {
-	res := "data:image/webp;base64,"
-	res += serialize.ToBase64(data)
-	return res
-}
-
-func GetEncodedEmpty(fs http.FileSystem) (string, error) {
-	f, err := fs.Open(constants.PathEmptyImage)
-	if err != nil {
-		return "", err
+func ImageToB64(format enums.ImageFormat, data []byte) string {
+	var base string
+	switch format {
+	case enums.IMAGE_FORMAT_PNG:
+		base = PNG
+	case enums.IMAGE_FORMAT_WEBP:
+		base = WEBP
+	default:
+		panic("unhandled image format")
 	}
-	defer f.Close()
-
-	img, err := io.ReadAll(f)
-	if err != nil {
-		return "", err
-	}
-
-	return WEBPEncode(img), nil
+	return base + serialize.ToBase64(data)
 }
 
 func GetThumbnailPath(path string, size string) (string, string, error) {
@@ -53,7 +44,7 @@ func GetThumbnailPath(path string, size string) (string, string, error) {
 	return newPath.String(), ext, nil
 }
 
-func GetImageData(
+func GetImageDataB64(
 	cache *fastcache.Cache,
 	fs http.FileSystem,
 	finalPath string,
@@ -78,14 +69,7 @@ func GetImageData(
 		return "", err
 	}
 
-	var imgData string
-	switch ext {
-	case ".webp":
-		imgData = WEBPEncode(img)
-	default:
-		panic("unhandled ext")
-	}
-
+	imgData := ImageToB64(enums.ParseImageFormatExtToEnum(ext), img)
 	cache.Set(cacheKey, []byte(imgData))
 	return imgData, nil
 }

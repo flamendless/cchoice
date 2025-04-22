@@ -1,6 +1,6 @@
 package enums
 
-//go:generate stringer -type=ProductStatus -trimprefix=PRODUCT_STATUS_
+//go:generate go tool stringer -type=ProductStatus -trimprefix=PRODUCT_STATUS_
 
 type ProductStatus int
 
@@ -10,7 +10,7 @@ const (
 	PRODUCT_STATUS_DELETED
 )
 
-func ParseProductStatusEnum(e string) ProductStatus {
+func ParseProductStatusToEnum(e string) ProductStatus {
 	switch e {
 	case PRODUCT_STATUS_ACTIVE.String():
 		return PRODUCT_STATUS_ACTIVE

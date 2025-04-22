@@ -349,7 +349,7 @@ func DBRowToProduct(row *queries.GetProductBySerialRow) *Product {
 		Name:        row.Name,
 		Description: row.Description.String,
 		Brand:       &Brand{},
-		Status:      enums.ParseProductStatusEnum(row.Status),
+		Status:      enums.ParseProductStatusToEnum(row.Status),
 		ProductCategory: &ProductCategory{
 			Category:    row.Category.String,
 			Subcategory: row.Subcategory.String,

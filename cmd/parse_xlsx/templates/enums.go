@@ -1,6 +1,6 @@
 package templates
 
-//go:generate stringer -type=TemplateKind -trimprefix=TEMPLATE_
+//go:generate go tool stringer -type=TemplateKind -trimprefix=TEMPLATE_
 
 import "fmt"
 
