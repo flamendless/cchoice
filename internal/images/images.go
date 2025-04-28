@@ -33,10 +33,16 @@ func ImageToB64(format enums.ImageFormat, data []byte) string {
 	return base + serialize.ToBase64(data)
 }
 
-func GetThumbnailPath(path string, size string) (string, string, error) {
+func GetImagePathWithSize(
+	path string,
+	size string,
+	isThumbnail bool,
+) (string, string, error) {
 	ext := filepath.Ext(path)
 	path = fmt.Sprintf("%s_%s%s", strings.TrimSuffix(path, ext), size, ext)
-	path = strings.Replace(path, "/images/", "/thumbnails/", 1)
+	if isThumbnail {
+		path = strings.Replace(path, "/images/", "/thumbnails/", 1)
+	}
 	newPath, err := url.Parse(path)
 	if err != nil {
 		return "", "", err

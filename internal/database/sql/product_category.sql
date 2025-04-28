@@ -66,7 +66,8 @@ SELECT
 	tbl_product.unit_price_with_vat,
 	tbl_product.unit_price_with_vat_currency,
 	tbl_brand.name AS brand_name,
-	COALESCE(tbl_product_image.thumbnail, 'static/images/empty_96x96.webp') AS thumbnail
+	COALESCE(tbl_product_image.thumbnail, 'static/images/empty_96x96.webp') AS thumbnail_path,
+	'' as thumbnail_data
 FROM tbl_product
 INNER JOIN
 	tbl_brand ON tbl_brand.id = tbl_product.brand_id

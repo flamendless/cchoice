@@ -6,8 +6,6 @@ import (
 	"fmt"
 )
 
-var onceProductImageScript = templ.NewOnceHandle()
-
 templ CategorySectionProducts(data models.CategorySectionProducts) {
 	<div id={ "category-sections-" + data.ID }>
 		if data.Subcategory != data.Category {
@@ -18,7 +16,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 		<div class="flex flex-row flex-wrap">
 			for _, product := range data.Products {
 				<div class="group flex flex-col items-center m-2 ml-4 hover:bg-cchoicesoft">
-					if product.Thumbnail == constants.PathEmptyImage {
+					if product.ThumbnailPath == constants.PathEmptyImage {
 						<img
 							class="w-24 max-w-24 h-24"
 							src="/cchoice/static/images/empty_96x96.webp"
@@ -26,9 +24,13 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 						/>
 					} else {
 						<img
-							onclick={ templ.JSFuncCall("toggle_product_image_viewer", templ.JSExpression("event"), product.Thumbnail) }
+							hx-get={ "/cchoice/products/image?size=1080x1080&path=" + product.ThumbnailPath }
+							hx-trigger="click"
+							hx-target="#modal_image_viewer img"
+							hx-select="img"
+							hx-swap="outerHTML"
 							class="w-24 max-w-24 h-24 cursor-zoom-in"
-							src={ product.Thumbnail }
+							src={ product.ThumbnailData }
 							alt="product thumbnail"
 						/>
 					}
