@@ -54,8 +54,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/product-categories/side-panel/list", s.categoriesSidePanelHandler)
 		r.Get("/product-categories/sections", s.categorySectionHandler)
 		r.Get("/product-categories/{category_id}/products", s.categoryProductsHandler)
-		r.Get("/thumbnail", s.thumbnailifyHandler)
-		r.Get("/modal/image/{path}", s.modalImageHandler)
+		r.Get("/products/image", s.productsImageHandler)
 	})
 
 	return r
@@ -65,21 +64,26 @@ func (s *Server) staticHandler(w http.ResponseWriter, r *http.Request) {
 	s.fsHandler.ServeHTTP(w, r)
 }
 
-func (s *Server) thumbnailifyHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Query().Get("path")
 	if path == "" || !strings.HasPrefix(path, constants.PathProductImages) {
+		logs.Log().Debug("invalid image prefix", zap.String("path", path))
 		return
 	}
 
+	key := "product_image_" + path
+	isThumbnail := false
 	size := r.URL.Query().Get("size")
 	if size == "" {
 		size = "160x160"
+		isThumbnail = true
+		key += size
 	}
 
-	cacheKey := []byte("thumbnailify_" + path + size)
+	cacheKey := []byte(key)
 	if data, ok := s.Cache.HasGet(nil, cacheKey); ok {
-		if _, err := w.Write(data); err != nil {
-			logs.Log().Fatal("Thumbnailify handler", zap.Error(err))
+		if err := components.Image(string(data)).Render(r.Context(), w); err != nil {
+			logs.Log().Fatal("Product Image handler", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		logs.Log().Debug("cache hit", zap.ByteString("key", cacheKey))
@@ -88,55 +92,26 @@ func (s *Server) thumbnailifyHandler(w http.ResponseWriter, r *http.Request) {
 		logs.Log().Debug("cache miss", zap.ByteString("key", cacheKey))
 	}
 
-	finalPath, _, err := images.GetThumbnailPath(path, size)
+	finalPath, ext, err := images.GetImagePathWithSize(path, size, isThumbnail)
 	if err != nil {
-		logs.Log().Fatal("Thumbnailify handler", zap.Error(err))
+		logs.Log().Fatal("Product Image handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if _, err := w.Write([]byte(finalPath)); err != nil {
-		logs.Log().Fatal("Thumbnailify handler", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	s.Cache.Set(cacheKey, []byte(finalPath))
-}
-
-func (s *Server) modalImageHandler(w http.ResponseWriter, r *http.Request) {
-	path := chi.URLParam(r, "path")
-	if path == "" || !strings.HasPrefix(path, constants.PathProductImages) {
-		logs.Log().Fatal("modal image handler")
-		http.Error(w, "Invalid url parameter", http.StatusBadRequest)
-		return
-	}
-
-	cacheKey := []byte("modal_image_viewer" + path)
-	if data, ok := s.Cache.HasGet(nil, cacheKey); ok {
-		if _, err := w.Write(data); err != nil {
-			logs.Log().Fatal("modal image viewer handler", zap.Error(err))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		logs.Log().Debug("cache hit", zap.ByteString("key", cacheKey))
-		return
-	} else {
-		logs.Log().Debug("cache miss", zap.ByteString("key", cacheKey))
-	}
-
-	src, err := images.GetImageDataB64(s.Cache, s.fs, path, ".wepb")
+	imgData, err := images.GetImageDataB64(s.Cache, s.fs, finalPath, ext)
 	if err != nil {
-		logs.Log().Fatal("modal image handler")
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	if err := components.ModalImageViewer(src).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal("modal image viewer handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	s.Cache.Set(cacheKey, []byte(path))
+	if err := components.Image(imgData).Render(r.Context(), w); err != nil {
+		logs.Log().Fatal("Product Image handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	s.Cache.Set(cacheKey, []byte(imgData))
 }
 
 func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -345,14 +320,11 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	for i, product := range products {
-		if product.Thumbnail == constants.PathEmptyImage {
+		if product.ThumbnailPath == constants.PathEmptyImage {
 			continue
 		}
 
-		origPath := product.Thumbnail
-		products[i].Thumbnail = constants.PathEmptyImage
-
-		finalPath, ext, err := images.GetThumbnailPath(origPath, "96x96")
+		finalPath, ext, err := images.GetImagePathWithSize(product.ThumbnailPath, "96x96", true)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			continue
@@ -364,7 +336,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 			continue
 		}
 
-		products[i].Thumbnail = imgData
+		products[i].ThumbnailData = imgData
 	}
 
 	categorySectionProducts := models.CategorySectionProducts{
