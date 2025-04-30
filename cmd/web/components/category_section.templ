@@ -26,23 +26,27 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 						<img
 							hx-get={ "/cchoice/products/image?size=1080x1080&path=" + product.ThumbnailPath }
 							hx-trigger="click"
-							hx-target="#modal_image_viewer img"
+							hx-target="#modal_image_viewer .modal-content img"
 							hx-select="img"
 							hx-swap="outerHTML"
+							_="on click trigger openModal on #modal_image_viewer"
 							class="w-24 max-w-24 h-24 cursor-zoom-in"
 							src={ product.ThumbnailData }
+							title="show high-quality image"
 							alt="product thumbnail"
 						/>
 					}
-					<p
+					<div
 						title={ product.Name }
-						class="max-w-24 text-xs font-normal text-ellipsis text-nowrap overflow-hidden group-hover:font-bold cursor-pointer"
+						class="cursor-pointer flex flex-col items-center"
 					>
-						{ product.Name }
-					</p>
-					<p class="text-xs font-light group-hover:font-semibold cursor-pointer">
-						{ product.BrandName }
-					</p>
+						<p class="max-w-24 text-xs font-normal text-ellipsis text-nowrap overflow-hidden group-hover:font-bold">
+							{ product.Name }
+						</p>
+						<p class="text-xs font-light group-hover:font-semibold">
+							{ product.BrandName }
+						</p>
+					</div>
 				</div>
 			}
 		</div>

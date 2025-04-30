@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"sync"
 	"syscall"
 
@@ -19,10 +20,18 @@ func InitLog() {
 	var config zap.Config
 	env := os.Getenv("APP_ENV")
 	switch env {
-	case "prod":
-		config = zap.NewProductionConfig()
 	case "local":
 		config = zap.NewDevelopmentConfig()
+		configLevel := os.Getenv("LOG_MIN_LEVEL")
+		if configLevel != "" {
+			lvl, err := strconv.Atoi(configLevel)
+			if err != nil {
+				panic(fmt.Errorf("Invalid LOG_MIN_LEVEL. Got '%s'", configLevel).Error())
+			}
+			config.Level.SetLevel(zapcore.Level(lvl - 1))
+		}
+	case "prod":
+		config = zap.NewProductionConfig()
 	default:
 		panic("Invalid app env")
 	}
