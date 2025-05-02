@@ -29,7 +29,7 @@ func ModalImageViewer(imageData string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"modal_image_viewer\" class=\"fixed hidden top-0 bottom-0 left-0 right-0 z-1000\n\t\t\tflex flex-col items-center\" _=\"on closeModal add .hidden\n\t\t\ton openModal remove .hidden\"><div class=\"absolute -z-1 top-0 bottom-0 left-0 right-0 bg-white/50\" _=\"on click trigger closeModal\"></div><div class=\"modal-content w-[32rem] h-screen flex flex-col items-center justify-center\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"modal_image_viewer\" class=\"fixed hidden top-0 bottom-0 left-0 right-0 z-1000\n\t\t\tflex flex-col items-center\" _=\"on closeModal add .hidden\n\t\t\ton openModal wait 0.05s then remove .hidden\"><div class=\"absolute -z-1 top-0 bottom-0 left-0 right-0 bg-white/50\" _=\"on click trigger closeModal\"></div><div class=\"modal-content w-[32rem] h-screen flex flex-col items-center justify-center\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

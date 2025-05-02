@@ -17,3 +17,13 @@ templ svgCart() {
 		></path>
 	</svg>
 }
+
+//https://www.svgbackgrounds.com/elements/animated-svg-preloaders/
+templ svgInfinite() {
+	<img
+		id="spinner"
+		class="htmx-indicator"
+		src={ string(templ.URL("/cchoice/static/svg/infinite-spinner.svg")) }
+		alt="infinite spinner svg"
+	/>
+}

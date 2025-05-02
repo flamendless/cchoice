@@ -6,7 +6,7 @@ templ ModalImageViewer(imageData string) {
 		class="fixed hidden top-0 bottom-0 left-0 right-0 z-1000
 			flex flex-col items-center"
 		_="on closeModal add .hidden
-			on openModal remove .hidden"
+			on openModal wait 0.05s then remove .hidden"
 	>
 		<div
 			class="absolute -z-1 top-0 bottom-0 left-0 right-0 bg-white/50"
