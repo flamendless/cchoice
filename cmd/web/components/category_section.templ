@@ -4,7 +4,10 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"fmt"
+	"os"
 )
+
+var appEnv = os.Getenv("APP_ENV")
 
 templ CategorySectionProducts(data models.CategorySectionProducts) {
 	<div id={ "category-sections-" + data.ID }>
@@ -80,24 +83,32 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 			@HR()
 		}
 		if i == len(categories)-1 {
-			<div
-				class="category-sections-inf-load py-32"
-				hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", page+1) }
-				hx-target=".category-sections-inf-load"
-				hx-swap="outerHTML"
-				hx-trigger={ fmt.Sprintf("load delay:%ds", page/4) }
-			></div>
+			if appEnv == "local" {
+				<div
+					class="category-sections-inf-load"
+					hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", page+1) }
+					hx-target=".category-sections-inf-load"
+					hx-swap="outerHTML"
+					hx-trigger={ fmt.Sprintf("load delay:%ds", page/16) }
+				></div>
+			} else {
+				<div
+					class="category-sections-inf-load"
+					hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", page+1) }
+					hx-target=".category-sections-inf-load"
+					hx-swap="outerHTML"
+					hx-trigger={ fmt.Sprintf("load delay:%ds", page/4) }
+				></div>
+			}
 		}
-	}
-	if len(categories) != 0 {
-		<div class="py-4"></div>
 	}
 }
 
 templ AllCategorySections() {
-	@ModalImageViewer("")
+	@ModalProductImageViewer("")
 	<div
-		class="w-full"
+		id="all-category-sections"
+		class="w-full h-screen overflow-x-hidden overflow-y-auto custom-scrollbar"
 		hx-trigger="load once"
 		hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", 0) }
 		hx-target="#category-sections"
@@ -109,7 +120,7 @@ templ AllCategorySections() {
 		@HR()
 		<div
 			id="category-sections"
-			class="w-full flex flex-col h-screen overflow-x-hidden overflow-y-scroll scrollbar-hide"
+			class="w-full flex flex-col overflow-x-hidden"
 		>
 			@CategorySection(0, nil)
 		</div>
