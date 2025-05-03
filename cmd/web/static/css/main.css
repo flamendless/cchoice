@@ -13,13 +13,37 @@
 	}
 
 	.htmx-indicator {
-        opacity: 0;
-        transition: opacity 500ms ease-in;
-    }
-    .htmx-request .htmx-indicator {
-        opacity: 1;
-    }
-    .htmx-request.htmx-indicator {
-        opacity: 1;
-    }
+		opacity: 0;
+		transition: opacity 500ms ease-in;
+	}
+	.htmx-request .htmx-indicator {
+		opacity: 1;
+	}
+	.htmx-request.htmx-indicator {
+		opacity: 1;
+	}
+
+	.custom-scrollbar::-webkit-scrollbar {
+		width: 12px;
+		height: 8px;
+	}
+
+	.custom-scrollbar::-webkit-scrollbar-track {
+		background: #F7EFEA;
+		border-radius: 10px;
+	}
+
+	.custom-scrollbar::-webkit-scrollbar-thumb {
+		background-color: #F6742F;
+		border-radius: 10px;
+		border: 2px solid #F7EFEA;
+	}
+
+	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+		background-color: #F46133;
+	}
+
+	.custom-scrollbar::-webkit-scrollbar-corner {
+		background: #F7EFEA;
+	}
 }

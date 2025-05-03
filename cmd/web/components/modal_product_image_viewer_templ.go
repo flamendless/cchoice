@@ -8,7 +8,7 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func ModalImageViewer(imageData string) templ.Component {
+func ModalProductImageViewer(imageData string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -37,7 +37,7 @@ func ModalImageViewer(imageData string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<button class=\"text-white bg-cchoice hover:bg-cchoice focus:ring-4 focus:outline-hidden focus:ring-cchoice font-medium rounded-lg text-sm px-2 py-1 cursor-pointer my-4\" alt=\"close image viewer modal\" _=\"on click trigger closeModal\">Close</button></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"flex flex-col w-auto h-auto justify-center mt-2\"><button class=\"text-white bg-cchoice hover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice font-medium rounded-lg text-sm px-8 py-1 cursor-pointer my-2\" alt=\"close image viewer modal\" _=\"on click trigger closeModal\">Go to product page</button> <button class=\"text-white bg-cchoice hover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice font-medium rounded-lg text-xs px-8 py-1 cursor-pointer my-2\" alt=\"close image viewer modal\" _=\"on click trigger closeModal\">Close</button></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

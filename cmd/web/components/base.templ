@@ -56,10 +56,12 @@ templ Base(title string, children ...templ.Component) {
 				<script async type="text/javascript" src={ string(templ.URL("/cchoice/static/js/hyperscript.min.js")) }>
 				</script>
 			}
+
 			<style type="text/css">
 				html, body {
-					height: 100%;
 					margin: 0;
+					padding: 0;
+					height: 100%;
 					overflow: hidden;
 				}
 				#wrapper {
@@ -67,6 +69,7 @@ templ Base(title string, children ...templ.Component) {
 				}
 			</style>
 		</head>
+
 		<body>
 			<div id="wrapper">
 				@Header()
