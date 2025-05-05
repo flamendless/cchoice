@@ -29,7 +29,7 @@ func ModalProductImageViewer(imageData string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"modal_image_viewer\" class=\"fixed hidden top-0 bottom-0 left-0 right-0 z-1000\n\t\t\tflex flex-col items-center\" _=\"on closeModal add .hidden\n\t\t\ton openModal wait 0.05s then remove .hidden\"><div class=\"absolute -z-1 top-0 bottom-0 left-0 right-0 bg-white/50\" _=\"on click trigger closeModal\"></div><div class=\"modal-content w-[32rem] h-screen flex flex-col items-center justify-center\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"modal_image_viewer\" class=\"fixed hidden top-0 bottom-0 left-0 right-0 z-1000\n\t\t\tflex flex-col items-center\" _=\"on closeModal add .hidden\n\t\t\ton openModal wait 0.05s then remove .hidden\"><div class=\"absolute -z-1 top-0 bottom-0 left-0 right-0 bg-white/50\" _=\"on click trigger closeModal\"></div><div class=\"modal-content w-[32rem] h-screen flex flex-col items-center justify-center\"><div class=\"relative inline-block\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -37,7 +37,7 @@ func ModalProductImageViewer(imageData string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"flex flex-col w-auto h-auto justify-center mt-2\"><button class=\"text-white bg-cchoice hover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice font-medium rounded-lg text-sm px-8 py-1 cursor-pointer my-2\" alt=\"close image viewer modal\" _=\"on click trigger closeModal\">Go to product page</button> <button class=\"text-white bg-cchoice hover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice font-medium rounded-lg text-xs px-8 py-1 cursor-pointer my-2\" alt=\"close image viewer modal\" _=\"on click trigger closeModal\">Close</button></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<span class=\"absolute top-0 right-0 size-8\n\t\t\t\t\t\trounded-full flex items-center justify-center transform translate-x-1/2 -translate-y-1/2\n\t\t\t\t\t\ttext-white bg-cchoice hover:bg-cchoice_dark font-medium text-xs cursor-pointer\" title=\"close image viewer\" _=\"on click trigger closeModal\">X</span></div><div class=\"flex flex-col w-auto h-auto justify-center mt-2\"><button class=\"text-white bg-cchoice hover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice font-medium rounded-lg text-sm px-8 py-1 cursor-pointer my-2\" alt=\"close image viewer modal\" _=\"on click trigger closeModal\">Go to product page</button></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
