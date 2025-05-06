@@ -377,7 +377,7 @@ func AllCategorySections() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div id=\"all-category-sections\" class=\"w-full h-screen overflow-x-hidden overflow-y-auto custom-scrollbar\" hx-trigger=\"load once\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div id=\"all-category-sections\" class=\"w-full overflow-x-hidden\" hx-trigger=\"load once\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -390,7 +390,7 @@ func AllCategorySections() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" hx-target=\"#category-sections\" hx-swap=\"beforeend\"><p class=\"text-xs font-normal m-2 my-0\">All Categories</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" hx-target=\"#category-sections\" hx-swap=\"beforeend\"><div class=\"sticky top-0 bg-white z-20\"><p class=\"text-xs font-normal m-2 my-0\">All Categories</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

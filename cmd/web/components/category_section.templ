@@ -108,15 +108,17 @@ templ AllCategorySections() {
 	@ModalProductImageViewer("")
 	<div
 		id="all-category-sections"
-		class="w-full h-screen overflow-x-hidden overflow-y-auto custom-scrollbar"
+		class="w-full overflow-x-hidden"
 		hx-trigger="load once"
 		hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", 0) }
 		hx-target="#category-sections"
 		hx-swap="beforeend"
 	>
-		<p class="text-xs font-normal m-2 my-0">
-			All Categories
-		</p>
+		<div class="sticky top-0 bg-white z-20">
+			<p class="text-xs font-normal m-2 my-0">
+				All Categories
+			</p>
+		</div>
 		@HR()
 		<div
 			id="category-sections"

@@ -98,7 +98,7 @@ func Footer() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<footer class=\"sticky bottom-0 py-2 px-1.5 w-full z-50 bg-white\"><hr class=\"border-2 border-cchoice_border my-0.5\"><div class=\"w-full flex flex-row\"><div id=\"footer-row1\" class=\"flex flex-row grow\" hx-trigger=\"load once\" hx-get=\"/cchoice/settings/footer-texts\" hx-select=\"#footer-row1-texts\" hx-target=\"#footer-row1-texts\" hx-swap=\"outerHTML\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<footer class=\"fixed left-0 bottom-0 py-2 px-1.5 w-full z-50 bg-white\"><hr class=\"border-2 border-cchoice_border my-0.5\"><div class=\"w-full flex flex-row\"><div id=\"footer-row1\" class=\"flex flex-row grow\" hx-trigger=\"load once\" hx-get=\"/cchoice/settings/footer-texts\" hx-select=\"#footer-row1-texts\" hx-target=\"#footer-row1-texts\" hx-swap=\"outerHTML\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

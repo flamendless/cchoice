@@ -34,12 +34,12 @@ func Base(title string, children ...templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><base href=\"/\"><meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\"><meta name=\"description\" content=\"C-Choice is the correct choice for your power\"><meta name=\"google\" content=\"nositelinkssearchbox\"><meta name=\"robots\" content=\"noarchive, noimageindex\"><meta name=\"keywords\" content=\"cchoice, c-choice, construction, power tools\"><meta name=\"viewport\" content=\"width=1024\"><link rel=\"dns-prefetch\" href=\"https://images1.cchoice.com\"><link rel=\"preload\" href=\"/cchoice/static/svg/logo_with_text.svg\" as=\"image\" type=\"image/svg+xml\"><link rel=\"preload\" href=\"/cchoice/static/images/empty_96x96.webp\" as=\"image\" type=\"image/png\"><!--\n\t\t\t\tTODO: (Brandon) - preload product images here\n\t\t\t\t<link rel=\"preload\" href=\"/cchoice/static/images/product_images/bosch/\" as=\"image\" type=\"image/png\"/>\n\t\t\t--><meta property=\"og:title\" content=\"C-Choice Construction Supplies\"><meta property=\"og:description\" content=\"C-Choice is the correct choice for your power\"><meta property=\"og:type\" content=\"website\"><meta property=\"og:url\" content=\"https://www.cchoice.com/\"><meta property=\"og:image\" content=\"https://images1.cchoice.com/cchoice/static/images/favicons/192x192.png\"><meta property=\"og:image:secure_url\" content=\"https://images1.cchoice.com/cchoice/static/images/favicons/192x192.png\"><meta name=\"twitter:card\" content=\"summary\"><meta charset=\"UTF-8\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><base href=\"/\"><meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\"><meta name=\"description\" content=\"Your Partner in Progress\"><meta name=\"google\" content=\"nositelinkssearchbox\"><meta name=\"robots\" content=\"noarchive, noimageindex\"><meta name=\"keywords\" content=\"cchoice, c-choice, construction, power tools\"><meta name=\"viewport\" content=\"width=1024\"><!--<link rel=\"dns-prefetch\" href=\"https://images1.cchoice.com\"/>--><link rel=\"preload\" href=\"/cchoice/static/svg/logo_with_text.svg\" as=\"image\" type=\"image/svg+xml\"><link rel=\"preload\" href=\"/cchoice/static/images/empty_96x96.webp\" as=\"image\" type=\"image/png\"><!--\n\t\t\t\tTODO: (Brandon) - preload product images here\n\t\t\t\t<link rel=\"preload\" href=\"/cchoice/static/images/product_images/bosch/\" as=\"image\" type=\"image/png\"/>\n\t\t\t--><meta property=\"og:title\" content=\"C-Choice Construction Supplies\"><meta property=\"og:description\" content=\"Your Partner in Progress\"><meta property=\"og:type\" content=\"website\"><!--<meta property=\"og:url\" content=\"https://www.cchoice.com/\"/>--><meta property=\"og:image\" content=\"/cchoice/static/images/favicons/192x192.png\"><meta property=\"og:image:secure_url\" content=\"/cchoice/static/images/favicons/192x192.png\"><meta name=\"twitter:card\" content=\"summary\"><meta charset=\"UTF-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if title == "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<title>CCHOICE</title>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<title>C-Choice</title>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -87,20 +87,20 @@ func Base(title string, children ...templ.Component) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\">\n\t\t\t\t</script> <script async type=\"text/javascript\" src=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"></script> <script async type=\"text/javascript\" src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL("/cchoice/static/js/hyperscript.min.js")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/base.templ`, Line: 56, Col: 105}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/base.templ`, Line: 55, Col: 105}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\">\n\t\t\t\t</script>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\"></script> <script>\n\t\t\t\t\tdocument.addEventListener(\"DOMContentLoaded\", function() {\n\t\t\t\t\t\tconst a = document.getElementById(\"all-category-sections\");\n\t\t\t\t\t\tconst b = document.getElementById(\"services\");\n\n\t\t\t\t\t\ta.addEventListener(\"scroll\", function() {\n\t\t\t\t\t\t\tb.scrollTop = a.scrollTop;\n\t\t\t\t\t\t\tconsole.log('scrolled');\n\t\t\t\t\t\t});\n\t\t\t\t\t})\n\t\t\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -110,7 +110,7 @@ func Base(title string, children ...templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</head><body class=\"h-screen m-0 p-0 overflow-hidden\"><div id=\"error_banner\" hidden>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</head><body class=\"h-screen m-0 p-0 overflow-x-hidden custom-scrollbar\"><div id=\"error_banner\" hidden>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -137,7 +137,7 @@ func Base(title string, children ...templ.Component) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL("/cchoice/static/js/error_handler.js")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/base.templ`, Line: 65, Col: 98}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/base.templ`, Line: 74, Col: 98}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -161,7 +161,7 @@ func Base(title string, children ...templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"min-h-screen\"><div class=\"flex items-start\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"flex flex-col pt-[128px]\"><div class=\"flex items-start\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -169,7 +169,7 @@ func Base(title string, children ...templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"w-full border-l-2 border-cchoice_border\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -177,15 +177,11 @@ func Base(title string, children ...templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
 		templ_7745c5c3_Err = Services().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -193,7 +189,7 @@ func Base(title string, children ...templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

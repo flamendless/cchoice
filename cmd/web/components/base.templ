@@ -51,14 +51,23 @@ templ Base(title string, children ...templ.Component) {
 				<link rel="icon" type="image/png" sizes="180x180" href="/cchoice/static/images/favicons/180x180.png"/>
 				<link rel="icon" type="image/png" sizes="192x192" href="/cchoice/static/images/favicons/192x192.png"/>
 				<link href="/cchoice/static/css/tailwind.css" rel="stylesheet"/>
-				<script type="text/javascript" src={ string(templ.URL("/cchoice/static/js/htmx.min.js")) }>
-				</script>
-				<script async type="text/javascript" src={ string(templ.URL("/cchoice/static/js/hyperscript.min.js")) }>
+				<script type="text/javascript" src={ string(templ.URL("/cchoice/static/js/htmx.min.js")) }></script>
+				<script async type="text/javascript" src={ string(templ.URL("/cchoice/static/js/hyperscript.min.js")) }></script>
+				<script>
+					document.addEventListener("DOMContentLoaded", function() {
+						const a = document.getElementById("all-category-sections");
+						const b = document.getElementById("services");
+
+						a.addEventListener("scroll", function() {
+							b.scrollTop = a.scrollTop;
+							console.log('scrolled');
+						});
+					})
 				</script>
 			}
 		</head>
 
-		<body class="h-screen m-0 p-0 overflow-hidden">
+		<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
 			<div id="error_banner" hidden>
 				@ErrorBanner()
 				@onceErrorHandler.Once() {
@@ -69,14 +78,14 @@ templ Base(title string, children ...templ.Component) {
 
 			@Header()
 
-			<div class="min-h-screen">
+			<div class="flex flex-col pt-[128px]">
 				<div class="flex items-start">
 					@CategoriesSidePanel()
-					<div class="w-full">
+					<div class="w-full border-l-2 border-cchoice_border">
 						@AllCategorySections()
+						@Services()
 					</div>
 				</div>
-				@Services()
 			</div>
 
 			@Footer()
