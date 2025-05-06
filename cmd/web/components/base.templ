@@ -55,13 +55,7 @@ templ Base(title string, children ...templ.Component) {
 				<script async type="text/javascript" src={ string(templ.URL("/cchoice/static/js/hyperscript.min.js")) }></script>
 				<script>
 					document.addEventListener("DOMContentLoaded", function() {
-						const a = document.getElementById("all-category-sections");
-						const b = document.getElementById("services");
-
-						a.addEventListener("scroll", function() {
-							b.scrollTop = a.scrollTop;
-							console.log('scrolled');
-						});
+						console.log("script added");
 					})
 				</script>
 			}
