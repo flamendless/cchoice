@@ -1,6 +1,8 @@
 package models
 
-import "cchoice/internal/database/queries"
+import (
+	"cchoice/internal/database/queries"
+)
 
 type HeaderRowText struct {
 	Label string

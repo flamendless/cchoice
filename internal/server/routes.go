@@ -185,7 +185,11 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	texts := []models.FooterRowText{
 		{
 			Label: "Home",
-			URL:   "/",
+			URL:   "/cchoice/",
+		},
+		{
+			Label: "Services",
+			URL:   "/cchoice#services",
 		},
 		{
 			Label: "Call Us",
