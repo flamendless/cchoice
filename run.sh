@@ -51,7 +51,7 @@ clean() {
 cleandb() {
 	clean
 	gensql
-	go tool sql-migrate up
+	go tool github.com/rubenv/sql-migrate/sql-migrate up
 
 	# local otherbrands=("BRADFORD" "SPARTAN" "SHINSETSU" "REDMAX" "KOBEWEL")
 	# for brand in "${otherbrands[@]}"; do
