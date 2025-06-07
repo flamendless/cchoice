@@ -1,16 +1,20 @@
 package components
 
+templ Service(text string) {
+	<div class="w-1/5 border-t-4 border-cchoice_border">
+		<div class="mt-2 text-center font-medium text-base">
+			{ text }
+		</div>
+	</div>
+}
+
 templ Services() {
-	<section id="services" class="absolute m-2 flex flex-col left-0">
-		<span>Our Services</span>
-		<div>
-			Delivery
-		</div>
-		<div>
-			Here when you need us
-		</div>
-		<div>
-			Expect high-quality products
+	<section id="services" class="absolute flex flex-col left-0 px-4 pt-4 pb-16 w-screen border-t-4 border-cchoice_border">
+		<span class="font-bold text-lg">Our Services</span>
+		<div class="flex flex-row justify-between mt-3 w-full pr-4">
+			@Service("Delivery")
+			@Service("Here when you need us")
+			@Service("Expect high-quality products")
 		</div>
 	</section>
 }
