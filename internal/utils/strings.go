@@ -2,15 +2,11 @@ package utils
 
 import (
 	"strings"
-	"sync"
 	"unicode"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
-
-var caserOnce sync.Once
-var caser cases.Caser
 
 func GetInitials(str string) string {
 	res := make([]rune, 0, len(str))
@@ -36,13 +32,10 @@ func RemoveEmptyStrings(input []string) []string {
 }
 
 func SlugToTile(input string) string {
-	caserOnce.Do(func() {
-		caser = cases.Title(language.English)
-	})
+	caser := cases.Title(language.English)
 	keywords := strings.Split(input, "-")
-	res := strings.Join(keywords, " ")
-	res = caser.String(res)
-	return res
+	joined := strings.Join(keywords, " ")
+	return caser.String(joined)
 }
 
 func GetBoolFlag(flag string) bool {
