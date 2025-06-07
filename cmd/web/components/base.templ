@@ -60,7 +60,6 @@ templ Base(title string, children ...templ.Component) {
 				</script>
 			}
 		</head>
-
 		<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
 			<div id="error_banner" hidden>
 				@ErrorBanner()
@@ -69,9 +68,7 @@ templ Base(title string, children ...templ.Component) {
 					</script>
 				}
 			</div>
-
 			@Header()
-
 			<div class="flex flex-col pt-[128px]">
 				<div class="flex items-start">
 					@CategoriesSidePanel()
@@ -81,7 +78,6 @@ templ Base(title string, children ...templ.Component) {
 					</div>
 				</div>
 			</div>
-
 			@Footer()
 		</body>
 	</html>

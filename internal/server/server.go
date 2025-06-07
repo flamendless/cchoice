@@ -103,9 +103,11 @@ func NewServer() *http.Server {
 		TLSConfig:    tlsConfig,
 	}
 	if NewServer.useHTTP2 {
-		http2.ConfigureServer(server, &http2.Server{
+		if err := http2.ConfigureServer(server, &http2.Server{
 			MaxConcurrentStreams: 256,
-		})
+		}); err != nil {
+			logs.Log().Error("Server configure", zap.Error(err))
+		}
 	}
 
 	logs.Log().Info(
