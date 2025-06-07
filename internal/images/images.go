@@ -68,7 +68,11 @@ func GetImageDataB64(
 	if err != nil {
 		return "", err
 	}
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			logs.Log().Error("File close", zap.Error(err))
+		}
+	}()
 
 	img, err := io.ReadAll(f)
 	if err != nil {
