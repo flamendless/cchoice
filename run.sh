@@ -16,6 +16,7 @@ if [[ $(grep -i Microsoft /proc/version) ]]; then
 fi
 
 serve() {
+	local -; set -x;
 	genall
 	if "${ISWSL}"; then
 		cmd.exe /c "start vivaldi http://localhost:7331/cchoice"
@@ -29,6 +30,7 @@ customrun() {
 }
 
 setup() {
+	local -; set -x;
 	if [ ! -f "./.git/hooks/pre-commit" ]; then
 		cp "./scripts/pre-commit-unit-test.sh" "./.git/hooks/pre-commit"
 		chmod +x "./.git/hooks/pre-commit"
@@ -36,6 +38,7 @@ setup() {
 }
 
 clean() {
+	local -; set -x;
 	echo "cleaning ${DBNAME}..."
 	if [ -f "./${DBNAME}" ]; then
 		rm "${DBNAME}"
@@ -49,6 +52,7 @@ clean() {
 }
 
 cleandb() {
+	local -; set -x;
 	clean
 	gensql
 	go tool github.com/rubenv/sql-migrate/sql-migrate up
@@ -70,6 +74,7 @@ cleandb() {
 }
 
 deps() {
+	local -; set -x;
 	# Tailwind https://tailwindcss.com/docs/installation/tailwind-cli
 	curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=10.0.0 sh -
 	pnpm install tailwindcss @tailwindcss/cli
@@ -94,6 +99,7 @@ genall() {
 }
 
 sc() {
+	local -; set -x;
 	go fmt ./...
 	go mod tidy
 	go vet ./...
