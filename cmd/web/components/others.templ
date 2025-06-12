@@ -1,0 +1,115 @@
+package components
+
+type brandImage struct {
+	filename string
+	alt      string
+}
+
+type other struct {
+	title       string
+	description string
+	brandImage  *brandImage
+}
+
+type otherSection struct {
+	title  string
+	href   string
+	others []other
+}
+
+var otherSections = []otherSection{
+	otherSection{
+		title: "About Us",
+		href: "about-us",
+		others: []other{
+			other{
+				title:       "Who We Are",
+				description: "We are a dedicated company and trusted dealer, committed to selecting the right partners who provide high-quality tools and accessories to drive better progress in the future",
+			},
+			other{
+				title:       "Vision",
+				description: "To be one of the leading importers of advance and innovative construction and fabrication tools and equipments",
+			},
+			other{
+				title:       "Mission",
+				description: "To provide quality products certified by international manufacturers in both construction and fabrication materials industries",
+			},
+		},
+	},
+	otherSection{
+		title: "Our Services",
+		href: "services",
+		others: []other{
+			other{
+				title:       "Delivery",
+				description: "Expect delivery at soonest",
+			},
+			other{
+				title:       "Here when you need us",
+				description: "Always available and right around the corner",
+			},
+			other{
+				title:       "Expect high-quality products",
+				description: "Authorized and trusted",
+			},
+		},
+	},
+	otherSection{
+		title: "Our Partners",
+		href: "partners",
+		others: []other{
+			other{
+				brandImage: &brandImage{
+					filename: "BOSCH.png",
+					alt:      "Bosch image",
+				},
+			},
+			other{
+				brandImage: &brandImage{
+					filename: "TAILIN.png",
+					alt:      "Tailin image",
+				},
+			},
+			other{
+				brandImage: &brandImage{
+					filename: "DELTAPLUS.png",
+					alt:      "DeltaPlus image",
+				},
+			},
+			other{
+				brandImage: &brandImage{
+					filename: "BOSUN.png",
+					alt:      "Bosun image",
+				},
+			},
+		},
+	},
+}
+
+templ OtherSections() {
+	<div id="others" class="absolute flex flex-col left-0 px-8 pt-4 pb-16 w-screen border-t-4 border-cchoice_border">
+		for _, otherSection := range otherSections {
+			<span class="font-bold text-lg mt-4">{ otherSection.title }</span>
+			<section id={ otherSection.href } class="flex flex-row justify-between my-4 w-full pr-4">
+				for _, other := range otherSection.others {
+					<div class="w-1/5 border-t-4 border-cchoice_border">
+						<div class="my-2 text-center font-medium text-base">
+							{ other.title }
+						</div>
+						<div class="my-2 font-normal text-sm text-wrap">
+							{ other.description }
+						</div>
+						if other.brandImage != nil {
+							<img
+								src={ templ.URL("/cchoice/static/images/brand_logos/" + other.brandImage.filename) }
+								class="w-3xs h-auto m-auto mt-8"
+								alt={ other.brandImage.alt }
+								loading="lazy"
+							/>
+						}
+					</div>
+				}
+			</section>
+		}
+	</div>
+}
