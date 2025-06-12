@@ -214,8 +214,16 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 			URL:   "/cchoice/",
 		},
 		{
+			Label: "About Us",
+			URL:   "/cchoice#about-us",
+		},
+		{
 			Label: "Services",
 			URL:   "/cchoice#services",
+		},
+		{
+			Label: "Partners",
+			URL:   "/cchoice#partners",
 		},
 		{
 			Label: "Call Us",
