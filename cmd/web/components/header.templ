@@ -8,10 +8,10 @@ templ LogoWithText(width string, height string) {
 	@logoWithTextHandlerOnce.Once() {
 		<a
 			href="/cchoice"
-			class="-mt-8 -mb-4 w-fit"
+			class="-mt-8 -mb-4 ml-4 w-fit"
 		>
 			<img
-				src={ string(templ.URL("/cchoice/static/svg/logo_with_text.svg")) }
+				src={ string(templ.URL("/cchoice/static/svg/logo_complete.svg")) }
 				alt="cchoice logo and text"
 				width={ width }
 				height={ height }
@@ -102,7 +102,7 @@ templ Header() {
 			>
 				@HeaderRow1Texts(nil)
 			</div>
-			<div id="header-row2" class="w-full flex flex-row">
+			<div id="header-row2" class="w-full flex flex-row items-center">
 				@LogoWithText("256", "128")
 				<div class="w-full flex items-center place-content-center px-8 py-2">
 					@SearchBar()
