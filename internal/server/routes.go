@@ -3,7 +3,9 @@ package server
 import (
 	"database/sql"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -47,6 +49,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		s.fsHandler = http.FileServer(s.fs)
 		r.Get("/static/*", s.staticHandler)
 
+		r.Get("/changelogs", s.changelogsHandler)
 		r.Get("/health", s.healthHandler)
 		r.Get("/", s.indexHandler)
 		r.Get("/settings/header-texts", s.headerTextsHandler)
@@ -118,6 +121,29 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	if err := components.Base("C-CHOICE").Render(r.Context(), w); err != nil {
 		logs.Log().Fatal("Index handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
+	f, err := os.Open("./CHANGELOGS.md")
+	if err != nil {
+		logs.Log().Fatal("Changelogs handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer func() {
+		if err := f.Close(); err != nil {
+			logs.Log().Fatal("Changelogs handler", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}()
+
+	w.Header().Set("Content-Type", "text/plain")
+	if _, err := io.Copy(w, f); err != nil {
+		logs.Log().Fatal("Changelogs handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
