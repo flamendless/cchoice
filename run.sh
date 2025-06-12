@@ -5,13 +5,12 @@
 
 set -euf -o pipefail
 
-GOOS="linux"
 DBNAME="test.db"
 DBPATH="file:./${DBNAME}"
 
 BROWSER="${BROWSER:-vivaldi}"
 ISWSL=false
-if [[ $(grep -i Microsoft /proc/version) ]]; then
+if grep -qv Microsoft /proc/version; then
 	ISWSL=true
 fi
 
@@ -114,14 +113,18 @@ sc() {
 	go tool unconvert ./...
 	go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@latest -test ./...
 
-	local PKGS=$(go list ./... | grep -v "internal/database/queries" | tr "\n" " ")
-	go tool errcheck $PKGS
+	local PKGS
+	PKGS=$(go list ./... | grep -v "internal/database/queries" | tr "\n" " ")
+	for d in ${PKGS}; do
+		go tool errcheck "$d"
+	done
 
 	set +f
-	local GODIRS=$(go list -f {{.Dir}} ./...)
-	for d in "${GODIRS}"; do
+	local GODIRS
+	GODIRS=$(go list -f "{{.Dir}}" ./...)
+	for d in ${GODIRS}; do
 		if [[ ! $d == *"cmd/web/components"* ]]; then
-			go tool goimports -w -local -v $d/*.go
+			go tool goimports -w -local -v "$d"/*.go
 		fi
 	done
 	set -f
