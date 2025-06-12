@@ -46,3 +46,27 @@ cd ~/certs
 mkcert -install
 mkcert localhost 127.0.0.1 ::1
 ```
+
+# Commits
+- Maintenance:
+    - simple fix
+    - simple revision
+    - code quality
+- Toolings:
+    - go tools
+    - dev tools
+    - library upgrade
+    - dependency upgrade
+- Script:
+    - run.sh
+- Config:
+    - git-chglog
+    - dotenv
+    - air
+- Docs:
+    - README
+    - Changelogs
+- Performance:
+    - optimization
+- Server
+- Web
