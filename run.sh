@@ -10,7 +10,7 @@ DBPATH="file:./${DBNAME}"
 
 BROWSER="${BROWSER:-vivaldi}"
 ISWSL=false
-if grep -qv Microsoft /proc/version; then
+if grep -qi Microsoft /proc/version; then
 	ISWSL=true
 fi
 
