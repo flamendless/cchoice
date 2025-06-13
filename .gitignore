@@ -10,3 +10,4 @@ node_modules/
 *_templ.txt
 cmd/web/static/images/product_images/bosch/
 cmd/web/static/thumbnails/product_images/bosch/
+cmd/web/static/images/brand_logos/*.webp

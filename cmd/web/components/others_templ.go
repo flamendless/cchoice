@@ -68,26 +68,32 @@ var otherSections = []otherSection{
 		others: []other{
 			other{
 				brandImage: &brandImage{
-					filename: "BOSCH.png",
+					filename: "BOSCH.webp",
 					alt:      "Bosch image",
 				},
 			},
 			other{
 				brandImage: &brandImage{
-					filename: "TAILIN.png",
+					filename: "TAILIN.webp",
 					alt:      "Tailin image",
 				},
 			},
 			other{
 				brandImage: &brandImage{
-					filename: "DELTAPLUS.png",
+					filename: "DELTAPLUS.webp",
 					alt:      "DeltaPlus image",
 				},
 			},
 			other{
 				brandImage: &brandImage{
-					filename: "BOSUN.png",
+					filename: "BOSUN.webp",
 					alt:      "Bosun image",
+				},
+			},
+			other{
+				brandImage: &brandImage{
+					filename: "STANLEY.webp",
+					alt:      "Stanley image",
 				},
 			},
 		},
@@ -127,7 +133,7 @@ func OtherSections() templ.Component {
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(otherSection.title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 92, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 98, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -140,7 +146,7 @@ func OtherSections() templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(otherSection.href)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 93, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 99, Col: 34}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -158,7 +164,7 @@ func OtherSections() templ.Component {
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(other.title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 97, Col: 20}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 103, Col: 20}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -171,7 +177,7 @@ func OtherSections() templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(other.description)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 100, Col: 26}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 106, Col: 26}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -189,7 +195,7 @@ func OtherSections() templ.Component {
 					var templ_7745c5c3_Var6 string
 					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(templ.URL("/cchoice/static/images/brand_logos/" + other.brandImage.filename))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 104, Col: 90}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 110, Col: 90}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 					if templ_7745c5c3_Err != nil {
@@ -202,7 +208,7 @@ func OtherSections() templ.Component {
 					var templ_7745c5c3_Var7 string
 					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(other.brandImage.alt)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 106, Col: 34}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 112, Col: 34}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
