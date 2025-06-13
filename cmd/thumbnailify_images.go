@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -32,10 +34,10 @@ func init() {
 	f().IntVarP(&flagsThumbnailifyImages.width, "width", "", 160, "Width of the output thumbnail")
 	f().IntVarP(&flagsThumbnailifyImages.height, "height", "", 160, "Height of the output thumbnail")
 	if err := cmdThumbnailifyImages.MarkFlagRequired("inpath"); err != nil {
-		panic(err)
+		panic(errors.Join(errs.ERR_CMD_REQUIRED, err))
 	}
 	if err := cmdThumbnailifyImages.MarkFlagRequired("outpath"); err != nil {
-		panic(err)
+		panic(errors.Join(errs.ERR_CMD_REQUIRED, err))
 	}
 	rootCmd.AddCommand(cmdThumbnailifyImages)
 }
@@ -48,12 +50,24 @@ var cmdThumbnailifyImages = &cobra.Command{
 		defer vips.Shutdown()
 
 		if _, err := os.Stat(flagsThumbnailifyImages.inpath); err != nil || os.IsNotExist(err) {
-			panic(err)
+			panic(errors.Join(errs.ERR_CMD_REQUIRED, err))
 		}
 		if _, err := os.Stat(flagsThumbnailifyImages.outpath); err != nil || os.IsNotExist(err) {
 			if err := os.MkdirAll(flagsThumbnailifyImages.outpath, 0755); err != nil {
-				panic(err)
+				panic(errors.Join(errs.ERR_CMD, err))
 			}
+		}
+
+		var ep *vips.ExportParams
+		switch flagsThumbnailifyImages.format {
+		case "png":
+			ep = vips.NewDefaultPNGExportParams()
+		case "jpg", "jpeg":
+			ep = vips.NewDefaultJPEGExportParams()
+		case "webp":
+			ep = vips.NewDefaultWEBPExportParams()
+		default:
+			panic("Invalid format: " + flagsThumbnailifyImages.format)
 		}
 
 		if err := filepath.Walk(flagsThumbnailifyImages.inpath, func(path string, info fs.FileInfo, err error) error {
@@ -78,17 +92,6 @@ var cmdThumbnailifyImages = &cobra.Command{
 				return nil
 			}
 
-			var ep *vips.ExportParams
-			switch flagsThumbnailifyImages.format {
-			case "png":
-				ep = vips.NewDefaultPNGExportParams()
-			case "jpg", "jpeg":
-				ep = vips.NewDefaultJPEGExportParams()
-			case "webp":
-				ep = vips.NewDefaultWEBPExportParams()
-			default:
-				panic("Invalid format: " + flagsThumbnailifyImages.format)
-			}
 			imgbytes, _, err := img.Export(ep)
 			if err != nil {
 				return err
@@ -109,7 +112,7 @@ var cmdThumbnailifyImages = &cobra.Command{
 
 			return nil
 		}); err != nil {
-			panic(err)
+			panic(errors.Join(errs.ERR_CMD, err))
 		}
 	},
 }
