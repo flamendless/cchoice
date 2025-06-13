@@ -59,6 +59,7 @@ mkcert localhost 127.0.0.1 ::1
     - dependency upgrade
 - Script:
     - run.sh
+    - cmd/thumbnailify_images.go
 - Config:
     - git-chglog
     - dotenv
