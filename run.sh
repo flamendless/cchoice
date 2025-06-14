@@ -144,7 +144,17 @@ testall() {
 }
 
 benchmark() {
-	go test -bench=. -benchmem ./...
+	go test -bench=. -benchmem ./... -v
+}
+
+prof() {
+	local TMP="./tmp"
+	if [ "$#" -ne 3 ]; then
+		echo "must pass either 2 more arguments"
+		exit 1
+	fi
+	MODE="benchmark" go test -cpuprofile "${TMP}/cpu.prof" -memprofile "${TMP}/mem.prof" -benchmem -bench=. -o "${TMP}/" "./${2}"
+	go tool pprof -http=localhost:3031 "${TMP}/${3}.prof"
 }
 
 prod() {
@@ -165,6 +175,7 @@ if [ "$#" -eq 0 ]; then
 	echo "    genall"
 	echo "    gensql"
 	echo "    gentempl"
+	echo "    prof"
 	echo "    serve"
 	echo "    sc"
 	echo "    setup"
