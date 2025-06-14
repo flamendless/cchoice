@@ -14,6 +14,7 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/enums"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
@@ -321,7 +322,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	categoryDBID := serialize.DecDBID(categoryID)
+	categoryDBID := serialize.MustDecodeToDBID(enums.DB_PREFIX_CATEGORY, categoryID)
 
 	category, err := s.dbRO.GetQueries().GetProductCategoryByID(r.Context(), categoryDBID)
 	if err != nil {
