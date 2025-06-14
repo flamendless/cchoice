@@ -13,84 +13,84 @@ type brandImage struct {
 	alt      string
 }
 
-type other struct {
+type postHomeContent struct {
 	title       string
 	description string
 	brandImage  *brandImage
 }
 
-type otherSection struct {
+type postHomeContentSection struct {
 	title  string
 	href   string
-	others []other
+	others []postHomeContent
 }
 
-var otherSections = []otherSection{
-	otherSection{
+var postHomeContentSections = []postHomeContentSection{
+	postHomeContentSection{
 		title: "About Us",
 		href:  "about-us",
-		others: []other{
-			other{
+		others: []postHomeContent{
+			postHomeContent{
 				title:       "Who We Are",
 				description: "We are a dedicated company and trusted dealer, committed to selecting the right partners who provide high-quality tools and accessories to drive better progress in the future",
 			},
-			other{
+			postHomeContent{
 				title:       "Vision",
 				description: "To be one of the leading importers of advance and innovative construction and fabrication tools and equipments",
 			},
-			other{
+			postHomeContent{
 				title:       "Mission",
 				description: "To provide quality products certified by international manufacturers in both construction and fabrication materials industries",
 			},
 		},
 	},
-	otherSection{
+	postHomeContentSection{
 		title: "Our Services",
 		href:  "services",
-		others: []other{
-			other{
+		others: []postHomeContent{
+			postHomeContent{
 				title:       "Delivery",
 				description: "Expect delivery at soonest",
 			},
-			other{
+			postHomeContent{
 				title:       "Here when you need us",
 				description: "Always available and right around the corner",
 			},
-			other{
+			postHomeContent{
 				title:       "Expect high-quality products",
 				description: "Authorized and trusted",
 			},
 		},
 	},
-	otherSection{
+	postHomeContentSection{
 		title: "Our Partners",
 		href:  "partners",
-		others: []other{
-			other{
+		others: []postHomeContent{
+			postHomeContent{
 				brandImage: &brandImage{
 					filename: "BOSCH.webp",
 					alt:      "Bosch image",
 				},
 			},
-			other{
+			postHomeContent{
 				brandImage: &brandImage{
 					filename: "TAILIN.webp",
 					alt:      "Tailin image",
 				},
 			},
-			other{
+			postHomeContent{
 				brandImage: &brandImage{
 					filename: "DELTAPLUS.webp",
 					alt:      "DeltaPlus image",
 				},
 			},
-			other{
+			postHomeContent{
 				brandImage: &brandImage{
 					filename: "BOSUN.webp",
 					alt:      "Bosun image",
 				},
 			},
-			other{
+			postHomeContent{
 				brandImage: &brandImage{
 					filename: "STANLEY.webp",
 					alt:      "Stanley image",
@@ -100,7 +100,7 @@ var otherSections = []otherSection{
 	},
 }
 
-func OtherSections() templ.Component {
+func PostHomeContentSections() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -125,15 +125,15 @@ func OtherSections() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, otherSection := range otherSections {
+		for _, postHomeContentSection := range postHomeContentSections {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<span class=\"font-bold text-lg mt-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var2 string
-			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(otherSection.title)
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(postHomeContentSection.title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 98, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 98, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -144,9 +144,9 @@ func OtherSections() templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(otherSection.href)
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(postHomeContentSection.href)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 99, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 99, Col: 44}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -156,15 +156,15 @@ func OtherSections() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			for _, other := range otherSection.others {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"w-1/5 border-t-4 border-cchoice_border\"><div class=\"my-2 text-center font-medium text-base\">")
+			for _, postHomeContent := range postHomeContentSection.others {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"w-1/5 border-t-4 border-cchoice_border content-center\"><div class=\"my-2 text-center font-medium text-base\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var4 string
-				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(other.title)
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(postHomeContent.title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 103, Col: 20}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 103, Col: 30}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -175,9 +175,9 @@ func OtherSections() templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var5 string
-				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(other.description)
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(postHomeContent.description)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 106, Col: 26}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 106, Col: 36}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -187,15 +187,15 @@ func OtherSections() templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				if other.brandImage != nil {
+				if postHomeContent.brandImage != nil {
 					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<img src=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var6 string
-					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(templ.URL("/cchoice/static/images/brand_logos/" + other.brandImage.filename))
+					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(templ.URL("/cchoice/static/images/brand_logos/" + postHomeContent.brandImage.filename))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 110, Col: 90}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 110, Col: 100}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 					if templ_7745c5c3_Err != nil {
@@ -206,9 +206,9 @@ func OtherSections() templ.Component {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var7 string
-					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(other.brandImage.alt)
+					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(postHomeContent.brandImage.alt)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/others.templ`, Line: 112, Col: 34}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 112, Col: 44}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
