@@ -9,6 +9,7 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/serialize"
 	"cchoice/internal/utils"
@@ -175,7 +176,7 @@ func GetCategorySectionHandler(
 		}
 
 		categoriesSubcategories[category] = append(categoriesSubcategories[category], models.Subcategory{
-			CategoryID: serialize.EncDBID(v.ID),
+			CategoryID: serialize.EncodeDBID(enums.DB_PREFIX_CATEGORY, v.ID),
 			Label:      utils.SlugToTile(v.Subcategory.String),
 		})
 	}
