@@ -36,16 +36,20 @@ func TestParseTemplateEnum(t *testing.T) {
 
 func BenchmarkTemplateToString(b *testing.B) {
 	for tpl := range tblTemplateKind {
-		for b.Loop() {
-			_ = tpl.String()
-		}
+		b.Run(tpl.String(), func(b *testing.B) {
+			for b.Loop() {
+				_ = tpl.String()
+			}
+		})
 	}
 }
 
 func BenchmarkParseTemplateEnum(b *testing.B) {
 	for _, val := range tblTemplateKind {
-		for b.Loop() {
-			_ = ParseTemplateEnum(val)
-		}
+		b.Run(val, func(b *testing.B) {
+			for b.Loop() {
+				_ = ParseTemplateEnum(val)
+			}
+		})
 	}
 }

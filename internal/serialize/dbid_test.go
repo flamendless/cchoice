@@ -2,9 +2,7 @@ package serialize
 
 import (
 	"cchoice/internal/enums"
-	"math/rand"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -31,10 +29,8 @@ func TestValidEncDecDBID(t *testing.T) {
 }
 
 func BenchmarkEncDecDBID(b *testing.B) {
-	for b.Loop() {
-		r := rand.New(rand.NewSource(time.Now().UnixNano()))
-		test := int64(r.Uint64())
-		enc := EncodeDBID(enums.DB_PREFIX_CATEGORY, test)
+	for i := range b.N {
+		enc := EncodeDBID(enums.DB_PREFIX_CATEGORY, int64(i))
 		_, _ = DecodeToDBID(enc)
 	}
 }

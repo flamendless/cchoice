@@ -48,16 +48,20 @@ func TestParseImageFormatExtEnum(t *testing.T) {
 
 func BenchmarkImageFormatToString(b *testing.B) {
 	for imageFormat := range tblImageFormat {
-		for b.Loop() {
-			_ = imageFormat.String()
-		}
+		b.Run(imageFormat.String(), func(b *testing.B) {
+			for b.Loop() {
+				_ = imageFormat.String()
+			}
+		})
 	}
 }
 
 func BenchmarkParseImageFormatEnum(b *testing.B) {
 	for _, val := range tblImageFormat {
-		for b.Loop() {
-			_ = ParseImageFormatToEnum(val)
-		}
+		b.Run(val, func(b *testing.B) {
+			for b.Loop() {
+				_ = ParseImageFormatToEnum(val)
+			}
+		})
 	}
 }
