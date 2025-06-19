@@ -134,6 +134,10 @@ sc() {
 }
 
 testall() {
+	go test ./... -v
+}
+
+testsum() {
 	go tool gotestsum \
 		--debug \
 		--format=pkgname-and-test-fails \
@@ -180,6 +184,7 @@ if [ "$#" -eq 0 ]; then
 	echo "    sc"
 	echo "    setup"
 	echo "    testall"
+	echo "    testsum"
 else
 	echo "Running ${1}"
 	time "$1" "$@"
