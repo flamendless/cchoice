@@ -98,7 +98,13 @@ templ PostHomeContentSections() {
 			<span class="font-bold text-lg mt-4">{ postHomeContentSection.title }</span>
 			<section id={ postHomeContentSection.href } class="flex flex-row justify-between my-4 w-full pr-4">
 				for _, postHomeContent := range postHomeContentSection.others {
-					<div class="w-1/5 border-t-4 border-cchoice_border content-center">
+					<div
+						if postHomeContent.brandImage == nil {
+							class="w-1/5 border-t-4 border-cchoice_border"
+						} else {
+							class="w-1/5 border-t-4 border-cchoice_border content-center"
+						}
+					>
 						<div class="my-2 text-center font-medium text-base">
 							{ postHomeContent.title }
 						</div>
