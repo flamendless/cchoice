@@ -152,7 +152,7 @@ func PostHomeContentSections() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"flex flex-row justify-between my-4 w-full pr-4\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"flex flex-row justify-between my-6 w-full pr-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -162,12 +162,12 @@ func PostHomeContentSections() templ.Component {
 					return templ_7745c5c3_Err
 				}
 				if postHomeContent.brandImage == nil {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " class=\"w-1/5 border-t-4 border-cchoice_border\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " class=\"w-1/4 border-t-4 border-cchoice_border\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				} else {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, " class=\"w-1/5 border-t-4 border-cchoice_border content-center\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, " class=\"w-1/4 border-t-4 border-cchoice_border content-center mx-8\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
