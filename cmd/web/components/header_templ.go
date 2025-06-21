@@ -119,7 +119,7 @@ func SearchBar() templ.Component {
 			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form class=\"w-6/12\"><label for=\"search\" class=\"mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white\">Search</label><div class=\"relative\"><div class=\"absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none\"><svg class=\"w-4 h-4 text-cchoice\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 20 20\"><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z\"></path></svg></div><input type=\"search\" id=\"search\" placeholder=\"Search any term...\" required class=\"block w-full p-3 ps-10 text-sm text-black border border-searchbar rounded-lg bg-searchbar focus:ring-cchoice focus:border-cchoice\"> <button type=\"submit\" class=\"text-white absolute end-2.5 bottom-2 bg-cchoice hover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice font-medium rounded-lg text-sm px-2 py-1\" alt=\"search button\" aria-label=\"Search\" title=\"Search\">Search</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form class=\"w-6/12\"><label for=\"search\" class=\"mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white\">Search</label><div class=\"relative\"><div class=\"absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none\" _=\"\n\t\t\t\t\ton htmx:beforeRequest from #search\n\t\t\t\t\t\tlog 'search is triggered'\n\t\t\t\t\t\tadd .hidden to #icon-search\n\t\t\t\t\tend\n\n\t\t\t\t\ton htmx:afterRequest from #search\n\t\t\t\t\t\tlog 'search is done'\n\t\t\t\t\t\twait 0.5s\n\t\t\t\t\t\tremove .hidden from #icon-search\n\t\t\t\t\tend\n\t\t\t\t\"><svg id=\"icon-search\" class=\"w-5 text-cchoice\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 20 20\"><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z\"></path></svg> <svg id=\"icon-spinner\" class=\"w-7 text-cchoice htmx-indicator\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\"><path fill=\"none\" stroke=\"#F6742F\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-dasharray=\"300 385\" stroke-dashoffset=\"0\" d=\"M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z\"><animate attributeName=\"stroke-dashoffset\" calcMode=\"spline\" dur=\"2\" values=\"685;-685\" keySplines=\"0 0 1 1\" repeatCount=\"indefinite\"></animate></path></svg></div><input required type=\"search\" id=\"search\" name=\"search\" placeholder=\"Search any term...\" class=\"block w-full p-3 ps-10 text-sm text-black border border-searchbar rounded-lg bg-searchbar focus:ring-cchoice focus:border-cchoice\" hx-post=\"/cchoice/search\" hx-trigger=\"input changed delay:500ms, keyup[key=='Enter']\" hx-indicator=\".htmx-indicator\" hx-validate=\"true\" hx-include=\"#search\"> <button type=\"submit\" class=\"text-white absolute end-2.5 bottom-2 bg-cchoice hover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice font-medium rounded-lg text-sm px-2 py-1\" alt=\"search button\" aria-label=\"Search\" title=\"Search\">Search</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -197,7 +197,7 @@ func HeaderRow1Texts(texts []models.HeaderRowText) templ.Component {
 			var templ_7745c5c3_Var9 templ.SafeURL
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(hrt.URL))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 79, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 113, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -210,7 +210,7 @@ func HeaderRow1Texts(texts []models.HeaderRowText) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(hrt.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 80, Col: 15}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 114, Col: 15}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
