@@ -65,11 +65,7 @@ cleandb() {
 	go run ./main.go thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/images/product_images/bosch" --format="webp" --width=1080 --height=1080
 	go run ./main.go convert_images --inpath="./cmd/web/static/images/brand_logos" --outpath="./cmd/web/static/images/brand_logos" --format="webp"
 
-	# TODO: (Brandon) - there is a bug with update where the newly inserted tbl_products_categories.product_id are incorrect
-	# go run ./main.go parse_xlsx -p "assets/xlsx/Price_List_effective_25_August_2023_r2.xlsx" -s "2023 PRICE LIST" -t "DELTAPLUS" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
-	# go run ./main.go parse_xlsx -p "assets/xlsx/Price_List_effective_25_August_2023_r2.xlsx" -s "2023 PRICE LIST" -t "DELTAPLUS" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1
 	go run ./main.go parse_xlsx -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./cmd/web/static/images/product_images/bosch/" --images_format="webp"
-	# go run ./main.go parse_xlsx -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./cmd/web/static/images/product_images/bosch/"
 
 }
 
@@ -80,7 +76,16 @@ deps() {
 	pnpm install tailwindcss @tailwindcss/cli
 
 	# libvips https://www.libvips.org/install.html (I use Arch BTW)
-	yay -S base-devel glib2 expat1 libdeflate libvips
+	yay -S \
+		base-devel \
+		glib2 \
+		expat1 \
+		libdeflate \
+		libvips \
+        libmagick \
+        openslide \
+        libxml2 \
+        libjxl
 }
 
 gensql() {
