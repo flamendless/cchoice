@@ -96,13 +96,13 @@ templ PostHomeContentSections() {
 	<div id="others" class="absolute flex flex-col left-0 px-8 pt-4 pb-16 w-screen border-t-4 border-cchoice_border">
 		for _, postHomeContentSection := range postHomeContentSections {
 			<span class="font-bold text-lg mt-4">{ postHomeContentSection.title }</span>
-			<section id={ postHomeContentSection.href } class="flex flex-row justify-between my-4 w-full pr-4">
+			<section id={ postHomeContentSection.href } class="flex flex-row justify-between my-6 w-full pr-4">
 				for _, postHomeContent := range postHomeContentSection.others {
 					<div
 						if postHomeContent.brandImage == nil {
-							class="w-1/5 border-t-4 border-cchoice_border"
+							class="w-1/4 border-t-4 border-cchoice_border"
 						} else {
-							class="w-1/5 border-t-4 border-cchoice_border content-center"
+							class="w-1/4 border-t-4 border-cchoice_border content-center mx-8"
 						}
 					>
 						<div class="my-2 text-center font-medium text-base">
