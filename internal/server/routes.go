@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"cchoice/cmd/web"
 	"cchoice/cmd/web/components"
@@ -59,6 +60,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/product-categories/sections", s.categorySectionHandler)
 		r.Get("/product-categories/{category_id}/products", s.categoryProductsHandler)
 		r.Get("/products/image", s.productsImageHandler)
+
+		r.Post("/search", s.searchHandler)
 	})
 
 	return r
@@ -389,4 +392,17 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		logs.Log().Fatal("category section list handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		logs.Log().Fatal("search handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	search := r.PostFormValue("search")
+
+	//TODO: (Brandon)
+	time.Sleep(time.Second * time.Duration(len(search)))
+	w.Write([]byte(search))
 }
