@@ -52,11 +52,12 @@ mkcert localhost 127.0.0.1 ::1
     - simple fix
     - simple revision
     - code quality
+- Deps:
+    - library upgrade
+    - dependency upgrade
 - Toolings:
     - go tools
     - dev tools
-    - library upgrade
-    - dependency upgrade
 - Script:
     - run.sh
     - cmd/thumbnailify_images.go
