@@ -1,12 +1,12 @@
 
--- +migrate Up
-CREATE TABLE tbl_product_category (
+-- +goose Up
+CREATE TABLE tbl_product_categories (
 	id INTEGER PRIMARY KEY,
 	category TEXT,
 	subcategory TEXT,
 	promoted_at_homepage bool DEFAULT false
 );
-CREATE INDEX idx_tbl_product_category_category ON tbl_product_category(category);
+CREATE INDEX idx_tbl_product_categories_category ON tbl_product_categories(category);
 
 CREATE TABLE tbl_product_specs (
 	id INTEGER PRIMARY KEY,
@@ -19,7 +19,7 @@ CREATE TABLE tbl_product_specs (
 	scope_of_supply TEXT
 );
 
-CREATE TABLE tbl_product (
+CREATE TABLE tbl_products (
 	id INTEGER PRIMARY KEY,
 	serial TEXT NOT NULL,
 	name TEXT NOT NULL,
@@ -44,21 +44,21 @@ CREATE TABLE tbl_product (
 	UNIQUE (serial)
 );
 
-CREATE INDEX idx_tbl_product_serial ON tbl_product(serial);
+CREATE INDEX idx_tbl_products_serial ON tbl_products(serial);
 
 CREATE TABLE tbl_products_categories (
 	id INTEGER PRIMARY KEY,
 	category_id INTEGER NOT NULL,
 	product_id INTEGER NOT NULL,
-	FOREIGN KEY (category_id) REFERENCES tbl_product_category(id),
-	FOREIGN KEY (product_id) REFERENCES tbl_product(id),
+	FOREIGN KEY (category_id) REFERENCES tbl_product_categories(id),
+	FOREIGN KEY (product_id) REFERENCES tbl_products(id),
 	UNIQUE(product_id, category_id)
 );
 
--- +migrate Down
-DROP INDEX idx_tbl_product_category_category;
-DROP INDEX idx_tbl_product_serial;
+-- +goose Down
+DROP INDEX idx_tbl_product_categories_category;
+DROP INDEX idx_tbl_products_serial;
 DROP TABLE tbl_products_categories;
 DROP TABLE tbl_product_specs;
-DROP TABLE tbl_product_category;
-DROP TABLE tbl_product;
+DROP TABLE tbl_product_categories;
+DROP TABLE tbl_products;

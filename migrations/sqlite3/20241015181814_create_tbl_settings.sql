@@ -1,5 +1,5 @@
 
--- +migrate Up
+-- +goose Up
 CREATE TABLE tbl_settings (
 	id INTEGER PRIMARY KEY,
 	name TEXT NOT NULL,
@@ -9,6 +9,6 @@ CREATE TABLE tbl_settings (
 );
 CREATE INDEX idx_tbl_settings_name ON tbl_settings(name);
 
--- +migrate Down
+-- +goose Down
 DROP INDEX idx_tbl_settings_name;
 DROP TABLE tbl_settings;

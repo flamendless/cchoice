@@ -12,7 +12,7 @@ import (
 )
 
 const createProductImage = `-- name: CreateProductImage :one
-INSERT INTO tbl_product_image (
+INSERT INTO tbl_product_images (
 	product_id,
 	path,
 	thumbnail,

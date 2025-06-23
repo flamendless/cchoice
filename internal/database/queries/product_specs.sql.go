@@ -123,8 +123,8 @@ func (q *Queries) GetProductSpecsByID(ctx context.Context, id int64) (TblProduct
 const getProductSpecsByProductID = `-- name: GetProductSpecsByProductID :one
 SELECT tbl_product_specs.id, tbl_product_specs.colours, tbl_product_specs.sizes, tbl_product_specs.segmentation, tbl_product_specs.part_number, tbl_product_specs.power, tbl_product_specs.capacity, tbl_product_specs.scope_of_supply
 FROM tbl_product_specs
-INNER JOIN tbl_product ON tbl_product.product_specs_id = tbl_product_specs.id
-WHERE tbl_product.id = ?
+INNER JOIN tbl_products ON tbl_products.product_specs_id = tbl_product_specs.id
+WHERE tbl_products.id = ?
 LIMIT 1
 `
 

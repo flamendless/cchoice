@@ -12,7 +12,7 @@ import (
 )
 
 const createProductCategory = `-- name: CreateProductCategory :one
-INSERT INTO tbl_product_category (
+INSERT INTO tbl_product_categories (
 	category,
 	subcategory
 ) VALUES (
@@ -62,15 +62,15 @@ const getProductCategoriesByPromoted = `-- name: GetProductCategoriesByPromoted 
 ;
 
 SELECT
-	tbl_product_category.id,
-	tbl_product_category.category,
+	tbl_product_categories.id,
+	tbl_product_categories.category,
 	COUNT(tbl_products_categories.product_id) AS products_count
-FROM tbl_product_category
-INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_category.id
+FROM tbl_product_categories
+INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
 WHERE promoted_at_homepage = ?
 GROUP BY tbl_products_categories.category_id
 HAVING tbl_products_categories.product_id
-ORDER BY tbl_product_category.category ASC
+ORDER BY tbl_product_categories.category ASC
 LIMIT ?
 `
 
@@ -112,15 +112,15 @@ const getProductCategoriesForSections = `-- name: GetProductCategoriesForSection
 ;
 
 SELECT
-	tbl_product_category.id,
-	tbl_product_category.category,
-	tbl_product_category.subcategory,
+	tbl_product_categories.id,
+	tbl_product_categories.category,
+	tbl_product_categories.subcategory,
 	COUNT(tbl_products_categories.product_id) AS products_count
-FROM tbl_product_category
-INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_category.id
+FROM tbl_product_categories
+INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
 GROUP BY tbl_products_categories.category_id
 HAVING tbl_products_categories.product_id
-ORDER BY tbl_product_category.category ASC
+ORDER BY tbl_product_categories.category ASC
 LIMIT 256
 `
 
@@ -161,15 +161,15 @@ func (q *Queries) GetProductCategoriesForSections(ctx context.Context) ([]GetPro
 
 const getProductCategoriesForSectionsPagination = `-- name: GetProductCategoriesForSectionsPagination :many
 SELECT
-	tbl_product_category.id,
-	tbl_product_category.category,
-	tbl_product_category.subcategory,
+	tbl_product_categories.id,
+	tbl_product_categories.category,
+	tbl_product_categories.subcategory,
 	COUNT(tbl_products_categories.product_id) AS products_count
-FROM tbl_product_category
-INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_category.id
+FROM tbl_product_categories
+INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
 GROUP BY tbl_products_categories.category_id
 HAVING tbl_products_categories.product_id
-ORDER BY tbl_product_category.category ASC
+ORDER BY tbl_product_categories.category ASC
 LIMIT ?
 OFFSET ?
 `
@@ -216,7 +216,7 @@ func (q *Queries) GetProductCategoriesForSectionsPagination(ctx context.Context,
 
 const getProductCategoryByCategory = `-- name: GetProductCategoryByCategory :one
 SELECT id, category, subcategory, promoted_at_homepage
-FROM tbl_product_category
+FROM tbl_product_categories
 WHERE category = ?
 LIMIT 1
 `
@@ -235,7 +235,7 @@ func (q *Queries) GetProductCategoryByCategory(ctx context.Context, category sql
 
 const getProductCategoryByCategoryAndSubcategory = `-- name: GetProductCategoryByCategoryAndSubcategory :one
 SELECT id, category, subcategory, promoted_at_homepage
-FROM tbl_product_category
+FROM tbl_product_categories
 WHERE category = ? AND subcategory = ?
 LIMIT 1
 `
@@ -259,7 +259,7 @@ func (q *Queries) GetProductCategoryByCategoryAndSubcategory(ctx context.Context
 
 const getProductCategoryByID = `-- name: GetProductCategoryByID :one
 SELECT id, category, subcategory, promoted_at_homepage
-FROM tbl_product_category
+FROM tbl_product_categories
 WHERE id = ?
 LIMIT 1
 `
@@ -278,23 +278,23 @@ func (q *Queries) GetProductCategoryByID(ctx context.Context, id int64) (TblProd
 
 const getProductsByCategoryID = `-- name: GetProductsByCategoryID :many
 SELECT
-	tbl_product.id,
-	tbl_product.name,
-	tbl_product.description,
-	tbl_product.unit_price_with_vat,
-	tbl_product.unit_price_with_vat_currency,
-	tbl_brand.name AS brand_name,
-	COALESCE(tbl_product_image.thumbnail, 'static/images/empty_96x96.webp') AS thumbnail_path,
+	tbl_products.id,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_brands.name AS brand_name,
+	COALESCE(tbl_product_images.thumbnail, 'static/images/empty_96x96.webp') AS thumbnail_path,
 	'' as thumbnail_data
-FROM tbl_product
+FROM tbl_products
 INNER JOIN
-	tbl_brand ON tbl_brand.id = tbl_product.brand_id
+	tbl_brands ON tbl_brands.id = tbl_products.brand_id
 INNER JOIN
-	tbl_products_categories ON tbl_products_categories.product_id = tbl_product.id
+	tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
 LEFT JOIN
-	tbl_product_image ON tbl_product_image.product_id = tbl_product.id
+	tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 WHERE tbl_products_categories.category_id = ?
-ORDER BY tbl_product.created_at DESC
+ORDER BY tbl_products.created_at DESC
 LIMIT ?
 `
 
@@ -364,16 +364,16 @@ func (q *Queries) GetProductsCategoriesByIDs(ctx context.Context, arg GetProduct
 	return id, err
 }
 
-const setInitialPromotedProductCategory = `-- name: SetInitialPromotedProductCategory :many
-UPDATE tbl_product_category
+const setInitialPromotedProductCategories = `-- name: SetInitialPromotedProductCategories :many
+UPDATE tbl_product_categories
 SET promoted_at_homepage = true
 WHERE
 	category IN (/*SLICE:categories*/?)
 RETURNING id
 `
 
-func (q *Queries) SetInitialPromotedProductCategory(ctx context.Context, categories []sql.NullString) ([]int64, error) {
-	query := setInitialPromotedProductCategory
+func (q *Queries) SetInitialPromotedProductCategories(ctx context.Context, categories []sql.NullString) ([]int64, error) {
+	query := setInitialPromotedProductCategories
 	var queryParams []interface{}
 	if len(categories) > 0 {
 		for _, v := range categories {

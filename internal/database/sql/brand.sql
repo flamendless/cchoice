@@ -1,36 +1,36 @@
--- name: GetBrandIDByName :one
+-- name: GetBrandsIDByName :one
 SELECT id
-FROM tbl_brand
+FROM tbl_brands
 WHERE
 	name = ?
 LIMIT 1;
 
--- name: GetBrandByID :one
+-- name: GetBrandsByID :one
 SELECT
-	tbl_brand.*,
-	tbl_brand_image.id AS brand_image_id,
-	tbl_brand_image.path AS path
-FROM tbl_brand
-INNER JOIN tbl_brand_image ON tbl_brand_image.brand_id = tbl_brand.id
+	tbl_brands.*,
+	tbl_brand_images.id AS brand_image_id,
+	tbl_brand_images.path AS path
+FROM tbl_brands
+INNER JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id
 WHERE
-	tbl_brand.id = ?
+	tbl_brands.id = ?
 LIMIT 1;
 
--- name: GetBrandLogos :many
+-- name: GetBrandsLogos :many
 SELECT
-	tbl_brand.id AS id,
-	tbl_brand.name AS name,
-	tbl_brand_image.id AS brand_image_id,
-	tbl_brand_image.path AS path
-FROM tbl_brand
-INNER JOIN tbl_brand_image ON tbl_brand_image.brand_id = tbl_brand.id
+	tbl_brands.id AS id,
+	tbl_brands.name AS name,
+	tbl_brand_images.id AS brand_image_id,
+	tbl_brand_images.path AS path
+FROM tbl_brands
+INNER JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id
 WHERE
-	tbl_brand_image.is_main = true
-ORDER BY tbl_brand.created_at DESC
+	tbl_brand_images.is_main = true
+ORDER BY tbl_brands.created_at DESC
 LIMIT ?;
 
--- name: CreateBrand :one
-INSERT INTO tbl_brand (
+-- name: CreateBrands :one
+INSERT INTO tbl_brands (
 	name,
 	created_at,
 	updated_at,
@@ -39,8 +39,8 @@ INSERT INTO tbl_brand (
 	?, ?, ?, ?
 ) RETURNING id;
 
--- name: CreateBrandImage :one
-INSERT INTO tbl_brand_image (
+-- name: CreateBrandImages :one
+INSERT INTO tbl_brand_images (
 	brand_id,
 	path,
 	is_main,

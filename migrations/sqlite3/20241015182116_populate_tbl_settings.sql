@@ -1,5 +1,5 @@
 
--- +migrate Up
+-- +goose Up
 INSERT INTO tbl_settings (name, value)
 VALUES
 	('url_tiktok', 'https://www.tiktok.com/@cchoicesales?_t=8pPsHyIgtF4&_r=1'),
@@ -9,7 +9,7 @@ VALUES
 	('mobile_no', '09976894824')
 ;
 
--- +migrate Down
+-- +goose Down
 DELETE FROM tbl_settings
 WHERE name IN ('url_tiktok', 'url_facebook', 'url_gmap', 'email', 'mobile_no')
 ;
