@@ -166,3 +166,12 @@ INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 ORDER BY tbl_products.created_at DESC
 LIMIT ?
 ;
+
+-- name: GetProductsBySearchQuery :many
+SELECT
+	*
+FROM tbl_products_fts
+WHERE
+	serial MATCH ? OR
+	name MATCH ?
+LIMIT ?;
