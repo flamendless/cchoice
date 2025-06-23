@@ -71,5 +71,8 @@ mkcert localhost 127.0.0.1 ::1
     - Changelogs
 - Performance:
     - optimization
-- Server
+- Server:
+    - SQL
+    - Migrations
+    - API
 - Web
