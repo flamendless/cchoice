@@ -1,6 +1,12 @@
 
 -- +goose Up
-CREATE VIRTUAL TABLE tbl_products_fts USING fts5(serial, name);
+CREATE VIRTUAL TABLE tbl_products_fts
+USING fts5(
+    serial,
+    name,
+    content='tbl_products',
+    content_rowid='id'
+);
 
 -- -- +goose StatementBegin
 CREATE TRIGGER tbl_products_after_insert AFTER INSERT ON tbl_products
