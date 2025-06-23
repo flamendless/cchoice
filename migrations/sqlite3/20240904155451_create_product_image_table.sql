@@ -1,6 +1,6 @@
 
--- +migrate Up
-CREATE TABLE tbl_product_image (
+-- +goose Up
+CREATE TABLE tbl_product_images (
 	id INTEGER PRIMARY KEY,
 	product_id INTEGER NOT NULL,
 	path TEXT NOT NULL,
@@ -10,8 +10,8 @@ CREATE TABLE tbl_product_image (
 	updated_at DATETIME NOT NULL DEFAULT (DATE('1970-01-01 00:00:00')),
 	deleted_at DATETIME NOT NULL DEFAULT (DATE('1970-01-01 00:00:00')),
 
-	FOREIGN KEY (product_id) REFERENCES tbl_product(id)
+	FOREIGN KEY (product_id) REFERENCES tbl_products(id)
 );
 
--- +migrate Down
-DROP TABLE tbl_product_image;
+-- +goose Down
+DROP TABLE tbl_product_images;

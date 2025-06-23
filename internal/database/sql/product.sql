@@ -1,121 +1,121 @@
--- name: GetProductByID :one
+-- name: GetProductsByID :one
 SELECT
 	*,
-	tbl_brand.name AS brand_name
-FROM tbl_product
-INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
-INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
-WHERE tbl_product.id = ?
+	tbl_brands.name AS brand_name
+FROM tbl_products
+INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
+INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE tbl_products.id = ?
 LIMIT 1;
 
--- name: GetProductBySerial :one
+-- name: GetProductsBySerial :one
 SELECT
 	*,
-	tbl_brand.name AS brand_name
-FROM tbl_product
-INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
-INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
-WHERE tbl_product.serial = ?
+	tbl_brands.name AS brand_name
+FROM tbl_products
+INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
+INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE tbl_products.serial = ?
 LIMIT 1;
 
 -- name: GetProducts :many
 SELECT
 	*,
-	tbl_brand.name AS brand_name
-FROM tbl_product
-INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
-INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
+	tbl_brands.name AS brand_name
+FROM tbl_products
+INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
+INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 ORDER BY created_at DESC;
 
 -- name: GetProductsByStatus :many
 SELECT
 	*,
-	tbl_brand.name AS brand_name
-FROM tbl_product
-INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
-INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
-WHERE tbl_product.status = ?
+	tbl_brands.name AS brand_name
+FROM tbl_products
+INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
+INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE tbl_products.status = ?
 ORDER BY created_at DESC;
 
 -- name: GetProductsByStatusSortByNameAsc :many
 SELECT
 	*,
-	tbl_brand.name AS brand_name
-FROM tbl_product
-INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
-INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
-WHERE tbl_product.status = ?
-ORDER BY LOWER(tbl_product.name) ASC;
+	tbl_brands.name AS brand_name
+FROM tbl_products
+INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
+INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE tbl_products.status = ?
+ORDER BY LOWER(tbl_products.name) ASC;
 
 -- name: GetProductsByStatusSortByNameDesc :many
 SELECT
 	*,
-	tbl_brand.name AS brand_name
-FROM tbl_product
-INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
-INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
-WHERE tbl_product.status = ?
-ORDER BY LOWER(tbl_product.name) DESC;
+	tbl_brands.name AS brand_name
+FROM tbl_products
+INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
+INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE tbl_products.status = ?
+ORDER BY LOWER(tbl_products.name) DESC;
 
 -- name: GetProductsByStatusSortByCreationDateAsc :many
 SELECT
 	*,
-	tbl_brand.name AS brand_name
-FROM tbl_product
-INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
-INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
-WHERE tbl_product.status = ?
-ORDER BY tbl_product.created_at ASC;
+	tbl_brands.name AS brand_name
+FROM tbl_products
+INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
+INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE tbl_products.status = ?
+ORDER BY tbl_products.created_at ASC;
 
 -- name: GetProductsByStatusSortByCreationDateDesc :many
 SELECT
 	*,
-	tbl_brand.name AS brand_name
-FROM tbl_product
-INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
-INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
-WHERE tbl_product.status = ?
-ORDER BY tbl_product.created_at DESC;
+	tbl_brands.name AS brand_name
+FROM tbl_products
+INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
+INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE tbl_products.status = ?
+ORDER BY tbl_products.created_at DESC;
 
 -- name: GetProductsByFilter :many
 SELECT
 	*,
-	tbl_brand.name AS brand_name
-FROM tbl_product
-INNER JOIN tbl_product_category ON tbl_product.id = tbl_product_category.product_id
-INNER JOIN tbl_product_specs ON tbl_product.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
+	tbl_brands.name AS brand_name
+FROM tbl_products
+INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
+INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 WHERE
-	(tbl_product.status = @status OR @status IS NULL) OR
-	(tbl_brand.name = @brand OR @brand IS NULL)
-ORDER BY tbl_product.updated_at DESC;
+	(tbl_products.status = @status OR @status IS NULL) OR
+	(tbl_brands.name = @brand OR @brand IS NULL)
+ORDER BY tbl_products.updated_at DESC;
 
 -- name: GetProductsWithSort :many
 SELECT *
-FROM tbl_product
+FROM tbl_products
 ORDER BY
-	(CASE WHEN @sort = 'sku' AND @dir = 'ASC' THEN  tbl_product.sku END) ASC,
-	(CASE WHEN @sort = 'sku' AND @dir = 'DESC' THEN tbl_product.sku END) DESC,
-	(CASE WHEN @sort = 'created_at' AND @dir = 'ASC' THEN tbl_product.created_at END) ASC,
-	(CASE WHEN @sort = 'created_at' AND @dir = 'DESC' THEN tbl_product.created_at END) DESC
+	(CASE WHEN @sort = 'sku' AND @dir = 'ASC' THEN  tbl_products.sku END) ASC,
+	(CASE WHEN @sort = 'sku' AND @dir = 'DESC' THEN tbl_products.sku END) DESC,
+	(CASE WHEN @sort = 'created_at' AND @dir = 'ASC' THEN tbl_products.created_at END) ASC,
+	(CASE WHEN @sort = 'created_at' AND @dir = 'DESC' THEN tbl_products.created_at END) DESC
 ;
 
 -- name: GetProductIDBySerial :one
 SELECT id
-FROM tbl_product
-WHERE tbl_product.serial = ?
+FROM tbl_products
+WHERE tbl_products.serial = ?
 LIMIT 1;
 
--- name: CreateProduct :one
-INSERT INTO tbl_product (
+-- name: CreateProducts :one
+INSERT INTO tbl_products (
 	serial,
 	name,
 	description,
@@ -136,8 +136,8 @@ INSERT INTO tbl_product (
 	?
 ) RETURNING *;
 
--- name: UpdateProduct :execlastid
-UPDATE tbl_product
+-- name: UpdateProducts :execlastid
+UPDATE tbl_products
 SET
 	name = ?,
 	description = ?,
@@ -155,14 +155,14 @@ WHERE id = ?;
 
 -- name: GetProductsListing :many
 SELECT
-	tbl_product.id,
-	tbl_product.name,
-	tbl_product.description,
-	tbl_product.unit_price_with_vat,
-	tbl_product.unit_price_with_vat_currency,
-	tbl_brand.name AS brand_name
-FROM tbl_product
-INNER JOIN tbl_brand ON tbl_brand.id = tbl_product.brand_id
-ORDER BY tbl_product.created_at DESC
+	tbl_products.id,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_brands.name AS brand_name
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+ORDER BY tbl_products.created_at DESC
 LIMIT ?
 ;

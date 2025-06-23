@@ -254,9 +254,9 @@ func (product *Product) InsertToDB(ctx context.Context, db database.Service) (in
 	product.ProductSpecs.ID = productSpecsID
 
 	now := time.Now().UTC()
-	insertedProduct, err := db.GetQueries().CreateProduct(
+	insertedProduct, err := db.GetQueries().CreateProducts(
 		ctx,
-		queries.CreateProductParams{
+		queries.CreateProductsParams{
 			Serial: product.Serial,
 			Name:   product.Name,
 			Description: sql.NullString{
@@ -304,9 +304,9 @@ func (product *Product) UpdateToDB(ctx context.Context, db database.Service) (in
 	product.ProductSpecs.ID = productSpecsID
 
 	now := time.Now().UTC()
-	updatedID, err := db.GetQueries().UpdateProduct(
+	updatedID, err := db.GetQueries().UpdateProducts(
 		ctx,
-		queries.UpdateProductParams{
+		queries.UpdateProductsParams{
 			ID:   product.ID,
 			Name: product.Name,
 			Description: sql.NullString{
@@ -339,7 +339,7 @@ func (product *Product) UpdateToDB(ctx context.Context, db database.Service) (in
 	return updatedID, err
 }
 
-func DBRowToProduct(row *queries.GetProductBySerialRow) *Product {
+func DBRowToProduct(row *queries.GetProductsBySerialRow) *Product {
 	moneyWithoutVat := utils.NewMoney(row.UnitPriceWithoutVat, row.UnitPriceWithoutVatCurrency)
 	moneyWithVat := utils.NewMoney(row.UnitPriceWithVat, row.UnitPriceWithVatCurrency)
 

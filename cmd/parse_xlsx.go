@@ -320,7 +320,7 @@ var cmdParseXLSX = &cobra.Command{
 					continue
 				}
 
-				row, err := tpl.CtxApp.DB.GetQueries().GetProductBySerial(cmd.Context(), product.Serial)
+				row, err := tpl.CtxApp.DB.GetQueries().GetProductsBySerial(cmd.Context(), product.Serial)
 				if err != nil {
 					continue
 				}
@@ -365,7 +365,7 @@ var cmdParseXLSX = &cobra.Command{
 
 		}
 
-		promotedCategoryIDs, err := tpl.CtxApp.DB.GetQueries().SetInitialPromotedProductCategory(cmd.Context(), params)
+		promotedCategoryIDs, err := tpl.CtxApp.DB.GetQueries().SetInitialPromotedProductCategories(cmd.Context(), params)
 		if err != nil {
 			panic(err)
 		}

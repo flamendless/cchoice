@@ -10,38 +10,8 @@ import (
 	"time"
 )
 
-const createBrand = `-- name: CreateBrand :one
-INSERT INTO tbl_brand (
-	name,
-	created_at,
-	updated_at,
-	deleted_at
-) VALUES (
-	?, ?, ?, ?
-) RETURNING id
-`
-
-type CreateBrandParams struct {
-	Name      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
-}
-
-func (q *Queries) CreateBrand(ctx context.Context, arg CreateBrandParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, createBrand,
-		arg.Name,
-		arg.CreatedAt,
-		arg.UpdatedAt,
-		arg.DeletedAt,
-	)
-	var id int64
-	err := row.Scan(&id)
-	return id, err
-}
-
-const createBrandImage = `-- name: CreateBrandImage :one
-INSERT INTO tbl_brand_image (
+const createBrandImages = `-- name: CreateBrandImages :one
+INSERT INTO tbl_brand_images (
 	brand_id,
 	path,
 	is_main,
@@ -54,7 +24,7 @@ INSERT INTO tbl_brand_image (
 ) RETURNING id
 `
 
-type CreateBrandImageParams struct {
+type CreateBrandImagesParams struct {
 	BrandID   int64
 	Path      string
 	IsMain    bool
@@ -63,8 +33,8 @@ type CreateBrandImageParams struct {
 	DeletedAt time.Time
 }
 
-func (q *Queries) CreateBrandImage(ctx context.Context, arg CreateBrandImageParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, createBrandImage,
+func (q *Queries) CreateBrandImages(ctx context.Context, arg CreateBrandImagesParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createBrandImages,
 		arg.BrandID,
 		arg.Path,
 		arg.IsMain,
@@ -77,19 +47,49 @@ func (q *Queries) CreateBrandImage(ctx context.Context, arg CreateBrandImagePara
 	return id, err
 }
 
-const getBrandByID = `-- name: GetBrandByID :one
+const createBrands = `-- name: CreateBrands :one
+INSERT INTO tbl_brands (
+	name,
+	created_at,
+	updated_at,
+	deleted_at
+) VALUES (
+	?, ?, ?, ?
+) RETURNING id
+`
+
+type CreateBrandsParams struct {
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
+}
+
+func (q *Queries) CreateBrands(ctx context.Context, arg CreateBrandsParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createBrands,
+		arg.Name,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+		arg.DeletedAt,
+	)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const getBrandsByID = `-- name: GetBrandsByID :one
 SELECT
-	tbl_brand.id, tbl_brand.name, tbl_brand.created_at, tbl_brand.updated_at, tbl_brand.deleted_at,
-	tbl_brand_image.id AS brand_image_id,
-	tbl_brand_image.path AS path
-FROM tbl_brand
-INNER JOIN tbl_brand_image ON tbl_brand_image.brand_id = tbl_brand.id
+	tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at,
+	tbl_brand_images.id AS brand_image_id,
+	tbl_brand_images.path AS path
+FROM tbl_brands
+INNER JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id
 WHERE
-	tbl_brand.id = ?
+	tbl_brands.id = ?
 LIMIT 1
 `
 
-type GetBrandByIDRow struct {
+type GetBrandsByIDRow struct {
 	ID           int64
 	Name         string
 	CreatedAt    time.Time
@@ -99,9 +99,9 @@ type GetBrandByIDRow struct {
 	Path         string
 }
 
-func (q *Queries) GetBrandByID(ctx context.Context, id int64) (GetBrandByIDRow, error) {
-	row := q.db.QueryRowContext(ctx, getBrandByID, id)
-	var i GetBrandByIDRow
+func (q *Queries) GetBrandsByID(ctx context.Context, id int64) (GetBrandsByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getBrandsByID, id)
+	var i GetBrandsByIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
@@ -114,51 +114,51 @@ func (q *Queries) GetBrandByID(ctx context.Context, id int64) (GetBrandByIDRow, 
 	return i, err
 }
 
-const getBrandIDByName = `-- name: GetBrandIDByName :one
+const getBrandsIDByName = `-- name: GetBrandsIDByName :one
 SELECT id
-FROM tbl_brand
+FROM tbl_brands
 WHERE
 	name = ?
 LIMIT 1
 `
 
-func (q *Queries) GetBrandIDByName(ctx context.Context, name string) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getBrandIDByName, name)
+func (q *Queries) GetBrandsIDByName(ctx context.Context, name string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getBrandsIDByName, name)
 	var id int64
 	err := row.Scan(&id)
 	return id, err
 }
 
-const getBrandLogos = `-- name: GetBrandLogos :many
+const getBrandsLogos = `-- name: GetBrandsLogos :many
 SELECT
-	tbl_brand.id AS id,
-	tbl_brand.name AS name,
-	tbl_brand_image.id AS brand_image_id,
-	tbl_brand_image.path AS path
-FROM tbl_brand
-INNER JOIN tbl_brand_image ON tbl_brand_image.brand_id = tbl_brand.id
+	tbl_brands.id AS id,
+	tbl_brands.name AS name,
+	tbl_brand_images.id AS brand_image_id,
+	tbl_brand_images.path AS path
+FROM tbl_brands
+INNER JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id
 WHERE
-	tbl_brand_image.is_main = true
-ORDER BY tbl_brand.created_at DESC
+	tbl_brand_images.is_main = true
+ORDER BY tbl_brands.created_at DESC
 LIMIT ?
 `
 
-type GetBrandLogosRow struct {
+type GetBrandsLogosRow struct {
 	ID           int64
 	Name         string
 	BrandImageID int64
 	Path         string
 }
 
-func (q *Queries) GetBrandLogos(ctx context.Context, limit int64) ([]GetBrandLogosRow, error) {
-	rows, err := q.db.QueryContext(ctx, getBrandLogos, limit)
+func (q *Queries) GetBrandsLogos(ctx context.Context, limit int64) ([]GetBrandsLogosRow, error) {
+	rows, err := q.db.QueryContext(ctx, getBrandsLogos, limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetBrandLogosRow
+	var items []GetBrandsLogosRow
 	for rows.Next() {
-		var i GetBrandLogosRow
+		var i GetBrandsLogosRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,

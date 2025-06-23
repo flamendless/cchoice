@@ -1,17 +1,17 @@
 
--- +migrate Up
-CREATE TABLE tbl_brand_image (
+-- +goose Up
+CREATE TABLE tbl_brands (
 	id INTEGER PRIMARY KEY,
-	brand_id INTEGER NOT NULL,
-	path TEXT NOT NULL,
-	is_main boolean NOT NULL DEFAULT false,
+	name TEXT NOT NULL,
 
 	created_at DATETIME NOT NULL DEFAULT (DATE('1970-01-01 00:00:00')),
 	updated_at DATETIME NOT NULL DEFAULT (DATE('1970-01-01 00:00:00')),
 	deleted_at DATETIME NOT NULL DEFAULT (DATE('1970-01-01 00:00:00')),
 
-	FOREIGN KEY (brand_id) REFERENCES tbl_brand(id)
+	UNIQUE (name)
 );
+CREATE INDEX idx_tbl_brands_name ON tbl_brands(name);
 
--- +migrate Down
-DROP TABLE tbl_brand_image;
+-- +goose Down
+DROP INDEX idx_tbl_brands_name;
+DROP TABLE tbl_brands;

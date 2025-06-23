@@ -9,15 +9,6 @@ import (
 	"time"
 )
 
-type TblAuth struct {
-	ID            int64
-	UserID        int64
-	Token         string
-	OtpEnabled    bool
-	OtpSecret     sql.NullString
-	RecoveryCodes sql.NullString
-}
-
 type TblBrand struct {
 	ID        int64
 	Name      string
@@ -91,19 +82,4 @@ type TblSetting struct {
 	ID    int64
 	Name  string
 	Value string
-}
-
-type TblUser struct {
-	ID         int64
-	FirstName  string
-	MiddleName string
-	LastName   string
-	Email      string
-	Password   string
-	MobileNo   string
-	UserType   string
-	Status     string
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-	DeletedAt  time.Time
 }
