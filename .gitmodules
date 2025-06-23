@@ -1,0 +1,3 @@
+[submodule "cmd/goose"]
+	path = cmd/goose
+	url = https://github.com/pressly/goose.git

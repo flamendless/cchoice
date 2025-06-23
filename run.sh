@@ -7,6 +7,7 @@ set -euf -o pipefail
 
 DBNAME="test.db"
 DBPATH="file:./${DBNAME}"
+TMP="./tmp"
 
 BROWSER="${BROWSER:-vivaldi}"
 ISWSL=false
@@ -22,6 +23,21 @@ serve() {
 	fi
 	go tool templ generate --watch --proxy="http://localhost:2626" --open-browser=false &
 	go tool air -c ".air.api.toml" api
+}
+
+build() {
+	local -; set -x;
+	genall
+	go build -o "${TMP}/main" .
+}
+
+buildgoose() {
+	local -; set -x;
+	cd ./cmd/goose
+	go mod tidy
+	go build -tags='no_postgres no_mysql no_clickhouse no_mssql no_vertica no_ydb' -o "../../${TMP}/goose" ./cmd/goose
+	cd ../..
+	chmod +x "${TMP}/goose"
 }
 
 customrun() {
@@ -54,7 +70,7 @@ cleandb() {
 	local -; set -x;
 	clean
 	gensql
-	go tool github.com/rubenv/sql-migrate/sql-migrate up
+	"${TMP}/goose" up
 
 	# local otherbrands=("BRADFORD" "SPARTAN" "SHINSETSU" "REDMAX" "KOBEWEL")
 	# for brand in "${otherbrands[@]}"; do
@@ -86,6 +102,8 @@ deps() {
         openslide \
         libxml2 \
         libjxl
+
+	buildgoose
 }
 
 gensql() {
@@ -157,7 +175,6 @@ benchmark() {
 }
 
 prof() {
-	local TMP="./tmp"
 	if [ "$#" -ne 3 ]; then
 		echo "must pass either 2 more arguments"
 		exit 1
@@ -169,7 +186,7 @@ prof() {
 prod() {
 	# genall
 	# templ generate
-	go build -o ./tmp/main .
+	build
 	echo "Run: ./tmp/main api > out 2>&1 &"
 }
 
