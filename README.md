@@ -1,5 +1,6 @@
 # Setup
 
+- `git clone --recurse-submodules -j8 <repo>`
 - `go mod download`
 - `go mod tidy`
 - `chmod +x ./run.sh`
