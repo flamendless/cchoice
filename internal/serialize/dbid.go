@@ -23,6 +23,10 @@ func DecodeToDBID(dbid string) (enums.DBPrefix, int64) {
 	}
 
 	splitted := bytes.Split(dec, []byte(":"))
+	if len(splitted) != 2 {
+		panic(fmt.Errorf("Failed to split bytestring: '%+v'", splitted))
+	}
+
 	prefix, decid := splitted[0], splitted[1]
 
 	id, err := strconv.Atoi(string(decid))
@@ -40,6 +44,10 @@ func MustDecodeToDBID(prefix enums.DBPrefix, dbid string) int64 {
 	}
 
 	splitted := bytes.Split(dec, []byte(":"))
+	if len(splitted) != 2 {
+		panic(fmt.Errorf("Failed to split bytestring: '%+v'", splitted))
+	}
+
 	if string(splitted[0]) != prefix.String() {
 		panic(fmt.Errorf("Prefix must match: '%s' %s", prefix.String(), splitted[0]))
 	}

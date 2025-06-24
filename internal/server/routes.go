@@ -403,8 +403,8 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	products, err := s.dbRO.GetQueries().GetProductsBySearchQuery(
 		r.Context(),
 		queries.GetProductsBySearchQueryParams{
-			Name:   search,
-			Limit:  6,
+			Name:  search,
+			Limit: 6,
 		},
 	)
 	if err != nil || len(products) == 0 {
