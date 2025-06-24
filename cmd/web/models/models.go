@@ -43,6 +43,8 @@ type CategorySectionProducts struct {
 	Products    []CategorySectionProduct
 }
 
+type SearchResultProduct queries.GetProductsBySearchQueryRow
+
 func ToCategorySectionProducts[T queries.GetProductsByCategoryIDRow](data []T) []CategorySectionProduct {
 	res := make([]CategorySectionProduct, 0, len(data))
 	for _, d := range data {

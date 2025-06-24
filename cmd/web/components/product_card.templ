@@ -1,0 +1,37 @@
+package components
+
+import (
+	"cchoice/cmd/web/models"
+)
+
+templ SearchResults() {
+	<div
+		id="search-results"
+		class="
+			absolute flex flex-col w-9/12 left-1/2 -translate-x-1/2 hidden
+			transform scale-y-100 origin-top transition-transform duration-200
+			left-0 top-full bg-white shadow-xl border-cchoice_border z-10
+		"
+	>
+		<ul></ul>
+	</div>
+}
+
+templ SearchResultProductCard(product models.SearchResultProduct) {
+	<li>
+		<div class="group flex flex-row items-center py-2 justify-evenly bg-white hover:bg-cchoicesoft">
+			<img
+				class="w-16 max-w-16 h-16 mx-4"
+				src={ product.ThumbnailData }
+				title={ product.Name }
+				alt="product thumbnail"
+			/>
+			<p
+				title={ product.Name }
+				class="text-base font-normal text-ellipsis text-wrap overflow-hidden"
+			>
+				{ product.Name }
+			</p>
+		</div>
+	</li>
+}
