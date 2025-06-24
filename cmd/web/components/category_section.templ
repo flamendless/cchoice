@@ -7,7 +7,13 @@ import (
 	"os"
 )
 
-var appEnv = os.Getenv("APP_ENV")
+var delayDiv = 4
+
+func init() {
+	if os.Getenv("APP_ENV") == "local" {
+		delayDiv = 16
+	}
+}
 
 templ CategorySectionProducts(data models.CategorySectionProducts) {
 	<div id={ "category-sections-" + data.ID }>
@@ -83,23 +89,14 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 			@HR()
 		}
 		if i == len(categories)-1 {
-			if appEnv == "local" {
-				<div
-					class="category-sections-inf-load"
-					hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", page+1) }
-					hx-target=".category-sections-inf-load"
-					hx-swap="outerHTML"
-					hx-trigger={ fmt.Sprintf("load delay:%ds", page/16) }
-				></div>
-			} else {
-				<div
-					class="category-sections-inf-load"
-					hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", page+1) }
-					hx-target=".category-sections-inf-load"
-					hx-swap="outerHTML"
-					hx-trigger={ fmt.Sprintf("load delay:%ds", page/4) }
-				></div>
-			}
+			<div
+				class="category-sections-inf-load"
+				hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", page+1) }
+				hx-target=".category-sections-inf-load"
+				hx-swap="outerHTML"
+				hx-trigger={ fmt.Sprintf("load delay:%ds", page/delayDiv) }
+			>
+			</div>
 		}
 	}
 }

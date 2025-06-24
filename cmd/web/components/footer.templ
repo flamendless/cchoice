@@ -5,10 +5,13 @@ import "cchoice/cmd/web/models"
 templ FooterRow1Texts(texts []models.FooterRowText) {
 	<div
 		id="footer-row1-texts"
-		class="flex flex-row text-xs"
+		class="flex flex-row flex-wrap text-xs"
 	>
 		for i, hrt := range texts {
-			<a href={ templ.SafeURL(hrt.URL) } class="font-light mx-1 cursor-pointer hover:underline">
+			<a
+				href={ templ.SafeURL(hrt.URL) }
+				class="font-light mx-1 text-nowrap cursor-pointer hover:underline"
+			>
 				{ hrt.Label }
 			</a>
 			if i < len(texts)-1 {
