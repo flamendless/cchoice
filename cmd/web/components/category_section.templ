@@ -95,8 +95,7 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 				hx-target=".category-sections-inf-load"
 				hx-swap="outerHTML"
 				hx-trigger={ fmt.Sprintf("load delay:%ds", page/delayDiv) }
-			>
-			</div>
+			></div>
 		}
 	}
 }
