@@ -8,7 +8,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	"cchoice/cmd/web"
 	"cchoice/cmd/web/components"
@@ -401,8 +400,39 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	search := r.PostFormValue("search")
+	products, err := s.dbRO.GetQueries().GetProductsBySearchQuery(
+		r.Context(),
+		queries.GetProductsBySearchQueryParams{
+			Name:   search,
+			Limit:  6,
+		},
+	)
+	if err != nil || len(products) == 0 {
+		logs.Log().Info("No search result", zap.String("search query", search))
+		return
+	}
 
-	//TODO: (Brandon)
-	time.Sleep(time.Second * time.Duration(len(search)))
-	w.Write([]byte(search))
+	for _, product := range products {
+		if product.ThumbnailPath == constants.PathEmptyImage {
+			continue
+		}
+
+		finalPath, ext, err := images.GetImagePathWithSize(product.ThumbnailPath, "96x96", true)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			continue
+		}
+
+		imgData, err := images.GetImageDataB64(s.Cache, s.fs, finalPath, ext)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			continue
+		}
+
+		product.ThumbnailData = imgData
+
+		if err := components.SearchResultProductCard(models.SearchResultProduct(product)).Render(r.Context(), w); err != nil {
+			logs.Log().Fatal("search result product card", zap.Error(err))
+		}
+	}
 }

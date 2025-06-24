@@ -30,12 +30,14 @@ templ SearchBar() {
 					on htmx:beforeRequest from #search
 						log 'search is triggered'
 						add .hidden to #icon-search
+						add .hidden to #search-results
 					end
 
 					on htmx:afterRequest from #search
 						log 'search is done'
 						wait 0.5s
 						remove .hidden from #icon-search
+						remove .hidden from #search-results
 					end
 				"
 			>
@@ -70,16 +72,19 @@ templ SearchBar() {
 
 			<input
 				required
+				autocomplete="off"
 				type="search"
 				id="search"
 				name="search"
 				placeholder="Search any term..."
 				class="block w-full p-3 ps-10 text-sm text-black border border-searchbar rounded-lg bg-searchbar focus:ring-cchoice focus:border-cchoice"
 				hx-post="/cchoice/search"
-				hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
+				hx-trigger="input changed delay:1000ms, keyup[key=='Enter']"
 				hx-indicator=".htmx-indicator"
 				hx-validate="true"
 				hx-include="#search"
+				hx-target="#search-results > ul"
+				hx-swap="innerHTML"
 			/>
 
 			<button
@@ -91,6 +96,8 @@ templ SearchBar() {
 			>
 				Search
 			</button>
+
+			@SearchResults()
 		</div>
 	</form>
 }
@@ -123,7 +130,7 @@ templ HeaderRow1Texts(texts []models.HeaderRowText) {
 }
 
 templ Header() {
-	<header class="fixed top-0 left-0 pt-2 pb-1.5 w-full z-50 bg-white max-h-[128px] truncate">
+	<header class="fixed top-0 left-0 pt-2 pb-1.5 w-full z-50 bg-white max-h-[128px] truncate overflow-visible">
 		<div class="w-full flex flex-col">
 			<div
 				id="header-row1"
@@ -138,7 +145,21 @@ templ Header() {
 			</div>
 			<div id="header-row2" class="w-full flex flex-row items-center">
 				@LogoWithText("256", "128")
-				<div class="w-full flex items-center place-content-center px-8 py-2">
+				<div
+					id="search-wrapper"
+					class="w-full flex items-center place-content-center px-8 py-2"
+					_="
+						on click from document
+							if event.target.closest('#search-wrapper') == null
+								add .hidden to #search-results
+							end
+						end
+
+						on keyup[key is 'Escape'] from document
+							add .hidden to #search-results
+						end
+					"
+				>
 					@SearchBar()
 				</div>
 				<div class="px-8 py-2">

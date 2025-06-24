@@ -19,7 +19,7 @@ serve() {
 	local -; set -x;
 	genall
 	if "${ISWSL}"; then
-		cmd.exe /c "start vivaldi http://localhost:7331/cchoice"
+		cmd.exe /c "start ${BROWSER} http://localhost:7331/cchoice"
 	fi
 	go tool templ generate --watch --proxy="http://localhost:2626" --open-browser=false &
 	go tool air -c ".air.api.toml" api
@@ -28,7 +28,7 @@ serve() {
 build() {
 	local -; set -x;
 	genall
-	go build -o "${TMP}/main" .
+	go build -tags='fts5' -o "${TMP}/main" .
 }
 
 buildgoose() {

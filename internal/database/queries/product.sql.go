@@ -404,31 +404,57 @@ func (q *Queries) GetProductsByID(ctx context.Context, id int64) (GetProductsByI
 const getProductsBySearchQuery = `-- name: GetProductsBySearchQuery :many
 ;
 
+
 SELECT
-	serial, name
+	tbl_products.id,
+	tbl_products.name,
+	tbl_brands.name AS brand_name,
+	COALESCE(
+		tbl_product_images.thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path,
+	'' as thumbnail_data
 FROM tbl_products_fts
+INNER JOIN tbl_products ON tbl_products.id = tbl_products_fts.rowid
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 WHERE
-	serial MATCH ? OR
-	name MATCH ?
+	tbl_products_fts.name MATCH ?
 LIMIT ?
 `
 
 type GetProductsBySearchQueryParams struct {
-	Serial string
-	Name   string
-	Limit  int64
+	Name  string
+	Limit int64
 }
 
-func (q *Queries) GetProductsBySearchQuery(ctx context.Context, arg GetProductsBySearchQueryParams) ([]TblProductsFt, error) {
-	rows, err := q.db.QueryContext(ctx, getProductsBySearchQuery, arg.Serial, arg.Name, arg.Limit)
+type GetProductsBySearchQueryRow struct {
+	ID            int64
+	Name          string
+	BrandName     string
+	ThumbnailPath string
+	ThumbnailData string
+}
+
+// TODO: (Brandon) if sqlc releases PR #3498
+//
+//	replace WHERE with `tbl_products_fts MATCH ?`
+func (q *Queries) GetProductsBySearchQuery(ctx context.Context, arg GetProductsBySearchQueryParams) ([]GetProductsBySearchQueryRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductsBySearchQuery, arg.Name, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblProductsFt
+	var items []GetProductsBySearchQueryRow
 	for rows.Next() {
-		var i TblProductsFt
-		if err := rows.Scan(&i.Serial, &i.Name); err != nil {
+		var i GetProductsBySearchQueryRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.BrandName,
+			&i.ThumbnailPath,
+			&i.ThumbnailData,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

@@ -167,11 +167,23 @@ ORDER BY tbl_products.created_at DESC
 LIMIT ?
 ;
 
+
+--TODO: (Brandon) if sqlc releases PR #3498
+--      replace WHERE with `tbl_products_fts MATCH ?`
 -- name: GetProductsBySearchQuery :many
 SELECT
-	*
+	tbl_products.id,
+	tbl_products.name,
+	tbl_brands.name AS brand_name,
+	COALESCE(
+		tbl_product_images.thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path,
+	'' as thumbnail_data
 FROM tbl_products_fts
+INNER JOIN tbl_products ON tbl_products.id = tbl_products_fts.rowid
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 WHERE
-	serial MATCH ? OR
-	name MATCH ?
+	tbl_products_fts.name MATCH ?
 LIMIT ?;
