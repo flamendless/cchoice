@@ -52,7 +52,14 @@ setup() {
 	fi
 }
 
-clean() {
+genimages() {
+	go run ./main.go thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/thumbnails/product_images/bosch" --format="webp" --width=96 --height=96
+	go run ./main.go thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/images/product_images/bosch" --format="webp" --width=1080 --height=1080
+	go run ./main.go convert_images --inpath="./cmd/web/static/images/brand_logos" --outpath="./cmd/web/static/images/brand_logos" --format="webp"
+
+}
+
+cleandb() {
 	local -; set -x;
 	echo "cleaning ${DBNAME}..."
 	if [ -f "./${DBNAME}" ]; then
@@ -64,22 +71,8 @@ clean() {
 	if [ -f "./${DBNAME}-wal" ]; then
 		rm "${DBNAME}-wal"
 	fi
-}
-
-cleandb() {
-	local -; set -x;
-	clean
 	gensql
 	"${TMP}/goose" up
-
-	# local otherbrands=("BRADFORD" "SPARTAN" "SHINSETSU" "REDMAX" "KOBEWEL")
-	# for brand in "${otherbrands[@]}"; do
-	# 	go run ./main.go parse_xlsx -p "assets/xlsx/sample.xlsx" -t "${brand}" --use_db --db_path "${DBPATH}" --panic_on_error=1
-	# done
-
-	go run ./main.go thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/thumbnails/product_images/bosch" --format="webp" --width=96 --height=96
-	go run ./main.go thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/images/product_images/bosch" --format="webp" --width=1080 --height=1080
-	go run ./main.go convert_images --inpath="./cmd/web/static/images/brand_logos" --outpath="./cmd/web/static/images/brand_logos" --format="webp"
 
 	go run -tags="fts5" ./main.go parse_xlsx -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./cmd/web/static/images/product_images/bosch/" --images_format="webp"
 
@@ -195,10 +188,10 @@ if [ "$#" -eq 0 ]; then
 	echo "Usage: ${0}"
 	echo "Commands:"
 	echo "    benchmark"
-	echo "    clean"
 	echo "    cleandb"
 	echo "    customrun"
 	echo "    genall"
+	echo "    genimages"
 	echo "    gensql"
 	echo "    gentempl"
 	echo "    prof"
