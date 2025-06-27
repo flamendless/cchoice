@@ -104,7 +104,8 @@ gensql() {
 }
 
 gentempl() {
-	pnpx @tailwindcss/cli -m -i ./cmd/web/static/css/main.css -o ./cmd/web/static/css/tailwind.css
+	local PNPX="$(which pnpx)"
+	$PNPX @tailwindcss/cli -m -i ./cmd/web/static/css/main.css -o ./cmd/web/static/css/tailwind.css
 	go tool templ generate templ -v
 }
 
