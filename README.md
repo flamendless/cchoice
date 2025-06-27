@@ -60,7 +60,7 @@ mkcert localhost 127.0.0.1 ::1
     - go tools
     - dev tools
 - Script:
-    - run.sh
+    - run.sh, deploy.sh
     - cmd/thumbnailify_images.go
 - Config:
     - git-chglog
