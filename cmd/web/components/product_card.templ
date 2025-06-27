@@ -17,16 +17,16 @@ templ SearchResults() {
 
 templ SearchResultProductCard(product models.SearchResultProduct) {
 	<li>
-		<div class="group flex flex-row items-center py-2 justify-evenly bg-white hover:bg-cchoicesoft">
+		<div class="group flex flex-row items-center py-2 bg-white hover:bg-cchoicesoft">
 			<img
 				class="w-16 max-w-16 h-16 mx-4"
 				src={ product.ThumbnailData }
 				title={ product.Name }
-				alt="product thumbnail"
+				alt={ product.Name + " thumbnail" }
 			/>
 			<p
 				title={ product.Name }
-				class="text-base font-normal text-ellipsis text-wrap overflow-hidden"
+				class="text-base font-normal text-ellipsis text-wrap overflow-hidden cursor-pointer"
 			>
 				{ product.Name }
 			</p>
