@@ -37,6 +37,10 @@ USEHTTP2=1
 # Only applicable if USESSL=1
 CERTPATH="/home/<user>/certs/localhost+2.pem"
 KEYPATH="/home/<user>/certs/localhost+2-key.pem"
+
+GOOSE_DRIVER=sqlite3
+GOOSE_DBSTRING=file:./test.db
+GOOSE_MIGRATION_DIR=./migrations/sqlite3
 ```
 
 # Generate local cert
