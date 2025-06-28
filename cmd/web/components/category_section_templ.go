@@ -15,11 +15,11 @@ import (
 	"os"
 )
 
-var delayDiv = 4
+var fetchMult = 0.4
 
 func init() {
 	if os.Getenv("APP_ENV") == "local" {
-		delayDiv = 16
+		fetchMult = 0.1
 	}
 }
 
@@ -320,9 +320,9 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var16 string
-				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("load delay:%ds", page/delayDiv))
+				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("load delay:%fs", float64(page)*fetchMult))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 97, Col: 61}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 97, Col: 71}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 				if templ_7745c5c3_Err != nil {

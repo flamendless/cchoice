@@ -408,9 +408,15 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	)
 	if err != nil || len(products) == 0 {
-		logs.Log().Info("No search result", zap.String("search query", search))
+		logs.Log().Info("No search result", zap.String("query", search))
 		return
 	}
+
+	logs.Log().Info(
+		"Search results",
+		zap.Int("count", len(products)),
+		zap.String("query", search),
+	)
 
 	for _, product := range products {
 		if product.ThumbnailPath == constants.PathEmptyImage {
