@@ -7,11 +7,11 @@ import (
 	"os"
 )
 
-var delayDiv = 4
+var fetchMult = 0.4
 
 func init() {
 	if os.Getenv("APP_ENV") == "local" {
-		delayDiv = 16
+		fetchMult = 0.1
 	}
 }
 
@@ -94,7 +94,7 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 				hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", page+1) }
 				hx-target=".category-sections-inf-load"
 				hx-swap="outerHTML"
-				hx-trigger={ fmt.Sprintf("load delay:%ds", page/delayDiv) }
+				hx-trigger={ fmt.Sprintf("load delay:%fs", float64(page)*fetchMult) }
 			></div>
 		}
 	}

@@ -31,13 +31,15 @@ templ SearchBar() {
 						log 'search is triggered'
 						add .hidden to #icon-search
 						add .hidden to #search-results
+						remove .hidden from #icon-spinner
 					end
 
 					on htmx:afterRequest from #search
 						log 'search is done'
-						wait 0.5s
+						wait 0.25s
 						remove .hidden from #icon-search
 						remove .hidden from #search-results
+						add .hidden to #icon-spinner
 					end
 				"
 			>
@@ -59,7 +61,7 @@ templ SearchBar() {
 				</svg>
 				<svg
 					id="icon-spinner"
-					class="w-7 text-cchoice htmx-indicator"
+					class="w-7 text-cchoice hidden"
 					aria-hidden="true"
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 300 150"
@@ -79,7 +81,6 @@ templ SearchBar() {
 				class="block w-full p-3 ps-10 text-sm text-black border border-searchbar rounded-lg bg-searchbar focus:ring-cchoice focus:border-cchoice"
 				hx-post="/cchoice/search"
 				hx-trigger="input changed delay:1000ms, keyup[key=='Enter']"
-				hx-indicator=".htmx-indicator"
 				hx-validate="true"
 				hx-include="#search"
 				hx-target="#search-results > ul"
