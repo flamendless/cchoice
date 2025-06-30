@@ -19,5 +19,6 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_KEY }}
-        timeout: 5m
-        script_path: scripts/deploy.sh
+        script: |
+          source ~/.bashrc
+          bash cchoice/scripts/deploy.sh
