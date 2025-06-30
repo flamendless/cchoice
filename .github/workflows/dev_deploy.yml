@@ -23,6 +23,15 @@ jobs:
           source ~/.bashrc
           bash cchoice/scripts/deploy.sh
 
+  send-email:
+    needs: deploy
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
     - name: Send Email via Gmail
       uses: Raghul-M/gmail-sender-action@v1
       with:
