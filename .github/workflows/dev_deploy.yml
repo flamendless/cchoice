@@ -1,4 +1,4 @@
-name: Deploy to Remote Server
+name: Deploy to Dev Remote Server
 
 on:
   push:
@@ -22,3 +22,12 @@ jobs:
         script: |
           source ~/.bashrc
           bash cchoice/scripts/deploy.sh
+
+    - name: Send Email via Gmail
+      uses: Raghul-M/gmail-sender-action@v1
+      with:
+        sender_email: ${{ secrets.GMAIL_SENDER }}
+        app_password: ${{ secrets.GMAIL_APP_PASSWORD }}
+        receiver_emails: ${{ secrets.RECIPIENTS }}
+        template_path: "templates/dev_email_template.html"
+        subject: "C-Choice Website (Dev) Notification"
