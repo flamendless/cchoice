@@ -78,3 +78,9 @@ mkcert localhost 127.0.0.1 ::1
     - Migrations
     - API
 - Web
+
+---
+
+# NOTES:
+
+For GH workflow, comment out `[ -z "$PS1" ] && return` in server's .bashrc
