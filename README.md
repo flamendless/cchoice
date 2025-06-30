@@ -54,18 +54,17 @@ mkcert localhost 127.0.0.1 ::1
 
 # Commits
 - Maintenance:
-    - simple fix
-    - simple revision
+    - simple fix or revision
     - code quality
 - Deps:
-    - library upgrade
-    - dependency upgrade
+    - library/dep upgrade
 - Toolings:
-    - go tools
-    - dev tools
+    - go or dev tools
 - Script:
-    - run.sh, deploy.sh
+    - run.sh, scripts/*
     - cmd/thumbnailify_images.go
+- CICD:
+    - gh actions, workflows
 - Config:
     - git-chglog
     - dotenv
@@ -73,8 +72,7 @@ mkcert localhost 127.0.0.1 ::1
 - Docs:
     - README
     - Changelogs
-- Performance:
-    - optimization
+- Performance
 - Server:
     - SQL
     - Migrations
