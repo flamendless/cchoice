@@ -2,6 +2,66 @@
 ## [Unreleased]
 
 
+<a name="dev-v0.0.2"></a>
+## [dev-v0.0.2] - 2025-06-30
+### CICD
+- Separate deploy and send-email jobs
+
+
+<a name="dev-v0.0.1"></a>
+## [dev-v0.0.1] - 2025-06-30
+### CICD
+- Include sending of email
+- Only deploy on matching tags
+- Update workflow
+- Add github workflow for deployment
+
+### Deps
+- Replace sql-migrate with goose
+- Update htmx and others
+
+### Docs
+- Add NOTES
+- Update commit labels
+- Create Deps tag
+- Add license for brand logos
+- Add commit topics in README
+
+### Maintenance
+- Apply static analysis
+- Fix git submodule
+- Fix benchmark functions
+- Add errs for commands
+- Update changelogs
+
+### Script
+- Add deploy.sh
+- Dynamic pnpx path
+- Separate generation of images from cleandb
+- Build goose
+- Add libvips module in deps
+- Rename testall -> testsum; Add simple testall
+- Add prof
+- Implement cmd/convert_images
+- Rename process_images -> thumbnailify_images
+
+### Server
+- Update tbl_products_fts
+- WIP FTS
+- Implement prefix in base64 encoding
+
+### Web
+- Fix icon spinner in searchbar
+- Improve searchbar and search results behavior
+- Show search results
+- Add footer wrap
+- WIP active search
+- Improve post home content styling
+- Fix styling in post home content sections
+- Rename other to post home content
+- Add "About Us" and "Partners" sections
+
+
 <a name="v0.0.1"></a>
 ## v0.0.1 - 2025-06-12
 ### Config
@@ -74,4 +134,6 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.0.2...HEAD
+[dev-v0.0.2]: https://github.com/flamendless/cchoice/compare/dev-v0.0.1...dev-v0.0.2
+[dev-v0.0.1]: https://github.com/flamendless/cchoice/compare/v0.0.1...dev-v0.0.1
