@@ -71,13 +71,14 @@ templ SearchBar() {
 					</path>
 				</svg>
 			</div>
+
 			<input
 				required
 				autocomplete="off"
 				type="search"
 				id="search"
 				name="search"
-				placeholder="Search any term..."
+				placeholder="Search by product name..."
 				class="block w-full p-3 ps-10 text-sm text-black border border-searchbar rounded-lg bg-searchbar focus:ring-cchoice focus:border-cchoice"
 				hx-post="/cchoice/search"
 				hx-trigger="input changed delay:1000ms, keyup[key=='Enter']"
@@ -86,12 +87,39 @@ templ SearchBar() {
 				hx-target="#search-results > ul"
 				hx-swap="innerHTML"
 				_="
+					on input
+						if my value == ''
+							add .hidden to #btn-clear
+						else
+							remove .hidden from #btn-clear
+					end
+
 					on focus
 						if my value != '' and #search-results.children.length > 0
 						then remove .hidden from #search-results
 					end
 				"
 			/>
+
+			<button
+				id="btn-clear"
+				type="button"
+				class="
+					hidden absolute end-[72px] bottom-2 text-base text-gray-400
+					hover:text-cchoice text-sm px-2 py-1
+				"
+				aria-label="clear search"
+				title="clear search"
+				_="
+					on click
+						set #search.value to ''
+						trigger input on #search
+					end
+				"
+			>
+				x
+			</button>
+
 			<button
 				type="submit"
 				class="
