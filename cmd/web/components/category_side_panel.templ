@@ -10,7 +10,10 @@ templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 		for i, category := range categories {
 			<a
 				href={ templ.SafeURL(category.URL) }
-				class="text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft"
+				class="
+					text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer
+					hover:underline hover:bg-cchoicesoft transition-colors
+				"
 			>
 				<p class="text-ellipsis text-nowrap overflow-hidden">
 					{ category.Label }

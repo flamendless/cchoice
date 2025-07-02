@@ -49,14 +49,14 @@ func CategoriesSidePanelList(categories []models.CategorySidePanelText) templ.Co
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft\"><p class=\"text-ellipsis text-nowrap overflow-hidden\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"\n\t\t\t\t\ttext-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer\n\t\t\t\t\thover:underline hover:bg-cchoicesoft transition-colors\n\t\t\t\t\"><p class=\"text-ellipsis text-nowrap overflow-hidden\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(category.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_side_panel.templ`, Line: 16, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_side_panel.templ`, Line: 19, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {

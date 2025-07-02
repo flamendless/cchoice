@@ -85,7 +85,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 			return templ_7745c5c3_Err
 		}
 		for _, product := range data.Products {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"group flex flex-col items-center m-2 ml-4 hover:bg-cchoicesoft\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"group flex flex-col items-center m-2 ml-4 hover:bg-cchoicesoft transition-colors\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -152,7 +152,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" class=\"cursor-pointer flex flex-col items-center\"><p class=\"max-w-24 text-xs font-normal text-ellipsis text-nowrap overflow-hidden group-hover:font-bold\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" class=\"cursor-pointer flex flex-col items-center\"><p class=\"max-w-24 text-xs font-normal text-ellipsis text-nowrap overflow-hidden group-hover:font-bold transition-colors\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -165,7 +165,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</p><p class=\"text-xs font-light group-hover:font-semibold\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</p><p class=\"text-xs font-light group-hover:font-semibold transition-colors\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
