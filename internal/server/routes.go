@@ -365,7 +365,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 			continue
 		}
 
-		finalPath, ext, err := images.GetImagePathWithSize(product.ThumbnailPath, "96x96", true)
+		finalPath, ext, err := images.GetImagePathWithSize(product.ThumbnailPath, constants.DefaultThumbnailSize, true)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			continue
@@ -404,17 +404,18 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		queries.GetProductsBySearchQueryParams{
 			Name:  search,
-			Limit: 6,
+			Limit: constants.MaxSearchShowResults,
 		},
 	)
 	if err != nil || len(products) == 0 {
-		logs.Log().Info("No search result", zap.String("query", search))
+		logs.Log().Info("No search result by name", zap.String("query", search))
 		return
 	}
 
 	logs.Log().Info(
 		"Search results",
 		zap.Int("count", len(products)),
+		zap.Int("limit", constants.MaxSearchShowResults),
 		zap.String("query", search),
 	)
 
@@ -423,7 +424,7 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		finalPath, ext, err := images.GetImagePathWithSize(product.ThumbnailPath, "96x96", true)
+		finalPath, ext, err := images.GetImagePathWithSize(product.ThumbnailPath, constants.DefaultThumbnailSize, true)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			continue
