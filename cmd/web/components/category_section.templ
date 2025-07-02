@@ -28,7 +28,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 					if product.ThumbnailPath == constants.PathEmptyImage {
 						<img
 							class="w-24 max-w-24 h-24"
-							src="/cchoice/static/images/empty_96x96.webp"
+							src={ "/cchoice/" + constants.PathEmptyImage }
 							alt="empty placeholder image"
 						/>
 					} else {
