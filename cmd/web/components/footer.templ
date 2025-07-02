@@ -10,7 +10,10 @@ templ FooterRow1Texts(texts []models.FooterRowText) {
 		for i, hrt := range texts {
 			<a
 				href={ templ.SafeURL(hrt.URL) }
-				class="font-light mx-1 text-nowrap cursor-pointer hover:underline"
+				class="
+					font-light mx-1 text-nowrap cursor-pointer
+					hover:underline hover:bg-cchoicesoft transition-colors
+				"
 			>
 				{ hrt.Label }
 			</a>

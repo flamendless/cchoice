@@ -49,14 +49,14 @@ func FooterRow1Texts(texts []models.FooterRowText) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"font-light mx-1 text-nowrap cursor-pointer hover:underline\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"\n\t\t\t\t\tfont-light mx-1 text-nowrap cursor-pointer\n\t\t\t\t\thover:underline hover:bg-cchoicesoft transition-colors\n\t\t\t\t\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(hrt.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/footer.templ`, Line: 15, Col: 15}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/footer.templ`, Line: 18, Col: 15}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {

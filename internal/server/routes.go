@@ -439,6 +439,12 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err := components.SearchResultProductCard(models.SearchResultProduct(product)).Render(r.Context(), w); err != nil {
 			logs.Log().Fatal("search result product card", zap.Error(err))
+			return
 		}
+	}
+
+	if err := components.SearchMore(search).Render(r.Context(), w); err != nil {
+		logs.Log().Fatal("search more component", zap.Error(err))
+		return
 	}
 }

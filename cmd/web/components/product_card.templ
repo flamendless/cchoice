@@ -15,9 +15,23 @@ templ SearchResults() {
 	</div>
 }
 
+templ SearchMore(query string) {
+	<li class="flex items-center justify-center">
+		<a
+			href={ templ.SafeURL("/cchoice/search?query=" + query) }
+			class="
+				text-center w-full border-t-2 border-cchoice_border p-2
+				hover:bg-cchoice hover:text-white transition-colors
+			"
+		>
+			See All Results
+		</a>
+	</li>
+}
+
 templ SearchResultProductCard(product models.SearchResultProduct) {
 	<li>
-		<div class="group flex flex-row items-center py-2 bg-white hover:bg-cchoicesoft">
+		<div class="group flex flex-row items-center py-2 bg-white hover:bg-cchoicesoft transition-colors">
 			<img
 				class="w-16 max-w-16 h-16 mx-4"
 				src={ product.ThumbnailData }
