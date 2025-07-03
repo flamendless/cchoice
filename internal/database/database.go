@@ -61,10 +61,8 @@ func New(mode DBMode) Service {
 		panic("db mode enum not handled")
 	}
 
+	logs.Log().Info("Initializing DB...", zap.String("mode", string(mode)))
 	dataSourceName := dburl + "?_journal_mode=wal" + "&mode=" + string(mode)
-
-	logs.Log().Info("Initializing DB...", zap.String("dsn", dataSourceName))
-
 	db, err := sql.Open("sqlite3", dataSourceName)
 	if err != nil {
 		logs.Log().Fatal("db open", zap.Error(err))
