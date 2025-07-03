@@ -131,6 +131,7 @@ sc() {
 	go tool unconvert ./...
 	go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@latest -test ./...
 
+	local -; set +x;
 	local PKGS
 	PKGS=$(go list ./... | grep -v "internal/database/queries" | tr "\n" " ")
 	for d in ${PKGS}; do
