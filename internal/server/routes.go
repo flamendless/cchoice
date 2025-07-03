@@ -121,7 +121,7 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
-	if err := components.Base("C-CHOICE").Render(r.Context(), w); err != nil {
+	if err := components.HomePage().Render(r.Context(), w); err != nil {
 		logs.Log().Fatal("Index handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
