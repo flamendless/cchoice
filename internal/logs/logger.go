@@ -1,14 +1,17 @@
 package logs
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"sync"
 	"syscall"
 
+	"github.com/goccy/go-json"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -47,6 +50,7 @@ func InitLog() {
 			fmt.Println(err)
 		}
 	}()
+
 	logger = newLogger
 }
 
@@ -63,4 +67,26 @@ func LogHTTPHandler(logger *zap.Logger, r *http.Request, err error) {
 		zap.String("method", r.Method),
 		zap.Error(err),
 	)
+}
+
+func LogResBody(logger *zap.Logger, id string, resp *http.Response) {
+	if resp == nil {
+		logger.Error("Nil resp")
+		return
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		logger.Error("Failed to read response body", zap.Error(err))
+		return
+	}
+	resp.Body = io.NopCloser(bytes.NewBuffer(body))
+
+	var prettyBuf bytes.Buffer
+	if err := json.Indent(&prettyBuf, body, "", "  "); err != nil {
+		logger.Error("Failed to pretty-print JSON", zap.Error(err))
+		return
+	}
+
+	logger.Sugar().Info("Response JSON (pretty)", zap.String("body", prettyBuf.String()))
 }
