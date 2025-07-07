@@ -21,6 +21,9 @@ PORT_FS=7070
 APP_ENV="local" # "local" or "prod"
 DB_URL=file:./test.db
 
+# PayMongo
+PAYMONGO_API_KEY="sk_test_"
+
 # Optional env vars
 # Only applicable if APP_ENV="local"
 # 0 Debug
