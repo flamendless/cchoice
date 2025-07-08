@@ -20,7 +20,6 @@ var tblImageFormatExt = map[ImageFormat][]string{
 func TestImageFormatToString(t *testing.T) {
 	for imageFormat, val := range tblImageFormat {
 		t.Run(val, func(t *testing.T) {
-			t.Parallel()
 			require.Equal(t, val, imageFormat.String())
 		})
 	}
@@ -29,7 +28,6 @@ func TestImageFormatToString(t *testing.T) {
 func TestParseImageFormatEnum(t *testing.T) {
 	for imageFormat, val := range tblImageFormat {
 		t.Run(val, func(t *testing.T) {
-			t.Parallel()
 			require.Equal(t, imageFormat, ParseImageFormatToEnum(val))
 		})
 	}
@@ -38,7 +36,6 @@ func TestParseImageFormatEnum(t *testing.T) {
 func TestParseImageFormatExtEnum(t *testing.T) {
 	for imageFormatExt, val := range tblImageFormatExt {
 		t.Run(imageFormatExt.String(), func(t *testing.T) {
-			t.Parallel()
 			for _, ext := range val {
 				require.Equal(t, imageFormatExt, ParseImageFormatExtToEnum(ext))
 			}
