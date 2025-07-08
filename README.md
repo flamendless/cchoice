@@ -56,6 +56,7 @@ mkcert localhost 127.0.0.1 ::1
 ```
 
 # Commits
+- Feature
 - Maintenance:
     - simple fix or revision
     - code quality
