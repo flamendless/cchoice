@@ -133,8 +133,9 @@ sc() {
 	local -; set +x;
 	local PKGS
 	PKGS=$(go list ./... | grep -v "internal/database/queries" | tr "\n" " ")
+	echo "Checking with errcheck and prealloc:"
 	for d in ${PKGS}; do
-		echo "Checking with errcheck and prealloc ${d}..."
+		echo "    ${d}."
 		go tool errcheck "$d"
 		go tool prealloc "$d"
 	done
@@ -153,7 +154,7 @@ sc() {
 }
 
 testall() {
-	go test ./... -v
+	go test ./... -failfast "${@:2}"
 }
 
 testsum() {
@@ -186,6 +187,10 @@ prod() {
 	echo "Run: ./tmp/main api > out 2>&1 &"
 }
 
+db() {
+	"${TMP}/goose" "${@:2}"
+}
+
 if [ "$#" -eq 0 ]; then
 	echo "First use: chmod +x ${0}"
 	echo "Usage: ${0}"
@@ -193,6 +198,7 @@ if [ "$#" -eq 0 ]; then
 	echo "    benchmark"
 	echo "    cleandb"
 	echo "    customrun"
+	echo "    db"
 	echo "    genall"
 	echo "    genimages"
 	echo "    gensql"
