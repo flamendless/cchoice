@@ -1,6 +1,7 @@
 package payments
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/goccy/go-json"
@@ -30,7 +31,7 @@ func (pm PaymentMethod) MarshalJSON() ([]byte, error) {
 }
 
 func ParsePaymentMethodToEnum(pm string) PaymentMethod {
-	switch pm {
+	switch strings.ToUpper(pm) {
 	case PAYMENT_METHOD_QRPH.String():
 		return PAYMENT_METHOD_QRPH
 	case PAYMENT_METHOD_BILLEASE.String():
@@ -54,6 +55,6 @@ func ParsePaymentMethodToEnum(pm string) PaymentMethod {
 	case PAYMENT_METHOD_PAYMAYA.String():
 		return PAYMENT_METHOD_PAYMAYA
 	default:
-		return PAYMENT_METHOD_UNDEFINED
+		panic(fmt.Errorf("Undefined payment method '%s'", pm))
 	}
 }
