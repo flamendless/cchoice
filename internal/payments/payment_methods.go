@@ -1,4 +1,4 @@
-package enums
+package payments
 
 import (
 	"strings"

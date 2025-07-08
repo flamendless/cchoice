@@ -69,24 +69,24 @@ func LogHTTPHandler(logger *zap.Logger, r *http.Request, err error) {
 	)
 }
 
-func LogResBody(logger *zap.Logger, id string, resp *http.Response) {
+func JSONResponse(id string, resp *http.Response) {
 	if resp == nil {
-		logger.Error("Nil resp")
+		logger.Error("Passed a nil *https.Response")
 		return
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		logger.Error("Failed to read response body", zap.Error(err))
+		Log().Error("Failed to read response body", zap.Error(err))
 		return
 	}
 	resp.Body = io.NopCloser(bytes.NewBuffer(body))
 
 	var prettyBuf bytes.Buffer
 	if err := json.Indent(&prettyBuf, body, "", "  "); err != nil {
-		logger.Error("Failed to pretty-print JSON", zap.Error(err))
+		Log().Error("Failed to pretty-print JSON", zap.Error(err))
 		return
 	}
 
-	logger.Sugar().Info("Response JSON (pretty)", zap.String("body", prettyBuf.String()))
+	Log().Sugar().Info("Pretty JSON", zap.String("body", prettyBuf.String()))
 }

@@ -1,14 +1,13 @@
-package serialize
+package database
 
 import (
 	"bytes"
-	"cchoice/internal/enums"
 	"encoding/base64"
 	"fmt"
 	"strconv"
 )
 
-func EncodeDBID(prefix enums.DBPrefix, dbid int64) string {
+func EncodeDBID(prefix DBPrefix, dbid int64) string {
 	var buf bytes.Buffer
 	buf.WriteString(prefix.String())
 	buf.WriteByte(':')
@@ -16,7 +15,7 @@ func EncodeDBID(prefix enums.DBPrefix, dbid int64) string {
 	return base64.RawURLEncoding.EncodeToString(buf.Bytes())
 }
 
-func DecodeToDBID(dbid string) (enums.DBPrefix, int64) {
+func DecodeToDBID(dbid string) (DBPrefix, int64) {
 	dec, err := base64.RawURLEncoding.DecodeString(dbid)
 	if err != nil {
 		panic(fmt.Errorf("Failed to decode string: '%s' %w", dec, err))
@@ -34,10 +33,10 @@ func DecodeToDBID(dbid string) (enums.DBPrefix, int64) {
 		panic(fmt.Errorf("Failed to decode string: '%s' %w", decid, err))
 	}
 
-	return enums.ParseDBPrefixToEnum(string(prefix)), int64(id)
+	return ParseDBPrefixToEnum(string(prefix)), int64(id)
 }
 
-func MustDecodeToDBID(prefix enums.DBPrefix, dbid string) int64 {
+func MustDecodeToDBID(prefix DBPrefix, dbid string) int64 {
 	dec, err := base64.RawURLEncoding.DecodeString(dbid)
 	if err != nil {
 		panic(fmt.Errorf("Failed to decode string '%s' from '%s' %w", dec, dbid, err))

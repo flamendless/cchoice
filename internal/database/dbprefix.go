@@ -1,4 +1,4 @@
-package enums
+package database
 
 //go:generate go tool stringer -type=DBPrefix -trimprefix=DB_PREFIX_
 

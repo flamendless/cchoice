@@ -1,4 +1,4 @@
-package enums
+package payments
 
 import (
 	"fmt"
@@ -27,7 +27,6 @@ var tblPaymentMethod = map[PaymentMethod]string{
 func TestPaymentMethodToString(t *testing.T) {
 	for paymentMethod, val := range tblPaymentMethod {
 		t.Run(val, func(t *testing.T) {
-			t.Parallel()
 			require.Equal(t, val, paymentMethod.String())
 		})
 	}
@@ -36,7 +35,6 @@ func TestPaymentMethodToString(t *testing.T) {
 func TestParsePaymentMethodEnum(t *testing.T) {
 	for paymentMethod, val := range tblPaymentMethod {
 		t.Run(val, func(t *testing.T) {
-			t.Parallel()
 			require.Equal(t, paymentMethod, ParsePaymentMethodToEnum(val))
 		})
 	}
@@ -45,7 +43,6 @@ func TestParsePaymentMethodEnum(t *testing.T) {
 func TestPaymentMethodEnumToJSON(t *testing.T) {
 	for paymentMethod, val := range tblPaymentMethod {
 		t.Run(val, func(t *testing.T) {
-			t.Parallel()
 			lower, err := json.Marshal(paymentMethod)
 			require.NoError(t, err)
 			require.Equal(t, fmt.Sprintf("\"%s\"", strings.ToLower(val)), string(lower))

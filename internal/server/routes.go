@@ -13,12 +13,11 @@ import (
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
+	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
-	"cchoice/internal/enums"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
-	"cchoice/internal/serialize"
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -324,7 +323,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	categoryDBID := serialize.MustDecodeToDBID(enums.DB_PREFIX_CATEGORY, categoryID)
+	categoryDBID := database.MustDecodeToDBID(database.DB_PREFIX_CATEGORY, categoryID)
 
 	category, err := s.dbRO.GetQueries().GetProductCategoryByID(r.Context(), categoryDBID)
 	if err != nil {

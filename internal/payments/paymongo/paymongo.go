@@ -1,9 +1,10 @@
-package payments
+package paymongo
 
 import (
 	"bytes"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/payments"
 	"encoding/base64"
 	"errors"
 	"net/http"
@@ -18,7 +19,7 @@ type PayMongo struct {
 	apiKey string
 }
 
-func MustInitPayMongo() *PayMongo {
+func MustInit() *PayMongo {
 	apiKey := os.Getenv("PAYMONGO_API_KEY")
 	if apiKey == "" {
 		panic("PAYMONGO_API_KEY is required")
@@ -38,7 +39,7 @@ func (p PayMongo) GetAuth() string {
 	return "Basic " + p.apiKey
 }
 
-func (p PayMongo) CreateCheckoutSession(payload createCheckoutSessionPayload) (createCheckoutSessionResponse, error) {
+func (p PayMongo) CreateCheckoutSession(payload payments.CreateCheckoutSessionPayload) (payments.CreateCheckoutSessionResponse, error) {
 	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
 		return nil, errors.Join(errs.ERR_PAYMENT_PAYLOAD, err)
@@ -57,18 +58,19 @@ func (p PayMongo) CreateCheckoutSession(payload createCheckoutSessionPayload) (c
 	if err != nil || resp == nil {
 		return nil, errors.Join(errs.ERR_PAYMENT_CLIENT, err)
 	}
-	logs.LogResBody(logs.Log(), "PayMongoCreateCheckoutSessionResponse", resp)
+	logs.JSONResponse("PayMongoCreateCheckoutSessionResponse", resp)
 
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
 			logs.Log().Error("Deferred", zap.Error(err))
 		}
 	}()
-	var res PayMongoCreateCheckoutSessionResponse
+	var res CreateCheckoutSessionResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		logs.JSONResponse("PayMongoCreateCheckoutSessionResponse", resp)
 		return nil, errors.Join(errs.ERR_PAYMENT_RESPONSE, err)
 	}
 	return &res, nil
 }
 
-var _ IPayments = (*PayMongo)(nil)
+var _ payments.PaymentGateway = (*PayMongo)(nil)
