@@ -168,7 +168,7 @@ testsum() {
 }
 
 benchmark() {
-	go test -bench=. -benchmem ./... -v
+	go test -bench=. -benchmem ./... "${@:2}"
 }
 
 prof() {

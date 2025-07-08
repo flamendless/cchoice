@@ -15,7 +15,6 @@ var tblProductStatus = map[ProductStatus]string{
 func TestProductStatusToString(t *testing.T) {
 	for productstatus, val := range tblProductStatus {
 		t.Run(val, func(t *testing.T) {
-			t.Parallel()
 			require.Equal(t, val, productstatus.String())
 		})
 	}
@@ -24,7 +23,6 @@ func TestProductStatusToString(t *testing.T) {
 func TestParseProductStatusEnum(t *testing.T) {
 	for productstatus, val := range tblProductStatus {
 		t.Run(val, func(t *testing.T) {
-			t.Parallel()
 			require.Equal(t, productstatus, ParseProductStatusToEnum(val))
 		})
 	}
