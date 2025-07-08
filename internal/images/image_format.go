@@ -1,4 +1,4 @@
-package enums
+package images
 
 //go:generate go tool stringer -type=ImageFormat -trimprefix=IMAGE_FORMAT_
 

@@ -1,8 +1,8 @@
 package payments
 
-type createCheckoutSessionPayload any
+type CreateCheckoutSessionPayload any
 
-type createCheckoutSessionResponse any
+type CreateCheckoutSessionResponse any
 
 type Address struct {
 	Line1      string `json:"line1"`
@@ -29,8 +29,8 @@ type LineItem struct {
 	Quantity    int32    `json:"quantity"`
 }
 
-type IPayments interface {
+type PaymentGateway interface {
 	GatewayName() string
 	GetAuth() string
-	CreateCheckoutSession(payload createCheckoutSessionPayload) (createCheckoutSessionResponse, error)
+	CreateCheckoutSession(payload CreateCheckoutSessionPayload) (CreateCheckoutSessionResponse, error)
 }

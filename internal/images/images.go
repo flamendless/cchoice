@@ -1,7 +1,6 @@
 package images
 
 import (
-	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/serialize"
 	"fmt"
@@ -20,12 +19,12 @@ const (
 	WEBP = "data:image/webp;base64,"
 )
 
-func ImageToB64(format enums.ImageFormat, data []byte) string {
+func ImageToB64(format ImageFormat, data []byte) string {
 	var base string
 	switch format {
-	case enums.IMAGE_FORMAT_PNG:
+	case IMAGE_FORMAT_PNG:
 		base = PNG
-	case enums.IMAGE_FORMAT_WEBP:
+	case IMAGE_FORMAT_WEBP:
 		base = WEBP
 	default:
 		panic("unhandled image format")
@@ -79,7 +78,7 @@ func GetImageDataB64(
 		return "", err
 	}
 
-	imgData := ImageToB64(enums.ParseImageFormatExtToEnum(ext), img)
+	imgData := ImageToB64(ParseImageFormatExtToEnum(ext), img)
 	cache.Set(cacheKey, []byte(imgData))
 	return imgData, nil
 }

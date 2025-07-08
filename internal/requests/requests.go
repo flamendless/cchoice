@@ -9,9 +9,7 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
-	"cchoice/internal/enums"
 	"cchoice/internal/logs"
-	"cchoice/internal/serialize"
 	"cchoice/internal/utils"
 
 	"github.com/VictoriaMetrics/fastcache"
@@ -176,7 +174,7 @@ func GetCategorySectionHandler(
 		}
 
 		categoriesSubcategories[category] = append(categoriesSubcategories[category], models.Subcategory{
-			CategoryID: serialize.EncodeDBID(enums.DB_PREFIX_CATEGORY, v.ID),
+			CategoryID: database.EncodeDBID(database.DB_PREFIX_CATEGORY, v.ID),
 			Label:      utils.SlugToTile(v.Subcategory.String),
 		})
 	}

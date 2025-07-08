@@ -17,6 +17,7 @@ import (
 	"cchoice/internal/database"
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
+	"cchoice/internal/payments/paymongo"
 	"cchoice/internal/utils"
 )
 
@@ -30,7 +31,7 @@ type Server struct {
 	fsHandler http.Handler
 	fsServer  *http.Server
 	Cache     *fastcache.Cache
-	payments  payments.IPayments
+	payments  payments.PaymentGateway
 	address   string
 	port      int
 	portFS    int
@@ -64,7 +65,7 @@ func NewServer() *http.Server {
 		dbRO:     dbRO,
 		dbRW:     dbRW,
 		Cache:    fastcache.New(CACHE_MAX_BYTES),
-		payments: payments.MustInitPayMongo(),
+		payments: paymongo.MustInit(),
 		useHTTP2: utils.GetBoolFlag(os.Getenv("USEHTTP2")),
 		useSSL:   utils.GetBoolFlag(os.Getenv("USESSL")),
 	}

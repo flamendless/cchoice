@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"cchoice/internal/enums"
 	"cchoice/internal/payments"
+	"cchoice/internal/payments/paymongo"
 	"fmt"
 
 	"github.com/Rhymond/go-money"
@@ -22,17 +22,17 @@ var cmdTestPayment = &cobra.Command{
 	Use:   "test_payment",
 	Short: "test_payment",
 	Run: func(cmd *cobra.Command, args []string) {
-		var pg payments.IPayments
+		var pg payments.PaymentGateway
 		switch flagGateway {
 		case "paymongo":
-			pg = payments.MustInitPayMongo()
+			pg = paymongo.MustInit()
 		default:
 			panic(fmt.Sprintf("Unimplemented gateway: '%s'", flagGateway))
 		}
 
-		payload := payments.PayMongoCreateCheckoutSessionPayload{
-			Data: payments.PayMongoCreateCheckoutSessionData{
-				Attributes: payments.PayMongoCreateCheckoutSessionAttr{
+		payload := paymongo.CreateCheckoutSessionPayload{
+			Data: paymongo.CreateCheckoutSessionData{
+				Attributes: paymongo.CreateCheckoutSessionAttr{
 					CancelURL:  "https://test.com/cancel",
 					SuccessURL: "https://test.com/success",
 					Billing: payments.Billing{
@@ -59,8 +59,8 @@ var cmdTestPayment = &cobra.Command{
 						},
 					},
 					Description: "test description",
-					PaymentMethodTypes: []enums.PaymentMethod{
-						enums.PAYMENT_METHOD_QRPH,
+					PaymentMethodTypes: []payments.PaymentMethod{
+						payments.PAYMENT_METHOD_QRPH,
 					},
 					ReferenceNumber:     "test-ref-number",
 					SendEmailReceipt:    false,
