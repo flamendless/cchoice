@@ -10,7 +10,6 @@ import (
 )
 
 var tblPaymentMethod = map[PaymentMethod]string{
-	PAYMENT_METHOD_UNDEFINED:         "UNDEFINED",
 	PAYMENT_METHOD_QRPH:              "QRPH",
 	PAYMENT_METHOD_BILLEASE:          "BILLEASE",
 	PAYMENT_METHOD_CARD:              "CARD",
@@ -40,6 +39,14 @@ func TestParsePaymentMethodEnum(t *testing.T) {
 	}
 }
 
+func TestParsePaymentMethodEnumLower(t *testing.T) {
+	for paymentMethod, val := range tblPaymentMethod {
+		t.Run(val, func(t *testing.T) {
+			require.Equal(t, paymentMethod, ParsePaymentMethodToEnum(strings.ToLower(val)))
+		})
+	}
+}
+
 func TestPaymentMethodEnumToJSON(t *testing.T) {
 	for paymentMethod, val := range tblPaymentMethod {
 		t.Run(val, func(t *testing.T) {
@@ -65,6 +72,16 @@ func BenchmarkParsePaymentMethodEnum(b *testing.B) {
 		b.Run(paymentMethod.String(), func(b *testing.B) {
 			for b.Loop() {
 				_ = ParsePaymentMethodToEnum(val)
+			}
+		})
+	}
+}
+
+func BenchmarkParsePaymentMethodEnumLower(b *testing.B) {
+	for paymentMethod, val := range tblPaymentMethod {
+		b.Run(paymentMethod.String(), func(b *testing.B) {
+			for b.Loop() {
+				_ = ParsePaymentMethodToEnum(strings.ToLower(val))
 			}
 		})
 	}

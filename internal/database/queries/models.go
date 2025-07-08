@@ -27,6 +27,37 @@ type TblBrandImage struct {
 	DeletedAt time.Time
 }
 
+type TblCheckout struct {
+	ID                     string
+	Gateway                string
+	Status                 string
+	Description            string
+	TotalAmount            int64
+	CheckoutUrl            string
+	ClientKey              string
+	ReferenceNumber        string
+	PaymentStatus          string
+	PaymentMethodType      string
+	PaidAt                 time.Time
+	MetadataRemarks        string
+	MetadataNotes          string
+	MetadataCustomerNumber string
+	CreatedAt              time.Time
+	UpdatedAt              time.Time
+}
+
+type TblCheckoutLineItem struct {
+	ID          int64
+	CheckoutID  string
+	Amount      int64
+	Currency    string
+	Description string
+	Name        string
+	Quantity    int64
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
 type TblProduct struct {
 	ID                          int64
 	Serial                      string

@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"cchoice/internal/database"
 	"cchoice/internal/payments"
 	"cchoice/internal/payments/paymongo"
 	"fmt"
 
 	"github.com/Rhymond/go-money"
+	"github.com/gookit/goutil/dump"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/spf13/cobra"
 )
@@ -29,6 +31,12 @@ var cmdTestPayment = &cobra.Command{
 		default:
 			panic(fmt.Sprintf("Unimplemented gateway: '%s'", flagGateway))
 		}
+
+		resPaymentMethods, err := pg.GetAvailablePaymentMethods()
+		if err != nil {
+			panic(err)
+		}
+		dump.Println("Available payment methods", resPaymentMethods)
 
 		payload := paymongo.CreateCheckoutSessionPayload{
 			Data: paymongo.CreateCheckoutSessionData{
@@ -58,10 +66,8 @@ var cmdTestPayment = &cobra.Command{
 							Quantity:    2,
 						},
 					},
-					Description: "test description",
-					PaymentMethodTypes: []payments.PaymentMethod{
-						payments.PAYMENT_METHOD_QRPH,
-					},
+					Description:         "test description",
+					PaymentMethodTypes:  resPaymentMethods.ToPaymentMethods(),
 					ReferenceNumber:     "test-ref-number",
 					SendEmailReceipt:    false,
 					ShowDescription:     true,
@@ -70,10 +76,25 @@ var cmdTestPayment = &cobra.Command{
 				},
 			},
 		}
-		res, err := pg.CreateCheckoutSession(&payload)
+		resCheckout, err := pg.CreateCheckoutSession(&payload)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(res)
+		dump.Println("Checkout", resCheckout)
+
+		db := database.New(database.DB_MODE_RW)
+		inserted, err := db.GetQueries().CreateCheckout(cmd.Context(), *resCheckout.ToCheckout(pg))
+		if err != nil {
+			panic(err)
+		}
+		dump.Println("Inserted checkout", inserted)
+
+		for _, lineItem := range resCheckout.ToLineItems() {
+			inserted, err := db.GetQueries().CreateCheckoutLineItem(cmd.Context(), *lineItem)
+			if err != nil {
+				panic(err)
+			}
+			dump.Println("Inserted line item", inserted)
+		}
 	},
 }

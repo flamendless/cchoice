@@ -26,8 +26,4 @@ type CreateCheckoutSessionPayload struct {
 	Data CreateCheckoutSessionData `json:"data"`
 }
 
-type CreateCheckoutSessionResponse struct {
-}
-
 var _ payments.CreateCheckoutSessionPayload = (*CreateCheckoutSessionPayload)(nil)
-var _ payments.CreateCheckoutSessionResponse = (*CreateCheckoutSessionResponse)(nil)
