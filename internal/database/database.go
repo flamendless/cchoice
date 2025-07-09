@@ -2,6 +2,7 @@ package database
 
 import (
 	"cchoice/internal/database/queries"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"context"
 	"database/sql"
@@ -45,7 +46,7 @@ var (
 
 func New(mode DBMode) Service {
 	if dburl == "" {
-		panic("No DB_URL set")
+		panic(fmt.Errorf("%w. DB_URL", errs.ERR_ENV_VAR_REQUIRED))
 	}
 
 	switch mode {
