@@ -15,6 +15,7 @@ import (
 	"golang.org/x/sync/singleflight"
 
 	"cchoice/internal/database"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
 	"cchoice/internal/payments/paymongo"
@@ -43,17 +44,17 @@ type Server struct {
 func NewServer() *http.Server {
 	address := os.Getenv("ADDRESS")
 	if address == "" {
-		panic("No ADDRESS set")
+		panic(fmt.Errorf("%w. ADDRESS", errs.ERR_ENV_VAR_REQUIRED))
 	}
 
 	port, err := strconv.Atoi(os.Getenv("PORT"))
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("%w. PORT. %w", errs.ERR_ENV_VAR_REQUIRED, err))
 	}
 
 	portFS, err := strconv.Atoi(os.Getenv("PORT_FS"))
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("%w. PORT_FS. %w", errs.ERR_ENV_VAR_REQUIRED, err))
 	}
 
 	dbRO := database.New(database.DB_MODE_RO)

@@ -2,6 +2,7 @@ package logs
 
 import (
 	"bytes"
+	"cchoice/internal/errs"
 	"errors"
 	"fmt"
 	"io"
@@ -36,7 +37,7 @@ func InitLog() {
 	case "prod":
 		config = zap.NewProductionConfig()
 	default:
-		panic("Invalid app env")
+		panic(fmt.Errorf("%w. APP_ENV", errs.ERR_ENV_VAR_REQUIRED))
 	}
 
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder

@@ -7,6 +7,7 @@ import (
 	"cchoice/internal/payments"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -16,14 +17,14 @@ import (
 )
 
 type PayMongo struct {
-	name   string
-	apiKey string
+	name       string
+	apiKey     string
 }
 
 func MustInit() *PayMongo {
 	apiKey := os.Getenv("PAYMONGO_API_KEY")
 	if apiKey == "" {
-		panic("PAYMONGO_API_KEY is required")
+		panic(fmt.Errorf("%w. PAYMONGO_API_KEY", errs.ERR_ENV_VAR_REQUIRED))
 	}
 	apiKey = base64.StdEncoding.EncodeToString([]byte(apiKey))
 	return &PayMongo{
