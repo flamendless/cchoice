@@ -23,6 +23,7 @@ DB_URL=file:./test.db
 
 # PayMongo
 PAYMONGO_API_KEY="sk_test_"
+PAYMONGO_SUCCESS_URL="https://test.com/cchoice/payments/success"
 
 # Optional env vars
 # Only applicable if APP_ENV="local"
