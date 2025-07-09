@@ -24,7 +24,7 @@ var cmdTestPayment = &cobra.Command{
 	Use:   "test_payment",
 	Short: "test_payment",
 	Run: func(cmd *cobra.Command, args []string) {
-		var pg payments.PaymentGateway
+		var pg payments.IPaymentGateway
 		switch flagGateway {
 		case "paymongo":
 			pg = paymongo.MustInit()

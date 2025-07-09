@@ -24,4 +24,3 @@ type LineItem struct {
 	Amount      int32    `json:"amount"`
 	Quantity    int32    `json:"quantity"`
 }
-

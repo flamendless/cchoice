@@ -12,7 +12,7 @@ type CreateCheckoutSessionResponse struct {
 }
 
 func (r *CreateCheckoutSessionResponse) ToCheckout(
-	pg payments.PaymentGateway,
+	pg payments.IPaymentGateway,
 ) *queries.CreateCheckoutParams {
 	var paidAt time.Time
 	if len(r.Data.Attributes.PaymentIntent.Attributes.Payments) > 0 {
@@ -21,7 +21,7 @@ func (r *CreateCheckoutSessionResponse) ToCheckout(
 
 	return &queries.CreateCheckoutParams{
 		ID:                     r.Data.ID,
-		Gateway:                pg.GatewayName(),
+		Gateway:                pg.GatewayEnum().String(),
 		Status:                 r.Data.Attributes.Status,
 		Description:            r.Data.Attributes.Description,
 		TotalAmount:            int64(r.Data.Attributes.PaymentIntent.Attributes.Amount),

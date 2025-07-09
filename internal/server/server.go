@@ -25,20 +25,20 @@ import (
 const CACHE_MAX_BYTES int = 1024
 
 type Server struct {
-	dbRO      database.Service
-	dbRW      database.Service
-	SF        singleflight.Group
-	fs        http.FileSystem
-	fsHandler http.Handler
-	fsServer  *http.Server
-	Cache     *fastcache.Cache
-	payments  payments.PaymentGateway
-	address   string
-	port      int
-	portFS    int
-	secure    bool
-	useHTTP2  bool
-	useSSL    bool
+	dbRO           database.Service
+	dbRW           database.Service
+	SF             singleflight.Group
+	fs             http.FileSystem
+	fsHandler      http.Handler
+	fsServer       *http.Server
+	Cache          *fastcache.Cache
+	paymentGateway payments.IPaymentGateway
+	address        string
+	port           int
+	portFS         int
+	secure         bool
+	useHTTP2       bool
+	useSSL         bool
 }
 
 func NewServer() *http.Server {
@@ -60,15 +60,15 @@ func NewServer() *http.Server {
 	dbRO := database.New(database.DB_MODE_RO)
 	dbRW := database.New(database.DB_MODE_RW)
 	NewServer := &Server{
-		address:  address,
-		port:     port,
-		portFS:   portFS,
-		dbRO:     dbRO,
-		dbRW:     dbRW,
-		Cache:    fastcache.New(CACHE_MAX_BYTES),
-		payments: paymongo.MustInit(),
-		useHTTP2: utils.GetBoolFlag(os.Getenv("USEHTTP2")),
-		useSSL:   utils.GetBoolFlag(os.Getenv("USESSL")),
+		address:        address,
+		port:           port,
+		portFS:         portFS,
+		dbRO:           dbRO,
+		dbRW:           dbRW,
+		Cache:          fastcache.New(CACHE_MAX_BYTES),
+		paymentGateway: paymongo.MustInit(),
+		useHTTP2:       utils.GetBoolFlag(os.Getenv("USEHTTP2")),
+		useSSL:         utils.GetBoolFlag(os.Getenv("USESSL")),
 	}
 
 	addr := fmt.Sprintf("%s:%d", NewServer.address, NewServer.port)
@@ -120,7 +120,7 @@ func NewServer() *http.Server {
 		zap.String("Address", addr),
 		zap.Bool("Use caching", NewServer.Cache != nil),
 		zap.Int("Caching max bytes", CACHE_MAX_BYTES),
-		zap.String("Payment gateway", NewServer.payments.GatewayName()),
+		zap.String("Payment gateway", NewServer.paymentGateway.GatewayEnum().String()),
 		zap.Bool("SSL", NewServer.useSSL),
 		zap.Bool("HTTP2", NewServer.useHTTP2),
 		zap.Duration("Read timeout", readTimeout),

@@ -12,13 +12,15 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Rhymond/go-money"
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
 )
 
 type PayMongo struct {
-	name       string
-	apiKey     string
+	apiKey         string
+	successURL     string
+	paymentGateway payments.PaymentGateway
 }
 
 func MustInit() *PayMongo {
@@ -27,14 +29,21 @@ func MustInit() *PayMongo {
 		panic(fmt.Errorf("%w. PAYMONGO_API_KEY", errs.ERR_ENV_VAR_REQUIRED))
 	}
 	apiKey = base64.StdEncoding.EncodeToString([]byte(apiKey))
+
+	successURL := os.Getenv("PAYMONGO_SUCCESS_URL")
+	if successURL == "" {
+		panic(fmt.Errorf("%w. PAYMONGO_SUCCESS_URL", errs.ERR_ENV_VAR_REQUIRED))
+	}
+
 	return &PayMongo{
-		name:   "PayMongo",
-		apiKey: apiKey,
+		paymentGateway: payments.PAYMENT_GATEWAY_PAYMONGO,
+		apiKey:         apiKey,
+		successURL:     successURL,
 	}
 }
 
-func (p PayMongo) GatewayName() string {
-	return p.name
+func (p PayMongo) GatewayEnum() payments.PaymentGateway {
+	return p.paymentGateway
 }
 
 func (p PayMongo) GetAuth() string {
@@ -44,13 +53,17 @@ func (p PayMongo) GetAuth() string {
 func (p PayMongo) CreateCheckoutSession(
 	payload payments.CreateCheckoutSessionPayload,
 ) (payments.CreateCheckoutSessionResponse, error) {
+	if _, ok := payload.(*CreateCheckoutSessionPayload); !ok {
+		return nil, fmt.Errorf("%w. Not for PayMongo", errs.ERR_PAYMENT_PAYLOAD)
+	}
+
 	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
 		return nil, errors.Join(errs.ERR_PAYMENT_PAYLOAD, err)
 	}
 
-	const url = "https://api.paymongo.com/v1/checkout_sessions"
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(jsonPayload))
+	const URL = "https://api.paymongo.com/v1/checkout_sessions"
+	req, err := http.NewRequest(http.MethodPost, URL, bytes.NewReader(jsonPayload))
 	if err != nil {
 		return nil, errors.Join(errs.ERR_PAYMENT_CLIENT, err)
 	}
@@ -59,7 +72,7 @@ func (p PayMongo) CreateCheckoutSession(
 	req.Header.Set("Authorization", p.GetAuth())
 
 	resp, err := http.DefaultClient.Do(req)
-	if err != nil || resp == nil || resp.StatusCode != 200 {
+	if err != nil || resp == nil || resp.StatusCode != http.StatusOK {
 		logs.JSONResponse("[PayMongo] CreateCheckoutSession", resp)
 		return nil, errors.Join(errs.ERR_PAYMENT_CLIENT, err)
 	}
@@ -79,8 +92,8 @@ func (p PayMongo) CreateCheckoutSession(
 }
 
 func (p PayMongo) GetAvailablePaymentMethods() (payments.GetAvailablePaymentMethodsResponse, error) {
-	const url = "https://api.paymongo.com/v1/merchants/capabilities/payment_methods"
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	const URL = "https://api.paymongo.com/v1/merchants/capabilities/payment_methods"
+	req, err := http.NewRequest(http.MethodGet, URL, nil)
 	if err != nil {
 		return nil, errors.Join(errs.ERR_PAYMENT_CLIENT, err)
 	}
@@ -88,7 +101,7 @@ func (p PayMongo) GetAvailablePaymentMethods() (payments.GetAvailablePaymentMeth
 	req.Header.Set("Authorization", p.GetAuth())
 
 	resp, err := http.DefaultClient.Do(req)
-	if err != nil || resp == nil || resp.StatusCode != 200 {
+	if err != nil || resp == nil || resp.StatusCode != http.StatusOK {
 		logs.JSONResponse("[PayMongo] GetAvailablePaymentMethods", resp)
 		return nil, errors.Join(errs.ERR_PAYMENT_CLIENT, err)
 	}
@@ -113,4 +126,60 @@ func (p PayMongo) GetAvailablePaymentMethods() (payments.GetAvailablePaymentMeth
 	return &res, nil
 }
 
-var _ payments.PaymentGateway = (*PayMongo)(nil)
+func (p PayMongo) CheckoutHanlder(w http.ResponseWriter, r *http.Request) error {
+	resPaymentMethods, err := p.GetAvailablePaymentMethods()
+	if err != nil {
+		return err
+	}
+
+	payload := CreateCheckoutSessionPayload{
+		Data: CreateCheckoutSessionData{
+			Attributes: CreateCheckoutSessionAttr{
+				CancelURL:  "https://test.com/cancel",
+				SuccessURL: p.successURL,
+				Billing: payments.Billing{
+					Address: payments.Address{
+						Line1:      "test line 1",
+						Line2:      "test line 2",
+						City:       "test city",
+						State:      "test state",
+						PostalCode: "test postal code",
+						Country:    "PH",
+					},
+					Name:  "test name",
+					Email: "test@mail.com",
+					Phone: "test phone",
+				},
+				LineItems: []payments.LineItem{
+					{
+						Amount:      1000,
+						Currency:    money.PHP,
+						Description: "test line item description",
+						Images:      []string{"https://test.com/image"},
+						Name:        "test line item name",
+						Quantity:    2,
+					},
+				},
+				Description:         "test description",
+				PaymentMethodTypes:  resPaymentMethods.ToPaymentMethods(),
+				ReferenceNumber:     "test-ref-number",
+				SendEmailReceipt:    false,
+				ShowDescription:     true,
+				ShowLineItems:       true,
+				StatementDescriptor: "test statement descriptor",
+			},
+		},
+	}
+
+	resCheckout, err := p.CreateCheckoutSession(&payload)
+	if err != nil {
+		return err
+	}
+
+	resPayMongoCheckout := resCheckout.(*CreateCheckoutSessionResponse)
+	http.Redirect(w, r, resPayMongoCheckout.Data.Attributes.CheckoutURL, http.StatusPermanentRedirect)
+
+	return nil
+}
+
+var _ payments.IPaymentGateway = (*PayMongo)(nil)
