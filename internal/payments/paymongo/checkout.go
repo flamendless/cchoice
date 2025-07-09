@@ -10,54 +10,54 @@ type CheckoutSession struct {
 
 type CheckoutSessionAttributes struct {
 	Billing            payments.Billing    `json:"billing"`
+	Metadata           Metadata            `json:"metadata"`
 	CheckoutURL        string              `json:"checkout_url"`
 	ClientKey          string              `json:"client_key"`
 	Description        string              `json:"description"`
-	LineItems          []payments.LineItem `json:"line_items"`
-	Livemode           bool                `json:"livemode"`
 	Merchant           string              `json:"merchant"`
-	Payments           []Payments          `json:"payments"`
-	PaymentIntent      PaymentIntent       `json:"payment_intent"`
-	PaymentMethodTypes []string            `json:"payment_method_types"`
 	ReferenceNumber    string              `json:"reference_number"`
+	Status             string              `json:"status"`
+	SuccessURL         string              `json:"success_url"`
+	PaymentIntent      PaymentIntent       `json:"payment_intent"`
+	LineItems          []payments.LineItem `json:"line_items"`
+	Payments           []Payments          `json:"payments"`
+	PaymentMethodTypes []string            `json:"payment_method_types"`
+	CreatedAt          int                 `json:"created_at"`
+	UpdatedAt          int                 `json:"updated_at"`
+	Livemode           bool                `json:"livemode"`
 	SendEmailReceipt   bool                `json:"send_email_receipt"`
 	ShowDescription    bool                `json:"show_description"`
 	ShowLineItems      bool                `json:"show_line_items"`
-	Status             string              `json:"status"`
-	SuccessURL         string              `json:"success_url"`
-	CreatedAt          int                 `json:"created_at"`
-	UpdatedAt          int                 `json:"updated_at"`
-	Metadata           Metadata            `json:"metadata"`
 }
 
 type PaymentAttributes struct {
-	AccessURL               string           `json:"access_url"`
-	Amount                  int              `json:"amount"`
-	BalanceTransactionID    string           `json:"balance_transaction_id"`
+	ExternalReferenceNumber any              `json:"external_reference_number"`
+	Payout                  any              `json:"payout"`
 	Billing                 payments.Billing `json:"billing"`
+	Source                  Source           `json:"source"`
+	Metadata                Metadata         `json:"metadata"`
+	AccessURL               string           `json:"access_url"`
+	BalanceTransactionID    string           `json:"balance_transaction_id"`
 	Currency                string           `json:"currency"`
 	Description             string           `json:"description"`
-	Disputed                bool             `json:"disputed"`
-	ExternalReferenceNumber any              `json:"external_reference_number"`
-	Fee                     int              `json:"fee"`
-	ForeignFee              int              `json:"foreign_fee"`
-	Livemode                bool             `json:"livemode"`
-	NetAmount               int              `json:"net_amount"`
 	Origin                  string           `json:"origin"`
 	PaymentIntentID         string           `json:"payment_intent_id"`
-	Payout                  any              `json:"payout"`
-	Source                  Source           `json:"source"`
 	StatementDescriptor     string           `json:"statement_descriptor"`
 	Status                  string           `json:"status"`
-	TaxAmount               int              `json:"tax_amount"`
-	Metadata                Metadata         `json:"metadata"`
 	Refunds                 []any            `json:"refunds"`
 	Taxes                   []Taxes          `json:"taxes"`
+	Amount                  int              `json:"amount"`
+	Fee                     int              `json:"fee"`
+	ForeignFee              int              `json:"foreign_fee"`
+	NetAmount               int              `json:"net_amount"`
+	TaxAmount               int              `json:"tax_amount"`
 	AvailableAt             int              `json:"available_at"`
 	CreatedAt               int              `json:"created_at"`
 	CreditedAt              int              `json:"credited_at"`
 	PaidAt                  int              `json:"paid_at"`
 	UpdatedAt               int              `json:"updated_at"`
+	Disputed                bool             `json:"disputed"`
+	Livemode                bool             `json:"livemode"`
 }
 
 type Source struct {
@@ -75,12 +75,12 @@ type Metadata struct {
 }
 
 type Taxes struct {
-	Amount    int    `json:"amount"`
 	Currency  string `json:"currency"`
-	Inclusive bool   `json:"inclusive"`
 	Name      string `json:"name"`
 	Type      string `json:"type"`
 	Value     string `json:"value"`
+	Amount    int    `json:"amount"`
+	Inclusive bool   `json:"inclusive"`
 }
 
 type Payments struct {
@@ -103,23 +103,23 @@ type PaymentMethodOptions struct {
 }
 
 type PaymentIntentAttributes struct {
-	Amount               int                  `json:"amount"`
+	LastPaymentError     any                  `json:"last_payment_error"`
+	NextAction           any                  `json:"next_action"`
+	SetupFutureUsage     any                  `json:"setup_future_usage"`
+	Metadata             Metadata             `json:"metadata"`
 	CaptureType          string               `json:"capture_type"`
 	ClientKey            string               `json:"client_key"`
 	Currency             string               `json:"currency"`
 	Description          string               `json:"description"`
-	Livemode             bool                 `json:"livemode"`
 	StatementDescriptor  string               `json:"statement_descriptor"`
 	Status               string               `json:"status"`
-	LastPaymentError     any                  `json:"last_payment_error"`
 	PaymentMethodAllowed []string             `json:"payment_method_allowed"`
 	Payments             []Payments           `json:"payments"`
-	NextAction           any                  `json:"next_action"`
 	PaymentMethodOptions PaymentMethodOptions `json:"payment_method_options"`
-	Metadata             Metadata             `json:"metadata"`
-	SetupFutureUsage     any                  `json:"setup_future_usage"`
+	Amount               int                  `json:"amount"`
 	CreatedAt            int                  `json:"created_at"`
 	UpdatedAt            int                  `json:"updated_at"`
+	Livemode             bool                 `json:"livemode"`
 }
 
 type PaymentIntent struct {

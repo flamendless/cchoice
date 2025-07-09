@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
+	"cchoice/internal/payments"
 	"cchoice/internal/requests"
 	"cchoice/internal/utils"
 
@@ -60,6 +62,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/products/image", s.productsImageHandler)
 
 		r.Post("/search", s.searchHandler)
+
+		r.Post("/checkout", s.checkoutHandler)
 	})
 
 	return r
@@ -123,6 +127,7 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	if err := components.HomePage().Render(r.Context(), w); err != nil {
 		logs.Log().Fatal("Index handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -192,6 +197,7 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	if err := components.HeaderRow1Texts(texts).Render(r.Context(), w); err != nil {
 		logs.Log().Fatal("header texts handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -252,6 +258,7 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	if err := components.FooterRow1Texts(texts).Render(r.Context(), w); err != nil {
 		logs.Log().Fatal("footer texts handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -276,6 +283,7 @@ func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Reque
 	if err := components.CategoriesSidePanelList(categories).Render(r.Context(), w); err != nil {
 		logs.Log().Fatal("categories side panel list handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -389,6 +397,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 	if err := components.CategorySectionProducts(categorySectionProducts).Render(r.Context(), w); err != nil {
 		logs.Log().Fatal("category section list handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -396,6 +405,7 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		logs.Log().Fatal("search handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	search := r.PostFormValue("search")
@@ -445,6 +455,28 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := components.SearchMore(search).Render(r.Context(), w); err != nil {
 		logs.Log().Fatal("search more component", zap.Error(err))
+		return
+	}
+}
+
+func (s *Server) checkoutHandler(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		logs.Log().Fatal("checkout handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	switch s.paymentGateway.GatewayEnum() {
+	case payments.PAYMENT_GATEWAY_PAYMONGO:
+		if err := s.paymentGateway.CheckoutHanlder(w, r); err != nil {
+			logs.Log().Fatal("[PayMongo] Checkout handler", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	default:
+		err := errors.New("checkout handler. Unimplemented payment gateway.")
+		logs.Log().Fatal(err.Error(), zap.String("gateway", s.paymentGateway.GatewayEnum().String()))
+		http.Error(w, err.Error(), http.StatusNotImplemented)
 		return
 	}
 }
