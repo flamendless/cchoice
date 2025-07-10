@@ -19,9 +19,10 @@ templ svgCart() {
 }
 
 //https://www.svgbackgrounds.com/elements/animated-svg-preloaders/
-templ svgInfinite() {
+templ svgInfinite(id string) {
 	<svg
-		class="w-4 h-4 htmx-indicator"
+		id={ id }
+		class="w-4 h-4"
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 300 150"
 	>

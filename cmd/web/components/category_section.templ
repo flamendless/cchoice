@@ -71,7 +71,7 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 			for _, subcategory := range category.Subcategories {
 				<div
 					class="w-full ml-0.5 pr-6 border-cchoice_border"
-					hx-trigger="load once"
+					hx-trigger="load once, history:restore"
 					hx-get={ "/cchoice/product-categories/" + subcategory.CategoryID + "/products" }
 					hx-select={ "#category-sections-" + subcategory.CategoryID }
 					hx-target={ "#category-sections-" + subcategory.CategoryID }
@@ -94,7 +94,7 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 				hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", page+1) }
 				hx-target=".category-sections-inf-load"
 				hx-swap="outerHTML"
-				hx-trigger={ fmt.Sprintf("load delay:%fs", float64(page)*fetchMult) }
+				hx-trigger={ fmt.Sprintf("load delay:%fs, history:restore", float64(page)*fetchMult) }
 			></div>
 		}
 	}
@@ -105,13 +105,13 @@ templ AllCategorySections() {
 	<div
 		id="all-category-sections"
 		class="w-full overflow-x-hidden"
-		hx-trigger="load once"
+		hx-trigger="load once, history:restore"
 		hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", 0) }
 		hx-target="#category-sections"
 		hx-swap="beforeend"
 	>
-		<div class="sticky top-0 bg-white z-20">
-			<p class="text-xs font-normal m-2 my-0">
+		<div class="sticky top-0 bg-white z-20 flex flex-row justify-between items-center px-2">
+			<p class="text-xs font-normal">
 				All Categories
 			</p>
 		</div>
