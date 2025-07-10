@@ -177,7 +177,7 @@ func (p PayMongo) CheckoutHanlder(w http.ResponseWriter, r *http.Request) error 
 	}
 
 	resPayMongoCheckout := resCheckout.(*CreateCheckoutSessionResponse)
-	http.Redirect(w, r, resPayMongoCheckout.Data.Attributes.CheckoutURL, http.StatusPermanentRedirect)
+	w.Header().Set("HX-Redirect", resPayMongoCheckout.Data.Attributes.CheckoutURL)
 
 	return nil
 }
