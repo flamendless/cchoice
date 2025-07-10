@@ -244,7 +244,7 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 				return templ_7745c5c3_Err
 			}
 			for _, subcategory := range category.Subcategories {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div class=\"w-full ml-0.5 pr-6 border-cchoice_border\" hx-trigger=\"load once\" hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div class=\"w-full ml-0.5 pr-6 border-cchoice_border\" hx-trigger=\"load once, history:restore\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -333,9 +333,9 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var17 string
-				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("load delay:%fs", float64(page)*fetchMult))
+				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("load delay:%fs, history:restore", float64(page)*fetchMult))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 97, Col: 71}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 97, Col: 88}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
@@ -376,7 +376,7 @@ func AllCategorySections() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<div id=\"all-category-sections\" class=\"w-full overflow-x-hidden\" hx-trigger=\"load once\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<div id=\"all-category-sections\" class=\"w-full overflow-x-hidden\" hx-trigger=\"load once, history:restore\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -389,7 +389,7 @@ func AllCategorySections() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" hx-target=\"#category-sections\" hx-swap=\"beforeend\"><div class=\"sticky top-0 bg-white z-20\"><p class=\"text-xs font-normal m-2 my-0\">All Categories</p></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" hx-target=\"#category-sections\" hx-swap=\"beforeend\"><div class=\"sticky top-0 bg-white z-20 flex flex-row justify-between items-center px-2\"><p class=\"text-xs font-normal\">All Categories</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

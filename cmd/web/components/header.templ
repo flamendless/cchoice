@@ -31,7 +31,7 @@ templ SearchBar() {
 						log 'search is triggered'
 						add .hidden to #icon-search
 						add .hidden to #search-results
-						remove .hidden from #icon-spinner
+						remove .hidden from #icon-spinner-search
 					end
 
 					on htmx:afterRequest from #search
@@ -39,7 +39,7 @@ templ SearchBar() {
 						wait 0.25s
 						remove .hidden from #icon-search
 						remove .hidden from #search-results
-						add .hidden to #icon-spinner
+						add .hidden to #icon-spinner-search
 					end
 				"
 			>
@@ -60,7 +60,7 @@ templ SearchBar() {
 					></path>
 				</svg>
 				<svg
-					id="icon-spinner"
+					id="icon-spinner-search"
 					class="w-7 text-cchoice hidden"
 					aria-hidden="true"
 					xmlns="http://www.w3.org/2000/svg"
@@ -145,6 +145,7 @@ templ Cart() {
 				group p-2 stroke-cchoice rounded-full
 				cursor-pointer hover:bg-cchoice_border
 			"
+			hx-post="/cchoice/checkout"
 		>
 			@svgCart()
 		</button>

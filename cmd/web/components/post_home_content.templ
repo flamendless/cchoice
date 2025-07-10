@@ -93,7 +93,10 @@ var postHomeContentSections = []postHomeContentSection{
 }
 
 templ PostHomeContentSections() {
-	<div id="others" class="absolute flex flex-col left-0 px-8 pt-4 pb-16 w-screen border-t-4 border-cchoice_border">
+	<div
+		id="others"
+		class="absolute flex flex-col left-0 px-8 pt-4 pb-16 w-screen border-t-4 border-cchoice_border"
+	>
 		for _, postHomeContentSection := range postHomeContentSections {
 			<span class="font-bold text-lg mt-4">{ postHomeContentSection.title }</span>
 			<section id={ postHomeContentSection.href } class="flex flex-row justify-between my-6 w-full pr-4">

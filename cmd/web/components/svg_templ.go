@@ -39,7 +39,7 @@ func svgCart() templ.Component {
 }
 
 // https://www.svgbackgrounds.com/elements/animated-svg-preloaders/
-func svgInfinite() templ.Component {
+func svgInfinite(id string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -60,7 +60,20 @@ func svgInfinite() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<svg class=\"w-4 h-4 htmx-indicator\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\"><path fill=\"none\" stroke=\"#F6742F\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-dasharray=\"300 385\" stroke-dashoffset=\"0\" d=\"M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z\"><animate attributeName=\"stroke-dashoffset\" calcMode=\"spline\" dur=\"2\" values=\"685;-685\" keySplines=\"0 0 1 1\" repeatCount=\"indefinite\"></animate></path></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<svg id=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var3 string
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(id)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/svg.templ`, Line: 24, Col: 9}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"w-4 h-4\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\"><path fill=\"none\" stroke=\"#F6742F\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-dasharray=\"300 385\" stroke-dashoffset=\"0\" d=\"M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z\"><animate attributeName=\"stroke-dashoffset\" calcMode=\"spline\" dur=\"2\" values=\"685;-685\" keySplines=\"0 0 1 1\" repeatCount=\"indefinite\"></animate></path></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
