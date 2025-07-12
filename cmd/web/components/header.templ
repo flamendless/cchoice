@@ -80,7 +80,7 @@ templ SearchBar() {
 				placeholder="Search by product name..."
 				class="block w-full p-3 ps-10 text-sm text-black border border-searchbar rounded-lg bg-searchbar focus:ring-cchoice focus:border-cchoice"
 				hx-post="/cchoice/search"
-				hx-trigger="input changed delay:1000ms, keyup[key=='Enter']"
+				hx-trigger="input[this.value.length >= 3] changed delay:1000ms, keyup[key=='Enter'], search[target.value.length >= 3]"
 				hx-validate="true"
 				hx-include="#search"
 				hx-target="#search-results > ul"

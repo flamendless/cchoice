@@ -8,7 +8,9 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "cchoice/internal/constants"
+import (
+	"cchoice/internal/constants"
+)
 
 var (
 	onceHeadLinks    = templ.NewOnceHandle()
@@ -40,7 +42,7 @@ func HomePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = HomePageHead("C-Choice").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = HomePageHead("Shop at C-Choice Construction Supply").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -84,7 +86,7 @@ func HomePageHead(title string) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/cchoice/" + constants.PathEmptyImage)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/homepage.templ`, Line: 31, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/homepage.templ`, Line: 33, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -107,7 +109,7 @@ func HomePageHead(title string) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/homepage.templ`, Line: 56, Col: 17}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/homepage.templ`, Line: 58, Col: 17}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -137,7 +139,7 @@ func HomePageHead(title string) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(constants.DefaultThumbnailSize)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/homepage.templ`, Line: 59, Col: 78}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/homepage.templ`, Line: 61, Col: 78}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -150,7 +152,7 @@ func HomePageHead(title string) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL("/cchoice/static/js/htmx.min.js")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/homepage.templ`, Line: 67, Col: 91}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/homepage.templ`, Line: 70, Col: 91}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -163,7 +165,7 @@ func HomePageHead(title string) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL("/cchoice/static/js/hyperscript.min.js")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/homepage.templ`, Line: 68, Col: 104}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/homepage.templ`, Line: 71, Col: 104}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -235,7 +237,7 @@ func HomePageBody() templ.Component {
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL("/cchoice/static/js/error_handler.js")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/homepage.templ`, Line: 83, Col: 97}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/homepage.templ`, Line: 86, Col: 97}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {

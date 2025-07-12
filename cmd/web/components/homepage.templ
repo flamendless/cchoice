@@ -1,6 +1,8 @@
 package components
 
-import "cchoice/internal/constants"
+import (
+	"cchoice/internal/constants"
+)
 
 var (
 	onceHeadLinks    = templ.NewOnceHandle()
@@ -10,7 +12,7 @@ var (
 templ HomePage() {
 	<!DOCTYPE html>
 	<html lang="en">
-		@HomePageHead("C-Choice")
+		@HomePageHead("Shop at C-Choice Construction Supply")
 		@HomePageBody()
 	</html>
 }
@@ -64,6 +66,7 @@ templ HomePageHead(title string) {
 			<link rel="icon" type="image/png" sizes="180x180" href="/cchoice/static/images/favicons/180x180.png"/>
 			<link rel="icon" type="image/png" sizes="192x192" href="/cchoice/static/images/favicons/192x192.png"/>
 			<link href="/cchoice/static/css/tailwind.css" rel="stylesheet"/>
+
 			<script type="text/javascript" src={ string(templ.URL("/cchoice/static/js/htmx.min.js")) }></script>
 			<script async type="text/javascript" src={ string(templ.URL("/cchoice/static/js/hyperscript.min.js")) }></script>
 			<script>
