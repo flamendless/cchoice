@@ -37,7 +37,23 @@ func ModalProductImageViewer(imageData string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<span class=\"absolute top-0 right-0 size-8\n\t\t\t\t\t\trounded-full flex items-center justify-center transform translate-x-1/2 -translate-y-1/2\n\t\t\t\t\t\ttext-white bg-cchoice hover:bg-cchoice_dark font-medium text-xs cursor-pointer transition-colors\" title=\"close image viewer\" _=\"on click trigger closeModal\">X</span></div><div class=\"flex flex-col w-auto h-auto justify-center mt-2\"><button class=\"\n\t\t\t\t\t\ttext-white bg-cchoice font-medium rounded-lg text-sm px-8 py-1 cursor-pointer my-2\n\t\t\t\t\t\thover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice\n\t\t\t\t\t\ttransition-colors\n\t\t\t\t\t\" alt=\"close image viewer modal\" _=\"on click trigger closeModal\">Go to product page</button></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<span class=\"absolute top-0 right-0 size-8\n\t\t\t\t\t\trounded-full flex items-center justify-center transform translate-x-1/2 -translate-y-1/2\n\t\t\t\t\t\ttext-white bg-cchoice hover:bg-cchoice_dark font-medium text-xs cursor-pointer transition-colors\" title=\"close image viewer\" _=\"on click trigger closeModal\">X</span></div><div class=\"flex flex-row h-auto justify-center w-full bg-white p-2\"><button class=\"\n\t\t\t\t\t\tflex justify-center items-center w-12 h-12\n\t\t\t\t\t\tbg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group\n\t\t\t\t\t\trounded-full hover:bg-cchoicesoft\n\t\t\t\t\t\" title=\"go to product page\" alt=\"go to product page button\" _=\"on click log 'TODO'\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = svgOpen("stroke-white group-hover:stroke-cchoice_border w-full h-full p-2").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</button> <button class=\"\n\t\t\t\t\t\tflex justify-center items-center relative inline-block w-12 h-12\n\t\t\t\t\t\tbg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group\n\t\t\t\t\t\trounded-full hover:bg-cchoicesoft\n\t\t\t\t\t\" title=\"add to cart\" alt=\"add to cart button\" _=\"on click log 'TODO'\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = svgCart("stroke-white group-hover:stroke-cchoice_border w-full h-full p-2").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<span class=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow\">+1</span></button></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
