@@ -91,10 +91,10 @@ deps() {
 		expat1 \
 		libdeflate \
 		libvips \
-        libmagick \
-        openslide \
-        libxml2 \
-        libjxl
+		libmagick \
+		openslide \
+		libxml2 \
+		libjxl
 
 	buildgoose
 }

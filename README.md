@@ -7,6 +7,7 @@
 - `./run.sh deps`
 - `./run.sh setup`
 - `./run.sh genall`
+- `./run.sh genimages`
 - `./run.sh testall`
 - `./run.sh benchmark`
 
