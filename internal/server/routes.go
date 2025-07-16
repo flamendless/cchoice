@@ -32,6 +32,7 @@ import (
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.CleanPath)
+	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 	r.Use(middleware.NoCache)
 	r.Use(cors.Handler(cors.Options{
@@ -63,7 +64,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		r.Post("/search", s.searchHandler)
 
-		r.Post("/checkout", s.checkoutHandler)
+		r.Post("/checkouts", s.checkoutsHandler)
+		r.Post("/checkouts/line", s.checkoutsLineHandler)
 	})
 
 	return r
@@ -459,7 +461,7 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) checkoutHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		logs.Log().Fatal("checkout handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -469,14 +471,36 @@ func (s *Server) checkoutHandler(w http.ResponseWriter, r *http.Request) {
 	switch s.paymentGateway.GatewayEnum() {
 	case payments.PAYMENT_GATEWAY_PAYMONGO:
 		if err := s.paymentGateway.CheckoutHanlder(w, r); err != nil {
-			logs.Log().Fatal("[PayMongo] Checkout handler", zap.Error(err))
+			logs.Log().Fatal("[PayMongo] Checkouts handler", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	default:
-		err := errors.New("checkout handler. Unimplemented payment gateway.")
+		err := errors.New("checkouts handler. Unimplemented payment gateway.")
 		logs.Log().Fatal(err.Error(), zap.String("gateway", s.paymentGateway.GatewayEnum().String()))
 		http.Error(w, err.Error(), http.StatusNotImplemented)
 		return
 	}
+}
+
+func (s *Server) checkoutsLineHandler(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		logs.Log().Fatal("checkouts line handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	productID := r.Form.Get("product_id")
+
+	lineItems, err := GetOrCreateLineItems(s.sessionManager, r.Context())
+	if err != nil {
+		logs.Log().Fatal("get line items", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	lineItems = append(lineItems, productID)
+	UpdateLineItems(s.sessionManager, r.Context(), lineItems)
+
+	fmt.Println(GetOrCreateLineItems(s.sessionManager, r.Context()))
 }

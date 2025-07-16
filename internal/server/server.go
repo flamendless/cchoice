@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/VictoriaMetrics/fastcache"
+	"github.com/alexedwards/scs/v2"
 	_ "github.com/joho/godotenv/autoload"
 	"go.uber.org/zap"
 	"golang.org/x/net/http2"
@@ -32,6 +33,7 @@ type Server struct {
 	fsHandler      http.Handler
 	fsServer       *http.Server
 	Cache          *fastcache.Cache
+	sessionManager *scs.SessionManager
 	paymentGateway payments.IPaymentGateway
 	address        string
 	port           int
@@ -57,6 +59,9 @@ func NewServer() *http.Server {
 		panic(fmt.Errorf("%w. PORT_FS. %w", errs.ERR_ENV_VAR_REQUIRED, err))
 	}
 
+	sessionManager := scs.New()
+	sessionManager.Lifetime = 1 * time.Hour
+
 	dbRO := database.New(database.DB_MODE_RO)
 	dbRW := database.New(database.DB_MODE_RW)
 	NewServer := &Server{
@@ -66,6 +71,7 @@ func NewServer() *http.Server {
 		dbRO:           dbRO,
 		dbRW:           dbRW,
 		Cache:          fastcache.New(CACHE_MAX_BYTES),
+		sessionManager: sessionManager,
 		paymentGateway: paymongo.MustInit(),
 		useHTTP2:       utils.GetBoolFlag(os.Getenv("USEHTTP2")),
 		useSSL:         utils.GetBoolFlag(os.Getenv("USESSL")),
@@ -99,9 +105,11 @@ func NewServer() *http.Server {
 		}
 	}
 
+	handler := sessionManager.LoadAndSave(NewServer.RegisterRoutes())
+
 	server := &http.Server{
 		Addr:         addr,
-		Handler:      NewServer.RegisterRoutes(),
+		Handler:      handler,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  readTimeout,
 		WriteTimeout: writeTimeout,
@@ -120,6 +128,8 @@ func NewServer() *http.Server {
 		zap.String("Address", addr),
 		zap.Bool("Use caching", NewServer.Cache != nil),
 		zap.Int("Caching max bytes", CACHE_MAX_BYTES),
+		zap.Bool("Use session manager", NewServer.sessionManager != nil),
+		zap.Duration("Session manager lifetime", NewServer.sessionManager.Lifetime),
 		zap.String("Payment gateway", NewServer.paymentGateway.GatewayEnum().String()),
 		zap.Bool("SSL", NewServer.useSSL),
 		zap.Bool("HTTP2", NewServer.useHTTP2),
