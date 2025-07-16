@@ -6,6 +6,7 @@ require (
 	github.com/Rhymond/go-money v1.0.15
 	github.com/VictoriaMetrics/fastcache v1.12.5
 	github.com/a-h/templ v0.3.898
+	github.com/alexedwards/scs/v2 v2.9.0
 	github.com/cohesivestack/valgo v0.4.1
 	github.com/davidbyttow/govips/v2 v2.16.0
 	github.com/gertd/go-pluralize v0.2.1
