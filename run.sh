@@ -81,8 +81,9 @@ cleandb() {
 deps() {
 	local -; set -x;
 	# Tailwind https://tailwindcss.com/docs/installation/tailwind-cli
-	curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=10.0.0 sh -
-	pnpm install tailwindcss @tailwindcss/cli
+	curl -LO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
+	chmod +x tailwindcss-linux-x64
+	mv tailwindcss-linux-x64 tailwindcss
 
 	# libvips https://www.libvips.org/install.html (I use Arch BTW)
 	yay -S \
@@ -104,8 +105,7 @@ gensql() {
 }
 
 gentempl() {
-	local PNPX="$(which pnpx)"
-	$PNPX @tailwindcss/cli -m -i ./cmd/web/static/css/main.css -o ./cmd/web/static/css/tailwind.css
+	./tailwindcss -m -i ./cmd/web/static/css/main.css -o ./cmd/web/static/css/tailwind.css
 	go tool templ generate templ -v
 }
 

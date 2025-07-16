@@ -11,3 +11,4 @@ node_modules/
 cmd/web/static/images/product_images/bosch/
 cmd/web/static/thumbnails/product_images/bosch/
 cmd/web/static/images/brand_logos/*.webp
+tailwindcss
