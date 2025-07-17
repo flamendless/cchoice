@@ -7,25 +7,25 @@ import (
 	"github.com/alexedwards/scs/v2"
 )
 
-const keyLineItems = "line_items"
+const sessionKeyProductIDs = "product_ids"
 
-func GetOrCreateLineItems(sm *scs.SessionManager, ctx context.Context) ([]string, error) {
-	if !sm.Exists(ctx, keyLineItems) {
-		sm.Put(ctx, keyLineItems, []string{})
-	}
-
-	lineItems, ok := sm.Get(ctx, keyLineItems).([]string)
-	if !ok {
-		return nil, errors.New("Failed to cast line items to []string")
-	}
-
-	return lineItems, nil
-}
-
-func UpdateLineItems(
+func AddProductID(
 	sm *scs.SessionManager,
 	ctx context.Context,
-	lineItems []string,
-) {
-	sm.Put(ctx, keyLineItems, lineItems)
+	productID string,
+) ([]string, error) {
+	if !sm.Exists(ctx, sessionKeyProductIDs) {
+		sm.Put(ctx, sessionKeyProductIDs, []string{})
+	}
+
+	productIDs, ok := sm.Get(ctx, sessionKeyProductIDs).([]string)
+	if !ok {
+		return nil, errors.New("Failed to cast product IDs to []string")
+	}
+
+	//TODO: (Brandon) - there should be a max number of items in a cart
+	productIDs = append(productIDs, productID)
+	sm.Put(ctx, sessionKeyProductIDs, productIDs)
+
+	return productIDs, nil
 }

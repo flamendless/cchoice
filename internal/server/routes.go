@@ -16,6 +16,7 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/errs"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
@@ -65,7 +66,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Post("/search", s.searchHandler)
 
 		r.Post("/checkouts", s.checkoutsHandler)
-		r.Post("/checkouts/line", s.checkoutsLineHandler)
+		r.Post("/checkouts/lines", s.checkoutsLinesHandler)
+		r.Get("/checkouts/lines/count", s.checkoutsLinesCountHandler)
 	})
 
 	return r
@@ -483,24 +485,37 @@ func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) checkoutsLineHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) checkoutsLinesHandler(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
-		logs.Log().Fatal("checkouts line handler", zap.Error(err))
+		logs.Log().Fatal("checkouts lines handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	productID := r.Form.Get("product_id")
+	if productID == "" {
+		err := errs.ERR_INVALID_PARAMS
+		logs.Log().Fatal("checkouts lines handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	lineItems, err := GetOrCreateLineItems(s.sessionManager, r.Context())
+	productIDs, err := AddProductID(s.sessionManager, r.Context(), productID)
 	if err != nil {
-		logs.Log().Fatal("get line items", zap.Error(err))
+		logs.Log().Fatal("add product id", zap.String("product id", productID), zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	lineItems = append(lineItems, productID)
-	UpdateLineItems(s.sessionManager, r.Context(), lineItems)
+	fmt.Println(productIDs)
 
-	fmt.Println(GetOrCreateLineItems(s.sessionManager, r.Context()))
+	w.WriteHeader(http.StatusOK)
+}
+
+func (s *Server) checkoutsLinesCountHandler(w http.ResponseWriter, r *http.Request) {
+	count := 0
+	if productIDs, ok := s.sessionManager.Get(r.Context(), sessionKeyProductIDs).([]string); ok {
+		count = len(productIDs)
+	}
+	w.Write(fmt.Appendf(nil, "%d", count))
 }
