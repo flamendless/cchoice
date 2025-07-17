@@ -1,0 +1,36 @@
+package components
+
+templ AddToCart() {
+	<button
+		id="btn-add-to-cart"
+		class="
+			flex justify-center items-center relative inline-block w-12 h-12
+			bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors
+			group rounded-full hover:bg-cchoicesoft
+		"
+		title="add to cart"
+		alt="add to cart button"
+		hx-post="/cchoice/checkouts/lines"
+		hx-include="#selected-product-id"
+		hx-swap="none"
+		_="
+			on click log 'Added to cart' end
+			on htmx:afterRequest
+				trigger get on #cart-count
+			end
+		"
+	>
+		@svgCart("stroke-white group-hover:stroke-cchoice_border w-full h-full p-2")
+		<span
+			class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow"
+		>
+			+1
+		</span>
+	</button>
+	<input
+		type="hidden"
+		id="selected-product-id"
+		name="product_id"
+		value=""
+	>
+}

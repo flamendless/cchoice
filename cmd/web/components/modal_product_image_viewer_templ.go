@@ -45,15 +45,15 @@ func ModalProductImageViewer(productID string, imageData string) templ.Component
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</button> <button id=\"btn-modal-add-to-cart\" class=\"\n\t\t\t\t\t\tflex justify-center items-center relative inline-block w-12 h-12\n\t\t\t\t\t\tbg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group\n\t\t\t\t\t\trounded-full hover:bg-cchoicesoft\n\t\t\t\t\t\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"/cchoice/checkouts/line\" hx-include=\"#selected-product-id\" _=\"on click log 'TODO'\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = svgCart("stroke-white group-hover:stroke-cchoice_border w-full h-full p-2").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = AddToCart().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<span class=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow\">+1</span></button> <input type=\"hidden\" id=\"selected-product-id\" name=\"product_id\" value=\"\"></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
