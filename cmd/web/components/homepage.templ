@@ -2,6 +2,7 @@ package components
 
 import (
 	"cchoice/internal/constants"
+	"os"
 )
 
 var (
@@ -12,7 +13,11 @@ var (
 templ HomePage() {
 	<!DOCTYPE html>
 	<html lang="en">
-		@HomePageHead("Shop at C-Choice Construction Supply")
+		if os.Getenv("APP_ENV") == "local" {
+			@HomePageHead("[DEV] Shop at C-Choice Construction Supply")
+		} else {
+			@HomePageHead("Shop at C-Choice Construction Supply")
+		}
 		@HomePageBody()
 	</html>
 }
