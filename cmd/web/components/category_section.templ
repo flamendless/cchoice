@@ -38,11 +38,17 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 							hx-target="#modal_image_viewer .modal-content img"
 							hx-select="img"
 							hx-swap="outerHTML"
-							_="on click trigger openModal on #modal_image_viewer"
 							class="w-24 max-w-24 h-24 cursor-zoom-in"
 							src={ product.ThumbnailData }
 							title="show high-quality image"
 							alt={ product.Name + " thumbnail" }
+							data-product-id={ product.ID }
+							_="
+								on click
+									trigger openModal on #modal_image_viewer
+									set #selected-product-id.value to my @data-product-id
+								end
+							"
 						/>
 					}
 					<div
@@ -101,7 +107,7 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 }
 
 templ AllCategorySections() {
-	@ModalProductImageViewer("")
+	@ModalProductImageViewer("", "")
 	<div
 		id="all-category-sections"
 		class="w-full overflow-x-hidden"

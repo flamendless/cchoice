@@ -1,12 +1,14 @@
 package components
 
-templ ModalProductImageViewer(imageData string) {
+templ ModalProductImageViewer(productID string, imageData string) {
 	<div
 		id="modal_image_viewer"
 		class="fixed hidden top-0 bottom-0 left-0 right-0 z-1000
 			flex flex-col items-center"
-		_="on closeModal add .hidden
-			on openModal wait 0.05s then remove .hidden"
+		_="
+			on closeModal add .hidden
+			on openModal wait 0.05s then remove .hidden
+		"
 	>
 		<div
 			class="absolute -z-1 top-0 bottom-0 left-0 right-0 bg-white/50"
@@ -45,6 +47,7 @@ templ ModalProductImageViewer(imageData string) {
 				</button>
 
 				<button
+					id="btn-modal-add-to-cart"
 					class="
 						flex justify-center items-center relative inline-block w-12 h-12
 						bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group
@@ -52,6 +55,8 @@ templ ModalProductImageViewer(imageData string) {
 					"
 					title="add to cart"
 					alt="add to cart button"
+					hx-post="/cchoice/checkouts/line"
+					hx-include="#selected-product-id"
 					_="on click log 'TODO'"
 				>
 					@svgCart("stroke-white group-hover:stroke-cchoice_border w-full h-full p-2")
@@ -61,6 +66,12 @@ templ ModalProductImageViewer(imageData string) {
 						+1
 					</span>
 				</button>
+				<input
+					type="hidden"
+					id="selected-product-id"
+					name="product_id"
+					value=""
+				>
 			</div>
 		</div>
 	</div>
