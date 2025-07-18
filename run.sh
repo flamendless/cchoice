@@ -78,6 +78,37 @@ cleandb() {
 
 }
 
+deps_arch() {
+        echo "Installing dependencies for Arch..."
+        yay -S --noconfirm \
+                base-devel \
+                glib2 \
+                expat1 \
+                libdeflate \
+                libvips \
+                libmagick \
+                openslide \
+                libxml2 \
+                libjxl
+}
+
+deps_debian() {
+        echo "Installing dependencies for Debian/Ubuntu..."
+        sudo apt update
+        sudo apt install -y \
+                build-essential \
+                golang-go \
+                git \
+                sqlite3 \
+                libsqlite3-dev \
+                libvips-dev \
+                libmagickwand-dev \
+                openslide-tools \
+                libxml2-dev \
+                libjxl-dev \
+                curl
+}
+
 deps() {
 	local -; set -x;
 	# Tailwind https://tailwindcss.com/docs/installation/tailwind-cli
