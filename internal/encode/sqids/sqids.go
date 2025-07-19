@@ -4,6 +4,7 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"errors"
 	"os"
 
 	sg "github.com/sqids/sqids-go"
@@ -11,6 +12,7 @@ import (
 )
 
 type Sqids struct {
+	name  string
 	sqids *sg.Sqids
 }
 
@@ -28,17 +30,22 @@ func MustSqids() *Sqids {
 		panic(err)
 	}
 	return &Sqids{
+		name:  "SQIDS",
 		sqids: s,
 	}
+}
+
+func (sqids Sqids) Name() string {
+	return sqids.name
 }
 
 func (sqids Sqids) Encode(dbid int64) string {
 	id, err := sqids.sqids.Encode([]uint64{uint64(dbid)})
 	if err != nil {
 		logs.Log().Warn(
-			"SQIDS",
-			zap.Error(errs.ERR_ENCODE),
-			zap.Error(err),
+			sqids.Name(),
+			zap.Error(errors.Join(errs.ERR_ENCODE, err)),
+			zap.Int64("dbid", dbid),
 		)
 		return ""
 	}
@@ -48,8 +55,12 @@ func (sqids Sqids) Encode(dbid int64) string {
 func (sqids Sqids) Decode(id string) int64 {
 	ids := sqids.sqids.Decode(id)
 	if len(ids) == 0 {
-		logs.Log().Warn("SQIDS", zap.Error(errs.ERR_DECODE))
-		return 0
+		logs.Log().Warn(
+			sqids.Name(),
+			zap.Error(errs.ERR_DECODE),
+			zap.String("id", id),
+		)
+		return -1
 	}
 	return int64(ids[0])
 }
