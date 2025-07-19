@@ -94,7 +94,7 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cacheKey := []byte(key)
-	if data, ok := s.Cache.HasGet(nil, cacheKey); ok {
+	if data, ok := s.cache.HasGet(nil, cacheKey); ok {
 		if err := components.Image(string(data)).Render(r.Context(), w); err != nil {
 			logs.Log().Fatal("Product Image handler", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -112,7 +112,7 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	imgData, err := images.GetImageDataB64(s.Cache, s.fs, finalPath, ext)
+	imgData, err := images.GetImageDataB64(s.cache, s.fs, finalPath, ext)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -124,7 +124,7 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.Cache.Set(cacheKey, []byte(imgData))
+	s.cache.Set(cacheKey, []byte(imgData))
 }
 
 func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -171,7 +171,7 @@ func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	settings, err := requests.GetSettingsData(
 		r.Context(),
-		s.Cache,
+		s.cache,
 		&s.SF,
 		s.dbRO,
 		[]byte("key_header_texts"),
@@ -208,7 +208,7 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	settings, err := requests.GetSettingsData(
 		r.Context(),
-		s.Cache,
+		s.cache,
 		&s.SF,
 		s.dbRO,
 		[]byte("key_footer_texts"),
@@ -269,7 +269,7 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Request) {
 	categories, err := requests.GetCategoriesSidePanel(
 		r.Context(),
-		s.Cache,
+		s.cache,
 		&s.SF,
 		s.dbRO,
 		[]byte("key_categories_side_panel"),
@@ -308,7 +308,7 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 
 	res, err := requests.GetCategorySectionHandler(
 		r.Context(),
-		s.Cache,
+		s.cache,
 		&s.SF,
 		s.dbRO,
 		fmt.Appendf([]byte{}, "categorySectionHandler_p%d_l%d", page, limit),
@@ -382,7 +382,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 			continue
 		}
 
-		imgData, err := images.GetImageDataB64(s.Cache, s.fs, finalPath, ext)
+		imgData, err := images.GetImageDataB64(s.cache, s.fs, finalPath, ext)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			continue
@@ -443,7 +443,7 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		imgData, err := images.GetImageDataB64(s.Cache, s.fs, finalPath, ext)
+		imgData, err := images.GetImageDataB64(s.cache, s.fs, finalPath, ext)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			continue
@@ -495,6 +495,14 @@ func (s *Server) checkoutsLinesHandler(w http.ResponseWriter, r *http.Request) {
 	productID := r.Form.Get("product_id")
 	if productID == "" {
 		err := errs.ERR_INVALID_PARAMS
+		logs.Log().Fatal("checkouts lines handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//TODO: (Brandon) - convert string ID to DB ID
+	const dbProductID = 26;
+	if _, err := s.dbRO.GetQueries().CheckProductExistsByID(r.Context(), dbProductID); err != nil {
 		logs.Log().Fatal("checkouts lines handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
