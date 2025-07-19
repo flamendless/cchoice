@@ -1,8 +1,8 @@
 package images
 
 import (
+	"cchoice/internal/encode/b64"
 	"cchoice/internal/logs"
-	"cchoice/internal/serialize"
 	"fmt"
 	"io"
 	"net/http"
@@ -29,7 +29,7 @@ func ImageToB64(format ImageFormat, data []byte) string {
 	default:
 		panic("unhandled image format")
 	}
-	return base + serialize.ToBase64(data)
+	return base + b64.ToBase64(data)
 }
 
 func GetImagePathWithSize(

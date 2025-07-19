@@ -19,6 +19,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-sqlite3 v1.14.28
 	github.com/spf13/cobra v1.9.1
+	github.com/sqids/sqids-go v0.4.1
 	github.com/stretchr/testify v1.10.0
 	github.com/xuri/excelize/v2 v2.9.1
 	go.uber.org/zap v1.27.0

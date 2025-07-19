@@ -16,6 +16,8 @@ import (
 	"golang.org/x/sync/singleflight"
 
 	"cchoice/internal/database"
+	"cchoice/internal/encode"
+	"cchoice/internal/encode/sqids"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
@@ -32,9 +34,10 @@ type Server struct {
 	fs             http.FileSystem
 	fsHandler      http.Handler
 	fsServer       *http.Server
-	Cache          *fastcache.Cache
+	cache          *fastcache.Cache
 	sessionManager *scs.SessionManager
 	paymentGateway payments.IPaymentGateway
+	encoder        encode.IEncode
 	address        string
 	port           int
 	portFS         int
@@ -70,9 +73,10 @@ func NewServer() *http.Server {
 		portFS:         portFS,
 		dbRO:           dbRO,
 		dbRW:           dbRW,
-		Cache:          fastcache.New(CACHE_MAX_BYTES),
+		cache:          fastcache.New(CACHE_MAX_BYTES),
 		sessionManager: sessionManager,
 		paymentGateway: paymongo.MustInit(),
+		encoder:        sqids.MustSqids(),
 		useHTTP2:       utils.GetBoolFlag(os.Getenv("USEHTTP2")),
 		useSSL:         utils.GetBoolFlag(os.Getenv("USESSL")),
 	}
@@ -126,7 +130,7 @@ func NewServer() *http.Server {
 	logs.Log().Info(
 		"Server",
 		zap.String("Address", addr),
-		zap.Bool("Use caching", NewServer.Cache != nil),
+		zap.Bool("Use caching", NewServer.cache != nil),
 		zap.Int("Caching max bytes", CACHE_MAX_BYTES),
 		zap.Bool("Use session manager", NewServer.sessionManager != nil),
 		zap.Duration("Session manager lifetime", NewServer.sessionManager.Lifetime),
