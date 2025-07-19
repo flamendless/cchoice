@@ -11,16 +11,24 @@ TMP="./tmp"
 
 BROWSER="${BROWSER:-vivaldi}"
 ISWSL=false
-if grep -qi Microsoft /proc/version; then
+ISMAC=false
+
+if [[ $(uname) == "Darwin" ]]; then
+	ISMAC=true
+elif grep -qi Microsoft /proc/version; then
 	ISWSL=true
 fi
 
 serve() {
 	local -; set -x;
 	genall
+
 	if "${ISWSL}"; then
 		cmd.exe /c "start ${BROWSER} http://localhost:7331/cchoice"
+	elif "${ISMAC}"; then
+		open -a ${BROWSER} "http://localhost:7331/cchoice"
 	fi
+
 	go tool templ generate --watch --proxy="http://localhost:2626" --open-browser=false &
 	go tool air -c ".air.api.toml" api
 }
@@ -33,6 +41,7 @@ build() {
 
 buildgoose() {
 	local -; set -x;
+	git submodule update --init --recursive
 	cd ./cmd/goose
 	go mod tidy
 	go build -tags='no_postgres no_mysql no_clickhouse no_mssql no_vertica no_ydb' -o "../../${TMP}/goose" ./cmd/goose
@@ -49,6 +58,10 @@ setup() {
 	if [ ! -f "./.git/hooks/pre-commit" ]; then
 		cp "./scripts/pre-commit-unit-test.sh" "./.git/hooks/pre-commit"
 		chmod +x "./.git/hooks/pre-commit"
+	fi
+
+	if [ ! -f "./.env" ]; then
+		cp "./.env.sample" "./.env"
 	fi
 }
 
@@ -93,7 +106,7 @@ deps_arch() {
 }
 
 deps_debian() {
-        echo "Installing dependencies for Debian/Ubuntu..."
+        echo "Installing dependencies for Debian..."
         sudo apt update
         sudo apt install -y \
                 build-essential \
@@ -109,24 +122,54 @@ deps_debian() {
                 curl
 }
 
-deps() {
-	local -; set -x;
-	# Tailwind https://tailwindcss.com/docs/installation/tailwind-cli
-	curl -LO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
-	chmod +x tailwindcss-linux-x64
-	mv tailwindcss-linux-x64 tailwindcss
-
-	# libvips https://www.libvips.org/install.html (I use Arch BTW)
-	yay -S \
-		base-devel \
-		glib2 \
-		expat1 \
-		libdeflate \
-		libvips \
-		libmagick \
+deps_mac() {
+        echo "Installing dependencies for MacOS..."
+        brew install \
+		go \
+		git \
+		sqlite \
+		vips \
+		imagemagick \
 		openslide \
 		libxml2 \
-		libjxl
+		jpeg-xl \
+		curl
+}
+
+deps() {
+	local -; set -x;
+
+	# Tailwind https://tailwindcss.com/docs/installation/tailwind-cli
+	if [[ ! -f tailwindcss ]]; then
+		local BIN
+		if "${ISWSL}"; then
+			BIN="tailwindcss-linux-x64"
+		elif "${ISMAC}"; then
+			BIN="tailwindcss-macos-arm64"
+		fi
+
+		curl -LO "https://github.com/tailwindlabs/tailwindcss/releases/latest/download/${BIN}"
+		chmod +x "${BIN}"
+		mv "${BIN}" tailwindcss
+	else
+		echo "You already have tailwindcss binary"
+	fi
+
+	if "${ISWSL}"; then
+		local DISTROID
+		DISTROID=$(grep ^ID= /etc/os-release | cut -d= -f2 | tr -d '"')
+
+		if [[ "$DISTROID" == "arch" ]]; then
+			deps_arch
+		elif [[ "$DISTROID" == "debian" ]]; then
+			deps_debian
+		else
+			echo "Unknown or unsupported distribution: $DISTROID"
+			exit 1
+		fi
+	elif "${ISMAC}"; then
+		deps_mac
+	fi
 
 	buildgoose
 }
@@ -230,6 +273,7 @@ if [ "$#" -eq 0 ]; then
 	echo "    cleandb"
 	echo "    customrun"
 	echo "    db"
+	echo "    deps"
 	echo "    genall"
 	echo "    genimages"
 	echo "    gensql"
