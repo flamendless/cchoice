@@ -35,8 +35,7 @@ mkcert localhost 127.0.0.1 ::1
 - Toolings:
     - go or dev tools
 - Script:
-    - run.sh, scripts/*
-    - cmd/thumbnailify_images.go
+    - run.sh, scripts/*, cmd/*
 - CICD:
     - gh actions, workflows
 - Config:
