@@ -189,6 +189,10 @@ genall() {
 	gentempl
 }
 
+genchlog() {
+	go tool git-chglog -o CHANGELOGS.md
+}
+
 sc() {
 	local -; set -x;
 	go fmt ./...
@@ -275,6 +279,7 @@ if [ "$#" -eq 0 ]; then
 	echo "    db"
 	echo "    deps"
 	echo "    genall"
+	echo "    genchlog"
 	echo "    genimages"
 	echo "    gensql"
 	echo "    gentempl"
