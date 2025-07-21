@@ -38,6 +38,12 @@ var cmdTestPayment = &cobra.Command{
 		}
 		dump.Println("Available payment methods", resPaymentMethods)
 
+		dbRW := database.New(database.DB_MODE_RW)
+		checkout, err := dbRW.GetQueries().CreateCheckout(cmd.Context(), "test_session_token")
+		if err != nil {
+			panic(err)
+		}
+
 		payload := paymongo.CreateCheckoutSessionPayload{
 			Data: paymongo.CreateCheckoutSessionData{
 				Attributes: paymongo.CreateCheckoutSessionAttr{
@@ -76,21 +82,24 @@ var cmdTestPayment = &cobra.Command{
 				},
 			},
 		}
-		resCheckout, err := pg.CreateCheckoutSession(&payload)
+		resCheckout, err := pg.CreateCheckoutPaymentSession(&payload)
 		if err != nil {
 			panic(err)
 		}
 		dump.Println("Checkout", resCheckout)
 
 		db := database.New(database.DB_MODE_RW)
-		inserted, err := db.GetQueries().CreateCheckout(cmd.Context(), *resCheckout.ToCheckout(pg))
+		inserted, err := db.GetQueries().CreateCheckoutPayment(
+			cmd.Context(),
+			*resCheckout.ToCheckoutPayment(pg),
+		)
 		if err != nil {
 			panic(err)
 		}
 		dump.Println("Inserted checkout", inserted)
 
-		for _, lineItem := range resCheckout.ToLineItems() {
-			inserted, err := db.GetQueries().CreateCheckoutLineItem(cmd.Context(), *lineItem)
+		for _, lineItem := range resCheckout.ToLineItems(checkout.ID) {
+			inserted, err := db.GetQueries().CreateCheckoutLine(cmd.Context(), *lineItem)
 			if err != nil {
 				panic(err)
 			}

@@ -8,8 +8,8 @@ import (
 type CreateCheckoutSessionPayload any
 
 type CreateCheckoutSessionResponse interface {
-	ToLineItems() []*queries.CreateCheckoutLineItemParams
-	ToCheckout(IPaymentGateway) *queries.CreateCheckoutParams
+	ToLineItems(int64) []*queries.CreateCheckoutLineParams
+	ToCheckoutPayment(IPaymentGateway) *queries.CreateCheckoutPaymentParams
 }
 
 type GetAvailablePaymentMethodsResponse interface {
@@ -20,6 +20,6 @@ type IPaymentGateway interface {
 	GatewayEnum() PaymentGateway
 	GetAuth() string
 	GetAvailablePaymentMethods() (GetAvailablePaymentMethodsResponse, error)
-	CreateCheckoutSession(CreateCheckoutSessionPayload) (CreateCheckoutSessionResponse, error)
-	CheckoutHanlder(http.ResponseWriter, *http.Request) error
+	CreateCheckoutPaymentSession(CreateCheckoutSessionPayload) (CreateCheckoutSessionResponse, error)
+	CheckoutPaymentHandler(http.ResponseWriter, *http.Request) error
 }

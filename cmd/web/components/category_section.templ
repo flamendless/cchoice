@@ -42,11 +42,13 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 							src={ product.ThumbnailData }
 							title="show high-quality image"
 							alt={ product.Name + " thumbnail" }
-							data-product-id={ product.ID }
+							data-product-id={ product.ProductID }
 							_="
 								on click
-									trigger openModal on #modal_image_viewer
 									set #selected-product-id.value to my @data-product-id
+									log 'selected: ' + #selected-product-id.value
+									log 'product-id: ' + @data-product-id
+									trigger openModal on #modal_image_viewer
 								end
 							"
 						/>

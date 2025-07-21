@@ -1,31 +1,32 @@
 package server
 
 import (
+	"cchoice/internal/errs"
 	"context"
-	"errors"
 
 	"github.com/alexedwards/scs/v2"
 )
 
-const sessionKeyProductIDs = "product_ids"
+const (
+	skCheckoutLineProductIDs = "checkout_line_ids"
+)
 
-func AddProductID(
-	sm *scs.SessionManager,
+func AddToCheckoutLineProductIDs(
 	ctx context.Context,
+	sm *scs.SessionManager,
 	productID string,
 ) ([]string, error) {
-	if !sm.Exists(ctx, sessionKeyProductIDs) {
-		sm.Put(ctx, sessionKeyProductIDs, []string{})
+	if !sm.Exists(ctx, skCheckoutLineProductIDs) {
+		sm.Put(ctx, skCheckoutLineProductIDs, []string{})
 	}
 
-	productIDs, ok := sm.Get(ctx, sessionKeyProductIDs).([]string)
+	checkoutLineProductIDs, ok := sm.Get(ctx, skCheckoutLineProductIDs).([]string)
 	if !ok {
-		return nil, errors.New("Failed to cast product IDs to []string")
+		return nil, errs.ERR_SESSION_CHECKOUT_LINE_PRODUCT_IDS
 	}
 
-	//TODO: (Brandon) - there should be a max number of items in a cart
-	productIDs = append(productIDs, productID)
-	sm.Put(ctx, sessionKeyProductIDs, productIDs)
+	checkoutLineProductIDs = append(checkoutLineProductIDs, productID)
+	sm.Put(ctx, skCheckoutLineProductIDs, checkoutLineProductIDs)
 
-	return productIDs, nil
+	return checkoutLineProductIDs, nil
 }

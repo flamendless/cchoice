@@ -13,8 +13,8 @@ import (
 	"cchoice/cmd/web"
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
+	"cchoice/internal/checkout"
 	"cchoice/internal/constants"
-	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/errs"
 	"cchoice/internal/images"
@@ -64,6 +64,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/products/image", s.productsImageHandler)
 
 		r.Post("/search", s.searchHandler)
+
+		r.Get("/carts", s.cartsHandler)
+		r.Get("/carts/lines", s.cartsLinesHandler)
 
 		r.Post("/checkouts", s.checkoutsHandler)
 		r.Post("/checkouts/lines", s.checkoutsLinesHandler)
@@ -311,6 +314,7 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 		s.cache,
 		&s.SF,
 		s.dbRO,
+		s.encoder,
 		fmt.Appendf([]byte{}, "categorySectionHandler_p%d_l%d", page, limit),
 		page,
 		limit,
@@ -335,8 +339,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	categoryDBID := database.MustDecodeToDBID(database.DB_PREFIX_CATEGORY, categoryID)
-
+	categoryDBID := s.encoder.Decode(categoryID)
 	category, err := s.dbRO.GetQueries().GetProductCategoryByID(r.Context(), categoryDBID)
 	if err != nil {
 		logs.Log().Fatal("category section list handler", zap.Error(err))
@@ -395,7 +398,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		ID:          categoryID,
 		Category:    utils.SlugToTile(category.Category.String),
 		Subcategory: utils.SlugToTile(category.Subcategory.String),
-		Products:    models.ToCategorySectionProducts(products),
+		Products:    models.ToCategorySectionProducts(s.encoder, products),
 	}
 
 	if err := components.CategorySectionProducts(categorySectionProducts).Render(r.Context(), w); err != nil {
@@ -451,7 +454,7 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 
 		product.ThumbnailData = imgData
 
-		if err := components.SearchResultProductCard(models.SearchResultProduct(product)).Render(r.Context(), w); err != nil {
+		if err := components.SearchResultProductCard(models.ToSearchResultProduct(s.encoder, product)).Render(r.Context(), w); err != nil {
 			logs.Log().Fatal("search result product card", zap.Error(err))
 			return
 		}
@@ -472,7 +475,7 @@ func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch s.paymentGateway.GatewayEnum() {
 	case payments.PAYMENT_GATEWAY_PAYMONGO:
-		if err := s.paymentGateway.CheckoutHanlder(w, r); err != nil {
+		if err := s.paymentGateway.CheckoutPaymentHandler(w, r); err != nil {
 			logs.Log().Fatal("[PayMongo] Checkouts handler", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -500,30 +503,141 @@ func (s *Server) checkoutsLinesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//TODO: (Brandon) - convert string ID to DB ID
-	const dbProductID = 26;
+	dbProductID := s.encoder.Decode(productID)
 	if _, err := s.dbRO.GetQueries().CheckProductExistsByID(r.Context(), dbProductID); err != nil {
-		logs.Log().Fatal("checkouts lines handler", zap.Error(err))
+		logs.Log().Fatal(
+			"checkouts lines handler",
+			zap.String("token", s.sessionManager.Token(r.Context())),
+			zap.Error(err),
+		)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	productIDs, err := AddProductID(s.sessionManager, r.Context(), productID)
+	checkoutLineProductIDs, err := AddToCheckoutLineProductIDs(r.Context(), s.sessionManager, productID)
 	if err != nil {
-		logs.Log().Fatal("add product id", zap.String("product id", productID), zap.Error(err))
+		logs.Log().Fatal(
+			"add checkout line",
+			zap.String("token", s.sessionManager.Token(r.Context())),
+			zap.String("product id", productID),
+			zap.Error(err),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Println(productIDs)
-
+	logs.Log().Info(
+		"checkouts lines",
+		zap.String("token", s.sessionManager.Token(r.Context())),
+		zap.Strings("checkout line product ids", checkoutLineProductIDs),
+	)
 	w.WriteHeader(http.StatusOK)
 }
 
 func (s *Server) checkoutsLinesCountHandler(w http.ResponseWriter, r *http.Request) {
 	count := 0
-	if productIDs, ok := s.sessionManager.Get(r.Context(), sessionKeyProductIDs).([]string); ok {
+	if productIDs, ok := s.sessionManager.Get(r.Context(), skCheckoutLineProductIDs).([]string); ok {
 		count = len(productIDs)
 	}
 	w.Write(fmt.Appendf(nil, "%d", count))
+}
+
+func (s *Server) cartsHandler(w http.ResponseWriter, r *http.Request) {
+	checkoutlineProductIDs, ok := s.sessionManager.Get(r.Context(), skCheckoutLineProductIDs).([]string)
+	if len(checkoutlineProductIDs) == 0 {
+		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
+			logs.Log().Fatal("Cart page handler", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	token := s.sessionManager.Token(r.Context())
+	if !ok {
+		logs.Log().Fatal(
+			"Cart page handler",
+			zap.Error(errs.ERR_SESSION_CHECKOUT_LINE_PRODUCT_IDS),
+			zap.String("token", token),
+		)
+		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
+			logs.Log().Fatal("Cart page handler", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	checkoutID, err := checkout.CreateCheckout(
+		r.Context(),
+		s.dbRW.GetQueries(),
+		s.encoder,
+		token,
+		checkoutlineProductIDs,
+	)
+	if err != nil || checkoutID == -1 {
+		logs.Log().Fatal(
+			"Cart page handler",
+			zap.Error(err),
+			zap.String("token", token),
+		)
+		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
+			logs.Log().Fatal("Cart page handler", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	if err := components.CartPage(components.CartPageBody()).Render(r.Context(), w); err != nil {
+		logs.Log().Fatal("Cart page handler", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Server) cartsLinesHandler(w http.ResponseWriter, r *http.Request) {
+	token := s.sessionManager.Token(r.Context())
+	checkoutID, err := s.dbRO.GetQueries().GetCheckoutIDBySessionID(r.Context(), token)
+	if err != nil {
+		logs.Log().Warn(
+			"Carts lines handler",
+			zap.Error(err),
+			zap.String("token", token),
+		)
+		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
+			logs.Log().Fatal("Cart page handler", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	checkoutLines, err := s.dbRO.GetQueries().GetCheckoutLinesByCheckoutID(r.Context(), checkoutID)
+	if err != nil || len(checkoutLines) == 0 {
+		logs.Log().Warn(
+			"Carts lines handler",
+			zap.Error(err),
+			zap.String("token", token),
+			zap.Int("checkout lines", len(checkoutLines)),
+		)
+		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
+			logs.Log().Fatal("Cart page handler", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	for _, checkoutLine := range checkoutLines {
+		cl := models.CheckoutLine{
+			ID:         s.encoder.Encode(checkoutLine.ID),
+			CheckoutID: s.encoder.Encode(checkoutLine.CheckoutID),
+			ProductID:  s.encoder.Encode(checkoutLine.ProductID),
+			Name:       checkoutLine.Name,
+			BrandName:  checkoutLine.BrandName,
+			Quantity:   checkoutLine.Quantity,
+		}
+
+		if err := components.CartCheckoutLineItem(cl).Render(r.Context(), w); err != nil {
+			logs.Log().Fatal("Cart lines handler", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			continue
+		}
+	}
 }

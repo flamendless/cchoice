@@ -198,7 +198,7 @@ func Cart() templ.Component {
 			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"m-2 flex flex-col place-conter-center\"><button alt=\"cart logo\" aria-label=\"Cart\" title=\"Cart\" class=\"\n\t\t\t\trelative inline-block\n\t\t\t\tgroup p-2 stroke-cchoice rounded-full\n\t\t\t\tcursor-pointer hover:bg-cchoice_border\n\t\t\t\" hx-post=\"/cchoice/checkouts\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"m-2 flex flex-col place-conter-center\"><button alt=\"cart logo\" aria-label=\"Cart\" title=\"Cart\" class=\"\n\t\t\t\trelative inline-block\n\t\t\t\tgroup p-2 stroke-cchoice rounded-full\n\t\t\t\tcursor-pointer hover:bg-cchoice_border\n\t\t\t\" _=\"on click go to url '/cchoice/carts'\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

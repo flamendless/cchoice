@@ -1,5 +1,76 @@
 package components
 
+import "os"
+import "fmt"
+import "cchoice/internal/constants"
+
+var (
+	onceHeadLinks    = templ.NewOnceHandle()
+)
+
+templ TabTitle(page string) {
+	if os.Getenv("APP_ENV") == "local" {
+		<title>{ fmt.Sprintf("[DEV] %s | C-Choice Construction Supply", page) }</title>
+	} else {
+		<title>{ fmt.Sprintf("%s | C-Choice Construction Supply", page) }</title>
+	}
+}
+
 templ HR() {
 	<hr class="border-2 border-cchoice_border mx-1 my-0.5"/>
+}
+
+templ HeadMeta() {
+	<base href="/"/>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+	<meta name="description" content="Your Partner in Progress"/>
+	<meta name="google" content="nositelinkssearchbox"/>
+	<meta name="robots" content="noarchive, noimageindex"/>
+	<meta name="keywords" content="cchoice, c-choice, construction, power tools"/>
+	<meta name="viewport" content="width=1024"/>
+	<!--<link rel="dns-prefetch" href="https://images1.cchoice.com"/>-->
+	<link rel="preload" href="/cchoice/static/svg/logo_complete.svg" as="image" type="image/svg+xml"/>
+	<link
+		rel="preload"
+		href={ "/cchoice/" + constants.PathEmptyImage }
+		as="image"
+		type="image/png"
+	/>
+	<!--
+		TODO: (Brandon) - preload product images here
+		<link rel="preload" href="/cchoice/static/images/product_images/bosch/" as="image" type="image/png"/>
+	-->
+	<meta property="og:title" content="C-Choice Construction Supplies"/>
+	<meta
+		property="og:description"
+		content="Your Partner in Progress"
+	/>
+	<meta property="og:type" content="website"/>
+	<!--<meta property="og:url" content="https://www.cchoice.com/"/>-->
+	<meta property="og:image" content="/cchoice/static/images/favicons/192x192.png"/>
+	<meta
+		property="og:image:secure_url"
+		content="/cchoice/static/images/favicons/192x192.png"
+	/>
+	<meta name="twitter:card" content="summary"/>
+	<meta charset="UTF-8"/>
+
+	@onceHeadLinks.Once() {
+		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href="/cchoice/static/images/favicons/favicon.ico"/>
+		<link rel="icon" type="image/png" sizes="114x114" href="/cchoice/static/images/favicons/114x114.png"/>
+		<link rel="icon" type="image/png" sizes="128x128" href="/cchoice/static/images/favicons/128x128.png"/>
+		<link rel="icon" type="image/png" sizes="152x152" href="/cchoice/static/images/favicons/152x152.png"/>
+		<link rel="icon" type="image/png" sizes="167x167" href="/cchoice/static/images/favicons/167x167.png"/>
+		<link rel="icon" type="image/png" sizes="180x180" href="/cchoice/static/images/favicons/180x180.png"/>
+		<link rel="icon" type="image/png" sizes="192x192" href="/cchoice/static/images/favicons/192x192.png"/>
+		<link href="/cchoice/static/css/tailwind.css" rel="stylesheet"/>
+
+		<script type="text/javascript" src={ string(templ.URL("/cchoice/static/js/htmx.min.js")) }></script>
+		<script async type="text/javascript" src={ string(templ.URL("/cchoice/static/js/hyperscript.min.js")) }></script>
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+				console.log("script added");
+			})
+		</script>
+	}
 }

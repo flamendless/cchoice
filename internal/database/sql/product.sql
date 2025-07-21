@@ -114,6 +114,12 @@ FROM tbl_products
 WHERE tbl_products.serial = ?
 LIMIT 1;
 
+-- name: CheckProductExistsByID :one
+SELECT 1
+FROM tbl_products
+WHERE tbl_products.id = ?
+LIMIT 1;
+
 -- name: CreateProducts :one
 INSERT INTO tbl_products (
 	serial,

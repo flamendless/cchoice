@@ -9,6 +9,7 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/encode"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 
@@ -123,6 +124,7 @@ func GetCategorySectionHandler(
 	cache *fastcache.Cache,
 	sf *singleflight.Group,
 	dbRO database.Service,
+	encoder encode.IEncode,
 	cacheKey []byte,
 	page int,
 	limit int,
@@ -174,7 +176,7 @@ func GetCategorySectionHandler(
 		}
 
 		categoriesSubcategories[category] = append(categoriesSubcategories[category], models.Subcategory{
-			CategoryID: database.EncodeDBID(database.DB_PREFIX_CATEGORY, v.ID),
+			CategoryID: encoder.Encode(v.ID),
 			Label:      utils.SlugToTile(v.Subcategory.String),
 		})
 	}

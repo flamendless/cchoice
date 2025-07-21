@@ -12,8 +12,84 @@ import (
 
 const createCheckout = `-- name: CreateCheckout :one
 INSERT INTO tbl_checkouts(
+	session_id
+) VALUES (
+	?
+) RETURNING id, session_id, created_at, updated_at
+`
+
+func (q *Queries) CreateCheckout(ctx context.Context, sessionID string) (TblCheckout, error) {
+	row := q.db.QueryRowContext(ctx, createCheckout, sessionID)
+	var i TblCheckout
+	err := row.Scan(
+		&i.ID,
+		&i.SessionID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const createCheckoutLine = `-- name: CreateCheckoutLine :one
+INSERT INTO tbl_checkout_lines(
+	checkout_id,
+	product_id,
+	name,
+	serial,
+	description,
+	amount,
+	currency,
+	quantity
+) VALUES (
+	?, ?, ?, ?,
+	?, ?, ?, ?
+) RETURNING id, checkout_id, product_id, name, serial, description, amount, currency, quantity, created_at, updated_at
+`
+
+type CreateCheckoutLineParams struct {
+	CheckoutID  int64
+	ProductID   int64
+	Name        string
+	Serial      string
+	Description string
+	Amount      int64
+	Currency    string
+	Quantity    int64
+}
+
+func (q *Queries) CreateCheckoutLine(ctx context.Context, arg CreateCheckoutLineParams) (TblCheckoutLine, error) {
+	row := q.db.QueryRowContext(ctx, createCheckoutLine,
+		arg.CheckoutID,
+		arg.ProductID,
+		arg.Name,
+		arg.Serial,
+		arg.Description,
+		arg.Amount,
+		arg.Currency,
+		arg.Quantity,
+	)
+	var i TblCheckoutLine
+	err := row.Scan(
+		&i.ID,
+		&i.CheckoutID,
+		&i.ProductID,
+		&i.Name,
+		&i.Serial,
+		&i.Description,
+		&i.Amount,
+		&i.Currency,
+		&i.Quantity,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const createCheckoutPayment = `-- name: CreateCheckoutPayment :one
+INSERT INTO tbl_checkout_payments(
 	id,
 	gateway,
+	checkout_id,
 	status,
 	description,
 	total_amount,
@@ -29,13 +105,14 @@ INSERT INTO tbl_checkouts(
 ) VALUES (
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
-	?, ?, ?, ?
-) RETURNING id, gateway, status, description, total_amount, checkout_url, client_key, reference_number, payment_status, payment_method_type, paid_at, metadata_remarks, metadata_notes, metadata_customer_number, created_at, updated_at
+	?, ?, ?, ?, ?
+) RETURNING id, gateway, checkout_id, status, description, total_amount, checkout_url, client_key, reference_number, payment_status, payment_method_type, paid_at, metadata_remarks, metadata_notes, metadata_customer_number, created_at, updated_at
 `
 
-type CreateCheckoutParams struct {
+type CreateCheckoutPaymentParams struct {
 	ID                     string
 	Gateway                string
+	CheckoutID             int64
 	Status                 string
 	Description            string
 	TotalAmount            int64
@@ -50,10 +127,11 @@ type CreateCheckoutParams struct {
 	MetadataCustomerNumber string
 }
 
-func (q *Queries) CreateCheckout(ctx context.Context, arg CreateCheckoutParams) (TblCheckout, error) {
-	row := q.db.QueryRowContext(ctx, createCheckout,
+func (q *Queries) CreateCheckoutPayment(ctx context.Context, arg CreateCheckoutPaymentParams) (TblCheckoutPayment, error) {
+	row := q.db.QueryRowContext(ctx, createCheckoutPayment,
 		arg.ID,
 		arg.Gateway,
+		arg.CheckoutID,
 		arg.Status,
 		arg.Description,
 		arg.TotalAmount,
@@ -67,10 +145,11 @@ func (q *Queries) CreateCheckout(ctx context.Context, arg CreateCheckoutParams) 
 		arg.MetadataNotes,
 		arg.MetadataCustomerNumber,
 	)
-	var i TblCheckout
+	var i TblCheckoutPayment
 	err := row.Scan(
 		&i.ID,
 		&i.Gateway,
+		&i.CheckoutID,
 		&i.Status,
 		&i.Description,
 		&i.TotalAmount,
@@ -89,40 +168,105 @@ func (q *Queries) CreateCheckout(ctx context.Context, arg CreateCheckoutParams) 
 	return i, err
 }
 
-const createCheckoutLineItem = `-- name: CreateCheckoutLineItem :execrows
-INSERT INTO tbl_checkout_line_items(
-	checkout_id,
-	amount,
-	currency,
-	description,
-	name,
-	quantity
-) VALUES (
-	?, ?, ?,
-	?, ?, ?
-) RETURNING id, checkout_id, amount, currency, description, name, quantity, created_at, updated_at
+const getCheckoutIDBySessionID = `-- name: GetCheckoutIDBySessionID :one
+SELECT id FROM tbl_checkouts
+WHERE session_id = ?
 `
 
-type CreateCheckoutLineItemParams struct {
-	CheckoutID  string
-	Amount      int64
-	Currency    string
-	Description string
-	Name        string
-	Quantity    int64
+func (q *Queries) GetCheckoutIDBySessionID(ctx context.Context, sessionID string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getCheckoutIDBySessionID, sessionID)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
-func (q *Queries) CreateCheckoutLineItem(ctx context.Context, arg CreateCheckoutLineItemParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, createCheckoutLineItem,
-		arg.CheckoutID,
-		arg.Amount,
-		arg.Currency,
-		arg.Description,
-		arg.Name,
-		arg.Quantity,
+const getCheckoutLineByID = `-- name: GetCheckoutLineByID :one
+SELECT
+	tbl_checkout_lines.id,
+	tbl_checkout_lines.checkout_id,
+	tbl_checkout_lines.product_id,
+	tbl_checkout_lines.quantity,
+	tbl_products.name as name,
+	tbl_brands.name as brand_name
+FROM tbl_checkout_lines
+INNER JOIN tbl_products ON tbl_products.id = tbl_checkout_lines.product_id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE tbl_checkout_lines.id = ?
+LIMIT 1
+`
+
+type GetCheckoutLineByIDRow struct {
+	ID         int64
+	CheckoutID int64
+	ProductID  int64
+	Quantity   int64
+	Name       string
+	BrandName  string
+}
+
+func (q *Queries) GetCheckoutLineByID(ctx context.Context, id int64) (GetCheckoutLineByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getCheckoutLineByID, id)
+	var i GetCheckoutLineByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.CheckoutID,
+		&i.ProductID,
+		&i.Quantity,
+		&i.Name,
+		&i.BrandName,
 	)
+	return i, err
+}
+
+const getCheckoutLinesByCheckoutID = `-- name: GetCheckoutLinesByCheckoutID :many
+SELECT
+	tbl_checkout_lines.id,
+	tbl_checkout_lines.checkout_id,
+	tbl_checkout_lines.product_id,
+	tbl_checkout_lines.quantity,
+	tbl_products.name as name,
+	tbl_brands.name as brand_name
+FROM tbl_checkout_lines
+INNER JOIN tbl_products ON tbl_products.id = tbl_checkout_lines.product_id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE tbl_checkout_lines.checkout_id = ?
+`
+
+type GetCheckoutLinesByCheckoutIDRow struct {
+	ID         int64
+	CheckoutID int64
+	ProductID  int64
+	Quantity   int64
+	Name       string
+	BrandName  string
+}
+
+func (q *Queries) GetCheckoutLinesByCheckoutID(ctx context.Context, checkoutID int64) ([]GetCheckoutLinesByCheckoutIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getCheckoutLinesByCheckoutID, checkoutID)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	return result.RowsAffected()
+	defer rows.Close()
+	var items []GetCheckoutLinesByCheckoutIDRow
+	for rows.Next() {
+		var i GetCheckoutLinesByCheckoutIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CheckoutID,
+			&i.ProductID,
+			&i.Quantity,
+			&i.Name,
+			&i.BrandName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
