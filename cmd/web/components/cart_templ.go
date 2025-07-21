@@ -31,7 +31,7 @@ func AddToCart() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<button id=\"btn-add-to-cart\" class=\"\n\t\t\tflex justify-center items-center relative inline-block w-12 h-12\n\t\t\tbg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors\n\t\t\tgroup rounded-full hover:bg-cchoicesoft\n\t\t\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"/cchoice/checkouts/lines\" hx-include=\"#selected-product-id\" hx-swap=\"none\" _=\"\n\t\t\ton click log 'Added to cart: ' + #selected-product-id.value end\n\t\t\ton htmx:afterRequest\n\t\t\t\ttrigger get on #cart-count\n\t\t\tend\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<button id=\"btn-add-to-cart\" class=\"\n\t\t\tflex justify-center items-center relative inline-block w-12 h-12\n\t\t\tbg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors\n\t\t\tgroup rounded-full hover:bg-cchoicesoft\n\t\t\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"/cchoice/carts/lines\" hx-include=\"#selected-product-id\" hx-swap=\"none\" _=\"\n\t\t\ton click log 'Added to cart: ' + #selected-product-id.value end\n\t\t\ton htmx:afterRequest\n\t\t\t\ttrigger get on #cart-count\n\t\t\tend\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
