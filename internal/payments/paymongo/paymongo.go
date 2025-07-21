@@ -50,7 +50,7 @@ func (p PayMongo) GetAuth() string {
 	return "Basic " + p.apiKey
 }
 
-func (p PayMongo) CreateCheckoutSession(
+func (p PayMongo) CreateCheckoutPaymentSession(
 	payload payments.CreateCheckoutSessionPayload,
 ) (payments.CreateCheckoutSessionResponse, error) {
 	if _, ok := payload.(*CreateCheckoutSessionPayload); !ok {
@@ -126,7 +126,7 @@ func (p PayMongo) GetAvailablePaymentMethods() (payments.GetAvailablePaymentMeth
 	return &res, nil
 }
 
-func (p PayMongo) CheckoutHanlder(w http.ResponseWriter, r *http.Request) error {
+func (p PayMongo) CheckoutPaymentHandler(w http.ResponseWriter, r *http.Request) error {
 	resPaymentMethods, err := p.GetAvailablePaymentMethods()
 	if err != nil {
 		return err
@@ -171,7 +171,7 @@ func (p PayMongo) CheckoutHanlder(w http.ResponseWriter, r *http.Request) error 
 		},
 	}
 
-	resCheckout, err := p.CreateCheckoutSession(&payload)
+	resCheckout, err := p.CreateCheckoutPaymentSession(&payload)
 	if err != nil {
 		return err
 	}

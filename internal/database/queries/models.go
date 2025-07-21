@@ -28,8 +28,30 @@ type TblBrandImage struct {
 }
 
 type TblCheckout struct {
+	ID        int64
+	SessionID string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+type TblCheckoutLine struct {
+	ID          int64
+	CheckoutID  int64
+	ProductID   int64
+	Name        string
+	Serial      string
+	Description string
+	Amount      int64
+	Currency    string
+	Quantity    int64
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+type TblCheckoutPayment struct {
 	ID                     string
 	Gateway                string
+	CheckoutID             int64
 	Status                 string
 	Description            string
 	TotalAmount            int64
@@ -44,18 +66,6 @@ type TblCheckout struct {
 	MetadataCustomerNumber string
 	CreatedAt              time.Time
 	UpdatedAt              time.Time
-}
-
-type TblCheckoutLineItem struct {
-	ID          int64
-	CheckoutID  string
-	Amount      int64
-	Currency    string
-	Description string
-	Name        string
-	Quantity    int64
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
 }
 
 type TblProduct struct {

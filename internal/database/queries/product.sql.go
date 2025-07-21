@@ -11,6 +11,20 @@ import (
 	"time"
 )
 
+const checkProductExistsByID = `-- name: CheckProductExistsByID :one
+SELECT 1
+FROM tbl_products
+WHERE tbl_products.id = ?
+LIMIT 1
+`
+
+func (q *Queries) CheckProductExistsByID(ctx context.Context, id int64) (int64, error) {
+	row := q.db.QueryRowContext(ctx, checkProductExistsByID, id)
+	var column_1 int64
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const createProducts = `-- name: CreateProducts :one
 INSERT INTO tbl_products (
 	serial,

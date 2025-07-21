@@ -11,15 +11,15 @@ type CreateCheckoutSessionResponse struct {
 	Data CheckoutSession `json:"data"`
 }
 
-func (r *CreateCheckoutSessionResponse) ToCheckout(
+func (r *CreateCheckoutSessionResponse) ToCheckoutPayment(
 	pg payments.IPaymentGateway,
-) *queries.CreateCheckoutParams {
+) *queries.CreateCheckoutPaymentParams {
 	var paidAt time.Time
 	if len(r.Data.Attributes.PaymentIntent.Attributes.Payments) > 0 {
 		paidAt = time.Unix(int64(r.Data.Attributes.PaymentIntent.Attributes.Payments[0].Attributes.PaidAt), 0)
 	}
 
-	return &queries.CreateCheckoutParams{
+	return &queries.CreateCheckoutPaymentParams{
 		ID:                     r.Data.ID,
 		Gateway:                pg.GatewayEnum().String(),
 		Status:                 r.Data.Attributes.Status,
@@ -37,11 +37,11 @@ func (r *CreateCheckoutSessionResponse) ToCheckout(
 	}
 }
 
-func (r *CreateCheckoutSessionResponse) ToLineItems() []*queries.CreateCheckoutLineItemParams {
-	res := make([]*queries.CreateCheckoutLineItemParams, 0, len(r.Data.Attributes.LineItems))
+func (r *CreateCheckoutSessionResponse) ToLineItems(checkoutID int64) []*queries.CreateCheckoutLineParams {
+	res := make([]*queries.CreateCheckoutLineParams, 0, len(r.Data.Attributes.LineItems))
 	for _, lineItem := range r.Data.Attributes.LineItems {
-		res = append(res, &queries.CreateCheckoutLineItemParams{
-			CheckoutID:  r.Data.ID,
+		res = append(res, &queries.CreateCheckoutLineParams{
+			CheckoutID:  checkoutID,
 			Amount:      int64(lineItem.Amount),
 			Currency:    lineItem.Currency,
 			Description: lineItem.Description,
