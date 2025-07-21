@@ -2,6 +2,62 @@
 ## [Unreleased]
 
 
+<a name="dev-v0.0.3"></a>
+## [dev-v0.0.3] - 2025-07-20
+### Deps
+- Remove pnpm. Use tailwind as standalone
+- Update htmx -> 2.0.6
+- Add goutil
+
+### Docs
+- Update script commit tag
+- CCS-20 Update guide
+- Add genimages in setup steps
+- Add env PAYMONGO_SUCCESS_URL
+- Add feature
+- Add PAYMONGO_API_KEY
+- Update changelogs
+
+### Feature
+- CCS-23 Add IEncode.Name
+- CCS-23 Implement SQIDS encoder/decoder
+- Get available payment methods
+
+### Maintenance
+- Add ERR_ENV_VAR_REQUIRED
+- Remove unnecessary parallel in unit tests
+- Move enums to their domain packages
+- Use constants for some repeating strings
+
+### Script
+- CCS-25 Add cmd for encoding/decoding
+- CCS-20 Add MacOS support
+- CCS-12 Add deps_debian
+- Add db; Update logging; Update testall
+- Move prealloc
+- Reduce verbosity in sc()
+
+### Server
+- Add route for getting cart count
+- WIP session manager for storing checkout lines
+- Use HX-Redirect instead of http.Redirect to solve CORS
+- Implement WIP checkout handler
+- Add checkouts migration
+- WIP PayMongo integration
+
+### Web
+- Add count in header cart
+- Submit product id in modal add to cart
+- Update site title to display app env
+- Add add to cart button in product modal
+- Update active search logic
+- Add history:restore in home page elements
+- Move Base to HomePage in preparation for ProductPage
+- Group hover cart
+- Add "X" clear button in search bar when there is a search query
+- Add search more results component and add color transitions
+
+
 <a name="dev-v0.0.2"></a>
 ## [dev-v0.0.2] - 2025-06-30
 ### CICD
@@ -134,6 +190,7 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.0.2...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.0.3...HEAD
+[dev-v0.0.3]: https://github.com/flamendless/cchoice/compare/dev-v0.0.2...dev-v0.0.3
 [dev-v0.0.2]: https://github.com/flamendless/cchoice/compare/dev-v0.0.1...dev-v0.0.2
 [dev-v0.0.1]: https://github.com/flamendless/cchoice/compare/v0.0.1...dev-v0.0.1
