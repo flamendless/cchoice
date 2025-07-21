@@ -156,7 +156,7 @@ func CartCount(n int) templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<span id=\"cart-count\" class=\"absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs font-bold rounded-md px-1.5 shadow\" hx-get=\"/cchoice/checkouts/lines/count\" hx-trigger=\"load once, every 30s, get\" hx-swap=\"textContent\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<span id=\"cart-count\" class=\"absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs font-bold rounded-md px-1.5 shadow\" hx-get=\"/cchoice/carts/lines/count\" hx-trigger=\"load once, every 30s, get\" hx-swap=\"textContent\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

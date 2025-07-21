@@ -1,4 +1,4 @@
-package checkout
+package cart
 
 import (
 	"cchoice/internal/database/queries"
@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func CreateCheckout(
+func CreateCart(
 	ctx context.Context,
 	dbq *queries.Queries,
 	encode encode.IEncode,

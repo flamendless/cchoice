@@ -1,27 +1,21 @@
 package server
 
 import (
-	"database/sql"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 
 	"cchoice/cmd/web"
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
-	"cchoice/internal/checkout"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
-	"cchoice/internal/errs"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
 	"cchoice/internal/requests"
-	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -58,19 +52,15 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/", s.indexHandler)
 		r.Get("/settings/header-texts", s.headerTextsHandler)
 		r.Get("/settings/footer-texts", s.footerTextsHandler)
-		r.Get("/product-categories/side-panel/list", s.categoriesSidePanelHandler)
-		r.Get("/product-categories/sections", s.categorySectionHandler)
-		r.Get("/product-categories/{category_id}/products", s.categoryProductsHandler)
 		r.Get("/products/image", s.productsImageHandler)
+
 
 		r.Post("/search", s.searchHandler)
 
-		r.Get("/carts", s.cartsHandler)
-		r.Get("/carts/lines", s.cartsLinesHandler)
-
 		r.Post("/checkouts", s.checkoutsHandler)
-		r.Post("/checkouts/lines", s.checkoutsLinesHandler)
-		r.Get("/checkouts/lines/count", s.checkoutsLinesCountHandler)
+
+		AddProductCategoriesHandlers(s, r)
+		AddCartsHandlers(s, r)
 	})
 
 	return r
@@ -269,145 +259,6 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Request) {
-	categories, err := requests.GetCategoriesSidePanel(
-		r.Context(),
-		s.cache,
-		&s.SF,
-		s.dbRO,
-		[]byte("key_categories_side_panel"),
-		queries.GetProductCategoriesByPromotedParams{
-			PromotedAtHomepage: sql.NullBool{Bool: true, Valid: true},
-			Limit:              100,
-		},
-	)
-	if err != nil {
-		logs.Log().Fatal("categories side panel list handler", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if err := components.CategoriesSidePanelList(categories).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal("categories side panel list handler", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) {
-	page := 0
-	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
-		if parsed, err := strconv.Atoi(paramPage); err == nil {
-			page = parsed
-		}
-	}
-
-	limit := constants.DefaultLimitCategories
-	if paramLimit := r.URL.Query().Get("limit"); paramLimit != "" {
-		if parsed, err := strconv.Atoi(paramLimit); err == nil {
-			limit = max(parsed, constants.DefaultLimitCategories)
-		}
-	}
-
-	res, err := requests.GetCategorySectionHandler(
-		r.Context(),
-		s.cache,
-		&s.SF,
-		s.dbRO,
-		s.encoder,
-		fmt.Appendf([]byte{}, "categorySectionHandler_p%d_l%d", page, limit),
-		page,
-		limit,
-	)
-	if err != nil {
-		logs.Log().Fatal("category section handler", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if err := components.CategorySection(page, res).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal("category section list handler", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request) {
-	categoryID := chi.URLParam(r, "category_id")
-	if categoryID == "" {
-		logs.Log().Fatal("category products list handler")
-		http.Error(w, "Invalid url parameter", http.StatusBadRequest)
-		return
-	}
-
-	categoryDBID := s.encoder.Decode(categoryID)
-	category, err := s.dbRO.GetQueries().GetProductCategoryByID(r.Context(), categoryDBID)
-	if err != nil {
-		logs.Log().Fatal("category section list handler", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if category.Category.String == "" {
-		logs.Log().Warn(
-			"category has no category value",
-			zap.Int64("category id", category.ID),
-			zap.String("subcategory", category.Subcategory.String),
-		)
-		return
-	}
-
-	products, err := s.dbRO.GetQueries().GetProductsByCategoryID(r.Context(), queries.GetProductsByCategoryIDParams{
-		CategoryID: categoryDBID,
-		Limit:      constants.DefaultLimitProducts,
-	})
-	if err != nil {
-		logs.Log().Fatal("category section list handler", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if len(products) == 0 {
-		logs.Log().Debug(
-			"category has no product",
-			zap.Int64("category id", category.ID),
-			zap.String("category name", category.Category.String),
-		)
-		return
-	}
-
-	for i, product := range products {
-		if product.ThumbnailPath == constants.PathEmptyImage {
-			continue
-		}
-
-		finalPath, ext, err := images.GetImagePathWithSize(product.ThumbnailPath, constants.DefaultThumbnailSize, true)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			continue
-		}
-
-		imgData, err := images.GetImageDataB64(s.cache, s.fs, finalPath, ext)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			continue
-		}
-
-		products[i].ThumbnailData = imgData
-	}
-
-	categorySectionProducts := models.CategorySectionProducts{
-		ID:          categoryID,
-		Category:    utils.SlugToTile(category.Category.String),
-		Subcategory: utils.SlugToTile(category.Subcategory.String),
-		Products:    models.ToCategorySectionProducts(s.encoder, products),
-	}
-
-	if err := components.CategorySectionProducts(categorySectionProducts).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal("category section list handler", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
 func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		logs.Log().Fatal("search handler", zap.Error(err))
@@ -485,159 +336,5 @@ func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		logs.Log().Fatal(err.Error(), zap.String("gateway", s.paymentGateway.GatewayEnum().String()))
 		http.Error(w, err.Error(), http.StatusNotImplemented)
 		return
-	}
-}
-
-func (s *Server) checkoutsLinesHandler(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		logs.Log().Fatal("checkouts lines handler", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	productID := r.Form.Get("product_id")
-	if productID == "" {
-		err := errs.ERR_INVALID_PARAMS
-		logs.Log().Fatal("checkouts lines handler", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	dbProductID := s.encoder.Decode(productID)
-	if _, err := s.dbRO.GetQueries().CheckProductExistsByID(r.Context(), dbProductID); err != nil {
-		logs.Log().Fatal(
-			"checkouts lines handler",
-			zap.String("token", s.sessionManager.Token(r.Context())),
-			zap.Error(err),
-		)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	checkoutLineProductIDs, err := AddToCheckoutLineProductIDs(r.Context(), s.sessionManager, productID)
-	if err != nil {
-		logs.Log().Fatal(
-			"add checkout line",
-			zap.String("token", s.sessionManager.Token(r.Context())),
-			zap.String("product id", productID),
-			zap.Error(err),
-		)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	logs.Log().Info(
-		"checkouts lines",
-		zap.String("token", s.sessionManager.Token(r.Context())),
-		zap.Strings("checkout line product ids", checkoutLineProductIDs),
-	)
-	w.WriteHeader(http.StatusOK)
-}
-
-func (s *Server) checkoutsLinesCountHandler(w http.ResponseWriter, r *http.Request) {
-	count := 0
-	if productIDs, ok := s.sessionManager.Get(r.Context(), skCheckoutLineProductIDs).([]string); ok {
-		count = len(productIDs)
-	}
-	w.Write(fmt.Appendf(nil, "%d", count))
-}
-
-func (s *Server) cartsHandler(w http.ResponseWriter, r *http.Request) {
-	checkoutlineProductIDs, ok := s.sessionManager.Get(r.Context(), skCheckoutLineProductIDs).([]string)
-	if len(checkoutlineProductIDs) == 0 {
-		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal("Cart page handler", zap.Error(err))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		return
-	}
-
-	token := s.sessionManager.Token(r.Context())
-	if !ok {
-		logs.Log().Fatal(
-			"Cart page handler",
-			zap.Error(errs.ERR_SESSION_CHECKOUT_LINE_PRODUCT_IDS),
-			zap.String("token", token),
-		)
-		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal("Cart page handler", zap.Error(err))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		return
-	}
-
-	checkoutID, err := checkout.CreateCheckout(
-		r.Context(),
-		s.dbRW.GetQueries(),
-		s.encoder,
-		token,
-		checkoutlineProductIDs,
-	)
-	if err != nil || checkoutID == -1 {
-		logs.Log().Fatal(
-			"Cart page handler",
-			zap.Error(err),
-			zap.String("token", token),
-		)
-		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal("Cart page handler", zap.Error(err))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		return
-	}
-
-	if err := components.CartPage(components.CartPageBody()).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal("Cart page handler", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-func (s *Server) cartsLinesHandler(w http.ResponseWriter, r *http.Request) {
-	token := s.sessionManager.Token(r.Context())
-	checkoutID, err := s.dbRO.GetQueries().GetCheckoutIDBySessionID(r.Context(), token)
-	if err != nil {
-		logs.Log().Warn(
-			"Carts lines handler",
-			zap.Error(err),
-			zap.String("token", token),
-		)
-		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal("Cart page handler", zap.Error(err))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		return
-	}
-
-	checkoutLines, err := s.dbRO.GetQueries().GetCheckoutLinesByCheckoutID(r.Context(), checkoutID)
-	if err != nil || len(checkoutLines) == 0 {
-		logs.Log().Warn(
-			"Carts lines handler",
-			zap.Error(err),
-			zap.String("token", token),
-			zap.Int("checkout lines", len(checkoutLines)),
-		)
-		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal("Cart page handler", zap.Error(err))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		return
-	}
-
-	for _, checkoutLine := range checkoutLines {
-		cl := models.CheckoutLine{
-			ID:         s.encoder.Encode(checkoutLine.ID),
-			CheckoutID: s.encoder.Encode(checkoutLine.CheckoutID),
-			ProductID:  s.encoder.Encode(checkoutLine.ProductID),
-			Name:       checkoutLine.Name,
-			BrandName:  checkoutLine.BrandName,
-			Quantity:   checkoutLine.Quantity,
-		}
-
-		if err := components.CartCheckoutLineItem(cl).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal("Cart lines handler", zap.Error(err))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			continue
-		}
 	}
 }
