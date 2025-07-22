@@ -1,6 +1,8 @@
 package components
 
-import "cchoice/cmd/web/models"
+import (
+	"cchoice/cmd/web/models"
+)
 
 templ AddToCart() {
 	<button
@@ -52,10 +54,10 @@ templ CartPageBody() {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
 		@ErrorBanner()
 		@Header()
-		<div class="flex flex-col items-center content-center pt-[128px]">
+		<div class="flex flex-col items-center content-center pt-[128px] px-2">
 			<div
 				id="cart-summary"
-				class="space-y-4"
+				class="w-1/2 px-16"
 				hx-get="/cchoice/carts/lines"
 				hx-trigger="load"
 				hx-swap="appendend"
@@ -82,14 +84,19 @@ templ EmptyCart() {
 
 templ CartCheckoutLineItem(cl models.CheckoutLine) {
 	<div class="flex items-center gap-4 border p-4 rounded">
-		<img src="https://via.placeholder.com/80" alt="Product" class="w-20 h-20 object-cover rounded"/>
+		<img
+			class="w-48 max-w-48 h-48"
+			title="product image"
+			src={ cl.ThumbnailData }
+			alt={ cl.Name + " thumbnail" }
+			data-product-id={ cl.ProductID }
+		/>
 		<div class="flex-1">
 			<h2 class="text-lg font-semibold">{ cl.Name }</h2>
 			<p class="text-sm text-gray-500">{ cl.BrandName }</p>
-		</div>
-		<div class="text-right">
-			<p class="text-gray-700">$29.99</p>
+			<p class="text-sm text-gray-500">{cl.Price.Display() } </p>
 			<p class="text-sm text-gray-500">Qty: { cl.Quantity }</p>
+			<p class="text-sm text-gray-700">Total: { cl.Total.Display() }</p>
 		</div>
 	</div>
 }

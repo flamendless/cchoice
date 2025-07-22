@@ -79,6 +79,11 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 
 	key := "product_image_" + path
 	isThumbnail := false
+	thumbnail := r.URL.Query().Get("thumbnail")
+	if thumbnail == "1" {
+		isThumbnail = true
+	}
+
 	size := r.URL.Query().Get("size")
 	if size == "" {
 		size = "160x160"
