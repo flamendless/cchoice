@@ -2,6 +2,33 @@
 ## [Unreleased]
 
 
+<a name="dev-v0.0.4"></a>
+## [dev-v0.0.4] - 2025-07-22
+### CICD
+- CCS-13 Try if update can be omitted
+- CCS-13 Use libvips-dev
+- CCS-13 Install libvips in workflow
+- CCS-13 Apply nolint directive
+- CCS-13 Fix path
+- CCS-13 Explicitly pass args
+- CCS-13 Update golangci config
+- CCS-13 Update golangci-lint workflow
+- CCS-13 Update golangci version to 8
+- CCS-13 Update golangci config
+- CCS-13 Integrate golangci-lint-action
+
+### Feature
+- Add to cart and cart page
+
+### Maintenance
+- CCS-27 Apply lint fixes
+- Separate some routes to other files
+
+### Script
+- Add golangci in deps and testall
+- Add genchlog
+
+
 <a name="dev-v0.0.3"></a>
 ## [dev-v0.0.3] - 2025-07-20
 ### Deps
@@ -190,7 +217,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.0.3...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.0.4...HEAD
+[dev-v0.0.4]: https://github.com/flamendless/cchoice/compare/dev-v0.0.3...dev-v0.0.4
 [dev-v0.0.3]: https://github.com/flamendless/cchoice/compare/dev-v0.0.2...dev-v0.0.3
 [dev-v0.0.2]: https://github.com/flamendless/cchoice/compare/dev-v0.0.1...dev-v0.0.2
 [dev-v0.0.1]: https://github.com/flamendless/cchoice/compare/v0.0.1...dev-v0.0.1
