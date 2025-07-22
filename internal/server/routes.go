@@ -332,7 +332,7 @@ func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	default:
-		err := errors.New("checkouts handler. Unimplemented payment gateway.")
+		err := errors.New("checkouts handler. Unimplemented payment gateway")
 		logs.Log().Fatal(err.Error(), zap.String("gateway", s.paymentGateway.GatewayEnum().String()))
 		http.Error(w, err.Error(), http.StatusNotImplemented)
 		return

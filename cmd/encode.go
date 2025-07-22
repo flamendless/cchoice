@@ -31,7 +31,7 @@ var cmdEncode = &cobra.Command{
 		case "sqids":
 			encode = sqids.MustSqids()
 		default:
-			panic(errs.ERR_CMD)
+			panic(errs.ErrCmd)
 		}
 
 		if flagIntID != 0 {

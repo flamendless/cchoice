@@ -101,7 +101,7 @@ func ValidateUserReg(data ValidateUserRegInput) error {
 
 	validMobile := strings.HasPrefix(data.MobileNo, "+639")
 	if !validMobile {
-		return errors.New("Invalid mobile number format")
+		return errors.New("invalid mobile number format")
 	}
 
 	return nil

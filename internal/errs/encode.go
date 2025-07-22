@@ -3,6 +3,6 @@ package errs
 import "errors"
 
 var (
-	ERR_DECODE = errors.New("[ENCODE]: Error in decoding")
-	ERR_ENCODE = errors.New("[ENCODE]: Error in encoding")
+	ErrDecode = errors.New("[ENCODE]: Error in decoding")
+	ErrEncode = errors.New("[ENCODE]: Error in encoding")
 )

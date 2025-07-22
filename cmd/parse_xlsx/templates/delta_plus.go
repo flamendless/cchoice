@@ -94,7 +94,7 @@ func DeltaPlusRowToProduct(tpl *Template, row []string) (*models.Product, []erro
 
 	var status enums.ProductStatus
 	if strings.Contains(strings.ToLower(name), "discontinued") {
-		status = enums.PRODUCT_STATUS_DELETED
+		_ = enums.PRODUCT_STATUS_DELETED
 		parserErr := errs.NewParserError(errs.ProductDiscontinued, "product is discontinued")
 		errsRes = append(errsRes, parserErr)
 		return nil, errsRes
@@ -161,7 +161,7 @@ func DeltaPlusRowToSpecs(tpl *Template, row []string) *models.ProductSpecs {
 }
 
 func DeltaPlusProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
-	var products []*models.Product = make([]*models.Product, 0, tpl.AssumedRowsCount)
+	products := make([]*models.Product, 0, tpl.AssumedRowsCount)
 
 	rowIdx := 0
 	for range tpl.SkipInitialRows + 1 {
@@ -189,11 +189,12 @@ LoopProductProces:
 		}
 
 		if len(row) == 1 {
-			if (category == "") && (subcategory == "") {
+			switch {
+			case category == "" && subcategory == "":
 				category = row[0]
-			} else if (category != "") && (subcategory == "") {
+			case category != "" && subcategory == "":
 				subcategory = row[0]
-			} else if (category != "") && (subcategory != "") {
+			case category != "" && subcategory != "":
 				if len(previousRow) != 1 {
 					subcategory = row[0]
 				} else {

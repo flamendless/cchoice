@@ -19,7 +19,7 @@ type Sqids struct {
 func MustSqids() *Sqids {
 	alphabet := os.Getenv("ENCODE_SALT")
 	if alphabet == "" {
-		panic(errs.ERR_ENV_VAR_REQUIRED)
+		panic(errs.ErrEnvVarRequired)
 	}
 
 	s, err := sg.New(sg.Options{
@@ -44,7 +44,7 @@ func (sqids Sqids) Encode(dbid int64) string {
 	if err != nil {
 		logs.Log().Warn(
 			sqids.Name(),
-			zap.Error(errors.Join(errs.ERR_ENCODE, err)),
+			zap.Error(errors.Join(errs.ErrEncode, err)),
 			zap.Int64("dbid", dbid),
 		)
 		return ""
@@ -57,7 +57,7 @@ func (sqids Sqids) Decode(id string) int64 {
 	if len(ids) == 0 {
 		logs.Log().Warn(
 			sqids.Name(),
-			zap.Error(errs.ERR_DECODE),
+			zap.Error(errs.ErrDecode),
 			zap.String("id", id),
 		)
 		return -1

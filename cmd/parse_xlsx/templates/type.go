@@ -80,7 +80,7 @@ func CreateTemplate(kind TemplateKind) *Template {
 		return &Template{BrandOnly: true}
 
 	default:
-		panic(fmt.Sprintf("No template parser found for %s", kind.String()))
+		panic("No template parser found for " + kind.String())
 	}
 }
 
@@ -103,7 +103,7 @@ func (tpl *Template) AlignRow(row []string) []string {
 }
 
 func (tpl *Template) ValidateColumns() bool {
-	var result bool = true
+	result := true
 	notFoundColumns := make([]string, 0, len(tpl.Columns))
 
 	for key, col := range tpl.Columns {

@@ -46,7 +46,7 @@ var (
 
 func New(mode DBMode) Service {
 	if dburl == "" {
-		panic(fmt.Errorf("%w. DB_URL", errs.ERR_ENV_VAR_REQUIRED))
+		panic(fmt.Errorf("%w. DB_URL", errs.ErrEnvVarRequired))
 	}
 
 	switch mode {

@@ -33,7 +33,6 @@ type Server struct {
 	SF             singleflight.Group
 	fs             http.FileSystem
 	fsHandler      http.Handler
-	fsServer       *http.Server
 	cache          *fastcache.Cache
 	sessionManager *scs.SessionManager
 	paymentGateway payments.IPaymentGateway
@@ -41,7 +40,6 @@ type Server struct {
 	address        string
 	port           int
 	portFS         int
-	secure         bool
 	useHTTP2       bool
 	useSSL         bool
 }
@@ -49,17 +47,17 @@ type Server struct {
 func NewServer() *http.Server {
 	address := os.Getenv("ADDRESS")
 	if address == "" {
-		panic(fmt.Errorf("%w. ADDRESS", errs.ERR_ENV_VAR_REQUIRED))
+		panic(fmt.Errorf("%w. ADDRESS", errs.ErrEnvVarRequired))
 	}
 
 	port, err := strconv.Atoi(os.Getenv("PORT"))
 	if err != nil {
-		panic(fmt.Errorf("%w. PORT. %w", errs.ERR_ENV_VAR_REQUIRED, err))
+		panic(fmt.Errorf("%w. PORT. %w", errs.ErrEnvVarRequired, err))
 	}
 
 	portFS, err := strconv.Atoi(os.Getenv("PORT_FS"))
 	if err != nil {
-		panic(fmt.Errorf("%w. PORT_FS. %w", errs.ERR_ENV_VAR_REQUIRED, err))
+		panic(fmt.Errorf("%w. PORT_FS. %w", errs.ErrEnvVarRequired, err))
 	}
 
 	sessionManager := scs.New()
