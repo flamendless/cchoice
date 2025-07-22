@@ -12,7 +12,7 @@ var pluralizerOnce sync.Once
 var pluralizer *pluralize.Client
 
 func SanitizePrice(price string) (*money.Money, []error) {
-	var errsRes []error = make([]error, 0, 2)
+	errsRes := make([]error, 0, 2)
 	currency := money.PHP
 
 	hasPHPTrailing := strings.HasSuffix(price, "PHP")
@@ -69,7 +69,7 @@ func SanitizeCategory(input string) string {
 		input = input[0:idxLeft]
 	}
 	input = strings.TrimSuffix(input, "AND")
-	input = strings.Trim(input, "  ")
+	input = strings.Trim(input, " ")
 	input = strings.TrimSpace(input)
 	input = strings.ReplaceAll(input, "- ", "-")
 	input = strings.ReplaceAll(input, " - ", "-")

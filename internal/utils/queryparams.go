@@ -11,7 +11,7 @@ func GetLimit(limit string) (int64, error) {
 	}
 	res, err := strconv.Atoi(limit)
 	if err != nil || res <= 0 {
-		return 0, errs.ERR_INVALID_PARAM_LIMIT
+		return 0, errs.ErrInvalidParamLimit
 	}
 	return int64(res), nil
 }

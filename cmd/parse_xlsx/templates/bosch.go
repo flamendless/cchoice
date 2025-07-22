@@ -177,7 +177,7 @@ func BoschRowToSpecs(tpl *Template, row []string) *models.ProductSpecs {
 }
 
 func BoschProcessRows(tpl *Template, rows *excelize.Rows) []*models.Product {
-	var products []*models.Product = make([]*models.Product, 0, tpl.AssumedRowsCount)
+	products := make([]*models.Product, 0, tpl.AssumedRowsCount)
 
 	rowIdx := 0
 	for range tpl.SkipInitialRows + 1 {
@@ -240,11 +240,12 @@ LoopProductProces:
 		}
 
 		category = utils.SanitizeCategory(category)
-		if category == "GRIDNERS" {
+		switch category {
+		case "GRIDNERS":
 			category = "GRINDERS"
-		} else if category == "PPRUNERS" {
+		case "PPRUNERS":
 			category = "PRUNERS"
-		} else if category == "CUTERS" {
+		case "CUTERS":
 			category = "CUTTERS"
 		}
 

@@ -22,7 +22,7 @@ func AddToCheckoutLineProductIDs(
 
 	checkoutLineProductIDs, ok := sm.Get(ctx, skCheckoutLineProductIDs).([]string)
 	if !ok {
-		return nil, errs.ERR_SESSION_CHECKOUT_LINE_PRODUCT_IDS
+		return nil, errs.ErrSessionCheckoutLineProductIDs
 	}
 
 	checkoutLineProductIDs = append(checkoutLineProductIDs, productID)

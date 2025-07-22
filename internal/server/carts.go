@@ -35,7 +35,7 @@ func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		logs.Log().Fatal(
 			"Cart page handler",
-			zap.Error(errs.ERR_SESSION_CHECKOUT_LINE_PRODUCT_IDS),
+			zap.Error(errs.ErrSessionCheckoutLineProductIDs),
 			zap.String("token", token),
 		)
 		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
@@ -130,7 +130,7 @@ func (s *Server) addProductToCartHandler(w http.ResponseWriter, r *http.Request)
 
 	productID := r.Form.Get("product_id")
 	if productID == "" {
-		err := errs.ERR_INVALID_PARAMS
+		err := errs.ErrInvalidParams
 		logs.Log().Fatal("checkouts lines handler", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -172,5 +172,5 @@ func (s *Server) getCartLinesCountHandler(w http.ResponseWriter, r *http.Request
 	if productIDs, ok := s.sessionManager.Get(r.Context(), skCheckoutLineProductIDs).([]string); ok {
 		count = len(productIDs)
 	}
-	w.Write(fmt.Appendf(nil, "%d", count))
+	_, _ = w.Write(fmt.Appendf(nil, "%d", count))
 }

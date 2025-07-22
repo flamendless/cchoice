@@ -67,35 +67,35 @@ func (product *Product) PostProcess(rowIdx int) {
 
 func (product *Product) Print() {
 	builder := strings.Builder{}
-	builder.WriteString(fmt.Sprintf("ID: %d\n", product.ID))
-	builder.WriteString(fmt.Sprintf("Serial: %s\n", product.Serial))
-	builder.WriteString(fmt.Sprintf("Name: %s\n", product.Name))
-	builder.WriteString(fmt.Sprintf("Description: %s\n", product.Description))
-	builder.WriteString(fmt.Sprintf("Brand: %s\n", product.Brand.Name))
-	builder.WriteString(fmt.Sprintf("Product Status: %s\n", &product.Status))
+	fmt.Fprintf(&builder, "ID: %d\n", product.ID)
+	fmt.Fprintf(&builder, "Serial: %s\n", product.Serial)
+	fmt.Fprintf(&builder, "Name: %s\n", product.Name)
+	fmt.Fprintf(&builder, "Description: %s\n", product.Description)
+	fmt.Fprintf(&builder, "Brand: %s\n", product.Brand.Name)
+	fmt.Fprintf(&builder, "Product Status: %s\n", &product.Status)
 	product.ProductCategory.Print(&builder)
 	product.ProductSpecs.Print(&builder)
-	builder.WriteString(fmt.Sprintf("Unit Price w/o VAT: %s\n", product.UnitPriceWithoutVat.Display()))
-	builder.WriteString(fmt.Sprintf("Unit Price w VAT: %s\n", product.UnitPriceWithVat.Display()))
-	builder.WriteString(fmt.Sprintf("Created At %s\n", product.CreatedAt))
-	builder.WriteString(fmt.Sprintf("Updated At %s\n", product.UpdatedAt))
-	builder.WriteString(fmt.Sprintf("Deleted At %s\n", product.DeletedAt))
+	fmt.Fprintf(&builder, "Unit Price w/o VAT: %s\n", product.UnitPriceWithoutVat.Display())
+	fmt.Fprintf(&builder, "Unit Price w VAT: %s\n", product.UnitPriceWithVat.Display())
+	fmt.Fprintf(&builder, "Created At %s\n", product.CreatedAt)
+	fmt.Fprintf(&builder, "Updated At %s\n", product.UpdatedAt)
+	fmt.Fprintf(&builder, "Deleted At %s\n", product.DeletedAt)
 	fmt.Println(builder.String())
 }
 
 func (productSpecs *ProductSpecs) Print(builder *strings.Builder) {
-	builder.WriteString(fmt.Sprintf("Colours: %s\n", productSpecs.Colours))
-	builder.WriteString(fmt.Sprintf("Sizes: %s\n", productSpecs.Sizes))
-	builder.WriteString(fmt.Sprintf("Segmentation: %s\n", productSpecs.Segmentation))
-	builder.WriteString(fmt.Sprintf("Part Number: %s\n", productSpecs.PartNumber))
-	builder.WriteString(fmt.Sprintf("Power: %s\n", productSpecs.Power))
-	builder.WriteString(fmt.Sprintf("Capacity: %s\n", productSpecs.Capacity))
-	builder.WriteString(fmt.Sprintf("Scope of Supply: %s\n", productSpecs.ScopeOfSupply))
+	fmt.Fprintf(builder, "Colours: %s\n", productSpecs.Colours)
+	fmt.Fprintf(builder, "Sizes: %s\n", productSpecs.Sizes)
+	fmt.Fprintf(builder, "Segmentation: %s\n", productSpecs.Segmentation)
+	fmt.Fprintf(builder, "Part Number: %s\n", productSpecs.PartNumber)
+	fmt.Fprintf(builder, "Power: %s\n", productSpecs.Power)
+	fmt.Fprintf(builder, "Capacity: %s\n", productSpecs.Capacity)
+	fmt.Fprintf(builder, "Scope of Supply: %s\n", productSpecs.ScopeOfSupply)
 }
 
 func (productCategory *ProductCategory) Print(builder *strings.Builder) {
-	builder.WriteString(fmt.Sprintf("Category: %s\n", productCategory.Category))
-	builder.WriteString(fmt.Sprintf("Subcategory: %s\n", productCategory.Subcategory))
+	fmt.Fprintf(builder, "Category: %s\n", productCategory.Category)
+	fmt.Fprintf(builder, "Subcategory: %s\n", productCategory.Subcategory)
 }
 
 func (product *Product) Duplicate() *Product {
@@ -328,6 +328,9 @@ func (product *Product) UpdateToDB(ctx context.Context, db database.Service) (in
 			UpdatedAt:                   now,
 		},
 	)
+	if err != nil {
+		return 0, err
+	}
 
 	product.ID = updatedID
 	categoryID, err := product.GetOrInsertCategoryID(ctx, db)

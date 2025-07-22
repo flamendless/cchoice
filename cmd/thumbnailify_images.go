@@ -34,10 +34,10 @@ func init() {
 	f().IntVarP(&flagsThumbnailifyImages.width, "width", "", 160, "Width of the output thumbnail")
 	f().IntVarP(&flagsThumbnailifyImages.height, "height", "", 160, "Height of the output thumbnail")
 	if err := cmdThumbnailifyImages.MarkFlagRequired("inpath"); err != nil {
-		panic(errors.Join(errs.ERR_CMD_REQUIRED, err))
+		panic(errors.Join(errs.ErrCmdRequired, err))
 	}
 	if err := cmdThumbnailifyImages.MarkFlagRequired("outpath"); err != nil {
-		panic(errors.Join(errs.ERR_CMD_REQUIRED, err))
+		panic(errors.Join(errs.ErrCmdRequired, err))
 	}
 	rootCmd.AddCommand(cmdThumbnailifyImages)
 }
@@ -50,11 +50,11 @@ var cmdThumbnailifyImages = &cobra.Command{
 		defer vips.Shutdown()
 
 		if _, err := os.Stat(flagsThumbnailifyImages.inpath); err != nil || os.IsNotExist(err) {
-			panic(errors.Join(errs.ERR_CMD_REQUIRED, err))
+			panic(errors.Join(errs.ErrCmdRequired, err))
 		}
 		if _, err := os.Stat(flagsThumbnailifyImages.outpath); err != nil || os.IsNotExist(err) {
 			if err := os.MkdirAll(flagsThumbnailifyImages.outpath, 0755); err != nil {
-				panic(errors.Join(errs.ERR_CMD, err))
+				panic(errors.Join(errs.ErrCmd, err))
 			}
 		}
 
@@ -112,7 +112,7 @@ var cmdThumbnailifyImages = &cobra.Command{
 
 			return nil
 		}); err != nil {
-			panic(errors.Join(errs.ERR_CMD, err))
+			panic(errors.Join(errs.ErrCmd, err))
 		}
 	},
 }

@@ -30,14 +30,14 @@ func InitLog() {
 		if configLevel != "" {
 			lvl, err := strconv.Atoi(configLevel)
 			if err != nil {
-				panic(fmt.Errorf("Invalid LOG_MIN_LEVEL. Got '%s'", configLevel).Error())
+				panic(fmt.Errorf("invalid LOG_MIN_LEVEL. Got '%s'", configLevel).Error())
 			}
 			config.Level.SetLevel(zapcore.Level(lvl - 1))
 		}
 	case "prod":
 		config = zap.NewProductionConfig()
 	default:
-		panic(fmt.Errorf("%w. APP_ENV", errs.ERR_ENV_VAR_REQUIRED))
+		panic(fmt.Errorf("%w. APP_ENV", errs.ErrEnvVarRequired))
 	}
 
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder

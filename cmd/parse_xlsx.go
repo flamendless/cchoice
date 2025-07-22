@@ -78,7 +78,7 @@ func ProcessColumns(tpl *templates.Template, file *excelize.File) bool {
 	}
 
 	for i, cell := range columns {
-		cell = strings.Replace(cell, "\n", " ", -1)
+		cell = strings.ReplaceAll(cell, "\n", " ")
 		col, exists := tpl.Columns[cell]
 		if !exists {
 			logs.Log().Info(fmt.Sprintf(

@@ -23,7 +23,7 @@ func TestGetLimit(t *testing.T) {
 		{
 			input:    "0",
 			expected: 0,
-			err:      errs.ERR_INVALID_PARAMS,
+			err:      errs.ErrInvalidParams,
 		},
 		{
 			input:    "26",

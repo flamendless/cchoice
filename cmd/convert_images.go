@@ -30,10 +30,10 @@ func init() {
 	f().StringVarP(&flagsConvertImages.outpath, "outpath", "o", "", "Output path to the images to store")
 	f().StringVarP(&flagsConvertImages.format, "format", "f", "webp", "Format of the images to store")
 	if err := cmdConvertImages.MarkFlagRequired("inpath"); err != nil {
-		panic(errors.Join(errs.ERR_CMD_REQUIRED, err))
+		panic(errors.Join(errs.ErrCmdRequired, err))
 	}
 	if err := cmdConvertImages.MarkFlagRequired("outpath"); err != nil {
-		panic(errors.Join(errs.ERR_CMD_REQUIRED, err))
+		panic(errors.Join(errs.ErrCmdRequired, err))
 	}
 	rootCmd.AddCommand(cmdConvertImages)
 }
@@ -46,11 +46,11 @@ var cmdConvertImages = &cobra.Command{
 		defer vips.Shutdown()
 
 		if _, err := os.Stat(flagsConvertImages.inpath); err != nil || os.IsNotExist(err) {
-			panic(errors.Join(errs.ERR_CMD_REQUIRED, err))
+			panic(errors.Join(errs.ErrCmdRequired, err))
 		}
 		if _, err := os.Stat(flagsConvertImages.outpath); err != nil || os.IsNotExist(err) {
 			if err := os.MkdirAll(flagsConvertImages.outpath, 0755); err != nil {
-				panic(errors.Join(errs.ERR_CMD, err))
+				panic(errors.Join(errs.ErrCmd, err))
 			}
 		}
 
@@ -98,7 +98,7 @@ var cmdConvertImages = &cobra.Command{
 
 			return nil
 		}); err != nil {
-			panic(errors.Join(errs.ERR_CMD, err))
+			panic(errors.Join(errs.ErrCmd, err))
 		}
 	},
 }

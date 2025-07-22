@@ -55,6 +55,6 @@ func ParsePaymentMethodToEnum(pm string) PaymentMethod {
 	case PAYMENT_METHOD_PAYMAYA.String():
 		return PAYMENT_METHOD_PAYMAYA
 	default:
-		panic(fmt.Errorf("Undefined payment method '%s'", pm))
+		panic(fmt.Errorf("undefined payment method '%s'", pm))
 	}
 }

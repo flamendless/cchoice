@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"cchoice/internal/logs"
-	"os"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -26,6 +25,5 @@ func Execute() {
 	}()
 	if err := rootCmd.Execute(); err != nil {
 		logs.Log().Error("error", zap.Error(err))
-		os.Exit(1)
 	}
 }
