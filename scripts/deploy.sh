@@ -11,6 +11,9 @@ git pull origin main
 echo "Stopping existing process..."
 pkill -x "./tmp/main api" || echo "No existing process found."
 
+echo "Running migrations..."
+./run.sh db up
+
 echo "Building..."
 ./run.sh prod
 
