@@ -12,6 +12,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        clean: true
 
     - name: Execute remote SSH commands using SSH key
       uses: appleboy/ssh-action@v1
