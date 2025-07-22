@@ -19,7 +19,6 @@ jobs:
 
     - name: libvips
       run: |
-        sudo apt-get update
         sudo apt-get -y install libvips-dev
 
     - name: Run golangci-lint
