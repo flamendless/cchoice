@@ -1,16 +1,27 @@
-# .golangci.yml
+version: "2"
+
 run:
-  timeout: 5m
+  timeout: 3m
 
 linters:
   enable:
     - govet
     - errcheck
     - staticcheck
-    - gosimple
     - unused
-    - deadcode
     - gocritic
+    - usestdlibvars
+    - prealloc
+    - perfsprint
+    - tparallel
+    - whitespace
+    - fatcontext
 
 issues:
   exclude-use-default: false
+
+exclusions:
+  paths:
+    - cmd/goose/
+    - cmd/thumbnailify_images.go
+    - cmd/convert_images.go
