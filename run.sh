@@ -148,6 +148,15 @@ deps() {
 			BIN="tailwindcss-linux-x64"
 		elif "${ISMAC}"; then
 			BIN="tailwindcss-macos-arm64"
+		else
+			if [[ "$DISTROID" == "arch" ]]; then
+				BIN="tailwindcss-linux-x64"
+			elif [[ "$DISTROID" == "debian" ]]; then
+				BIN="tailwindcss-linux-x64"
+			else
+				echo "Unknown or unsupported distribution: $DISTROID"
+				exit 1
+			fi
 		fi
 
 		curl -LO "https://github.com/tailwindlabs/tailwindcss/releases/latest/download/${BIN}"
