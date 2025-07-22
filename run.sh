@@ -92,39 +92,40 @@ cleandb() {
 }
 
 deps_arch() {
-        echo "Installing dependencies for Arch..."
-        yay -S --noconfirm \
-                base-devel \
-                glib2 \
-                expat1 \
-                libdeflate \
-                libvips \
-                libmagick \
-                openslide \
-                libxml2 \
-                libjxl
+	echo "Installing dependencies for Arch..."
+	yay -S --noconfirm \
+		base-devel \
+		glib2 \
+		expat1 \
+		libdeflate \
+		libvips \
+		libmagick \
+		openslide \
+		libxml2 \
+		libjxl \
+		golangci-lint-bin
 }
 
 deps_debian() {
-        echo "Installing dependencies for Debian..."
-        sudo apt update
-        sudo apt install -y \
-                build-essential \
-                golang-go \
-                git \
-                sqlite3 \
-                libsqlite3-dev \
-                libvips-dev \
-                libmagickwand-dev \
-                openslide-tools \
-                libxml2-dev \
-                libjxl-dev \
-                curl
+	echo "Installing dependencies for Debian..."
+	sudo apt update
+	sudo apt install -y \
+		build-essential \
+		golang-go \
+		git \
+		sqlite3 \
+		libsqlite3-dev \
+		libvips-dev \
+		libmagickwand-dev \
+		openslide-tools \
+		libxml2-dev \
+		libjxl-dev \
+		curl
 }
 
 deps_mac() {
-        echo "Installing dependencies for MacOS..."
-        brew install \
+	echo "Installing dependencies for MacOS..."
+	brew install \
 		go \
 		git \
 		sqlite \
@@ -133,7 +134,8 @@ deps_mac() {
 		openslide \
 		libxml2 \
 		jpeg-xl \
-		curl
+		curl \
+		golangci-lint
 }
 
 deps() {
@@ -200,23 +202,11 @@ sc() {
 	go vet ./...
 	go tool templ fmt ./cmd/web/components
 
-	go tool usestdlibvars ./...
-	go tool fatcontext ./...
 	go tool betteralign -apply ./...
 	go tool nilaway ./...
 	go tool smrcptr ./...
 	go tool unconvert ./...
 	go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@latest -test ./...
-
-	local -; set +x;
-	local PKGS
-	PKGS=$(go list ./... | grep -v "internal/database/queries" | tr "\n" " ")
-	echo "Checking with errcheck and prealloc:"
-	for d in ${PKGS}; do
-		echo "    ${d}."
-		go tool errcheck "$d"
-		go tool prealloc "$d"
-	done
 
 	set +f
 	local GODIRS
@@ -233,6 +223,9 @@ sc() {
 
 testall() {
 	go test ./... -failfast "${@:2}"
+	if [ -x "$(command -v golangci-lint)" ]; then
+		golangci-lint run
+	fi
 }
 
 testsum() {
