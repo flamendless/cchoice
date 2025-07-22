@@ -33,7 +33,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 						/>
 					} else {
 						<img
-							hx-get={ "/cchoice/products/image?size=1080x1080&path=" + product.ThumbnailPath }
+							hx-get={ "/cchoice/products/image?thumbnail=1&size=1080x1080&path=" + product.ThumbnailPath }
 							hx-trigger="click"
 							hx-target="#modal_image_viewer .modal-content img"
 							hx-select="img"

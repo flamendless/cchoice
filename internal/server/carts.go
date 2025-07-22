@@ -7,8 +7,11 @@ import (
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/cart"
+	"cchoice/internal/constants"
 	"cchoice/internal/errs"
+	"cchoice/internal/images"
 	"cchoice/internal/logs"
+	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
@@ -104,13 +107,32 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, checkoutLine := range checkoutLines {
+		var imgData string
+		if checkoutLine.ThumbnailPath != constants.PathEmptyImage {
+			finalPath, ext, err := images.GetImagePathWithSize(
+				checkoutLine.ThumbnailPath,
+				constants.CartPageThumbnailSize,
+				true,
+			)
+			if err == nil {
+				if imgDataB64, err := images.GetImageDataB64(s.cache, s.fs, finalPath, ext); err == nil {
+					imgData = imgDataB64
+				}
+			}
+		}
+
+		price := utils.NewMoney(checkoutLine.UnitPriceWithVat, checkoutLine.UnitPriceWithVatCurrency)
 		cl := models.CheckoutLine{
-			ID:         s.encoder.Encode(checkoutLine.ID),
-			CheckoutID: s.encoder.Encode(checkoutLine.CheckoutID),
-			ProductID:  s.encoder.Encode(checkoutLine.ProductID),
-			Name:       checkoutLine.Name,
-			BrandName:  checkoutLine.BrandName,
-			Quantity:   checkoutLine.Quantity,
+			ID:                       s.encoder.Encode(checkoutLine.ID),
+			CheckoutID:               s.encoder.Encode(checkoutLine.CheckoutID),
+			ProductID:                s.encoder.Encode(checkoutLine.ProductID),
+			Name:                     checkoutLine.Name,
+			BrandName:                checkoutLine.BrandName,
+			Quantity:                 checkoutLine.Quantity,
+			ThumbnailPath:            checkoutLine.ThumbnailPath,
+			ThumbnailData:            imgData,
+			Price:                    *price,
+			Total:                    *price.Multiply(checkoutLine.Quantity),
 		}
 
 		if err := components.CartCheckoutLineItem(cl).Render(r.Context(), w); err != nil {

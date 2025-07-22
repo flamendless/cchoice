@@ -225,20 +225,32 @@ SELECT
 	tbl_checkout_lines.product_id,
 	tbl_checkout_lines.quantity,
 	tbl_products.name as name,
-	tbl_brands.name as brand_name
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_brands.name as brand_name,
+	COALESCE(
+		tbl_product_images.thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path,
+	'' as thumbnail_data
 FROM tbl_checkout_lines
 INNER JOIN tbl_products ON tbl_products.id = tbl_checkout_lines.product_id
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 WHERE tbl_checkout_lines.checkout_id = ?
 `
 
 type GetCheckoutLinesByCheckoutIDRow struct {
-	ID         int64
-	CheckoutID int64
-	ProductID  int64
-	Quantity   int64
-	Name       string
-	BrandName  string
+	ID                       int64
+	CheckoutID               int64
+	ProductID                int64
+	Quantity                 int64
+	Name                     string
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	BrandName                string
+	ThumbnailPath            string
+	ThumbnailData            string
 }
 
 func (q *Queries) GetCheckoutLinesByCheckoutID(ctx context.Context, checkoutID int64) ([]GetCheckoutLinesByCheckoutIDRow, error) {
@@ -256,7 +268,11 @@ func (q *Queries) GetCheckoutLinesByCheckoutID(ctx context.Context, checkoutID i
 			&i.ProductID,
 			&i.Quantity,
 			&i.Name,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
 			&i.BrandName,
+			&i.ThumbnailPath,
+			&i.ThumbnailData,
 		); err != nil {
 			return nil, err
 		}
