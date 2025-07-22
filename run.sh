@@ -224,6 +224,7 @@ sc() {
 testall() {
 	go test ./... -failfast "${@:2}"
 	if [ -x "$(command -v golangci-lint)" ]; then
+		golangci-lint config verify
 		golangci-lint run
 	fi
 }
