@@ -74,7 +74,9 @@ var cmdThumbnailifyImages = &cobra.Command{
 			if err != nil {
 				return err
 			}
-			if info.IsDir() {
+
+			skip := info.IsDir() || strings.HasSuffix(path, flagsThumbnailifyImages.format)
+			if skip {
 				logs.Log().Info("Skipping...", zap.String("path", path))
 				return nil
 			}
