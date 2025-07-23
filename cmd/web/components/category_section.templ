@@ -4,13 +4,13 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"fmt"
-	"os"
+	"cchoice/internal/conf"
 )
 
 var fetchMult = 0.4
 
 func init() {
-	if os.Getenv("APP_ENV") == "local" {
+	if conf.GetConf().IsLocal() {
 		fetchMult = 0.1
 	}
 }

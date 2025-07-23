@@ -24,7 +24,7 @@ type PayMongo struct {
 }
 
 func MustInit() *PayMongo {
-	cfg := conf.GetConf()
+	cfg := conf.Conf()
 	if cfg.PaymentService != "paymongo" {
 		panic("'PAYMENT_SERVICE' must be 'paymongo' to use this")
 	}

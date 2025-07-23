@@ -43,7 +43,7 @@ var (
 )
 
 func New(mode DBMode) Service {
-	dburl := conf.GetConf().DBURL
+	dburl := conf.Conf().DBURL
 	switch mode {
 	case DB_MODE_RO:
 		if dbInstanceRO != nil {
@@ -134,7 +134,7 @@ func (s *service) Health() map[string]string {
 }
 
 func (s *service) Close() error {
-	logs.Log().Info("Disconnected from database", zap.String("db url", conf.GetConf().DBURL))
+	logs.Log().Info("Disconnected from database", zap.String("db url", conf.Conf().DBURL))
 	return s.db.Close()
 }
 

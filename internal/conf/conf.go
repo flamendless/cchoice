@@ -9,10 +9,10 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
-var c *Conf
+var appCfg *appConfig
 var once sync.Once
 
-type Conf struct {
+type appConfig struct {
 	Address            string `env:"ADDRESS" env-required:""`
 	Port               int    `env:"PORT" env-required:""`
 	PortFS             int    `env:"PORT_FS" env-required:""`
@@ -29,7 +29,7 @@ type Conf struct {
 	KeyPath            string `env:"KEYPATH"`
 }
 
-func validate(c *Conf) {
+func validate(c *appConfig) {
 	if c.PaymentService == "paymongo" {
 		if c.PayMongoAPIKey == "" || c.PayMongoSuccessURL == "" {
 			panic(fmt.Errorf("[PayMongo]: %w", errs.ErrEnvVarRequired))
@@ -38,7 +38,7 @@ func validate(c *Conf) {
 		panic("Only 'paymongo' service is allowed for now")
 	}
 
-	if c.AppEnv == "local" {
+	if c.IsLocal() {
 		if c.CertPath == "" || c.KeyPath == "" {
 			panic(fmt.Errorf("[CertPath, KeyPath]: %w", errs.ErrEnvVarRequired))
 		}
@@ -48,14 +48,22 @@ func validate(c *Conf) {
 	}
 }
 
-func GetConf() *Conf {
+func Conf() *appConfig {
 	once.Do(func() {
-		var co Conf
+		var co appConfig
 		if err := cleanenv.ReadEnv(&co); err != nil {
 			panic(errors.Join(errs.ErrEnvVarRequired, err))
 		}
 		validate(&co)
-		c = &co
+		appCfg = &co
 	})
-	return c
+	return appCfg
+}
+
+func (c *appConfig) IsLocal() bool {
+	return c.AppEnv == "local"
+}
+
+func (c *appConfig) IsProd() bool {
+	return c.AppEnv == "prod"
 }
