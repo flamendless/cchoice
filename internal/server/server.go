@@ -42,7 +42,7 @@ type Server struct {
 }
 
 func NewServer() *http.Server {
-	cfg := conf.GetConf()
+	cfg := conf.Conf()
 	sessionManager := scs.New()
 	sessionManager.Lifetime = 1 * time.Hour
 

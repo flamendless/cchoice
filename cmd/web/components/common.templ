@@ -1,15 +1,15 @@
 package components
 
-import "os"
 import "fmt"
 import "cchoice/internal/constants"
+import "cchoice/internal/conf"
 
 var (
 	onceHeadLinks    = templ.NewOnceHandle()
 )
 
 templ TabTitle(page string) {
-	if os.Getenv("APP_ENV") == "local" {
+	if conf.GetConf().IsLocal() {
 		<title>{ fmt.Sprintf("[DEV] %s | C-Choice Construction Supply", page) }</title>
 	} else {
 		<title>{ fmt.Sprintf("%s | C-Choice Construction Supply", page) }</title>

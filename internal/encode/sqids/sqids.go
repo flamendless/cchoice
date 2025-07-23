@@ -19,7 +19,7 @@ type Sqids struct {
 func MustSqids() *Sqids {
 	s, err := sg.New(sg.Options{
 		MinLength: 16,
-		Alphabet:  conf.GetConf().EncodeSalt,
+		Alphabet:  conf.Conf().EncodeSalt,
 	})
 	if err != nil {
 		panic(err)

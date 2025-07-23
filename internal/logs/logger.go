@@ -21,13 +21,14 @@ var logger *zap.Logger
 
 func InitLog() {
 	var config zap.Config
-	env := conf.GetConf().AppEnv
-	switch env {
-	case "local":
+
+	cfg := conf.Conf()
+	switch {
+	case cfg.IsLocal():
 		config = zap.NewDevelopmentConfig()
-		configLevel := conf.GetConf().LogMinLevel
+		configLevel := conf.Conf().LogMinLevel
 		config.Level.SetLevel(zapcore.Level(configLevel - 1))
-	case "prod":
+	case cfg.IsProd():
 		config = zap.NewProductionConfig()
 	default:
 		panic(fmt.Errorf("%w. APP_ENV", errs.ErrEnvVarRequired))
