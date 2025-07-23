@@ -1,11 +1,11 @@
 package sqids
 
 import (
+	"cchoice/internal/conf"
 	"cchoice/internal/encode"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"errors"
-	"os"
 
 	sg "github.com/sqids/sqids-go"
 	"go.uber.org/zap"
@@ -17,14 +17,9 @@ type Sqids struct {
 }
 
 func MustSqids() *Sqids {
-	alphabet := os.Getenv("ENCODE_SALT")
-	if alphabet == "" {
-		panic(errs.ErrEnvVarRequired)
-	}
-
 	s, err := sg.New(sg.Options{
 		MinLength: 16,
-		Alphabet:  alphabet,
+		Alphabet:  conf.GetConf().EncodeSalt,
 	})
 	if err != nil {
 		panic(err)

@@ -2,6 +2,7 @@ package paymongo
 
 import (
 	"bytes"
+	"cchoice/internal/conf"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
@@ -10,7 +11,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 
 	"github.com/Rhymond/go-money"
 	"github.com/goccy/go-json"
@@ -24,17 +24,13 @@ type PayMongo struct {
 }
 
 func MustInit() *PayMongo {
-	apiKey := os.Getenv("PAYMONGO_API_KEY")
-	if apiKey == "" {
-		panic(fmt.Errorf("%w. PAYMONGO_API_KEY", errs.ErrEnvVarRequired))
-	}
-	apiKey = base64.StdEncoding.EncodeToString([]byte(apiKey))
-
-	successURL := os.Getenv("PAYMONGO_SUCCESS_URL")
-	if successURL == "" {
-		panic(fmt.Errorf("%w. PAYMONGO_SUCCESS_URL", errs.ErrEnvVarRequired))
+	cfg := conf.GetConf()
+	if cfg.PaymentService != "paymongo" {
+		panic("'PAYMENT_SERVICE' must be 'paymongo' to use this")
 	}
 
+	apiKey := base64.StdEncoding.EncodeToString([]byte(cfg.PayMongoAPIKey))
+	successURL := cfg.PayMongoSuccessURL
 	return &PayMongo{
 		paymentGateway: payments.PAYMENT_GATEWAY_PAYMONGO,
 		apiKey:         apiKey,

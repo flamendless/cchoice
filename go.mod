@@ -16,6 +16,7 @@ require (
 	github.com/gookit/goutil v0.7.0
 	github.com/gosimple/slug v1.15.0
 	github.com/govalues/decimal v0.1.36
+	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-sqlite3 v1.14.28
 	github.com/spf13/cobra v1.9.1
@@ -33,6 +34,7 @@ require (
 	dario.cat/mergo v1.0.1 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/AlecAivazis/survey/v2 v2.3.6 // indirect
+	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/KimMachineGun/automemlimit v0.7.1 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
@@ -159,6 +161,7 @@ require (
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.10.0 // indirect
 	modernc.org/sqlite v1.37.0 // indirect
+	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )
 
 tool (

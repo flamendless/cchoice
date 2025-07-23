@@ -1,13 +1,12 @@
 package database
 
 import (
+	"cchoice/internal/conf"
 	"cchoice/internal/database/queries"
-	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 	"strconv"
 	"time"
 
@@ -39,16 +38,12 @@ func (s *service) GetQueries() *queries.Queries {
 }
 
 var (
-	dburl        = os.Getenv("DB_URL")
 	dbInstanceRO *service
 	dbInstanceRW *service
 )
 
 func New(mode DBMode) Service {
-	if dburl == "" {
-		panic(fmt.Errorf("%w. DB_URL", errs.ErrEnvVarRequired))
-	}
-
+	dburl := conf.GetConf().DBURL
 	switch mode {
 	case DB_MODE_RO:
 		if dbInstanceRO != nil {
@@ -139,7 +134,7 @@ func (s *service) Health() map[string]string {
 }
 
 func (s *service) Close() error {
-	logs.Log().Info("Disconnected from database", zap.String("db url", dburl))
+	logs.Log().Info("Disconnected from database", zap.String("db url", conf.GetConf().DBURL))
 	return s.db.Close()
 }
 
