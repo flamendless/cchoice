@@ -4,8 +4,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/VictoriaMetrics/fastcache"
@@ -15,14 +13,13 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/sync/singleflight"
 
+	"cchoice/internal/conf"
 	"cchoice/internal/database"
 	"cchoice/internal/encode"
 	"cchoice/internal/encode/sqids"
-	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
 	"cchoice/internal/payments/paymongo"
-	"cchoice/internal/utils"
 )
 
 const CACHE_MAX_BYTES int = 1024
@@ -45,38 +42,24 @@ type Server struct {
 }
 
 func NewServer() *http.Server {
-	address := os.Getenv("ADDRESS")
-	if address == "" {
-		panic(fmt.Errorf("%w. ADDRESS", errs.ErrEnvVarRequired))
-	}
-
-	port, err := strconv.Atoi(os.Getenv("PORT"))
-	if err != nil {
-		panic(fmt.Errorf("%w. PORT. %w", errs.ErrEnvVarRequired, err))
-	}
-
-	portFS, err := strconv.Atoi(os.Getenv("PORT_FS"))
-	if err != nil {
-		panic(fmt.Errorf("%w. PORT_FS. %w", errs.ErrEnvVarRequired, err))
-	}
-
+	cfg := conf.GetConf()
 	sessionManager := scs.New()
 	sessionManager.Lifetime = 1 * time.Hour
 
 	dbRO := database.New(database.DB_MODE_RO)
 	dbRW := database.New(database.DB_MODE_RW)
 	NewServer := &Server{
-		address:        address,
-		port:           port,
-		portFS:         portFS,
+		address:        cfg.Address,
+		port:           cfg.Port,
+		portFS:         cfg.PortFS,
 		dbRO:           dbRO,
 		dbRW:           dbRW,
 		cache:          fastcache.New(CACHE_MAX_BYTES),
 		sessionManager: sessionManager,
 		paymentGateway: paymongo.MustInit(),
 		encoder:        sqids.MustSqids(),
-		useHTTP2:       utils.GetBoolFlag(os.Getenv("USEHTTP2")),
-		useSSL:         utils.GetBoolFlag(os.Getenv("USESSL")),
+		useHTTP2:       cfg.UseHTTP2,
+		useSSL:         cfg.UseSSL,
 	}
 
 	addr := fmt.Sprintf("%s:%d", NewServer.address, NewServer.port)
@@ -85,20 +68,12 @@ func NewServer() *http.Server {
 
 	var tlsConfig *tls.Config
 	if NewServer.useSSL {
-		var certPath, keyPath string
-		if os.Getenv("APP_ENV") == "local" {
-			certPath = os.Getenv("CERTPATH")
-			keyPath = os.Getenv("KEYPATH")
-		} else {
-			certPath = fmt.Sprintf("/etc/letsencrypt/live/%s/fullchain.pem", NewServer.address)
-			keyPath = fmt.Sprintf("/etc/letsencrypt/live/%s/privkey.pem", NewServer.address)
-		}
 		logs.Log().Info(
 			"SSL: opening files",
-			zap.String("cert", certPath),
-			zap.String("key", keyPath),
+			zap.String("cert", cfg.CertPath),
+			zap.String("key", cfg.KeyPath),
 		)
-		serverTLSCert, err := tls.LoadX509KeyPair(certPath, keyPath)
+		serverTLSCert, err := tls.LoadX509KeyPair(cfg.CertPath, cfg.KeyPath)
 		if err != nil {
 			panic(err)
 		}

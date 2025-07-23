@@ -2,13 +2,12 @@ package logs
 
 import (
 	"bytes"
+	"cchoice/internal/conf"
 	"cchoice/internal/errs"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"strconv"
 	"sync"
 	"syscall"
 
@@ -22,18 +21,12 @@ var logger *zap.Logger
 
 func InitLog() {
 	var config zap.Config
-	env := os.Getenv("APP_ENV")
+	env := conf.GetConf().AppEnv
 	switch env {
 	case "local":
 		config = zap.NewDevelopmentConfig()
-		configLevel := os.Getenv("LOG_MIN_LEVEL")
-		if configLevel != "" {
-			lvl, err := strconv.Atoi(configLevel)
-			if err != nil {
-				panic(fmt.Errorf("invalid LOG_MIN_LEVEL. Got '%s'", configLevel).Error())
-			}
-			config.Level.SetLevel(zapcore.Level(lvl - 1))
-		}
+		configLevel := conf.GetConf().LogMinLevel
+		config.Level.SetLevel(zapcore.Level(configLevel - 1))
 	case "prod":
 		config = zap.NewProductionConfig()
 	default:
