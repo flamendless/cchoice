@@ -10,15 +10,15 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"cchoice/cmd/web/models"
+	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"fmt"
-	"os"
 )
 
 var fetchMult = 0.4
 
 func init() {
-	if os.Getenv("APP_ENV") == "local" {
+	if conf.Conf().IsLocal() {
 		fetchMult = 0.1
 	}
 }

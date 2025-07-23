@@ -10,7 +10,7 @@ import (
 var fetchMult = 0.4
 
 func init() {
-	if conf.GetConf().IsLocal() {
+	if conf.Conf().IsLocal() {
 		fetchMult = 0.1
 	}
 }

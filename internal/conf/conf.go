@@ -29,7 +29,7 @@ type appConfig struct {
 	KeyPath            string `env:"KEYPATH"`
 }
 
-func validate(c *appConfig) {
+func mustValidate(c *appConfig) {
 	if c.PaymentService == "paymongo" {
 		if c.PayMongoAPIKey == "" || c.PayMongoSuccessURL == "" {
 			panic(fmt.Errorf("[PayMongo]: %w", errs.ErrEnvVarRequired))
@@ -54,7 +54,7 @@ func Conf() *appConfig {
 		if err := cleanenv.ReadEnv(&co); err != nil {
 			panic(errors.Join(errs.ErrEnvVarRequired, err))
 		}
-		validate(&co)
+		mustValidate(&co)
 		appCfg = &co
 	})
 	return appCfg

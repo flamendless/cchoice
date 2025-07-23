@@ -19,6 +19,7 @@ import (
 
 func AddCartsHandlers(s *Server, r chi.Router) {
 	r.Get("/carts", s.cartsPageHandler)
+	r.Get("/carts/summary-bar", s.getCartSummaryBarHandler)
 	r.Get("/carts/lines", s.cartLinesHandler)
 	r.Get("/carts/lines/count", s.getCartLinesCountHandler)
 	r.Post("/carts/lines", s.addProductToCartHandler)
@@ -77,27 +78,12 @@ func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 	token := s.sessionManager.Token(r.Context())
-	checkoutID, err := s.dbRO.GetQueries().GetCheckoutIDBySessionID(r.Context(), token)
+	checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
 	if err != nil {
 		logs.Log().Warn(
 			"Carts lines handler",
 			zap.Error(err),
 			zap.String("token", token),
-		)
-		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal("Cart page handler", zap.Error(err))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		return
-	}
-
-	checkoutLines, err := s.dbRO.GetQueries().GetCheckoutLinesByCheckoutID(r.Context(), checkoutID)
-	if err != nil || len(checkoutLines) == 0 {
-		logs.Log().Warn(
-			"Carts lines handler",
-			zap.Error(err),
-			zap.String("token", token),
-			zap.Int("checkout lines", len(checkoutLines)),
 		)
 		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
 			logs.Log().Fatal("Cart page handler", zap.Error(err))
@@ -122,17 +108,22 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		price := utils.NewMoney(checkoutLine.UnitPriceWithVat, checkoutLine.UnitPriceWithVatCurrency)
+
+		//TODO: (Brandon) - Discounts/sales
+		discountedPrice := utils.NewMoney(checkoutLine.UnitPriceWithVat, checkoutLine.UnitPriceWithVatCurrency)
+
 		cl := models.CheckoutLine{
-			ID:                       s.encoder.Encode(checkoutLine.ID),
-			CheckoutID:               s.encoder.Encode(checkoutLine.CheckoutID),
-			ProductID:                s.encoder.Encode(checkoutLine.ProductID),
-			Name:                     checkoutLine.Name,
-			BrandName:                checkoutLine.BrandName,
-			Quantity:                 checkoutLine.Quantity,
-			ThumbnailPath:            checkoutLine.ThumbnailPath,
-			ThumbnailData:            imgData,
-			Price:                    *price,
-			Total:                    *price.Multiply(checkoutLine.Quantity),
+			ID:              s.encoder.Encode(checkoutLine.ID),
+			CheckoutID:      s.encoder.Encode(checkoutLine.CheckoutID),
+			ProductID:       s.encoder.Encode(checkoutLine.ProductID),
+			Name:            checkoutLine.Name,
+			BrandName:       checkoutLine.BrandName,
+			Quantity:        checkoutLine.Quantity,
+			ThumbnailPath:   checkoutLine.ThumbnailPath,
+			ThumbnailData:   imgData,
+			Price:           *price,
+			DiscountedPrice: *discountedPrice,
+			Total:           *discountedPrice.Multiply(checkoutLine.Quantity),
 		}
 
 		if err := components.CartCheckoutLineItem(cl).Render(r.Context(), w); err != nil {
@@ -187,6 +178,28 @@ func (s *Server) addProductToCartHandler(w http.ResponseWriter, r *http.Request)
 		zap.Strings("checkout line product ids", checkoutLineProductIDs),
 	)
 	w.WriteHeader(http.StatusOK)
+}
+
+func (s *Server) getCartSummaryBarHandler(w http.ResponseWriter, r *http.Request) {
+	data := r.URL.Query().Get("data")
+	if data == "" {
+		return
+	}
+
+	if data == "items" {
+		token := s.sessionManager.Token(r.Context())
+		checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
+		if err != nil {
+			_, _ = w.Write([]byte("0 Items"))
+			return
+		}
+
+		count := 0
+		for _, checkoutLine := range checkoutLines {
+			count += int(checkoutLine.Quantity)
+		}
+		_, _ = w.Write(fmt.Appendf(nil, "%d Items", count))
+	}
 }
 
 func (s *Server) getCartLinesCountHandler(w http.ResponseWriter, r *http.Request) {

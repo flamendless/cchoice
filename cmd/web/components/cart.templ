@@ -2,6 +2,7 @@ package components
 
 import (
 	"cchoice/cmd/web/models"
+	"cchoice/internal/conf"
 )
 
 templ AddToCart() {
@@ -55,13 +56,15 @@ templ CartPageBody() {
 		@ErrorBanner()
 		@Header()
 		<div class="flex flex-col items-center content-center pt-[128px] px-2">
+			@CartSummaryBar()
 			<div
 				id="cart-summary"
-				class="w-1/2 px-16"
+				class="w-1/2 px-16 flex flex-col gap-[8px]"
 				hx-get="/cchoice/carts/lines"
 				hx-trigger="load"
 				hx-swap="appendend"
-			></div>
+			>
+			</div>
 		</div>
 		@Footer()
 	</body>
@@ -72,6 +75,9 @@ templ CartPageBodyEmpty() {
 		@ErrorBanner()
 		@Header()
 		<div class="flex flex-col items-center content-center pt-[128px]">
+			if conf.Conf().IsLocal() {
+				@CartSummaryBar()
+			}
 			@EmptyCart()
 		</div>
 		@Footer()
@@ -79,23 +85,55 @@ templ CartPageBodyEmpty() {
 }
 
 templ EmptyCart() {
-	<h1>Your cart is empty</h1>
+	<div class="h-[50vh] flex flex-col justify-center items-center">
+		<h1 class="text-2xl text-cchoice-800">Your cart is empty</h1>
+		@svgCart("size-32 my-4 stroke-cchoice")
+	</div>
+}
+
+templ CartSummaryBar() {
+	<div
+		id="cart-summary-bar"
+		class="w-[60%] flex justify-around my-2"
+		hx-get="/cchoice/carts/summary-bar?data=items"
+		hx-trigger="load"
+		hx-target="#cart-summary-bar-n-items"
+		hx-swap="textContent"
+	>
+		<p class="text-sm text-gray-600">Cart Summary</p>
+		<p
+			id="cart-summary-bar-n-items"
+			class="text-sm text-gray-600"
+		>
+			0 Items
+		</p>
+	</div>
 }
 
 templ CartCheckoutLineItem(cl models.CheckoutLine) {
-	<div class="flex items-center gap-4 border p-4 rounded">
+	<div class="flex items-center gap-4 border rounded h-32">
 		<img
-			class="w-48 max-w-48 h-48"
-			title="product image"
+			class="p-[8px] w-32 max-w-32 h-32"
+			title={ "product image of " + cl.Name }
 			src={ cl.ThumbnailData }
 			alt={ cl.Name + " thumbnail" }
 			data-product-id={ cl.ProductID }
 		/>
+
 		<div class="flex-1">
 			<h2 class="text-lg font-semibold">{ cl.Name }</h2>
-			<p class="text-sm text-gray-500">{ cl.BrandName }</p>
-			<p class="text-sm text-gray-500">{cl.Price.Display() } </p>
-			<p class="text-sm text-gray-500">Qty: { cl.Quantity }</p>
+			<p class="text-sm text-gray-600">{ cl.BrandName }</p>
+			<span class="flex gap-[4px]">
+				<p class="text-sm text-gray-400 line-through">
+					{ cl.Price.Display() }
+				</p>
+				<p class="text-sm text-gray-500">
+					{ cl.DiscountedPrice.Display() }
+				</p>
+			</span>
+			<p class="text-sm text-gray-500">
+				Qty: { cl.Quantity }
+			</p>
 			<p class="text-sm text-gray-700">Total: { cl.Total.Display() }</p>
 		</div>
 	</div>
