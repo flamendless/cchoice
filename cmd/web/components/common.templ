@@ -9,7 +9,7 @@ var (
 )
 
 templ TabTitle(page string) {
-	if conf.GetConf().IsLocal() {
+	if conf.Conf().IsLocal() {
 		<title>{ fmt.Sprintf("[DEV] %s | C-Choice Construction Supply", page) }</title>
 	} else {
 		<title>{ fmt.Sprintf("%s | C-Choice Construction Supply", page) }</title>

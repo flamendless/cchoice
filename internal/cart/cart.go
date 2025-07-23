@@ -1,6 +1,7 @@
 package cart
 
 import (
+	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
 	"cchoice/internal/logs"
@@ -71,4 +72,22 @@ func CreateCart(
 	)
 
 	return checkout.ID, nil
+}
+
+func GetCheckoutLines(
+	ctx context.Context,
+	dbRO database.Service,
+	token string,
+) ([]queries.GetCheckoutLinesByCheckoutIDRow, error) {
+	checkoutID, err := dbRO.GetQueries().GetCheckoutIDBySessionID(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	checkoutLines, err := dbRO.GetQueries().GetCheckoutLinesByCheckoutID(ctx, checkoutID)
+	if err != nil {
+		return nil, err
+	}
+
+	return checkoutLines, nil
 }
