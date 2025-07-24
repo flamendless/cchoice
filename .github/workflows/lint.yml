@@ -15,10 +15,6 @@ jobs:
       with:
         go-version: stable
 
-    - name: libvips
-      run: |
-        sudo apt-get -y install libvips-dev
-
     - name: Run golangci-lint
       uses: golangci/golangci-lint-action@v8
       with:
