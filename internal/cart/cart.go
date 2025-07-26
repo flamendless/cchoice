@@ -6,6 +6,8 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/logs"
 	"context"
+	"database/sql"
+	"errors"
 
 	"go.uber.org/zap"
 )
@@ -21,13 +23,19 @@ func CreateCart(
 		return -1, nil
 	}
 
-	if checkoutID, err := dbq.GetCheckoutIDBySessionID(ctx, token); err == nil && checkoutID != 0 {
-		return checkoutID, nil
-	}
+	var checkoutID int64 = -1
 
-	checkout, err := dbq.CreateCheckout(ctx, token)
+	existingCheckoutID, err := dbq.GetCheckoutIDBySessionID(ctx, token)
 	if err != nil {
-		return -1, err
+		if errors.Is(err, sql.ErrNoRows) {
+			checkout, err := dbq.CreateCheckout(ctx, token)
+			if err != nil {
+				return -1, err
+			}
+			checkoutID = checkout.ID
+		}
+	} else {
+		checkoutID = existingCheckoutID
 	}
 
 	productIDsCount := map[string]int64{}
@@ -41,7 +49,7 @@ func CreateCart(
 		_, err := dbq.CreateCheckoutLine(
 			ctx,
 			queries.CreateCheckoutLineParams{
-				CheckoutID: checkout.ID,
+				CheckoutID: checkoutID,
 				ProductID:  dbProductID,
 				Quantity:   qty,
 
@@ -57,7 +65,7 @@ func CreateCart(
 			logs.Log().Warn(
 				"Can't create checkoutline",
 				zap.Error(err),
-				zap.Int64("checkout id", checkout.ID),
+				zap.Int64("checkout id", checkoutID),
 				zap.String("product id", productID),
 			)
 		}
@@ -67,11 +75,11 @@ func CreateCart(
 	logs.Log().Info(
 		"Created checkout",
 		zap.String("token", token),
-		zap.Int64("checkout id", checkout.ID),
+		zap.Int64("checkout id", checkoutID),
 		zap.Int("checkout lines count", created),
 	)
 
-	return checkout.ID, nil
+	return checkoutID, nil
 }
 
 func GetCheckoutLines(
