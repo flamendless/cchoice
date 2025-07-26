@@ -1,4 +1,4 @@
-//go:build staticfs
+//go:build embeddedfs
 package static
 
 import (
@@ -8,14 +8,18 @@ import (
 )
 
 //go:embed *
-var Files embed.FS
+var files embed.FS
+
+func GetMode() string {
+	return "embeddedfs"
+}
 
 func GetFS() fs.FS {
-	return Files
+	return files
 }
 
 func Handler() http.Handler {
-	sub, err := fs.Sub(Files, ".")
+	sub, err := fs.Sub(files, ".")
 	if err != nil {
 		panic(err)
 	}

@@ -36,6 +36,7 @@ serve() {
 build() {
 	local -; set -x;
 	genall
+	# go build -tags='fts5' -tags="embeddedfs" -o "${TMP}/main" .
 	go build -tags='fts5' -tags="staticfs" -o "${TMP}/main" .
 }
 
