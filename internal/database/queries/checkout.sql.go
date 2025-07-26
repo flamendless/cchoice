@@ -10,6 +10,19 @@ import (
 	"time"
 )
 
+const countCheckoutLineByCheckoutID = `-- name: CountCheckoutLineByCheckoutID :one
+SELECT COUNT(*)
+FROM tbl_checkout_lines
+WHERE tbl_checkout_lines.checkout_id = ?
+`
+
+func (q *Queries) CountCheckoutLineByCheckoutID(ctx context.Context, checkoutID int64) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countCheckoutLineByCheckoutID, checkoutID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createCheckout = `-- name: CreateCheckout :one
 INSERT INTO tbl_checkouts(
 	session_id
@@ -166,6 +179,16 @@ func (q *Queries) CreateCheckoutPayment(ctx context.Context, arg CreateCheckoutP
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const deleteCheckoutLineByID = `-- name: DeleteCheckoutLineByID :exec
+DELETE FROM tbl_checkout_lines
+WHERE id = ?
+`
+
+func (q *Queries) DeleteCheckoutLineByID(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteCheckoutLineByID, id)
+	return err
 }
 
 const getCheckoutIDBySessionID = `-- name: GetCheckoutIDBySessionID :one

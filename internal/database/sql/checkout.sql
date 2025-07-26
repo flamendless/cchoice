@@ -13,6 +13,10 @@ INSERT INTO tbl_checkout_lines(
 	?, ?, ?, ?
 ) RETURNING *;
 
+-- name: DeleteCheckoutLineByID :exec
+DELETE FROM tbl_checkout_lines
+WHERE id = ?;
+
 -- name: GetCheckoutLineByID :one
 SELECT
 	tbl_checkout_lines.id,
@@ -26,6 +30,11 @@ INNER JOIN tbl_products ON tbl_products.id = tbl_checkout_lines.product_id
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 WHERE tbl_checkout_lines.id = ?
 LIMIT 1;
+
+-- name: CountCheckoutLineByCheckoutID :one
+SELECT COUNT(*)
+FROM tbl_checkout_lines
+WHERE tbl_checkout_lines.checkout_id = ?;
 
 -- name: GetCheckoutLinesByCheckoutID :many
 SELECT

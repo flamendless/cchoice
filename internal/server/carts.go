@@ -23,6 +23,7 @@ func AddCartsHandlers(s *Server, r chi.Router) {
 	r.Get("/carts/lines", s.cartLinesHandler)
 	r.Get("/carts/lines/count", s.getCartLinesCountHandler)
 	r.Post("/carts/lines", s.addProductToCartHandler)
+	r.Delete("/carts/lines/{checkoutline_id}", s.removeProductFromCartHandler)
 }
 
 func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -179,6 +180,66 @@ func (s *Server) addProductToCartHandler(w http.ResponseWriter, r *http.Request)
 		zap.String("token", s.sessionManager.Token(r.Context())),
 		zap.Strings("checkout line product ids", checkoutLineProductIDs),
 	)
+	w.WriteHeader(http.StatusOK)
+}
+
+func (s *Server) removeProductFromCartHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Remove Product From Cart handler]"
+	checkoutLineID := chi.URLParam(r, "checkoutline_id")
+	dbCheckoutLineID := s.encoder.Decode(checkoutLineID)
+
+	checkoutLine, err := s.dbRO.GetQueries().GetCheckoutLineByID(r.Context(), dbCheckoutLineID)
+	if err != nil {
+		logs.Log().Fatal(
+			logtag,
+			zap.String("token", s.sessionManager.Token(r.Context())),
+			zap.String("checkoutline id", checkoutLineID),
+			zap.Error(err),
+		)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if _, err := RemoveFromCheckoutLineProductIDs(
+		r.Context(),
+		s.sessionManager,
+		s.encoder.Encode(checkoutLine.ProductID),
+	); err != nil {
+		logs.Log().Fatal(
+			logtag,
+			zap.String("token", s.sessionManager.Token(r.Context())),
+			zap.String("checkoutline id", checkoutLineID),
+			zap.Error(err),
+		)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := s.dbRW.GetQueries().DeleteCheckoutLineByID(r.Context(), dbCheckoutLineID); err != nil {
+		logs.Log().Fatal(
+			logtag,
+			zap.String("token", s.sessionManager.Token(r.Context())),
+			zap.String("checkoutline id", checkoutLineID),
+			zap.Error(err),
+		)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	remaining, err := s.dbRO.GetQueries().CountCheckoutLineByCheckoutID(r.Context(), checkoutLine.CheckoutID)
+	if err != nil {
+		logs.Log().Fatal(
+			logtag,
+			zap.String("token", s.sessionManager.Token(r.Context())),
+			zap.String("checkoutline id", checkoutLineID),
+			zap.Error(err),
+		)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if remaining == 0 {
+		w.Header().Set("HX-Redirect", "/cchoice/carts")
+	}
 	w.WriteHeader(http.StatusOK)
 }
 
