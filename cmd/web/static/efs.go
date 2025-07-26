@@ -1,3 +1,4 @@
+//go:build staticfs
 package static
 
 import (
@@ -8,6 +9,10 @@ import (
 
 //go:embed *
 var Files embed.FS
+
+func GetFS() fs.FS {
+	return Files
+}
 
 func Handler() http.Handler {
 	sub, err := fs.Sub(Files, ".")
