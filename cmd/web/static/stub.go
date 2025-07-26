@@ -8,7 +8,7 @@ import (
 )
 
 func GetMode() string {
-	return ""
+	return "stubfs"
 }
 
 func GetFS() fs.FS {
