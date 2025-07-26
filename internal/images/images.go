@@ -2,7 +2,9 @@ package images
 
 import (
 	"cchoice/internal/encode/b64"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -42,9 +44,10 @@ func GetImagePathWithSize(
 	if isThumbnail {
 		path = strings.Replace(path, "/images/", "/thumbnails/", 1)
 	}
+
 	newPath, err := url.Parse(path)
 	if err != nil {
-		return "", "", err
+		return "", "", errors.Join(errs.ErrFS, err)
 	}
 	return newPath.String(), ext, nil
 }
@@ -63,9 +66,11 @@ func GetImageDataB64(
 		logs.Log().Debug("cache miss", zap.ByteString("key", cacheKey))
 	}
 
+	finalPath = strings.TrimPrefix(finalPath, "static")
+
 	f, err := fs.Open(finalPath)
 	if err != nil {
-		return "", err
+		return "", errors.Join(errs.ErrFS, err)
 	}
 	defer func() {
 		if err := f.Close(); err != nil {
@@ -75,7 +80,7 @@ func GetImageDataB64(
 
 	img, err := io.ReadAll(f)
 	if err != nil {
-		return "", err
+		return "", errors.Join(errs.ErrFS, err)
 	}
 
 	imgData := ImageToB64(ParseImageFormatExtToEnum(ext), img)

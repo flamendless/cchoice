@@ -29,7 +29,6 @@ type Server struct {
 	dbRW           database.Service
 	SF             singleflight.Group
 	fs             http.FileSystem
-	fsHandler      http.Handler
 	cache          *fastcache.Cache
 	sessionManager *scs.SessionManager
 	paymentGateway payments.IPaymentGateway

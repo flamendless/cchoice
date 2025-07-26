@@ -7,11 +7,12 @@ import (
 	"os"
 	"strings"
 
-	"cchoice/cmd/web"
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
+	"cchoice/cmd/web/static"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/errs"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
@@ -42,10 +43,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Route("/cchoice", func(r chi.Router) {
 		r.Use(middleware.StripPrefix("/cchoice"))
 
-		// r.Handle("/static/*", http.FileServer(http.FS(web.Files)))
-		s.fs = http.FS(web.Files)
-		s.fsHandler = http.FileServer(s.fs)
-		r.Get("/static/*", s.staticHandler)
+		s.fs = http.FS(static.Files)
+		r.Handle("/static/*", http.StripPrefix("/static/", static.Handler()))
 
 		r.Get("/changelogs", s.changelogsHandler)
 		r.Get("/health", s.healthHandler)
@@ -53,7 +52,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/settings/header-texts", s.headerTextsHandler)
 		r.Get("/settings/footer-texts", s.footerTextsHandler)
 		r.Get("/products/image", s.productsImageHandler)
-
 
 		r.Post("/search", s.searchHandler)
 
@@ -63,11 +61,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 		AddCartsHandlers(s, r)
 	})
 
-	return r
-}
+	if s.fs == nil {
+		panic(errors.Join(errs.ErrServerInit, errors.New("server.fs not setup")))
+	}
 
-func (s *Server) staticHandler(w http.ResponseWriter, r *http.Request) {
-	s.fsHandler.ServeHTTP(w, r)
+	return r
 }
 
 func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
