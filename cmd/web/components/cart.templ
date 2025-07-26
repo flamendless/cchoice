@@ -75,7 +75,7 @@ templ CartPageBodyEmpty() {
 		@ErrorBanner()
 		@Header()
 		<div class="flex flex-col items-center content-center pt-[128px]">
-			if conf.Conf().IsLocal() {
+			if false && conf.Conf().IsLocal() {
 				@CartSummaryBar()
 			}
 			@EmptyCart()
@@ -115,44 +115,59 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 		id={ "cart-checkout-line-item-" + cl.ID }
 		class="flex items-center gap-4 border rounded h-auto"
 	>
-		<img
-			class="m-2 w-32 max-w-32 h-32"
-			title={ "product image of " + cl.Name }
-			src={ cl.ThumbnailData }
-			alt={ cl.Name + " thumbnail" }
-			data-product-id={ cl.ProductID }
-		/>
+		<div class="flex items-center gap-2 pl-3">
+			<input
+				type="checkbox"
+				class="w-5 h-5 accent-cchoice_border hover:accent-cchoice"
+				aria-label="Select item"
+				name="checked_item"
+				value={ cl.ID }
+				checked
+			>
+			<img
+				class="m-2 w-32 max-w-32 h-32"
+				title={ "product image of " + cl.Name }
+				src={ cl.ThumbnailData }
+				alt={ cl.Name + " thumbnail" }
+				data-product-id={ cl.ProductID }
+			/>
+		</div>
 
-		<div class="flex-1">
-			<h2 class="text-lg font-semibold">{ cl.Name }</h2>
-			<p class="text-sm text-gray-600">{ cl.BrandName }</p>
-			<span class="flex gap-[4px]">
-				if res, _ := cl.Price.Compare(&cl.DiscountedPrice); res != 0 {
-					<p class="text-sm text-gray-400 line-through">
-						{ cl.Price.Display() }
-					</p>
-					<p class="text-sm text-gray-500">
-						{ cl.DiscountedPrice.Display() }
-					</p>
-				} else {
-					<p class="text-sm text-gray-500">
-						{ cl.DiscountedPrice.Display() }
-					</p>
-				}
-			</span>
-			<p class="text-sm text-gray-500">
-				Qty: { cl.Quantity }
-			</p>
-			<p class="text-sm text-gray-700">Total: { cl.Total.Display() }</p>
+		<div class="flex flex-row grow">
+			<div class="flex-1">
+				<h2 class="text-lg font-semibold">{ cl.Name }</h2>
+				<p class="text-sm text-gray-600">{ cl.BrandName }</p>
+				<span class="flex gap-[4px]">
+					if res, _ := cl.Price.Compare(&cl.DiscountedPrice); res != 0 {
+						<p class="text-sm text-gray-400 line-through">
+							{ cl.Price.Display() }
+						</p>
+						<p class="text-sm text-gray-500">
+							{ cl.DiscountedPrice.Display() }
+						</p>
+					} else {
+						<p class="text-sm text-gray-500">
+							{ cl.DiscountedPrice.Display() }
+						</p>
+					}
+				</span>
+				<p class="text-sm text-gray-500">
+					Qty: { cl.Quantity }
+				</p>
+				<p class="text-sm text-gray-700">Total: { cl.Total.Display() }</p>
+			</div>
 
-			<div class="text-right mr-2">
+			<div class="place-content-end mr-2">
 				<button
+					alt="Remove item from cart button"
+					aria-label="Remove item in cart"
+					title="Remove item from cart"
 					hx-delete={ "/cchoice/carts/lines/" + cl.ID }
 					hx-target={ "#cart-checkout-line-item-" + cl.ID }
 					hx-swap="outerHTML"
 					hx-push-url="false"
 					class="
-						group stroke-cchoice rounded-full
+						group stroke-cchoice rounded-full p-2
 						cursor-pointer hover:bg-cchoice_border
 					"
 				>
