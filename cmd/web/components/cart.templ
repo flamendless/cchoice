@@ -111,9 +111,12 @@ templ CartSummaryBar() {
 }
 
 templ CartCheckoutLineItem(cl models.CheckoutLine) {
-	<div class="flex items-center gap-4 border rounded h-32">
+	<div
+		id={ "cart-checkout-line-item-" + cl.ID }
+		class="flex items-center gap-4 border rounded h-auto"
+	>
 		<img
-			class="p-[8px] w-32 max-w-32 h-32"
+			class="m-2 w-32 max-w-32 h-32"
 			title={ "product image of " + cl.Name }
 			src={ cl.ThumbnailData }
 			alt={ cl.Name + " thumbnail" }
@@ -124,17 +127,38 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 			<h2 class="text-lg font-semibold">{ cl.Name }</h2>
 			<p class="text-sm text-gray-600">{ cl.BrandName }</p>
 			<span class="flex gap-[4px]">
-				<p class="text-sm text-gray-400 line-through">
-					{ cl.Price.Display() }
-				</p>
-				<p class="text-sm text-gray-500">
-					{ cl.DiscountedPrice.Display() }
-				</p>
+				if res, _ := cl.Price.Compare(&cl.DiscountedPrice); res != 0 {
+					<p class="text-sm text-gray-400 line-through">
+						{ cl.Price.Display() }
+					</p>
+					<p class="text-sm text-gray-500">
+						{ cl.DiscountedPrice.Display() }
+					</p>
+				} else {
+					<p class="text-sm text-gray-500">
+						{ cl.DiscountedPrice.Display() }
+					</p>
+				}
 			</span>
 			<p class="text-sm text-gray-500">
 				Qty: { cl.Quantity }
 			</p>
 			<p class="text-sm text-gray-700">Total: { cl.Total.Display() }</p>
+
+			<div class="text-right mr-2">
+				<button
+					hx-delete={ "/cchoice/carts/lines/" + cl.ID }
+					hx-target={ "#cart-checkout-line-item-" + cl.ID }
+					hx-swap="outerHTML"
+					hx-push-url="false"
+					class="
+						group stroke-cchoice rounded-full
+						cursor-pointer hover:bg-cchoice_border
+					"
+				>
+					@svgTrash("stroke-cchoice group-hover:stroke-white cursor-pointer")
+				</button>
+			</div>
 		</div>
 	</div>
 }
