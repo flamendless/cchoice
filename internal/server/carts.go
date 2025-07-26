@@ -26,10 +26,11 @@ func AddCartsHandlers(s *Server, r chi.Router) {
 }
 
 func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Cart Page Handler]"
 	checkoutlineProductIDs, ok := s.sessionManager.Get(r.Context(), skCheckoutLineProductIDs).([]string)
 	if len(checkoutlineProductIDs) == 0 {
 		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal("Cart page handler", zap.Error(err))
+			logs.Log().Fatal(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
@@ -38,12 +39,12 @@ func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
 	token := s.sessionManager.Token(r.Context())
 	if !ok {
 		logs.Log().Fatal(
-			"Cart page handler",
+			logtag,
 			zap.Error(errs.ErrSessionCheckoutLineProductIDs),
 			zap.String("token", token),
 		)
 		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal("Cart page handler", zap.Error(err))
+			logs.Log().Fatal(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
@@ -58,35 +59,36 @@ func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil || checkoutID == -1 {
 		logs.Log().Fatal(
-			"Cart page handler",
+			logtag,
 			zap.Error(err),
 			zap.String("token", token),
 		)
 		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal("Cart page handler", zap.Error(err))
+			logs.Log().Fatal(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
 
 	if err := components.CartPage(components.CartPageBody()).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal("Cart page handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
 func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Cart Lines Handler]"
 	token := s.sessionManager.Token(r.Context())
 	checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
 	if err != nil {
 		logs.Log().Warn(
-			"Carts lines handler",
+			logtag,
 			zap.Error(err),
 			zap.String("token", token),
 		)
 		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal("Cart page handler", zap.Error(err))
+			logs.Log().Fatal(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
@@ -127,7 +129,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := components.CartCheckoutLineItem(cl).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal("Cart lines handler", zap.Error(err))
+			logs.Log().Fatal(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			continue
 		}
@@ -135,24 +137,24 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) addProductToCartHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Add Product To Cart Handler]"
 	if err := r.ParseForm(); err != nil {
-		logs.Log().Fatal("checkouts lines handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	productID := r.Form.Get("product_id")
 	if productID == "" {
-		err := errs.ErrInvalidParams
-		logs.Log().Fatal("checkouts lines handler", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		logs.Log().Fatal(logtag, zap.Error(errs.ErrInvalidParams))
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
 
 	dbProductID := s.encoder.Decode(productID)
 	if _, err := s.dbRO.GetQueries().CheckProductExistsByID(r.Context(), dbProductID); err != nil {
 		logs.Log().Fatal(
-			"checkouts lines handler",
+			logtag,
 			zap.String("token", s.sessionManager.Token(r.Context())),
 			zap.Error(err),
 		)
@@ -163,7 +165,7 @@ func (s *Server) addProductToCartHandler(w http.ResponseWriter, r *http.Request)
 	checkoutLineProductIDs, err := AddToCheckoutLineProductIDs(r.Context(), s.sessionManager, productID)
 	if err != nil {
 		logs.Log().Fatal(
-			"add checkout line",
+			logtag,
 			zap.String("token", s.sessionManager.Token(r.Context())),
 			zap.String("product id", productID),
 			zap.Error(err),
@@ -173,7 +175,7 @@ func (s *Server) addProductToCartHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	logs.Log().Info(
-		"checkouts lines",
+		logtag,
 		zap.String("token", s.sessionManager.Token(r.Context())),
 		zap.Strings("checkout line product ids", checkoutLineProductIDs),
 	)
@@ -181,8 +183,11 @@ func (s *Server) addProductToCartHandler(w http.ResponseWriter, r *http.Request)
 }
 
 func (s *Server) getCartSummaryBarHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Get Cart Summary Bar Handler]"
 	data := r.URL.Query().Get("data")
 	if data == "" {
+		logs.Log().Fatal(logtag, zap.Error(errs.ErrInvalidParams))
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -190,7 +195,10 @@ func (s *Server) getCartSummaryBarHandler(w http.ResponseWriter, r *http.Request
 		token := s.sessionManager.Token(r.Context())
 		checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
 		if err != nil {
-			_, _ = w.Write([]byte("0 Items"))
+			if _, err := w.Write([]byte("0 Items")); err != nil {
+				logs.Log().Fatal(logtag, zap.Error(err))
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
 			return
 		}
 
@@ -198,14 +206,21 @@ func (s *Server) getCartSummaryBarHandler(w http.ResponseWriter, r *http.Request
 		for _, checkoutLine := range checkoutLines {
 			count += int(checkoutLine.Quantity)
 		}
-		_, _ = w.Write(fmt.Appendf(nil, "%d Items", count))
+		if _, err := w.Write(fmt.Appendf(nil, "%d Items", count)); err != nil {
+			logs.Log().Fatal(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 
 func (s *Server) getCartLinesCountHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Get Cart Lines Count Handler]"
 	count := 0
 	if productIDs, ok := s.sessionManager.Get(r.Context(), skCheckoutLineProductIDs).([]string); ok {
 		count = len(productIDs)
 	}
-	_, _ = w.Write(fmt.Appendf(nil, "%d", count))
+	if _, err := w.Write(fmt.Appendf(nil, "%d", count)); err != nil {
+		logs.Log().Fatal(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

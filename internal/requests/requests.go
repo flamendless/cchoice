@@ -7,6 +7,7 @@ import (
 	"sort"
 
 	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
@@ -27,11 +28,11 @@ func GetSettingsData(
 	keys []string,
 ) (map[string]string, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
-		logs.Log().Debug("cache hit", zap.ByteString("key", cacheKey))
+		logs.Log().Debug(constants.CacheHit, zap.ByteString("key", cacheKey))
 		buf := bytes.NewBuffer(data)
 		var res map[string]string
 		if err := gob.NewDecoder(buf).Decode(&res); err != nil {
-			logs.Log().Debug("cache miss", zap.ByteString("key", cacheKey))
+			logs.Log().Debug(constants.CacheMiss, zap.ByteString("key", cacheKey))
 			return nil, err
 		}
 		return res, nil
@@ -73,11 +74,11 @@ func GetCategoriesSidePanel(
 	params queries.GetProductCategoriesByPromotedParams,
 ) ([]models.CategorySidePanelText, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
-		logs.Log().Debug("cache hit", zap.ByteString("key", cacheKey))
+		logs.Log().Debug(constants.CacheHit, zap.ByteString("key", cacheKey))
 		buf := bytes.NewBuffer(data)
 		var res []models.CategorySidePanelText
 		if err := gob.NewDecoder(buf).Decode(&res); err != nil {
-			logs.Log().Debug("cache miss", zap.ByteString("key", cacheKey))
+			logs.Log().Debug(constants.CacheMiss, zap.ByteString("key", cacheKey))
 			return nil, err
 		}
 		return res, nil
@@ -130,11 +131,11 @@ func GetCategorySectionHandler(
 	limit int,
 ) ([]models.GroupedCategorySection, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
-		logs.Log().Debug("cache hit", zap.ByteString("key", cacheKey))
+		logs.Log().Debug(constants.CacheHit, zap.ByteString("key", cacheKey))
 		buf := bytes.NewBuffer(data)
 		var res []models.GroupedCategorySection
 		if err := gob.NewDecoder(buf).Decode(&res); err != nil {
-			logs.Log().Debug("cache miss", zap.ByteString("key", cacheKey))
+			logs.Log().Debug(constants.CacheMiss, zap.ByteString("key", cacheKey))
 			return nil, err
 		}
 		return res, nil

@@ -73,9 +73,14 @@ func (s *Server) RegisterRoutes() http.Handler {
 }
 
 func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Products Image Handler]"
 	path := r.URL.Query().Get("path")
 	if path == "" || !strings.HasPrefix(path, constants.PathProductImages) {
-		logs.Log().Debug("invalid image prefix", zap.String("path", path))
+		logs.Log().Debug(
+			logtag,
+			zap.Error(errs.ErrImagePrefix),
+			zap.String("path", path),
+		)
 		return
 	}
 
@@ -96,18 +101,18 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 	cacheKey := []byte(key)
 	if data, ok := s.cache.HasGet(nil, cacheKey); ok {
 		if err := components.Image(string(data)).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal("Product Image handler", zap.Error(err))
+			logs.Log().Fatal(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		logs.Log().Debug("cache hit", zap.ByteString("key", cacheKey))
+		logs.Log().Debug(constants.CacheHit, zap.ByteString("key", cacheKey))
 		return
 	} else {
-		logs.Log().Debug("cache miss", zap.ByteString("key", cacheKey))
+		logs.Log().Debug(constants.CacheMiss, zap.ByteString("key", cacheKey))
 	}
 
 	finalPath, ext, err := images.GetImagePathWithSize(path, size, isThumbnail)
 	if err != nil {
-		logs.Log().Fatal("Product Image handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -119,7 +124,7 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := components.Image(imgData).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal("Product Image handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -128,23 +133,25 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Index handler]"
 	if err := components.HomePage().Render(r.Context(), w); err != nil {
-		logs.Log().Fatal("Index handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
 func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Changelogs Handler]"
 	f, err := os.Open("./CHANGELOGS.md")
 	if err != nil {
-		logs.Log().Fatal("Changelogs handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer func() {
 		if err := f.Close(); err != nil {
-			logs.Log().Fatal("Changelogs handler", zap.Error(err))
+			logs.Log().Fatal(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -152,23 +159,29 @@ func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	if _, err := io.Copy(w, f); err != nil {
-		logs.Log().Fatal("Changelogs handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
 func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Health Handler]"
 	jsonResp, err := json.Marshal(s.dbRO.Health())
 	if err != nil {
-		logs.Log().Fatal("Health handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	_, _ = w.Write(jsonResp)
+	if _, err := w.Write(jsonResp); err != nil {
+		logs.Log().Fatal(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Header Texts Handler]"
 	settings, err := requests.GetSettingsData(
 		r.Context(),
 		s.cache,
@@ -178,7 +191,7 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		[]string{"email", "mobile_no"},
 	)
 	if err != nil {
-		logs.Log().Fatal("header texts handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -199,13 +212,14 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := components.HeaderRow1Texts(texts).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal("header texts handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
 func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Footer Texts Handler]"
 	settings, err := requests.GetSettingsData(
 		r.Context(),
 		s.cache,
@@ -215,7 +229,7 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		[]string{"mobile_no", "email", "url_gmap", "url_facebook", "url_tiktok"},
 	)
 	if err != nil {
-		logs.Log().Fatal("header texts handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -260,15 +274,16 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := components.FooterRow1Texts(texts).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal("footer texts handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
 func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Search Handler]"
 	if err := r.ParseForm(); err != nil {
-		logs.Log().Fatal("search handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -282,12 +297,12 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	)
 	if err != nil || len(products) == 0 {
-		logs.Log().Info("No search result by name", zap.String("query", search))
+		logs.Log().Info(logtag, zap.String("query", search))
 		return
 	}
 
 	logs.Log().Info(
-		"Search results",
+		logtag,
 		zap.Int("count", len(products)),
 		zap.Int("limit", constants.MaxSearchShowResults),
 		zap.String("query", search),
@@ -313,20 +328,21 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		product.ThumbnailData = imgData
 
 		if err := components.SearchResultProductCard(models.ToSearchResultProduct(s.encoder, product)).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal("search result product card", zap.Error(err))
+			logs.Log().Fatal(logtag, zap.Error(err))
 			return
 		}
 	}
 
 	if err := components.SearchMore(search).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal("search more component", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		return
 	}
 }
 
 func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Checkouts Handler]"
 	if err := r.ParseForm(); err != nil {
-		logs.Log().Fatal("checkout handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

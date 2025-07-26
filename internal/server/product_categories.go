@@ -10,6 +10,7 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/errs"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
@@ -26,6 +27,7 @@ func AddProductCategoriesHandlers(s *Server, r chi.Router) {
 }
 
 func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Categories Side Panel Handler]"
 	categories, err := requests.GetCategoriesSidePanel(
 		r.Context(),
 		s.cache,
@@ -38,19 +40,20 @@ func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Reque
 		},
 	)
 	if err != nil {
-		logs.Log().Fatal("categories side panel list handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if err := components.CategoriesSidePanelList(categories).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal("categories side panel list handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
 func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Categories Section Handler]"
 	page := 0
 	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
 		if parsed, err := strconv.Atoi(paramPage); err == nil {
@@ -76,36 +79,37 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 		limit,
 	)
 	if err != nil {
-		logs.Log().Fatal("category section handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if err := components.CategorySection(page, res).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal("category section list handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
 func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Category Products Handler]"
 	categoryID := chi.URLParam(r, "category_id")
 	if categoryID == "" {
-		logs.Log().Fatal("category products list handler")
-		http.Error(w, "Invalid url parameter", http.StatusBadRequest)
+		logs.Log().Fatal(logtag, zap.Error(errs.ErrInvalidParams))
+		http.Error(w,errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
 
 	categoryDBID := s.encoder.Decode(categoryID)
 	category, err := s.dbRO.GetQueries().GetProductCategoryByID(r.Context(), categoryDBID)
 	if err != nil {
-		logs.Log().Fatal("category section list handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if category.Category.String == "" {
 		logs.Log().Warn(
-			"category has no category value",
+			logtag,
 			zap.Int64("category id", category.ID),
 			zap.String("subcategory", category.Subcategory.String),
 		)
@@ -117,13 +121,13 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		Limit:      constants.DefaultLimitProducts,
 	})
 	if err != nil {
-		logs.Log().Fatal("category section list handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if len(products) == 0 {
 		logs.Log().Debug(
-			"category has no product",
+			logtag,
 			zap.Int64("category id", category.ID),
 			zap.String("category name", category.Category.String),
 		)
@@ -158,7 +162,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	if err := components.CategorySectionProducts(categorySectionProducts).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal("category section list handler", zap.Error(err))
+		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

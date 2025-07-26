@@ -51,7 +51,7 @@ buildgoose() {
 }
 
 customrun() {
-	go run ./main.go "${@:2}"
+	FSMODE="stubfs" go run ./main.go "${@:2}"
 }
 
 setup() {
@@ -225,11 +225,11 @@ sc() {
 }
 
 testall() {
-	go test ./... -failfast "${@:2}"
 	if [ -x "$(command -v golangci-lint)" ]; then
 		golangci-lint config verify
 		golangci-lint run
 	fi
+	go test ./... -failfast "${@:2}"
 }
 
 testsum() {
