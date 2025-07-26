@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"cchoice/cmd/web/static"
 	"cchoice/internal/errs"
 	"errors"
 	"fmt"
@@ -21,6 +22,7 @@ type appConfig struct {
 	PaymentService     string `env:"PAYMENT_SERVICE" env-required:""`
 	PayMongoAPIKey     string `env:"PAYMONGO_API_KEY"`
 	PayMongoSuccessURL string `env:"PAYMONGO_SUCCESS_URL"`
+	FSMode             string `env:"FSMODE" env-required:""`
 	EncodeSalt         string `env:"ENCODE_SALT" env-required:""`
 	LogMinLevel        int    `env:"LOG_MIN_LEVEL" env-default:"1"`
 	UseSSL             bool   `env:"USESSL"`
@@ -45,6 +47,17 @@ func mustValidate(c *appConfig) {
 	} else {
 		c.CertPath = fmt.Sprintf("/etc/letsencrypt/live/%s/fullchain.pem", c.Address)
 		c.KeyPath = fmt.Sprintf("/etc/letsencrypt/live/%s/privkey.pem", c.Address)
+	}
+
+	if c.FSMode != static.GetMode() {
+		panic(errors.Join(
+			errs.ErrFS,
+			fmt.Errorf(
+				"got FSMODE '%s' but mode compiled was '%s'",
+				c.FSMode,
+				static.GetMode(),
+			),
+		))
 	}
 }
 

@@ -49,7 +49,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 		}
 
 		s.fs = http.FS(fs)
-		r.Handle("/static/*", http.StripPrefix("/static/", static.Handler()))
+		r.Handle(
+			"/static/*",
+			http.StripPrefix("/static/", static.Handler()),
+		)
 
 		r.Get("/changelogs", s.changelogsHandler)
 		r.Get("/health", s.healthHandler)
