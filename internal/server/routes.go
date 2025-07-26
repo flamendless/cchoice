@@ -43,7 +43,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Route("/cchoice", func(r chi.Router) {
 		r.Use(middleware.StripPrefix("/cchoice"))
 
-		s.fs = http.FS(static.Files)
+		fs := static.GetFS()
+		if fs == nil {
+			panic(errors.Join(errs.ErrServerInit, errors.New("server.fs not setup")))
+		}
+
+		s.fs = http.FS(fs)
 		r.Handle("/static/*", http.StripPrefix("/static/", static.Handler()))
 
 		r.Get("/changelogs", s.changelogsHandler)
@@ -60,10 +65,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 		AddProductCategoriesHandlers(s, r)
 		AddCartsHandlers(s, r)
 	})
-
-	if s.fs == nil {
-		panic(errors.Join(errs.ErrServerInit, errors.New("server.fs not setup")))
-	}
 
 	return r
 }
