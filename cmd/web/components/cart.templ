@@ -3,6 +3,7 @@ package components
 import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/conf"
+	"cchoice/internal/constants"
 )
 
 templ AddToCart() {
@@ -151,9 +152,62 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 						</p>
 					}
 				</span>
-				<p class="text-sm text-gray-500">
-					Qty: { cl.Quantity }
-				</p>
+
+				<div class="flex items-center gap-2 my-1">
+					<button
+						id={ "btn-minus-" + cl.ID }
+						alt="decrease quantity button"
+						aria-label="Decrease quantity"
+						title="Decrease quantity"
+						class="p-1 border rounded disabled:opacity-40 group hover:bg-cchoice cursor-pointer disabled:cursor-not-allowed"
+						disabled?={ cl.Quantity <= 1 }
+						hx-patch={ "/cchoice/carts/lines/" + cl.ID + "?dec=1" }
+						hx-target="[name='qty']"
+						hx-swap="textContent"
+						_="
+							on htmx:afterRequest
+								put me.parentElement.querySelector('p[name=qty]').textContent into txtQty
+								put (txtQty is 'Qty: 1') into me.disabled
+							end
+						"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4 text-cchoice-600 group-hover:bg-cchoice"
+							fill="none" viewBox="0 0 24 24" stroke="currentColor"
+						>
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+						</svg>
+					</button>
+
+					<p name="qty" class="text-sm text-gray-500">
+						Qty: { cl.Quantity }
+					</p>
+
+					<button
+						alt="increase quantity button"
+						aria-label="Increase quantity"
+						title="Increase quantity"
+						class="p-1 border rounded disabled:opacity-40 group hover:bg-cchoice cursor-pointer disabled:cursor-not-allowed"
+						disabled?={ cl.Quantity >= constants.MaxCartLineQty }
+						hx-patch={ "/cchoice/carts/lines/" + cl.ID + "?inc=1" }
+						hx-target="[name='qty']"
+						hx-swap="textContent"
+						_="
+							on htmx:afterRequest
+								put me.parentElement.querySelector('p[name=qty]').textContent into txtQty
+								put (txtQty is 'Qty: 99') into me.disabled
+							end
+						"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4 text-cchoice-600 group-hover:bg-cchoice"
+							fill="none" viewBox="0 0 24 24" stroke="currentColor"
+						>
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+						</svg>
+					</button>
+				</div>
+
 				<p class="text-sm text-gray-700">Total: { cl.Total.Display() }</p>
 			</div>
 

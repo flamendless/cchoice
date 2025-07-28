@@ -57,6 +57,16 @@ INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 WHERE tbl_checkout_lines.checkout_id = ?;
 
+-- name: UpdateCheckoutLineQtyByID :one
+UPDATE tbl_checkout_lines SET quantity = quantity + ?
+WHERE id = ? AND quantity > 1 AND quantity < 99
+RETURNING quantity;
+
+-- name: CheckCheckoutLineExistsByCheckoutIDAndProductID :one
+SELECT EXISTS (
+	SELECT 1 FROM tbl_checkout_lines
+	WHERE checkout_id = ? AND product_id = ?
+);
 
 -- name: CreateCheckout :one
 INSERT INTO tbl_checkouts(
