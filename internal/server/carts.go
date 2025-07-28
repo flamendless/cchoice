@@ -8,6 +8,7 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/cart"
 	"cchoice/internal/constants"
+	"cchoice/internal/database/queries"
 	"cchoice/internal/errs"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
@@ -24,6 +25,7 @@ func AddCartsHandlers(s *Server, r chi.Router) {
 	r.Get("/carts/lines/count", s.getCartLinesCountHandler)
 	r.Post("/carts/lines", s.addProductToCartHandler)
 	r.Delete("/carts/lines/{checkoutline_id}", s.removeProductFromCartHandler)
+	r.Patch("/carts/lines/{checkoutline_id}", s.updateCartLinesQtyHandler)
 }
 
 func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -59,11 +61,7 @@ func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
 		checkoutlineProductIDs,
 	)
 	if err != nil || checkoutID == -1 {
-		logs.Log().Fatal(
-			logtag,
-			zap.Error(err),
-			zap.String("token", token),
-		)
+		logs.Log().Fatal(logtag, zap.Error(err), zap.String("token", token))
 		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
 			logs.Log().Fatal(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -83,11 +81,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 	token := s.sessionManager.Token(r.Context())
 	checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
 	if err != nil {
-		logs.Log().Warn(
-			logtag,
-			zap.Error(err),
-			zap.String("token", token),
-		)
+		logs.Log().Warn(logtag, zap.Error(err), zap.String("token", token))
 		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
 			logs.Log().Fatal(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -184,7 +178,7 @@ func (s *Server) addProductToCartHandler(w http.ResponseWriter, r *http.Request)
 }
 
 func (s *Server) removeProductFromCartHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Remove Product From Cart handler]"
+	const logtag = "[Remove Product From Cart Handler]"
 	checkoutLineID := chi.URLParam(r, "checkoutline_id")
 	dbCheckoutLineID := s.encoder.Decode(checkoutLineID)
 
@@ -283,5 +277,49 @@ func (s *Server) getCartLinesCountHandler(w http.ResponseWriter, r *http.Request
 	if _, err := w.Write(fmt.Appendf(nil, "%d", count)); err != nil {
 		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (s *Server) updateCartLinesQtyHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Update Cart Lines Qty Handler]"
+	checkoutLineID := chi.URLParam(r, "checkoutline_id")
+	dbCheckoutLineID := s.encoder.Decode(checkoutLineID)
+
+	qty := 0
+	if r.URL.Query().Get("dec") == "1" {
+		qty = -1
+	} else if r.URL.Query().Get("inc") == "1" {
+		qty = 1
+	}
+
+	if qty == 0 {
+		logs.Log().Fatal(
+			logtag,
+			zap.String("checkoutline id", checkoutLineID),
+			zap.Error(errs.ErrInvalidParams),
+		)
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+		return
+	}
+
+	newQty, _ := s.dbRW.GetQueries().UpdateCheckoutLineQtyByID(
+		r.Context(),
+		queries.UpdateCheckoutLineQtyByIDParams{
+			ID:       dbCheckoutLineID,
+			Quantity: int64(qty),
+		},
+	)
+	if newQty == 0 {
+		if r.URL.Query().Get("dec") == "1" {
+			newQty = 1
+		} else if r.URL.Query().Get("inc") == "1" {
+			newQty = constants.MaxCartLineQty
+		}
+	}
+
+	if _, err := w.Write(fmt.Appendf(nil, "Qty: %d", newQty)); err != nil {
+		logs.Log().Fatal(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }

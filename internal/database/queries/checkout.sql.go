@@ -10,6 +10,25 @@ import (
 	"time"
 )
 
+const checkCheckoutLineExistsByCheckoutIDAndProductID = `-- name: CheckCheckoutLineExistsByCheckoutIDAndProductID :one
+SELECT EXISTS (
+	SELECT 1 FROM tbl_checkout_lines
+	WHERE checkout_id = ? AND product_id = ?
+)
+`
+
+type CheckCheckoutLineExistsByCheckoutIDAndProductIDParams struct {
+	CheckoutID int64
+	ProductID  int64
+}
+
+func (q *Queries) CheckCheckoutLineExistsByCheckoutIDAndProductID(ctx context.Context, arg CheckCheckoutLineExistsByCheckoutIDAndProductIDParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, checkCheckoutLineExistsByCheckoutIDAndProductID, arg.CheckoutID, arg.ProductID)
+	var column_1 int64
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const countCheckoutLineByCheckoutID = `-- name: CountCheckoutLineByCheckoutID :one
 SELECT COUNT(*)
 FROM tbl_checkout_lines
@@ -308,4 +327,22 @@ func (q *Queries) GetCheckoutLinesByCheckoutID(ctx context.Context, checkoutID i
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateCheckoutLineQtyByID = `-- name: UpdateCheckoutLineQtyByID :one
+UPDATE tbl_checkout_lines SET quantity = quantity + ?
+WHERE id = ? AND quantity > 1 AND quantity < 99
+RETURNING quantity
+`
+
+type UpdateCheckoutLineQtyByIDParams struct {
+	Quantity int64
+	ID       int64
+}
+
+func (q *Queries) UpdateCheckoutLineQtyByID(ctx context.Context, arg UpdateCheckoutLineQtyByIDParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, updateCheckoutLineQtyByID, arg.Quantity, arg.ID)
+	var quantity int64
+	err := row.Scan(&quantity)
+	return quantity, err
 }
