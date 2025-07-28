@@ -46,7 +46,18 @@ func CreateCart(
 	created := 0
 	for productID, qty := range productIDsCount {
 		dbProductID := encode.Decode(productID)
-		_, err := dbq.CreateCheckoutLine(
+		exists, err := dbq.CheckCheckoutLineExistsByCheckoutIDAndProductID(
+			ctx,
+			queries.CheckCheckoutLineExistsByCheckoutIDAndProductIDParams{
+				CheckoutID: checkoutID,
+				ProductID: dbProductID,
+			},
+		)
+		if err != nil || exists == 1 {
+			continue
+		}
+
+		if _, err := dbq.CreateCheckoutLine(
 			ctx,
 			queries.CreateCheckoutLineParams{
 				CheckoutID: checkoutID,
@@ -60,8 +71,7 @@ func CreateCart(
 				Amount:      0,
 				Currency:    "",
 			},
-		)
-		if err != nil {
+		); err != nil {
 			logs.Log().Warn(
 				"Can't create checkoutline",
 				zap.Error(err),
