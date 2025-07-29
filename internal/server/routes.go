@@ -31,6 +31,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 	r.Use(middleware.NoCache)
+	r.Use(middleware.Compress(5))
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST"},
@@ -38,7 +39,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))
-	r.Use(middleware.Compress(5))
 
 	r.Route("/cchoice", func(r chi.Router) {
 		r.Use(middleware.StripPrefix("/cchoice"))

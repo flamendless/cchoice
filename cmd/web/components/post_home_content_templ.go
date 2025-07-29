@@ -229,7 +229,7 @@ func PostHomeContentSections() templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" loading=\"lazy\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" loading=\"lazy\" width=\"256\" height=\"256\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
