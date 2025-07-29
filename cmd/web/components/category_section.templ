@@ -42,6 +42,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 							src={ product.ThumbnailData }
 							title="show high-quality image"
 							alt={ product.Name + " thumbnail" }
+							loading="lazy"
 							data-product-id={ product.ProductID }
 							_="
 								on click
@@ -81,15 +82,16 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 					class="w-full ml-0.5 pr-6 border-cchoice_border"
 					hx-trigger="load once, history:restore"
 					hx-get={ "/cchoice/product-categories/" + subcategory.CategoryID + "/products" }
-					hx-select={ "#category-sections-" + subcategory.CategoryID }
 					hx-target={ "#category-sections-" + subcategory.CategoryID }
-					hx-swap="outerHTML"
+					hx-swap="innerHTML"
 				>
-					@CategorySectionProducts(models.CategorySectionProducts{
-						ID:          subcategory.CategoryID,
-						Category:    category.Label,
-						Subcategory: subcategory.Label,
-					})
+					<div id={ "category-sections-" + subcategory.CategoryID }>
+						@CategorySectionProducts(models.CategorySectionProducts{
+							ID:          subcategory.CategoryID,
+							Category:    category.Label,
+							Subcategory: subcategory.Label,
+						})
+					</div>
 				</div>
 			}
 		</div>
