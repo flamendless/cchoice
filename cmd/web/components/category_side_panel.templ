@@ -28,7 +28,11 @@ templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 
 templ CategoriesSidePanel() {
 	<div
-		class="sticky left-0 top-0 w-fit min-w-[15%] max-w-[20%] ml-0.5 pr-6 flex flex-col"
+		class="
+			fixed top-0 left-0 w-fit min-w-[15%] max-w-[15%] w-[15%]
+			ml-0.5 pr-6 flex flex-col
+			h-full overflow-auto pt-[128px]
+		"
 		hx-trigger="load once, history:restore"
 		hx-get="/cchoice/product-categories/side-panel/list"
 		hx-select="#categories-side-panel-list"

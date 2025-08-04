@@ -8,13 +8,20 @@ templ LogoWithText(width string, height string) {
 	@logoWithTextHandlerOnce.Once() {
 		<a
 			href="/cchoice"
-			class="-mt-8 -mb-4 ml-4 w-fit"
+			class="
+				w-fit flex items-center mb-4
+				md:-mt-8 md:-mb-4 md:ml-4
+			"
 		>
 			<img
 				src={ string(templ.URL("/cchoice/static/svg/logo_complete.svg")) }
 				alt="cchoice logo and text"
 				width={ width }
 				height={ height }
+				class="
+					h-[72px] w-auto object-contain
+					md:h-[96px] lg:h-[128px]
+				"
 			/>
 		</a>
 	}
@@ -25,7 +32,7 @@ templ SearchBar() {
 		<label for="search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
 		<div class="relative">
 			<div
-				class="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none"
+				class="hidden absolute inset-y-0 start-0 sm:flex items-center ps-2 pointer-events-none"
 				_="
 					on htmx:beforeRequest from #search
 						log 'search is triggered'
@@ -78,7 +85,11 @@ templ SearchBar() {
 				id="search"
 				name="search"
 				placeholder="Search by product name..."
-				class="block w-full p-3 ps-10 text-sm text-black border border-searchbar rounded-lg bg-searchbar focus:ring-cchoice focus:border-cchoice"
+				class="
+					block w-full p-3 ps-10 pe-12 text-sm text-black border border-searchbar rounded-lg bg-searchbar
+					focus:ring-cchoice focus:border-cchoice
+
+				"
 				hx-post="/cchoice/search"
 				hx-trigger="input[this.value.length >= 3] changed delay:1000ms, keyup[key=='Enter'], search[target.value.length >= 3]"
 				hx-validate="true"
@@ -99,6 +110,7 @@ templ SearchBar() {
 					end
 				"
 			/>
+
 			<button
 				id="btn-clear"
 				type="button"
@@ -117,9 +129,11 @@ templ SearchBar() {
 			>
 				x
 			</button>
+
 			<button
 				type="submit"
 				class="
+					flex items-center justify-center gap-1
 					text-white absolute end-2.5 bottom-2 bg-cchoice
 					font-medium rounded-lg text-sm px-2 py-1
 					hover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice transition-colors
@@ -128,8 +142,22 @@ templ SearchBar() {
 				aria-label="Search"
 				title="Search"
 			>
-				Search
+				<svg
+					class="w-5 h-5 lg:hidden"
+					aria-hidden="true"
+					xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"
+				>
+				<path
+					stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+					d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+				/>
+				</svg>
+
+				<span class="hidden lg:inline">
+					Search
+				</span>
 			</button>
+
 			@SearchResults()
 		</div>
 	</form>
@@ -188,11 +216,17 @@ templ HeaderRow1Texts(texts []models.HeaderRowText) {
 }
 
 templ Header() {
-	<header class="fixed top-0 left-0 pt-2 pb-1.5 w-full z-50 bg-white max-h-[128px] truncate overflow-visible">
-		<div class="w-full flex flex-col">
+	<header
+		class="
+			sticky top-0 left-0 pt-2 pb-1.5 w-full z-50 bg-white
+			max-h-none md:max-h-[128px]
+			truncate overflow-visible
+		"
+	>
+		<div class="w-full flex flex-col sm:flex-col md:flex-col">
 			<div
 				id="header-row1"
-				class="w-full flex flex-row"
+				class="w-full flex flex-row hidden sm:hidden md:hidden lg:flex"
 				hx-trigger="load once"
 				hx-get="/cchoice/settings/header-texts"
 				hx-select="#header-row1-texts"
@@ -201,7 +235,11 @@ templ Header() {
 			>
 				@HeaderRow1Texts(nil)
 			</div>
-			<div id="header-row2" class="w-full flex flex-row items-center">
+
+			<div
+				id="header-row2"
+				class="w-full flex flex-col items-center md:flex-row"
+			>
 				@LogoWithText("256", "128")
 				<div
 					id="search-wrapper"
@@ -225,6 +263,7 @@ templ Header() {
 				</div>
 			</div>
 		</div>
+
 		@HR()
 	</header>
 }

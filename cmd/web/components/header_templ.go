@@ -45,14 +45,14 @@ func LogoWithText(width string, height string) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<a href=\"/cchoice\" class=\"-mt-8 -mb-4 ml-4 w-fit\"><img src=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<a href=\"/cchoice\" class=\"\n\t\t\t\tw-fit flex items-center mb-4\n\t\t\t\tmd:-mt-8 md:-mb-4 md:ml-4\n\t\t\t\"><img src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL("/cchoice/static/svg/logo_complete.svg")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 14, Col: 68}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 17, Col: 68}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -65,7 +65,7 @@ func LogoWithText(width string, height string) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(width)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 16, Col: 17}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 19, Col: 17}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -78,13 +78,13 @@ func LogoWithText(width string, height string) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(height)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 17, Col: 19}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 20, Col: 19}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"></a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"\n\t\t\t\t\th-[72px] w-auto object-contain\n\t\t\t\t\tmd:h-[96px] lg:h-[128px]\n\t\t\t\t\"></a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -119,7 +119,7 @@ func SearchBar() templ.Component {
 			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form class=\"w-6/12\"><label for=\"search\" class=\"mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white\">Search</label><div class=\"relative\"><div class=\"absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none\" _=\"\n\t\t\t\t\ton htmx:beforeRequest from #search\n\t\t\t\t\t\tlog 'search is triggered'\n\t\t\t\t\t\tadd .hidden to #icon-search\n\t\t\t\t\t\tadd .hidden to #search-results\n\t\t\t\t\t\tremove .hidden from #icon-spinner-search\n\t\t\t\t\tend\n\n\t\t\t\t\ton htmx:afterRequest from #search\n\t\t\t\t\t\tlog 'search is done'\n\t\t\t\t\t\twait 0.25s\n\t\t\t\t\t\tremove .hidden from #icon-search\n\t\t\t\t\t\tremove .hidden from #search-results\n\t\t\t\t\t\tadd .hidden to #icon-spinner-search\n\t\t\t\t\tend\n\t\t\t\t\"><svg id=\"icon-search\" class=\"w-5 text-cchoice\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 20 20\"><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z\"></path></svg> <svg id=\"icon-spinner-search\" class=\"w-7 text-cchoice hidden\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\"><path fill=\"none\" stroke=\"#F6742F\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-dasharray=\"300 385\" stroke-dashoffset=\"0\" d=\"M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z\"><animate attributeName=\"stroke-dashoffset\" calcMode=\"spline\" dur=\"2\" values=\"685;-685\" keySplines=\"0 0 1 1\" repeatCount=\"indefinite\"></animate></path></svg></div><input required autocomplete=\"off\" type=\"search\" id=\"search\" name=\"search\" placeholder=\"Search by product name...\" class=\"block w-full p-3 ps-10 text-sm text-black border border-searchbar rounded-lg bg-searchbar focus:ring-cchoice focus:border-cchoice\" hx-post=\"/cchoice/search\" hx-trigger=\"input[this.value.length >= 3] changed delay:1000ms, keyup[key=='Enter'], search[target.value.length >= 3]\" hx-validate=\"true\" hx-include=\"#search\" hx-target=\"#search-results > ul\" hx-swap=\"innerHTML\" _=\"\n\t\t\t\t\ton input\n\t\t\t\t\t\tif my value == ''\n\t\t\t\t\t\t\tadd .hidden to #btn-clear\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tremove .hidden from #btn-clear\n\t\t\t\t\tend\n\n\t\t\t\t\ton focus\n\t\t\t\t\t\tif my value != '' and #search-results.children.length > 0\n\t\t\t\t\t\tthen remove .hidden from #search-results\n\t\t\t\t\tend\n\t\t\t\t\"> <button id=\"btn-clear\" type=\"button\" class=\"\n\t\t\t\t\thidden absolute end-[72px] bottom-2 text-base text-gray-400\n\t\t\t\t\thover:text-cchoice text-sm px-2 py-1\n\t\t\t\t\" aria-label=\"clear search\" title=\"clear search\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tset #search.value to ''\n\t\t\t\t\t\ttrigger input on #search\n\t\t\t\t\tend\n\t\t\t\t\">x</button> <button type=\"submit\" class=\"\n\t\t\t\t\ttext-white absolute end-2.5 bottom-2 bg-cchoice\n\t\t\t\t\tfont-medium rounded-lg text-sm px-2 py-1\n\t\t\t\t\thover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice transition-colors\n\t\t\t\t\" alt=\"search button\" aria-label=\"Search\" title=\"Search\">Search</button>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form class=\"w-6/12\"><label for=\"search\" class=\"mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white\">Search</label><div class=\"relative\"><div class=\"hidden absolute inset-y-0 start-0 sm:flex items-center ps-2 pointer-events-none\" _=\"\n\t\t\t\t\ton htmx:beforeRequest from #search\n\t\t\t\t\t\tlog 'search is triggered'\n\t\t\t\t\t\tadd .hidden to #icon-search\n\t\t\t\t\t\tadd .hidden to #search-results\n\t\t\t\t\t\tremove .hidden from #icon-spinner-search\n\t\t\t\t\tend\n\n\t\t\t\t\ton htmx:afterRequest from #search\n\t\t\t\t\t\tlog 'search is done'\n\t\t\t\t\t\twait 0.25s\n\t\t\t\t\t\tremove .hidden from #icon-search\n\t\t\t\t\t\tremove .hidden from #search-results\n\t\t\t\t\t\tadd .hidden to #icon-spinner-search\n\t\t\t\t\tend\n\t\t\t\t\"><svg id=\"icon-search\" class=\"w-5 text-cchoice\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 20 20\"><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z\"></path></svg> <svg id=\"icon-spinner-search\" class=\"w-7 text-cchoice hidden\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\"><path fill=\"none\" stroke=\"#F6742F\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-dasharray=\"300 385\" stroke-dashoffset=\"0\" d=\"M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z\"><animate attributeName=\"stroke-dashoffset\" calcMode=\"spline\" dur=\"2\" values=\"685;-685\" keySplines=\"0 0 1 1\" repeatCount=\"indefinite\"></animate></path></svg></div><input required autocomplete=\"off\" type=\"search\" id=\"search\" name=\"search\" placeholder=\"Search by product name...\" class=\"\n\t\t\t\t\tblock w-full p-3 ps-10 pe-12 text-sm text-black border border-searchbar rounded-lg bg-searchbar\n\t\t\t\t\tfocus:ring-cchoice focus:border-cchoice\n\n\t\t\t\t\" hx-post=\"/cchoice/search\" hx-trigger=\"input[this.value.length >= 3] changed delay:1000ms, keyup[key=='Enter'], search[target.value.length >= 3]\" hx-validate=\"true\" hx-include=\"#search\" hx-target=\"#search-results > ul\" hx-swap=\"innerHTML\" _=\"\n\t\t\t\t\ton input\n\t\t\t\t\t\tif my value == ''\n\t\t\t\t\t\t\tadd .hidden to #btn-clear\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tremove .hidden from #btn-clear\n\t\t\t\t\tend\n\n\t\t\t\t\ton focus\n\t\t\t\t\t\tif my value != '' and #search-results.children.length > 0\n\t\t\t\t\t\tthen remove .hidden from #search-results\n\t\t\t\t\tend\n\t\t\t\t\"> <button id=\"btn-clear\" type=\"button\" class=\"\n\t\t\t\t\thidden absolute end-[72px] bottom-2 text-base text-gray-400\n\t\t\t\t\thover:text-cchoice text-sm px-2 py-1\n\t\t\t\t\" aria-label=\"clear search\" title=\"clear search\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tset #search.value to ''\n\t\t\t\t\t\ttrigger input on #search\n\t\t\t\t\tend\n\t\t\t\t\">x</button> <button type=\"submit\" class=\"\n\t\t\t\t\tflex items-center justify-center gap-1\n\t\t\t\t\ttext-white absolute end-2.5 bottom-2 bg-cchoice\n\t\t\t\t\tfont-medium rounded-lg text-sm px-2 py-1\n\t\t\t\t\thover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice transition-colors\n\t\t\t\t\" alt=\"search button\" aria-label=\"Search\" title=\"Search\"><svg class=\"w-5 h-5 lg:hidden\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 20 20\"><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z\"></path></svg> <span class=\"hidden lg:inline\">Search</span></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -163,7 +163,7 @@ func CartCount(n int) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(n)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 146, Col: 5}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 174, Col: 5}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -251,7 +251,7 @@ func HeaderRow1Texts(texts []models.HeaderRowText) templ.Component {
 			var templ_7745c5c3_Var11 templ.SafeURL
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(hrt.URL))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 173, Col: 33}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 201, Col: 33}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -264,7 +264,7 @@ func HeaderRow1Texts(texts []models.HeaderRowText) templ.Component {
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(hrt.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 179, Col: 15}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/header.templ`, Line: 207, Col: 15}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -310,7 +310,7 @@ func Header() templ.Component {
 			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<header class=\"fixed top-0 left-0 pt-2 pb-1.5 w-full z-50 bg-white max-h-[128px] truncate overflow-visible\"><div class=\"w-full flex flex-col\"><div id=\"header-row1\" class=\"w-full flex flex-row\" hx-trigger=\"load once\" hx-get=\"/cchoice/settings/header-texts\" hx-select=\"#header-row1-texts\" hx-target=\"#header-row1-texts\" hx-swap=\"outerHTML\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<header class=\"\n\t\t\tsticky top-0 left-0 pt-2 pb-1.5 w-full z-50 bg-white\n\t\t\tmax-h-none md:max-h-[128px]\n\t\t\ttruncate overflow-visible\n\t\t\"><div class=\"w-full flex flex-col sm:flex-col md:flex-col\"><div id=\"header-row1\" class=\"w-full flex flex-row hidden sm:hidden md:hidden lg:flex\" hx-trigger=\"load once\" hx-get=\"/cchoice/settings/header-texts\" hx-select=\"#header-row1-texts\" hx-target=\"#header-row1-texts\" hx-swap=\"outerHTML\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -318,7 +318,7 @@ func Header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div><div id=\"header-row2\" class=\"w-full flex flex-row items-center\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div><div id=\"header-row2\" class=\"w-full flex flex-col items-center md:flex-row\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
