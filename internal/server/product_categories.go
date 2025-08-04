@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
@@ -134,8 +135,10 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	productsWithValidImages := make([]queries.GetProductsByCategoryIDRow, 0, len(products))
 	for i, product := range products {
-		if product.ThumbnailPath == constants.PathEmptyImage {
+		if strings.HasSuffix(product.ThumbnailPath, constants.EmptyImageFilename) {
+			logs.Log().Info("No valid image/thumbnail", zap.Int64("product id", product.ID))
 			continue
 		}
 
@@ -152,13 +155,14 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		}
 
 		products[i].ThumbnailData = imgData
+		productsWithValidImages = append(productsWithValidImages, products[i])
 	}
 
 	categorySectionProducts := models.CategorySectionProducts{
 		ID:          categoryID,
 		Category:    utils.SlugToTile(category.Category.String),
 		Subcategory: utils.SlugToTile(category.Subcategory.String),
-		Products:    models.ToCategorySectionProducts(s.encoder, products),
+		Products:    models.ToCategorySectionProducts(s.encoder, productsWithValidImages),
 	}
 
 	if err := components.CategorySectionProducts(categorySectionProducts).Render(r.Context(), w); err != nil {

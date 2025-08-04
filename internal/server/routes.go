@@ -309,7 +309,7 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	)
 
 	for _, product := range products {
-		if product.ThumbnailPath == constants.PathEmptyImage {
+		if strings.HasSuffix(product.ThumbnailPath, constants.EmptyImageFilename) {
 			continue
 		}
 

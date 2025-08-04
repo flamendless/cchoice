@@ -2,7 +2,6 @@ package components
 
 import (
 	"cchoice/cmd/web/models"
-	"cchoice/internal/constants"
 	"fmt"
 	"cchoice/internal/conf"
 )
@@ -25,35 +24,27 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 		<div class="flex flex-row flex-wrap">
 			for _, product := range data.Products {
 				<div class="group flex flex-col items-center m-2 ml-4 hover:bg-cchoicesoft transition-colors">
-					if product.ThumbnailPath == constants.PathEmptyImage {
-						<img
-							class="w-24 max-w-24 h-24"
-							src={ "/cchoice/" + constants.PathEmptyImage }
-							alt="empty placeholder image"
-						/>
-					} else {
-						<img
-							hx-get={ "/cchoice/products/image?thumbnail=1&size=1080x1080&path=" + product.ThumbnailPath }
-							hx-trigger="click"
-							hx-target="#modal_image_viewer .modal-content img"
-							hx-select="img"
-							hx-swap="outerHTML"
-							class="w-24 max-w-24 h-24 cursor-zoom-in"
-							src={ product.ThumbnailData }
-							title="show high-quality image"
-							alt={ product.Name + " thumbnail" }
-							loading="lazy"
-							data-product-id={ product.ProductID }
-							_="
-								on click
-									set #selected-product-id.value to my @data-product-id
-									log 'selected: ' + #selected-product-id.value
-									log 'product-id: ' + @data-product-id
-									trigger openModal on #modal_image_viewer
-								end
-							"
-						/>
-					}
+					<img
+						hx-get={ "/cchoice/products/image?thumbnail=1&size=1080x1080&path=" + product.ThumbnailPath }
+						hx-trigger="click"
+						hx-target="#modal_image_viewer .modal-content img"
+						hx-select="img"
+						hx-swap="outerHTML"
+						class="w-24 max-w-24 h-24 cursor-zoom-in"
+						src={ product.ThumbnailData }
+						title="show high-quality image"
+						alt={ product.Name + " thumbnail" }
+						loading="lazy"
+						data-product-id={ product.ProductID }
+						_="
+							on click
+								set #selected-product-id.value to my @data-product-id
+								log 'selected: ' + #selected-product-id.value
+								log 'product-id: ' + @data-product-id
+								trigger openModal on #modal_image_viewer
+							end
+						"
+					/>
 					<div
 						title={ product.Name }
 						class="cursor-pointer flex flex-col items-center"

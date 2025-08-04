@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
@@ -92,7 +93,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 
 	for _, checkoutLine := range checkoutLines {
 		var imgData string
-		if checkoutLine.ThumbnailPath != constants.PathEmptyImage {
+		if !strings.HasSuffix(checkoutLine.ThumbnailPath, constants.EmptyImageFilename) {
 			finalPath, ext, err := images.GetImagePathWithSize(
 				checkoutLine.ThumbnailPath,
 				constants.CartPageThumbnailSize,
