@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -20,7 +21,7 @@ import (
 
 func AddCartsHandlers(s *Server, r chi.Router) {
 	r.Get("/carts", s.cartsPageHandler)
-	r.Get("/carts/summary-bar", s.getCartSummaryBarHandler)
+	r.Get("/carts/summary", s.getCartSummaryHandler)
 	r.Get("/carts/lines", s.cartLinesHandler)
 	r.Get("/carts/lines/count", s.getCartLinesCountHandler)
 	r.Post("/carts/lines", s.addProductToCartHandler)
@@ -237,16 +238,19 @@ func (s *Server) removeProductFromCartHandler(w http.ResponseWriter, r *http.Req
 	w.WriteHeader(http.StatusOK)
 }
 
-func (s *Server) getCartSummaryBarHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Get Cart Summary Bar Handler]"
+func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Get Cart Summary Handler]"
 	data := r.URL.Query().Get("data")
-	if data == "" {
-		logs.Log().Fatal(logtag, zap.Error(errs.ErrInvalidParams))
+	switch data {
+	default:
+		logs.Log().Fatal(
+			logtag,
+			zap.Error(errs.ErrInvalidParams),
+			zap.String("data", data),
+		)
 		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
-		return
-	}
 
-	if data == "items" {
+	case "bar_items":
 		token := s.sessionManager.Token(r.Context())
 		checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
 		if err != nil {
@@ -264,6 +268,47 @@ func (s *Server) getCartSummaryBarHandler(w http.ResponseWriter, r *http.Request
 		if _, err := w.Write(fmt.Appendf(nil, "%d Items", count)); err != nil {
 			logs.Log().Fatal(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+	case "summary_total":
+		token := s.sessionManager.Token(r.Context())
+		checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
+		if err != nil {
+			if _, err := w.Write([]byte("0 Items")); err != nil {
+				logs.Log().Fatal(logtag, zap.Error(err))
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			return
+		}
+
+		var errs error
+		subtotal := utils.NewMoney(0, "PHP")
+		deliveryFee := utils.NewMoney(0, "PHP")
+		totalDiscounts := utils.NewMoney(0, "PHP")
+
+		for _, checkoutLine := range checkoutLines {
+			sub := utils.NewMoney(checkoutLine.UnitPriceWithVat, checkoutLine.UnitPriceWithVatCurrency).Multiply(checkoutLine.Quantity)
+
+			newSubtotal, err := subtotal.Add(sub)
+			if err != nil {
+				errs = errors.Join(errs, err)
+			}
+
+			subtotal = newSubtotal
+		}
+
+		total, _ := subtotal.Add(deliveryFee)
+		total, _ = total.Subtract(totalDiscounts)
+
+		errs = errors.Join(errs, components.CartSummaryRow("Subtotal", subtotal.Display(), "text-gray-500").Render(r.Context(), w))
+		errs = errors.Join(errs, components.CartSummaryRow("Total Discount", "- " + totalDiscounts.Display(), "text-red-500").Render(r.Context(), w))
+		errs = errors.Join(errs, components.CartSummaryRow("Delivery Fee", deliveryFee.Display(), "text-gray-500").Render(r.Context(), w))
+		errs = errors.Join(errs, components.HR().Render(r.Context(), w))
+		errs = errors.Join(errs, components.CartSummaryRow("Total", total.Display()).Render(r.Context(), w))
+
+		if errs != nil {
+			logs.Log().Fatal(logtag, zap.Error(errs))
+			http.Error(w, errs.Error(), http.StatusInternalServerError)
 		}
 	}
 }
