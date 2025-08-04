@@ -57,7 +57,7 @@ templ CartPageBody() {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
 		@ErrorBanner()
 		@Header()
-		<div class="flex flex-col items-center content-center pt-[128px] px-2 gap-4">
+		<div class="flex flex-col items-center content-center pt-[128px] px-2 pb-32 gap-4">
 			@CartSummaryBar()
 
 			<div class="flex w-screen gap-4 justify-center px-8">
@@ -68,6 +68,7 @@ templ CartPageBody() {
 					hx-trigger="load"
 					hx-swap="appendend"
 				>
+					//CartCheckoutLineItem
 				</div>
 
 				<div
@@ -75,11 +76,12 @@ templ CartPageBody() {
 				>
 					<div
 						id="cart-summary"
-						class="flex flex-col gap-1 border rounded h-auto p-2"
+						class="flex flex-col sticky top-[128px] gap-1 border rounded h-auto p-2"
 						hx-get="/cchoice/carts/summary?data=summary_total"
 						hx-trigger="load once, get"
 						hx-swap="appendend"
 					>
+						//CartSummaryRow
 					</div>
 				</div>
 			</div>

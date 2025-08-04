@@ -102,7 +102,7 @@ func CategoriesSidePanel() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"sticky left-0 top-0 w-fit max-w-[13%] ml-0.5 pr-6 flex flex-col\" hx-trigger=\"load once, history:restore\" hx-get=\"/cchoice/product-categories/side-panel/list\" hx-select=\"#categories-side-panel-list\" hx-target=\"#categories-side-panel-list\" hx-swap=\"outerHTML\"><p class=\"text-xs font-normal m-2 my-0 text-nowrap\">Choose a Category</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"sticky left-0 top-0 w-fit min-w-[15%] max-w-[20%] ml-0.5 pr-6 flex flex-col\" hx-trigger=\"load once, history:restore\" hx-get=\"/cchoice/product-categories/side-panel/list\" hx-select=\"#categories-side-panel-list\" hx-target=\"#categories-side-panel-list\" hx-swap=\"outerHTML\"><p class=\"text-xs font-normal m-2 my-0 text-nowrap\">Choose a Category</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
