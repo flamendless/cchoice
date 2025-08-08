@@ -41,7 +41,9 @@ func GetImagePathWithSize(
 	isThumbnail bool,
 ) (string, string, error) {
 	ext := filepath.Ext(path)
-	path = fmt.Sprintf("%s_%s%s", strings.TrimSuffix(path, ext), size, ext)
+	if size != "" {
+		path = fmt.Sprintf("%s_%s%s", strings.TrimSuffix(path, ext), size, ext)
+	}
 	if isThumbnail {
 		path = strings.Replace(path, "/images/", "/thumbnails/", 1)
 	}
