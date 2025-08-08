@@ -14,6 +14,7 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
+	"cchoice/internal/payments"
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -28,6 +29,8 @@ func AddCartsHandlers(s *Server, r chi.Router) {
 	r.Post("/carts/lines", s.addProductToCartHandler)
 	r.Delete("/carts/lines/{checkoutline_id}", s.removeProductFromCartHandler)
 	r.Patch("/carts/lines/{checkoutline_id}", s.updateCartLinesQtyHandler)
+	r.Get("/carts/payment-methods", s.cartsPaymentMethodsHandler)
+	r.Post("/carts/finalize", s.cartsFinalizeHandler)
 }
 
 func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -367,5 +370,47 @@ func (s *Server) updateCartLinesQtyHandler(w http.ResponseWriter, r *http.Reques
 		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+}
+
+func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Cart Finalize Handler]"
+	if err := r.ParseForm(); err != nil {
+		logs.Log().Fatal(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Cart Payment Methods Handler]"
+
+	var paymentMethods []payments.PaymentMethod
+
+	switch s.paymentGateway.GatewayEnum() {
+	case payments.PAYMENT_GATEWAY_PAYMONGO:
+		paymongoMethods, err := s.paymentGateway.GetAvailablePaymentMethods()
+		if err != nil {
+			logs.Log().Fatal(
+				logtag,
+				zap.String("gateway", s.paymentGateway.GatewayEnum().String()),
+				zap.Error(err),
+			)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		paymentMethods = paymongoMethods.ToPaymentMethods()
+	default:
+		err := errors.New("checkouts handler. Unimplemented payment gateway")
+		logs.Log().Fatal(err.Error(), zap.String("gateway", s.paymentGateway.GatewayEnum().String()))
+		http.Error(w, err.Error(), http.StatusNotImplemented)
+		return
+	}
+
+	for _, pm := range paymentMethods {
+		if err := components.CartPaymentMethod(pm, pm.GetImageData(s.cache, s.fs)).Render(r.Context(), w); err != nil {
+			logs.Log().Fatal(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }

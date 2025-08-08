@@ -1,10 +1,15 @@
 package payments
 
 import (
+	"cchoice/internal/images"
+	"cchoice/internal/logs"
 	"fmt"
+	"net/http"
 	"strings"
 
+	"github.com/VictoriaMetrics/fastcache"
 	"github.com/goccy/go-json"
+	"go.uber.org/zap"
 )
 
 //go:generate go tool stringer -type=PaymentMethod -trimprefix=PAYMENT_METHOD_
@@ -28,6 +33,28 @@ const (
 
 func (pm PaymentMethod) MarshalJSON() ([]byte, error) {
 	return json.Marshal(strings.ToLower(pm.String()))
+}
+
+func (pm PaymentMethod) GetImageData(cache *fastcache.Cache, fs http.FileSystem) string {
+	var imgURL string
+	switch pm {
+	case PAYMENT_METHOD_QRPH:
+		imgURL = "static/images/payments/qrph.png"
+	default:
+		panic("Unhandled payment method image")
+	}
+
+	finalPath, ext, err := images.GetImagePathWithSize(imgURL, "", false)
+	if err != nil {
+		logs.Log().Info("PaymentMethod image data", zap.Error(err))
+		return ""
+	}
+	imgDataB64, err := images.GetImageDataB64(cache, fs, finalPath, ext)
+	if err != nil {
+		logs.Log().Info("PaymentMethod image data", zap.Error(err))
+		return ""
+	}
+	return imgDataB64
 }
 
 func ParsePaymentMethodToEnum(pm string) PaymentMethod {

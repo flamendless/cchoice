@@ -5,6 +5,7 @@ import (
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"strings"
+	"cchoice/internal/payments"
 )
 
 templ AddToCart() {
@@ -83,6 +84,41 @@ templ CartPageBody() {
 					>
 						//CartSummaryRow
 					</div>
+
+					<div
+						id="cart-payments"
+						class="flex flex-col sticky top-[128px] gap-1 border rounded h-auto p-2"
+						hx-get="/cchoice/carts/payment-methods"
+						hx-trigger="load once, get"
+						hx-swap="appendend"
+					>
+						//CartPaymentMethod
+					</div>
+
+					<div
+						id="cart-proceed"
+						class="flex flex-col sticky top-[128px] gap-1 border rounded h-auto p-2"
+					>
+						<button
+							class="
+								flex justify-center items-center relative inline-block px-4 py-2 m-2
+								bg-cchoice font-medium rounded-lg cursor-pointer transition-colors
+								text-white rounded-full hover:bg-cchoicesoft
+							"
+							title="proceed to checkout"
+							alt="proceed to checkout button"
+							hx-post="/cchoice/carts/finalize"
+							hx-swap="none"
+							_="
+								on click
+									log 'Proceed to checkout'
+									call alert('TODO')
+								end
+							"
+						>
+							Proceed to checkout
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -94,6 +130,33 @@ templ CartSummaryRow(left string, right string, class ...string) {
 	<div class={ "flex flex-row flex-1 justify-between " + strings.Join(class, " ") }>
 		<h1>{ left }</h1>
 		<h1 class="text-right">{ right }</h1>
+	</div>
+}
+
+templ CartPaymentMethod(paymentMethod payments.PaymentMethod, imageData string) {
+	<div class="flex flex-row flex-wrap gap-4">
+		<label
+			class="
+				flex flex-col items-center p-4 border-2 border-gray-300
+				rounded-lg cursor-pointer transition-colors hover:border-cchoice hover:bg-cchoice/10
+				peer-checked:border-cchoice peer-checked:bg-cchoice/20
+			"
+		>
+			<input
+				type="radio"
+				class="hidden peer"
+				aria-label="Select payment method"
+				name="checked_payment_method"
+				value={ paymentMethod.String() }
+			/>
+			<img
+				class="w-16 h-16 object-contain mb-2"
+				title={ "image of " + paymentMethod.String() }
+				src={ imageData }
+				alt={ paymentMethod.String() + " thumbnail" }
+			/>
+			<h1 class="text-center text-sm">{ paymentMethod.String() }</h1>
+		</label>
 	</div>
 }
 
@@ -150,7 +213,7 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 				name="checked_item"
 				value={ cl.ID }
 				checked
-			>
+			/>
 			<img
 				class="m-2 w-32 max-w-32 h-32"
 				title={ "product image of " + cl.Name }
