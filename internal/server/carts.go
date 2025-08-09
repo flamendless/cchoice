@@ -351,19 +351,17 @@ func (s *Server) updateCartLinesQtyHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	newQty, _ := s.dbRW.GetQueries().UpdateCheckoutLineQtyByID(
+	newQty, err := s.dbRW.GetQueries().UpdateCheckoutLineQtyByID(
 		r.Context(),
 		queries.UpdateCheckoutLineQtyByIDParams{
 			ID:       dbCheckoutLineID,
 			Quantity: int64(qty),
 		},
 	)
-	if newQty == 0 {
-		if r.URL.Query().Get("dec") == "1" {
-			newQty = 1
-		} else if r.URL.Query().Get("inc") == "1" {
-			newQty = constants.MaxCartLineQty
-		}
+	if err != nil {
+		logs.Log().Fatal(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	if _, err := w.Write(fmt.Appendf(nil, "Qty: %d", newQty)); err != nil {
