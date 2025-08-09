@@ -58,8 +58,9 @@ LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 WHERE tbl_checkout_lines.checkout_id = ?;
 
 -- name: UpdateCheckoutLineQtyByID :one
-UPDATE tbl_checkout_lines SET quantity = quantity + ?
-WHERE id = ? AND quantity > 1 AND quantity < 99
+UPDATE tbl_checkout_lines
+SET quantity = MIN(99, MAX(1, quantity + ?))
+WHERE id = ?
 RETURNING quantity;
 
 -- name: CheckCheckoutLineExistsByCheckoutIDAndProductID :one

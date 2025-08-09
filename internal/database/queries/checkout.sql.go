@@ -330,8 +330,9 @@ func (q *Queries) GetCheckoutLinesByCheckoutID(ctx context.Context, checkoutID i
 }
 
 const updateCheckoutLineQtyByID = `-- name: UpdateCheckoutLineQtyByID :one
-UPDATE tbl_checkout_lines SET quantity = quantity + ?
-WHERE id = ? AND quantity > 1 AND quantity < 99
+UPDATE tbl_checkout_lines
+SET quantity = MIN(99, MAX(1, quantity + ?))
+WHERE id = ?
 RETURNING quantity
 `
 
