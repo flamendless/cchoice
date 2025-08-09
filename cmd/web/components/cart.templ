@@ -6,6 +6,7 @@ import (
 	"cchoice/internal/constants"
 	"strings"
 	"cchoice/internal/payments"
+	"fmt"
 )
 
 templ AddToCart() {
@@ -242,7 +243,7 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 					}
 				</span>
 
-				<div class="flex items-center gap-2 my-1">
+				<div class="cart-line flex items-center gap-2 my-1">
 					<button
 						id={ "btn-minus-" + cl.ID }
 						alt="decrease quantity button"
@@ -251,11 +252,11 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 						class="p-1 border rounded disabled:opacity-40 group hover:bg-cchoice cursor-pointer disabled:cursor-not-allowed"
 						disabled?={ cl.Quantity <= 1 }
 						hx-patch={ "/cchoice/carts/lines/" + cl.ID + "?dec=1" }
-						hx-target="[name='qty']"
+						hx-target={ fmt.Sprintf("[name=qty-%s]", cl.ID) }
 						hx-swap="textContent"
 						_="
 							on htmx:afterRequest
-								put me.parentElement.querySelector('p[name=qty]').textContent into txtQty
+								put me.closest('.cart-line').querySelector('[name=qty]').textContent into txtQty
 								put (txtQty is 'Qty: 1') into me.disabled
 								trigger get on #cart-summary
 							end
@@ -269,22 +270,26 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 						</svg>
 					</button>
 
-					<p name="qty" class="text-sm text-gray-500">
+					<p
+						name={ "qty-" + cl.ID }
+						class="text-sm text-gray-500"
+					>
 						Qty: { cl.Quantity }
 					</p>
 
 					<button
+						id={ "btn-plus-" + cl.ID }
 						alt="increase quantity button"
 						aria-label="Increase quantity"
 						title="Increase quantity"
 						class="p-1 border rounded disabled:opacity-40 group hover:bg-cchoice cursor-pointer disabled:cursor-not-allowed"
 						disabled?={ cl.Quantity >= constants.MaxCartLineQty }
 						hx-patch={ "/cchoice/carts/lines/" + cl.ID + "?inc=1" }
-						hx-target="[name='qty']"
+						hx-target={ fmt.Sprintf("[name=qty-%s]", cl.ID) }
 						hx-swap="textContent"
 						_="
 							on htmx:afterRequest
-								put me.parentElement.querySelector('p[name=qty]').textContent into txtQty
+								put me.closest('.cart-line').querySelector('[name=qty]').textContent into txtQty
 								put (txtQty is 'Qty: 99') into me.disabled
 								trigger get on #cart-summary
 							end
