@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 
 	"cchoice/cmd/web/components"
@@ -305,7 +306,7 @@ func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
 		total, _ = total.Subtract(totalDiscounts)
 
 		errs = errors.Join(errs, components.CartSummaryRow("Subtotal", subtotal.Display(), "text-gray-500").Render(r.Context(), w))
-		errs = errors.Join(errs, components.CartSummaryRow("Total Discount", "- " + totalDiscounts.Display(), "text-red-500").Render(r.Context(), w))
+		errs = errors.Join(errs, components.CartSummaryRow("Total Discount", "- "+totalDiscounts.Display(), "text-red-500").Render(r.Context(), w))
 		errs = errors.Join(errs, components.CartSummaryRow("Delivery Fee", deliveryFee.Display(), "text-gray-500").Render(r.Context(), w))
 		errs = errors.Join(errs, components.HR().Render(r.Context(), w))
 		errs = errors.Join(errs, components.CartSummaryRow("Total", total.Display()).Render(r.Context(), w))
@@ -383,11 +384,18 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Cart Payment Methods Handler]"
 
-	var paymentMethods []payments.PaymentMethod
+	cod, err := s.dbRO.GetQueries().GetSettingsCOD(r.Context())
+	paymentMethods := []models.AvailablePaymentMethod{
+		{
+			Value:     payments.PAYMENT_METHOD_COD,
+			Enabled:   (err == nil && cod),
+			ImageData: payments.PAYMENT_METHOD_COD.GetImageData(s.cache, s.fs),
+		},
+	}
 
 	switch s.paymentGateway.GatewayEnum() {
 	case payments.PAYMENT_GATEWAY_PAYMONGO:
-		paymongoMethods, err := s.paymentGateway.GetAvailablePaymentMethods()
+		availablePaymongoMethods, err := s.paymentGateway.GetAvailablePaymentMethods()
 		if err != nil {
 			logs.Log().Fatal(
 				logtag,
@@ -397,7 +405,17 @@ func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Reque
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		paymentMethods = paymongoMethods.ToPaymentMethods()
+
+		availablePaymentMethods := availablePaymongoMethods.ToPaymentMethods()
+		paymongoMethods := s.paymentGateway.GatewayEnum().GetAllPaymentMethods()
+		for _, pm := range paymongoMethods {
+			paymentMethods = append(paymentMethods, models.AvailablePaymentMethod{
+				Value:     pm,
+				Enabled:   slices.Contains(availablePaymentMethods, pm),
+				ImageData: pm.GetImageData(s.cache, s.fs),
+			})
+		}
+
 	default:
 		err := errors.New("checkouts handler. Unimplemented payment gateway")
 		logs.Log().Fatal(err.Error(), zap.String("gateway", s.paymentGateway.GatewayEnum().String()))
@@ -406,7 +424,7 @@ func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	for _, pm := range paymentMethods {
-		if err := components.CartPaymentMethod(pm, pm.GetImageData(s.cache, s.fs)).Render(r.Context(), w); err != nil {
+		if err := components.CartPaymentMethod(pm).Render(r.Context(), w); err != nil {
 			logs.Log().Fatal(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
