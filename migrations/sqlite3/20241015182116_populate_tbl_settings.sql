@@ -1,6 +1,6 @@
 
 -- +goose Up
-INSERT INTO tbl_settings (name, value)
+INSERT INTO tbl_settings(name, value)
 VALUES
 	('url_tiktok', 'https://www.tiktok.com/@cchoicesales?_t=8pPsHyIgtF4&_r=1'),
 	('url_facebook', 'https://www.facebook.com/profile.php?id=61553625688578&mibextid=ZbWKwL'),
