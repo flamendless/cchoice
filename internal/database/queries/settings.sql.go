@@ -51,3 +51,23 @@ func (q *Queries) GetSettingsByNames(ctx context.Context, name []string) ([]TblS
 	}
 	return items, nil
 }
+
+const getSettingsCOD = `-- name: GetSettingsCOD :one
+SELECT CAST(
+		CASE
+		WHEN value = 'true' then true
+		ELSE false
+		END
+		AS BOOLEAN
+	)
+FROM tbl_settings
+WHERE name = 'cash_on_delivery'
+LIMIT 1
+`
+
+func (q *Queries) GetSettingsCOD(ctx context.Context) (bool, error) {
+	row := q.db.QueryRowContext(ctx, getSettingsCOD)
+	var column_1 bool
+	err := row.Scan(&column_1)
+	return column_1, err
+}
