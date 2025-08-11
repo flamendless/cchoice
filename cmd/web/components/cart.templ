@@ -5,7 +5,6 @@ import (
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"strings"
-	"cchoice/internal/payments"
 	"fmt"
 )
 
@@ -74,11 +73,11 @@ templ CartPageBody() {
 				</div>
 
 				<div
-					class="flex flex-col gap-[8px] mx-4 w-1/3"
+					class="flex flex-col gap-[8px] mx-4 w-1/3 sticky top-[128px]"
 				>
 					<div
 						id="cart-summary"
-						class="flex flex-col sticky top-[128px] gap-1 border rounded h-auto p-2"
+						class="flex flex-col gap-1 border rounded h-auto p-2"
 						hx-get="/cchoice/carts/summary?data=summary_total"
 						hx-trigger="load once, get"
 						hx-swap="appendend"
@@ -88,7 +87,7 @@ templ CartPageBody() {
 
 					<div
 						id="cart-payments"
-						class="flex flex-col sticky top-[128px] gap-1 border rounded h-auto p-2"
+						class="flex flex-row flex-wrap justify-center gap-1 border rounded h-auto p-2"
 						hx-get="/cchoice/carts/payment-methods"
 						hx-trigger="load once, get"
 						hx-swap="appendend"
@@ -98,7 +97,7 @@ templ CartPageBody() {
 
 					<div
 						id="cart-proceed"
-						class="flex flex-col sticky top-[128px] gap-1 border rounded h-auto p-2"
+						class="flex flex-col gap-1 border rounded h-auto p-2"
 					>
 						<button
 							class="
@@ -134,29 +133,47 @@ templ CartSummaryRow(left string, right string, class ...string) {
 	</div>
 }
 
-templ CartPaymentMethod(paymentMethod payments.PaymentMethod, imageData string) {
+templ CartPaymentItem(paymentMethod models.AvailablePaymentMethod) {
+	<img
+		class="w-12 h-12 object-contain mb-1"
+		title={ "image of " + paymentMethod.Value.String() }
+		src={ paymentMethod.ImageData }
+		alt={ paymentMethod.Value.String() + " thumbnail" }
+	/>
+	<h1 class="text-center text-xs">{ paymentMethod.Value.GetDisplayText() }</h1>
+}
+
+templ CartPaymentMethod(paymentMethod models.AvailablePaymentMethod) {
 	<div class="flex flex-row flex-wrap gap-4">
-		<label
-			class="
-				flex flex-col items-center p-4 border-2 border-gray-300
-				rounded-lg cursor-pointer transition-colors hover:border-cchoice hover:bg-cchoice/10
-				peer-checked:border-cchoice peer-checked:bg-cchoice/20
-			"
-		>
+		<label>
 			<input
 				type="radio"
 				class="hidden peer"
 				aria-label="Select payment method"
 				name="checked_payment_method"
-				value={ paymentMethod.String() }
+				disabled
 			/>
-			<img
-				class="w-16 h-16 object-contain mb-2"
-				title={ "image of " + paymentMethod.String() }
-				src={ imageData }
-				alt={ paymentMethod.String() + " thumbnail" }
-			/>
-			<h1 class="text-center text-sm">{ paymentMethod.String() }</h1>
+			if paymentMethod.Enabled {
+				<div
+					class="
+						flex flex-col w-22 h-22 items-center justify-center p-2 border-2 border-gray-300
+						rounded-lg cursor-pointer transition-colors hover:border-cchoice hover:bg-cchoice/10
+						peer-checked:border-cchoice peer-checked:bg-cchoice/20
+					"
+				>
+					@CartPaymentItem(paymentMethod)
+				</div>
+			} else {
+				<div
+					class="
+						flex flex-col w-22 h-22 items-center justify-center p-4 rounded-lg
+						border-2 border-gray-200 cursor-not-allowed opacity-50
+						filter grayscale brightness-75
+					"
+				>
+					@CartPaymentItem(paymentMethod)
+				</div>
+			}
 		</label>
 	</div>
 }
