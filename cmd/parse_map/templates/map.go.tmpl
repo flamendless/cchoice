@@ -1,0 +1,25 @@
+package models
+
+import (
+	"cchoice/cmd/parse_map/enums"
+)
+
+var PhilippinesMap = []Map{
+{{- template "renderMaps" . }}
+}
+
+{{- define "renderMaps" }}
+{{- range . }}
+{
+	ID:       "{{ .ID }}",
+	Name:     "{{ .Name }}",
+	Code:     "{{ .Code }}",
+	Level:    enums.LEVEL_{{ .Level }},
+	{{- if .Contents }}
+	Contents: []*Map{
+		{{- template "renderMaps" .Contents }}
+	},
+	{{- end }}
+},
+{{- end }}
+{{- end }}
