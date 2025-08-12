@@ -73,6 +73,10 @@ genimages() {
 
 }
 
+genmaps() {
+	go run -tags="staticfs" ./main.go parse_map --filepath="./assets/xlsx/PSGC-2Q-2025-Publication-Datafile.xlsx" --json="true"
+}
+
 cleandb() {
 	local -; set -x;
 	echo "cleaning ${DBNAME}..."
@@ -88,7 +92,7 @@ cleandb() {
 	gensql
 	"${TMP}/goose" up
 
-	go run -tags="fts5" ./main.go parse_xlsx -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./cmd/web/static/images/product_images/bosch/" --images_format="webp"
+	go run -tags="fts5" -tags="staticfs" ./main.go parse_products -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./cmd/web/static/images/product_images/bosch/" --images_format="webp"
 
 }
 
@@ -278,11 +282,12 @@ if [ "$#" -eq 0 ]; then
 	echo "    genall"
 	echo "    genchlog"
 	echo "    genimages"
+	echo "    genmaps"
 	echo "    gensql"
 	echo "    gentempl"
 	echo "    prof"
-	echo "    serve"
 	echo "    sc"
+	echo "    serve"
 	echo "    setup"
 	echo "    testall"
 	echo "    testsum"

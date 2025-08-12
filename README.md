@@ -9,6 +9,7 @@
 - `./run.sh genall`
 - `./run.sh cleandb`
 - `./run.sh genimages`
+- `./run.sh genmaps`
 - `./run.sh testall`
 - `./run.sh benchmark`
 
