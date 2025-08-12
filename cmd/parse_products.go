@@ -15,38 +15,39 @@ import (
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 
-	"cchoice/cmd/parse_xlsx/models"
-	"cchoice/cmd/parse_xlsx/templates"
+	"cchoice/cmd/parse_products/models"
+	"cchoice/cmd/parse_products/templates"
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 )
 
-var parseXLSXFlags models.ParseXLSXFlags
+var parseProductsFlags models.ParseProductsFlags
 
 func init() {
-	f := cmdParseXLSX.Flags
-	f().StringVarP(&parseXLSXFlags.Template, "template", "t", "", "Template to use")
-	f().StringVarP(&parseXLSXFlags.Filepath, "filepath", "p", "", "Filepath to the XLSX file")
-	f().StringVarP(&parseXLSXFlags.Sheet, "sheet", "s", "", "Sheet name to use")
-	f().StringVarP(&parseXLSXFlags.DBPath, "db_path", "", ":memory:", "Path to database")
-	f().StringVarP(&parseXLSXFlags.ImagesBasePath, "images_basepath", "", "", "Base path to the images")
-	f().StringVarP(&parseXLSXFlags.ImagesFormat, "images_format", "", "webp", "Format of the images")
-	f().BoolVarP(&parseXLSXFlags.Strict, "strict", "x", false, "Panic upon first product error")
-	f().BoolVarP(&parseXLSXFlags.PrintProcessedProducts, "print_processed_products", "v", false, "Print processed products")
-	f().BoolVarP(&parseXLSXFlags.UseDB, "use_db", "", false, "Use DB to save processed data")
-	f().BoolVarP(&parseXLSXFlags.VerifyPrices, "verify_prices", "", true, "Verify prices processed and saved to DB")
-	f().BoolVarP(&parseXLSXFlags.PanicOnFirstDBError, "panic_on_error", "", false, "Whether to panic immediately on first DB error or not")
-	f().IntVarP(&parseXLSXFlags.Limit, "limit", "l", 0, "Limit number of rows to process")
+	f := cmdParseProducts.Flags
+	f().StringVarP(&parseProductsFlags.Template, "template", "t", "", "Template to use")
+	f().StringVarP(&parseProductsFlags.Filepath, "filepath", "p", "", "Filepath to the XLSX file")
+	f().StringVarP(&parseProductsFlags.Sheet, "sheet", "s", "", "Sheet name to use")
+	f().StringVarP(&parseProductsFlags.DBPath, "db_path", "", ":memory:", "Path to database")
+	f().StringVarP(&parseProductsFlags.ImagesBasePath, "images_basepath", "", "", "Base path to the images")
+	f().StringVarP(&parseProductsFlags.ImagesFormat, "images_format", "", "webp", "Format of the images")
+	f().BoolVarP(&parseProductsFlags.Strict, "strict", "x", false, "Panic upon first product error")
+	f().BoolVarP(&parseProductsFlags.PrintProcessedProducts, "print_processed_products", "v", false, "Print processed products")
+	f().BoolVarP(&parseProductsFlags.UseDB, "use_db", "", false, "Use DB to save processed data")
+	f().BoolVarP(&parseProductsFlags.VerifyPrices, "verify_prices", "", true, "Verify prices processed and saved to DB")
+	f().BoolVarP(&parseProductsFlags.PanicOnFirstDBError, "panic_on_error", "", false, "Whether to panic immediately on first DB error or not")
+	f().IntVarP(&parseProductsFlags.Limit, "limit", "l", 0, "Limit number of rows to process")
 
-	if err := cmdParseXLSX.MarkFlagRequired("template"); err != nil {
+	if err := cmdParseProducts.MarkFlagRequired("template"); err != nil {
 		panic(err)
 	}
-	if err := cmdParseXLSX.MarkFlagRequired("filepath"); err != nil {
+	if err := cmdParseProducts.MarkFlagRequired("filepath"); err != nil {
 		panic(err)
 	}
 
-	rootCmd.AddCommand(cmdParseXLSX)
+	rootCmd.AddCommand(cmdParseProducts)
 }
 
 func ProcessColumns(tpl *templates.Template, file *excelize.File) bool {
@@ -93,43 +94,41 @@ func ProcessColumns(tpl *templates.Template, file *excelize.File) bool {
 	return tpl.ValidateColumns()
 }
 
-var cmdParseXLSX = &cobra.Command{
-	Use:   "parse_xlsx",
-	Short: "Parse XLSX file",
+var cmdParseProducts = &cobra.Command{
+	Use:   "parse_products",
+	Short: "Parse products",
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.Log().Info(
-			"Parsing XLSX",
-			zap.String("template", parseXLSXFlags.Template),
-			zap.String("filepath", parseXLSXFlags.Filepath),
-			zap.String("sheet", parseXLSXFlags.Sheet),
-			zap.Bool("strict", parseXLSXFlags.Strict),
-			zap.Int("limit", parseXLSXFlags.Limit),
-			zap.String("images path", parseXLSXFlags.ImagesBasePath),
-			zap.String("images format", parseXLSXFlags.ImagesFormat),
+			"Parsing products",
+			zap.String("template", parseProductsFlags.Template),
+			zap.String("filepath", parseProductsFlags.Filepath),
+			zap.String("sheet", parseProductsFlags.Sheet),
+			zap.Bool("strict", parseProductsFlags.Strict),
+			zap.Int("limit", parseProductsFlags.Limit),
+			zap.String("images path", parseProductsFlags.ImagesBasePath),
+			zap.String("images format", parseProductsFlags.ImagesFormat),
 		)
 
-		templateKind := templates.ParseTemplateEnum(parseXLSXFlags.Template)
+		templateKind := templates.ParseTemplateEnum(parseProductsFlags.Template)
 		tpl := templates.CreateTemplate(templateKind)
 
-		file, err := excelize.OpenFile(parseXLSXFlags.Filepath)
+		file, err := excelize.OpenFile(parseProductsFlags.Filepath)
 		if err != nil {
-			logs.Log().Error(err.Error())
-			return
+			panic(err)
 		}
 		defer func() {
-			err = file.Close()
-			if err != nil {
+			if err := file.Close(); err != nil {
 				logs.Log().Error(err.Error())
 				return
 			}
 		}()
 
-		if parseXLSXFlags.Sheet == "" {
-			parseXLSXFlags.Sheet = file.GetSheetName(0)
+		if parseProductsFlags.Sheet == "" {
+			parseProductsFlags.Sheet = file.GetSheetName(0)
 		}
 
-		tpl.AppFlags = &parseXLSXFlags
-		tpl.CtxApp = &models.ParseXLSX{}
+		tpl.AppFlags = &parseProductsFlags
+		tpl.CtxApp = &models.ParseProducts{}
 		tpl.CtxApp.Metrics = &models.Metrics{}
 
 		startProcessColumns := time.Now()
@@ -139,14 +138,13 @@ var cmdParseXLSX = &cobra.Command{
 		}
 		tpl.CtxApp.Metrics.Add("process column time", time.Since(startProcessColumns))
 
-		rows, err := file.Rows(parseXLSXFlags.Sheet)
+		rows, err := file.Rows(parseProductsFlags.Sheet)
 		if err != nil {
 			logs.Log().Error(err.Error())
 			return
 		}
 		defer func() {
-			err := rows.Close()
-			if err != nil {
+			if err := rows.Close(); err != nil {
 				logs.Log().Error(err.Error())
 			}
 		}()
@@ -172,7 +170,7 @@ var cmdParseXLSX = &cobra.Command{
 		}()
 
 		logs.Log().Debug("Getting brand...")
-		brand := models.NewBrand(parseXLSXFlags.Template)
+		brand := models.NewBrand(parseProductsFlags.Template)
 		brandID := brand.GetDBID(cmd.Context(), tpl.CtxApp.DB)
 		if brandID == 0 {
 			brandID, err := brand.InsertToDB(cmd.Context(), tpl.CtxApp.DB)
@@ -182,7 +180,7 @@ var cmdParseXLSX = &cobra.Command{
 			now := time.Now().UTC()
 			brandImage := models.BrandImage{
 				BrandID:   brandID,
-				Path:      "static/images/brand_logos/" + parseXLSXFlags.Template + "." + parseXLSXFlags.ImagesFormat,
+				Path:      "static/images/brand_logos/" + parseProductsFlags.Template + "." + parseProductsFlags.ImagesFormat,
 				IsMain:    true,
 				CreatedAt: now,
 				UpdatedAt: now,
@@ -242,7 +240,7 @@ var cmdParseXLSX = &cobra.Command{
 							)
 
 							if tpl.AppFlags.PanicOnFirstDBError {
-								panic(1)
+								panic(errs.ParserPanic)
 							}
 						} else {
 							updatedIds = append(updatedIds, existingProductId)
@@ -260,7 +258,7 @@ var cmdParseXLSX = &cobra.Command{
 							)
 
 							if tpl.AppFlags.PanicOnFirstDBError {
-								panic(1)
+								panic(errs.ParserPanic)
 							}
 						} else {
 							insertedIds = append(insertedIds, productID)
@@ -275,7 +273,7 @@ var cmdParseXLSX = &cobra.Command{
 										zap.Error(err),
 									)
 									if tpl.AppFlags.PanicOnFirstDBError {
-										panic(1)
+										panic(errs.ParserPanic)
 									}
 								}
 								if err == nil {

@@ -2,12 +2,12 @@ package models
 
 import "cchoice/internal/database"
 
-type ParseXLSX struct {
+type ParseProducts struct {
 	DB      database.Service
 	Metrics *Metrics
 }
 
-type ParseXLSXFlags struct {
+type ParseProductsFlags struct {
 	Template               string
 	Filepath               string
 	Sheet                  string

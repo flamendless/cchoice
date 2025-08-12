@@ -1,7 +1,7 @@
 package templates
 
 import (
-	"cchoice/cmd/parse_xlsx/models"
+	"cchoice/cmd/parse_products/models"
 	"fmt"
 	"strings"
 
@@ -14,8 +14,8 @@ type Column struct {
 }
 
 type Template struct {
-	AppFlags *models.ParseXLSXFlags
-	CtxApp   *models.ParseXLSX
+	AppFlags *models.ParseProductsFlags
+	CtxApp   *models.ParseProducts
 	Brand    *models.Brand
 
 	Columns               map[string]*Column
