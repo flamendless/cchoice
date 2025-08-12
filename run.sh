@@ -36,8 +36,8 @@ serve() {
 build() {
 	local -; set -x;
 	genall
-	# go build -tags='fts5' -tags="embeddedfs" -o "${TMP}/main" .
-	go build -tags='fts5' -tags="staticfs" -o "${TMP}/main" .
+	# go build -tags="fts5 embeddedfs" -o "${TMP}/main" .
+	go build -tags="fts5 staticfs" -o "${TMP}/main" .
 }
 
 buildgoose() {
@@ -45,7 +45,7 @@ buildgoose() {
 	git submodule update --init --recursive
 	cd ./cmd/goose
 	go mod tidy
-	go build -tags='no_postgres no_mysql no_clickhouse no_mssql no_vertica no_ydb' -o "../../${TMP}/goose" ./cmd/goose
+	go build -tags="no_postgres no_mysql no_clickhouse no_mssql no_vertica no_ydb" -o "../../${TMP}/goose" ./cmd/goose
 	cd ../..
 	chmod +x "${TMP}/goose"
 }
@@ -67,9 +67,9 @@ setup() {
 }
 
 genimages() {
-	go run -tags=imageprocessing ./main.go thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/thumbnails/product_images/bosch" --format="webp" --width=96 --height=96
-	go run -tags=imageprocessing ./main.go thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/thumbnails/product_images/bosch" --format="webp" --width=1080 --height=1080
-	go run -tags=imageprocessing ./main.go convert_images --inpath="./cmd/web/static/images/brand_logos" --outpath="./cmd/web/static/images/brand_logos" --format="webp"
+	go run -tags="imageprocessing" ./main.go thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/thumbnails/product_images/bosch" --format="webp" --width=96 --height=96
+	go run -tags="imageprocessing" ./main.go thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/thumbnails/product_images/bosch" --format="webp" --width=1080 --height=1080
+	go run -tags="imageprocessing" ./main.go convert_images --inpath="./cmd/web/static/images/brand_logos" --outpath="./cmd/web/static/images/brand_logos" --format="webp"
 
 }
 
@@ -92,7 +92,7 @@ cleandb() {
 	gensql
 	"${TMP}/goose" up
 
-	go run -tags="fts5" -tags="staticfs" ./main.go parse_products -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./cmd/web/static/images/product_images/bosch/" --images_format="webp"
+	go run -tags="fts5 staticfs" ./main.go parse_products -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./cmd/web/static/images/product_images/bosch/" --images_format="webp"
 
 }
 
