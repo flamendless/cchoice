@@ -1,7 +1,7 @@
 package templates
 
 import (
-	"cchoice/cmd/parse_xlsx/models"
+	"cchoice/cmd/parse_products/models"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 

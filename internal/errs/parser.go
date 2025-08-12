@@ -8,6 +8,7 @@ import (
 type ParserErrorCode string
 
 const (
+	ParserPanic         ParserErrorCode = "PANIC"
 	ProductDiscontinued ParserErrorCode = "PRODUCT_DISCONTINUED"
 	BlankProductName    ParserErrorCode = "BLANK_PRODUCT_NAME"
 	CantCovert          ParserErrorCode = "CANT_CONVERT"
