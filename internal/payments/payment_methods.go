@@ -78,26 +78,26 @@ func (pm PaymentMethod) GetImageData(cache *fastcache.Cache, fs http.FileSystem)
 		imgURL += "cod.png"
 	case PAYMENT_METHOD_QRPH:
 		imgURL += "qrph.png"
-	case PAYMENT_METHOD_BILLEASE:
-		imgURL += "qrph.png"
-	case PAYMENT_METHOD_CARD:
-		imgURL += "qrph.png"
-	case PAYMENT_METHOD_DOB:
-		imgURL += "qrph.png"
+	// case PAYMENT_METHOD_BILLEASE:
+	// 	imgURL += "billease.svg"
+	// case PAYMENT_METHOD_CARD:
+	// 	imgURL += "qrph.png"
+	// case PAYMENT_METHOD_DOB:
+	// 	imgURL += "qrph.png"
 	case PAYMENT_METHOD_DOB_UBP:
-		imgURL += "qrph.png"
+		imgURL += "unionbank.png"
 	case PAYMENT_METHOD_BRANKAS_BDO:
-		imgURL += "qrph.png"
-	case PAYMENT_METHOD_BRANKAS_LANDBANK:
-		imgURL += "qrph.png"
-	case PAYMENT_METHOD_BRANKAS_METROBANK:
-		imgURL += "qrph.png"
+		imgURL += "bdo.png"
+	// case PAYMENT_METHOD_BRANKAS_LANDBANK:
+	// 	imgURL += "qrph.png"
+	// case PAYMENT_METHOD_BRANKAS_METROBANK:
+	// 	imgURL += "qrph.png"
 	case PAYMENT_METHOD_GCASH:
-		imgURL += "qrph.png"
-	case PAYMENT_METHOD_GRAB_PAY:
-		imgURL += "qrph.png"
+		imgURL += "gcash.png"
+	// case PAYMENT_METHOD_GRAB_PAY:
+	// 	imgURL += "qrph.png"
 	case PAYMENT_METHOD_PAYMAYA:
-		imgURL += "qrph.png"
+		imgURL += "maya.png"
 	default:
 		logs.Log().Warn("Unhandled payment method", zap.Any("pm", pm))
 		return ""

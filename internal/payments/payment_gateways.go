@@ -38,3 +38,13 @@ func (pg PaymentGateway) GetAllPaymentMethods() []PaymentMethod {
 		PAYMENT_METHOD_PAYMAYA,
 	}
 }
+
+func (pg PaymentGateway) GetPrioritizedPaymentMethods() []PaymentMethod {
+	return []PaymentMethod{
+		PAYMENT_METHOD_QRPH,
+		PAYMENT_METHOD_DOB_UBP,
+		PAYMENT_METHOD_BRANKAS_BDO,
+		PAYMENT_METHOD_GCASH,
+		PAYMENT_METHOD_PAYMAYA,
+	}
+}
