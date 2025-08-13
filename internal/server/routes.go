@@ -67,6 +67,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		AddProductCategoriesHandlers(s, r)
 		AddCartsHandlers(s, r)
+		AddShippingHandlers(s, r)
 	})
 
 	return r

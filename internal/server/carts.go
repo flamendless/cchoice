@@ -94,8 +94,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-
-	for _, checkoutLine := range checkoutLines {
+;	for _, checkoutLine := range checkoutLines {
 		var imgData string
 		if !strings.HasSuffix(checkoutLine.ThumbnailPath, constants.EmptyImageFilename) {
 			finalPath, ext, err := images.GetImagePathWithSize(
