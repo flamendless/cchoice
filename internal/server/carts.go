@@ -408,10 +408,15 @@ func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Reque
 
 		availablePaymentMethods := availablePaymongoMethods.ToPaymentMethods()
 		paymongoMethods := s.paymentGateway.GatewayEnum().GetAllPaymentMethods()
+		prioritizedPaymentMethods := s.paymentGateway.GatewayEnum().GetPrioritizedPaymentMethods()
 		for _, pm := range paymongoMethods {
+			enabled := slices.Contains(availablePaymentMethods, pm)
+			if !enabled && !slices.Contains(prioritizedPaymentMethods, pm) {
+				continue
+			}
 			paymentMethods = append(paymentMethods, models.AvailablePaymentMethod{
 				Value:     pm,
-				Enabled:   slices.Contains(availablePaymentMethods, pm),
+				Enabled:   enabled,
 				ImageData: pm.GetImageData(s.cache, s.fs),
 			})
 		}
