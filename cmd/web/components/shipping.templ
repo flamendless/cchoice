@@ -1,5 +1,100 @@
 package components
 
+templ MapOption(value string, name string) {
+	<option value={ value }>{ name }</option>
+}
+
+templ ProvinceSelect() {
+	<div class="flex flex-col">
+		<label for="province" class="mb-1 font-medium">Province</label>
+		<select
+			id="province"
+			name="province"
+			class="border rounded-lg p-2"
+			required
+			hx-get="/cchoice/shipping/address?data=provinces"
+			hx-trigger="load once"
+			hx-swap="beforeend"
+			_="
+				on change
+					if my value is not ''
+						trigger reset on #city
+						trigger get on #city
+
+						if #barangay's value is not ''
+							trigger reset on #barangay
+						end
+					else
+						set #city's value to ''
+						set #barangay's value to ''
+					end
+				end
+			"
+		>
+			<option value="">Select Province</option>
+		</select>
+	</div>
+}
+
+templ CitySelect() {
+	<div class="flex flex-col">
+		<label for="city" class="mb-1 font-medium">City / Municipality</label>
+		<select
+			id="city"
+			name="city"
+			class="border rounded-lg p-2"
+			required
+			hx-get="/cchoice/shipping/address?data=cities"
+			hx-trigger="change, get"
+			hx-include="#province"
+			hx-swap="beforeend"
+			_="
+				on reset
+					set my innerHTML to '<option>Select City/Municipality</option>'
+				end
+
+				on change
+					if my value is not ''
+						trigger reset on #barangay
+						trigger get on #barangay
+					else
+						set #barangay's value to ''
+					end
+				end
+			"
+		>
+			<option value="">Select City / Municipality</option>
+		</select>
+	</div>
+}
+
+templ BarangaySelect() {
+	<div class="flex flex-col">
+		<label for="barangay" class="mb-1 font-medium">Barangay</label>
+		<select
+			id="barangay"
+			name="barangay"
+			class="border rounded-lg p-2"
+			required
+			hx-get="/cchoice/shipping/address?data=barangays"
+			hx-trigger="change, get"
+			hx-include="#city"
+			hx-swap="beforeend"
+			_="
+				on reset
+					set my innerHTML to '<option>Select Barangay</option>'
+				end
+			"
+		>
+			<option value="">Select Barangay</option>
+		</select>
+	</div>
+}
+
 templ ShippingAddressSelect() {
-	<h1>hi</h1>
+	<div class="flex flex-col gap-2 w-full max-w-lg">
+		@ProvinceSelect()
+		@CitySelect()
+		@BarangaySelect()
+	</div>
 }

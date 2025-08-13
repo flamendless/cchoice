@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"go/format"
 	"os"
-	"sort"
 	"text/template"
 	"time"
 
@@ -44,15 +43,6 @@ func init() {
 		panic(err)
 	}
 	rootCmd.AddCommand(cmdParseMap)
-}
-
-func sortMap(m []*maps_models.Map) {
-	sort.Slice(m, func(i, j int) bool {
-		return m[i].Name < m[j].Name
-	})
-	for i := range m {
-		sortMap(m[i].Contents)
-	}
 }
 
 var cmdParseMap = &cobra.Command{
@@ -136,7 +126,7 @@ var cmdParseMap = &cobra.Command{
 				continue
 			}
 
-			for current != nil && current.Level >= level {
+			for current != nil && !isParentLevel(level, current.Level) {
 				current = current.Parent
 			}
 
@@ -163,7 +153,7 @@ var cmdParseMap = &cobra.Command{
 		dump.Println("Done parsing map data")
 
 		processTimeSort := time.Now()
-		sortMap(data)
+		maps_models.SortMap(data)
 		metrics.Add("sorting", time.Since(processTimeSort))
 
 		tmpl, err := template.ParseFiles("./cmd/parse_map/templates/map.go.tmpl")
@@ -195,4 +185,19 @@ var cmdParseMap = &cobra.Command{
 			}
 		}
 	},
+}
+
+func isParentLevel(child enums.Level, parent enums.Level) bool {
+	switch child {
+	case enums.LEVEL_REGION:
+		return parent == enums.LEVEL_UNDEFINED // root only
+	case enums.LEVEL_PROVINCE:
+		return parent == enums.LEVEL_REGION
+	case enums.LEVEL_CITY, enums.LEVEL_MUNICIPALITY:
+		return parent == enums.LEVEL_PROVINCE
+	case enums.LEVEL_BARANGAY:
+		return parent == enums.LEVEL_CITY || parent == enums.LEVEL_MUNICIPALITY
+	default:
+		return false
+	}
 }
