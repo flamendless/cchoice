@@ -5,4 +5,7 @@ const (
 	CartPageThumbnailSize = "1080x1080"
 	CacheHit              = "cache hit"
 	CacheMiss             = "cache miss"
+	CacheStore            = "cache store"
+	Singleflight          = "singleflight"
+	Gob                   = "gob"
 )

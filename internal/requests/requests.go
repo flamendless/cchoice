@@ -7,7 +7,6 @@ import (
 	"sort"
 
 	"cchoice/cmd/web/models"
-	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
@@ -28,14 +27,16 @@ func GetSettingsData(
 	keys []string,
 ) (map[string]string, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
-		logs.Log().Debug(constants.CacheHit, zap.ByteString("key", cacheKey))
 		buf := bytes.NewBuffer(data)
 		var res map[string]string
 		if err := gob.NewDecoder(buf).Decode(&res); err != nil {
-			logs.Log().Debug(constants.CacheMiss, zap.ByteString("key", cacheKey))
+			logs.GobError(cacheKey, err)
 			return nil, err
 		}
+		logs.CacheHit(cacheKey, len(res))
 		return res, nil
+	} else {
+		logs.CacheMiss(cacheKey)
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
@@ -48,7 +49,7 @@ func GetSettingsData(
 	if err != nil {
 		return nil, err
 	}
-	logs.Log().Debug("sf", zap.ByteString("key", cacheKey), zap.Bool("shared", shared))
+	logs.SF(cacheKey, shared)
 	res := sfRes.([]queries.TblSetting)
 
 	settings := make(map[string]string, len(res))
@@ -59,7 +60,7 @@ func GetSettingsData(
 	buf := new(bytes.Buffer)
 	if err := gob.NewEncoder(buf).Encode(settings); err == nil {
 		cache.Set(cacheKey, buf.Bytes())
-		logs.Log().Debug("stored data to cache", zap.ByteString("key", cacheKey))
+		logs.CacheStore(cacheKey, buf)
 	}
 
 	return settings, nil
@@ -74,14 +75,16 @@ func GetCategoriesSidePanel(
 	params queries.GetProductCategoriesByPromotedParams,
 ) ([]models.CategorySidePanelText, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
-		logs.Log().Debug(constants.CacheHit, zap.ByteString("key", cacheKey))
 		buf := bytes.NewBuffer(data)
 		var res []models.CategorySidePanelText
 		if err := gob.NewDecoder(buf).Decode(&res); err != nil {
-			logs.Log().Debug(constants.CacheMiss, zap.ByteString("key", cacheKey))
+			logs.GobError(cacheKey, err)
 			return nil, err
 		}
+		logs.CacheHit(cacheKey, len(res))
 		return res, nil
+	} else {
+		logs.CacheMiss(cacheKey)
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
@@ -94,7 +97,7 @@ func GetCategoriesSidePanel(
 	if err != nil {
 		return nil, err
 	}
-	logs.Log().Debug("sf", zap.ByteString("key", cacheKey), zap.Bool("shared", shared))
+	logs.SF(cacheKey, shared)
 	res := sfRes.([]queries.GetProductCategoriesByPromotedRow)
 
 	found := map[string]bool{}
@@ -114,7 +117,7 @@ func GetCategoriesSidePanel(
 	buf := new(bytes.Buffer)
 	if err := gob.NewEncoder(buf).Encode(categories); err == nil {
 		cache.Set(cacheKey, buf.Bytes())
-		logs.Log().Debug("stored data to cache", zap.ByteString("key", cacheKey))
+		logs.CacheStore(cacheKey, buf)
 	}
 
 	return categories, nil
@@ -131,14 +134,16 @@ func GetCategorySectionHandler(
 	limit int,
 ) ([]models.GroupedCategorySection, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
-		logs.Log().Debug(constants.CacheHit, zap.ByteString("key", cacheKey))
 		buf := bytes.NewBuffer(data)
 		var res []models.GroupedCategorySection
 		if err := gob.NewDecoder(buf).Decode(&res); err != nil {
-			logs.Log().Debug(constants.CacheMiss, zap.ByteString("key", cacheKey))
+			logs.GobError(cacheKey, err)
 			return nil, err
 		}
+		logs.CacheHit(cacheKey, len(res))
 		return res, nil
+	} else {
+		logs.CacheMiss(cacheKey)
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
@@ -157,7 +162,7 @@ func GetCategorySectionHandler(
 	if err != nil {
 		return nil, err
 	}
-	logs.Log().Debug("sf", zap.ByteString("key", cacheKey), zap.Bool("shared", shared))
+	logs.SF(cacheKey, shared)
 
 	res := sfRes.([]queries.GetProductCategoriesForSectionsPaginationRow)
 	categoriesSubcategories := map[string][]models.Subcategory{}
@@ -199,7 +204,7 @@ func GetCategorySectionHandler(
 	buf := new(bytes.Buffer)
 	if err := gob.NewEncoder(buf).Encode(categorySections); err == nil {
 		cache.Set(cacheKey, buf.Bytes())
-		logs.Log().Debug("stored data to cache", zap.ByteString("key", cacheKey))
+		logs.CacheStore(cacheKey, buf)
 	}
 
 	return categorySections, nil
