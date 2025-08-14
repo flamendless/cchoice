@@ -29,7 +29,7 @@ func traverseMap(m *Map, result *[]*Map, level enums.Level) {
 }
 
 func GetMapsByLevel(m []*Map, level enums.Level) []*Map {
-	var result []*Map
+	result := make([]*Map, 0, len(m))
 	for _, n := range m {
 		traverseMap(n, &result, level)
 	}

@@ -1,11 +1,11 @@
 package server
 
 import (
-	"cchoice/cmd/parse_map/enums"
 	"cchoice/cmd/parse_map/models"
 	"cchoice/cmd/web/components"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/requests"
 	"fmt"
 	"net/http"
 
@@ -24,7 +24,12 @@ func (s *Server) shippingAddressHandler(w http.ResponseWriter, r *http.Request) 
 	var maps []*models.Map
 	switch data {
 	case "provinces":
-		maps = models.GetMapsByLevel(models.PhilippinesMap, enums.LEVEL_PROVINCE)
+		cachedMaps, err := requests.GetProvinces(s.cache, &s.SF)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		maps = cachedMaps
 
 	case "cities":
 		province := r.URL.Query().Get("province")
@@ -33,13 +38,14 @@ func (s *Server) shippingAddressHandler(w http.ResponseWriter, r *http.Request) 
 			http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 			return
 		}
-		provinceMap := models.BinarySearchMapByName(models.PhilippinesMap, province, enums.LEVEL_PROVINCE)
-		if provinceMap == nil {
-			logs.Log().Fatal(logtag, zap.Error(errs.ErrInvalidParams))
-			http.Error(w, errs.ErrInvalidParams.Error(), http.StatusInternalServerError)
+
+		cachedMaps, err := requests.GetCitiesByProvince(s.cache, &s.SF, province)
+		if err != nil {
+			logs.Log().Fatal(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		maps = provinceMap.Contents
+		maps = cachedMaps
 		if err := components.MapOption("", "Select City/Municipality").Render(r.Context(), w); err != nil {
 			logs.Log().Fatal(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -53,16 +59,14 @@ func (s *Server) shippingAddressHandler(w http.ResponseWriter, r *http.Request) 
 			http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 			return
 		}
-		cityMap := models.BinarySearchMapByName(models.PhilippinesMap, city, enums.LEVEL_CITY)
-		if cityMap == nil {
-			cityMap = models.BinarySearchMapByName(models.PhilippinesMap, city, enums.LEVEL_MUNICIPALITY)
-			if cityMap == nil {
-				logs.Log().Fatal(logtag, zap.Error(errs.ErrInvalidParams))
-				http.Error(w, errs.ErrInvalidParams.Error(), http.StatusInternalServerError)
-				return
-			}
+
+		cachedMaps, err := requests.GetBarangaysByCity(s.cache, &s.SF, city)
+		if err != nil {
+			logs.Log().Fatal(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
-		maps = cityMap.Contents
+		maps = cachedMaps
 		if err := components.MapOption("", "Select Barangay").Render(r.Context(), w); err != nil {
 			logs.Log().Fatal(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)

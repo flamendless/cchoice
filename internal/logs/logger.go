@@ -3,6 +3,7 @@ package logs
 import (
 	"bytes"
 	"cchoice/internal/conf"
+	"cchoice/internal/constants"
 	"cchoice/internal/errs"
 	"errors"
 	"fmt"
@@ -84,4 +85,40 @@ func JSONResponse(id string, resp *http.Response) {
 	}
 
 	Log().Sugar().Info("Pretty JSON", zap.String("body", prettyBuf.String()))
+}
+
+func CacheMiss(key []byte) {
+	Log().Debug(constants.CacheMiss, zap.ByteString("key", key))
+}
+
+func CacheHit(key []byte, length int) {
+	Log().Debug(
+		constants.CacheHit,
+		zap.ByteString("key", key),
+		zap.Int("len", length),
+	)
+}
+
+func CacheStore(key []byte, buf *bytes.Buffer) {
+	Log().Debug(
+		constants.CacheStore,
+		zap.ByteString("key", key),
+		zap.Int("len", buf.Len()),
+	)
+}
+
+func GobError(key []byte, err error) {
+	Log().Debug(
+		constants.Gob,
+		zap.ByteString("key", key),
+		zap.Error(err),
+	)
+}
+
+func SF(key []byte, shared bool) {
+	Log().Debug(
+		constants.Singleflight,
+		zap.ByteString("key", key),
+		zap.Bool("shared", shared),
+	)
 }

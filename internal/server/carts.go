@@ -3,6 +3,7 @@ package server
 import (
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"slices"
 	"strings"
@@ -401,6 +402,10 @@ func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Reque
 				zap.String("gateway", s.paymentGateway.GatewayEnum().String()),
 				zap.Error(err),
 			)
+			var dnsErr *net.DNSError
+			if errors.As(err, &dnsErr) && dnsErr.Err == "no such host" {
+				return
+			}
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
