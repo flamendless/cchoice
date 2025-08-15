@@ -6,7 +6,7 @@ templ MapOption(value string, name string) {
 
 templ ProvinceSelect() {
 	<div class="flex flex-col">
-		<label for="province" class="mb-1 font-medium">Province</label>
+		<!-- <label for="province" class="mb-1 font-medium">Province</label> -->
 		<select
 			id="province"
 			name="province"
@@ -38,7 +38,7 @@ templ ProvinceSelect() {
 
 templ CitySelect() {
 	<div class="flex flex-col">
-		<label for="city" class="mb-1 font-medium">City / Municipality</label>
+		<!-- <label for="city" class="mb-1 font-medium">City / Municipality</label> -->
 		<select
 			id="city"
 			name="city"
@@ -50,7 +50,7 @@ templ CitySelect() {
 			hx-swap="beforeend"
 			_="
 				on reset
-					set my innerHTML to '<option>Select City/Municipality</option>'
+					set my innerHTML to '<option>Select City / Municipality</option>'
 				end
 
 				on change
@@ -70,7 +70,7 @@ templ CitySelect() {
 
 templ BarangaySelect() {
 	<div class="flex flex-col">
-		<label for="barangay" class="mb-1 font-medium">Barangay</label>
+		<!-- <label for="barangay" class="mb-1 font-medium">Barangay</label> -->
 		<select
 			id="barangay"
 			name="barangay"
@@ -93,6 +93,105 @@ templ BarangaySelect() {
 
 templ ShippingAddressSelect() {
 	<div class="flex flex-col gap-2 w-full max-w-lg">
+
+		<div>
+			<input
+				type="email"
+				name="email"
+				class="border rounded-lg p-2 w-full"
+				placeholder="E-Mail"
+				required
+				_="
+					on input
+						if my.validity.valid add .hidden to #email_warning
+						else remove .hidden from #email_warning
+						end
+					end
+				"
+			/>
+			<small id="email_warning" class="text-red-500 text-xs hidden">
+				Please enter a valid email address
+			</small>
+		</div>
+
+		<div class="flex flex-col">
+			<div class="flex">
+				<span
+					class="
+						flex items-center px-3 rounded-lg border border-r-0
+						bg-gray-100 text-gray-600
+					"
+				>
+					+63
+				</span>
+				<input
+					type="tel"
+					name="mobile_no"
+					class="border rounded-lg p-2 w-full"
+					placeholder="Mobile Number"
+					pattern="^[0-9]{10}$"
+					required
+					_="
+						on input
+							if my.validity.valid add .hidden to #mobile_no_warning
+							else remove .hidden from #mobile_no_warning
+							end
+						end
+					"
+				/>
+			</div>
+			<small id="mobile_no_warning" class="text-red-500 text-xs hidden">
+				Please enter a valid mobile number
+			</small>
+		</div>
+
+		<input
+			type="text"
+			name="address_line1"
+			class="border rounded-lg p-2 w-full"
+			placeholder="Address Line 1"
+			required
+		/>
+
+		<input
+			type="text"
+			name="address_line2"
+			class="border rounded-lg p-2 w-full"
+			placeholder="Address Line 2"
+			required
+		/>
+
+		<div>
+			<input
+				type="text"
+				name="postal"
+				class="border rounded-lg p-2 w-full"
+				placeholder="Postal Code"
+				pattern="^[0-9]{4}$"
+				required
+				_="
+					on input
+						if my.validity.valid add .hidden to #postal_warning
+						else remove .hidden from #postal_warning
+						end
+					end
+				"
+			/>
+			<small id="postal_warning" class="text-red-500 text-xs hidden">
+				Please enter a postal code (4 digits only)
+			</small>
+		</div>
+
+		<select
+			id="country"
+			name="country"
+			class="border rounded-lg p-2 cursor-not-allowed"
+			required
+			disabled
+		>
+			<option value="PH">Philippines</option>
+		</select>
+
 		@ProvinceSelect()
 		@CitySelect()
 		@BarangaySelect()
