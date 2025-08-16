@@ -46,7 +46,7 @@ func (s *Server) shippingAddressHandler(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 		maps = cachedMaps
-		if err := components.MapOption("", "Select City/Municipality").Render(r.Context(), w); err != nil {
+		if err := components.MapOption("", "Select City / Municipality").Render(r.Context(), w); err != nil {
 			logs.Log().Fatal(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
