@@ -99,18 +99,8 @@ templ CartPageBody() {
 						hx-trigger="load once, get"
 						hx-swap="beforeend"
 						hx-target="#payment-methods"
-						_="
-							on change
-								if <input[name='checked_payment_method']:checked/> exists then
-									remove @disabled from #btn-proceed
-								else
-									add @disabled to #btn-proceed
-								end
-							end
-						"
 					>
 						@CartSubcard("payment-methods", "Payment Method")
-						//CartPaymentMethod
 					</div>
 
 					<div
@@ -130,15 +120,6 @@ templ CartPageBody() {
 							hx-post="/cchoice/carts/finalize"
 							hx-swap="none"
 							disabled
-							_="
-								on click
-									if my @disabled then
-										call alert('Please select a payment method first')
-									else
-										call alert('TODO')
-									end
-								end
-							"
 						>
 							Proceed to checkout
 						</button>
@@ -147,6 +128,9 @@ templ CartPageBody() {
 			</div>
 		</div>
 		@Footer()
+
+		<script type="text/javascript" src={ string(templ.URL("/cchoice/static/js/cart.js")) }>
+		</script>
 	</body>
 }
 
