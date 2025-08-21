@@ -63,11 +63,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		r.Post("/search", s.searchHandler)
 
-		r.Post("/checkouts", s.checkoutsHandler)
-
 		AddProductCategoriesHandlers(s, r)
 		AddCartsHandlers(s, r)
 		AddShippingHandlers(s, r)
+
+		//INFO: (Brandon) - unused routes
+		r.Post("/checkouts", s.checkoutsHandler)
 	})
 
 	return r
@@ -350,11 +351,11 @@ func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch s.paymentGateway.GatewayEnum() {
 	case payments.PAYMENT_GATEWAY_PAYMONGO:
-		if err := s.paymentGateway.CheckoutPaymentHandler(w, r); err != nil {
-			logs.Log().Fatal("[PayMongo] Checkouts handler", zap.Error(err))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		// if err := s.paymentGateway.CheckoutPaymentHandler(w, r); err != nil {
+		// 	logs.Log().Fatal("[PayMongo] Checkouts handler", zap.Error(err))
+		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+		// 	return
+		// }
 	default:
 		err := errors.New("checkouts handler. Unimplemented payment gateway")
 		logs.Log().Fatal(err.Error(), zap.String("gateway", s.paymentGateway.GatewayEnum().String()))

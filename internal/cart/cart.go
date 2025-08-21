@@ -50,7 +50,7 @@ func CreateCart(
 			ctx,
 			queries.CheckCheckoutLineExistsByCheckoutIDAndProductIDParams{
 				CheckoutID: checkoutID,
-				ProductID: dbProductID,
+				ProductID:  dbProductID,
 			},
 		)
 		if err != nil || exists == 1 {
@@ -108,4 +108,25 @@ func GetCheckoutLines(
 	}
 
 	return checkoutLines, nil
+}
+
+func KeepItemsInCheckoutLines(
+	ctx context.Context,
+	dbRW database.Service,
+	token string,
+	checkoutLineIDs []int64,
+) error {
+	checkoutID, err := dbRW.GetQueries().GetCheckoutIDBySessionID(ctx, token)
+	if err != nil {
+		return err
+	}
+
+	if err := dbRW.GetQueries().RemoveItemInCheckoutLinesByID(ctx, queries.RemoveItemInCheckoutLinesByIDParams{
+		Ids:        checkoutLineIDs,
+		CheckoutID: checkoutID,
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }
