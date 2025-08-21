@@ -18,10 +18,10 @@ type CheckoutSessionAttributes struct {
 	ReferenceNumber    string              `json:"reference_number"`
 	Status             string              `json:"status"`
 	SuccessURL         string              `json:"success_url"`
-	PaymentIntent      PaymentIntent       `json:"payment_intent"`
 	LineItems          []payments.LineItem `json:"line_items"`
 	Payments           []Payments          `json:"payments"`
 	PaymentMethodTypes []string            `json:"payment_method_types"`
+	PaymentIntent      PaymentIntent       `json:"payment_intent"`
 	CreatedAt          int                 `json:"created_at"`
 	UpdatedAt          int                 `json:"updated_at"`
 	Livemode           bool                `json:"livemode"`

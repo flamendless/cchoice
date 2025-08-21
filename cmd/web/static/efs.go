@@ -1,4 +1,5 @@
 //go:build embeddedfs
+
 package static
 
 import (

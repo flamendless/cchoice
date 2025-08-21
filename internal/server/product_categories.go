@@ -96,7 +96,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 	categoryID := chi.URLParam(r, "category_id")
 	if categoryID == "" {
 		logs.Log().Fatal(logtag, zap.Error(errs.ErrInvalidParams))
-		http.Error(w,errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
 

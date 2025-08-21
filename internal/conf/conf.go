@@ -15,8 +15,6 @@ var once sync.Once
 
 type appConfig struct {
 	Address            string `env:"ADDRESS" env-required:""`
-	Port               int    `env:"PORT" env-required:""`
-	PortFS             int    `env:"PORT_FS" env-required:""`
 	AppEnv             string `env:"APP_ENV" env-required:""`
 	DBURL              string `env:"DB_URL" env-required:""`
 	PaymentService     string `env:"PAYMENT_SERVICE" env-required:""`
@@ -25,11 +23,13 @@ type appConfig struct {
 	PayMongoCancelURL  string `env:"PAYMONGO_CANCEL_URL"`
 	FSMode             string `env:"FSMODE" env-required:""`
 	EncodeSalt         string `env:"ENCODE_SALT" env-required:""`
+	CertPath           string `env:"CERTPATH"`
+	KeyPath            string `env:"KEYPATH"`
+	Port               int    `env:"PORT" env-required:""`
+	PortFS             int    `env:"PORT_FS" env-required:""`
 	LogMinLevel        int    `env:"LOG_MIN_LEVEL" env-default:"1"`
 	UseSSL             bool   `env:"USESSL"`
 	UseHTTP2           bool   `env:"USEHTTP2"`
-	CertPath           string `env:"CERTPATH"`
-	KeyPath            string `env:"KEYPATH"`
 }
 
 func mustValidate(c *appConfig) {

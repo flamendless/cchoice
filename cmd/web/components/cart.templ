@@ -4,8 +4,8 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
-	"strings"
 	"fmt"
+	"strings"
 )
 
 templ AddToCart() {
@@ -60,7 +60,6 @@ templ CartPageBody() {
 		@Header()
 		<div class="flex flex-col items-center content-center px-2 pb-32 gap-4">
 			@CartSummaryBar()
-
 			<form
 				id="checkout-form"
 				hx-post="/cchoice/carts/finalize"
@@ -76,7 +75,6 @@ templ CartPageBody() {
 					>
 						//CartCheckoutLineItem
 					</div>
-
 					<div
 						class="flex flex-col gap-[8px] mx-4 w-1/3 sticky top-[128px]"
 					>
@@ -89,14 +87,12 @@ templ CartPageBody() {
 						>
 							//CartSummaryRow
 						</div>
-
 						<div
 							id="cart-shipping"
 							class="flex flex-col gap-1 border rounded h-auto p-2"
 						>
 							@CartSubcard("shipping-address-select", "Shipping Information", ShippingAddressSelect())
 						</div>
-
 						<div
 							id="cart-payments"
 							class="flex flex-row flex-wrap justify-center gap-1 border rounded h-auto p-2"
@@ -107,7 +103,6 @@ templ CartPageBody() {
 						>
 							@CartSubcard("payment-methods", "Payment Method")
 						</div>
-
 						<div
 							id="cart-proceed"
 							class="flex flex-col gap-1 border rounded h-auto p-2"
@@ -133,7 +128,6 @@ templ CartPageBody() {
 			</form>
 		</div>
 		@Footer()
-
 		<script type="text/javascript" src={ string(templ.URL("/cchoice/static/js/cart.js")) }>
 		</script>
 	</body>
@@ -254,7 +248,6 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 				data-product-id={ cl.ProductID }
 			/>
 		</div>
-
 		<div class="flex flex-row grow">
 			<div class="flex-1">
 				<h2 class="text-base font-semibold">{ cl.Name }</h2>
@@ -273,7 +266,6 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 						</p>
 					}
 				</span>
-
 				<div class="cart-line flex items-center gap-2 my-1">
 					<button
 						id={ "btn-minus-" + cl.ID }
@@ -293,21 +285,22 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 							end
 						"
 					>
-						<svg xmlns="http://www.w3.org/2000/svg"
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
 							class="h-4 w-4 text-cchoice-600 group-hover:bg-cchoice"
-							fill="none" viewBox="0 0 24 24" stroke="currentColor"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
 						>
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
 						</svg>
 					</button>
-
 					<p
 						name={ "qty-" + cl.ID }
 						class="text-sm text-gray-500"
 					>
 						Qty: { cl.Quantity }
 					</p>
-
 					<button
 						id={ "btn-plus-" + cl.ID }
 						alt="increase quantity button"
@@ -326,18 +319,19 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 							end
 						"
 					>
-						<svg xmlns="http://www.w3.org/2000/svg"
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
 							class="h-4 w-4 text-cchoice-600 group-hover:bg-cchoice"
-							fill="none" viewBox="0 0 24 24" stroke="currentColor"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
 						>
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
 						</svg>
 					</button>
 				</div>
-
 				<p class="text-sm text-gray-700">Total: { cl.Total.Display() }</p>
 			</div>
-
 			<div class="place-content-end mr-2">
 				<button
 					alt="Remove item from cart button"
