@@ -22,6 +22,7 @@ type appConfig struct {
 	PaymentService     string `env:"PAYMENT_SERVICE" env-required:""`
 	PayMongoAPIKey     string `env:"PAYMONGO_API_KEY"`
 	PayMongoSuccessURL string `env:"PAYMONGO_SUCCESS_URL"`
+	PayMongoCancelURL  string `env:"PAYMONGO_CANCEL_URL"`
 	FSMode             string `env:"FSMODE" env-required:""`
 	EncodeSalt         string `env:"ENCODE_SALT" env-required:""`
 	LogMinLevel        int    `env:"LOG_MIN_LEVEL" env-default:"1"`
@@ -33,7 +34,7 @@ type appConfig struct {
 
 func mustValidate(c *appConfig) {
 	if c.PaymentService == "paymongo" {
-		if c.PayMongoAPIKey == "" || c.PayMongoSuccessURL == "" {
+		if c.PayMongoAPIKey == "" || c.PayMongoSuccessURL == "" || c.PayMongoCancelURL == "" {
 			panic(fmt.Errorf("[PayMongo]: %w", errs.ErrEnvVarRequired))
 		}
 	} else {

@@ -23,6 +23,15 @@ func ParsePaymentGatewayToEnum(pg string) PaymentGateway {
 	}
 }
 
+func (pg PaymentGateway) Code() string {
+	switch pg {
+	case PAYMENT_GATEWAY_PAYMONGO:
+		return "pm"
+	default:
+		return "px"
+	}
+}
+
 func (pg PaymentGateway) GetAllPaymentMethods() []PaymentMethod {
 	return []PaymentMethod{
 		PAYMENT_METHOD_QRPH,

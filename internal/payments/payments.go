@@ -21,5 +21,17 @@ type IPaymentGateway interface {
 	GetAuth() string
 	GetAvailablePaymentMethods() (GetAvailablePaymentMethodsResponse, error)
 	CreateCheckoutPaymentSession(CreateCheckoutSessionPayload) (CreateCheckoutSessionResponse, error)
-	CheckoutPaymentHandler(http.ResponseWriter, *http.Request) error
+	CheckoutPaymentHandler(
+		http.ResponseWriter,
+		*http.Request,
+		CreateCheckoutSessionPayload,
+	) error
+
+	GenerateRefNo() string
+
+	CreatePayload(
+		Billing,
+		[]LineItem,
+		[]PaymentMethod,
+	) CreateCheckoutSessionPayload
 }

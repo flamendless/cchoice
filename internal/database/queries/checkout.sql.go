@@ -7,10 +7,14 @@ package queries
 
 import (
 	"context"
+	"database/sql"
+	"strings"
 	"time"
 )
 
 const checkCheckoutLineExistsByCheckoutIDAndProductID = `-- name: CheckCheckoutLineExistsByCheckoutIDAndProductID :one
+;
+
 SELECT EXISTS (
 	SELECT 1 FROM tbl_checkout_lines
 	WHERE checkout_id = ? AND product_id = ?
@@ -267,6 +271,7 @@ SELECT
 	tbl_checkout_lines.product_id,
 	tbl_checkout_lines.quantity,
 	tbl_products.name as name,
+	tbl_products.description as description,
 	tbl_products.unit_price_with_vat,
 	tbl_products.unit_price_with_vat_currency,
 	tbl_brands.name as brand_name,
@@ -288,6 +293,7 @@ type GetCheckoutLinesByCheckoutIDRow struct {
 	ProductID                int64
 	Quantity                 int64
 	Name                     string
+	Description              sql.NullString
 	UnitPriceWithVat         int64
 	UnitPriceWithVatCurrency string
 	BrandName                string
@@ -310,6 +316,7 @@ func (q *Queries) GetCheckoutLinesByCheckoutID(ctx context.Context, checkoutID i
 			&i.ProductID,
 			&i.Quantity,
 			&i.Name,
+			&i.Description,
 			&i.UnitPriceWithVat,
 			&i.UnitPriceWithVatCurrency,
 			&i.BrandName,
@@ -327,6 +334,33 @@ func (q *Queries) GetCheckoutLinesByCheckoutID(ctx context.Context, checkoutID i
 		return nil, err
 	}
 	return items, nil
+}
+
+const removeItemInCheckoutLinesByID = `-- name: RemoveItemInCheckoutLinesByID :exec
+DELETE FROM tbl_checkout_lines
+WHERE checkout_id = ?
+	AND id NOT IN (/*SLICE:ids*/?)
+`
+
+type RemoveItemInCheckoutLinesByIDParams struct {
+	CheckoutID int64
+	Ids        []int64
+}
+
+func (q *Queries) RemoveItemInCheckoutLinesByID(ctx context.Context, arg RemoveItemInCheckoutLinesByIDParams) error {
+	query := removeItemInCheckoutLinesByID
+	var queryParams []interface{}
+	queryParams = append(queryParams, arg.CheckoutID)
+	if len(arg.Ids) > 0 {
+		for _, v := range arg.Ids {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:ids*/?", strings.Repeat(",?", len(arg.Ids))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:ids*/?", "NULL", 1)
+	}
+	_, err := q.db.ExecContext(ctx, query, queryParams...)
+	return err
 }
 
 const updateCheckoutLineQtyByID = `-- name: UpdateCheckoutLineQtyByID :one

@@ -43,6 +43,7 @@ SELECT
 	tbl_checkout_lines.product_id,
 	tbl_checkout_lines.quantity,
 	tbl_products.name as name,
+	tbl_products.description as description,
 	tbl_products.unit_price_with_vat,
 	tbl_products.unit_price_with_vat_currency,
 	tbl_brands.name as brand_name,
@@ -62,6 +63,12 @@ UPDATE tbl_checkout_lines
 SET quantity = MIN(99, MAX(1, quantity + ?))
 WHERE id = ?
 RETURNING quantity;
+
+-- name: RemoveItemInCheckoutLinesByID :exec
+DELETE FROM tbl_checkout_lines
+WHERE checkout_id = ?
+	AND id NOT IN (sqlc.slice('ids'))
+;
 
 -- name: CheckCheckoutLineExistsByCheckoutIDAndProductID :one
 SELECT EXISTS (

@@ -6,13 +6,16 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
+	"crypto/rand"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
+	"time"
 
-	"github.com/Rhymond/go-money"
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
 )
@@ -20,6 +23,7 @@ import (
 type PayMongo struct {
 	apiKey         string
 	successURL     string
+	cancelURL      string
 	paymentGateway payments.PaymentGateway
 }
 
@@ -30,11 +34,11 @@ func MustInit() *PayMongo {
 	}
 
 	apiKey := base64.StdEncoding.EncodeToString([]byte(cfg.PayMongoAPIKey))
-	successURL := cfg.PayMongoSuccessURL
 	return &PayMongo{
 		paymentGateway: payments.PAYMENT_GATEWAY_PAYMONGO,
 		apiKey:         apiKey,
-		successURL:     successURL,
+		successURL:     cfg.PayMongoSuccessURL,
+		cancelURL:      cfg.PayMongoCancelURL,
 	}
 }
 
@@ -49,11 +53,12 @@ func (p PayMongo) GetAuth() string {
 func (p PayMongo) CreateCheckoutPaymentSession(
 	payload payments.CreateCheckoutSessionPayload,
 ) (payments.CreateCheckoutSessionResponse, error) {
-	if _, ok := payload.(*CreateCheckoutSessionPayload); !ok {
+	paymongoPayload, ok := payload.(CreateCheckoutSessionPayload)
+	if !ok {
 		return nil, fmt.Errorf("%w. Not for PayMongo", errs.ErrPaymentPayload)
 	}
 
-	jsonPayload, err := json.Marshal(payload)
+	jsonPayload, err := json.Marshal(paymongoPayload)
 	if err != nil {
 		return nil, errors.Join(errs.ErrPaymentPayload, err)
 	}
@@ -122,52 +127,12 @@ func (p PayMongo) GetAvailablePaymentMethods() (payments.GetAvailablePaymentMeth
 	return &res, nil
 }
 
-func (p PayMongo) CheckoutPaymentHandler(w http.ResponseWriter, r *http.Request) error {
-	resPaymentMethods, err := p.GetAvailablePaymentMethods()
-	if err != nil {
-		return err
-	}
-
-	payload := CreateCheckoutSessionPayload{
-		Data: CreateCheckoutSessionData{
-			Attributes: CreateCheckoutSessionAttr{
-				CancelURL:  "https://test.com/cancel",
-				SuccessURL: p.successURL,
-				Billing: payments.Billing{
-					Address: payments.Address{
-						Line1:      "test line 1",
-						Line2:      "test line 2",
-						City:       "test city",
-						State:      "test state",
-						PostalCode: "test postal code",
-						Country:    "PH",
-					},
-					Name:  "test name",
-					Email: "test@mail.com",
-					Phone: "test phone",
-				},
-				LineItems: []payments.LineItem{
-					{
-						Amount:      1000,
-						Currency:    money.PHP,
-						Description: "test line item description",
-						Images:      []string{"https://test.com/image"},
-						Name:        "test line item name",
-						Quantity:    2,
-					},
-				},
-				Description:         "test description",
-				PaymentMethodTypes:  resPaymentMethods.ToPaymentMethods(),
-				ReferenceNumber:     "test-ref-number",
-				SendEmailReceipt:    false,
-				ShowDescription:     true,
-				ShowLineItems:       true,
-				StatementDescriptor: "test statement descriptor",
-			},
-		},
-	}
-
-	resCheckout, err := p.CreateCheckoutPaymentSession(&payload)
+func (p PayMongo) CheckoutPaymentHandler(
+	w http.ResponseWriter,
+	r *http.Request,
+	payload payments.CreateCheckoutSessionPayload,
+) error {
+	resCheckout, err := p.CreateCheckoutPaymentSession(payload)
 	if err != nil {
 		return err
 	}
@@ -176,6 +141,45 @@ func (p PayMongo) CheckoutPaymentHandler(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("HX-Redirect", resPayMongoCheckout.Data.Attributes.CheckoutURL)
 
 	return nil
+}
+
+func (p PayMongo) GenerateRefNo() string {
+	ts := time.Now().UTC().UnixNano()
+	tsEnc := strconv.FormatInt(ts, 36)
+
+	//INFO: (Brandon) - if we ever encounter duplication, increase precision by increasing number of bytes
+	b := make([]byte, 4)
+	if _, err := rand.Read(b); err != nil {
+		return fmt.Sprintf("%s_%s_%d", p.GatewayEnum().Code(), tsEnc, time.Now().UnixNano())
+	}
+
+	r := hex.EncodeToString(b)
+	return fmt.Sprintf("%s_%s_%s", p.GatewayEnum().Code(), tsEnc, r)
+}
+
+func (p PayMongo) CreatePayload(
+	billing payments.Billing,
+	lineItems []payments.LineItem,
+	paymentMethods []payments.PaymentMethod,
+) payments.CreateCheckoutSessionPayload {
+	payload := CreateCheckoutSessionPayload{
+		Data: CreateCheckoutSessionData{
+			Attributes: CreateCheckoutSessionAttr{
+				CancelURL:           p.cancelURL,
+				SuccessURL:          p.successURL,
+				Billing:             billing,
+				LineItems:           lineItems,
+				PaymentMethodTypes:  paymentMethods,
+				Description:         "C-Choice Checkout",
+				ReferenceNumber:     p.GenerateRefNo(),
+				SendEmailReceipt:    false,
+				ShowDescription:     true,
+				ShowLineItems:       true,
+				StatementDescriptor: "C-Choice Checkout Statement",
+			},
+		},
+	}
+	return payload
 }
 
 var _ payments.IPaymentGateway = (*PayMongo)(nil)

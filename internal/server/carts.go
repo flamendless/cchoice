@@ -19,6 +19,7 @@ import (
 	"cchoice/internal/payments"
 	"cchoice/internal/utils"
 
+	"github.com/Rhymond/go-money"
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
@@ -95,7 +96,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-;	for _, checkoutLine := range checkoutLines {
+	for _, checkoutLine := range checkoutLines {
 		var imgData string
 		if !strings.HasSuffix(checkoutLine.ThumbnailPath, constants.EmptyImageFilename) {
 			finalPath, ext, err := images.GetImagePathWithSize(
@@ -374,9 +375,65 @@ func (s *Server) updateCartLinesQtyHandler(w http.ResponseWriter, r *http.Reques
 
 func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Cart Finalize Handler]"
-	if err := r.ParseForm(); err != nil {
+	var cartCheckout cart.CartCheckout
+	if err := utils.FormToStruct(r, &cartCheckout); err != nil {
 		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	token := s.sessionManager.Token(r.Context())
+	if err := cart.KeepItemsInCheckoutLines(r.Context(), s.dbRW, token, cartCheckout.ToDBCheckoutIDs(s.encoder)); err != nil {
+		logs.Log().Fatal(logtag, zap.Error(err), zap.String("token", token), zap.Any("form", cartCheckout))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
+	if err != nil {
+		logs.Log().Fatal(logtag, zap.Error(err), zap.String("token", token))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	switch s.paymentGateway.GatewayEnum() {
+	case payments.PAYMENT_GATEWAY_PAYMONGO:
+		paymentMethods := []payments.PaymentMethod{payments.ParsePaymentMethodToEnum(cartCheckout.PaymentMethod)}
+		billing := payments.Billing{
+			Address: payments.Address{
+				Line1:      cartCheckout.AddressLine1,
+				Line2:      cartCheckout.AddressLine2,
+				City:       cartCheckout.City,
+				State:      cartCheckout.Province,
+				PostalCode: cartCheckout.Postal,
+				Country:    "PH",
+			},
+			Name:  cartCheckout.Email,
+			Email: cartCheckout.Email,
+			Phone: cartCheckout.MobileNo,
+		}
+		lineItems := make([]payments.LineItem, 0, len(cartCheckout.CheckoutIDs))
+		for _, checkoutLine := range checkoutLines {
+			lineItems = append(lineItems, payments.LineItem{
+				Amount:      int32(checkoutLine.UnitPriceWithVat),
+				Currency:    money.PHP,
+				Description: checkoutLine.Description.String,
+				Images:      []string{checkoutLine.ThumbnailPath},
+				Name:        checkoutLine.Name,
+				Quantity:    int32(checkoutLine.Quantity),
+			})
+		}
+
+		payload := s.paymentGateway.CreatePayload(billing, lineItems, paymentMethods)
+		if err := s.paymentGateway.CheckoutPaymentHandler(w, r, payload); err != nil {
+			logs.Log().Fatal(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	default:
+		err := fmt.Errorf("%s. Unimplemented payment gateway", logtag)
+		logs.Log().Fatal(err.Error(), zap.String("gateway", s.paymentGateway.GatewayEnum().String()))
+		http.Error(w, err.Error(), http.StatusNotImplemented)
 		return
 	}
 }
