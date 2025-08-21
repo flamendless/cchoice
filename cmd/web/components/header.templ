@@ -110,7 +110,6 @@ templ SearchBar() {
 					end
 				"
 			/>
-
 			<button
 				id="btn-clear"
 				type="button"
@@ -129,7 +128,6 @@ templ SearchBar() {
 			>
 				x
 			</button>
-
 			<button
 				type="submit"
 				class="
@@ -145,19 +143,22 @@ templ SearchBar() {
 				<svg
 					class="w-5 h-5 lg:hidden"
 					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 20 20"
 				>
-				<path
-					stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-					d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-				/>
+					<path
+						stroke="currentColor"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+					></path>
 				</svg>
-
 				<span class="hidden lg:inline">
 					Search
 				</span>
 			</button>
-
 			@SearchResults()
 		</div>
 	</form>
@@ -235,7 +236,6 @@ templ Header() {
 			>
 				@HeaderRow1Texts(nil)
 			</div>
-
 			<div
 				id="header-row2"
 				class="w-full flex flex-col items-center md:flex-row"
@@ -263,7 +263,6 @@ templ Header() {
 				</div>
 			</div>
 		</div>
-
 		@HR()
 	</header>
 }

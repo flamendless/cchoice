@@ -12,8 +12,8 @@ import (
 )
 
 type Sqids struct {
-	name  string
 	sqids *sg.Sqids
+	name  string
 }
 
 func MustSqids() *Sqids {

@@ -7,12 +7,12 @@ import (
 )
 
 type Map struct {
+	Parent   *Map        `json:"-"`
 	ID       string      `json:"id"`
 	Name     string      `json:"name"`
 	Code     string      `json:"code"`
-	Level    enums.Level `json:"level"`
 	Contents []*Map      `json:"contents"`
-	Parent   *Map        `json:"-"`
+	Level    enums.Level `json:"level"`
 }
 
 func (m *Map) Stringer() string {
@@ -81,4 +81,3 @@ func SortMap(m []*Map) {
 		SortMap(m[i].Contents)
 	}
 }
-

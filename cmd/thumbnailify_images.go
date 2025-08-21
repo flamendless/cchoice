@@ -1,4 +1,5 @@
 //go:build imageprocessing
+
 package cmd
 
 import (

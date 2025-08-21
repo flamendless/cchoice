@@ -5,7 +5,7 @@ import "cchoice/internal/constants"
 import "cchoice/internal/conf"
 
 var (
-	onceHeadLinks    = templ.NewOnceHandle()
+	onceHeadLinks = templ.NewOnceHandle()
 )
 
 templ TabTitle(page string) {
@@ -54,7 +54,6 @@ templ HeadMeta() {
 	/>
 	<meta name="twitter:card" content="summary"/>
 	<meta charset="UTF-8"/>
-
 	@onceHeadLinks.Once() {
 		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href="/cchoice/static/images/favicons/favicon.ico"/>
 		<link rel="icon" type="image/png" sizes="114x114" href="/cchoice/static/images/favicons/114x114.png"/>
@@ -64,7 +63,6 @@ templ HeadMeta() {
 		<link rel="icon" type="image/png" sizes="180x180" href="/cchoice/static/images/favicons/180x180.png"/>
 		<link rel="icon" type="image/png" sizes="192x192" href="/cchoice/static/images/favicons/192x192.png"/>
 		<link href="/cchoice/static/css/tailwind.css" rel="stylesheet"/>
-
 		<script type="text/javascript" src={ string(templ.URL("/cchoice/static/js/htmx.min.js")) }></script>
 		<script async type="text/javascript" src={ string(templ.URL("/cchoice/static/js/hyperscript.min.js")) }></script>
 		<script>

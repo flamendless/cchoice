@@ -113,7 +113,8 @@ templ warning(text string) {
 }
 
 templ divInputWarning() {
-	<div class="flex flex-col gap-1">{ children... }</div>
+	<div class="flex flex-col gap-1">{ children... }
+</div>
 }
 
 templ ShippingAddressSelect() {
@@ -122,27 +123,22 @@ templ ShippingAddressSelect() {
 			@input("email", "email", "E-Mail")
 			@warning("Please enter a valid email address")
 		}
-
 		@divInputWarning() {
 			@input("tel", "mobile_no", "Mobile Number (+63)", "^\\+63[0-9]{10}$")
 			@warning("Please enter a valid mobile number")
 		}
-
 		@divInputWarning() {
 			@input("text", "address_line1", "Address Line 1")
 			@warning("Please enter a valid address line")
 		}
-
 		@divInputWarning() {
 			@input("text", "address_line2", "Address Line 2")
 			@warning("Please enter a valid address line")
 		}
-
 		@divInputWarning() {
 			@input("text", "postal", "Postal code", "^[0-9]{4}$")
 			@warning("Please enter a valid postal code (4 digits only)")
 		}
-
 		<div class="flex flex-col">
 			<select
 				id="country"
@@ -154,7 +150,6 @@ templ ShippingAddressSelect() {
 				<option value="PH">Philippines</option>
 			</select>
 		</div>
-
 		@ProvinceSelect()
 		@CitySelect()
 		@BarangaySelect()
