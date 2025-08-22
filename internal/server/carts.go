@@ -321,11 +321,15 @@ func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) getCartLinesCountHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Get Cart Lines Count Handler]"
-	count := 0
+	set := map[string]bool{}
 	if productIDs, ok := s.sessionManager.Get(r.Context(), skCheckoutLineProductIDs).([]string); ok {
-		count = len(productIDs)
+		for _, productID := range productIDs {
+			if _, exists := set[productID]; !exists {
+				set[productID] = true
+			}
+		}
 	}
-	if _, err := w.Write(fmt.Appendf(nil, "%d", count)); err != nil {
+	if _, err := w.Write(fmt.Appendf(nil, "%d", len(set))); err != nil {
 		logs.Log().Fatal(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
