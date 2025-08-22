@@ -83,7 +83,7 @@ templ CartPageBody() {
 							class="flex flex-col gap-1 border rounded h-auto p-2"
 							hx-get="/cchoice/carts/summary?data=summary_total"
 							hx-trigger="load once, get"
-							hx-swap="beforeend"
+							hx-swap="innerHTML"
 						>
 							//CartSummaryRow
 						</div>
@@ -226,6 +226,98 @@ templ CartSummaryBar() {
 	</div>
 }
 
+templ btnQtyDecrease(cl models.CheckoutLine) {
+	<button
+		type="button"
+		id={ "btn-minus-" + cl.ID }
+		alt="decrease quantity button"
+		aria-label="Decrease quantity"
+		title="Decrease quantity"
+		class="p-1 border rounded disabled:opacity-40 group hover:bg-cchoice cursor-pointer disabled:cursor-not-allowed"
+		disabled?={ cl.Quantity <= 1 }
+		hx-patch={ "/cchoice/carts/lines/" + cl.ID + "?dec=1" }
+		hx-target={ fmt.Sprintf("[name=qty-%s]", cl.ID) }
+		hx-swap="textContent"
+		_="
+			on htmx:afterRequest
+				put me.closest('.cart-line').querySelector('[name^=qty-]').textContent into txtQty
+				put txtQty.split(':')[1].trim() into qty
+				set qty to Number(qty)
+
+				if qty <= 1
+					set me.disabled to true
+				else
+					set me.disabled to false
+				end
+
+				put me.id.replace('btn-minus-', 'btn-plus-') into plusID
+				put document.querySelector('#' + plusID) into btnPlus
+				if btnPlus is not null
+					trigger htmx:afterRequest on btnPlus
+				end
+
+				trigger get on #cart-summary
+			end
+		"
+	>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			class="h-4 w-4 text-cchoice-600 group-hover:bg-cchoice"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke="currentColor"
+		>
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+		</svg>
+	</button>
+}
+
+templ btnQtyIncrease(cl models.CheckoutLine) {
+	<button
+		type="button"
+		id={ "btn-plus-" + cl.ID }
+		alt="increase quantity button"
+		aria-label="Increase quantity"
+		title="Increase quantity"
+		class="p-1 border rounded disabled:opacity-40 group hover:bg-cchoice cursor-pointer disabled:cursor-not-allowed"
+		disabled?={ cl.Quantity >= constants.MaxCartLineQty }
+		hx-patch={ "/cchoice/carts/lines/" + cl.ID + "?inc=1" }
+		hx-target={ fmt.Sprintf("[name=qty-%s]", cl.ID) }
+		hx-swap="textContent"
+		_="
+			on htmx:afterRequest
+				put me.closest('.cart-line').querySelector('[name^=qty-]').textContent into txtQty
+				put txtQty.split(':')[1].trim() into qty
+				set qty to Number(qty)
+
+				if qty >= 99
+					set me.disabled to true
+				else
+					set me.disabled to false
+				end
+
+				put me.id.replace('btn-plus-', 'btn-minus-') into minusID
+				put document.querySelector('#' + minusID) into btnMinus
+				if btnMinus is not null
+					trigger htmx:afterRequest on btnMinus
+				end
+
+				trigger get on #cart-summary
+			end
+		"
+	>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			class="h-4 w-4 text-cchoice-600 group-hover:bg-cchoice"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke="currentColor"
+		>
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+		</svg>
+	</button>
+}
+
 templ CartCheckoutLineItem(cl models.CheckoutLine) {
 	<div
 		id={ "cart-checkout-line-item-" + cl.ID }
@@ -266,71 +358,21 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 						</p>
 					}
 				</span>
+
 				<div class="cart-line flex items-center gap-2 my-1">
-					<button
-						id={ "btn-minus-" + cl.ID }
-						alt="decrease quantity button"
-						aria-label="Decrease quantity"
-						title="Decrease quantity"
-						class="p-1 border rounded disabled:opacity-40 group hover:bg-cchoice cursor-pointer disabled:cursor-not-allowed"
-						disabled?={ cl.Quantity <= 1 }
-						hx-patch={ "/cchoice/carts/lines/" + cl.ID + "?dec=1" }
-						hx-target={ fmt.Sprintf("[name=qty-%s]", cl.ID) }
-						hx-swap="textContent"
-						_="
-							on htmx:afterRequest
-								put me.closest('.cart-line').querySelector('[name=qty]').textContent into txtQty
-								put (txtQty is 'Qty: 1') into me.disabled
-								trigger get on #cart-summary
-							end
-						"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4 text-cchoice-600 group-hover:bg-cchoice"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-						</svg>
-					</button>
+					@btnQtyDecrease(cl)
 					<p
 						name={ "qty-" + cl.ID }
 						class="text-sm text-gray-500"
 					>
 						Qty: { cl.Quantity }
 					</p>
-					<button
-						id={ "btn-plus-" + cl.ID }
-						alt="increase quantity button"
-						aria-label="Increase quantity"
-						title="Increase quantity"
-						class="p-1 border rounded disabled:opacity-40 group hover:bg-cchoice cursor-pointer disabled:cursor-not-allowed"
-						disabled?={ cl.Quantity >= constants.MaxCartLineQty }
-						hx-patch={ "/cchoice/carts/lines/" + cl.ID + "?inc=1" }
-						hx-target={ fmt.Sprintf("[name=qty-%s]", cl.ID) }
-						hx-swap="textContent"
-						_="
-							on htmx:afterRequest
-								put me.closest('.cart-line').querySelector('[name=qty]').textContent into txtQty
-								put (txtQty is 'Qty: 99') into me.disabled
-								trigger get on #cart-summary
-							end
-						"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4 text-cchoice-600 group-hover:bg-cchoice"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-						</svg>
-					</button>
+					@btnQtyIncrease(cl)
 				</div>
-				<p class="text-sm text-gray-700">Total: { cl.Total.Display() }</p>
+
+				<p class="text-sm text-gray-700">
+					Total: { cl.Total.Display() }
+				</p>
 			</div>
 			<div class="place-content-end mr-2">
 				<button
