@@ -8,6 +8,17 @@ import (
 	"strings"
 )
 
+templ CartPage(body templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			@HeadMeta()
+			@TabTitle("Cart")
+		</head>
+		@body
+	</html>
+}
+
 templ AddToCart() {
 	<button
 		id="btn-add-to-cart"
@@ -41,17 +52,6 @@ templ AddToCart() {
 		name="product_id"
 		value=""
 	/>
-}
-
-templ CartPage(body templ.Component) {
-	<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			@HeadMeta()
-			@TabTitle("Cart")
-		</head>
-		@body
-	</html>
 }
 
 templ CartPageBody() {

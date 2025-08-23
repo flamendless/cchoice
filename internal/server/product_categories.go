@@ -41,13 +41,13 @@ func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Reque
 		},
 	)
 	if err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if err := components.CategoriesSidePanelList(categories).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -80,12 +80,12 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 		limit,
 	)
 	if err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if err := components.CategorySection(page, res).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -95,7 +95,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 	const logtag = "[Category Products Handler]"
 	categoryID := chi.URLParam(r, "category_id")
 	if categoryID == "" {
-		logs.Log().Fatal(logtag, zap.Error(errs.ErrInvalidParams))
+		logs.Log().Error(logtag, zap.Error(errs.ErrInvalidParams))
 		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
@@ -103,7 +103,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 	categoryDBID := s.encoder.Decode(categoryID)
 	category, err := s.dbRO.GetQueries().GetProductCategoryByID(r.Context(), categoryDBID)
 	if err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -122,7 +122,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		Limit:      constants.DefaultLimitProducts,
 	})
 	if err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -166,7 +166,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	if err := components.CategorySectionProducts(categorySectionProducts).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

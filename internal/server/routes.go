@@ -103,7 +103,7 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 	cacheKey := []byte(key)
 	if data, ok := s.cache.HasGet(nil, cacheKey); ok {
 		if err := components.Image(string(data)).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal(logtag, zap.Error(err))
+			logs.Log().Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		logs.Log().Debug(constants.CacheHit, zap.ByteString("key", cacheKey))
@@ -114,7 +114,7 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 
 	finalPath, ext, err := images.GetImagePathWithSize(path, size, isThumbnail)
 	if err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -126,7 +126,7 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := components.Image(imgData).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -137,7 +137,7 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Index handler]"
 	if err := components.HomePage().Render(r.Context(), w); err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -147,13 +147,13 @@ func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Changelogs Handler]"
 	f, err := os.Open("./CHANGELOGS.md")
 	if err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer func() {
 		if err := f.Close(); err != nil {
-			logs.Log().Fatal(logtag, zap.Error(err))
+			logs.Log().Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -161,7 +161,7 @@ func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	if _, err := io.Copy(w, f); err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -171,12 +171,12 @@ func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Health Handler]"
 	jsonResp, err := json.Marshal(s.dbRO.Health())
 	if err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if _, err := w.Write(jsonResp); err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -193,7 +193,7 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		[]string{"email", "mobile_no"},
 	)
 	if err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -214,7 +214,7 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := components.HeaderRow1Texts(texts).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -231,7 +231,7 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		[]string{"mobile_no", "email", "url_gmap", "url_facebook", "url_tiktok"},
 	)
 	if err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -276,7 +276,7 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := components.FooterRow1Texts(texts).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -285,7 +285,7 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Search Handler]"
 	if err := r.ParseForm(); err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -330,13 +330,13 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		product.ThumbnailData = imgData
 
 		if err := components.SearchResultProductCard(models.ToSearchResultProduct(s.encoder, product)).Render(r.Context(), w); err != nil {
-			logs.Log().Fatal(logtag, zap.Error(err))
+			logs.Log().Error(logtag, zap.Error(err))
 			return
 		}
 	}
 
 	if err := components.SearchMore(search).Render(r.Context(), w); err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		return
 	}
 }
@@ -344,7 +344,7 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Checkouts Handler]"
 	if err := r.ParseForm(); err != nil {
-		logs.Log().Fatal(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -352,13 +352,13 @@ func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	switch s.paymentGateway.GatewayEnum() {
 	case payments.PAYMENT_GATEWAY_PAYMONGO:
 		// if err := s.paymentGateway.CheckoutPaymentHandler(w, r); err != nil {
-		// 	logs.Log().Fatal("[PayMongo] Checkouts handler", zap.Error(err))
+		// 	logs.Log().Error("[PayMongo] Checkouts handler", zap.Error(err))
 		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
 		// 	return
 		// }
 	default:
 		err := errors.New("checkouts handler. Unimplemented payment gateway")
-		logs.Log().Fatal(err.Error(), zap.String("gateway", s.paymentGateway.GatewayEnum().String()))
+		logs.Log().Error(err.Error(), zap.String("gateway", s.paymentGateway.GatewayEnum().String()))
 		http.Error(w, err.Error(), http.StatusNotImplemented)
 		return
 	}

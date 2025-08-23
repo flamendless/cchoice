@@ -16,7 +16,7 @@ import (
 	"strings"
 )
 
-func AddToCart() templ.Component {
+func CartPage(body templ.Component) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -37,15 +37,27 @@ func AddToCart() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<button id=\"btn-add-to-cart\" class=\"\n\t\t\tflex justify-center items-center relative inline-block w-12 h-12\n\t\t\tbg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors\n\t\t\tgroup rounded-full hover:bg-cchoicesoft\n\t\t\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"/cchoice/carts/lines\" hx-include=\"#selected-product-id\" hx-swap=\"none\" _=\"\n\t\t\ton click log 'Added to cart: ' + #selected-product-id.value end\n\t\t\ton htmx:afterRequest\n\t\t\t\ttrigger get on #cart-count\n\t\t\tend\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = svgCart("stroke-white group-hover:stroke-cchoice_border w-full h-full p-2").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = HeadMeta().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<span class=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow\">+1</span></button> <input type=\"hidden\" id=\"selected-product-id\" name=\"product_id\" value=\"\">")
+		templ_7745c5c3_Err = TabTitle("Cart").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = body.Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -53,7 +65,7 @@ func AddToCart() templ.Component {
 	})
 }
 
-func CartPage(body templ.Component) templ.Component {
+func AddToCart() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -74,27 +86,15 @@ func CartPage(body templ.Component) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<!doctype html><html lang=\"en\"><head>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<button id=\"btn-add-to-cart\" class=\"\n\t\t\tflex justify-center items-center relative inline-block w-12 h-12\n\t\t\tbg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors\n\t\t\tgroup rounded-full hover:bg-cchoicesoft\n\t\t\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"/cchoice/carts/lines\" hx-include=\"#selected-product-id\" hx-swap=\"none\" _=\"\n\t\t\ton click log 'Added to cart: ' + #selected-product-id.value end\n\t\t\ton htmx:afterRequest\n\t\t\t\ttrigger get on #cart-count\n\t\t\tend\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = HeadMeta().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = svgCart("stroke-white group-hover:stroke-cchoice_border w-full h-full p-2").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TabTitle("Cart").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</head>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = body.Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<span class=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow\">+1</span></button> <input type=\"hidden\" id=\"selected-product-id\" name=\"product_id\" value=\"\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
