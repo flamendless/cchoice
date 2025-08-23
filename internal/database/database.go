@@ -62,6 +62,7 @@ func New(mode DBMode) Service {
 	db, err := sql.Open("sqlite3", dataSourceName)
 	if err != nil {
 		logs.Log().Fatal("db open", zap.Error(err))
+		return nil
 	}
 
 	switch mode {
