@@ -1,6 +1,87 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Bugfix
+- CCS-51 Fix quantity increase/decrease behavior
+- CCS-44 Use custom name for line items
+- CCS-39 Exclude products with no valid image in home page
+- Refresh on cart page should not re-create checkoutline
+- Reuse created checkout
+
+### CICD
+- CCS-13 Remove push event for running lint workflow
+
+### Deps
+- Upgrade packages
+- CCS-29 Upgrade deps
+
+### Docs
+- Move ENCODE_SALT to required section
+
+### Featue
+- CCS-43 Display all payment methods
+
+### Feature
+- Complete cart page -> paymongo page
+- CCS-46 Add other input in shipping information
+- CCS-46 Display shipping address
+- CCS-49 Add other payment methods images
+- CCS-43 Display available payment methods
+- CCS-38 Implement cart page summary
+- CCS-35 Add minus/plus buttons for quantity in cart line
+- CCS-26 Add product image, price, and total in cart page
+
+### Maintenance
+- Apply sc
+- Simplify frontend code for shipping
+- Rename file
+- Fix build tags
+- Rename parse_xlsx -> parse_products
+- CCS-28 Add IsLocal and IsProd
+- CCS-28 Centralize conf
+- Patch recursive thumbnailify
+
+### Performance
+- CCS-50 Cache and singleflight address
+- CCS-37 Address some issues reported by Lighthouse
+- CCS-30 Utilize build tags to omit libvips
+
+### Script
+- CCS-47 WIP parse_map
+- Add migration in deploy
+- Default tailwind bin
+- Update deps
+
+### Server
+- Replace fatal -> error in handlers
+- Header cart count should reflect unique products, not total quantity
+- CCS-45 Add cash on delivery in tbl_settings
+- Use SQL functions to simplify quantity changes
+- CCS-32 Implement checkoutline deletion
+- CCS-33 Improve logs by using log tag
+- CCS-31 Implement embedded, static, and stub fs mode
+- CCS-31 Stub static files
+- CCS-31 Move static to a package
+
+### Web
+- Update position and style of error banner
+- Make the cart page a form
+- CCS-41 Make header responsive
+- CCS-38 Make cart page summary sticky
+- CCS-36 Dynamic product image modal height
+- CCS-34 Add checkbox in cart items
+- CCS-32 Add trash button in cart line
+- Improve empty cart page; Add cart summary bar
+
+
+<a name="dev-v0.0.5"></a>
+## [dev-v0.0.5] - 2025-07-22
+### CICD
+- Update dev_deploy
+
+### Docs
+- dev-v0.0.4 changelogs
+
 
 <a name="dev-v0.0.4"></a>
 ## [dev-v0.0.4] - 2025-07-22
@@ -217,7 +298,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.0.4...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.0.5...HEAD
+[dev-v0.0.5]: https://github.com/flamendless/cchoice/compare/dev-v0.0.4...dev-v0.0.5
 [dev-v0.0.4]: https://github.com/flamendless/cchoice/compare/dev-v0.0.3...dev-v0.0.4
 [dev-v0.0.3]: https://github.com/flamendless/cchoice/compare/dev-v0.0.2...dev-v0.0.3
 [dev-v0.0.2]: https://github.com/flamendless/cchoice/compare/dev-v0.0.1...dev-v0.0.2
