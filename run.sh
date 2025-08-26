@@ -67,9 +67,10 @@ setup() {
 }
 
 genimages() {
-	go run -tags="imageprocessing" ./main.go thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/thumbnails/product_images/bosch" --format="webp" --width=96 --height=96
-	go run -tags="imageprocessing" ./main.go thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/thumbnails/product_images/bosch" --format="webp" --width=1080 --height=1080
-	go run -tags="imageprocessing" ./main.go convert_images --inpath="./cmd/web/static/images/brand_logos" --outpath="./cmd/web/static/images/brand_logos" --format="webp"
+	go build -tags="imageprocessing staticfs" -o "${TMP}/genimages" .
+	"${TMP}/genimages" thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/thumbnails/product_images/bosch" --format="webp" --width=96 --height=96
+	"${TMP}/genimages" thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/thumbnails/product_images/bosch" --format="webp" --width=1080 --height=1080
+	"${TMP}/genimages" convert_images --inpath="./cmd/web/static/images/brand_logos" --outpath="./cmd/web/static/images/brand_logos" --format="webp"
 }
 
 genmaps() {
