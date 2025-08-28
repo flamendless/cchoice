@@ -8,6 +8,7 @@ import (
 	"cchoice/cmd/parse_map/models"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/metrics"
 
 	"github.com/VictoriaMetrics/fastcache"
 	"golang.org/x/sync/singleflight"
@@ -25,10 +26,10 @@ func GetProvinces(
 			logs.GobError(cacheKey, err)
 			return nil, err
 		}
-		logs.CacheHit(cacheKey, len(res))
+		metrics.Cache.HitClient()
 		return res, nil
 	} else {
-		logs.CacheMiss(cacheKey)
+		metrics.Cache.MissClient()
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
@@ -76,10 +77,10 @@ func GetCitiesByProvince(
 			logs.GobError(cacheKey, err)
 			return nil, err
 		}
-		logs.CacheHit(cacheKey, len(res))
+		metrics.Cache.HitClient()
 		return res, nil
 	} else {
-		logs.CacheMiss(cacheKey)
+		metrics.Cache.MissClient()
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
@@ -121,10 +122,10 @@ func GetBarangaysByCity(
 			logs.GobError(cacheKey, err)
 			return nil, err
 		}
-		logs.CacheHit(cacheKey, len(res))
+		metrics.Cache.HitClient()
 		return res, nil
 	} else {
-		logs.CacheMiss(cacheKey)
+		metrics.Cache.MissClient()
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {

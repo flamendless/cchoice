@@ -15,6 +15,7 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
+	"cchoice/internal/metrics"
 	"cchoice/internal/payments"
 	"cchoice/internal/requests"
 
@@ -30,7 +31,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Use(middleware.CleanPath)
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
-	r.Use(middleware.NoCache)
+	// r.Use(middleware.NoCache)
 	r.Use(middleware.Compress(5))
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
@@ -51,11 +52,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 		s.fs = http.FS(fs)
 		r.Handle(
 			"/static/*",
-			http.StripPrefix("/static/", static.Handler()),
+			// http.StripPrefix("/static/", static.Handler()),
+			http.StripPrefix("/static/", static.CacheHandler(CacheHeaders)),
 		)
 
 		r.Get("/changelogs", s.changelogsHandler)
 		r.Get("/health", s.healthHandler)
+		r.Get("/metrics", s.metricsHandler)
 		r.Get("/", s.indexHandler)
 		r.Get("/settings/header-texts", s.headerTextsHandler)
 		r.Get("/settings/footer-texts", s.footerTextsHandler)
@@ -106,10 +109,10 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 			logs.Log().Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		logs.Log().Debug(constants.CacheHit, zap.ByteString("key", cacheKey))
+		metrics.Cache.HitClient()
 		return
 	} else {
-		logs.Log().Debug(constants.CacheMiss, zap.ByteString("key", cacheKey))
+		metrics.Cache.MissClient()
 	}
 
 	finalPath, ext, err := images.GetImagePathWithSize(path, size, isThumbnail)
@@ -117,6 +120,16 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	if notModified, file, err := CacheHeaders(w, r, s.fs, finalPath); err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	} else {
+		defer file.Close()
+		if notModified {
+			return
+		}
 	}
 
 	imgData, err := images.GetImageDataB64(s.cache, s.fs, finalPath, ext)
@@ -136,6 +149,7 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Index handler]"
+	metrics.Cache.ResetAll()
 	if err := components.HomePage().Render(r.Context(), w); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -176,6 +190,21 @@ func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if _, err := w.Write(jsonResp); err != nil {
+		logs.Log().Error(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Server) metricsHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Metrics Handler]"
+	resp := map[string]int64{
+		"headers hit":  metrics.Cache.ValueHitHeaders(),
+		"headers miss": metrics.Cache.ValueMissHeaders(),
+		"client hit":   metrics.Cache.ValueHitClient(),
+		"client miss":  metrics.Cache.ValueMissClient(),
+	}
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -11,6 +11,7 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
 	"cchoice/internal/logs"
+	"cchoice/internal/metrics"
 	"cchoice/internal/utils"
 
 	"github.com/VictoriaMetrics/fastcache"
@@ -33,10 +34,10 @@ func GetSettingsData(
 			logs.GobError(cacheKey, err)
 			return nil, err
 		}
-		logs.CacheHit(cacheKey, len(res))
+		metrics.Cache.HitClient()
 		return res, nil
 	} else {
-		logs.CacheMiss(cacheKey)
+		metrics.Cache.MissClient()
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
@@ -81,10 +82,10 @@ func GetCategoriesSidePanel(
 			logs.GobError(cacheKey, err)
 			return nil, err
 		}
-		logs.CacheHit(cacheKey, len(res))
+		metrics.Cache.HitClient()
 		return res, nil
 	} else {
-		logs.CacheMiss(cacheKey)
+		metrics.Cache.MissClient()
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
@@ -140,10 +141,10 @@ func GetCategorySectionHandler(
 			logs.GobError(cacheKey, err)
 			return nil, err
 		}
-		logs.CacheHit(cacheKey, len(res))
+		metrics.Cache.HitClient()
 		return res, nil
 	} else {
-		logs.CacheMiss(cacheKey)
+		metrics.Cache.MissClient()
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
