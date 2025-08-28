@@ -87,18 +87,6 @@ func JSONResponse(id string, resp *http.Response) {
 	Log().Sugar().Info("Pretty JSON", zap.String("body", prettyBuf.String()))
 }
 
-func CacheMiss(key []byte) {
-	Log().Debug(constants.CacheMiss, zap.ByteString("key", key))
-}
-
-func CacheHit(key []byte, length int) {
-	Log().Debug(
-		constants.CacheHit,
-		zap.ByteString("key", key),
-		zap.Int("len", length),
-	)
-}
-
 func CacheStore(key []byte, buf *bytes.Buffer) {
 	Log().Debug(
 		constants.CacheStore,

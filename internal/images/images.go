@@ -1,10 +1,10 @@
 package images
 
 import (
-	"cchoice/internal/constants"
 	"cchoice/internal/encode/b64"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/metrics"
 	"errors"
 	"fmt"
 	"io"
@@ -63,10 +63,10 @@ func GetImageDataB64(
 ) (string, error) {
 	cacheKey := fmt.Appendf([]byte{}, "image_data_%s_%s", finalPath, ext)
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
-		logs.Log().Debug(constants.CacheHit, zap.ByteString("key", cacheKey))
+		metrics.Cache.HitClient()
 		return string(data), nil
 	} else {
-		logs.Log().Debug(constants.CacheMiss, zap.ByteString("key", cacheKey))
+		metrics.Cache.MissClient()
 	}
 
 	finalPath = strings.TrimPrefix(finalPath, "static")

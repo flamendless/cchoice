@@ -26,3 +26,9 @@ func Handler() http.Handler {
 	}
 	return http.FileServer(http.FS(sub))
 }
+
+type fnCache func(http.ResponseWriter, *http.Request, http.FileSystem, string) (bool, http.File, error)
+
+func CacheHandler(fn fnCache) http.Handler {
+	return http.NotFoundHandler()
+}
