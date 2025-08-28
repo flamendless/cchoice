@@ -39,7 +39,7 @@ func CacheHeaders(
 	w.Header().Set("ETag", etag)
 
 	if match := r.Header.Get("If-None-Match"); match == etag {
-		metrics.Cache.HitHeaders()
+		metrics.Cache.HeadersHit()
 		w.WriteHeader(http.StatusNotModified)
 		return true, file, nil
 	}
@@ -47,14 +47,14 @@ func CacheHeaders(
 	if since := r.Header.Get("If-Modified-Since"); since != "" {
 		if t, err := time.Parse(http.TimeFormat, since); err == nil {
 			if info.ModTime().Before(t.Add(1 * time.Second)) {
-				metrics.Cache.HitHeaders()
+				metrics.Cache.HeadersHit()
 				w.WriteHeader(http.StatusNotModified)
 				return true, file, nil
 			}
 		}
 	}
 
-	metrics.Cache.MissHeaders()
+	metrics.Cache.HeadersMiss()
 
 	return false, file, nil
 }

@@ -23,6 +23,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/goccy/go-json"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 )
 
@@ -58,7 +59,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		r.Get("/changelogs", s.changelogsHandler)
 		r.Get("/health", s.healthHandler)
-		r.Get("/metrics", s.metricsHandler)
+		r.Handle("/metrics", promhttp.Handler())
 		r.Get("/", s.indexHandler)
 		r.Get("/settings/header-texts", s.headerTextsHandler)
 		r.Get("/settings/footer-texts", s.footerTextsHandler)
@@ -109,10 +110,10 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 			logs.Log().Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		metrics.Cache.HitClient()
+		metrics.Cache.MemHit()
 		return
 	} else {
-		metrics.Cache.MissClient()
+		metrics.Cache.MemMiss()
 	}
 
 	finalPath, ext, err := images.GetImagePathWithSize(path, size, isThumbnail)
@@ -149,7 +150,6 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Index handler]"
-	metrics.Cache.ResetAll()
 	if err := components.HomePage().Render(r.Context(), w); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -190,21 +190,6 @@ func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if _, err := w.Write(jsonResp); err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-func (s *Server) metricsHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Metrics Handler]"
-	resp := map[string]int64{
-		"headers hit":  metrics.Cache.ValueHitHeaders(),
-		"headers miss": metrics.Cache.ValueMissHeaders(),
-		"client hit":   metrics.Cache.ValueHitClient(),
-		"client miss":  metrics.Cache.ValueMissClient(),
-	}
-	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
