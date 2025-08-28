@@ -63,10 +63,10 @@ func GetImageDataB64(
 ) (string, error) {
 	cacheKey := fmt.Appendf([]byte{}, "image_data_%s_%s", finalPath, ext)
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
-		metrics.Cache.HitClient()
+		metrics.Cache.MemHit()
 		return string(data), nil
 	} else {
-		metrics.Cache.MissClient()
+		metrics.Cache.MemMiss()
 	}
 
 	finalPath = strings.TrimPrefix(finalPath, "static")

@@ -26,10 +26,10 @@ func GetProvinces(
 			logs.GobError(cacheKey, err)
 			return nil, err
 		}
-		metrics.Cache.HitClient()
+		metrics.Cache.MemHit()
 		return res, nil
 	} else {
-		metrics.Cache.MissClient()
+		metrics.Cache.MemMiss()
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
@@ -77,10 +77,10 @@ func GetCitiesByProvince(
 			logs.GobError(cacheKey, err)
 			return nil, err
 		}
-		metrics.Cache.HitClient()
+		metrics.Cache.MemHit()
 		return res, nil
 	} else {
-		metrics.Cache.MissClient()
+		metrics.Cache.MemMiss()
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
@@ -122,10 +122,10 @@ func GetBarangaysByCity(
 			logs.GobError(cacheKey, err)
 			return nil, err
 		}
-		metrics.Cache.HitClient()
+		metrics.Cache.MemHit()
 		return res, nil
 	} else {
-		metrics.Cache.MissClient()
+		metrics.Cache.MemMiss()
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
