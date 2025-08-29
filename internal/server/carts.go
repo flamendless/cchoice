@@ -422,6 +422,7 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 				Amount:      int32(checkoutLine.UnitPriceWithVat),
 				Currency:    money.PHP,
 				Description: checkoutLine.Description.String,
+				// Images:      []string{"http://" + s.address + "/cchoice/" + checkoutLine.ThumbnailPath},
 				Images:      []string{checkoutLine.ThumbnailPath},
 				Name:        checkoutLine.Name,
 				Quantity:    int32(checkoutLine.Quantity),
@@ -430,7 +431,7 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 
 		payload := s.paymentGateway.CreatePayload(billing, lineItems, paymentMethods)
 		if err := s.paymentGateway.CheckoutPaymentHandler(w, r, payload); err != nil {
-			logs.Log().Error(logtag, zap.Error(err))
+			logs.Log().Error(logtag, zap.Error(err), zap.Any("payload", payload))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
