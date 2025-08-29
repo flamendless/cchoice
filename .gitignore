@@ -12,3 +12,4 @@ cmd/web/static/images/product_images/bosch/*.webp
 cmd/web/static/thumbnails/product_images/bosch/*.webp
 cmd/web/static/images/brand_logos/*.webp
 tailwindcss
+data/

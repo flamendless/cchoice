@@ -270,11 +270,52 @@ db() {
 	"${TMP}/goose" "${@:2}"
 }
 
+checkproc() {
+	local process_name="$1"
+	if ! pgrep -f "$process_name" >/dev/null 2>&1; then
+		echo "Process ${process_name} is not yet running"
+		return 1
+    fi
+	local port="$2"
+	if ! lsof -i ":${port}" >/dev/null 2>&1; then
+		echo "Process on port ${port} is not yet running"
+		return 1
+    fi
+	return 0
+}
+
+prom() {
+	if ! checkproc "./tmp/main" "7331"; then
+		exit 1
+	fi
+
+	if "${ISWSL}"; then
+		cmd.exe /c "start ${BROWSER} http://localhost:9090/"
+	elif "${ISMAC}"; then
+		open -a ${BROWSER} "http://localhost:9090/"
+	fi
+
+	prometheus
+}
+
+graf() {
+	if ! checkproc "prometheus" "9090"; then
+		exit 1
+	fi
+
+	if "${ISWSL}"; then
+		cmd.exe /c "start ${BROWSER} http://localhost:3000/"
+	elif "${ISMAC}"; then
+		open -a ${BROWSER} "http://localhost:3000/"
+	fi
+}
+
 if [ "$#" -eq 0 ]; then
 	echo "First use: chmod +x ${0}"
 	echo "Usage: ${0}"
 	echo "Commands:"
 	echo "    benchmark"
+	echo "    checkproc"
 	echo "    cleandb"
 	echo "    customrun"
 	echo "    db"
@@ -285,7 +326,9 @@ if [ "$#" -eq 0 ]; then
 	echo "    genmaps"
 	echo "    gensql"
 	echo "    gentempl"
+	echo "    graf"
 	echo "    prof"
+	echo "    prom"
 	echo "    sc"
 	echo "    serve"
 	echo "    setup"
