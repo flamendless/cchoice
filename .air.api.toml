@@ -5,7 +5,7 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./tmp/main"
-  cmd = "./run.sh genall && ./run.sh build"
+  cmd = "mage genAll && mage build"
   delay = 100
   exclude_dir = ["internal/database/queries", "cmd/web/static/images/", "cmd/web/static/thumbnails/", "cmd/web/static/svg/", "cmd/goose/"]
   exclude_file = []

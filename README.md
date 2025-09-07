@@ -3,15 +3,15 @@
 - `git clone --recurse-submodules --shallow-submodules -j8 <repo>`
 - `go mod download`
 - `go mod tidy`
-- `chmod +x ./run.sh`
-- `./run.sh deps`
-- `./run.sh setup`
-- `./run.sh genall`
-- `./run.sh cleandb`
-- `./run.sh genimages`
-- `./run.sh genmaps`
-- `./run.sh testall`
-- `./run.sh benchmark`
+- `go install github.com/magefile/mage@latest`
+- `mage deps`
+- `mage setup`
+- `mage genAll`
+- `mage cleanDB`
+- `mage genImages`
+- `mage genMaps`
+- `mage testAll`
+- `mage benchmark`
 
 # Env Vars
 
@@ -36,7 +36,7 @@ mkcert localhost 127.0.0.1 ::1
 - Toolings:
     - go or dev tools
 - Script:
-    - run.sh, scripts/*, cmd/*
+    - run.sh, scripts/*, cmd/*, magefile.go
 - CICD:
     - gh actions, workflows
 - Config:

@@ -2,9 +2,9 @@
 
 echo "Running unit tests..."
 
-./run.sh testall
+mage testAll
 
 if [ $? -ne 0 ]; then
-	echo "You have an error with unit tests. Run ./run.sh testall"
+	echo "You have an error with unit tests. Run 'mage testAll'"
 	exit 1
 fi

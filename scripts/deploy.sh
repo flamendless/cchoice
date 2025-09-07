@@ -12,10 +12,10 @@ echo "Stopping existing process..."
 pkill -x "./tmp/main api" || echo "No existing process found."
 
 echo "Running migrations..."
-./run.sh db up
+mage dbUp
 
 echo "Building..."
-./run.sh prod
+mage prod
 
 echo "Running API..."
 ./tmp/main api > out 2>&1 &
