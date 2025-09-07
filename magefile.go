@@ -418,7 +418,20 @@ func SC() error {
 }
 
 func TestAll() error {
-	return run(Command{Type: CmdExec, Cmd: "go", Args: append([]string{"test", "./...", "-failfast"})})
+	if _, err := exec.LookPath("golangci-lint"); err == nil {
+		if err := run(Command{Type: CmdExec, Cmd: "golangci-lint", Args: []string{"config", "verify"}}); err != nil {
+			return err
+		}
+		if err := run(Command{Type: CmdExec, Cmd: "golangci-lint", Args: []string{"run"}}); err != nil {
+			return err
+		}
+    }
+
+	return run(Command{
+		Type: CmdExec,
+		Cmd: "go",
+		Args: append([]string{"test", "./...", "-failfast"}),
+	})
 }
 
 func TestSum() error {
