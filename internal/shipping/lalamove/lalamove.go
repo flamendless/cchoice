@@ -18,12 +18,12 @@ import (
 )
 
 type Lalamove struct {
-	shippingService shipping.ShippingService
 	client          *http.Client
 	apiKey          string
 	secret          string
 	baseURL         string
 	apiVersion      string
+	shippingService shipping.ShippingService
 }
 
 func MustInit() *Lalamove {
@@ -87,7 +87,7 @@ func (c *Lalamove) doRequest(method, path string, body []byte) (*http.Response, 
 	req.Header.Set("Market", "PH")
 
 	resp, err := c.client.Do(req)
-	if err != nil {
+	if err != nil || resp == nil {
 		return nil, errors.Join(errs.ErrHTTPRequest, err)
 	}
 
@@ -139,7 +139,7 @@ func (c *Lalamove) GetQuotation(req shipping.ShippingRequest) (*shipping.Shippin
 		return nil, errors.Join(errs.ErrLalamove, err)
 	}
 	resp, err := c.doRequest(http.MethodPost, "/v3/quotations", body)
-	if err != nil {
+	if err != nil || resp == nil {
 		return nil, errors.Join(errs.ErrLalamove, err)
 	}
 	defer resp.Body.Close()
@@ -160,7 +160,7 @@ func (c *Lalamove) CreateOrder(req shipping.ShippingRequest) (*shipping.Shipping
 	}
 
 	resp, err := c.doRequest(http.MethodPost, "/v3/orders", body)
-	if err != nil {
+	if err != nil || resp == nil {
 		return nil, errors.Join(errs.ErrLalamove, err)
 	}
 	defer resp.Body.Close()
@@ -177,7 +177,7 @@ func (c *Lalamove) GetOrderStatus(orderID string) (*shipping.ShippingOrder, erro
 	path := "/v3/orders/" + orderID
 
 	resp, err := c.doRequest("GET", path, nil)
-	if err != nil {
+	if err != nil || resp == nil {
 		return nil, errors.Join(errs.ErrLalamove, err)
 	}
 	defer resp.Body.Close()
@@ -194,7 +194,7 @@ func (c *Lalamove) CancelOrder(orderID string) error {
 	path := fmt.Sprintf("/v3/orders/%s/cancel", orderID)
 
 	resp, err := c.doRequest("PUT", path, nil)
-	if err != nil {
+	if err != nil || resp == nil {
 		return err
 	}
 	defer resp.Body.Close()
@@ -203,7 +203,7 @@ func (c *Lalamove) CancelOrder(orderID string) error {
 
 func (c *Lalamove) GetCapabilities() (*shipping.ServiceCapabilities, error) {
 	resp, err := c.doRequest("GET", "/v3/cities", nil)
-	if err != nil {
+	if err != nil || resp == nil {
 		return nil, errors.Join(errs.ErrLalamove, err)
 	}
 	defer resp.Body.Close()

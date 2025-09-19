@@ -34,9 +34,9 @@ type SpecialRequest struct {
 	Name          string `json:"name"`
 	Description   string `json:"description"`
 	ParentType    string `json:"parent_type,omitempty"`
-	MaxSelection  int    `json:"max_selection"`
 	EffectiveTime string `json:"effective_time,omitempty"`
 	OfflineTime   string `json:"offline_time,omitempty"`
+	MaxSelection  int    `json:"max_selection"`
 }
 
 type City struct {
@@ -103,13 +103,13 @@ type QuotationResponse struct {
 	ScheduleAt       string                  `json:"scheduleAt"`
 	ExpiresAt        string                  `json:"expiresAt"`
 	ServiceType      string                  `json:"serviceType"`
-	SpecialRequests  []string                `json:"specialRequests"`
 	Language         string                  `json:"language"`
-	Stops            []QuotationStop         `json:"stops"`
-	IsRouteOptimized bool                    `json:"isRouteOptimized"`
-	PriceBreakdown   QuotationPriceBreakdown `json:"priceBreakdown"`
 	Item             QuotationItem           `json:"item"`
+	SpecialRequests  []string                `json:"specialRequests"`
+	Stops            []QuotationStop         `json:"stops"`
+	PriceBreakdown   QuotationPriceBreakdown `json:"priceBreakdown"`
 	Distance         DistanceKm              `json:"distance"`
+	IsRouteOptimized bool                    `json:"isRouteOptimized"`
 }
 
 type QuotationStop struct {
@@ -119,13 +119,13 @@ type QuotationStop struct {
 }
 
 type QuotationPriceBreakdown struct {
+	Currency                string `json:"currency"`
 	Base                    Price  `json:"base"`
 	SpecialRequests         Price  `json:"specialRequests"`
 	VAT                     Price  `json:"vat"`
 	TotalBeforeOptimization Price  `json:"totalBeforeOptimization"`
 	TotalExcludePriorityFee Price  `json:"totalExcludePriorityFee"`
 	Total                   Price  `json:"total"`
-	Currency                string `json:"currency"`
 }
 
 type QuotationItem struct {

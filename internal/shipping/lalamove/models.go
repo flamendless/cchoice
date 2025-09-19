@@ -35,4 +35,3 @@ func (e LalamoveErrorResponse) Error() string {
 
 	return fmt.Sprintf("multiple errors: [%s]", strings.Join(messages, "; "))
 }
-

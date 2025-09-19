@@ -84,6 +84,9 @@ func Conf() *appConfig {
 		mustValidate(&co)
 		appCfg = &co
 	})
+	if appCfg == nil {
+		panic("Conf should have been initialized at this point")
+	}
 	return appCfg
 }
 
