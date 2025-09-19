@@ -43,6 +43,15 @@ type Server struct {
 	useSSL          bool
 }
 
+func (s *Server) buildURL(path string) string {
+	//TODO: (Brandon) Implement CDN
+	return fmt.Sprintf(
+		`https://%s/cchoice/%s`,
+		s.address,
+		path,
+	)
+}
+
 func NewServer() *http.Server {
 	cfg := conf.Conf()
 	sessionManager := scs.New()

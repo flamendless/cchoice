@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"net/http"
 	"reflect"
 
@@ -12,10 +13,17 @@ func FormToStruct(r *http.Request, dst any) error {
 		return err
 	}
 
-	t := reflect.TypeOf(dst).Elem()
+	if reflect.TypeOf(dst).Kind() != reflect.Ptr {
+		return errors.New("target must be a pointer")
+	}
+	elem := reflect.TypeOf(dst).Elem()
+	if elem.Kind() != reflect.Struct {
+		return errors.New("target must be a pointer to struct")
+	}
+
 	sliceFields := map[string]struct{}{}
-	for i := 0; i < t.NumField(); i++ {
-		f := t.Field(i)
+	for i := 0; i < elem.NumField(); i++ {
+		f := elem.Field(i)
 		if f.Type.Kind() == reflect.Slice {
 			if tag := f.Tag.Get("json"); tag != "" {
 				sliceFields[tag] = struct{}{}
@@ -26,11 +34,17 @@ func FormToStruct(r *http.Request, dst any) error {
 	flat := make(map[string]any, len(r.Form))
 	for k, v := range r.Form {
 		if _, isSlice := sliceFields[k]; isSlice {
-			flat[k] = v
-		} else if len(v) == 1 {
-			flat[k] = v[0]
+			sanitized := make([]string, len(v))
+			for i, val := range v {
+				sanitized[i] = SanitizeString(val)
+			}
+			flat[k] = sanitized
 		} else {
-			flat[k] = v
+			if len(v) > 0 {
+				flat[k] = SanitizeString(v[0])
+			} else {
+				flat[k] = ""
+			}
 		}
 	}
 
