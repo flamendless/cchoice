@@ -92,7 +92,7 @@ func (d *DistanceKm) UnmarshalJSON(data []byte) error {
 }
 
 func (d DistanceKm) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{
+	return json.Marshal(map[string]any{
 		"value": strconv.FormatFloat(float64(d)*1000, 'f', -1, 64),
 		"unit":  "m",
 	})

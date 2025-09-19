@@ -138,7 +138,7 @@ func (c *Lalamove) GetQuotation(req shipping.ShippingRequest) (*shipping.Shippin
 	if err != nil {
 		return nil, errors.Join(errs.ErrLalamove, err)
 	}
-	resp, err := c.doRequest("POST", "/v3/quotations", body)
+	resp, err := c.doRequest(http.MethodPost, "/v3/quotations", body)
 	if err != nil {
 		return nil, errors.Join(errs.ErrLalamove, err)
 	}
@@ -159,7 +159,7 @@ func (c *Lalamove) CreateOrder(req shipping.ShippingRequest) (*shipping.Shipping
 		return nil, errors.Join(errs.ErrLalamove, err)
 	}
 
-	resp, err := c.doRequest("POST", "/v3/orders", body)
+	resp, err := c.doRequest(http.MethodPost, "/v3/orders", body)
 	if err != nil {
 		return nil, errors.Join(errs.ErrLalamove, err)
 	}
