@@ -19,8 +19,13 @@ type appConfig struct {
 	DBURL              string `env:"DB_URL" env-required:""`
 	PaymentService     string `env:"PAYMENT_SERVICE" env-required:""`
 	PayMongoAPIKey     string `env:"PAYMONGO_API_KEY"`
+	PayMongoBaseURL    string `env:"PAYMONGO_BASE_URL"`
 	PayMongoSuccessURL string `env:"PAYMONGO_SUCCESS_URL"`
 	PayMongoCancelURL  string `env:"PAYMONGO_CANCEL_URL"`
+	ShippingService    string `env:"SHIPPING_SERVICE" env-required:""`
+	LalamoveBaseURL    string `env:"LALAMOVE_BASE_URL"`
+	LalamoveAPIKey     string `env:"LALAMOVE_API_KEY"`
+	LalamoveAPISecret  string `env:"LALAMOVE_API_SECRET"`
 	FSMode             string `env:"FSMODE" env-required:""`
 	EncodeSalt         string `env:"ENCODE_SALT" env-required:""`
 	CertPath           string `env:"CERTPATH"`
@@ -34,11 +39,19 @@ type appConfig struct {
 
 func mustValidate(c *appConfig) {
 	if c.PaymentService == "paymongo" {
-		if c.PayMongoAPIKey == "" || c.PayMongoSuccessURL == "" || c.PayMongoCancelURL == "" {
+		if c.PayMongoBaseURL == "" || c.PayMongoAPIKey == "" || c.PayMongoSuccessURL == "" || c.PayMongoCancelURL == "" {
 			panic(fmt.Errorf("[PayMongo]: %w", errs.ErrEnvVarRequired))
 		}
 	} else {
 		panic("Only 'paymongo' service is allowed for now")
+	}
+
+	if c.ShippingService == "lalamove" {
+		if c.LalamoveBaseURL == "" || c.LalamoveAPIKey == "" || c.LalamoveAPISecret == "" {
+			panic(fmt.Errorf("[Lalamove]: %w", errs.ErrEnvVarRequired))
+		}
+	} else {
+		panic("Only 'lalamove' service is allowed for now")
 	}
 
 	if c.IsLocal() {

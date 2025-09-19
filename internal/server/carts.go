@@ -423,9 +423,9 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 				Currency:    money.PHP,
 				Description: checkoutLine.Description.String,
 				// Images:      []string{"http://" + s.address + "/cchoice/" + checkoutLine.ThumbnailPath},
-				Images:      []string{checkoutLine.ThumbnailPath},
-				Name:        checkoutLine.Name,
-				Quantity:    int32(checkoutLine.Quantity),
+				Images:   []string{checkoutLine.ThumbnailPath},
+				Name:     checkoutLine.Name,
+				Quantity: int32(checkoutLine.Quantity),
 			})
 		}
 

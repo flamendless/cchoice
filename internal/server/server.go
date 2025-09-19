@@ -20,24 +20,27 @@ import (
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
 	"cchoice/internal/payments/paymongo"
+	"cchoice/internal/shipping"
+	"cchoice/internal/shipping/lalamove"
 )
 
 const CACHE_MAX_BYTES int = 1024
 
 type Server struct {
-	dbRO           database.Service
-	dbRW           database.Service
-	SF             singleflight.Group
-	fs             http.FileSystem
-	cache          *fastcache.Cache
-	sessionManager *scs.SessionManager
-	paymentGateway payments.IPaymentGateway
-	encoder        encode.IEncode
-	address        string
-	port           int
-	portFS         int
-	useHTTP2       bool
-	useSSL         bool
+	dbRO            database.Service
+	dbRW            database.Service
+	SF              singleflight.Group
+	fs              http.FileSystem
+	cache           *fastcache.Cache
+	sessionManager  *scs.SessionManager
+	paymentGateway  payments.IPaymentGateway
+	shippingService shipping.IShippingService
+	encoder         encode.IEncode
+	address         string
+	port            int
+	portFS          int
+	useHTTP2        bool
+	useSSL          bool
 }
 
 func NewServer() *http.Server {
@@ -48,17 +51,18 @@ func NewServer() *http.Server {
 	dbRO := database.New(database.DB_MODE_RO)
 	dbRW := database.New(database.DB_MODE_RW)
 	NewServer := &Server{
-		address:        cfg.Address,
-		port:           cfg.Port,
-		portFS:         cfg.PortFS,
-		dbRO:           dbRO,
-		dbRW:           dbRW,
-		cache:          fastcache.New(CACHE_MAX_BYTES),
-		sessionManager: sessionManager,
-		paymentGateway: paymongo.MustInit(),
-		encoder:        sqids.MustSqids(),
-		useHTTP2:       cfg.UseHTTP2,
-		useSSL:         cfg.UseSSL,
+		address:         cfg.Address,
+		port:            cfg.Port,
+		portFS:          cfg.PortFS,
+		dbRO:            dbRO,
+		dbRW:            dbRW,
+		cache:           fastcache.New(CACHE_MAX_BYTES),
+		sessionManager:  sessionManager,
+		paymentGateway:  paymongo.MustInit(),
+		shippingService: lalamove.MustInit(),
+		encoder:         sqids.MustSqids(),
+		useHTTP2:        cfg.UseHTTP2,
+		useSSL:          cfg.UseSSL,
 	}
 
 	addr := fmt.Sprintf("%s:%d", NewServer.address, NewServer.port)
@@ -107,6 +111,7 @@ func NewServer() *http.Server {
 		zap.Bool("Use session manager", NewServer.sessionManager != nil),
 		zap.Duration("Session manager lifetime", NewServer.sessionManager.Lifetime),
 		zap.String("Payment gateway", NewServer.paymentGateway.GatewayEnum().String()),
+		zap.String("Shipping service", NewServer.shippingService.Enum().String()),
 		zap.Bool("SSL", NewServer.useSSL),
 		zap.Bool("HTTP2", NewServer.useHTTP2),
 		zap.Duration("Read timeout", readTimeout),
