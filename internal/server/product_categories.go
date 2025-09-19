@@ -142,14 +142,9 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 			continue
 		}
 
-		finalPath, ext, err := images.GetImagePathWithSize(product.ThumbnailPath, constants.DefaultThumbnailSize, true)
+		imgData, err := images.GetImageDataB64(s.cache, s.fs, product.ThumbnailPath, images.IMAGE_FORMAT_WEBP)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			continue
-		}
-
-		imgData, err := images.GetImageDataB64(s.cache, s.fs, finalPath, ext)
-		if err != nil {
+			logs.Log().Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			continue
 		}

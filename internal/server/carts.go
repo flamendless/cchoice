@@ -99,15 +99,8 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 	for _, checkoutLine := range checkoutLines {
 		var imgData string
 		if !strings.HasSuffix(checkoutLine.ThumbnailPath, constants.EmptyImageFilename) {
-			finalPath, ext, err := images.GetImagePathWithSize(
-				checkoutLine.ThumbnailPath,
-				constants.CartPageThumbnailSize,
-				true,
-			)
-			if err == nil {
-				if imgDataB64, err := images.GetImageDataB64(s.cache, s.fs, finalPath, ext); err == nil {
-					imgData = imgDataB64
-				}
+			if imgDataB64, err := images.GetImageDataB64(s.cache, s.fs, checkoutLine.ThumbnailPath, images.IMAGE_FORMAT_WEBP); err == nil {
+				imgData = imgDataB64
 			}
 		}
 

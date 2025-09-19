@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
-	"path/filepath"
 	"strings"
 
 	"github.com/VictoriaMetrics/fastcache"
@@ -35,41 +33,20 @@ func ImageToB64(format ImageFormat, data []byte) string {
 	return base + b64.ToBase64(data)
 }
 
-func GetImagePathWithSize(
-	path string,
-	size string,
-	isThumbnail bool,
-) (string, string, error) {
-	ext := filepath.Ext(path)
-	if size != "" {
-		path = fmt.Sprintf("%s_%s%s", strings.TrimSuffix(path, ext), size, ext)
-	}
-	if isThumbnail {
-		path = strings.Replace(path, "/images/", "/thumbnails/", 1)
-	}
-
-	newPath, err := url.Parse(path)
-	if err != nil {
-		return "", "", errors.Join(errs.ErrFS, err)
-	}
-	return newPath.String(), ext, nil
-}
-
 func GetImageDataB64(
 	cache *fastcache.Cache,
 	fs http.FileSystem,
 	finalPath string,
-	ext string,
+	ext ImageFormat,
 ) (string, error) {
-	cacheKey := fmt.Appendf([]byte{}, "image_data_%s_%s", finalPath, ext)
+	finalPath = strings.TrimPrefix(finalPath, "static")
+	cacheKey := fmt.Appendf([]byte{}, "image_data_%s_%s", finalPath, ext.String())
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
 		metrics.Cache.MemHit()
 		return string(data), nil
 	} else {
 		metrics.Cache.MemMiss()
 	}
-
-	finalPath = strings.TrimPrefix(finalPath, "static")
 
 	f, err := fs.Open(finalPath)
 	if err != nil {
@@ -86,7 +63,7 @@ func GetImageDataB64(
 		return "", errors.Join(errs.ErrFS, err)
 	}
 
-	imgData := ImageToB64(ParseImageFormatExtToEnum(ext), img)
+	imgData := ImageToB64(ext, img)
 	cache.Set(cacheKey, []byte(imgData))
 	return imgData, nil
 }

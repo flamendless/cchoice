@@ -24,7 +24,7 @@ func init() {
 
 var cmdEncode = &cobra.Command{
 	Use:   "encode",
-	Short: "encode",
+	Short: "encode database id (int) <-> string",
 	Run: func(cmd *cobra.Command, args []string) {
 		var encode encode.IEncode
 		switch flagMethod {

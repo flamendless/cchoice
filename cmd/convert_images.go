@@ -68,23 +68,27 @@ var cmdConvertImages = &cobra.Command{
 			panic("Invalid format: " + flagsConvertImages.format)
 		}
 
+		validExts := []string{".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}
 		if err := filepath.Walk(flagsConvertImages.inpath, func(path string, info fs.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
 			if info.IsDir() {
-				logs.Log().Info("Skipping...", zap.String("path", path))
+				logs.Log().Info("Skipping directory", zap.String("path", path))
 				return nil
 			}
 
-			img, err := vips.NewImageFromFile(path)
-			if err != nil {
-				return nil
+			ext := strings.ToLower(filepath.Ext(info.Name()))
+			isValid := false
+			for _, validExt := range validExts {
+				if ext == validExt {
+					isValid = true
+					break
+				}
 			}
-
-			imgbytes, _, err := img.Export(ep)
-			if err != nil {
-				return err
+			if !isValid {
+				logs.Log().Info("Skipping non-image file", zap.String("path", path))
+				return nil
 			}
 
 			filename := strings.TrimSuffix(info.Name(), filepath.Ext(info.Name()))
@@ -94,10 +98,40 @@ var cmdConvertImages = &cobra.Command{
 				filename,
 				flagsConvertImages.format,
 			)
-			if err := os.WriteFile(output, imgbytes, 0644); err != nil {
+
+			if _, err := os.Stat(output); err == nil {
+				logs.Log().Info("Output file already exists, skipping",
+					zap.String("input", path),
+					zap.String("output", output))
+				return nil
+			}
+
+			logs.Log().Info("Processing image", zap.String("path", path))
+
+			img, err := vips.NewImageFromFile(path)
+			if err != nil {
+				logs.Log().Error("Failed to load image", zap.Error(err), zap.String("path", path))
+				return nil
+			}
+
+			imgbytes, _, err := img.Export(ep)
+			if err != nil {
+				logs.Log().Error("Failed to export image", zap.Error(err))
+				img.Close()
 				return err
 			}
 
+			if err := os.WriteFile(output, imgbytes, 0644); err != nil {
+				logs.Log().Error("Failed to write output file", zap.Error(err))
+				img.Close()
+				return err
+			}
+
+			logs.Log().Info("Successfully converted image",
+				zap.String("input", path),
+				zap.String("output", output))
+
+			img.Close()
 			return nil
 		}); err != nil {
 			panic(errors.Join(errs.ErrCmd, err))

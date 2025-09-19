@@ -26,6 +26,7 @@ func (s *Server) shippingAddressHandler(w http.ResponseWriter, r *http.Request) 
 	case "provinces":
 		cachedMaps, err := requests.GetProvinces(s.cache, &s.SF)
 		if err != nil {
+			logs.Log().Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

@@ -103,13 +103,7 @@ func (pm PaymentMethod) GetImageData(cache *fastcache.Cache, fs http.FileSystem)
 		return ""
 	}
 
-	finalPath, ext, err := images.GetImagePathWithSize(imgURL, "", false)
-	if err != nil {
-		logs.Log().Info("PaymentMethod image data", zap.Error(err))
-		return ""
-	}
-
-	imgDataB64, err := images.GetImageDataB64(cache, fs, finalPath, ext)
+	imgDataB64, err := images.GetImageDataB64(cache, fs, imgURL, images.IMAGE_FORMAT_PNG)
 	if err != nil {
 		logs.Log().Info("PaymentMethod image data", zap.Error(err))
 		return ""

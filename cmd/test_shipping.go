@@ -21,7 +21,7 @@ func init() {
 
 var cmdTestShipping = &cobra.Command{
 	Use:   "test_shipping",
-	Short: "test_shipping",
+	Short: "test shipping by making API calls",
 	Run: func(cmd *cobra.Command, args []string) {
 		var ss shipping.IShippingService
 		switch flagShippingService {
