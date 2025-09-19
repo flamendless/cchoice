@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"regexp"
 	"strings"
 	"sync"
 
@@ -10,6 +11,11 @@ import (
 
 var pluralizerOnce sync.Once
 var pluralizer *pluralize.Client
+
+var (
+	multipleSpacesRegex *regexp.Regexp
+	regexOnce           sync.Once
+)
 
 func SanitizePrice(price string) (*money.Money, []error) {
 	errsRes := make([]error, 0, 2)
@@ -83,4 +89,13 @@ func SanitizeCategory(input string) string {
 	}
 
 	return input
+}
+
+func SanitizeString(s string) string {
+	regexOnce.Do(func() {
+		multipleSpacesRegex = regexp.MustCompile(`\s+`)
+	})
+	s = strings.TrimSpace(s)
+	s = multipleSpacesRegex.ReplaceAllString(s, " ")
+	return strings.TrimSpace(s)
 }
