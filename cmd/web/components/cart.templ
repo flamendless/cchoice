@@ -358,7 +358,6 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 						</p>
 					}
 				</span>
-
 				<div class="cart-line flex items-center gap-2 my-1">
 					@btnQtyDecrease(cl)
 					<p
@@ -369,7 +368,6 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 					</p>
 					@btnQtyIncrease(cl)
 				</div>
-
 				<p class="text-sm text-gray-700">
 					Total: { cl.Total.Display() }
 				</p>

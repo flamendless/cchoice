@@ -95,6 +95,7 @@ templ input(t string, name string, placeholder string, pattern ...string) {
 		class="border rounded-lg p-2 w-full h-full peer"
 		placeholder={ placeholder }
 		required
+		onblur="this.value = this.value.trim()"
 		if len(pattern) > 0 {
 			pattern={ pattern[0] }
 		}
@@ -113,8 +114,9 @@ templ warning(text string) {
 }
 
 templ divInputWarning() {
-	<div class="flex flex-col gap-1">{ children... }
-</div>
+	<div class="flex flex-col gap-1">
+		{ children... }
+	</div>
 }
 
 templ ShippingAddressSelect() {
