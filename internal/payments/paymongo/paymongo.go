@@ -21,9 +21,11 @@ import (
 )
 
 type PayMongo struct {
+	client         *http.Client
 	apiKey         string
 	successURL     string
 	cancelURL      string
+	baseURL        string
 	paymentGateway payments.PaymentGateway
 }
 
@@ -39,6 +41,8 @@ func MustInit() *PayMongo {
 		apiKey:         apiKey,
 		successURL:     cfg.PayMongoSuccessURL,
 		cancelURL:      cfg.PayMongoCancelURL,
+		baseURL:        cfg.PayMongoBaseURL,
+		client:         &http.Client{Timeout: 10 * time.Second},
 	}
 }
 
@@ -63,10 +67,10 @@ func (p PayMongo) CreateCheckoutPaymentSession(
 		return nil, errors.Join(errs.ErrPaymentPayload, err)
 	}
 
-	const URL = "https://api.paymongo.com/v1/checkout_sessions"
+	URL := p.baseURL + "/checkout_sessions"
 	req, err := http.NewRequest(http.MethodPost, URL, bytes.NewReader(jsonPayload))
 	if err != nil {
-		return nil, errors.Join(errs.ErrPaymenetClient, err)
+		return nil, errors.Join(errs.ErrPaymentClient, err)
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
@@ -75,7 +79,7 @@ func (p PayMongo) CreateCheckoutPaymentSession(
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil || resp == nil || resp.StatusCode != http.StatusOK {
 		logs.JSONResponse("[PayMongo] CreateCheckoutSession", resp)
-		return nil, errors.Join(errs.ErrPaymenetClient, err)
+		return nil, errors.Join(errs.ErrPaymentClient, err)
 	}
 
 	defer func() {
@@ -93,10 +97,10 @@ func (p PayMongo) CreateCheckoutPaymentSession(
 }
 
 func (p PayMongo) GetAvailablePaymentMethods() (payments.GetAvailablePaymentMethodsResponse, error) {
-	const URL = "https://api.paymongo.com/v1/merchants/capabilities/payment_methods"
+	URL := p.baseURL + "/merchants/capabilities/payment_methods"
 	req, err := http.NewRequest(http.MethodGet, URL, nil)
 	if err != nil {
-		return nil, errors.Join(errs.ErrPaymenetClient, err)
+		return nil, errors.Join(errs.ErrPaymentClient, err)
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", p.GetAuth())
@@ -104,7 +108,7 @@ func (p PayMongo) GetAvailablePaymentMethods() (payments.GetAvailablePaymentMeth
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil || resp == nil || resp.StatusCode != http.StatusOK {
 		logs.JSONResponse("[PayMongo] GetAvailablePaymentMethods", resp)
-		return nil, errors.Join(errs.ErrPaymenetClient, err)
+		return nil, errors.Join(errs.ErrPaymentClient, err)
 	}
 
 	defer func() {
