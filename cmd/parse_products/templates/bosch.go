@@ -302,7 +302,8 @@ func BoschProcessProductImage(tpl *Template, product *models.Product) (*models.P
 	case "png":
 		thumbnail = path
 	case "webp":
-		path := fmt.Sprintf("%s/%s.webp", basepath, filename)
+		path := fmt.Sprintf("%s/640x640/%s.webp", basepath, filename)
+		path = strings.Replace(path, "original", "webp", 1)
 		thumbnailPath := "./cmd/web/" + path
 		_, err := os.Stat(thumbnailPath)
 		if err != nil {

@@ -68,8 +68,7 @@ setup() {
 
 genimages() {
 	go build -tags="imageprocessing staticfs" -o "${TMP}/genimages" .
-	"${TMP}/genimages" thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/thumbnails/product_images/bosch" --format="webp" --width=96 --height=96
-	"${TMP}/genimages" thumbnailify_images --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/thumbnails/product_images/bosch" --format="webp" --width=1080 --height=1080
+	"${TMP}/genimages" prepare_image_variants --inpath="./cmd/web/static/images/product_images/bosch" --outpath="./cmd/web/static/images/product_images"
 	"${TMP}/genimages" convert_images --inpath="./cmd/web/static/images/brand_logos" --outpath="./cmd/web/static/images/brand_logos" --format="webp"
 }
 
@@ -92,7 +91,7 @@ cleandb() {
 	gensql
 	"${TMP}/goose" up
 
-	go run -tags="fts5 staticfs" ./main.go parse_products -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./cmd/web/static/images/product_images/bosch/" --images_format="webp"
+	go run -tags="fts5 staticfs" ./main.go parse_products -p "assets/xlsx/bosch.xlsx" -s "DATABASE" -t "BOSCH" --use_db --db_path "${DBPATH}" --verify_prices=1 --panic_on_error=1 --images_basepath="./cmd/web/static/images/product_images/bosch/original/" --images_format="webp"
 
 }
 

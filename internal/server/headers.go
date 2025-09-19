@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -16,6 +17,8 @@ func CacheHeaders(
 ) (bool, http.File, error) {
 	var file http.File
 	var errFile error
+
+	path = strings.TrimPrefix(path, "static")
 
 	if fs != nil {
 		file, errFile = fs.Open(path)

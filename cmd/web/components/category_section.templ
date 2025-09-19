@@ -25,7 +25,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 			for _, product := range data.Products {
 				<div class="group flex flex-col items-center m-2 ml-4 hover:bg-cchoicesoft transition-colors">
 					<img
-						hx-get={ "/cchoice/products/image?thumbnail=1&size=1080x1080&path=" + product.ThumbnailPath }
+						hx-get={ "/cchoice/products/image?thumbnail=1&quality=best&path=" + product.ThumbnailPath }
 						hx-trigger="click"
 						hx-target="#modal_image_viewer .modal-content img"
 						hx-select="img"

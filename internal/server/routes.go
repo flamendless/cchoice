@@ -91,19 +91,20 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	key := "product_image_" + path
-	isThumbnail := false
+	ext := images.IMAGE_FORMAT_PNG
 	thumbnail := r.URL.Query().Get("thumbnail")
 	if thumbnail == "1" {
-		isThumbnail = true
+		ext = images.IMAGE_FORMAT_WEBP
 	}
 
 	size := r.URL.Query().Get("size")
-	if size == "" {
-		size = "160x160"
-		isThumbnail = true
-		key += size
+	quality := r.URL.Query().Get("quality")
+	if quality == "best" {
+		size = "640x640"
+		ext = images.IMAGE_FORMAT_WEBP
 	}
 
+	key += size
 	cacheKey := []byte(key)
 	if data, ok := s.cache.HasGet(nil, cacheKey); ok {
 		if err := components.Image(string(data)).Render(r.Context(), w); err != nil {
@@ -116,14 +117,8 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 		metrics.Cache.MemMiss()
 	}
 
-	finalPath, ext, err := images.GetImagePathWithSize(path, size, isThumbnail)
-	if err != nil {
+	if notModified, file, err := CacheHeaders(w, r, s.fs, path); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if notModified, file, err := CacheHeaders(w, r, s.fs, finalPath); err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	} else {
@@ -133,8 +128,9 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	imgData, err := images.GetImageDataB64(s.cache, s.fs, finalPath, ext)
+	imgData, err := images.GetImageDataB64(s.cache, s.fs, path, ext)
 	if err != nil {
+		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -329,14 +325,9 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		finalPath, ext, err := images.GetImagePathWithSize(product.ThumbnailPath, constants.DefaultThumbnailSize, true)
+		imgData, err := images.GetImageDataB64(s.cache, s.fs, product.ThumbnailPath, images.IMAGE_FORMAT_WEBP)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			continue
-		}
-
-		imgData, err := images.GetImageDataB64(s.cache, s.fs, finalPath, ext)
-		if err != nil {
+			logs.Log().Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			continue
 		}

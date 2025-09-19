@@ -22,7 +22,7 @@ func init() {
 
 var cmdTestPayment = &cobra.Command{
 	Use:   "test_payment",
-	Short: "test_payment",
+	Short: "test payment by making API calls",
 	Run: func(cmd *cobra.Command, args []string) {
 		var pg payments.IPaymentGateway
 		switch flagGateway {
