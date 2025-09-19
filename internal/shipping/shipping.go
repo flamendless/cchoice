@@ -8,7 +8,7 @@ type Coordinates struct {
 type Location struct {
 	Coordinates Coordinates `json:"coordinates"`
 	Address     string      `json:"address"`
-	Contact     Contact     `json:"contact,omitempty"`
+	Contact     Contact     `json:"contact"`
 }
 
 type Contact struct {
@@ -17,39 +17,39 @@ type Contact struct {
 }
 
 type Package struct {
-	Weight      string            `json:"weight"`
 	Dimensions  map[string]string `json:"dimensions,omitempty"`
+	Metadata    map[string]any    `json:"metadata,omitempty"`
+	Weight      string            `json:"weight"`
 	Description string            `json:"description,omitempty"`
 	Value       string            `json:"value,omitempty"`
-	Metadata    map[string]any    `json:"metadata,omitempty"`
 }
 
 type ShippingRequest struct {
+	Package          Package        `json:"package"`
+	Options          map[string]any `json:"options,omitempty"`
 	PickupLocation   Location       `json:"pickup_location"`
 	DeliveryLocation Location       `json:"delivery_location"`
-	Package          Package        `json:"package"`
 	ScheduledAt      string         `json:"scheduled_at,omitempty"`
 	ServiceType      string         `json:"service_type,omitempty"`
-	Options          map[string]any `json:"options,omitempty"`
 }
 
 type ShippingQuotation struct {
+	Metadata     map[string]any `json:"metadata,omitempty"`
 	ID           string         `json:"id,omitempty"`
 	Currency     string         `json:"currency"`
+	ServiceType  string         `json:"service_type"`
+	ExpiresAt    string         `json:"expires_at,omitempty"`
 	Fee          float64        `json:"fee"`
 	DistanceKm   float64        `json:"distance_km"`
 	EstimatedETA int            `json:"estimated_eta"`
-	ServiceType  string         `json:"service_type"`
-	ExpiresAt    string         `json:"expires_at,omitempty"`
-	Metadata     map[string]any `json:"metadata,omitempty"`
 }
 
 type ShippingOrder struct {
+	TrackingInfo map[string]any    `json:"tracking_info,omitempty"`
+	Metadata     map[string]any    `json:"metadata,omitempty"`
 	ID           string            `json:"id"`
 	Status       string            `json:"status"`
 	Quotation    ShippingQuotation `json:"quotation"`
-	TrackingInfo map[string]any    `json:"tracking_info,omitempty"`
-	Metadata     map[string]any    `json:"metadata,omitempty"`
 }
 
 // Features represents the capabilities supported by a shipping service
@@ -67,12 +67,12 @@ type Features struct {
 }
 
 type ServiceCapabilities struct {
+	Metadata          map[string]any `json:"metadata,omitempty"`
+	Provider          string         `json:"provider"`
+	APIVersion        string         `json:"api_version"`
 	SupportedServices []string       `json:"supported_services"`
 	Coverage          []string       `json:"coverage"`
 	Features          Features       `json:"features"`
-	Provider          string         `json:"provider"`
-	APIVersion        string         `json:"api_version"`
-	Metadata          map[string]any `json:"metadata,omitempty"`
 }
 
 type IShippingService interface {
