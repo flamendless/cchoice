@@ -5,6 +5,7 @@ package cmd
 import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/utils"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -68,7 +69,6 @@ var cmdConvertImages = &cobra.Command{
 			panic("Invalid format: " + flagsConvertImages.format)
 		}
 
-		validExts := []string{".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}
 		if err := filepath.Walk(flagsConvertImages.inpath, func(path string, info fs.FileInfo, err error) error {
 			if err != nil {
 				return err
@@ -78,20 +78,13 @@ var cmdConvertImages = &cobra.Command{
 				return nil
 			}
 
-			ext := strings.ToLower(filepath.Ext(info.Name()))
-			isValid := false
-			for _, validExt := range validExts {
-				if ext == validExt {
-					isValid = true
-					break
-				}
-			}
-			if !isValid {
+			ext := filepath.Ext(info.Name())
+			if !utils.IsValidImageExtension(ext){
 				logs.Log().Info("Skipping non-image file", zap.String("path", path))
 				return nil
 			}
 
-			filename := strings.TrimSuffix(info.Name(), filepath.Ext(info.Name()))
+			filename := strings.TrimSuffix(info.Name(), ext)
 			output := fmt.Sprintf(
 				"%s/%s.%s",
 				flagsConvertImages.outpath,

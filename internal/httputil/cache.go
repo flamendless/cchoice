@@ -1,10 +1,13 @@
-package server
+package httputil
 
 import (
 	"cchoice/internal/metrics"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
 	"time"
 )
@@ -34,10 +37,13 @@ func CacheHeaders(
 		return false, nil, err
 	}
 
+	etag, err := generateETag(info, r.URL.RawQuery)
+	if err != nil {
+		return false, nil, err
+	}
 	lastMod := info.ModTime().UTC().Format(http.TimeFormat)
-	etag := fmt.Sprintf(`"%x-%x"`, info.Size(), info.ModTime().Unix())
 
-	w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+	setCacheControlHeaders(w, r)
 	w.Header().Set("Last-Modified", lastMod)
 	w.Header().Set("ETag", etag)
 
@@ -58,6 +64,37 @@ func CacheHeaders(
 	}
 
 	metrics.Cache.HeadersMiss()
-
 	return false, file, nil
+}
+
+func generateETag(info os.FileInfo, rawQuery string) (string, error) {
+	queryParams := parseAndSortQuery(rawQuery)
+	h := sha256.New()
+	if _, err := fmt.Fprintf(h, "%d-%d-%s", info.Size(), info.ModTime().Unix(), queryParams); err != nil {
+		return "", err
+	}
+	hash := hex.EncodeToString(h.Sum(nil))[:16]
+	return fmt.Sprintf(`"f%x-q%s"`, info.ModTime().Unix(), hash), nil
+}
+
+func parseAndSortQuery(rawQuery string) string {
+	if rawQuery == "" {
+		return ""
+	}
+
+	params := strings.Split(rawQuery, "&")
+	sort.Strings(params)
+	return strings.Join(params, "&")
+}
+
+func setCacheControlHeaders(w http.ResponseWriter, r *http.Request) {
+	if strings.Contains(r.URL.Path, "/static/") {
+		w.Header().Set("Cache-Control", "public, max-age=86400") // 1 day
+	} else {
+		w.Header().Set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400") // 1 hour, stale 1 day
+	}
+
+	if r.URL.RawQuery != "" {
+		w.Header().Set("Vary", "Accept, Accept-Encoding")
+	}
 }

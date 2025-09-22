@@ -42,7 +42,8 @@ func InitLog() {
 		fmt.Println(err)
 	}
 	defer func() {
-		if err := newLogger.Sync(); !errors.Is(err, syscall.EINVAL) {
+		err := logger.Sync()
+		if err != nil && !errors.Is(err, syscall.ENOTTY) {
 			fmt.Println(err)
 		}
 	}()
