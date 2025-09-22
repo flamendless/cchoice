@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -13,6 +14,7 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/metrics"
@@ -26,6 +28,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 )
+
+func buildImageCacheKey(path, thumbnail, size, quality string, ext images.ImageFormat) []byte {
+	key := fmt.Sprintf("product_image_%s_t%s_s%s_q%s_%s",
+		path, thumbnail, size, quality, ext.String())
+	return []byte(key)
+}
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
@@ -54,7 +62,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Handle(
 			"/static/*",
 			// http.StripPrefix("/static/", static.Handler()),
-			http.StripPrefix("/static/", static.CacheHandler(CacheHeaders)),
+			http.StripPrefix("/static/", static.CacheHandler(httputil.CacheHeaders)),
 		)
 
 		r.Get("/changelogs", s.changelogsHandler)
@@ -90,7 +98,6 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	key := "product_image_" + path
 	ext := images.IMAGE_FORMAT_PNG
 	thumbnail := r.URL.Query().Get("thumbnail")
 	if thumbnail == "1" {
@@ -104,9 +111,10 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 		ext = images.IMAGE_FORMAT_WEBP
 	}
 
-	key += size
-	cacheKey := []byte(key)
+	cacheKey := buildImageCacheKey(path, thumbnail, size, quality, ext)
+
 	if data, ok := s.cache.HasGet(nil, cacheKey); ok {
+		w.Header().Set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400")
 		if err := components.Image(string(data)).Render(r.Context(), w); err != nil {
 			logs.Log().Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -117,7 +125,7 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 		metrics.Cache.MemMiss()
 	}
 
-	if notModified, file, err := CacheHeaders(w, r, s.fs, path); err != nil {
+	if notModified, file, err := httputil.CacheHeaders(w, r, s.fs, path); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return

@@ -5,6 +5,7 @@ package cmd
 import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/utils"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -23,16 +24,77 @@ type prepareImageVariantsFlags struct {
 	outpath string
 }
 
-var imageSizes = []struct {
+type imageSize struct {
 	width  int
 	height int
-}{
+}
+
+var imageSizes = []imageSize{
 	{96, 96},
 	{256, 256},
 	{640, 640},
 }
 
 var flagsPrepareImageVariants prepareImageVariantsFlags
+
+func getImageFiles(inpath string) ([]string, error) {
+	var imageFiles []string
+
+	err := filepath.Walk(inpath, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		ext := filepath.Ext(info.Name())
+		if utils.IsValidImageExtension(ext) {
+			imageFiles = append(imageFiles, path)
+		} else {
+			logs.Log().Info("Skipping non-image file", zap.String("path", path))
+		}
+
+		return nil
+	})
+
+	return imageFiles, err
+}
+
+func processImageForSize(imagePath string, size imageSize, webpPath string, webpExport *vips.ExportParams) error {
+	folderName := fmt.Sprintf("%dx%d", size.width, size.height)
+
+	img, err := vips.NewImageFromFile(imagePath)
+	if err != nil {
+		return fmt.Errorf("failed to load image: %w", err)
+	}
+	defer img.Close()
+
+	if err := img.Thumbnail(size.width, size.height, vips.InterestingCentre); err != nil {
+		return fmt.Errorf("failed to create thumbnail: %w", err)
+	}
+
+	imgBytes, _, err := img.Export(webpExport)
+	if err != nil {
+		return fmt.Errorf("failed to export WebP: %w", err)
+	}
+
+	filename := strings.TrimSuffix(filepath.Base(imagePath), filepath.Ext(imagePath))
+	outputFile := filepath.Join(webpPath, folderName, filename+".webp")
+
+	if err := os.WriteFile(outputFile, imgBytes, 0644); err != nil {
+		return fmt.Errorf("failed to write image variant: %w", err)
+	}
+
+	logs.Log().Info("Created image variant",
+		zap.String("size", folderName),
+		zap.String("input", imagePath),
+		zap.String("output", outputFile),
+	)
+
+	return nil
+}
 
 func init() {
 	f := cmdPrepareImageVariants.Flags
@@ -81,81 +143,41 @@ var cmdPrepareImageVariants = &cobra.Command{
 			}
 		}
 
+		imageFiles, err := getImageFiles(flagsPrepareImageVariants.inpath)
+		if err != nil {
+			panic(errors.Join(errs.ErrCmd, fmt.Errorf("failed to get image files: %w", err)))
+		}
+
+		if len(imageFiles) == 0 {
+			logs.Log().Info("No valid image files found", zap.String("path", flagsPrepareImageVariants.inpath))
+			return
+		}
+
+		logs.Log().Info("Found image files to process", zap.Int("count", len(imageFiles)))
+
 		webpExport := vips.NewDefaultWEBPExportParams()
-		validExts := []string{".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}
 
-		if err := filepath.Walk(flagsPrepareImageVariants.inpath, func(path string, info fs.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
+		for _, size := range imageSizes {
+			folderName := fmt.Sprintf("%dx%d", size.width, size.height)
+			logs.Log().Info("Processing size variant", zap.String("size", folderName))
 
-			if info.IsDir() {
-				return nil
-			}
+			for _, imagePath := range imageFiles {
+				logs.Log().Info("Processing image",
+					zap.String("path", imagePath),
+					zap.String("size", folderName))
 
-			ext := strings.ToLower(filepath.Ext(info.Name()))
-			isValid := false
-			for _, validExt := range validExts {
-				if ext == validExt {
-					isValid = true
-					break
-				}
-			}
-			if !isValid {
-				logs.Log().Info("Skipping non-image file", zap.String("path", path))
-				return nil
-			}
-
-			logs.Log().Info("Processing image", zap.String("path", path))
-
-			img, err := vips.NewImageFromFile(path)
-			if err != nil {
-				logs.Log().Error("Failed to load image", zap.Error(err), zap.String("path", path))
-				return nil
-			}
-
-			filename := strings.TrimSuffix(info.Name(), filepath.Ext(info.Name()))
-			for _, size := range imageSizes {
-				folderName := fmt.Sprintf("%dx%d", size.width, size.height)
-
-				imgCopy, err := vips.NewImageFromFile(path)
-				if err != nil {
-					logs.Log().Error("Failed to load image copy", zap.Error(err))
+				if err := processImageForSize(imagePath, size, webpPath, webpExport); err != nil {
+					logs.Log().Error("Failed to process image variant",
+						zap.Error(err),
+						zap.String("path", imagePath),
+						zap.String("size", folderName))
 					continue
 				}
-
-				if err := imgCopy.Thumbnail(size.width, size.height, vips.InterestingCentre); err != nil {
-					logs.Log().Error("Failed to create image variant", zap.Error(err))
-					imgCopy.Close()
-					continue
-				}
-
-				imgBytes, _, err := imgCopy.Export(webpExport)
-				if err != nil {
-					logs.Log().Error("Failed to export WebP", zap.Error(err))
-					imgCopy.Close()
-					continue
-				}
-
-				outputFile := filepath.Join(webpPath, folderName, filename+".webp")
-				if err := os.WriteFile(outputFile, imgBytes, 0644); err != nil {
-					logs.Log().Error("Failed to write image variant", zap.Error(err))
-					imgCopy.Close()
-					continue
-				}
-
-				logs.Log().Info("Created image variant",
-					zap.String("size", folderName),
-					zap.String("output", outputFile),
-				)
-
-				imgCopy.Close()
 			}
 
-			img.Close()
-			return nil
-		}); err != nil {
-			panic(errors.Join(errs.ErrCmd, err))
+			logs.Log().Info("Completed size variant",
+				zap.String("size", folderName),
+				zap.Int("processed", len(imageFiles)))
 		}
 
 		logs.Log().Info("Image variant preparation completed",
