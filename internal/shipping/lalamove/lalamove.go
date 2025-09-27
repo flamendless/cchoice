@@ -66,7 +66,7 @@ func (c *Lalamove) doRequest(method, path string, body []byte) (*http.Response, 
 		}
 		rawWrappedBody, err := json.Marshal(wrappedBody)
 		if err != nil {
-			return nil, errors.Join(errs.ErrLalamove, err)
+			return nil, err
 		}
 		body = rawWrappedBody
 	}
@@ -74,12 +74,12 @@ func (c *Lalamove) doRequest(method, path string, body []byte) (*http.Response, 
 	url := c.baseURL + path
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
 	if err != nil {
-		return nil, errors.Join(errs.ErrLalamove, err)
+		return nil, errors.Join(errs.ErrHTTPRequest, err)
 	}
 
 	authHeader, err := c.signRequest(method, path, body)
 	if err != nil {
-		return nil, errors.Join(errs.ErrLalamove, err)
+		return nil, errors.Join(errs.ErrSign, err)
 	}
 	req.Header.Set("Authorization", authHeader)
 	req.Header.Set("Content-Type", "application/json")
@@ -94,14 +94,14 @@ func (c *Lalamove) doRequest(method, path string, body []byte) (*http.Response, 
 	if resp.ContentLength != 0 {
 		bodyBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return nil, errors.Join(errs.ErrLalamove, err)
+			return nil, errors.Join(errs.ErrHTTPRequest, err)
 		}
 		resp.Body.Close()
 
 		var wrapper map[string]json.RawMessage
 		if err := json.Unmarshal(bodyBytes, &wrapper); err != nil {
 			resp.Body = io.NopCloser(bytes.NewReader(bodyBytes))
-			return resp, nil
+			return resp, errors.Join(errs.ErrHTTPRequest, err)
 		}
 
 		if errorsValue, hasErrors := wrapper["errors"]; hasErrors {
@@ -114,7 +114,7 @@ func (c *Lalamove) doRequest(method, path string, body []byte) (*http.Response, 
 		if messageValue, hasMessage := wrapper["message"]; hasMessage {
 			var message string
 			if err := json.Unmarshal(messageValue, &message); err == nil {
-				return nil, errors.Join(errs.ErrLalamove, errors.New(message))
+				return nil, errors.New(message)
 			}
 		}
 
@@ -153,7 +153,7 @@ func (c *Lalamove) GetQuotation(req shipping.ShippingRequest) (*shipping.Shippin
 }
 
 func (c *Lalamove) CreateOrder(req shipping.ShippingRequest) (*shipping.ShippingOrder, error) {
-	lalamoveReq := NewLalamoveQuotationRequest(req)
+	lalamoveReq := NewLalamoveOrderRequest(req)
 	body, err := json.Marshal(lalamoveReq)
 	if err != nil {
 		return nil, errors.Join(errs.ErrLalamove, err)
@@ -247,7 +247,7 @@ func (c *Lalamove) GetCapabilities() (*shipping.ServiceCapabilities, error) {
 		Provider:   c.shippingService.String(),
 		APIVersion: c.apiVersion,
 		Metadata: map[string]any{
-			"cities_data": cities, // Lalamove-specific raw city data
+			"cities_data": cities,
 		},
 	}, nil
 }

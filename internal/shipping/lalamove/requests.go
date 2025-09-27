@@ -24,6 +24,165 @@ type LalamoveQuotationRequest struct {
 	IsRouteOptimized bool                   `json:"isRouteOptimized,omitempty"`
 }
 
+type OrderSender struct {
+	StopID string `json:"stopId"`
+	Name   string `json:"name"`
+	Phone  string `json:"phone"`
+}
+
+type OrderRecipient struct {
+	StopID  string `json:"stopId"`
+	Name    string `json:"name"`
+	Phone   string `json:"phone"`
+	Remarks string `json:"remarks,omitempty"`
+}
+
+type OrderMetadata map[string]string
+
+type LalamoveOrderRequest struct {
+	QuotationID  string           `json:"quotationId"`
+	Sender       OrderSender      `json:"sender"`
+	Recipients   []OrderRecipient `json:"recipients"`
+	IsPODEnabled *bool            `json:"isPODEnabled,omitempty"`
+	Partner      string           `json:"partner,omitempty"`
+	Metadata     *OrderMetadata   `json:"metadata,omitempty"`
+}
+
+func NewLalamoveOrderRequest(req shipping.ShippingRequest) *LalamoveOrderRequest {
+	quotationID := ""
+	if req.Options != nil {
+		if quotationIDVal, exists := req.Options["quotation_id"]; exists {
+			if quotationIDStr, ok := quotationIDVal.(string); ok {
+				quotationID = quotationIDStr
+			}
+		}
+	}
+
+	var senderStopID, recipientStopID string
+	if req.Options != nil {
+		if stopsData, exists := req.Options["quotation_stops"]; exists {
+			if stops, ok := stopsData.([]QuotationStop); ok {
+				if len(stops) >= 1 {
+					senderStopID = stops[0].StopID
+				}
+				if len(stops) >= 2 {
+					recipientStopID = stops[1].StopID
+				}
+			}
+		}
+	}
+
+	sender := OrderSender{
+		StopID: senderStopID,
+		Name:   req.PickupLocation.Contact.Name,
+		Phone:  req.PickupLocation.Contact.Phone,
+	}
+
+	recipients := []OrderRecipient{
+		{
+			StopID: recipientStopID,
+			Name:   req.DeliveryLocation.Contact.Name,
+			Phone:  req.DeliveryLocation.Contact.Phone,
+		},
+	}
+
+	var isPODEnabled *bool
+	var partner string
+	var metadata *OrderMetadata
+
+	if req.Options != nil {
+		if podVal, exists := req.Options["is_pod_enabled"]; exists {
+			if podBool, ok := podVal.(bool); ok {
+				isPODEnabled = &podBool
+			}
+		}
+
+		if partnerVal, exists := req.Options["partner"]; exists {
+			if partnerStr, ok := partnerVal.(string); ok {
+				partner = partnerStr
+			}
+		}
+
+		if metadataVal, exists := req.Options["metadata"]; exists {
+			if metadataMap, ok := metadataVal.(map[string]interface{}); ok {
+				metadata = &OrderMetadata{}
+				*metadata = make(map[string]string)
+				for key, value := range metadataMap {
+					if valueStr, ok := value.(string); ok {
+						(*metadata)[key] = valueStr
+					}
+				}
+			}
+		}
+
+		if remarksVal, exists := req.Options["remarks"]; exists {
+			if remarksStr, ok := remarksVal.(string); ok {
+				recipients[0].Remarks = remarksStr
+			}
+		}
+	}
+
+	return &LalamoveOrderRequest{
+		QuotationID:  quotationID,
+		Sender:       sender,
+		Recipients:   recipients,
+		IsPODEnabled: isPODEnabled,
+		Partner:      partner,
+		Metadata:     metadata,
+	}
+}
+
+type OrderRequestParams struct {
+	IsPODEnabled bool              `json:"isPODEnabled"`
+	Partner      string            `json:"partner,omitempty"`
+	Remarks      string            `json:"remarks,omitempty"`
+	Metadata     map[string]string `json:"metadata,omitempty"`
+}
+
+func CreateOrderRequest(originalReq shipping.ShippingRequest, quotation *shipping.ShippingQuotation, params OrderRequestParams) shipping.ShippingRequest {
+	orderReq := shipping.ShippingRequest{
+		Package:          originalReq.Package,
+		PickupLocation:   originalReq.PickupLocation,
+		DeliveryLocation: originalReq.DeliveryLocation,
+		ScheduledAt:      originalReq.ScheduledAt,
+		ServiceType:      originalReq.ServiceType,
+		Options:          make(map[string]any),
+	}
+
+	if originalReq.Options != nil {
+		for k, v := range originalReq.Options {
+			orderReq.Options[k] = v
+		}
+	}
+
+	orderReq.Options["quotation_id"] = quotation.ID
+	orderReq.Options["is_pod_enabled"] = params.IsPODEnabled
+
+	if quotation.Metadata != nil {
+		if stopsData, exists := quotation.Metadata["stops"]; exists {
+			orderReq.Options["quotation_stops"] = stopsData
+		}
+	}
+
+	if params.Partner != "" {
+		orderReq.Options["partner"] = params.Partner
+	}
+
+	if params.Remarks != "" {
+		orderReq.Options["remarks"] = params.Remarks
+	}
+
+	if len(params.Metadata) > 0 {
+		metadataInterface := make(map[string]interface{})
+		for k, v := range params.Metadata {
+			metadataInterface[k] = v
+		}
+		orderReq.Options["metadata"] = metadataInterface
+	}
+
+	return orderReq
+}
+
 func NewLalamoveQuotationRequest(req shipping.ShippingRequest) *LalamoveQuotationRequest {
 	stops := []QuotationStopRequest{
 		{

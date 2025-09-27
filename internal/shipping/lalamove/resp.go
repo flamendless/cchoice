@@ -161,6 +161,7 @@ func (q *QuotationResponse) ToShippingQuotation() *shipping.ShippingQuotation {
 			"special_requests":   q.SpecialRequests,
 			"language":           q.Language,
 			"is_route_optimized": q.IsRouteOptimized,
+			"stops":              q.Stops,
 			"price_breakdown": map[string]any{
 				"base":                       float64(q.PriceBreakdown.Base),
 				"special_requests":           float64(q.PriceBreakdown.SpecialRequests),
