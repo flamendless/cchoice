@@ -55,7 +55,7 @@ var cmdTestShipping = &cobra.Command{
 		fmt.Printf("    API Version: %s\n", capabilities.APIVersion)
 		fmt.Println()
 		fmt.Println("=== Testing GetQuotation ===")
-		quotationReq := shipping.ShippingRequest{
+		reqShipping := shipping.ShippingRequest{
 			PickupLocation: shipping.Location{
 				Coordinates: shipping.Coordinates{
 					Lat: "14.4791",
@@ -64,7 +64,7 @@ var cmdTestShipping = &cobra.Command{
 				Address: "Cavite, Philippines",
 				Contact: shipping.Contact{
 					Name:  "John Sender",
-					Phone: "+63-917-123-4567",
+					Phone: "+639171234567",
 				},
 			},
 			DeliveryLocation: shipping.Location{
@@ -75,7 +75,7 @@ var cmdTestShipping = &cobra.Command{
 				Address: "Quezon City, Philippines",
 				Contact: shipping.Contact{
 					Name:  "Jane Receiver",
-					Phone: "+63-917-987-6543",
+					Phone: "+639179876543",
 				},
 			},
 			Package: shipping.Package{
@@ -101,9 +101,9 @@ var cmdTestShipping = &cobra.Command{
 				"is_route_optimized": true,
 			},
 		}
-		fmt.Println("Quotation Request:", quotationReq)
+		fmt.Println("Quotation Request:", reqShipping)
 
-		quotation, err := ss.GetQuotation(quotationReq)
+		quotation, err := ss.GetQuotation(reqShipping)
 		if err != nil {
 			panic(err)
 		}
@@ -119,47 +119,28 @@ var cmdTestShipping = &cobra.Command{
 		dump.Println("Quotation Metadata:", quotation.Metadata)
 
 		fmt.Println("=== Testing CreateOrder ===")
-		orderReq := shipping.ShippingRequest{
-			PickupLocation: shipping.Location{
-				Coordinates: shipping.Coordinates{
-					Lat: "14.5995",
-					Lng: "120.9842",
-				},
-				Address: "Makati, Philippines",
-				Contact: shipping.Contact{
-					Name:  "Business Sender",
-					Phone: "+63-917-111-2222",
-				},
-			},
-			DeliveryLocation: shipping.Location{
-				Coordinates: shipping.Coordinates{
-					Lat: "14.6760",
-					Lng: "121.0437",
-				},
-				Address: "Ortigas, Philippines",
-				Contact: shipping.Contact{
-					Name:  "Customer Receiver",
-					Phone: "+63-917-333-4444",
-				},
-			},
-			Package: shipping.Package{
-				Weight:      "LESS_THAN_3KG",
-				Description: "Food delivery items",
-				Value:       "1500",
-				Metadata: map[string]any{
-					"categories":            []string{"FOOD_DELIVERY"},
-					"quantity":              "2",
-					"handling_instructions": []string{"KEEP_UPRIGHT", "FRAGILE"},
-				},
-			},
-			ScheduledAt: time.Now().UTC().Add(2 * time.Hour).Format("2006-01-02T15:04:05Z"),
-			ServiceType: "MOTORCYCLE",
-			Options: map[string]any{
-				"special_requests":   []string{"CASH_ON_DELIVERY"},
-				"language":           "en_PH",
-				"is_route_optimized": true,
+
+		// Define order-specific parameters
+		orderParams := lalamove.OrderRequestParams{
+			IsPODEnabled: true,
+			Partner:      "Lalamove Partner 1",
+			Remarks:      "Please handle with care - fragile items",
+			Metadata: map[string]string{
+				"restaurant_order_id": "1234",
+				"restaurant_name":     "Rustam's Kebab",
+				"customer_notes":      "Extra spicy",
+				"order_source":        "mobile_app",
 			},
 		}
+
+		orderReq := lalamove.CreateOrderRequest(reqShipping, quotation, orderParams)
+
+		fmt.Println("Order Request (with additional fields):")
+		fmt.Printf("  Quotation ID: %v\n", orderReq.Options["quotation_id"])
+		fmt.Printf("  POD Enabled: %v\n", orderReq.Options["is_pod_enabled"])
+		fmt.Printf("  Partner: %v\n", orderReq.Options["partner"])
+		fmt.Printf("  Remarks: %v\n", orderReq.Options["remarks"])
+		dump.Println("  Metadata:", orderReq.Options["metadata"])
 
 		order, err := ss.CreateOrder(orderReq)
 		if err != nil {
