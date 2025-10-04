@@ -5,6 +5,7 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/geocoding"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -43,7 +44,7 @@ func (g *GoogleMapsGeocoder) SetRegion(region string) {
 
 func (g *GoogleMapsGeocoder) Geocode(req geocoding.GeocodeRequest) (*geocoding.GeocodeResponse, error) {
 	if req.Address == "" {
-		return nil, errs.ErrInvalidRequest
+		return nil, errs.ErrGMapsInvalidRequest
 	}
 
 	params := url.Values{}
@@ -80,12 +81,12 @@ func (g *GoogleMapsGeocoder) Geocode(req geocoding.GeocodeRequest) (*geocoding.G
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(errs.ErrGMapsInvalidResponse, errs.ErrIORead, err)
 	}
 
 	var apiResp GoogleMapsGeocodeResponse
 	if err := json.Unmarshal(body, &apiResp); err != nil {
-		return nil, err
+		return nil, errors.Join(errs.ErrGMapsInvalidResponse, errs.ErrJSONUnmarshal, err)
 	}
 
 	if err := g.checkStatus(apiResp.Status); err != nil {
@@ -93,7 +94,7 @@ func (g *GoogleMapsGeocoder) Geocode(req geocoding.GeocodeRequest) (*geocoding.G
 	}
 
 	if len(apiResp.Results) == 0 {
-		return nil, errs.ErrNoResults
+		return nil, errs.ErrGMapsNoResults
 	}
 
 	result := apiResp.Results[0]
@@ -102,7 +103,7 @@ func (g *GoogleMapsGeocoder) Geocode(req geocoding.GeocodeRequest) (*geocoding.G
 
 func (g *GoogleMapsGeocoder) ReverseGeocode(req geocoding.ReverseGeocodeRequest) (*geocoding.GeocodeResponse, error) {
 	if req.Coordinates.Lat == "" || req.Coordinates.Lng == "" {
-		return nil, errs.ErrInvalidRequest
+		return nil, errs.ErrGMapsInvalidRequest
 	}
 
 	params := url.Values{}
@@ -127,12 +128,12 @@ func (g *GoogleMapsGeocoder) ReverseGeocode(req geocoding.ReverseGeocodeRequest)
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(errs.ErrGMapsInvalidResponse, errs.ErrIORead, err)
 	}
 
 	var apiResp GoogleMapsGeocodeResponse
 	if err := json.Unmarshal(body, &apiResp); err != nil {
-		return nil, err
+		return nil, errors.Join(errs.ErrGMapsInvalidResponse, errs.ErrJSONUnmarshal, err)
 	}
 
 	if err := g.checkStatus(apiResp.Status); err != nil {
@@ -140,7 +141,7 @@ func (g *GoogleMapsGeocoder) ReverseGeocode(req geocoding.ReverseGeocodeRequest)
 	}
 
 	if len(apiResp.Results) == 0 {
-		return nil, errs.ErrNoResults
+		return nil, errs.ErrGMapsNoResults
 	}
 
 	result := apiResp.Results[0]
@@ -168,15 +169,15 @@ func (g *GoogleMapsGeocoder) checkStatus(status string) error {
 	case "OK":
 		return nil
 	case "ZERO_RESULTS":
-		return errs.ErrNoResults
+		return errs.ErrGMapsNoResults
 	case "OVER_QUERY_LIMIT":
-		return errs.ErrQuotaExceeded
+		return errs.ErrGMapsQuotaExceeded
 	case "REQUEST_DENIED":
-		return errs.ErrRequestDenied
+		return errs.ErrGMapsRequestDenied
 	case "INVALID_REQUEST":
-		return errs.ErrInvalidRequest
+		return errs.ErrGMapsInvalidRequest
 	default:
-		return fmt.Errorf("%w: %s", errs.ErrUnknownError, status)
+		return fmt.Errorf("%w: %s", errs.ErrGMapsUnknownError, status)
 	}
 }
 

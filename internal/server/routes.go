@@ -55,7 +55,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		fs := static.GetFS()
 		if fs == nil {
-			panic(errors.Join(errs.ErrServerInit, errors.New("server.fs not setup")))
+			panic(errors.Join(errs.ErrServerInit, errs.ErrServerFSNotSetup))
 		}
 
 		s.fs = http.FS(fs)
@@ -370,7 +370,7 @@ func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		// 	return
 		// }
 	default:
-		err := errors.New("checkouts handler. Unimplemented payment gateway")
+		err := errs.ErrServerUnimplementedGateway
 		logs.Log().Error(err.Error(), zap.String("gateway", s.paymentGateway.GatewayEnum().String()))
 		http.Error(w, err.Error(), http.StatusNotImplemented)
 		return

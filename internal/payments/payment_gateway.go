@@ -1,6 +1,7 @@
 package payments
 
 import (
+	"cchoice/internal/errs"
 	"fmt"
 	"strings"
 )
@@ -19,7 +20,7 @@ func ParsePaymentGatewayToEnum(pg string) PaymentGateway {
 	case PAYMENT_GATEWAY_PAYMONGO.String():
 		return PAYMENT_GATEWAY_PAYMONGO
 	default:
-		panic(fmt.Errorf("undefined payment gateway '%s'", pg))
+		panic(fmt.Errorf("%w: '%s'", errs.ErrCmdUndefinedService, pg))
 	}
 }
 

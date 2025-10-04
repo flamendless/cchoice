@@ -3,11 +3,10 @@ package errs
 import "errors"
 
 var (
-	ErrAPIKeyRequired  = errors.New("google Maps API key is required")
-	ErrInvalidResponse = errors.New("invalid response from Google Maps API")
-	ErrNoResults       = errors.New("no results found")
-	ErrQuotaExceeded   = errors.New("API quota exceeded")
-	ErrInvalidRequest  = errors.New("invalid request")
-	ErrRequestDenied   = errors.New("request denied")
-	ErrUnknownError    = errors.New("unknown error from Google Maps API")
+	ErrGeocodingNilRequest       = errors.New("[GEOCODING]: Request cannot be nil")
+	ErrGeocodingNilLocation      = errors.New("[GEOCODING]: Location cannot be nil")
+	ErrGeocodingEmptyAddress     = errors.New("[GEOCODING]: Address cannot be empty")
+	ErrGeocodingEmptyCoordinates = errors.New("[GEOCODING]: Coordinates cannot be empty")
+	ErrGeocodingAddressTooShort  = errors.New("[GEOCODING]: Address is too short, minimum 10 characters required")
+	ErrGeocodingInvalidLocation  = errors.New("[GEOCODING]: Location must have either valid coordinates or an address")
 )
