@@ -10,11 +10,12 @@ func _() {
 	var x [1]struct{}
 	_ = x[SHIPPING_SERVICE_UNDEFINED-0]
 	_ = x[SHIPPING_SERVICE_LALAMOVE-1]
+	_ = x[SHIPPING_SERVICE_CCHOICE-2]
 }
 
-const _ShippingService_name = "UNDEFINEDLALAMOVE"
+const _ShippingService_name = "UNDEFINEDLALAMOVECCHOICE"
 
-var _ShippingService_index = [...]uint8{0, 9, 17}
+var _ShippingService_index = [...]uint8{0, 9, 17, 24}
 
 func (i ShippingService) String() string {
 	if i < 0 || i >= ShippingService(len(_ShippingService_index)-1) {

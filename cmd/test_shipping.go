@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"cchoice/internal/geocoding/googlemaps"
 	"cchoice/internal/shipping"
+	"cchoice/internal/shipping/cchoice"
 	"cchoice/internal/shipping/lalamove"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/gookit/goutil/dump"
@@ -15,7 +18,7 @@ var flagShippingService string
 
 func init() {
 	f := cmdTestShipping.Flags
-	f().StringVarP(&flagShippingService, "service", "s", "lalamove", "Shipping service name")
+	f().StringVarP(&flagShippingService, "service", "s", "cchoice", "Shipping service name (lalamove, cchoice)")
 	rootCmd.AddCommand(cmdTestShipping)
 }
 
@@ -23,9 +26,24 @@ var cmdTestShipping = &cobra.Command{
 	Use:   "test_shipping",
 	Short: "test shipping by making API calls",
 	Run: func(cmd *cobra.Command, args []string) {
+		originalShippingService := os.Getenv("SHIPPING_SERVICE")
+		defer func() {
+			if originalShippingService == "" {
+				os.Unsetenv("SHIPPING_SERVICE")
+			} else {
+				os.Setenv("SHIPPING_SERVICE", originalShippingService)
+			}
+		}()
+
 		var ss shipping.IShippingService
 		switch flagShippingService {
+		case "cchoice":
+			os.Setenv("SHIPPING_SERVICE", "cchoice")
+			fmt.Println("Using SHIPPING_SERVICE=cchoice for testing")
+			ss = cchoice.MustInit()
 		case "lalamove":
+			os.Setenv("SHIPPING_SERVICE", "lalamove")
+			fmt.Println("Using SHIPPING_SERVICE=lalamove for testing")
 			ss = lalamove.MustInit()
 		default:
 			panic(fmt.Sprintf("Unimplemented shipping service: '%s'", flagShippingService))
@@ -50,6 +68,8 @@ var cmdTestShipping = &cobra.Command{
 		fmt.Printf("    Cash on Delivery: %v\n", capabilities.Features.CashOnDelivery)
 		fmt.Printf("    Contactless Delivery: %v\n", capabilities.Features.ContactlessDelivery)
 
+		geocoder := googlemaps.MustInit()
+
 		fmt.Printf("\nProvider Information:\n")
 		fmt.Printf("    Provider: %s\n", capabilities.Provider)
 		fmt.Printf("    API Version: %s\n", capabilities.APIVersion)
@@ -57,10 +77,6 @@ var cmdTestShipping = &cobra.Command{
 		fmt.Println("=== Testing GetQuotation ===")
 		reqShipping := shipping.ShippingRequest{
 			PickupLocation: shipping.Location{
-				Coordinates: shipping.Coordinates{
-					Lat: "14.4791",
-					Lng: "120.8970",
-				},
 				Address: "Cavite, Philippines",
 				Contact: shipping.Contact{
 					Name:  "John Sender",
@@ -68,10 +84,6 @@ var cmdTestShipping = &cobra.Command{
 				},
 			},
 			DeliveryLocation: shipping.Location{
-				Coordinates: shipping.Coordinates{
-					Lat: "14.6760",
-					Lng: "121.0437",
-				},
 				Address: "Quezon City, Philippines",
 				Contact: shipping.Contact{
 					Name:  "Jane Receiver",
@@ -79,7 +91,7 @@ var cmdTestShipping = &cobra.Command{
 				},
 			},
 			Package: shipping.Package{
-				Weight:      "LESS_THAN_3KG",
+				Weight:      getPackageWeight(flagShippingService),
 				Description: "Electronics and office supplies",
 				Value:       "5000",
 				Dimensions: map[string]string{
@@ -101,6 +113,26 @@ var cmdTestShipping = &cobra.Command{
 				"is_route_optimized": true,
 			},
 		}
+
+		fmt.Printf("\nUse geocoding to get coordinates for both locations\n")
+		pickupCoords, err := geocoder.GeocodeShippingAddress(reqShipping.PickupLocation.Address)
+		if err != nil {
+			panic(err)
+		}
+		reqShipping.PickupLocation.Coordinates = shipping.Coordinates{
+			Lat: pickupCoords.Lat,
+			Lng: pickupCoords.Lng,
+		}
+
+		deliveryCoords, err := geocoder.GeocodeShippingAddress(reqShipping.DeliveryLocation.Address)
+		if err != nil {
+			panic(err)
+		}
+		reqShipping.DeliveryLocation.Coordinates = shipping.Coordinates{
+			Lat: deliveryCoords.Lat,
+			Lng: deliveryCoords.Lng,
+		}
+
 		fmt.Println("Quotation Request:", reqShipping)
 
 		quotation, err := ss.GetQuotation(reqShipping)
@@ -118,9 +150,40 @@ var cmdTestShipping = &cobra.Command{
 		}
 		dump.Println("Quotation Metadata:", quotation.Metadata)
 
+		if flagShippingService == "cchoice" {
+			fmt.Println("\n=== C-Choice Service: Testing Unsupported Operations (Should Fail) ===")
+
+			fmt.Println("Testing CreateOrder (should fail)...")
+			_, err = ss.CreateOrder(reqShipping)
+			if err != nil {
+				fmt.Printf("✓ CreateOrder failed as expected: %v\n", err)
+			} else {
+				fmt.Println("✗ CreateOrder should have failed!")
+			}
+
+			fmt.Println("Testing GetOrderStatus (should fail)...")
+			_, err = ss.GetOrderStatus("test-order-id")
+			if err != nil {
+				fmt.Printf("✓ GetOrderStatus failed as expected: %v\n", err)
+			} else {
+				fmt.Println("✗ GetOrderStatus should have failed!")
+			}
+
+			fmt.Println("Testing CancelOrder (should fail)...")
+			err = ss.CancelOrder("test-order-id")
+			if err != nil {
+				fmt.Printf("✓ CancelOrder failed as expected: %v\n", err)
+			} else {
+				fmt.Println("✗ CancelOrder should have failed!")
+			}
+
+			fmt.Println("\n=== Test Completed ===")
+			fmt.Println("C-Choice shipping service (quotation-only) working successfully!")
+			return
+		}
+
 		fmt.Println("=== Testing CreateOrder ===")
 
-		// Define order-specific parameters
 		orderParams := lalamove.OrderRequestParams{
 			IsPODEnabled: true,
 			Partner:      "Lalamove Partner 1",
@@ -173,4 +236,15 @@ var cmdTestShipping = &cobra.Command{
 		fmt.Println("=== Test Completed ===")
 		fmt.Println("Generic shipping interface working successfully!")
 	},
+}
+
+func getPackageWeight(service string) string {
+	switch service {
+	case "cchoice":
+		return "2.5"
+	case "lalamove":
+		return "LESS_THAN_3KG"
+	default:
+		return "2.5"
+	}
 }

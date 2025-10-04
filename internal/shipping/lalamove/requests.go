@@ -2,6 +2,7 @@ package lalamove
 
 import (
 	"cchoice/internal/shipping"
+	"maps"
 )
 
 type QuotationStopRequest struct {
@@ -40,12 +41,12 @@ type OrderRecipient struct {
 type OrderMetadata map[string]string
 
 type LalamoveOrderRequest struct {
-	QuotationID  string           `json:"quotationId"`
-	Sender       OrderSender      `json:"sender"`
-	Recipients   []OrderRecipient `json:"recipients"`
 	IsPODEnabled *bool            `json:"isPODEnabled,omitempty"`
-	Partner      string           `json:"partner,omitempty"`
 	Metadata     *OrderMetadata   `json:"metadata,omitempty"`
+	Sender       OrderSender      `json:"sender"`
+	QuotationID  string           `json:"quotationId"`
+	Partner      string           `json:"partner,omitempty"`
+	Recipients   []OrderRecipient `json:"recipients"`
 }
 
 func NewLalamoveOrderRequest(req shipping.ShippingRequest) *LalamoveOrderRequest {
@@ -104,7 +105,7 @@ func NewLalamoveOrderRequest(req shipping.ShippingRequest) *LalamoveOrderRequest
 		}
 
 		if metadataVal, exists := req.Options["metadata"]; exists {
-			if metadataMap, ok := metadataVal.(map[string]interface{}); ok {
+			if metadataMap, ok := metadataVal.(map[string]any); ok {
 				metadata = &OrderMetadata{}
 				*metadata = make(map[string]string)
 				for key, value := range metadataMap {
@@ -133,10 +134,10 @@ func NewLalamoveOrderRequest(req shipping.ShippingRequest) *LalamoveOrderRequest
 }
 
 type OrderRequestParams struct {
-	IsPODEnabled bool              `json:"isPODEnabled"`
+	Metadata     map[string]string `json:"metadata,omitempty"`
 	Partner      string            `json:"partner,omitempty"`
 	Remarks      string            `json:"remarks,omitempty"`
-	Metadata     map[string]string `json:"metadata,omitempty"`
+	IsPODEnabled bool              `json:"isPODEnabled"`
 }
 
 func CreateOrderRequest(originalReq shipping.ShippingRequest, quotation *shipping.ShippingQuotation, params OrderRequestParams) shipping.ShippingRequest {
@@ -150,9 +151,7 @@ func CreateOrderRequest(originalReq shipping.ShippingRequest, quotation *shippin
 	}
 
 	if originalReq.Options != nil {
-		for k, v := range originalReq.Options {
-			orderReq.Options[k] = v
-		}
+		maps.Copy(orderReq.Options, originalReq.Options)
 	}
 
 	orderReq.Options["quotation_id"] = quotation.ID
@@ -173,7 +172,7 @@ func CreateOrderRequest(originalReq shipping.ShippingRequest, quotation *shippin
 	}
 
 	if len(params.Metadata) > 0 {
-		metadataInterface := make(map[string]interface{})
+		metadataInterface := make(map[string]any)
 		for k, v := range params.Metadata {
 			metadataInterface[k] = v
 		}

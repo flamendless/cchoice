@@ -26,6 +26,8 @@ type appConfig struct {
 	LalamoveBaseURL    string `env:"LALAMOVE_BASE_URL"`
 	LalamoveAPIKey     string `env:"LALAMOVE_API_KEY"`
 	LalamoveAPISecret  string `env:"LALAMOVE_API_SECRET"`
+	GeocodingService   string `env:"GEOCODING_SERVICE" env-required:""`
+	GoogleMapsAPIKey   string `env:"GOOGLE_MAPS_API_KEY"`
 	FSMode             string `env:"FSMODE" env-required:""`
 	EncodeSalt         string `env:"ENCODE_SALT" env-required:""`
 	CertPath           string `env:"CERTPATH"`
@@ -46,12 +48,22 @@ func mustValidate(c *appConfig) {
 		panic("Only 'paymongo' service is allowed for now")
 	}
 
-	if c.ShippingService == "lalamove" {
+	switch c.ShippingService {
+	case "lalamove":
 		if c.LalamoveBaseURL == "" || c.LalamoveAPIKey == "" || c.LalamoveAPISecret == "" {
 			panic(fmt.Errorf("[Lalamove]: %w", errs.ErrEnvVarRequired))
 		}
-	} else {
+	case "cchoice":
+	default:
 		panic("Only 'lalamove' service is allowed for now")
+	}
+
+	if c.GeocodingService == "googlemaps" {
+		if c.GoogleMapsAPIKey == "" {
+			panic(fmt.Errorf("[GoogleMaps]: %w", errs.ErrEnvVarRequired))
+		}
+	} else {
+		panic("Only 'googlemaps' service is allowed for now")
 	}
 
 	if c.IsLocal() {

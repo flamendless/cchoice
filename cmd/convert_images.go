@@ -79,7 +79,7 @@ var cmdConvertImages = &cobra.Command{
 			}
 
 			ext := filepath.Ext(info.Name())
-			if !utils.IsValidImageExtension(ext){
+			if !utils.IsValidImageExtension(ext) {
 				logs.Log().Info("Skipping non-image file", zap.String("path", path))
 				return nil
 			}
