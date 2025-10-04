@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cchoice/internal/errs"
 	"cchoice/internal/geocoding/googlemaps"
 	"cchoice/internal/shipping"
 	"cchoice/internal/shipping/cchoice"
@@ -46,7 +47,7 @@ var cmdTestShipping = &cobra.Command{
 			fmt.Println("Using SHIPPING_SERVICE=lalamove for testing")
 			ss = lalamove.MustInit()
 		default:
-			panic(fmt.Sprintf("Unimplemented shipping service: '%s'", flagShippingService))
+			panic(fmt.Errorf("%w: '%s'", errs.ErrCmdUnimplementedService, flagShippingService))
 		}
 
 		fmt.Println("=== Testing GetCapabilities ===")

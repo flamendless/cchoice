@@ -50,56 +50,56 @@ var BoschColumns map[string]*Column = map[string]*Column{
 func BoschProcessPrices(tpl *Template, row []string) ([]*money.Money, []error) {
 	colRP, ok := tpl.Columns["Retail Price (Local Currency)"]
 	if !ok {
-		panic("missing column")
+		panic(errs.ErrCmdMissingColumn)
 	}
 	priceWithoutVat := row[colRP.Index]
 	priceWithVat := row[colRP.Index]
 
 	prices := make([]*money.Money, 0, 8)
-	errs := make([]error, 0, 8)
+	errors := make([]error, 0, 8)
 
 	unitPriceWithoutVat, err := utils.SanitizePrice(priceWithoutVat)
 	if err != nil {
-		errs = append(errs, err...)
+		errors = append(errors, err...)
 	}
 
 	unitPriceWithVat, err := utils.SanitizePrice(priceWithVat)
 	if err != nil {
-		errs = append(errs, err...)
+		errors = append(errors, err...)
 	}
 
-	if len(errs) == 0 {
+	if len(errors) == 0 {
 		prices = append(prices, unitPriceWithoutVat)
 		prices = append(prices, unitPriceWithVat)
 	}
 
-	return prices, errs
+	return prices, errors
 }
 
 func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 	colPartNumber, ok := tpl.Columns["Part Number"]
 	if !ok {
-		panic("missing column")
+		panic(errs.ErrCmdMissingColumn)
 	}
 
 	colPower, ok := tpl.Columns["Power"]
 	if !ok {
-		panic("missing column")
+		panic(errs.ErrCmdMissingColumn)
 	}
 
 	colCapacity, ok := tpl.Columns["Capacity"]
 	if !ok {
-		panic("missing column")
+		panic(errs.ErrCmdMissingColumn)
 	}
 
 	colScopeOfSupply, ok := tpl.Columns["Scope of supply"]
 	if !ok {
-		panic("missing column")
+		panic(errs.ErrCmdMissingColumn)
 	}
 
 	colModel, ok := tpl.Columns["Model"]
 	if !ok {
-		panic("missing column")
+		panic(errs.ErrCmdMissingColumn)
 	}
 
 	errsRes := make([]error, 0, 8)
@@ -112,7 +112,7 @@ func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 
 	prices, errMonies := BoschProcessPrices(tpl, row)
 	if len(prices) < 2 {
-		panic("invalid prices")
+		panic(errs.ErrCmdInvalidPrice)
 	}
 	if len(errMonies) > 0 {
 		errsRes = append(errsRes, errMonies...)
@@ -145,22 +145,22 @@ func BoschRowToProduct(tpl *Template, row []string) (*models.Product, []error) {
 func BoschRowToSpecs(tpl *Template, row []string) *models.ProductSpecs {
 	colPartNumber, ok := tpl.Columns["Part Number"]
 	if !ok {
-		panic("missing column")
+		panic(errs.ErrCmdMissingColumn)
 	}
 
 	colPower, ok := tpl.Columns["Power"]
 	if !ok {
-		panic("missing column")
+		panic(errs.ErrCmdMissingColumn)
 	}
 
 	colCapacity, ok := tpl.Columns["Capacity"]
 	if !ok {
-		panic("missing column")
+		panic(errs.ErrCmdMissingColumn)
 	}
 
 	colScopeOfSupply, ok := tpl.Columns["Scope of supply"]
 	if !ok {
-		panic("missing column")
+		panic(errs.ErrCmdMissingColumn)
 	}
 
 	partNumber := row[colPartNumber.Index]
@@ -201,23 +201,23 @@ LoopProductProces:
 		}
 
 		row = tpl.AlignRow(row)
-		product, errs := tpl.RowToProduct(tpl, row)
+		product, errsVars := tpl.RowToProduct(tpl, row)
 		if product == nil {
 			continue
 		}
 		specs := tpl.RowToSpecs(tpl, row)
 
-		if len(errs) > 0 {
+		if len(errsVars) > 0 {
 			proceedToError := true
 			if proceedToError {
 				if tpl.AppFlags.Strict {
-					logs.Log().Panic("error", zap.Errors("errors", errs))
+					logs.Log().Panic("error", zap.Errors("errors", errsVars))
 					return nil
 				}
 				logs.Log().Debug(
 					"row to product",
 					zap.Int("row number", rowIdx),
-					zap.Errors("errors", errs),
+					zap.Errors("errors", errsVars),
 				)
 				totalErrors += 1
 				continue LoopProductProces
@@ -226,7 +226,7 @@ LoopProductProces:
 
 		colCategory, ok := tpl.Columns["Category"]
 		if !ok {
-			panic("missing column")
+			panic(errs.ErrCmdMissingColumn)
 		}
 		category := utils.SanitizeCategory(row[colCategory.Index])
 		subcategory := category
@@ -254,10 +254,10 @@ LoopProductProces:
 			Subcategory: utils.SanitizeCategory(subcategory),
 		}
 		if product.ProductCategory.Category == "" {
-			panic(fmt.Sprintf("product '%s' has no category value", product.Name))
+			panic(fmt.Errorf("%w: product '%s'", errs.ErrCmdNoCategory, product.Name))
 		}
 		if product.ProductCategory.Subcategory == "" {
-			panic(fmt.Sprintf("product '%s' has no subcategory value", product.Name))
+			panic(fmt.Errorf("%w: product '%s'", errs.ErrCmdNoSubcategory, product.Name))
 		}
 		product.ProductSpecs = specs
 		product.PostProcess(rowIdx)

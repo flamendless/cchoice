@@ -29,7 +29,7 @@ type Lalamove struct {
 func MustInit() *Lalamove {
 	cfg := conf.Conf()
 	if cfg.ShippingService != "lalamove" {
-		panic("'SHIPPING_SERVICE' must be 'lalamove' to use this")
+		panic(errs.ErrLalamoveServiceInit)
 	}
 
 	return &Lalamove{
@@ -52,7 +52,7 @@ func (c *Lalamove) signRequest(method string, path string, body []byte) (string,
 
 	mac := hmac.New(sha256.New, []byte(c.secret))
 	if _, err := mac.Write([]byte(message)); err != nil {
-		return "", errors.Join(errs.ErrLalamove, errs.ErrSign, err)
+		return "", errors.Join(errs.ErrLalamoveSignRequest, err)
 	}
 	signature := hex.EncodeToString(mac.Sum(nil))
 	authHeader := fmt.Sprintf("hmac %s:%s:%s", c.apiKey, timestamp, signature)
@@ -66,7 +66,7 @@ func (c *Lalamove) doRequest(method, path string, body []byte) (*http.Response, 
 		}
 		rawWrappedBody, err := json.Marshal(wrappedBody)
 		if err != nil {
-			return nil, err
+			return nil, errors.Join(errs.ErrLalamoveJSONMarshal, errs.ErrJSONMarshal, err)
 		}
 		body = rawWrappedBody
 	}
@@ -74,12 +74,12 @@ func (c *Lalamove) doRequest(method, path string, body []byte) (*http.Response, 
 	url := c.baseURL + path
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
 	if err != nil {
-		return nil, errors.Join(errs.ErrHTTPRequest, err)
+		return nil, errors.Join(errs.ErrLalamoveHTTPRequest, errs.ErrHTTPNewRequest, err)
 	}
 
 	authHeader, err := c.signRequest(method, path, body)
 	if err != nil {
-		return nil, errors.Join(errs.ErrSign, err)
+		return nil, errors.Join(errs.ErrLalamoveSignRequest, err)
 	}
 	req.Header.Set("Authorization", authHeader)
 	req.Header.Set("Content-Type", "application/json")
@@ -88,33 +88,37 @@ func (c *Lalamove) doRequest(method, path string, body []byte) (*http.Response, 
 
 	resp, err := c.client.Do(req)
 	if err != nil || resp == nil {
-		return nil, errors.Join(errs.ErrHTTPRequest, err)
+		return nil, errors.Join(errs.ErrLalamoveHTTPRequest, errs.ErrHTTPDoRequest, err)
 	}
 
 	if resp.ContentLength != 0 {
 		bodyBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return nil, errors.Join(errs.ErrHTTPRequest, err)
+			return nil, errors.Join(errs.ErrLalamoveHTTPRequest, errs.ErrHTTPReadResponse, err)
 		}
 		resp.Body.Close()
 
 		var wrapper map[string]json.RawMessage
 		if err := json.Unmarshal(bodyBytes, &wrapper); err != nil {
 			resp.Body = io.NopCloser(bytes.NewReader(bodyBytes))
-			return resp, errors.Join(errs.ErrHTTPRequest, err)
+			return resp, errors.Join(errs.ErrLalamoveJSONUnmarshal, errs.ErrJSONUnmarshal, err)
 		}
 
 		if errorsValue, hasErrors := wrapper["errors"]; hasErrors {
 			var errorResp LalamoveErrorResponse
 			if err := json.Unmarshal(errorsValue, &errorResp.Errors); err == nil {
-				return nil, errors.Join(errs.ErrLalamove, errorResp)
+				return nil, errors.Join(errs.ErrLalamoveAPIResponse, errorResp)
+			} else {
+				return nil, errors.Join(errs.ErrLalamoveJSONUnmarshal, errs.ErrJSONUnmarshal, err)
 			}
 		}
 
 		if messageValue, hasMessage := wrapper["message"]; hasMessage {
 			var message string
 			if err := json.Unmarshal(messageValue, &message); err == nil {
-				return nil, errors.New(message)
+				return nil, errs.ErrLalamoveAPIResponse
+			} else {
+				return nil, errors.Join(errs.ErrLalamoveJSONUnmarshal, errs.ErrJSONUnmarshal, err)
 			}
 		}
 
@@ -136,17 +140,17 @@ func (c *Lalamove) GetQuotation(req shipping.ShippingRequest) (*shipping.Shippin
 	lalamoveReq := NewLalamoveQuotationRequest(req)
 	body, err := json.Marshal(lalamoveReq)
 	if err != nil {
-		return nil, errors.Join(errs.ErrLalamove, err)
+		return nil, errors.Join(errs.ErrLalamoveQuotation, errs.ErrLalamoveJSONMarshal, err)
 	}
 	resp, err := c.doRequest(http.MethodPost, "/v3/quotations", body)
 	if err != nil || resp == nil {
-		return nil, errors.Join(errs.ErrLalamove, err)
+		return nil, errors.Join(errs.ErrLalamoveQuotation, err)
 	}
 	defer resp.Body.Close()
 
 	var result QuotationResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, errors.Join(errs.ErrLalamove, err)
+		return nil, errors.Join(errs.ErrLalamoveQuotation, errs.ErrJSONDecode, err)
 	}
 
 	return result.ToShippingQuotation(), nil
@@ -156,18 +160,18 @@ func (c *Lalamove) CreateOrder(req shipping.ShippingRequest) (*shipping.Shipping
 	lalamoveReq := NewLalamoveOrderRequest(req)
 	body, err := json.Marshal(lalamoveReq)
 	if err != nil {
-		return nil, errors.Join(errs.ErrLalamove, err)
+		return nil, errors.Join(errs.ErrLalamoveOrderCreate, errs.ErrLalamoveJSONMarshal, err)
 	}
 
 	resp, err := c.doRequest(http.MethodPost, "/v3/orders", body)
 	if err != nil || resp == nil {
-		return nil, errors.Join(errs.ErrLalamove, err)
+		return nil, errors.Join(errs.ErrLalamoveOrderCreate, err)
 	}
 	defer resp.Body.Close()
 
 	var result OrderResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, errors.Join(errs.ErrLalamove, err)
+		return nil, errors.Join(errs.ErrLalamoveOrderCreate, errs.ErrJSONDecode, err)
 	}
 
 	return result.ToShippingOrder(), nil
@@ -178,13 +182,13 @@ func (c *Lalamove) GetOrderStatus(orderID string) (*shipping.ShippingOrder, erro
 
 	resp, err := c.doRequest("GET", path, nil)
 	if err != nil || resp == nil {
-		return nil, errors.Join(errs.ErrLalamove, err)
+		return nil, errors.Join(errs.ErrLalamoveOrderStatus, err)
 	}
 	defer resp.Body.Close()
 
 	var result OrderStatusResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, errors.Join(errs.ErrLalamove, err)
+		return nil, errors.Join(errs.ErrLalamoveOrderStatus, errs.ErrJSONDecode, err)
 	}
 
 	return result.ToShippingOrder(), nil
@@ -204,13 +208,13 @@ func (c *Lalamove) CancelOrder(orderID string) error {
 func (c *Lalamove) GetCapabilities() (*shipping.ServiceCapabilities, error) {
 	resp, err := c.doRequest("GET", "/v3/cities", nil)
 	if err != nil || resp == nil {
-		return nil, errors.Join(errs.ErrLalamove, err)
+		return nil, errors.Join(errs.ErrLalamoveCapabilities, err)
 	}
 	defer resp.Body.Close()
 
 	var cities CitiesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&cities); err != nil {
-		return nil, errors.Join(errs.ErrLalamove, err)
+		return nil, errors.Join(errs.ErrLalamoveCapabilities, errs.ErrJSONDecode, err)
 	}
 
 	coverage := make([]string, 0, len(cities))

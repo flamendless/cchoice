@@ -428,7 +428,7 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	default:
-		err := fmt.Errorf("%s. Unimplemented payment gateway", logtag)
+		err := fmt.Errorf("%s. %w", logtag, errs.ErrServerUnimplementedGateway)
 		logs.Log().Error(err.Error(), zap.String("gateway", s.paymentGateway.GatewayEnum().String()))
 		http.Error(w, err.Error(), http.StatusNotImplemented)
 		return

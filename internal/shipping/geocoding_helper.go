@@ -1,8 +1,8 @@
 package shipping
 
 import (
+	"cchoice/internal/errs"
 	"cchoice/internal/geocoding"
-	"errors"
 	"fmt"
 )
 
@@ -18,7 +18,7 @@ func NewGeocodingHelper(geocoder geocoding.IGeocoder) *GeocodingHelper {
 
 func (gh *GeocodingHelper) EnsureCoordinates(request *ShippingRequest) error {
 	if request == nil {
-		return errors.New("shipping request cannot be nil")
+		return errs.ErrGeocodingNilRequest
 	}
 
 	if err := gh.ensureLocationCoordinates(&request.PickupLocation, "pickup"); err != nil {
@@ -59,7 +59,7 @@ func (gh *GeocodingHelper) ensureLocationCoordinates(location *Location, locatio
 
 func (gh *GeocodingHelper) GeocodeAddress(address string) (*Coordinates, error) {
 	if address == "" {
-		return nil, errors.New("address cannot be empty")
+		return nil, errs.ErrGeocodingEmptyAddress
 	}
 
 	coordinates, err := gh.geocoder.GeocodeShippingAddress(address)
@@ -75,7 +75,7 @@ func (gh *GeocodingHelper) GeocodeAddress(address string) (*Coordinates, error) 
 
 func (gh *GeocodingHelper) ReverseGeocode(coordinates Coordinates) (string, error) {
 	if coordinates.Lat == "" || coordinates.Lng == "" {
-		return "", errors.New("coordinates cannot be empty")
+		return "", errs.ErrGeocodingEmptyCoordinates
 	}
 
 	req := geocoding.ReverseGeocodeRequest{
@@ -96,7 +96,7 @@ func (gh *GeocodingHelper) ReverseGeocode(coordinates Coordinates) (string, erro
 
 func (gh *GeocodingHelper) ValidateShippingRequest(request *ShippingRequest) error {
 	if request == nil {
-		return errors.New("shipping request cannot be nil")
+		return errs.ErrGeocodingNilRequest
 	}
 
 	if err := gh.validateLocation(&request.PickupLocation, "pickup"); err != nil {
@@ -119,20 +119,19 @@ func (gh *GeocodingHelper) validateLocation(location *Location, locationType str
 	hasAddress := location.Address != ""
 
 	if !hasCoordinates && !hasAddress {
-		return fmt.Errorf("%s location must have either valid coordinates or an address for geocoding", locationType)
+		return fmt.Errorf("%w: %s location", errs.ErrGeocodingInvalidLocation, locationType)
 	}
 
 	return nil
 }
 
-// GeocodeShippingLocation geocodes a single shipping location if it doesn't already have coordinates
 func GeocodeShippingLocation(geocoder geocoding.IGeocoder, location *Location) error {
 	if location == nil {
-		return errors.New("location cannot be nil")
+		return errs.ErrGeocodingNilLocation
 	}
 
 	if location.Address == "" {
-		return errors.New("location address cannot be empty")
+		return errs.ErrGeocodingEmptyAddress
 	}
 
 	if location.Coordinates.Lat != "" && location.Coordinates.Lng != "" {
@@ -151,10 +150,9 @@ func GeocodeShippingLocation(geocoder geocoding.IGeocoder, location *Location) e
 	return nil
 }
 
-// GeocodeShippingRequest geocodes both pickup and delivery locations in a shipping request
 func GeocodeShippingRequest(geocoder geocoding.IGeocoder, request *ShippingRequest) error {
 	if request == nil {
-		return errors.New("shipping request cannot be nil")
+		return errs.ErrGeocodingNilRequest
 	}
 
 	if err := GeocodeShippingLocation(geocoder, &request.PickupLocation); err != nil {

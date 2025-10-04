@@ -81,7 +81,7 @@ func (s *Server) shippingAddressHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if len(maps) == 0 {
-		err := fmt.Errorf("no maps found for '%s'", data)
+		err := fmt.Errorf("%w for '%s'", errs.ErrServerNoMapsFound, data)
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

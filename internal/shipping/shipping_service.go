@@ -3,6 +3,7 @@
 package shipping
 
 import (
+	"cchoice/internal/errs"
 	"fmt"
 	"strings"
 )
@@ -22,6 +23,6 @@ func ParseShippingServiceToEnum(ss string) ShippingService {
 	case SHIPPING_SERVICE_LALAMOVE.String():
 		return SHIPPING_SERVICE_LALAMOVE
 	default:
-		panic(fmt.Errorf("undefined shipping service '%s'", ss))
+		panic(fmt.Errorf("%w: '%s'", errs.ErrCmdUndefinedService, ss))
 	}
 }
