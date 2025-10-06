@@ -11,6 +11,7 @@ import (
 
 const (
 	skCheckoutLineProductIDs = "checkout_line_ids"
+	skShippingQuotation      = "shipping_quotation"
 )
 
 func AddToCheckoutLineProductIDs(

@@ -3,8 +3,12 @@ package requests
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
 	"encoding/gob"
+	"encoding/hex"
+	"fmt"
 	"sort"
+	"strings"
 
 	"cchoice/cmd/web/models"
 	"cchoice/internal/database"
@@ -209,4 +213,24 @@ func GetCategorySectionHandler(
 	}
 
 	return categorySections, nil
+}
+
+func GenerateSettingsCacheKey(keys []string) []byte {
+	sort.Strings(keys)
+	keyData := "homepage:settings:" + strings.Join(keys, ",")
+	hash := sha256.Sum256([]byte(keyData))
+	return fmt.Appendf(nil, "hp_set_%s", hex.EncodeToString(hash[:])[:16])
+}
+
+func GenerateCategoriesSidePanelCacheKey(params queries.GetProductCategoriesByPromotedParams) []byte {
+	keyData := fmt.Sprintf("homepage:categories_side:%t:%t:%d",
+		params.PromotedAtHomepage.Valid, params.PromotedAtHomepage.Bool, params.Limit)
+	hash := sha256.Sum256([]byte(keyData))
+	return fmt.Appendf(nil, "hp_cat_%s", hex.EncodeToString(hash[:])[:16])
+}
+
+func GenerateCategorySectionCacheKey(page, limit int) []byte {
+	keyData := fmt.Sprintf("homepage:category_sections:%d:%d", page, limit)
+	hash := sha256.Sum256([]byte(keyData))
+	return fmt.Appendf(nil, "hp_sec_%s", hex.EncodeToString(hash[:])[:16])
 }

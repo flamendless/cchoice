@@ -17,6 +17,7 @@ import (
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
+	"cchoice/internal/shipping"
 	"cchoice/internal/utils"
 
 	"github.com/Rhymond/go-money"
@@ -285,6 +286,10 @@ func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
 		deliveryFee := utils.NewMoney(0, "PHP")
 		totalDiscounts := utils.NewMoney(0, "PHP")
 
+		if quotation, ok := s.sessionManager.Get(r.Context(), skShippingQuotation).(*shipping.ShippingQuotation); ok && quotation != nil {
+			deliveryFee = utils.NewMoney(int64(quotation.Fee*100), quotation.Currency)
+		}
+
 		for _, checkoutLine := range checkoutLines {
 			sub := utils.NewMoney(checkoutLine.UnitPriceWithVat, checkoutLine.UnitPriceWithVatCurrency).Multiply(checkoutLine.Quantity)
 
@@ -301,7 +306,7 @@ func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
 
 		errs = errors.Join(errs, components.CartSummaryRow("Subtotal", subtotal.Display(), "text-gray-500").Render(r.Context(), w))
 		errs = errors.Join(errs, components.CartSummaryRow("Total Discount", "- "+totalDiscounts.Display(), "text-red-500").Render(r.Context(), w))
-		errs = errors.Join(errs, components.CartSummaryRow("Delivery Fee", deliveryFee.Display(), "text-gray-500").Render(r.Context(), w))
+		errs = errors.Join(errs, components.CartSummaryRowWithID("delivery-fee-row", "Delivery Fee", deliveryFee.Display(), "text-gray-500").Render(r.Context(), w))
 		errs = errors.Join(errs, components.HR().Render(r.Context(), w))
 		errs = errors.Join(errs, components.CartSummaryRow("Total", total.Display()).Render(r.Context(), w))
 

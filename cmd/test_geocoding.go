@@ -117,7 +117,7 @@ var testGeocodingCmd = &cobra.Command{
 				Weight:      "2.5",
 				Description: "Test package",
 			},
-			ServiceType: "MOTORCYCLE",
+			ServiceType: shipping.SERVICE_TYPE_MOTORCYCLE,
 		}
 
 		fmt.Printf("  Pickup Address: %s\n", shippingReq.PickupLocation.Address)

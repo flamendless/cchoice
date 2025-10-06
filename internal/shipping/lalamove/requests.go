@@ -230,7 +230,7 @@ func NewLalamoveQuotationRequest(req shipping.ShippingRequest) *LalamoveQuotatio
 
 	return &LalamoveQuotationRequest{
 		ScheduleAt:       req.ScheduledAt,
-		ServiceType:      req.ServiceType,
+		ServiceType:      req.ServiceType.String(),
 		SpecialRequests:  specialRequests,
 		Language:         language,
 		Stops:            stops,

@@ -9,7 +9,7 @@ templ ProvinceSelect() {
 		<select
 			id="province"
 			name="province"
-			class="border rounded-lg p-2"
+			class="border rounded-lg p-2 required-field"
 			required
 			hx-get="/cchoice/shipping/address?data=provinces"
 			hx-trigger="load once"
@@ -40,7 +40,7 @@ templ CitySelect() {
 		<select
 			id="city"
 			name="city"
-			class="border rounded-lg p-2"
+			class="border rounded-lg p-2 required-field"
 			required
 			hx-get="/cchoice/shipping/address?data=cities"
 			hx-trigger="change, get"
@@ -71,7 +71,7 @@ templ BarangaySelect() {
 		<select
 			id="barangay"
 			name="barangay"
-			class="border rounded-lg p-2"
+			class="border rounded-lg p-2 required-field"
 			required
 			hx-get="/cchoice/shipping/address?data=barangays"
 			hx-trigger="change, get"
@@ -102,6 +102,20 @@ templ input(t string, name string, placeholder string, pattern ...string) {
 	/>
 }
 
+templ inputWithClass(t string, name string, placeholder string, class string, pattern ...string) {
+	<input
+		type={ t }
+		name={ name }
+		class={ "border rounded-lg p-2 w-full h-full peer " + class }
+		placeholder={ placeholder }
+		required
+		onblur="this.value = this.value.trim()"
+		if len(pattern) > 0 {
+			pattern={ pattern[0] }
+		}
+	/>
+}
+
 templ warning(text string) {
 	<small
 		class="
@@ -120,7 +134,21 @@ templ divInputWarning() {
 }
 
 templ ShippingAddressSelect() {
-	<div class="flex flex-col gap-2 w-full max-w-lg">
+	<div
+		class="flex flex-col gap-2 w-full max-w-lg"
+		id="shipping-form"
+		hx-post="/cchoice/shipping/quotation"
+		hx-trigger="post"
+		hx-swap="none"
+		_="
+			on change from .required-field
+				if #address_line1.value !== '' and #city.value !== '' and #province.value !== '' and #barangay.value !== ''
+					log 'All fields completed, calculating shipping...'
+					trigger post on #shipping-form
+					trigger get on #cart-summary
+				end
+		"
+	>
 		@divInputWarning() {
 			@input("email", "email", "E-Mail")
 			@warning("Please enter a valid email address")
@@ -130,13 +158,18 @@ templ ShippingAddressSelect() {
 			@warning("Please enter a valid mobile number")
 		}
 		@divInputWarning() {
-			@input("text", "address_line1", "Address Line 1")
+			@inputWithClass("text", "address_line1", "Address Line 1", "required-field")
 			@warning("Please enter a valid address line")
 		}
-		@divInputWarning() {
-			@input("text", "address_line2", "Address Line 2")
-			@warning("Please enter a valid address line")
-		}
+		<div class="flex flex-col gap-1">
+			<input
+				type="text"
+				name="address_line2"
+				class="border rounded-lg p-2 w-full h-full"
+				placeholder="Address Line 2 (Optional)"
+				onblur="this.value = this.value.trim()"
+			/>
+		</div>
 		@divInputWarning() {
 			@input("text", "postal", "Postal code", "^[0-9]{4}$")
 			@warning("Please enter a valid postal code (4 digits only)")

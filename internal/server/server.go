@@ -17,10 +17,13 @@ import (
 	"cchoice/internal/database"
 	"cchoice/internal/encode"
 	"cchoice/internal/encode/sqids"
+	"cchoice/internal/geocoding"
+	"cchoice/internal/geocoding/googlemaps"
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
 	"cchoice/internal/payments/paymongo"
 	"cchoice/internal/shipping"
+	cchoiceservice "cchoice/internal/shipping/cchoice"
 	"cchoice/internal/shipping/lalamove"
 )
 
@@ -35,6 +38,7 @@ type Server struct {
 	sessionManager  *scs.SessionManager
 	paymentGateway  payments.IPaymentGateway
 	shippingService shipping.IShippingService
+	geocoder        geocoding.IGeocoder
 	encoder         encode.IEncode
 	address         string
 	port            int
@@ -59,6 +63,33 @@ func NewServer() *http.Server {
 
 	dbRO := database.New(database.DB_MODE_RO)
 	dbRW := database.New(database.DB_MODE_RW)
+
+	var paymentGateway payments.IPaymentGateway
+	switch cfg.PaymentService {
+	case "paymongo":
+		paymentGateway = paymongo.MustInit()
+	default:
+		panic("Unsupported payment service: " + cfg.PaymentService)
+	}
+
+	var shippingService shipping.IShippingService
+	switch cfg.ShippingService {
+	case "lalamove":
+		shippingService = lalamove.MustInit()
+	case "cchoice":
+		shippingService = cchoiceservice.MustInit()
+	default:
+		panic("Unsupported shipping service: " + cfg.ShippingService)
+	}
+
+	var geocoder geocoding.IGeocoder
+	switch cfg.GeocodingService {
+	case "googlemaps":
+		geocoder = googlemaps.MustInit()
+	default:
+		panic("Unsupported geocoding service: " + cfg.GeocodingService)
+	}
+
 	NewServer := &Server{
 		address:         cfg.Address,
 		port:            cfg.Port,
@@ -67,8 +98,9 @@ func NewServer() *http.Server {
 		dbRW:            dbRW,
 		cache:           fastcache.New(CACHE_MAX_BYTES),
 		sessionManager:  sessionManager,
-		paymentGateway:  paymongo.MustInit(),
-		shippingService: lalamove.MustInit(),
+		paymentGateway:  paymentGateway,
+		shippingService: shippingService,
+		geocoder:        geocoder,
 		encoder:         sqids.MustSqids(),
 		useHTTP2:        cfg.UseHTTP2,
 		useSSL:          cfg.UseSSL,
