@@ -6,6 +6,7 @@ import (
 	"cchoice/internal/constants"
 	"fmt"
 	"strings"
+	"time"
 )
 
 templ CartPage(body templ.Component) {
@@ -82,7 +83,7 @@ templ CartPageBody() {
 							id="cart-summary"
 							class="flex flex-col gap-1 border rounded h-auto p-2"
 							hx-get="/cchoice/carts/summary?data=summary_total"
-							hx-trigger="load once, get"
+							hx-trigger="load, every 3s"
 							hx-swap="innerHTML"
 						>
 							//CartSummaryRow
@@ -128,13 +129,20 @@ templ CartPageBody() {
 			</form>
 		</div>
 		@Footer()
-		<script type="text/javascript" src={ string(templ.URL("/cchoice/static/js/cart.js")) }>
+		<script type="text/javascript" src={ string(templ.URL("/cchoice/static/js/cart.js?v=" + fmt.Sprintf("%d", time.Now().Unix()))) }>
 		</script>
 	</body>
 }
 
 templ CartSummaryRow(left string, right string, class ...string) {
 	<div class={ "flex flex-row flex-1 justify-between " + strings.Join(class, " ") }>
+		<h1>{ left }</h1>
+		<h1 class="text-right">{ right }</h1>
+	</div>
+}
+
+templ CartSummaryRowWithID(id string, left string, right string, class ...string) {
+	<div id={ id } class={ "flex flex-row flex-1 justify-between " + strings.Join(class, " ") }>
 		<h1>{ left }</h1>
 		<h1 class="text-right">{ right }</h1>
 	</div>

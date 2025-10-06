@@ -1,5 +1,12 @@
 package shipping
 
+import "encoding/gob"
+
+func init() {
+	gob.Register(&ShippingQuotation{})
+	gob.Register(ServiceType(0))
+}
+
 type Coordinates struct {
 	Lat string `json:"lat"`
 	Lng string `json:"lng"`
@@ -30,14 +37,14 @@ type ShippingRequest struct {
 	PickupLocation   Location       `json:"pickup_location"`
 	DeliveryLocation Location       `json:"delivery_location"`
 	ScheduledAt      string         `json:"scheduled_at,omitempty"`
-	ServiceType      string         `json:"service_type,omitempty"`
+	ServiceType      ServiceType    `json:"service_type,omitempty"`
 }
 
 type ShippingQuotation struct {
 	Metadata     map[string]any `json:"metadata,omitempty"`
 	ID           string         `json:"id,omitempty"`
 	Currency     string         `json:"currency"`
-	ServiceType  string         `json:"service_type"`
+	ServiceType  ServiceType    `json:"service_type"`
 	ExpiresAt    string         `json:"expires_at,omitempty"`
 	Fee          float64        `json:"fee"`
 	DistanceKm   float64        `json:"distance_km"`
@@ -52,7 +59,6 @@ type ShippingOrder struct {
 	Quotation    ShippingQuotation `json:"quotation"`
 }
 
-// Features represents the capabilities supported by a shipping service
 type Features struct {
 	RealTimeTracking    bool `json:"real_time_tracking"`
 	RouteOptimization   bool `json:"route_optimization"`
@@ -70,7 +76,7 @@ type ServiceCapabilities struct {
 	Metadata          map[string]any `json:"metadata,omitempty"`
 	Provider          string         `json:"provider"`
 	APIVersion        string         `json:"api_version"`
-	SupportedServices []string       `json:"supported_services"`
+	SupportedServices []ServiceType  `json:"supported_services"`
 	Coverage          []string       `json:"coverage"`
 	Features          Features       `json:"features"`
 }
@@ -82,4 +88,5 @@ type IShippingService interface {
 	CreateOrder(ShippingRequest) (*ShippingOrder, error)
 	GetOrderStatus(string) (*ShippingOrder, error)
 	CancelOrder(string) error
+	GetBusinessLocation() *Location
 }

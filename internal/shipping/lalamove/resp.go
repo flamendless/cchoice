@@ -154,7 +154,7 @@ func (q *QuotationResponse) ToShippingQuotation() *shipping.ShippingQuotation {
 		Fee:          float64(q.PriceBreakdown.Total),
 		DistanceKm:   float64(q.Distance),
 		EstimatedETA: 0,
-		ServiceType:  q.ServiceType,
+		ServiceType:  shipping.ParseServiceTypeToEnum(q.ServiceType),
 		ExpiresAt:    q.ExpiresAt,
 		Metadata: map[string]any{
 			"schedule_at":        q.ScheduleAt,

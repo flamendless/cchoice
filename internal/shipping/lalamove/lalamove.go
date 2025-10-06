@@ -18,12 +18,13 @@ import (
 )
 
 type Lalamove struct {
-	client          *http.Client
-	apiKey          string
-	secret          string
-	baseURL         string
-	apiVersion      string
-	shippingService shipping.ShippingService
+	client           *http.Client
+	apiKey           string
+	secret           string
+	baseURL          string
+	apiVersion       string
+	shippingService  shipping.ShippingService
+	businessLocation *shipping.Location
 }
 
 func MustInit() *Lalamove {
@@ -39,11 +40,22 @@ func MustInit() *Lalamove {
 		baseURL:         cfg.LalamoveBaseURL,
 		client:          &http.Client{Timeout: 10 * time.Second},
 		apiVersion:      "v3",
+		businessLocation: &shipping.Location{
+			Coordinates: shipping.Coordinates{
+				Lat: cfg.BusinessLat,
+				Lng: cfg.BusinessLng,
+			},
+			Address: cfg.BusinessAddress,
+		},
 	}
 }
 
 func (c *Lalamove) Enum() shipping.ShippingService {
 	return c.shippingService
+}
+
+func (c *Lalamove) GetBusinessLocation() *shipping.Location {
+	return c.businessLocation
 }
 
 func (c *Lalamove) signRequest(method string, path string, body []byte) (string, error) {
@@ -222,13 +234,14 @@ func (c *Lalamove) GetCapabilities() (*shipping.ServiceCapabilities, error) {
 		coverage = append(coverage, city.Name)
 	}
 
-	var supportedServices []string
-	serviceSet := make(map[string]bool)
+	var supportedServices []shipping.ServiceType
+	serviceTypeSet := make(map[shipping.ServiceType]bool)
 	for _, city := range cities {
 		for _, service := range city.Services {
-			if !serviceSet[service.Key] {
-				supportedServices = append(supportedServices, service.Key)
-				serviceSet[service.Key] = true
+			serviceType := shipping.ParseServiceTypeToEnum(service.Key)
+			if !serviceTypeSet[serviceType] {
+				supportedServices = append(supportedServices, serviceType)
+				serviceTypeSet[serviceType] = true
 			}
 		}
 	}

@@ -7,7 +7,6 @@ import (
 	"cchoice/internal/shipping/cchoice"
 	"cchoice/internal/shipping/lalamove"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/gookit/goutil/dump"
@@ -27,24 +26,11 @@ var cmdTestShipping = &cobra.Command{
 	Use:   "test_shipping",
 	Short: "test shipping by making API calls",
 	Run: func(cmd *cobra.Command, args []string) {
-		originalShippingService := os.Getenv("SHIPPING_SERVICE")
-		defer func() {
-			if originalShippingService == "" {
-				os.Unsetenv("SHIPPING_SERVICE")
-			} else {
-				os.Setenv("SHIPPING_SERVICE", originalShippingService)
-			}
-		}()
-
 		var ss shipping.IShippingService
 		switch flagShippingService {
 		case "cchoice":
-			os.Setenv("SHIPPING_SERVICE", "cchoice")
-			fmt.Println("Using SHIPPING_SERVICE=cchoice for testing")
 			ss = cchoice.MustInit()
 		case "lalamove":
-			os.Setenv("SHIPPING_SERVICE", "lalamove")
-			fmt.Println("Using SHIPPING_SERVICE=lalamove for testing")
 			ss = lalamove.MustInit()
 		default:
 			panic(fmt.Errorf("%w: '%s'", errs.ErrCmdUnimplementedService, flagShippingService))
@@ -107,7 +93,7 @@ var cmdTestShipping = &cobra.Command{
 				},
 			},
 			ScheduledAt: time.Now().UTC().Add(1 * time.Hour).Format("2006-01-02T15:04:05Z"),
-			ServiceType: "MOTORCYCLE",
+			ServiceType: shipping.SERVICE_TYPE_MOTORCYCLE,
 			Options: map[string]any{
 				"special_requests":   []string{"PURCHASE_SERVICE_1"},
 				"language":           "en_PH",

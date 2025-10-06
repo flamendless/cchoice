@@ -2,7 +2,9 @@ package requests
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/gob"
+	"encoding/hex"
 
 	"cchoice/cmd/parse_map/enums"
 	"cchoice/cmd/parse_map/models"
@@ -18,7 +20,7 @@ func GetProvinces(
 	cache *fastcache.Cache,
 	sf *singleflight.Group,
 ) ([]*models.Map, error) {
-	cacheKey := []byte("key_provinces")
+	cacheKey := []byte(generateProvincesCacheKey())
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
 		buf := bytes.NewBuffer(data)
 		var res []*models.Map
@@ -68,7 +70,7 @@ func GetCitiesByProvince(
 		return nil, errs.ErrInvalidParams
 	}
 
-	cacheKey := []byte("key_city_by_" + province)
+	cacheKey := []byte(generateCitiesCacheKey(province))
 
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
 		buf := bytes.NewBuffer(data)
@@ -113,7 +115,7 @@ func GetBarangaysByCity(
 		return nil, errs.ErrInvalidParams
 	}
 
-	cacheKey := []byte("key_barangay_by_city_" + city)
+	cacheKey := []byte(generateBarangaysCacheKey(city))
 
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
 		buf := bytes.NewBuffer(data)
@@ -151,4 +153,22 @@ func GetBarangaysByCity(
 		logs.CacheStore(cacheKey, buf)
 	}
 	return maps, nil
+}
+
+func generateProvincesCacheKey() string {
+	keyData := "maps:provinces"
+	hash := sha256.Sum256([]byte(keyData))
+	return "map_prov_" + hex.EncodeToString(hash[:])[:16]
+}
+
+func generateCitiesCacheKey(province string) string {
+	keyData := "maps:cities:" + province
+	hash := sha256.Sum256([]byte(keyData))
+	return "map_city_" + hex.EncodeToString(hash[:])[:16]
+}
+
+func generateBarangaysCacheKey(city string) string {
+	keyData := "maps:barangays:" + city
+	hash := sha256.Sum256([]byte(keyData))
+	return "map_brgy_" + hex.EncodeToString(hash[:])[:16]
 }

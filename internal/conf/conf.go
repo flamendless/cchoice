@@ -28,6 +28,9 @@ type appConfig struct {
 	LalamoveAPISecret  string `env:"LALAMOVE_API_SECRET"`
 	GeocodingService   string `env:"GEOCODING_SERVICE" env-required:""`
 	GoogleMapsAPIKey   string `env:"GOOGLE_MAPS_API_KEY"`
+	BusinessLat        string `env:"BUSINESS_LAT" env-default:"14.3866"`
+	BusinessLng        string `env:"BUSINESS_LNG" env-default:"120.8811"`
+	BusinessAddress    string `env:"BUSINESS_ADDRESS" env-default:"General Trias, Cavite, Philippines"`
 	FSMode             string `env:"FSMODE" env-required:""`
 	EncodeSalt         string `env:"ENCODE_SALT" env-required:""`
 	CertPath           string `env:"CERTPATH"`
