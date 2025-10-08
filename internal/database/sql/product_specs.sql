@@ -24,8 +24,11 @@ INSERT INTO tbl_product_specs (
 	part_number,
 	power,
 	capacity,
-	scope_of_supply
+	scope_of_supply,
+	weight,
+	weight_unit
 ) VALUES (
 	?, ?, ?, ?,
-	?, ?, ?
+	?, ?, ?, ?,
+	?
 ) RETURNING *;
