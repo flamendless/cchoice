@@ -90,7 +90,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 	token := s.sessionManager.Token(r.Context())
 	checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
 	if err != nil {
-		logs.Log().Warn(logtag, zap.Error(err), zap.String("token", token))
+		logs.Log().Warn(logtag, zap.Error(err), zap.Error(errs.ErrCartMissingCheckoutLines), zap.String("token", token))
 		if err := components.CartPage(components.CartPageBodyEmpty()).Render(r.Context(), w); err != nil {
 			logs.Log().Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -254,6 +254,7 @@ func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
 		token := s.sessionManager.Token(r.Context())
 		checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
 		if err != nil {
+			logs.Log().Warn(logtag, zap.Error(err), zap.Error(errs.ErrCartMissingCheckoutLines), zap.String("token", token))
 			if _, err := w.Write([]byte("0 Items")); err != nil {
 				logs.Log().Error(logtag, zap.Error(err))
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -274,6 +275,7 @@ func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
 		token := s.sessionManager.Token(r.Context())
 		checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
 		if err != nil {
+			logs.Log().Warn(logtag, zap.Error(err), zap.Error(errs.ErrCartMissingCheckoutLines), zap.String("token", token))
 			if _, err := w.Write([]byte("0 Items")); err != nil {
 				logs.Log().Error(logtag, zap.Error(err))
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -393,7 +395,7 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 
 	checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
 	if err != nil {
-		logs.Log().Error(logtag, zap.Error(err), zap.String("token", token))
+		logs.Log().Warn(logtag, zap.Error(err), zap.Error(errs.ErrCartMissingCheckoutLines), zap.String("token", token))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

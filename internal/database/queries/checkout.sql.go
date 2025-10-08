@@ -279,11 +279,14 @@ SELECT
 		tbl_product_images.thumbnail,
 		'static/images/empty_96x96.webp'
 	) AS thumbnail_path,
-	'' as thumbnail_data
+	'' as thumbnail_data,
+	tbl_product_specs.weight,
+	tbl_product_specs.weight_unit
 FROM tbl_checkout_lines
 INNER JOIN tbl_products ON tbl_products.id = tbl_checkout_lines.product_id
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_specs ON tbl_product_specs.id = tbl_products.product_specs_id
 WHERE tbl_checkout_lines.checkout_id = ?
 `
 
@@ -299,6 +302,8 @@ type GetCheckoutLinesByCheckoutIDRow struct {
 	BrandName                string
 	ThumbnailPath            string
 	ThumbnailData            string
+	Weight                   sql.NullFloat64
+	WeightUnit               sql.NullString
 }
 
 func (q *Queries) GetCheckoutLinesByCheckoutID(ctx context.Context, checkoutID int64) ([]GetCheckoutLinesByCheckoutIDRow, error) {
@@ -322,6 +327,8 @@ func (q *Queries) GetCheckoutLinesByCheckoutID(ctx context.Context, checkoutID i
 			&i.BrandName,
 			&i.ThumbnailPath,
 			&i.ThumbnailData,
+			&i.Weight,
+			&i.WeightUnit,
 		); err != nil {
 			return nil, err
 		}

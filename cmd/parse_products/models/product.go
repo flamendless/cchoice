@@ -35,7 +35,7 @@ type ProductSpecs struct {
 	ScopeOfSupply string
 	ID            int64
 	Weight        float64
-	WeightUnit    string
+	WeightUnit    enums.WeightUnit
 }
 
 type Product struct {
@@ -240,7 +240,7 @@ func (product *Product) GetOrInsertProductSpecsID(ctx context.Context, db databa
 					Valid:   true,
 				},
 				WeightUnit: sql.NullString{
-					String: product.ProductSpecs.WeightUnit,
+					String: product.ProductSpecs.WeightUnit.ToString(),
 					Valid:  true,
 				},
 			},

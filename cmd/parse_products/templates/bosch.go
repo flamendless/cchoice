@@ -190,7 +190,7 @@ func BoschRowToSpecs(tpl *Template, row []string) *models.ProductSpecs {
 		Capacity:      capacity,
 		ScopeOfSupply: scopeOfSupply,
 		Weight:        weight,
-		WeightUnit:    "kg",
+		WeightUnit:    enums.WEIGHT_UNIT_KG,
 	}
 }
 

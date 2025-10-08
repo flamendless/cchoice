@@ -3,6 +3,7 @@ package server
 import (
 	"cchoice/cmd/parse_map/models"
 	"cchoice/cmd/web/components"
+	"cchoice/internal/cart"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
@@ -104,6 +105,14 @@ func (s *Server) shippingAddressHandler(w http.ResponseWriter, r *http.Request) 
 func (s *Server) shippingQuotationHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Shipping Quotation Handler]"
 
+	token := s.sessionManager.Token(r.Context())
+	checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
+	if err != nil {
+		logs.Log().Warn(logtag, zap.Error(err), zap.String("token", token))
+		http.Error(w, errs.ErrCartMissingCheckoutLines.Error(), http.StatusBadRequest)
+		return
+	}
+
 	if err := r.ParseForm(); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -133,11 +142,18 @@ func (s *Server) shippingQuotationHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	totalWeight, err := utils.CalculateTotalWeightFromCheckoutLines(checkoutLines)
+	if err != nil {
+		logs.Log().Error(logtag, zap.Error(err))
+		http.Error(w, "Failed to calculate package weight", http.StatusInternalServerError)
+		return
+	}
+
 	businessLocation := s.shippingService.GetBusinessLocation()
 
 	shippingRequest := shipping.ShippingRequest{
 		Package: shipping.Package{
-			Weight:      "1.0",
+			Weight:      totalWeight,
 			Description: "Order package",
 		},
 		PickupLocation: *businessLocation,
@@ -158,7 +174,7 @@ func (s *Server) shippingQuotationHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	logs.Log().Info(logtag, zap.Any("quotation", quotation))
+	logs.Log().Info(logtag, zap.Any("quotation", quotation), zap.String("total_weight", totalWeight))
 
 	s.sessionManager.Put(r.Context(), skShippingQuotation, quotation)
 
