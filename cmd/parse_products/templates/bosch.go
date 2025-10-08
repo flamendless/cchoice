@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/Rhymond/go-money"
@@ -42,6 +43,10 @@ var BoschColumns map[string]*Column = map[string]*Column{
 		Required: true,
 	},
 	"Retail Price (Local Currency)": {
+		Index:    -1,
+		Required: true,
+	},
+	"Weight": {
 		Index:    -1,
 		Required: true,
 	},
@@ -163,16 +168,29 @@ func BoschRowToSpecs(tpl *Template, row []string) *models.ProductSpecs {
 		panic(errs.ErrCmdMissingColumn)
 	}
 
+	colWeight, ok := tpl.Columns["Weight"]
+	if !ok {
+		panic(errs.ErrCmdMissingColumn)
+	}
+
 	partNumber := row[colPartNumber.Index]
 	power := row[colPower.Index]
 	capacity := row[colCapacity.Index]
 	scopeOfSupply := row[colScopeOfSupply.Index]
+
+	weightStr := row[colWeight.Index]
+	weight, err := strconv.ParseFloat(weightStr, 64)
+	if err != nil {
+		panic(err)
+	}
 
 	return &models.ProductSpecs{
 		PartNumber:    partNumber,
 		Power:         power,
 		Capacity:      capacity,
 		ScopeOfSupply: scopeOfSupply,
+		Weight:        weight,
+		WeightUnit:    "kg",
 	}
 }
 

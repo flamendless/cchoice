@@ -111,6 +111,8 @@ type TblProductSpec struct {
 	Power         sql.NullString
 	Capacity      sql.NullString
 	ScopeOfSupply sql.NullString
+	WeightUnit    sql.NullString
+	Weight        sql.NullFloat64
 }
 
 type TblProductsCategory struct {
