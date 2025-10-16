@@ -46,7 +46,7 @@ var BoschColumns map[string]*Column = map[string]*Column{
 		Index:    -1,
 		Required: true,
 	},
-	"Weight": {
+	"weight (kg)": {
 		Index:    -1,
 		Required: true,
 	},
@@ -168,7 +168,7 @@ func BoschRowToSpecs(tpl *Template, row []string) *models.ProductSpecs {
 		panic(errs.ErrCmdMissingColumn)
 	}
 
-	colWeight, ok := tpl.Columns["Weight"]
+	colWeight, ok := tpl.Columns["weight (kg)"]
 	if !ok {
 		panic(errs.ErrCmdMissingColumn)
 	}
