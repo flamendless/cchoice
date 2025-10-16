@@ -68,6 +68,20 @@ type TblCheckoutPayment struct {
 	UpdatedAt              time.Time
 }
 
+type TblGeocodingCache struct {
+	ID                int64
+	Address           string
+	NormalizedAddress string
+	Latitude          string
+	Longitude         string
+	FormattedAddress  string
+	PlaceID           sql.NullString
+	ResponseData      sql.NullString
+	CreatedAt         sql.NullTime
+	UpdatedAt         sql.NullTime
+	ExpiresAt         sql.NullTime
+}
+
 type TblProduct struct {
 	ID                          int64
 	Serial                      string

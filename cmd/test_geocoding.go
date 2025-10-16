@@ -21,7 +21,7 @@ var testGeocodingCmd = &cobra.Command{
 		fmt.Println("Testing Google Maps Geocoding Integration")
 		fmt.Println("=========================================")
 
-		geocoder := googlemaps.MustInit()
+		geocoder := googlemaps.MustInit(nil)
 
 		testAddresses := []string{
 			"EDSA cor. Ortigas Avenue, Pasig City, Metro Manila, Philippines",

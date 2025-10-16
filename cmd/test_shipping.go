@@ -55,7 +55,7 @@ var cmdTestShipping = &cobra.Command{
 		fmt.Printf("    Cash on Delivery: %v\n", capabilities.Features.CashOnDelivery)
 		fmt.Printf("    Contactless Delivery: %v\n", capabilities.Features.ContactlessDelivery)
 
-		geocoder := googlemaps.MustInit()
+		geocoder := googlemaps.MustInit(nil)
 
 		fmt.Printf("\nProvider Information:\n")
 		fmt.Printf("    Provider: %s\n", capabilities.Provider)
