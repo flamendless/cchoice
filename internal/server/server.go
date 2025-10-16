@@ -85,7 +85,7 @@ func NewServer() *http.Server {
 	var geocoder geocoding.IGeocoder
 	switch cfg.GeocodingService {
 	case "googlemaps":
-		geocoder = googlemaps.MustInit()
+		geocoder = googlemaps.MustInit(dbRW)
 	default:
 		panic("Unsupported geocoding service: " + cfg.GeocodingService)
 	}
