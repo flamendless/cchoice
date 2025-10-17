@@ -134,6 +134,13 @@ templ divInputWarning() {
 }
 
 templ ShippingAddressSelect() {
+	<div id="delivery-fee-loading-template" class="hidden">
+		<h1>Delivery Fee</h1>
+		<h1 class="text-right flex items-center gap-1">
+			@svgInfinite("delivery-fee-spinner")
+			<span>Calculating...</span>
+		</h1>
+	</div>
 	<div
 		class="flex flex-col gap-2 w-full max-w-lg"
 		id="shipping-form"
@@ -145,8 +152,24 @@ templ ShippingAddressSelect() {
 				if #address_line1.value !== '' and #city.value !== '' and #province.value !== '' and #barangay.value !== ''
 					log 'All fields completed, calculating shipping...'
 					trigger post on #shipping-form
+				end
+			end
+
+			on htmx:beforeRequest
+				if event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/cchoice/shipping/quotation'
+					put #delivery-fee-row into deliveryRow
+					put #delivery-fee-loading-template into loadingTemplate
+					if deliveryRow is not null and loadingTemplate is not null
+						set deliveryRow.innerHTML to loadingTemplate.innerHTML
+					end
+				end
+			end
+
+			on htmx:afterRequest
+				if event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/cchoice/shipping/quotation'
 					trigger get on #cart-summary
 				end
+			end
 		"
 	>
 		@divInputWarning() {
