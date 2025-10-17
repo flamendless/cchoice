@@ -113,7 +113,7 @@ func CitySelect() templ.Component {
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"flex flex-col\"><select id=\"city\" name=\"city\" class=\"border rounded-lg p-2 required-field\" required hx-get=\"/cchoice/shipping/address?data=cities\" hx-trigger=\"change, get\" hx-include=\"#province\" hx-swap=\"beforeend\" _=\"\n\t\t\t\ton reset\n\t\t\t\t\tset my innerHTML to '<option>Select City / Municipality</option>'\n\t\t\t\tend\n\n\t\t\t\ton change\n\t\t\t\t\tif my value is not ''\n\t\t\t\t\t\ttrigger reset on #barangay\n\t\t\t\t\t\ttrigger get on #barangay\n\t\t\t\t\telse\n\t\t\t\t\t\tset #barangay's value to ''\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\t\"><option value=\"\">Select City / Municipality</option></select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"flex flex-col\"><select id=\"city\" name=\"city\" class=\"border rounded-lg p-2 required-field\" required hx-get=\"/cchoice/shipping/address?data=cities\" hx-trigger=\"change, get\" hx-include=\"#province\" hx-swap=\"beforeend\" _=\"\n\t\t\t\ton reset\n\t\t\t\t\tset my innerHTML to '<option value=&quot;&quot;>Select City / Municipality</option>'\n\t\t\t\tend\n\n\t\t\t\ton change\n\t\t\t\t\tif my value is not ''\n\t\t\t\t\t\ttrigger reset on #barangay\n\t\t\t\t\t\ttrigger get on #barangay\n\t\t\t\t\telse\n\t\t\t\t\t\tset #barangay's value to ''\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\t\"><option value=\"\">Select City / Municipality</option></select></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -142,7 +142,7 @@ func BarangaySelect() templ.Component {
 			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"flex flex-col\"><select id=\"barangay\" name=\"barangay\" class=\"border rounded-lg p-2 required-field\" required hx-get=\"/cchoice/shipping/address?data=barangays\" hx-trigger=\"change, get\" hx-include=\"#city\" hx-swap=\"beforeend\" _=\"\n\t\t\t\ton reset\n\t\t\t\t\tset my innerHTML to '<option>Select Barangay</option>'\n\t\t\t\tend\n\t\t\t\"><option value=\"\">Select Barangay</option></select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"flex flex-col\"><select id=\"barangay\" name=\"barangay\" class=\"border rounded-lg p-2 required-field\" required hx-get=\"/cchoice/shipping/address?data=barangays\" hx-trigger=\"change, get\" hx-include=\"#city\" hx-swap=\"beforeend\" _=\"\n\t\t\t\ton reset\n\t\t\t\t\tset my innerHTML to '<option value=&quot;&quot;>Select Barangay</option>'\n\t\t\t\tend\n\t\t\t\"><option value=\"\">Select Barangay</option></select></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -450,7 +450,15 @@ func ShippingAddressSelect() templ.Component {
 			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div class=\"flex flex-col gap-2 w-full max-w-lg\" id=\"shipping-form\" hx-post=\"/cchoice/shipping/quotation\" hx-trigger=\"post\" hx-swap=\"none\" _=\"\n\t\t\ton change from .required-field\n\t\t\t\tif #address_line1.value !== '' and #city.value !== '' and #province.value !== '' and #barangay.value !== ''\n\t\t\t\t\tlog 'All fields completed, calculating shipping...'\n\t\t\t\t\ttrigger post on #shipping-form\n\t\t\t\t\ttrigger get on #cart-summary\n\t\t\t\tend\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div id=\"delivery-fee-loading-template\" class=\"hidden\"><h1>Delivery Fee</h1><h1 class=\"text-right flex items-center gap-1\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = svgInfinite("delivery-fee-spinner").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<span>Calculating...</span></h1></div><div class=\"flex flex-col gap-2 w-full max-w-lg\" id=\"shipping-form\" hx-post=\"/cchoice/shipping/quotation\" hx-trigger=\"post\" hx-swap=\"none\" _=\"\n\t\t\ton change from .required-field\n\t\t\t\tif #address_line1.value !== '' and #city.value !== '' and #province.value !== '' and #barangay.value !== ''\n\t\t\t\t\tlog 'All fields completed, calculating shipping...'\n\t\t\t\t\ttrigger post on #shipping-form\n\t\t\t\tend\n\t\t\tend\n\n\t\t\ton htmx:beforeRequest\n\t\t\t\tif event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/cchoice/shipping/quotation'\n\t\t\t\t\tput #delivery-fee-row into deliveryRow\n\t\t\t\t\tput #delivery-fee-loading-template into loadingTemplate\n\t\t\t\t\tif deliveryRow is not null and loadingTemplate is not null\n\t\t\t\t\t\tset deliveryRow.innerHTML to loadingTemplate.innerHTML\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\tend\n\n\t\t\ton htmx:afterRequest\n\t\t\t\tif event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/cchoice/shipping/quotation'\n\t\t\t\t\ttrigger get on #cart-summary\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -470,7 +478,7 @@ func ShippingAddressSelect() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, " ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, " ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -500,7 +508,7 @@ func ShippingAddressSelect() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, " ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, " ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -530,7 +538,7 @@ func ShippingAddressSelect() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, " ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, " ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -544,7 +552,7 @@ func ShippingAddressSelect() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<div class=\"flex flex-col gap-1\"><input type=\"text\" name=\"address_line2\" class=\"border rounded-lg p-2 w-full h-full\" placeholder=\"Address Line 2 (Optional)\" onblur=\"this.value = this.value.trim()\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"flex flex-col gap-1\"><input type=\"text\" name=\"address_line2\" class=\"border rounded-lg p-2 w-full h-full\" placeholder=\"Address Line 2 (Optional)\" onblur=\"this.value = this.value.trim()\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -564,7 +572,7 @@ func ShippingAddressSelect() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, " ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, " ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -578,7 +586,7 @@ func ShippingAddressSelect() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<div class=\"flex flex-col\"><select id=\"country\" name=\"country\" class=\"w-full h-full border rounded-lg p-2 cursor-not-allowed\" required disabled><option value=\"PH\">Philippines</option></select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<div class=\"flex flex-col\"><select id=\"country\" name=\"country\" class=\"w-full h-full border rounded-lg p-2 cursor-not-allowed\" required disabled><option value=\"PH\">Philippines</option></select></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -594,7 +602,7 @@ func ShippingAddressSelect() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
