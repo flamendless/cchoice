@@ -14,4 +14,6 @@ type CheckoutLine struct {
 	ThumbnailPath   string
 	ThumbnailData   string
 	Quantity        int64
+	WeightKg        float64
+	WeightDisplay   string
 }

@@ -124,6 +124,11 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 			Total:           *discountedPrice.Multiply(checkoutLine.Quantity),
 		}
 
+		if weightKg, err := utils.ConvertWeightToKg(checkoutLine.Weight, checkoutLine.WeightUnit); err == nil {
+			cl.WeightKg = weightKg
+			cl.WeightDisplay = fmt.Sprintf("%.2f kg", weightKg)
+		}
+
 		if err := components.CartCheckoutLineItem(cl).Render(r.Context(), w); err != nil {
 			logs.Log().Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -305,9 +310,11 @@ func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
 
 		total, _ := subtotal.Add(deliveryFee)
 		total, _ = total.Subtract(totalDiscounts)
+		totalWeightKg, _ := utils.CalculateTotalWeightFromCheckoutLines(checkoutLines)
 
 		errs = errors.Join(errs, components.CartSummaryRow("Subtotal", subtotal.Display(), "text-gray-500").Render(r.Context(), w))
 		errs = errors.Join(errs, components.CartSummaryRow("Total Discount", "- "+totalDiscounts.Display(), "text-red-500").Render(r.Context(), w))
+		errs = errors.Join(errs, components.CartSummaryRow("Total Weight", totalWeightKg+" kg", "text-gray-500").Render(r.Context(), w))
 		errs = errors.Join(errs, components.CartSummaryRowWithID("delivery-fee-row", "Delivery Fee", deliveryFee.Display(), "text-gray-500").Render(r.Context(), w))
 		errs = errors.Join(errs, components.HR().Render(r.Context(), w))
 		errs = errors.Join(errs, components.CartSummaryRow("Total", total.Display()).Render(r.Context(), w))
