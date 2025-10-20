@@ -37,6 +37,7 @@ build() {
 	local -; set -x;
 	genall
 	# go build -tags="fts5 embeddedfs" -o "${TMP}/main" .
+	go generate ./...
 	go build -tags="fts5 staticfs" -o "${TMP}/main" .
 }
 

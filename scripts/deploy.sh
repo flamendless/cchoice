@@ -15,6 +15,7 @@ echo "Running migrations..."
 mage dbUp
 
 echo "Building..."
+go generate ./...
 mage prod
 
 echo "Running API..."

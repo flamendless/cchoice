@@ -56,6 +56,12 @@ mkcert localhost 127.0.0.1 ::1
 
 ---
 
+# VERSION:
+
+- To check current version in browser. Invoke `await _G.VERSION()` in browser console
+
+---
+
 # NOTES:
 
 For GH workflow, comment out `[ -z "$PS1" ] && return` in server's .bashrc
