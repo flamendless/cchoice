@@ -8,6 +8,9 @@ cd "cchoice"
 echo "Syncing repository..."
 git pull origin main
 
+echo "Fetching tags..."
+git fetch --prune --tags origin
+
 echo "Stopping existing process..."
 pkill -x "./tmp/main api" || echo "No existing process found."
 

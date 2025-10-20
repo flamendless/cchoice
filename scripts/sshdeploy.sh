@@ -17,6 +17,9 @@ ssh "$SSH_ADDR" bash --login -i -s <<EOF
 	echo "Syncing repository..."
 	git pull origin main
 
+	echo "Fetching tags..."
+	git fetch --prune --tags origin
+
 	echo "Stopping existing process..."
 	pkill -f "./tmp/main api" || echo "No existing process found."
 
