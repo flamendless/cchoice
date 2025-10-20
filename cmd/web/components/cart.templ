@@ -352,6 +352,7 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 			<div class="flex-1">
 				<h2 class="text-base font-semibold">{ cl.Name }</h2>
 				<p class="text-xs text-gray-600">{ cl.BrandName }</p>
+				<p class="text-xs text-gray-600">{ cl.WeightDisplay }</p>
 				<span class="flex gap-[4px]">
 					if res, _ := cl.Price.Compare(&cl.DiscountedPrice); res != 0 {
 						<p class="text-sm text-gray-600 line-through">
