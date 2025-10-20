@@ -11,6 +11,7 @@ import (
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
 	"cchoice/cmd/web/static"
+	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/errs"
@@ -67,6 +68,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		r.Get("/changelogs", s.changelogsHandler)
 		r.Get("/health", s.healthHandler)
+		r.Get("/version", s.versionHandler)
 		r.Handle("/metrics", promhttp.Handler())
 		r.Get("/", s.indexHandler)
 		r.Get("/settings/header-texts", s.headerTextsHandler)
@@ -198,6 +200,15 @@ func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func (s *Server) versionHandler(w http.ResponseWriter, r *http.Request) {
+	ver := conf.GitTagProd
+	if conf.Conf().IsLocal() {
+		ver = conf.GitTagDev
+	}
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	_, _ = w.Write([]byte(ver))
 }
 
 func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {

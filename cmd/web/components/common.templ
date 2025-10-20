@@ -66,9 +66,24 @@ templ HeadMeta() {
 		<script type="text/javascript" src={ string(templ.URL("/cchoice/static/js/htmx.min.js")) }></script>
 		<script async type="text/javascript" src={ string(templ.URL("/cchoice/static/js/hyperscript.min.js")) }></script>
 		<script>
-			document.addEventListener("DOMContentLoaded", function() {
-				console.log("script added");
-			})
+			(function(){
+				if (!globalThis._G) {
+					globalThis._G = {};
+				}
+				Object.defineProperty(globalThis._G, "VERSION", {
+					value: async function() {
+						try {
+							const resp = await fetch("/cchoice/version", { cache: "no-store" });
+							if (!resp.ok) { return ""; }
+							return await resp.text();
+						} catch (_) {
+							return "";
+						}
+					},
+					writable: false,
+					configurable: false
+				});
+			})();
 		</script>
 	}
 }
