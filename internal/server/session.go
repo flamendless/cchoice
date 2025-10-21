@@ -12,6 +12,7 @@ import (
 const (
 	skCheckoutLineProductIDs = "checkout_line_ids"
 	skShippingQuotation      = "shipping_quotation"
+	skCheckedItems           = "checked_items"
 )
 
 func AddToCheckoutLineProductIDs(
@@ -56,4 +57,37 @@ func RemoveFromCheckoutLineProductIDs(
 	sm.Put(ctx, skCheckoutLineProductIDs, checkoutLineProductIDs)
 
 	return checkoutLineProductIDs, nil
+}
+
+func GetCheckedItems(ctx context.Context, sm *scs.SessionManager) []string {
+	if !sm.Exists(ctx, skCheckedItems) {
+		return []string{}
+	}
+
+	checkedItems, ok := sm.Get(ctx, skCheckedItems).([]string)
+	if !ok {
+		return []string{}
+	}
+
+	return checkedItems
+}
+
+func SetCheckedItems(ctx context.Context, sm *scs.SessionManager, checkedItems []string) {
+	sm.Put(ctx, skCheckedItems, checkedItems)
+}
+
+func ToggleCheckedItem(ctx context.Context, sm *scs.SessionManager, itemID string) []string {
+	checkedItems := GetCheckedItems(ctx, sm)
+
+	for i, id := range checkedItems {
+		if id == itemID {
+			checkedItems = slices.Delete(checkedItems, i, i+1)
+			sm.Put(ctx, skCheckedItems, checkedItems)
+			return checkedItems
+		}
+	}
+
+	checkedItems = append(checkedItems, itemID)
+	sm.Put(ctx, skCheckedItems, checkedItems)
+	return checkedItems
 }

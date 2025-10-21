@@ -338,7 +338,15 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 				aria-label="Select item"
 				name="checked_item"
 				value={ cl.ID }
-				checked
+				checked?={ cl.Checked }
+				hx-patch={ "/cchoice/carts/lines/" + cl.ID + "/toggle" }
+				hx-target="#cart-summary"
+				hx-swap="innerHTML"
+				_="
+					on htmx:afterRequest
+						trigger get on #cart-summary-bar
+					end
+				"
 			/>
 			<img
 				class="m-2 w-32 max-w-32 h-32"
