@@ -5,11 +5,11 @@ templ MapOption(value string, name string) {
 }
 
 templ ProvinceSelect() {
-	<div class="flex flex-col">
+	<div class="relative">
 		<select
 			id="province"
 			name="province"
-			class="border rounded-lg p-2 required-field"
+			class="border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent required-field"
 			required
 			hx-get="/cchoice/shipping/address?data=provinces"
 			hx-trigger="load once"
@@ -30,17 +30,22 @@ templ ProvinceSelect() {
 				end
 			"
 		>
-			<option value="">Select Province</option>
+			<option value=""> </option>
 		</select>
+		<label
+			class="absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none"
+		>
+			Province
+		</label>
 	</div>
 }
 
 templ CitySelect() {
-	<div class="flex flex-col">
+	<div class="relative">
 		<select
 			id="city"
 			name="city"
-			class="border rounded-lg p-2 required-field"
+			class="border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent required-field"
 			required
 			hx-get="/cchoice/shipping/address?data=cities"
 			hx-trigger="change, get"
@@ -63,15 +68,20 @@ templ CitySelect() {
 		>
 			<option value="">Select City / Municipality</option>
 		</select>
+		<label
+			class="absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none"
+		>
+			City / Municipality
+		</label>
 	</div>
 }
 
 templ BarangaySelect() {
-	<div class="flex flex-col">
+	<div class="relative">
 		<select
 			id="barangay"
 			name="barangay"
-			class="border rounded-lg p-2 required-field"
+			class="border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent required-field"
 			required
 			hx-get="/cchoice/shipping/address?data=barangays"
 			hx-trigger="change, get"
@@ -85,6 +95,11 @@ templ BarangaySelect() {
 		>
 			<option value="">Select Barangay</option>
 		</select>
+		<label
+			class="absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none"
+		>
+			Barangay
+		</label>
 	</div>
 }
 
@@ -133,6 +148,55 @@ templ divInputWarning() {
 	</div>
 }
 
+templ infieldLabelInput(t string, name string, label string, pattern ...string) {
+	<div class="relative">
+		<input
+			type={ t }
+			name={ name }
+			class="border rounded-lg p-3 pt-6 w-full peer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+			placeholder=" "
+			required
+			onblur="this.value = this.value.trim()"
+			if len(pattern) > 0 {
+				pattern={ pattern[0] }
+			}
+		/>
+		<label
+			class="absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none"
+		>
+			{ label }
+		</label>
+		<small
+			class="
+				text-red-500 text-xs block invisible h-0 mt-1
+				peer-invalid:visible peer-invalid:h-auto
+			"
+		>
+			Please enter a valid { label }
+		</small>
+	</div>
+}
+
+templ infieldLabelSelect(id string, name string, label string, required bool, disabled bool) {
+	<div class="relative">
+		<select
+			id={ id }
+			name={ name }
+			class="border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+			required={ required }
+			disabled={ disabled }
+		>
+			<option value=""> </option>
+			{ children... }
+		</select>
+		<label
+			class="absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none"
+		>
+			{ label }
+		</label>
+	</div>
+}
+
 templ ShippingAddressSelect() {
 	<div id="delivery-fee-loading-template" class="hidden">
 		<h1>Delivery Fee</h1>
@@ -172,41 +236,64 @@ templ ShippingAddressSelect() {
 			end
 		"
 	>
-		@divInputWarning() {
-			@input("email", "email", "E-Mail")
-			@warning("Please enter a valid email address")
-		}
-		@divInputWarning() {
-			@input("tel", "mobile_no", "Mobile Number (+63)", "^\\+63[0-9]{10}$")
-			@warning("Please enter a valid mobile number")
-		}
-		@divInputWarning() {
-			@inputWithClass("text", "address_line1", "Address Line 1", "required-field")
-			@warning("Please enter a valid address line")
-		}
-		<div class="flex flex-col gap-1">
+		@infieldLabelInput("email", "email", "E-Mail")
+		@infieldLabelInput("tel", "mobile_no", "Mobile Number (+63)", "^\\+63[0-9]{10}$")
+		@infieldLabelInput("text", "address_line1", "Address Line 1")
+		<div class="relative">
 			<input
 				type="text"
 				name="address_line2"
-				class="border rounded-lg p-2 w-full h-full"
-				placeholder="Address Line 2 (Optional)"
+				class="border rounded-lg p-3 pt-6 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+				placeholder=" "
 				onblur="this.value = this.value.trim()"
 			/>
-		</div>
-		@divInputWarning() {
-			@input("text", "postal", "Postal code", "^[0-9]{4}$")
-			@warning("Please enter a valid postal code (4 digits only)")
-		}
-		<div class="flex flex-col">
-			<select
-				id="country"
-				name="country"
-				class="w-full h-full border rounded-lg p-2 cursor-not-allowed"
-				required
-				disabled
+			<label
+				class="absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none"
 			>
-				<option value="PH">Philippines</option>
-			</select>
+				Address Line 2 (Optional)
+			</label>
+		</div>
+		<div class="flex flex-row gap-1">
+			<div class="relative w-1/2">
+				<input
+					type="text"
+					name="postal"
+					class="border rounded-lg px-3 py-2 pt-6 w-full h-14 peer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+					placeholder=" "
+					required
+					pattern="^[0-9]{4}$"
+					onblur="this.value = this.value.trim()"
+				/>
+				<label
+					class="absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none"
+				>
+					Postal Code
+				</label>
+				<small
+					class="
+						text-red-500 text-xs block invisible h-0 mt-1
+						peer-invalid:visible peer-invalid:h-auto
+					"
+				>
+					Please enter a valid postal code (4 digits only)
+				</small>
+			</div>
+			<div class="relative w-1/2">
+				<select
+					id="country"
+					name="country"
+					class="border rounded-lg px-3 py-2 pt-6 w-full h-14 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+					required
+					disabled
+				>
+					<option value="PH" selected>Philippines</option>
+				</select>
+				<label
+					class="absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none"
+				>
+					Country
+				</label>
+			</div>
 		</div>
 		@ProvinceSelect()
 		@CitySelect()
