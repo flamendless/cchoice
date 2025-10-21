@@ -43,6 +43,11 @@ document.addEventListener("DOMContentLoaded", () => {
 		return allValid;
 	}
 
+	function hasCheckedItems() {
+		const checkedItems = document.querySelectorAll("input[name='checked_item']:checked");
+		return checkedItems.length > 0;
+	}
+
 	async function checkForm() {
 		const requiredInputs = document.querySelectorAll("#cart-shipping [required]");
 		const allValid = Array.from(requiredInputs).every(input => input.checkValidity());
@@ -52,14 +57,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const addressComplete = areAddressFieldsComplete();
 		const shippingQuotationExists = addressComplete ? await checkShippingQuotationStatus() : false;
+		const itemsChecked = hasCheckedItems();
 
-		const shouldEnable = allValid && paymentSelected && shippingQuotationExists;
+		const shouldEnable = allValid && paymentSelected && shippingQuotationExists && itemsChecked;
 
 		// console.log("=== Form Check Results ===");
 		// console.log("HTML5 validation (allValid):", allValid);
 		// console.log("Payment selected:", paymentSelected);
 		// console.log("Address complete:", addressComplete);
 		// console.log("Shipping quotation exists:", shippingQuotationExists);
+		// console.log("Items checked:", itemsChecked);
 		// console.log("Final decision (should enable):", shouldEnable);
 		// console.log("=========================");
 
@@ -84,6 +91,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	document.body.addEventListener("htmx:afterRequest", (event) => {
 		if (event.detail.elt && event.detail.elt.id === "shipping-form") {
+			checkForm();
+		}
+	});
+
+	// Listen for checkbox changes in cart lines
+	document.addEventListener("change", (event) => {
+		if (event.target.name === "checked_item") {
+			checkForm();
+		}
+	});
+
+	// Listen for HTMX requests that might affect cart lines
+	document.body.addEventListener("htmx:afterRequest", (event) => {
+		if (event.detail.elt && (
+			event.detail.elt.id === "cart-lines" ||
+			event.detail.elt.closest("#cart-lines")
+		)) {
 			checkForm();
 		}
 	});

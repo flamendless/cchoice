@@ -33,6 +33,7 @@ func AddCartsHandlers(s *Server, r chi.Router) {
 	r.Post("/carts/lines", s.addProductToCartHandler)
 	r.Delete("/carts/lines/{checkoutline_id}", s.removeProductFromCartHandler)
 	r.Patch("/carts/lines/{checkoutline_id}", s.updateCartLinesQtyHandler)
+	r.Patch("/carts/lines/{checkoutline_id}/toggle", s.toggleCartLineCheckboxHandler)
 	r.Get("/carts/payment-methods", s.cartsPaymentMethodsHandler)
 	r.Post("/carts/finalize", s.cartsFinalizeHandler)
 }
@@ -97,6 +98,16 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	if !s.sessionManager.Exists(r.Context(), skCheckedItems) {
+		var checkedItems []string
+		for _, checkoutLine := range checkoutLines {
+			checkedItems = append(checkedItems, s.encoder.Encode(checkoutLine.ID))
+		}
+		SetCheckedItems(r.Context(), s.sessionManager, checkedItems)
+	}
+	checkedItems := GetCheckedItems(r.Context(), s.sessionManager)
+
 	for _, checkoutLine := range checkoutLines {
 		var imgData string
 		if !strings.HasSuffix(checkoutLine.ThumbnailPath, constants.EmptyImageFilename) {
@@ -110,8 +121,17 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 		//TODO: (Brandon) - Discounts/sales
 		discountedPrice := utils.NewMoney(checkoutLine.UnitPriceWithVat, checkoutLine.UnitPriceWithVatCurrency)
 
+		encodedID := s.encoder.Encode(checkoutLine.ID)
+		isChecked := false
+		for _, checkedID := range checkedItems {
+			if checkedID == encodedID {
+				isChecked = true
+				break
+			}
+		}
+
 		cl := models.CheckoutLine{
-			ID:              s.encoder.Encode(checkoutLine.ID),
+			ID:              encodedID,
 			CheckoutID:      s.encoder.Encode(checkoutLine.CheckoutID),
 			ProductID:       s.encoder.Encode(checkoutLine.ProductID),
 			Name:            checkoutLine.Name,
@@ -122,6 +142,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 			Price:           *price,
 			DiscountedPrice: *discountedPrice,
 			Total:           *discountedPrice.Multiply(checkoutLine.Quantity),
+			Checked:         isChecked,
 		}
 
 		if weightKg, err := utils.ConvertWeightToKg(checkoutLine.Weight, checkoutLine.WeightUnit); err == nil {
@@ -257,7 +278,17 @@ func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
 
 	case "bar_items":
 		token := s.sessionManager.Token(r.Context())
-		checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
+		checkedItems := GetCheckedItems(r.Context(), s.sessionManager)
+
+		var checkoutLines []queries.GetCheckoutLinesByCheckoutIDRow
+		var err error
+
+		if len(checkedItems) > 0 {
+			checkoutLines, err = cart.GetCheckedCheckoutLines(r.Context(), s.dbRO, token, checkedItems, s.encoder)
+		} else {
+			checkoutLines = []queries.GetCheckoutLinesByCheckoutIDRow{}
+		}
+
 		if err != nil {
 			logs.Log().Warn(logtag, zap.Error(err), zap.Error(errs.ErrCartMissingCheckoutLines), zap.String("token", token))
 			if _, err := w.Write([]byte("0 Items")); err != nil {
@@ -278,7 +309,17 @@ func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
 
 	case "summary_total":
 		token := s.sessionManager.Token(r.Context())
-		checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
+		checkedItems := GetCheckedItems(r.Context(), s.sessionManager)
+
+		var checkoutLines []queries.GetCheckoutLinesByCheckoutIDRow
+		var err error
+
+		if len(checkedItems) > 0 {
+			checkoutLines, err = cart.GetCheckedCheckoutLines(r.Context(), s.dbRO, token, checkedItems, s.encoder)
+		} else {
+			checkoutLines = []queries.GetCheckoutLinesByCheckoutIDRow{}
+		}
+
 		if err != nil {
 			logs.Log().Warn(logtag, zap.Error(err), zap.Error(errs.ErrCartMissingCheckoutLines), zap.String("token", token))
 			if _, err := w.Write([]byte("0 Items")); err != nil {
@@ -384,6 +425,23 @@ func (s *Server) updateCartLinesQtyHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
+func (s *Server) toggleCartLineCheckboxHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Toggle Cart Line Checkbox Handler]"
+	checkoutLineID := chi.URLParam(r, "checkoutline_id")
+
+	token := s.sessionManager.Token(r.Context())
+	checkedItems := ToggleCheckedItem(r.Context(), s.sessionManager, checkoutLineID)
+
+	logs.Log().Info(
+		logtag,
+		zap.String("token", token),
+		zap.String("checkoutline id", checkoutLineID),
+		zap.Strings("checked items", checkedItems),
+	)
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Cart Finalize Handler]"
 	var cartCheckout cart.CartCheckout
@@ -401,7 +459,7 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	checkoutLines, err := cart.GetCheckoutLines(r.Context(), s.dbRO, token)
-	if err != nil {
+	if err != nil || len(checkoutLines) == 0 {
 		logs.Log().Warn(logtag, zap.Error(err), zap.Error(errs.ErrCartMissingCheckoutLines), zap.String("token", token))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

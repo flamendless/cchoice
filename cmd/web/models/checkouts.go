@@ -16,4 +16,5 @@ type CheckoutLine struct {
 	Quantity        int64
 	WeightKg        float64
 	WeightDisplay   string
+	Checked         bool
 }

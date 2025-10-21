@@ -110,6 +110,45 @@ func GetCheckoutLines(
 	return checkoutLines, nil
 }
 
+func GetCheckedCheckoutLines(
+	ctx context.Context,
+	dbRO database.Service,
+	token string,
+	checkedItemIDs []string,
+	encoder encode.IEncode,
+) ([]queries.GetCheckoutLinesByCheckoutIDRow, error) {
+	if len(checkedItemIDs) == 0 {
+		return []queries.GetCheckoutLinesByCheckoutIDRow{}, nil
+	}
+
+	checkoutID, err := dbRO.GetQueries().GetCheckoutIDBySessionID(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	dbCheckoutLineIDs := make([]int64, 0, len(checkedItemIDs))
+	for _, id := range checkedItemIDs {
+		dbCheckoutLineIDs = append(dbCheckoutLineIDs, encoder.Decode(id))
+	}
+
+	checkoutLines, err := dbRO.GetQueries().GetCheckoutLinesByCheckoutID(ctx, checkoutID)
+	if err != nil {
+		return nil, err
+	}
+
+	var filteredLines []queries.GetCheckoutLinesByCheckoutIDRow
+	for _, line := range checkoutLines {
+		for _, checkedID := range dbCheckoutLineIDs {
+			if line.ID == checkedID {
+				filteredLines = append(filteredLines, line)
+				break
+			}
+		}
+	}
+
+	return filteredLines, nil
+}
+
 func KeepItemsInCheckoutLines(
 	ctx context.Context,
 	dbRW database.Service,
