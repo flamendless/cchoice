@@ -84,7 +84,7 @@ func ProvinceSelect() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"flex flex-col\"><select id=\"province\" name=\"province\" class=\"border rounded-lg p-2 required-field\" required hx-get=\"/cchoice/shipping/address?data=provinces\" hx-trigger=\"load once\" hx-swap=\"beforeend\" _=\"\n\t\t\t\ton change\n\t\t\t\t\tif my value is not ''\n\t\t\t\t\t\ttrigger reset on #city\n\t\t\t\t\t\ttrigger get on #city\n\n\t\t\t\t\t\tif #barangay's value is not ''\n\t\t\t\t\t\t\ttrigger reset on #barangay\n\t\t\t\t\t\tend\n\t\t\t\t\telse\n\t\t\t\t\t\tset #city's value to ''\n\t\t\t\t\t\tset #barangay's value to ''\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\t\"><option value=\"\">Select Province</option></select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"relative\"><select id=\"province\" name=\"province\" class=\"border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent required-field\" required hx-get=\"/cchoice/shipping/address?data=provinces\" hx-trigger=\"load once\" hx-swap=\"beforeend\" _=\"\n\t\t\t\ton change\n\t\t\t\t\tif my value is not ''\n\t\t\t\t\t\ttrigger reset on #city\n\t\t\t\t\t\ttrigger get on #city\n\n\t\t\t\t\t\tif #barangay's value is not ''\n\t\t\t\t\t\t\ttrigger reset on #barangay\n\t\t\t\t\t\tend\n\t\t\t\t\telse\n\t\t\t\t\t\tset #city's value to ''\n\t\t\t\t\t\tset #barangay's value to ''\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\t\"><option value=\"\"></option></select> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Province</label></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -113,7 +113,7 @@ func CitySelect() templ.Component {
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"flex flex-col\"><select id=\"city\" name=\"city\" class=\"border rounded-lg p-2 required-field\" required hx-get=\"/cchoice/shipping/address?data=cities\" hx-trigger=\"change, get\" hx-include=\"#province\" hx-swap=\"beforeend\" _=\"\n\t\t\t\ton reset\n\t\t\t\t\tset my innerHTML to '<option value=&quot;&quot;>Select City / Municipality</option>'\n\t\t\t\tend\n\n\t\t\t\ton change\n\t\t\t\t\tif my value is not ''\n\t\t\t\t\t\ttrigger reset on #barangay\n\t\t\t\t\t\ttrigger get on #barangay\n\t\t\t\t\telse\n\t\t\t\t\t\tset #barangay's value to ''\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\t\"><option value=\"\">Select City / Municipality</option></select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"relative\"><select id=\"city\" name=\"city\" class=\"border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent required-field\" required hx-get=\"/cchoice/shipping/address?data=cities\" hx-trigger=\"change, get\" hx-include=\"#province\" hx-swap=\"beforeend\" _=\"\n\t\t\t\ton reset\n\t\t\t\t\tset my innerHTML to '<option value=&quot;&quot;>Select City / Municipality</option>'\n\t\t\t\tend\n\n\t\t\t\ton change\n\t\t\t\t\tif my value is not ''\n\t\t\t\t\t\ttrigger reset on #barangay\n\t\t\t\t\t\ttrigger get on #barangay\n\t\t\t\t\telse\n\t\t\t\t\t\tset #barangay's value to ''\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\t\"><option value=\"\">Select City / Municipality</option></select> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">City / Municipality</label></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -142,7 +142,7 @@ func BarangaySelect() templ.Component {
 			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"flex flex-col\"><select id=\"barangay\" name=\"barangay\" class=\"border rounded-lg p-2 required-field\" required hx-get=\"/cchoice/shipping/address?data=barangays\" hx-trigger=\"change, get\" hx-include=\"#city\" hx-swap=\"beforeend\" _=\"\n\t\t\t\ton reset\n\t\t\t\t\tset my innerHTML to '<option value=&quot;&quot;>Select Barangay</option>'\n\t\t\t\tend\n\t\t\t\"><option value=\"\">Select Barangay</option></select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"relative\"><select id=\"barangay\" name=\"barangay\" class=\"border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent required-field\" required hx-get=\"/cchoice/shipping/address?data=barangays\" hx-trigger=\"change, get\" hx-include=\"#city\" hx-swap=\"beforeend\" _=\"\n\t\t\t\ton reset\n\t\t\t\t\tset my innerHTML to '<option value=&quot;&quot;>Select Barangay</option>'\n\t\t\t\tend\n\t\t\t\"><option value=\"\">Select Barangay</option></select> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Barangay</label></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -178,7 +178,7 @@ func input(t string, name string, placeholder string, pattern ...string) templ.C
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(t)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 93, Col: 10}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 108, Col: 10}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -191,7 +191,7 @@ func input(t string, name string, placeholder string, pattern ...string) templ.C
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 94, Col: 13}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 109, Col: 13}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -204,7 +204,7 @@ func input(t string, name string, placeholder string, pattern ...string) templ.C
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(placeholder)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 96, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 111, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -222,7 +222,7 @@ func input(t string, name string, placeholder string, pattern ...string) templ.C
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(pattern[0])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 100, Col: 23}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 115, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -274,7 +274,7 @@ func inputWithClass(t string, name string, placeholder string, class string, pat
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(t)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 107, Col: 10}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 122, Col: 10}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -287,7 +287,7 @@ func inputWithClass(t string, name string, placeholder string, class string, pat
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 108, Col: 13}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 123, Col: 13}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
@@ -313,7 +313,7 @@ func inputWithClass(t string, name string, placeholder string, class string, pat
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(placeholder)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 110, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 125, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
@@ -331,7 +331,7 @@ func inputWithClass(t string, name string, placeholder string, class string, pat
 			var templ_7745c5c3_Var18 string
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(pattern[0])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 114, Col: 23}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 129, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
@@ -378,7 +378,7 @@ func warning(text string) templ.Component {
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(text)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 126, Col: 8}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 141, Col: 8}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -429,7 +429,7 @@ func divInputWarning() templ.Component {
 	})
 }
 
-func ShippingAddressSelect() templ.Component {
+func infieldLabelInput(t string, name string, label string, pattern ...string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -450,7 +450,213 @@ func ShippingAddressSelect() templ.Component {
 			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div id=\"delivery-fee-loading-template\" class=\"hidden\"><h1>Delivery Fee</h1><h1 class=\"text-right flex items-center gap-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div class=\"relative\"><input type=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var23 string
+		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(t)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 154, Col: 11}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" name=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var24 string
+		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(name)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 155, Col: 14}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\" class=\"border rounded-lg p-3 pt-6 w-full peer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" placeholder=\" \" required onblur=\"this.value = this.value.trim()\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if len(pattern) > 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, " pattern=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var25 string
+			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(pattern[0])
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 161, Col: 24}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var26 string
+		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(label)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 167, Col: 10}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</label> <small class=\"\n\t\t\t\ttext-red-500 text-xs block invisible h-0 mt-1\n\t\t\t\tpeer-invalid:visible peer-invalid:h-auto\n\t\t\t\">Please enter a valid ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var27 string
+		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(label)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 175, Col: 31}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</small></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func infieldLabelSelect(id string, name string, label string, required bool, disabled bool) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var28 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var28 == nil {
+			templ_7745c5c3_Var28 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<div class=\"relative\"><select id=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var29 string
+		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(id)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 183, Col: 10}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" name=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var30 string
+		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(name)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 184, Col: 14}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\" class=\"border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" required=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var31 string
+		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(required)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 186, Col: 22}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" disabled=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var32 string
+		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(disabled)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 187, Col: 22}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\"><option value=\"\"></option>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templ_7745c5c3_Var28.Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</select> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var33 string
+		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(label)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 195, Col: 10}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</label></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func ShippingAddressSelect() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var34 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var34 == nil {
+			templ_7745c5c3_Var34 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<div id=\"delivery-fee-loading-template\" class=\"hidden\"><h1>Delivery Fee</h1><h1 class=\"text-right flex items-center gap-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -458,135 +664,23 @@ func ShippingAddressSelect() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<span>Calculating...</span></h1></div><div class=\"flex flex-col gap-2 w-full max-w-lg\" id=\"shipping-form\" hx-post=\"/cchoice/shipping/quotation\" hx-trigger=\"post\" hx-swap=\"none\" _=\"\n\t\t\ton change from .required-field\n\t\t\t\tif #address_line1.value !== '' and #city.value !== '' and #province.value !== '' and #barangay.value !== ''\n\t\t\t\t\tlog 'All fields completed, calculating shipping...'\n\t\t\t\t\ttrigger post on #shipping-form\n\t\t\t\tend\n\t\t\tend\n\n\t\t\ton htmx:beforeRequest\n\t\t\t\tif event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/cchoice/shipping/quotation'\n\t\t\t\t\tput #delivery-fee-row into deliveryRow\n\t\t\t\t\tput #delivery-fee-loading-template into loadingTemplate\n\t\t\t\t\tif deliveryRow is not null and loadingTemplate is not null\n\t\t\t\t\t\tset deliveryRow.innerHTML to loadingTemplate.innerHTML\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\tend\n\n\t\t\ton htmx:afterRequest\n\t\t\t\tif event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/cchoice/shipping/quotation'\n\t\t\t\t\ttrigger get on #cart-summary\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<span>Calculating...</span></h1></div><div class=\"flex flex-col gap-2 w-full max-w-lg\" id=\"shipping-form\" hx-post=\"/cchoice/shipping/quotation\" hx-trigger=\"post\" hx-swap=\"none\" _=\"\n\t\t\ton change from .required-field\n\t\t\t\tif #address_line1.value !== '' and #city.value !== '' and #province.value !== '' and #barangay.value !== ''\n\t\t\t\t\tlog 'All fields completed, calculating shipping...'\n\t\t\t\t\ttrigger post on #shipping-form\n\t\t\t\tend\n\t\t\tend\n\n\t\t\ton htmx:beforeRequest\n\t\t\t\tif event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/cchoice/shipping/quotation'\n\t\t\t\t\tput #delivery-fee-row into deliveryRow\n\t\t\t\t\tput #delivery-fee-loading-template into loadingTemplate\n\t\t\t\t\tif deliveryRow is not null and loadingTemplate is not null\n\t\t\t\t\t\tset deliveryRow.innerHTML to loadingTemplate.innerHTML\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\tend\n\n\t\t\ton htmx:afterRequest\n\t\t\t\tif event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/cchoice/shipping/quotation'\n\t\t\t\t\ttrigger get on #cart-summary\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Var23 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-			if !templ_7745c5c3_IsBuffer {
-				defer func() {
-					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-					if templ_7745c5c3_Err == nil {
-						templ_7745c5c3_Err = templ_7745c5c3_BufErr
-					}
-				}()
-			}
-			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = input("email", "email", "E-Mail").Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, " ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = warning("Please enter a valid email address").Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			return nil
-		})
-		templ_7745c5c3_Err = divInputWarning().Render(templ.WithChildren(ctx, templ_7745c5c3_Var23), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = infieldLabelInput("email", "email", "E-Mail").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Var24 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-			if !templ_7745c5c3_IsBuffer {
-				defer func() {
-					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-					if templ_7745c5c3_Err == nil {
-						templ_7745c5c3_Err = templ_7745c5c3_BufErr
-					}
-				}()
-			}
-			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = input("tel", "mobile_no", "Mobile Number (+63)", "^\\+63[0-9]{10}$").Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, " ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = warning("Please enter a valid mobile number").Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			return nil
-		})
-		templ_7745c5c3_Err = divInputWarning().Render(templ.WithChildren(ctx, templ_7745c5c3_Var24), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = infieldLabelInput("tel", "mobile_no", "Mobile Number (+63)", "^\\+63[0-9]{10}$").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Var25 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-			if !templ_7745c5c3_IsBuffer {
-				defer func() {
-					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-					if templ_7745c5c3_Err == nil {
-						templ_7745c5c3_Err = templ_7745c5c3_BufErr
-					}
-				}()
-			}
-			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = inputWithClass("text", "address_line1", "Address Line 1", "required-field").Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, " ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = warning("Please enter a valid address line").Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			return nil
-		})
-		templ_7745c5c3_Err = divInputWarning().Render(templ.WithChildren(ctx, templ_7745c5c3_Var25), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = infieldLabelInput("text", "address_line1", "Address Line 1").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"flex flex-col gap-1\"><input type=\"text\" name=\"address_line2\" class=\"border rounded-lg p-2 w-full h-full\" placeholder=\"Address Line 2 (Optional)\" onblur=\"this.value = this.value.trim()\"></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Var26 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-			if !templ_7745c5c3_IsBuffer {
-				defer func() {
-					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-					if templ_7745c5c3_Err == nil {
-						templ_7745c5c3_Err = templ_7745c5c3_BufErr
-					}
-				}()
-			}
-			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = input("text", "postal", "Postal code", "^[0-9]{4}$").Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, " ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = warning("Please enter a valid postal code (4 digits only)").Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			return nil
-		})
-		templ_7745c5c3_Err = divInputWarning().Render(templ.WithChildren(ctx, templ_7745c5c3_Var26), templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<div class=\"flex flex-col\"><select id=\"country\" name=\"country\" class=\"w-full h-full border rounded-lg p-2 cursor-not-allowed\" required disabled><option value=\"PH\">Philippines</option></select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"relative\"><input type=\"text\" name=\"address_line2\" class=\"border rounded-lg p-3 pt-6 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" placeholder=\" \" onblur=\"this.value = this.value.trim()\"> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Address Line 2 (Optional)</label></div><div class=\"flex flex-row gap-1\"><div class=\"relative w-1/2\"><input type=\"text\" name=\"postal\" class=\"border rounded-lg px-3 py-2 pt-6 w-full h-14 peer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" placeholder=\" \" required pattern=\"^[0-9]{4}$\" onblur=\"this.value = this.value.trim()\"> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Postal Code</label> <small class=\"\n\t\t\t\t\t\ttext-red-500 text-xs block invisible h-0 mt-1\n\t\t\t\t\t\tpeer-invalid:visible peer-invalid:h-auto\n\t\t\t\t\t\">Please enter a valid postal code (4 digits only)</small></div><div class=\"relative w-1/2\"><select id=\"country\" name=\"country\" class=\"border rounded-lg px-3 py-2 pt-6 w-full h-14 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" required disabled><option value=\"PH\" selected>Philippines</option></select> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Country</label></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -602,7 +696,7 @@ func ShippingAddressSelect() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
