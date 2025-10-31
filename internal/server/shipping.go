@@ -177,6 +177,7 @@ func (s *Server) shippingQuotationHandler(w http.ResponseWriter, r *http.Request
 	logs.Log().Info(logtag, zap.Any("quotation", quotation), zap.String("total_weight", totalWeight))
 
 	s.sessionManager.Put(r.Context(), skShippingQuotation, quotation)
+	s.sessionManager.Put(r.Context(), skShippingRequest, shippingRequest)
 
 	if err := components.CartSummaryRowWithID("delivery-fee-row", "Delivery Fee", utils.NewMoney(int64(quotation.Fee*100), quotation.Currency).Display(), "text-gray-500").Render(r.Context(), w); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
