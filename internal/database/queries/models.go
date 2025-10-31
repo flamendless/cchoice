@@ -82,6 +82,65 @@ type TblGeocodingCache struct {
 	ExpiresAt         sql.NullTime
 }
 
+type TblOrder struct {
+	ID                       int64
+	CheckoutID               int64
+	CheckoutPaymentID        string
+	OrderNumber              string
+	Status                   string
+	CustomerName             string
+	CustomerEmail            string
+	CustomerPhone            string
+	BillingAddressLine1      string
+	BillingAddressLine2      string
+	BillingCity              string
+	BillingState             string
+	BillingPostalCode        string
+	BillingCountry           string
+	BillingLatitude          sql.NullString
+	BillingLongitude         sql.NullString
+	BillingFormattedAddress  sql.NullString
+	BillingPlaceID           sql.NullString
+	ShippingAddressLine1     string
+	ShippingAddressLine2     string
+	ShippingCity             string
+	ShippingState            string
+	ShippingPostalCode       string
+	ShippingCountry          string
+	ShippingLatitude         sql.NullString
+	ShippingLongitude        sql.NullString
+	ShippingFormattedAddress sql.NullString
+	ShippingPlaceID          sql.NullString
+	SubtotalAmount           int64
+	ShippingAmount           int64
+	DiscountAmount           int64
+	TotalAmount              int64
+	Currency                 string
+	ShippingService          sql.NullString
+	ShippingOrderID          sql.NullString
+	ShippingTrackingNumber   sql.NullString
+	Notes                    sql.NullString
+	Remarks                  sql.NullString
+	CreatedAt                time.Time
+	UpdatedAt                time.Time
+}
+
+type TblOrderLine struct {
+	ID             int64
+	OrderID        int64
+	CheckoutLineID int64
+	ProductID      int64
+	Name           string
+	Serial         string
+	Description    string
+	UnitPrice      int64
+	Quantity       int64
+	TotalPrice     int64
+	Currency       string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+}
+
 type TblProduct struct {
 	ID                          int64
 	Serial                      string
