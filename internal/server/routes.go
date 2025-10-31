@@ -80,6 +80,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		AddProductCategoriesHandlers(s, r)
 		AddCartsHandlers(s, r)
 		AddShippingHandlers(s, r)
+		AddPaymentHandlers(s, r)
 
 		//INFO: (Brandon) - unused routes
 		r.Post("/checkouts", s.checkoutsHandler)
