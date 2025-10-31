@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -36,11 +37,19 @@ func MustInit() *PayMongo {
 	}
 
 	apiKey := base64.StdEncoding.EncodeToString([]byte(cfg.PayMongoAPIKey))
+
+	address := cfg.Address
+	if address == "localhost" {
+		address = "http://localhost"
+	}
+	successURL := fmt.Sprintf("%s:%d%s", address, cfg.Port, cfg.PayMongoSuccessURL)
+	cancelURL := fmt.Sprintf("%s:%d%s", address, cfg.Port, cfg.PayMongoCancelURL)
+
 	return &PayMongo{
 		paymentGateway: payments.PAYMENT_GATEWAY_PAYMONGO,
 		apiKey:         apiKey,
-		successURL:     cfg.PayMongoSuccessURL,
-		cancelURL:      cfg.PayMongoCancelURL,
+		successURL:     successURL,
+		cancelURL:      cancelURL,
 		baseURL:        cfg.PayMongoBaseURL,
 		client:         &http.Client{Timeout: 10 * time.Second},
 	}
@@ -166,16 +175,34 @@ func (p PayMongo) CreatePayload(
 	lineItems []payments.LineItem,
 	paymentMethods []payments.PaymentMethod,
 ) payments.CreateCheckoutSessionPayload {
+	referenceNumber := p.GenerateRefNo()
+
+	cancelURLWithRef := p.cancelURL
+	if u, err := url.Parse(cancelURLWithRef); err == nil {
+		q := u.Query()
+		q.Set("order_ref", referenceNumber)
+		u.RawQuery = q.Encode()
+		cancelURLWithRef = u.String()
+	}
+
+	successURLWithRef := p.successURL
+	if u, err := url.Parse(successURLWithRef); err == nil {
+		q := u.Query()
+		q.Set("order_ref", referenceNumber)
+		u.RawQuery = q.Encode()
+		successURLWithRef = u.String()
+	}
+
 	payload := CreateCheckoutSessionPayload{
 		Data: CreateCheckoutSessionData{
 			Attributes: CreateCheckoutSessionAttr{
-				CancelURL:           p.cancelURL,
-				SuccessURL:          p.successURL,
+				CancelURL:           cancelURLWithRef,
+				SuccessURL:          successURLWithRef,
 				Billing:             billing,
 				LineItems:           lineItems,
 				PaymentMethodTypes:  paymentMethods,
 				Description:         "C-Choice Checkout",
-				ReferenceNumber:     p.GenerateRefNo(),
+				ReferenceNumber:     referenceNumber,
 				SendEmailReceipt:    false,
 				ShowDescription:     true,
 				ShowLineItems:       true,

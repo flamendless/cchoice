@@ -1,0 +1,62 @@
+package components
+
+templ CancelPaymentPage(body templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			@HeadMeta()
+			@TabTitle("Payment Cancelled")
+		</head>
+		@body
+	</html>
+}
+
+templ CancelPaymentPageBody(orderRefNumber string) {
+	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
+		@ErrorBanner()
+		@Header()
+		<div class="flex flex-col items-center content-center px-2 pb-32 pt-[128px] gap-4">
+			<div class="flex flex-col items-center justify-center gap-4 max-w-2xl mx-auto px-8">
+				<h1 class="text-3xl font-semibold text-cchoice-800">Payment Cancelled</h1>
+				<p class="text-lg text-gray-600 text-center">
+					Your payment has been cancelled. No charges have been made to your account.
+				</p>
+				<div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-2">
+					<p class="text-sm text-gray-600 mb-1">Order Reference Number:</p>
+					<p class="text-base font-mono font-semibold text-red-800">{ orderRefNumber }</p>
+				</div>
+				<p class="text-base text-gray-500 text-center">
+					If you'd like to complete your purchase, you can return to your cart to try again.
+				</p>
+				<div class="flex flex-row gap-4 mt-4">
+					<a
+						href="/cchoice/carts"
+						class="
+							flex justify-center items-center relative inline-block px-6 py-3
+							bg-cchoice font-medium rounded-lg text-white cursor-pointer
+							transition-colors rounded-full hover:bg-cchoicesoft
+						"
+						title="Return to cart"
+						alt="Return to cart button"
+					>
+						Return to Cart
+					</a>
+					<a
+						href="/cchoice"
+						class="
+							flex justify-center items-center relative inline-block px-6 py-3
+							bg-gray-200 font-medium rounded-lg text-gray-700 cursor-pointer
+							transition-colors rounded-full hover:bg-gray-300
+						"
+						title="Go to home"
+						alt="Go to home button"
+					>
+						Go to Home
+					</a>
+				</div>
+			</div>
+		</div>
+		@Footer()
+	</body>
+}
+

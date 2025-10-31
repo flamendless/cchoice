@@ -16,6 +16,7 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
+	"cchoice/internal/orders"
 	"cchoice/internal/payments"
 	"cchoice/internal/shipping"
 	"cchoice/internal/utils"
@@ -494,11 +495,56 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		payload := s.paymentGateway.CreatePayload(billing, lineItems, paymentMethods)
-		if err := s.paymentGateway.CheckoutPaymentHandler(w, r, payload); err != nil {
+
+		resCheckout, err := s.paymentGateway.CreateCheckoutPaymentSession(payload)
+		if err != nil {
 			logs.Log().Error(logtag, zap.Error(err), zap.Any("payload", payload))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
+		checkoutID, err := s.dbRO.GetQueries().GetCheckoutIDBySessionID(r.Context(), token)
+		if err != nil {
+			logs.Log().Error(logtag, zap.Error(err), zap.String("token", token))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		var shippingQuotation *shipping.ShippingQuotation
+		if quotation, ok := s.sessionManager.Get(r.Context(), skShippingQuotation).(*shipping.ShippingQuotation); ok && quotation != nil {
+			shippingQuotation = quotation
+		}
+
+		var shippingCoordinates *shipping.Coordinates
+		if shippingReq, ok := s.sessionManager.Get(r.Context(), skShippingRequest).(*shipping.ShippingRequest); ok && shippingReq != nil {
+			shippingCoordinates = &shippingReq.DeliveryLocation.Coordinates
+		}
+
+		orderParams := orders.CreateOrderParams{
+			CheckoutID:              checkoutID,
+			Checkout:                cartCheckout,
+			CheckoutLines:           checkoutLines,
+			CheckoutSessionResponse: resCheckout,
+			ShippingQuotation:       shippingQuotation,
+			ShippingCoordinates:     shippingCoordinates,
+			PaymentGateway:          s.paymentGateway,
+			Geocoder:                s.geocoder,
+			Cache:                   s.cache,
+			SingleFlight:            &s.SF,
+			Encoder:                 s.encoder,
+		}
+
+		order, checkoutURL, err := orders.CreateOrderFromCheckout(r.Context(), s.dbRW, orderParams)
+		if err != nil {
+			logs.Log().Error(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		logs.Log().Info(logtag, zap.Int64("order_id", order.ID), zap.String("order_number", order.OrderNumber), zap.String("token", token))
+
+		// Redirect to payment gateway
+		w.Header().Set("HX-Redirect", checkoutURL)
 	default:
 		err := fmt.Errorf("%s. %w", logtag, errs.ErrServerUnimplementedGateway)
 		logs.Log().Error(err.Error(), zap.String("gateway", s.paymentGateway.GatewayEnum().String()))
