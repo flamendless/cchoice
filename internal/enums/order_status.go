@@ -1,0 +1,37 @@
+package enums
+
+//go:generate go tool stringer -type=OrderStatus -trimprefix=ORDER_STATUS_
+
+type OrderStatus int
+
+const (
+	ORDER_STATUS_UNDEFINED OrderStatus = iota
+	ORDER_STATUS_PENDING
+	ORDER_STATUS_CONFIRMED
+	ORDER_STATUS_PROCESSING
+	ORDER_STATUS_SHIPPED
+	ORDER_STATUS_DELIVERED
+	ORDER_STATUS_CANCELLED
+	ORDER_STATUS_REFUNDED
+)
+
+func ParseOrderStatusToEnum(e string) OrderStatus {
+	switch e {
+	case ORDER_STATUS_PENDING.String():
+		return ORDER_STATUS_PENDING
+	case ORDER_STATUS_CONFIRMED.String():
+		return ORDER_STATUS_CONFIRMED
+	case ORDER_STATUS_PROCESSING.String():
+		return ORDER_STATUS_PROCESSING
+	case ORDER_STATUS_SHIPPED.String():
+		return ORDER_STATUS_SHIPPED
+	case ORDER_STATUS_DELIVERED.String():
+		return ORDER_STATUS_DELIVERED
+	case ORDER_STATUS_CANCELLED.String():
+		return ORDER_STATUS_CANCELLED
+	case ORDER_STATUS_REFUNDED.String():
+		return ORDER_STATUS_REFUNDED
+	default:
+		return ORDER_STATUS_UNDEFINED
+	}
+}
