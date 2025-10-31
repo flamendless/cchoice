@@ -4,6 +4,8 @@ import "encoding/gob"
 
 func init() {
 	gob.Register(&ShippingQuotation{})
+	gob.Register(&ShippingRequest{})
+	gob.Register(&Coordinates{})
 	gob.Register(ServiceType(0))
 }
 

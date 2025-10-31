@@ -12,6 +12,7 @@ import (
 const (
 	skCheckoutLineProductIDs = "checkout_line_ids"
 	skShippingQuotation      = "shipping_quotation"
+	skShippingRequest        = "shipping_request"
 	skCheckedItems           = "checked_items"
 )
 
