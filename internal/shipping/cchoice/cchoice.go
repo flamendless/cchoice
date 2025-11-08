@@ -34,10 +34,10 @@ func MustInit() *CChoiceService {
 		maxDistance:     100.0,
 		businessLocation: &shipping.Location{
 			Coordinates: shipping.Coordinates{
-				Lat: cfg.BusinessLat,
-				Lng: cfg.BusinessLng,
+				Lat: cfg.Business.Lat,
+				Lng: cfg.Business.Lng,
 			},
-			Address: cfg.BusinessAddress,
+			Address: cfg.Business.Address,
 		},
 	}
 }

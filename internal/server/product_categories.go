@@ -142,7 +142,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 			continue
 		}
 
-		imgData, err := images.GetImageDataB64(s.cache, s.fs, product.ThumbnailPath, images.IMAGE_FORMAT_WEBP)
+		imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, product.ThumbnailPath, images.IMAGE_FORMAT_WEBP)
 		if err != nil {
 			logs.Log().Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)

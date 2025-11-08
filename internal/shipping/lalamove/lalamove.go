@@ -35,17 +35,17 @@ func MustInit() *Lalamove {
 
 	return &Lalamove{
 		shippingService: shipping.SHIPPING_SERVICE_LALAMOVE,
-		apiKey:          cfg.LalamoveAPIKey,
-		secret:          cfg.LalamoveAPISecret,
-		baseURL:         cfg.LalamoveBaseURL,
+		apiKey:          cfg.Lalamove.APIKey,
+		secret:          cfg.Lalamove.Secret,
+		baseURL:         cfg.Lalamove.BaseURL,
 		client:          &http.Client{Timeout: 10 * time.Second},
 		apiVersion:      "v3",
 		businessLocation: &shipping.Location{
 			Coordinates: shipping.Coordinates{
-				Lat: cfg.BusinessLat,
-				Lng: cfg.BusinessLng,
+				Lat: cfg.Business.Lat,
+				Lng: cfg.Business.Lng,
 			},
-			Address: cfg.BusinessAddress,
+			Address: cfg.Business.Address,
 		},
 	}
 }

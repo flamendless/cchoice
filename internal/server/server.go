@@ -25,15 +25,19 @@ import (
 	"cchoice/internal/shipping"
 	cchoiceservice "cchoice/internal/shipping/cchoice"
 	"cchoice/internal/shipping/lalamove"
+	"cchoice/internal/storage"
+	"cchoice/internal/storage/linode"
+	localstorage "cchoice/internal/storage/local"
 )
 
-const CACHE_MAX_BYTES int = 1024
+const CACHE_MAX_BYTES int = 100 * 1024 * 1024 // 100MB cache for better cost efficiency
 
 type Server struct {
 	dbRO            database.Service
 	dbRW            database.Service
 	SF              singleflight.Group
-	fs              http.FileSystem
+	staticFS        http.FileSystem // For static assets (JS, CSS, icons) - always local
+	productImageFS  http.FileSystem // For product images - configurable (local or object storage)
 	cache           *fastcache.Cache
 	sessionManager  *scs.SessionManager
 	paymentGateway  payments.IPaymentGateway
@@ -90,20 +94,34 @@ func NewServer() *http.Server {
 		panic("Unsupported geocoding service: " + cfg.GeocodingService)
 	}
 
+	staticFS := localstorage.New()
+
+	var productImageFS storage.IFileSystem
+	switch cfg.StorageProvider {
+	case "linode":
+		productImageFS = linode.New()
+	case "local":
+		productImageFS = localstorage.New()
+	default:
+		panic("Unsupported storage provider: " + cfg.StorageProvider)
+	}
+
 	NewServer := &Server{
-		address:         cfg.Address,
-		port:            cfg.Port,
-		portFS:          cfg.PortFS,
+		address:         cfg.Server.Address,
+		port:            cfg.Server.Port,
+		portFS:          cfg.Server.PortFS,
 		dbRO:            dbRO,
 		dbRW:            dbRW,
+		staticFS:        staticFS,
+		productImageFS:  productImageFS,
 		cache:           fastcache.New(CACHE_MAX_BYTES),
 		sessionManager:  sessionManager,
 		paymentGateway:  paymentGateway,
 		shippingService: shippingService,
 		geocoder:        geocoder,
 		encoder:         sqids.MustSqids(),
-		useHTTP2:        cfg.UseHTTP2,
-		useSSL:          cfg.UseSSL,
+		useHTTP2:        cfg.Server.UseHTTP2,
+		useSSL:          cfg.Server.UseSSL,
 	}
 
 	addr := fmt.Sprintf("%s:%d", NewServer.address, NewServer.port)
@@ -114,10 +132,10 @@ func NewServer() *http.Server {
 	if NewServer.useSSL {
 		logs.Log().Info(
 			"SSL: opening files",
-			zap.String("cert", cfg.CertPath),
-			zap.String("key", cfg.KeyPath),
+			zap.String("cert", cfg.Server.CertPath),
+			zap.String("key", cfg.Server.KeyPath),
 		)
-		serverTLSCert, err := tls.LoadX509KeyPair(cfg.CertPath, cfg.KeyPath)
+		serverTLSCert, err := tls.LoadX509KeyPair(cfg.Server.CertPath, cfg.Server.KeyPath)
 		if err != nil {
 			panic(err)
 		}
@@ -153,6 +171,7 @@ func NewServer() *http.Server {
 		zap.Duration("Session manager lifetime", NewServer.sessionManager.Lifetime),
 		zap.String("Payment gateway", NewServer.paymentGateway.GatewayEnum().String()),
 		zap.String("Shipping service", NewServer.shippingService.Enum().String()),
+		zap.String("Storage provider", cfg.StorageProvider),
 		zap.Bool("SSL", NewServer.useSSL),
 		zap.Bool("HTTP2", NewServer.useHTTP2),
 		zap.Duration("Read timeout", readTimeout),

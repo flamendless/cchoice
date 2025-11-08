@@ -40,7 +40,7 @@ func MustInit(db database.Service) *GoogleMapsGeocoder {
 	}
 
 	return &GoogleMapsGeocoder{
-		apiKey:  cfg.GoogleMapsAPIKey,
+		apiKey:  cfg.GoogleMaps.APIKey,
 		baseURL: "https://maps.googleapis.com/maps/api/geocode/json",
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,
@@ -62,7 +62,7 @@ func MustInitWithCache(db database.Service, cacheExpiry time.Duration) *GoogleMa
 	}
 
 	return &GoogleMapsGeocoder{
-		apiKey:  cfg.GoogleMapsAPIKey,
+		apiKey:  cfg.GoogleMaps.APIKey,
 		baseURL: "https://maps.googleapis.com/maps/api/geocode/json",
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,

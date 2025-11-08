@@ -10,7 +10,6 @@ import (
 
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
-	"cchoice/cmd/web/static"
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
@@ -54,17 +53,35 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Route("/cchoice", func(r chi.Router) {
 		r.Use(middleware.StripPrefix("/cchoice"))
 
-		fs := static.GetFS()
-		if fs == nil {
+		// Use staticFS for static assets (JS, CSS, icons)
+		if s.staticFS == nil {
 			panic(errors.Join(errs.ErrServerInit, errs.ErrServerFSNotSetup))
 		}
 
-		s.fs = http.FS(fs)
-		r.Handle(
-			"/static/*",
-			// http.StripPrefix("/static/", static.Handler()),
-			http.StripPrefix("/static/", static.CacheHandler(httputil.CacheHeaders)),
-		)
+		// Custom static file handler with caching
+		r.Handle("/static/*", http.StripPrefix("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			path := r.URL.Path
+			notModified, file, err := httputil.CacheHeaders(w, r, s.staticFS, path)
+			if err != nil {
+				logs.Log().Debug("[Static Handler]", zap.Error(err), zap.String("path", path))
+				http.NotFound(w, r)
+				return
+			}
+			defer file.Close()
+
+			if notModified {
+				return
+			}
+
+			info, err := file.Stat()
+			if err != nil {
+				logs.Log().Error("[Static Handler]", zap.Error(err))
+				http.NotFound(w, r)
+				return
+			}
+
+			http.ServeContent(w, r, info.Name(), info.ModTime(), file)
+		})))
 
 		r.Get("/changelogs", s.changelogsHandler)
 		r.Get("/health", s.healthHandler)
@@ -128,7 +145,7 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 		metrics.Cache.MemMiss()
 	}
 
-	if notModified, file, err := httputil.CacheHeaders(w, r, s.fs, path); err != nil {
+	if notModified, file, err := httputil.CacheHeaders(w, r, s.productImageFS, path); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -139,7 +156,7 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	imgData, err := images.GetImageDataB64(s.cache, s.fs, path, ext)
+	imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, path, ext)
 	if err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -345,7 +362,7 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		imgData, err := images.GetImageDataB64(s.cache, s.fs, product.ThumbnailPath, images.IMAGE_FORMAT_WEBP)
+		imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, product.ThumbnailPath, images.IMAGE_FORMAT_WEBP)
 		if err != nil {
 			logs.Log().Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
