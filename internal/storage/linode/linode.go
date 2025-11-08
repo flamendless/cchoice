@@ -154,8 +154,13 @@ func New() storage.IFileSystem {
 		panic(fmt.Errorf("failed to load AWS config: %w", err))
 	}
 
+	endpoint := cfg.Linode.Endpoint
+	if !strings.HasPrefix(endpoint, "http://") && !strings.HasPrefix(endpoint, "https://") {
+		endpoint = "https://" + endpoint
+	}
+
 	client := s3.NewFromConfig(awsCfg, func(o *s3.Options) {
-		o.BaseEndpoint = aws.String(cfg.Linode.Endpoint)
+		o.BaseEndpoint = aws.String(endpoint)
 		o.UsePathStyle = true
 	})
 
