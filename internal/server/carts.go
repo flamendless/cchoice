@@ -112,7 +112,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 	for _, checkoutLine := range checkoutLines {
 		var imgData string
 		if !strings.HasSuffix(checkoutLine.ThumbnailPath, constants.EmptyImageFilename) {
-			if imgDataB64, err := images.GetImageDataB64(s.cache, s.fs, checkoutLine.ThumbnailPath, images.IMAGE_FORMAT_WEBP); err == nil {
+			if imgDataB64, err := images.GetImageDataB64(s.cache, s.productImageFS, checkoutLine.ThumbnailPath, images.IMAGE_FORMAT_WEBP); err == nil {
 				imgData = imgDataB64
 			}
 		}
@@ -561,7 +561,7 @@ func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Reque
 		{
 			Value:     payments.PAYMENT_METHOD_COD,
 			Enabled:   (err == nil && cod),
-			ImageData: payments.PAYMENT_METHOD_COD.GetImageData(s.cache, s.fs),
+			ImageData: payments.PAYMENT_METHOD_COD.GetImageData(s.cache, s.staticFS),
 		},
 	}
 
@@ -593,7 +593,7 @@ func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Reque
 			paymentMethods = append(paymentMethods, models.AvailablePaymentMethod{
 				Value:     pm,
 				Enabled:   enabled,
-				ImageData: pm.GetImageData(s.cache, s.fs),
+				ImageData: pm.GetImageData(s.cache, s.staticFS),
 			})
 		}
 

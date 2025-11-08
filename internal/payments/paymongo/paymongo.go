@@ -36,21 +36,21 @@ func MustInit() *PayMongo {
 		panic("'PAYMENT_SERVICE' must be 'paymongo' to use this")
 	}
 
-	apiKey := base64.StdEncoding.EncodeToString([]byte(cfg.PayMongoAPIKey))
+	apiKey := base64.StdEncoding.EncodeToString([]byte(cfg.PayMongo.APIKey))
 
-	address := cfg.Address
+	address := cfg.Server.Address
 	if address == "localhost" {
 		address = "http://localhost"
 	}
-	successURL := fmt.Sprintf("%s:%d%s", address, cfg.Port, cfg.PayMongoSuccessURL)
-	cancelURL := fmt.Sprintf("%s:%d%s", address, cfg.Port, cfg.PayMongoCancelURL)
+	successURL := fmt.Sprintf("%s:%d%s", address, cfg.Server.Port, cfg.PayMongo.SuccessURL)
+	cancelURL := fmt.Sprintf("%s:%d%s", address, cfg.Server.Port, cfg.PayMongo.CancelURL)
 
 	return &PayMongo{
 		paymentGateway: payments.PAYMENT_GATEWAY_PAYMONGO,
 		apiKey:         apiKey,
 		successURL:     successURL,
 		cancelURL:      cancelURL,
-		baseURL:        cfg.PayMongoBaseURL,
+		baseURL:        cfg.PayMongo.BaseURL,
 		client:         &http.Client{Timeout: 10 * time.Second},
 	}
 }

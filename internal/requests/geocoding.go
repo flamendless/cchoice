@@ -59,7 +59,7 @@ func generateGeocodingCacheKey(address string) string {
 	cfg := conf.Conf()
 
 	keyData := fmt.Sprintf("geocoding:%s:%s:%s",
-		cfg.GeocodingService, cfg.GoogleMapsAPIKey[:8], address)
+		cfg.GeocodingService, cfg.GoogleMaps.APIKey[:8], address)
 
 	hash := sha256.Sum256([]byte(keyData))
 	return "geo_" + hex.EncodeToString(hash[:])[:16]

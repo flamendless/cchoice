@@ -60,7 +60,7 @@ func generateShippingCacheKey(address, weight, serviceType string) string {
 	cfg := conf.Conf()
 
 	keyData := fmt.Sprintf("shipping:%s:%s:%s:%s:%s:%s",
-		cfg.BusinessLat, cfg.BusinessLng, address, weight, serviceType, cfg.ShippingService)
+		cfg.Business.Lat, cfg.Business.Lng, address, weight, serviceType, cfg.ShippingService)
 
 	hash := sha256.Sum256([]byte(keyData))
 	return "ship_" + hex.EncodeToString(hash[:])[:16]

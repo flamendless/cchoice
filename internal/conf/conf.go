@@ -14,37 +14,68 @@ var appCfg *appConfig
 var once sync.Once
 
 type appConfig struct {
-	Address            string `env:"ADDRESS" env-required:""`
-	AppEnv             string `env:"APP_ENV" env-required:""`
-	DBURL              string `env:"DB_URL" env-required:""`
-	PaymentService     string `env:"PAYMENT_SERVICE" env-required:""`
-	PayMongoAPIKey     string `env:"PAYMONGO_API_KEY"`
-	PayMongoBaseURL    string `env:"PAYMONGO_BASE_URL"`
-	PayMongoSuccessURL string `env:"PAYMONGO_SUCCESS_URL"`
-	PayMongoCancelURL  string `env:"PAYMONGO_CANCEL_URL"`
-	ShippingService    string `env:"SHIPPING_SERVICE" env-required:""`
-	LalamoveBaseURL    string `env:"LALAMOVE_BASE_URL"`
-	LalamoveAPIKey     string `env:"LALAMOVE_API_KEY"`
-	LalamoveAPISecret  string `env:"LALAMOVE_API_SECRET"`
-	GeocodingService   string `env:"GEOCODING_SERVICE" env-required:""`
-	GoogleMapsAPIKey   string `env:"GOOGLE_MAPS_API_KEY"`
-	BusinessLat        string `env:"BUSINESS_LAT" env-default:"14.3866"`
-	BusinessLng        string `env:"BUSINESS_LNG" env-default:"120.8811"`
-	BusinessAddress    string `env:"BUSINESS_ADDRESS" env-default:"General Trias, Cavite, Philippines"`
-	FSMode             string `env:"FSMODE" env-required:""`
-	EncodeSalt         string `env:"ENCODE_SALT" env-required:""`
-	CertPath           string `env:"CERTPATH"`
-	KeyPath            string `env:"KEYPATH"`
-	Port               int    `env:"PORT" env-required:""`
-	PortFS             int    `env:"PORT_FS" env-required:""`
-	LogMinLevel        int    `env:"LOG_MIN_LEVEL" env-default:"1"`
-	UseSSL             bool   `env:"USESSL"`
-	UseHTTP2           bool   `env:"USEHTTP2"`
+	Server           ServerConfig
+	AppEnv           string `env:"APP_ENV" env-required:""`
+	DBURL            string `env:"DB_URL" env-required:""`
+	PaymentService   string `env:"PAYMENT_SERVICE" env-required:""`
+	PayMongo         PayMongoConfig
+	ShippingService  string `env:"SHIPPING_SERVICE" env-required:""`
+	Lalamove         LalamoveConfig
+	GeocodingService string `env:"GEOCODING_SERVICE" env-required:""`
+	GoogleMaps       GoogleMapsConfig
+	Business         BusinessConfig
+	FSMode           string `env:"FSMODE" env-required:""`
+	EncodeSalt       string `env:"ENCODE_SALT" env-required:""`
+	LogMinLevel      int    `env:"LOG_MIN_LEVEL" env-default:"1"`
+	StorageProvider  string `env:"STORAGE_PROVIDER" env-default:"local"`
+	Linode           LinodeConfig
+}
+
+type ServerConfig struct {
+	Address  string `env:"ADDRESS" env-required:""`
+	Port     int    `env:"PORT" env-required:""`
+	PortFS   int    `env:"PORT_FS" env-required:""`
+	UseSSL   bool   `env:"USESSL"`
+	UseHTTP2 bool   `env:"USEHTTP2"`
+	CertPath string `env:"CERTPATH"`
+	KeyPath  string `env:"KEYPATH"`
+}
+
+type PayMongoConfig struct {
+	APIKey     string `env:"PAYMONGO_API_KEY"`
+	BaseURL    string `env:"PAYMONGO_BASE_URL"`
+	SuccessURL string `env:"PAYMONGO_SUCCESS_URL"`
+	CancelURL  string `env:"PAYMONGO_CANCEL_URL"`
+}
+
+type LalamoveConfig struct {
+	BaseURL string `env:"LALAMOVE_BASE_URL"`
+	APIKey  string `env:"LALAMOVE_API_KEY"`
+	Secret  string `env:"LALAMOVE_API_SECRET"`
+}
+
+type GoogleMapsConfig struct {
+	APIKey string `env:"GOOGLE_MAPS_API_KEY"`
+}
+
+type BusinessConfig struct {
+	Lat     string `env:"BUSINESS_LAT" env-default:"14.3866"`
+	Lng     string `env:"BUSINESS_LNG" env-default:"120.8811"`
+	Address string `env:"BUSINESS_ADDRESS" env-default:"General Trias, Cavite, Philippines"`
+}
+
+type LinodeConfig struct {
+	Endpoint   string `env:"LINODE_ENDPOINT"`
+	AccessKey  string `env:"LINODE_ACCESS_KEY"`
+	SecretKey  string `env:"LINODE_SECRET_KEY"`
+	Bucket     string `env:"LINODE_BUCKET"`
+	Region     string `env:"LINODE_REGION" env-default:"sg-sin-2"`
+	BasePrefix string `env:"LINODE_BASE_PREFIX" env-default:""`
 }
 
 func mustValidate(c *appConfig) {
 	if c.PaymentService == "paymongo" {
-		if c.PayMongoBaseURL == "" || c.PayMongoAPIKey == "" || c.PayMongoSuccessURL == "" || c.PayMongoCancelURL == "" {
+		if c.PayMongo.BaseURL == "" || c.PayMongo.APIKey == "" || c.PayMongo.SuccessURL == "" || c.PayMongo.CancelURL == "" {
 			panic(fmt.Errorf("[PayMongo]: %w", errs.ErrEnvVarRequired))
 		}
 	} else {
@@ -53,7 +84,7 @@ func mustValidate(c *appConfig) {
 
 	switch c.ShippingService {
 	case "lalamove":
-		if c.LalamoveBaseURL == "" || c.LalamoveAPIKey == "" || c.LalamoveAPISecret == "" {
+		if c.Lalamove.BaseURL == "" || c.Lalamove.APIKey == "" || c.Lalamove.Secret == "" {
 			panic(fmt.Errorf("[Lalamove]: %w", errs.ErrEnvVarRequired))
 		}
 	case "cchoice":
@@ -62,7 +93,7 @@ func mustValidate(c *appConfig) {
 	}
 
 	if c.GeocodingService == "googlemaps" {
-		if c.GoogleMapsAPIKey == "" {
+		if c.GoogleMaps.APIKey == "" {
 			panic(fmt.Errorf("[GoogleMaps]: %w", errs.ErrEnvVarRequired))
 		}
 	} else {
@@ -70,12 +101,12 @@ func mustValidate(c *appConfig) {
 	}
 
 	if c.IsLocal() {
-		if c.CertPath == "" || c.KeyPath == "" {
+		if c.Server.CertPath == "" || c.Server.KeyPath == "" {
 			panic(fmt.Errorf("[CertPath, KeyPath]: %w", errs.ErrEnvVarRequired))
 		}
 	} else {
-		c.CertPath = fmt.Sprintf("/etc/letsencrypt/live/%s/fullchain.pem", c.Address)
-		c.KeyPath = fmt.Sprintf("/etc/letsencrypt/live/%s/privkey.pem", c.Address)
+		c.Server.CertPath = fmt.Sprintf("/etc/letsencrypt/live/%s/fullchain.pem", c.Server.Address)
+		c.Server.KeyPath = fmt.Sprintf("/etc/letsencrypt/live/%s/privkey.pem", c.Server.Address)
 	}
 
 	if c.FSMode != static.GetMode() {
@@ -87,6 +118,12 @@ func mustValidate(c *appConfig) {
 				static.GetMode(),
 			),
 		))
+	}
+
+	if c.StorageProvider == "linode" {
+		if c.Linode.Endpoint == "" || c.Linode.AccessKey == "" || c.Linode.SecretKey == "" || c.Linode.Bucket == "" {
+			panic(fmt.Errorf("[Linode Storage]: %w", errs.ErrEnvVarRequired))
+		}
 	}
 }
 
