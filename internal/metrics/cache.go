@@ -35,18 +35,32 @@ var (
 			Help: "Number of reset",
 		},
 	)
+	linodeAssetHit = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "linode_asset_hit_total",
+			Help: "Number of successful asset retrievals from Linode Object Storage",
+		},
+	)
+	linodeAssetError = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "linode_asset_error_total",
+			Help: "Number of failed asset retrieval attempts from Linode Object Storage",
+		},
+	)
 )
 
 func init() {
-	prometheus.MustRegister(headersHit, memHit, reset)
+	prometheus.MustRegister(headersHit, memHit, reset, linodeAssetHit, linodeAssetError)
 }
 
 var Cache metricsCache
 
 type metricsCache struct{}
 
-func (c *metricsCache) HeadersHit()  { headersHit.Inc() }
-func (c *metricsCache) HeadersMiss() { headersMiss.Inc() }
-func (c *metricsCache) MemHit()      { memHit.Inc() }
-func (c *metricsCache) MemMiss()     { memMiss.Inc() }
-func (c *metricsCache) ResetAll()    { reset.Inc() }
+func (c *metricsCache) HeadersHit()       { headersHit.Inc() }
+func (c *metricsCache) HeadersMiss()      { headersMiss.Inc() }
+func (c *metricsCache) MemHit()           { memHit.Inc() }
+func (c *metricsCache) MemMiss()          { memMiss.Inc() }
+func (c *metricsCache) ResetAll()         { reset.Inc() }
+func (c *metricsCache) LinodeAssetHit()   { linodeAssetHit.Inc() }
+func (c *metricsCache) LinodeAssetError() { linodeAssetError.Inc() }

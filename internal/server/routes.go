@@ -91,6 +91,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/settings/header-texts", s.headerTextsHandler)
 		r.Get("/settings/footer-texts", s.footerTextsHandler)
 		r.Get("/products/image", s.productsImageHandler)
+		r.Get("/brands/logo", s.brandLogoHandler)
 
 		r.Post("/search", s.searchHandler)
 
@@ -132,7 +133,28 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cacheKey := buildImageCacheKey(path, thumbnail, size, quality, ext)
+	s.serveImage(w, r, path, ext, cacheKey, logtag)
+}
 
+func (s *Server) brandLogoHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Brand Logo Handler]"
+	filename := r.URL.Query().Get("filename")
+	if filename == "" {
+		logs.Log().Debug(
+			logtag,
+			zap.String("error", "missing filename parameter"),
+		)
+		http.Error(w, "missing filename parameter", http.StatusBadRequest)
+		return
+	}
+
+	path := "static/images/brand_logos/" + filename
+	ext := images.IMAGE_FORMAT_WEBP
+	cacheKey := buildImageCacheKey(path, "", "", "", ext)
+	s.serveImage(w, r, path, ext, cacheKey, logtag)
+}
+
+func (s *Server) serveImage(w http.ResponseWriter, r *http.Request, path string, ext images.ImageFormat, cacheKey []byte, logtag string) {
 	if data, ok := s.cache.HasGet(nil, cacheKey); ok {
 		w.Header().Set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400")
 		if err := components.Image(string(data)).Render(r.Context(), w); err != nil {

@@ -88,7 +88,7 @@ func NewClientFromConfig() (*Client, error) {
 	}
 
 	logs.Log().Info(
-		"Linode keys",
+		"Linode",
 		zap.String("endpoint", cfg.Linode.Endpoint),
 		zap.String("bucket", cfg.Linode.Bucket),
 		zap.String("region", cfg.Linode.Region),

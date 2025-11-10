@@ -55,22 +55,6 @@ var cmdMigrateImagesLinode = &cobra.Command{
 
 		basePath := flagsMigrateImagesLinode.basePath
 
-		productImagesPath := filepath.Join(basePath, "product_images")
-		if _, err := os.Stat(productImagesPath); err == nil {
-			logs.Log().Info(
-				"Migrating product images",
-				zap.String("path", productImagesPath),
-			)
-			if err := migrateImages(ctx, client, productImagesPath, basePath, "Product images", false); err != nil {
-				panic(errors.Join(errs.ErrCmd, fmt.Errorf("failed to migrate product images: %w", err)))
-			}
-		} else {
-			logs.Log().Warn(
-				"Product images directory not found",
-				zap.String("path", productImagesPath),
-			)
-		}
-
 		brandLogosPath := filepath.Join(basePath, "brand_logos")
 		if _, err := os.Stat(brandLogosPath); err == nil {
 			logs.Log().Info(
@@ -84,6 +68,22 @@ var cmdMigrateImagesLinode = &cobra.Command{
 			logs.Log().Warn(
 				"Brand logos directory not found",
 				zap.String("path", brandLogosPath),
+			)
+		}
+
+		productImagesPath := filepath.Join(basePath, "product_images")
+		if _, err := os.Stat(productImagesPath); err == nil {
+			logs.Log().Info(
+				"Migrating product images",
+				zap.String("path", productImagesPath),
+			)
+			if err := migrateImages(ctx, client, productImagesPath, basePath, "Product images", false); err != nil {
+				panic(errors.Join(errs.ErrCmd, fmt.Errorf("failed to migrate product images: %w", err)))
+			}
+		} else {
+			logs.Log().Warn(
+				"Product images directory not found",
+				zap.String("path", productImagesPath),
 			)
 		}
 

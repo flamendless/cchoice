@@ -2,7 +2,6 @@ package components
 
 type brandImage struct {
 	filename string
-	s3URL    string
 	alt      string
 }
 
@@ -117,7 +116,10 @@ templ PostHomeContentSections() {
 						</div>
 						if postHomeContent.brandImage != nil {
 							<img
-								src={ templ.URL(GetBrandLogoURL(postHomeContent.brandImage.s3URL, postHomeContent.brandImage.filename)) }
+								hx-get={ templ.URL(GetBrandLogoURL(postHomeContent.brandImage.filename)) }
+								hx-trigger="load"
+								hx-select="img"
+								hx-swap="outerHTML"
 								class="w-3xs h-auto m-auto mt-8"
 								alt={ postHomeContent.brandImage.alt }
 								loading="lazy"
