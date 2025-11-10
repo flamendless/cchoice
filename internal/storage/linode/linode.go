@@ -1,9 +1,8 @@
 package linode
 
 import (
-	"cchoice/internal/conf"
-	"cchoice/internal/errs"
 	"cchoice/internal/storage"
+	s3client "cchoice/internal/storage/s3"
 	"context"
 	"errors"
 	"fmt"
@@ -16,27 +15,25 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	awsconfig "github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 type LinodeFS struct {
-	client     *s3.Client
+	s3Client   *s3client.Client
 	bucket     string
 	basePrefix string
 }
 
 type LinodeFile struct {
-	body    io.ReadCloser
-	name    string
-	size    int64
-	modTime time.Time
-	pos     int64
-	isDir   bool
-	client  *s3.Client
-	bucket  string
-	key     string
+	body     io.ReadCloser
+	name     string
+	size     int64
+	modTime  time.Time
+	pos      int64
+	isDir    bool
+	s3Client *s3client.Client
+	bucket   string
+	key      string
 }
 
 func (f *LinodeFile) Read(p []byte) (n int, err error) {
@@ -77,7 +74,7 @@ func (f *LinodeFile) Readdir(count int) ([]fs.FileInfo, error) {
 		MaxKeys:   aws.Int32(int32(count)),
 	}
 
-	result, err := f.client.ListObjectsV2(ctx, listInput)
+	result, err := f.s3Client.GetS3Client().ListObjectsV2(ctx, listInput)
 	if err != nil {
 		return nil, err
 	}
@@ -131,50 +128,20 @@ func (f *fileInfo) IsDir() bool        { return f.isDir }
 func (f *fileInfo) Sys() interface{}   { return nil }
 
 func New() storage.IFileSystem {
-	cfg := conf.Conf()
-	if cfg.StorageProvider != "linode" {
-		panic("STORAGE_PROVIDER must be 'linode' to use LinodeFS")
-	}
-
-	if cfg.Linode.Endpoint == "" || cfg.Linode.AccessKey == "" || cfg.Linode.SecretKey == "" || cfg.Linode.Bucket == "" {
-		panic(fmt.Errorf("[Linode]: %w", errs.ErrEnvVarRequired))
+	s3Client, err := s3client.NewClientFromConfig()
+	if err != nil {
+		panic(fmt.Errorf("failed to create S3 client: %w", err))
 	}
 
 	ctx := context.Background()
-
-	awsCfg, err := awsconfig.LoadDefaultConfig(ctx,
-		awsconfig.WithRegion(cfg.Linode.Region),
-		awsconfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
-			cfg.Linode.AccessKey,
-			cfg.Linode.SecretKey,
-			"",
-		)),
-	)
-	if err != nil {
-		panic(fmt.Errorf("failed to load AWS config: %w", err))
-	}
-
-	endpoint := cfg.Linode.Endpoint
-	if !strings.HasPrefix(endpoint, "http://") && !strings.HasPrefix(endpoint, "https://") {
-		endpoint = "https://" + endpoint
-	}
-
-	client := s3.NewFromConfig(awsCfg, func(o *s3.Options) {
-		o.BaseEndpoint = aws.String(endpoint)
-		o.UsePathStyle = true
-	})
-
-	_, err = client.HeadBucket(ctx, &s3.HeadBucketInput{
-		Bucket: aws.String(cfg.Linode.Bucket),
-	})
-	if err != nil {
-		panic(fmt.Errorf("failed to connect to Linode bucket '%s': %w", cfg.Linode.Bucket, err))
+	if err := s3Client.HeadBucket(ctx); err != nil {
+		panic(fmt.Errorf("failed to connect to Linode bucket '%s': %w", s3Client.GetBucket(), err))
 	}
 
 	return &LinodeFS{
-		client:     client,
-		bucket:     cfg.Linode.Bucket,
-		basePrefix: strings.TrimPrefix(cfg.Linode.BasePrefix, "/"),
+		s3Client:   s3Client,
+		bucket:     s3Client.GetBucket(),
+		basePrefix: s3Client.GetBasePrefix(),
 	}
 }
 
@@ -189,42 +156,35 @@ func (l *LinodeFS) Open(name string) (http.File, error) {
 
 	ctx := context.Background()
 
-	getInput := &s3.GetObjectInput{
-		Bucket: aws.String(l.bucket),
-		Key:    aws.String(key),
-	}
-
-	result, err := l.client.GetObject(ctx, getInput)
+	body, err := l.s3Client.GetObject(ctx, name)
 	if err != nil {
-		var apiErr interface{ ErrorCode() string }
-		if errors.As(err, &apiErr) && apiErr.ErrorCode() == "NoSuchKey" {
-			return nil, fmt.Errorf("file not found: %s", name)
-		}
 		if strings.Contains(err.Error(), "NoSuchKey") {
 			return nil, fmt.Errorf("file not found: %s", name)
 		}
 		return nil, fmt.Errorf("failed to get object from Linode: %w", err)
 	}
 
+	result, err := l.s3Client.HeadObject(ctx, name)
 	var size int64
-	if result.ContentLength != nil {
-		size = *result.ContentLength
-	}
-
 	modTime := time.Now()
-	if result.LastModified != nil {
-		modTime = *result.LastModified
+	if err == nil {
+		if result.ContentLength != nil {
+			size = *result.ContentLength
+		}
+		if result.LastModified != nil {
+			modTime = *result.LastModified
+		}
 	}
 
 	return &LinodeFile{
-		body:    result.Body,
-		name:    path.Base(name),
-		size:    size,
-		modTime: modTime,
-		isDir:   false,
-		client:  l.client,
-		bucket:  l.bucket,
-		key:     key,
+		body:     body,
+		name:     path.Base(name),
+		size:     size,
+		modTime:  modTime,
+		isDir:    false,
+		s3Client: l.s3Client,
+		bucket:   l.bucket,
+		key:      key,
 	}, nil
 }
 

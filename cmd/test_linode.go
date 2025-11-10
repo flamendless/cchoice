@@ -1,16 +1,10 @@
 package cmd
 
 import (
-	"cchoice/internal/conf"
-	"cchoice/internal/errs"
+	"cchoice/internal/storage/s3"
 	"context"
 	"fmt"
-	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	awsconfig "github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/spf13/cobra"
 )
@@ -26,65 +20,26 @@ var cmdTestLinode = &cobra.Command{
 		fmt.Println("Testing Linode Object Storage Connection...")
 		fmt.Println("==========================================")
 
-		cfg := conf.Conf()
-
-		if cfg.StorageProvider != "linode" || cfg.Linode.Endpoint == "" || cfg.Linode.AccessKey == "" || cfg.Linode.SecretKey == "" || cfg.Linode.Bucket == "" {
-			panic(errs.ErrEnvVarRequired)
-		}
-
-		ctx := context.Background()
-
-		awsCfg, err := awsconfig.LoadDefaultConfig(ctx,
-			awsconfig.WithRegion(cfg.Linode.Region),
-			awsconfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
-				cfg.Linode.AccessKey,
-				cfg.Linode.SecretKey,
-				"",
-			)),
-		)
+		client, err := s3.NewClientFromConfig()
 		if err != nil {
 			panic(err)
 		}
 
-		endpoint := cfg.Linode.Endpoint
-		if !strings.HasPrefix(endpoint, "http://") && !strings.HasPrefix(endpoint, "https://") {
-			endpoint = "https://" + endpoint
-		}
-
-		client := s3.NewFromConfig(awsCfg, func(o *s3.Options) {
-			o.BaseEndpoint = aws.String(endpoint)
-			o.UsePathStyle = true
-		})
-
-		_, err = client.HeadBucket(ctx, &s3.HeadBucketInput{
-			Bucket: aws.String(cfg.Linode.Bucket),
-		})
-		if err != nil {
+		ctx := context.Background()
+		if err := client.HeadBucket(ctx); err != nil {
 			panic(err)
 		}
 
 		fmt.Println("\nTesting object listing...")
-		listInput := &s3.ListObjectsV2Input{
-			Bucket:  aws.String(cfg.Linode.Bucket),
-			MaxKeys: aws.Int32(5),
-		}
-		if cfg.Linode.BasePrefix != "" {
-			prefix := cfg.Linode.BasePrefix
-			if prefix[0] == '/' {
-				prefix = prefix[1:]
-			}
-			listInput.Prefix = aws.String(prefix)
-		}
-
-		result, err := client.ListObjectsV2(ctx, listInput)
+		objects, err := client.ListObjects(ctx, "", 5)
 		if err != nil {
 			panic(err)
 		}
 
 		fmt.Printf("Successfully listed objects\n")
-		if result.KeyCount != nil && *result.KeyCount > 0 {
-			fmt.Printf("  Found %d object(s) (showing up to 5):\n", *result.KeyCount)
-			for i, obj := range result.Contents {
+		if len(objects) > 0 {
+			fmt.Printf("  Found %d object(s) (showing up to 5):\n", len(objects))
+			for i, obj := range objects {
 				if i >= 5 {
 					break
 				}
