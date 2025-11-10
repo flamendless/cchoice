@@ -2,7 +2,6 @@ package linode
 
 import (
 	"cchoice/internal/storage"
-	objectstorage "cchoice/internal/storage/objectstorage"
 	"context"
 	"errors"
 	"fmt"
@@ -16,7 +15,7 @@ import (
 )
 
 type LinodeFS struct {
-	objstorage *objectstorage.Client
+	objstorage *Client
 	bucket     string
 	basePrefix string
 }
@@ -28,9 +27,77 @@ type LinodeFile struct {
 	modTime    time.Time
 	pos        int64
 	isDir      bool
-	objstorage *objectstorage.Client
+	objstorage *Client
 	bucket     string
 	key        string
+}
+
+type fileInfo struct {
+	name    string
+	size    int64
+	modTime time.Time
+	isDir   bool
+}
+
+func New() storage.IFileSystem {
+	s3Client, err := NewClientFromConfig()
+	if err != nil {
+		panic(fmt.Errorf("failed to create S3 client: %w", err))
+	}
+
+	ctx := context.Background()
+	if err := s3Client.HeadBucket(ctx); err != nil {
+		panic(fmt.Errorf("failed to connect to Linode bucket '%s': %w", s3Client.GetBucket(), err))
+	}
+
+	return &LinodeFS{
+		objstorage: s3Client,
+		bucket:     s3Client.GetBucket(),
+		basePrefix: s3Client.GetBasePrefix(),
+	}
+}
+
+func (l *LinodeFS) Open(name string) (http.File, error) {
+	name = strings.TrimPrefix(name, "/")
+	name = strings.TrimPrefix(name, "static/")
+
+	key := name
+	if l.basePrefix != "" {
+		key = path.Join(l.basePrefix, name)
+	}
+
+	ctx := context.Background()
+
+	body, err := l.objstorage.GetObject(ctx, name)
+	if err != nil {
+		if strings.Contains(err.Error(), "NoSuchKey") {
+			return nil, fmt.Errorf("file not found: %s", name)
+		}
+		return nil, fmt.Errorf("failed to get object from Linode: %w", err)
+	}
+
+	result, err := l.objstorage.HeadObject(ctx, name)
+	var size int64
+	modTime := time.Now()
+	if err == nil {
+		if result.ContentLength != nil {
+			size = *result.ContentLength
+		}
+		if result.LastModified != nil {
+			modTime = *result.LastModified
+		}
+	}
+
+	return &LinodeFile{
+		body:       body,
+		name:       path.Base(name),
+		size:       size,
+		modTime:    modTime,
+		isDir:      false,
+		objstorage: l.objstorage,
+		bucket:     l.bucket,
+		key:        key,
+	}, nil
 }
 
 func (f *LinodeFile) Read(p []byte) (n int, err error) {
@@ -102,79 +169,11 @@ func (f *LinodeFile) Stat() (fs.FileInfo, error) {
 	}, nil
 }
 
-type fileInfo struct {
-	name    string
-	size    int64
-	modTime time.Time
-	isDir   bool
-}
-
 func (f *fileInfo) Name() string       { return f.name }
 func (f *fileInfo) Size() int64        { return f.size }
 func (f *fileInfo) Mode() os.FileMode  { return 0644 }
 func (f *fileInfo) ModTime() time.Time { return f.modTime }
 func (f *fileInfo) IsDir() bool        { return f.isDir }
 func (f *fileInfo) Sys() interface{}   { return nil }
-
-func New() storage.IFileSystem {
-	s3Client, err := objectstorage.NewClientFromConfig()
-	if err != nil {
-		panic(fmt.Errorf("failed to create S3 client: %w", err))
-	}
-
-	ctx := context.Background()
-	if err := s3Client.HeadBucket(ctx); err != nil {
-		panic(fmt.Errorf("failed to connect to Linode bucket '%s': %w", s3Client.GetBucket(), err))
-	}
-
-	return &LinodeFS{
-		objstorage: s3Client,
-		bucket:     s3Client.GetBucket(),
-		basePrefix: s3Client.GetBasePrefix(),
-	}
-}
-
-func (l *LinodeFS) Open(name string) (http.File, error) {
-	name = strings.TrimPrefix(name, "/")
-	name = strings.TrimPrefix(name, "static/")
-
-	key := name
-	if l.basePrefix != "" {
-		key = path.Join(l.basePrefix, name)
-	}
-
-	ctx := context.Background()
-
-	body, err := l.objstorage.GetObject(ctx, name)
-	if err != nil {
-		if strings.Contains(err.Error(), "NoSuchKey") {
-			return nil, fmt.Errorf("file not found: %s", name)
-		}
-		return nil, fmt.Errorf("failed to get object from Linode: %w", err)
-	}
-
-	result, err := l.objstorage.HeadObject(ctx, name)
-	var size int64
-	modTime := time.Now()
-	if err == nil {
-		if result.ContentLength != nil {
-			size = *result.ContentLength
-		}
-		if result.LastModified != nil {
-			modTime = *result.LastModified
-		}
-	}
-
-	return &LinodeFile{
-		body:       body,
-		name:       path.Base(name),
-		size:       size,
-		modTime:    modTime,
-		isDir:      false,
-		objstorage: l.objstorage,
-		bucket:     l.bucket,
-		key:        key,
-	}, nil
-}
 
 var _ storage.IFileSystem = (*LinodeFS)(nil)

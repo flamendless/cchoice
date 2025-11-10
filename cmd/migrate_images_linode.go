@@ -3,7 +3,7 @@ package cmd
 import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
-	objectstorage "cchoice/internal/storage/objectstorage"
+	"cchoice/internal/storage/linode"
 	"context"
 	"errors"
 	"fmt"
@@ -35,7 +35,7 @@ var cmdMigrateImagesLinode = &cobra.Command{
 	Use:   "migrate_images_linode",
 	Short: "migrate product images and brand logos to Linode Object Storage",
 	Run: func(cmd *cobra.Command, args []string) {
-		client, err := objectstorage.NewClientFromConfig()
+		client, err := linode.NewClientFromConfig()
 		if err != nil {
 			panic(errors.Join(errs.ErrCmd, fmt.Errorf("failed to initialize Linode client: %w", err)))
 		}
@@ -93,7 +93,7 @@ var cmdMigrateImagesLinode = &cobra.Command{
 
 func migrateImages(
 	ctx context.Context,
-	client *objectstorage.Client,
+	client *linode.Client,
 	imagesPath string,
 	basePath string,
 	summaryLabel string,
@@ -222,7 +222,7 @@ func getContentType(ext string) string {
 	}
 }
 
-func migrateFile(ctx context.Context, client *objectstorage.Client, filePath string, s3Key string) error {
+func migrateFile(ctx context.Context, client *linode.Client, filePath string, s3Key string) error {
 	info, err := os.Stat(filePath)
 	if err != nil {
 		return fmt.Errorf("failed to stat file: %w", err)

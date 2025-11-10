@@ -7,6 +7,7 @@ package queries
 
 import (
 	"context"
+	"database/sql"
 	"time"
 )
 
@@ -14,12 +15,13 @@ const createBrandImages = `-- name: CreateBrandImages :one
 INSERT INTO tbl_brand_images (
 	brand_id,
 	path,
+	s3_url,
 	is_main,
 	created_at,
 	updated_at,
 	deleted_at
 ) VALUES (
-	?, ?, ?,
+	?, ?, ?, ?,
 	?, ?, ?
 ) RETURNING id
 `
@@ -27,6 +29,7 @@ INSERT INTO tbl_brand_images (
 type CreateBrandImagesParams struct {
 	BrandID   int64
 	Path      string
+	S3Url     sql.NullString
 	IsMain    bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -37,6 +40,7 @@ func (q *Queries) CreateBrandImages(ctx context.Context, arg CreateBrandImagesPa
 	row := q.db.QueryRowContext(ctx, createBrandImages,
 		arg.BrandID,
 		arg.Path,
+		arg.S3Url,
 		arg.IsMain,
 		arg.CreatedAt,
 		arg.UpdatedAt,
@@ -77,11 +81,27 @@ func (q *Queries) CreateBrands(ctx context.Context, arg CreateBrandsParams) (int
 	return id, err
 }
 
+const getBrandImageS3URLByPath = `-- name: GetBrandImageS3URLByPath :one
+SELECT s3_url
+FROM tbl_brand_images
+WHERE
+	path = ?
+LIMIT 1
+`
+
+func (q *Queries) GetBrandImageS3URLByPath(ctx context.Context, path string) (sql.NullString, error) {
+	row := q.db.QueryRowContext(ctx, getBrandImageS3URLByPath, path)
+	var s3_url sql.NullString
+	err := row.Scan(&s3_url)
+	return s3_url, err
+}
+
 const getBrandsByID = `-- name: GetBrandsByID :one
 SELECT
 	tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at,
 	tbl_brand_images.id AS brand_image_id,
-	tbl_brand_images.path AS path
+	tbl_brand_images.path AS path,
+	tbl_brand_images.s3_url AS s3_url
 FROM tbl_brands
 INNER JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id
 WHERE
@@ -97,6 +117,7 @@ type GetBrandsByIDRow struct {
 	DeletedAt    time.Time
 	BrandImageID int64
 	Path         string
+	S3Url        sql.NullString
 }
 
 func (q *Queries) GetBrandsByID(ctx context.Context, id int64) (GetBrandsByIDRow, error) {
@@ -110,6 +131,7 @@ func (q *Queries) GetBrandsByID(ctx context.Context, id int64) (GetBrandsByIDRow
 		&i.DeletedAt,
 		&i.BrandImageID,
 		&i.Path,
+		&i.S3Url,
 	)
 	return i, err
 }
@@ -134,7 +156,8 @@ SELECT
 	tbl_brands.id AS id,
 	tbl_brands.name AS name,
 	tbl_brand_images.id AS brand_image_id,
-	tbl_brand_images.path AS path
+	tbl_brand_images.path AS path,
+	tbl_brand_images.s3_url AS s3_url
 FROM tbl_brands
 INNER JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id
 WHERE
@@ -148,6 +171,7 @@ type GetBrandsLogosRow struct {
 	Name         string
 	BrandImageID int64
 	Path         string
+	S3Url        sql.NullString
 }
 
 func (q *Queries) GetBrandsLogos(ctx context.Context, limit int64) ([]GetBrandsLogosRow, error) {
@@ -164,6 +188,7 @@ func (q *Queries) GetBrandsLogos(ctx context.Context, limit int64) ([]GetBrandsL
 			&i.Name,
 			&i.BrandImageID,
 			&i.Path,
+			&i.S3Url,
 		); err != nil {
 			return nil, err
 		}

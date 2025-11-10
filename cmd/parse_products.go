@@ -17,10 +17,12 @@ import (
 
 	"cchoice/cmd/parse_products/models"
 	"cchoice/cmd/parse_products/templates"
+	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/storage/linode"
 )
 
 var parseProductsFlags models.ParseProductsFlags
@@ -178,14 +180,22 @@ var cmdParseProducts = &cobra.Command{
 				panic(err)
 			}
 			now := time.Now().UTC()
+			path := "static/images/brand_logos/" + parseProductsFlags.Template + "." + parseProductsFlags.ImagesFormat
 			brandImage := models.BrandImage{
 				BrandID:   brandID,
-				Path:      "static/images/brand_logos/" + parseProductsFlags.Template + "." + parseProductsFlags.ImagesFormat,
+				Path:      path,
 				IsMain:    true,
 				CreatedAt: now,
 				UpdatedAt: now,
 				DeletedAt: constants.DtBeginning,
 			}
+
+			cfg := conf.Conf()
+			if cfg.StorageProvider == "linode" {
+				objStorage := linode.MustInit()
+				brandImage.S3URL = objStorage.GetPublicURL(path)
+			}
+
 			_, err = brandImage.InsertToDB(cmd.Context(), tpl.CtxApp.DB)
 			if err != nil {
 				panic(err)
