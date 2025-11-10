@@ -69,7 +69,7 @@ type LinodeConfig struct {
 	AccessKey  string `env:"LINODE_ACCESS_KEY"`
 	SecretKey  string `env:"LINODE_SECRET_KEY"`
 	Bucket     string `env:"LINODE_BUCKET"`
-	Region     string `env:"LINODE_REGION" env-default:"sg-sin-2"`
+	Region     string `env:"LINODE_REGION" env-default:""`
 	BasePrefix string `env:"LINODE_BASE_PREFIX" env-default:""`
 }
 
@@ -121,7 +121,7 @@ func mustValidate(c *appConfig) {
 	}
 
 	if c.StorageProvider == "linode" {
-		if c.Linode.Endpoint == "" || c.Linode.AccessKey == "" || c.Linode.SecretKey == "" || c.Linode.Bucket == "" {
+		if c.Linode.Endpoint == "" || c.Linode.AccessKey == "" || c.Linode.SecretKey == "" || c.Linode.Bucket == "" || c.Linode.Region == "" {
 			panic(fmt.Errorf("[Linode Storage]: %w", errs.ErrEnvVarRequired))
 		}
 	}
