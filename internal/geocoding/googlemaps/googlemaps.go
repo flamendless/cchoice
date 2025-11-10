@@ -22,8 +22,6 @@ import (
 	"go.uber.org/zap"
 )
 
-const DB_NIL = "DB is not initialized, skipping cache store"
-
 type GoogleMapsGeocoder struct {
 	apiKey      string
 	baseURL     string
@@ -85,7 +83,6 @@ func (g *GoogleMapsGeocoder) normalizeAddress(address string) string {
 
 func (g *GoogleMapsGeocoder) checkDBCache(address string) (*geocoding.GeocodeResponse, bool) {
 	if g.db == nil {
-		logs.Log().Warn(DB_NIL)
 		return nil, false
 	}
 
@@ -138,7 +135,6 @@ func (g *GoogleMapsGeocoder) checkDBCache(address string) (*geocoding.GeocodeRes
 
 func (g *GoogleMapsGeocoder) storeDBCache(address string, response *geocoding.GeocodeResponse) {
 	if g.db == nil {
-		logs.Log().Warn(DB_NIL)
 		return
 	}
 

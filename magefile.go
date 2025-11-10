@@ -245,16 +245,21 @@ func GenImages() error {
 		return err
 	}
 	if err := run(Command{
-		Type: CmdTmpExec, Cmd: "genimages",
-		Args: []string{"prepare_image_variants",
+		Type: CmdTmpExec,
+		Cmd:  "genimages",
+		Args: []string{
+			"prepare_image_variants",
 			"--inpath=./cmd/web/static/images/product_images/bosch",
-			"--outpath=./cmd/web/static/images/product_images"},
+			"--outpath=./cmd/web/static/images/product_images",
+		},
 	}); err != nil {
 		return err
 	}
 	if err := run(Command{
-		Type: CmdTmpExec, Cmd: "genimages",
-		Args: []string{"convert_images", "--inpath=./cmd/web/static/images/brand_logos",
+		Type: CmdTmpExec,
+		Cmd: "genimages",
+		Args: []string{
+			"convert_images", "--inpath=./cmd/web/static/images/brand_logos",
 			"--outpath=./cmd/web/static/images/brand_logos", "--format=webp"},
 	}); err != nil {
 		return err
@@ -268,7 +273,8 @@ func GenMaps() error {
 		Tags: []string{"staticfs"},
 		Args: []string{"./main.go", "parse_map",
 			"--filepath=./assets/xlsx/PSGC-2Q-2025-Publication-Datafile.xlsx",
-			"--json=true"},
+			"--json=true",
+		},
 	})
 }
 
@@ -281,7 +287,11 @@ func CleanDB() error {
 	if err := GenSQL(); err != nil {
 		return err
 	}
-	if err := run(Command{Type: CmdTmpExec, Cmd: "goose", Args: []string{"up"}}); err != nil {
+	if err := run(Command{
+		Type: CmdTmpExec,
+		Cmd:  "goose",
+		Args: []string{"up"},
+	}); err != nil {
 		return err
 	}
 	return run(Command{
@@ -293,7 +303,8 @@ func CleanDB() error {
 			"--use_db", "--db_path", dbPath,
 			"--verify_prices=1", "--panic_on_error=1",
 			"--images_basepath=./cmd/web/static/images/product_images/bosch/original/",
-			"--images_format=webp"},
+			"--images_format=webp",
+		},
 	})
 }
 
@@ -434,6 +445,38 @@ func TestAll() error {
 	})
 }
 
+func TestInteg() error {
+	if err := run(Command{
+		Type: CmdGoBuild,
+		Out:  filepath.Join(tmpDir, "main"),
+		Tags: []string{"fts5", "staticfs"},
+	}); err != nil {
+		return err
+	}
+	if err := run(Command{
+		Type: CmdTmpExec,
+		Cmd:  "main",
+		Args: []string{"test_linode"},
+	}); err != nil {
+		return err
+	}
+	if err := run(Command{
+		Type: CmdTmpExec,
+		Cmd:  "main",
+		Args: []string{"test_payment"},
+	}); err != nil {
+		return err
+	}
+	if err := run(Command{
+		Type: CmdTmpExec,
+		Cmd:  "main",
+		Args: []string{"test_shipping"},
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func TestSum() error {
 	return run(Command{
 		Type: CmdExec,
@@ -468,11 +511,19 @@ func Prod() error {
 }
 
 func DBUp() error {
-	return run(Command{Type: CmdTmpExec, Cmd: "goose", Args: []string{"up"}})
+	return run(Command{
+		Type: CmdTmpExec,
+		Cmd:  "goose",
+		Args: []string{"up"},
+	})
 }
 
 func DBDown() error {
-	return run(Command{Type: CmdTmpExec, Cmd: "goose", Args: []string{"down"}})
+	return run(Command{
+		Type: CmdTmpExec,
+		Cmd:  "goose",
+		Args: []string{"down"},
+	})
 }
 
 func Prom() error {
