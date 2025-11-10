@@ -2,7 +2,7 @@ package linode
 
 import (
 	"cchoice/internal/storage"
-	s3client "cchoice/internal/storage/s3"
+	objectstorage "cchoice/internal/storage/objectstorage"
 	"context"
 	"errors"
 	"fmt"
@@ -13,27 +13,24 @@ import (
 	"path"
 	"strings"
 	"time"
-
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 type LinodeFS struct {
-	s3Client   *s3client.Client
+	objstorage *objectstorage.Client
 	bucket     string
 	basePrefix string
 }
 
 type LinodeFile struct {
-	body     io.ReadCloser
-	name     string
-	size     int64
-	modTime  time.Time
-	pos      int64
-	isDir    bool
-	s3Client *s3client.Client
-	bucket   string
-	key      string
+	body       io.ReadCloser
+	name       string
+	size       int64
+	modTime    time.Time
+	pos        int64
+	isDir      bool
+	objstorage *objectstorage.Client
+	bucket     string
+	key        string
 }
 
 func (f *LinodeFile) Read(p []byte) (n int, err error) {
@@ -67,32 +64,24 @@ func (f *LinodeFile) Readdir(count int) ([]fs.FileInfo, error) {
 		prefix += "/"
 	}
 
-	listInput := &s3.ListObjectsV2Input{
-		Bucket:    aws.String(f.bucket),
-		Prefix:    aws.String(prefix),
-		Delimiter: aws.String("/"),
-		MaxKeys:   aws.Int32(int32(count)),
-	}
-
-	result, err := f.s3Client.GetS3Client().ListObjectsV2(ctx, listInput)
+	objects, commonPrefixes, err := f.objstorage.ListObjectsV2(ctx, prefix, "/", int32(count))
 	if err != nil {
 		return nil, err
 	}
 
-	fileInfos := make([]fs.FileInfo, 0, len(result.Contents))
-	for _, obj := range result.Contents {
-		key := *obj.Key
+	fileInfos := make([]fs.FileInfo, 0, len(objects)+len(commonPrefixes))
+	for _, obj := range objects {
 		info := &fileInfo{
-			name:    path.Base(key),
-			size:    *obj.Size,
+			name:    path.Base(obj.Key),
+			size:    obj.Size,
 			modTime: *obj.LastModified,
 			isDir:   false,
 		}
 		fileInfos = append(fileInfos, info)
 	}
 
-	for _, prefix := range result.CommonPrefixes {
-		key := *prefix.Prefix
+	for _, prefix := range commonPrefixes {
+		key := prefix
 		info := &fileInfo{
 			name:    path.Base(strings.TrimSuffix(key, "/")),
 			modTime: time.Now(),
@@ -128,7 +117,7 @@ func (f *fileInfo) IsDir() bool        { return f.isDir }
 func (f *fileInfo) Sys() interface{}   { return nil }
 
 func New() storage.IFileSystem {
-	s3Client, err := s3client.NewClientFromConfig()
+	s3Client, err := objectstorage.NewClientFromConfig()
 	if err != nil {
 		panic(fmt.Errorf("failed to create S3 client: %w", err))
 	}
@@ -139,7 +128,7 @@ func New() storage.IFileSystem {
 	}
 
 	return &LinodeFS{
-		s3Client:   s3Client,
+		objstorage: s3Client,
 		bucket:     s3Client.GetBucket(),
 		basePrefix: s3Client.GetBasePrefix(),
 	}
@@ -156,7 +145,7 @@ func (l *LinodeFS) Open(name string) (http.File, error) {
 
 	ctx := context.Background()
 
-	body, err := l.s3Client.GetObject(ctx, name)
+	body, err := l.objstorage.GetObject(ctx, name)
 	if err != nil {
 		if strings.Contains(err.Error(), "NoSuchKey") {
 			return nil, fmt.Errorf("file not found: %s", name)
@@ -164,7 +153,7 @@ func (l *LinodeFS) Open(name string) (http.File, error) {
 		return nil, fmt.Errorf("failed to get object from Linode: %w", err)
 	}
 
-	result, err := l.s3Client.HeadObject(ctx, name)
+	result, err := l.objstorage.HeadObject(ctx, name)
 	var size int64
 	modTime := time.Now()
 	if err == nil {
@@ -177,14 +166,14 @@ func (l *LinodeFS) Open(name string) (http.File, error) {
 	}
 
 	return &LinodeFile{
-		body:     body,
-		name:     path.Base(name),
-		size:     size,
-		modTime:  modTime,
-		isDir:    false,
-		s3Client: l.s3Client,
-		bucket:   l.bucket,
-		key:      key,
+		body:       body,
+		name:       path.Base(name),
+		size:       size,
+		modTime:    modTime,
+		isDir:      false,
+		objstorage: l.objstorage,
+		bucket:     l.bucket,
+		key:        key,
 	}, nil
 }
 

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"cchoice/internal/storage/s3"
+	"cchoice/internal/storage/objectstorage"
 	"context"
 	"fmt"
 
@@ -20,7 +20,7 @@ var cmdTestLinode = &cobra.Command{
 		fmt.Println("Testing Linode Object Storage Connection...")
 		fmt.Println("==========================================")
 
-		client, err := s3.NewClientFromConfig()
+		client, err := objectstorage.NewClientFromConfig()
 		if err != nil {
 			panic(err)
 		}
@@ -43,7 +43,7 @@ var cmdTestLinode = &cobra.Command{
 				if i >= 5 {
 					break
 				}
-				fmt.Printf("    - %s (size: %d bytes)\n", *obj.Key, *obj.Size)
+				fmt.Printf("    - %s (size: %d bytes)\n", obj.Key, obj.Size)
 			}
 		} else {
 			fmt.Println("  Bucket is empty or no objects found with the specified prefix")

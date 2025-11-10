@@ -267,6 +267,27 @@ func GenImages() error {
 	return nil
 }
 
+func MigrateImagesToLinodeStorage() error {
+	if err := run(Command{
+		Type: CmdGoBuild,
+		Out:  filepath.Join(tmpDir, "migrate_images_linode"),
+		Tags: []string{"staticfs"},
+	}); err != nil {
+		return err
+	}
+	if err := run(Command{
+		Type: CmdTmpExec,
+		Cmd:  "migrate_images_linode",
+		Args: []string{
+			"migrate_images_linode",
+			"--dry-run=false",
+		},
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func GenMaps() error {
 	return run(Command{
 		Type: CmdGoRun,
