@@ -25,6 +25,7 @@ type TblBrandImage struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time
+	S3Url     sql.NullString
 }
 
 type TblCheckout struct {

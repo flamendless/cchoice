@@ -5,6 +5,7 @@ import (
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"context"
+	"database/sql"
 	"time"
 )
 
@@ -21,6 +22,7 @@ type BrandImage struct {
 	UpdatedAt time.Time
 	DeletedAt time.Time
 	Path      string
+	S3URL     string
 	ID        int64
 	BrandID   int64
 	IsMain    bool
@@ -65,6 +67,7 @@ func (brandImage *BrandImage) InsertToDB(ctx context.Context, db database.Servic
 		queries.CreateBrandImagesParams{
 			BrandID:   brandImage.BrandID,
 			Path:      brandImage.Path,
+			S3Url:     sql.NullString{Valid: brandImage.S3URL != "", String: brandImage.S3URL},
 			IsMain:    brandImage.IsMain,
 			CreatedAt: brandImage.CreatedAt,
 			UpdatedAt: brandImage.UpdatedAt,

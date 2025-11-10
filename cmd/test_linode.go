@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"cchoice/internal/storage/objectstorage"
+	"cchoice/internal/storage/linode"
 	"context"
 	"fmt"
 
@@ -20,7 +20,7 @@ var cmdTestLinode = &cobra.Command{
 		fmt.Println("Testing Linode Object Storage Connection...")
 		fmt.Println("==========================================")
 
-		client, err := objectstorage.NewClientFromConfig()
+		client, err := linode.NewClientFromConfig()
 		if err != nil {
 			panic(err)
 		}

@@ -1,11 +1,13 @@
-package objectstorage
+package linode
 
 import (
 	"bytes"
 	"cchoice/internal/conf"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/storage"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -20,6 +22,7 @@ type Client struct {
 	minioClient *minio.Client
 	bucket      string
 	basePrefix  string
+	endpoint    string
 }
 
 type Config struct {
@@ -36,6 +39,11 @@ type ObjectInfo struct {
 	Key          string
 	Size         int64
 	LastModified *time.Time
+}
+
+type HeadObjectOutput struct {
+	ContentLength *int64
+	LastModified  *time.Time
 }
 
 func NewClient(cfg Config) (*Client, error) {
@@ -69,6 +77,7 @@ func NewClient(cfg Config) (*Client, error) {
 		minioClient: minioClient,
 		bucket:      cfg.Bucket,
 		basePrefix:  basePrefix,
+		endpoint:    endpoint,
 	}, nil
 }
 
@@ -94,6 +103,25 @@ func NewClientFromConfig() (*Client, error) {
 		Bucket:     cfg.Linode.Bucket,
 		BasePrefix: cfg.Linode.BasePrefix,
 	})
+}
+
+func MustInit() storage.IObjectStorage {
+	cfg := conf.Conf()
+	if cfg.StorageProvider != "linode" {
+		panic("'STORAGE_PROVIDER' must be 'linode' to use this")
+	}
+
+	client, err := NewClientFromConfig()
+	if err != nil {
+		panic(errors.Join(errs.ErrLinodeServiceInit, fmt.Errorf("failed to initialize Linode client: %w", err)))
+	}
+
+	ctx := context.Background()
+	if err := client.HeadBucket(ctx); err != nil {
+		panic(errors.Join(errs.ErrLinodeServiceInit, fmt.Errorf("failed to connect to Linode bucket: %w", err)))
+	}
+
+	return client
 }
 
 func (c *Client) normalizeKey(key string) string {
@@ -177,7 +205,7 @@ func (c *Client) ListObjects(ctx context.Context, prefix string, maxKeys int32) 
 		MaxKeys:   int(maxKeys),
 	})
 
-	var objects []ObjectInfo
+	objects := make([]ObjectInfo, 0, len(objectCh))
 	for obj := range objectCh {
 		if obj.Err != nil {
 			return nil, fmt.Errorf("failed to list objects with prefix '%s': %w", normalizedPrefix, obj.Err)
@@ -231,11 +259,6 @@ func (c *Client) ListObjectsV2(ctx context.Context, prefix string, delimiter str
 	return objects, commonPrefixes, nil
 }
 
-type HeadObjectOutput struct {
-	ContentLength *int64
-	LastModified  *time.Time
-}
-
 func (c *Client) HeadObject(ctx context.Context, key string) (*HeadObjectOutput, error) {
 	normalizedKey := c.normalizeKey(key)
 
@@ -273,3 +296,27 @@ func (c *Client) GetBasePrefix() string {
 func (c *Client) GetMinioClient() *minio.Client {
 	return c.minioClient
 }
+
+func (c *Client) ProviderEnum() storage.StorageProvider {
+	return storage.STORAGE_PROVIDER_LINODE
+}
+
+func (c *Client) GetPublicURL(key string) string {
+	normalizedKey := c.normalizeKey(key)
+	endpoint := strings.TrimPrefix(c.endpoint, "https://")
+	endpoint = strings.TrimPrefix(endpoint, "http://")
+	normalizedKey = strings.TrimPrefix(normalizedKey, "/")
+	url := fmt.Sprintf("https://%s.%s/%s", c.bucket, endpoint, normalizedKey)
+	return url
+}
+
+func (c *Client) PresignedGetObject(ctx context.Context, key string, expiry time.Duration) (string, error) {
+	normalizedKey := c.normalizeKey(key)
+	url, err := c.minioClient.PresignedGetObject(ctx, c.bucket, normalizedKey, expiry, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate presigned URL for '%s': %w", normalizedKey, err)
+	}
+	return url.String(), nil
+}
+
+var _ storage.IObjectStorage = (*Client)(nil)

@@ -42,6 +42,7 @@ type Server struct {
 	sessionManager  *scs.SessionManager
 	paymentGateway  payments.IPaymentGateway
 	shippingService shipping.IShippingService
+	objectStorage   storage.IObjectStorage
 	geocoder        geocoding.IGeocoder
 	encoder         encode.IEncode
 	address         string
@@ -106,6 +107,16 @@ func NewServer() *http.Server {
 		panic("Unsupported storage provider: " + cfg.StorageProvider)
 	}
 
+	var objStorage storage.IObjectStorage
+	switch cfg.StorageProvider {
+	case "linode":
+		objStorage = linode.MustInit()
+	case "local":
+		objStorage = nil
+	default:
+		panic("Unsupported storage provider: " + cfg.StorageProvider)
+	}
+
 	NewServer := &Server{
 		address:         cfg.Server.Address,
 		port:            cfg.Server.Port,
@@ -118,6 +129,7 @@ func NewServer() *http.Server {
 		sessionManager:  sessionManager,
 		paymentGateway:  paymentGateway,
 		shippingService: shippingService,
+		objectStorage:   objStorage,
 		geocoder:        geocoder,
 		encoder:         sqids.MustSqids(),
 		useHTTP2:        cfg.Server.UseHTTP2,
