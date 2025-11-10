@@ -82,7 +82,7 @@ var cmdTestPayment = &cobra.Command{
 				},
 			},
 		}
-		resCheckout, err := pg.CreateCheckoutPaymentSession(&payload)
+		resCheckout, err := pg.CreateCheckoutPaymentSession(payload)
 		if err != nil {
 			panic(err)
 		}

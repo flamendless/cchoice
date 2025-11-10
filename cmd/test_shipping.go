@@ -143,25 +143,25 @@ var cmdTestShipping = &cobra.Command{
 			fmt.Println("Testing CreateOrder (should fail)...")
 			_, err = ss.CreateOrder(reqShipping)
 			if err != nil {
-				fmt.Printf("✓ CreateOrder failed as expected: %v\n", err)
+				fmt.Printf("CreateOrder failed as expected: %v\n", err)
 			} else {
-				fmt.Println("✗ CreateOrder should have failed!")
+				fmt.Println("CreateOrder should have failed!")
 			}
 
 			fmt.Println("Testing GetOrderStatus (should fail)...")
 			_, err = ss.GetOrderStatus("test-order-id")
 			if err != nil {
-				fmt.Printf("✓ GetOrderStatus failed as expected: %v\n", err)
+				fmt.Printf("GetOrderStatus failed as expected: %v\n", err)
 			} else {
-				fmt.Println("✗ GetOrderStatus should have failed!")
+				fmt.Println("GetOrderStatus should have failed!")
 			}
 
 			fmt.Println("Testing CancelOrder (should fail)...")
 			err = ss.CancelOrder("test-order-id")
 			if err != nil {
-				fmt.Printf("✓ CancelOrder failed as expected: %v\n", err)
+				fmt.Printf("CancelOrder failed as expected: %v\n", err)
 			} else {
-				fmt.Println("✗ CancelOrder should have failed!")
+				fmt.Println("CancelOrder should have failed!")
 			}
 
 			fmt.Println("\n=== Test Completed ===")
