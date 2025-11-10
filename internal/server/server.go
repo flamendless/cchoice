@@ -97,22 +97,16 @@ func NewServer() *http.Server {
 
 	staticFS := localstorage.New()
 
-	var productImageFS storage.IFileSystem
-	switch cfg.StorageProvider {
-	case "linode":
-		productImageFS = linode.New()
-	case "local":
-		productImageFS = localstorage.New()
-	default:
-		panic("Unsupported storage provider: " + cfg.StorageProvider)
-	}
-
 	var objStorage storage.IObjectStorage
+	var productImageFS storage.IFileSystem
+
 	switch cfg.StorageProvider {
 	case "linode":
 		objStorage = linode.MustInit()
+		productImageFS = linode.New(objStorage)
 	case "local":
 		objStorage = nil
+		productImageFS = localstorage.New()
 	default:
 		panic("Unsupported storage provider: " + cfg.StorageProvider)
 	}

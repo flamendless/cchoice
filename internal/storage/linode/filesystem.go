@@ -1,6 +1,8 @@
 package linode
 
 import (
+	"cchoice/internal/logs"
+	"cchoice/internal/metrics"
 	"cchoice/internal/storage"
 	"context"
 	"errors"
@@ -12,6 +14,8 @@ import (
 	"path"
 	"strings"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 type LinodeFS struct {
@@ -39,25 +43,30 @@ type fileInfo struct {
 	isDir   bool
 }
 
-func New() storage.IFileSystem {
-	s3Client, err := NewClientFromConfig()
-	if err != nil {
-		panic(fmt.Errorf("failed to create S3 client: %w", err))
+func New(objstorage storage.IObjectStorage) storage.IFileSystem {
+	linodeClient, ok := objstorage.(*Client)
+	if !ok {
+		panic("Invalid object storage")
 	}
 
 	ctx := context.Background()
-	if err := s3Client.HeadBucket(ctx); err != nil {
-		panic(fmt.Errorf("failed to connect to Linode bucket '%s': %w", s3Client.GetBucket(), err))
+	if err := linodeClient.HeadBucket(ctx); err != nil {
+		panic(fmt.Errorf(
+			"failed to connect to Linode bucket '%s': %w",
+			linodeClient.GetBucket(),
+			err,
+		))
 	}
 
 	return &LinodeFS{
-		objstorage: s3Client,
-		bucket:     s3Client.GetBucket(),
-		basePrefix: s3Client.GetBasePrefix(),
+		objstorage: linodeClient,
+		bucket:     linodeClient.GetBucket(),
+		basePrefix: linodeClient.GetBasePrefix(),
 	}
 }
 
 func (l *LinodeFS) Open(name string) (http.File, error) {
+	const logtag = "[LinodeFS]"
 	name = strings.TrimPrefix(name, "/")
 	name = strings.TrimPrefix(name, "static/")
 
@@ -70,9 +79,22 @@ func (l *LinodeFS) Open(name string) (http.File, error) {
 
 	body, err := l.objstorage.GetObject(ctx, name)
 	if err != nil {
+		metrics.Cache.LinodeAssetError()
 		if strings.Contains(err.Error(), "NoSuchKey") {
+			logs.Log().Debug(
+				logtag,
+				zap.String("error", "file not found"),
+				zap.String("key", name),
+				zap.String("bucket", l.bucket),
+			)
 			return nil, fmt.Errorf("file not found: %s", name)
 		}
+		logs.Log().Error(
+			logtag,
+			zap.Error(err),
+			zap.String("key", name),
+			zap.String("bucket", l.bucket),
+		)
 		return nil, fmt.Errorf("failed to get object from Linode: %w", err)
 	}
 
@@ -87,6 +109,15 @@ func (l *LinodeFS) Open(name string) (http.File, error) {
 			modTime = *result.LastModified
 		}
 	}
+
+	metrics.Cache.LinodeAssetHit()
+	logs.Log().Info(
+		logtag,
+		zap.String("action", "asset_retrieved"),
+		zap.String("key", name),
+		zap.String("bucket", l.bucket),
+		zap.Int64("size", size),
+	)
 
 	return &LinodeFile{
 		body:       body,
