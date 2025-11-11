@@ -21,7 +21,7 @@ import (
 
 type Client struct {
 	minioClient *minio.Client
-	bucket      string
+	bucketEnum  enums.LinodeBucketEnum
 	basePrefix  string
 	endpoint    string
 }
@@ -76,7 +76,7 @@ func NewClient(cfg Config) (*Client, error) {
 
 	return &Client{
 		minioClient: minioClient,
-		bucket:      cfg.Bucket,
+		bucketEnum:  enums.LINODE_BUCKET_UNDEFINED,
 		basePrefix:  basePrefix,
 		endpoint:    endpoint,
 	}, nil
@@ -111,12 +111,11 @@ func NewClientFromConfigWithBucket(bucketEnum enums.LinodeBucketEnum) (*Client, 
 		"Linode",
 		zap.String("endpoint", cfg.Linode.Endpoint),
 		zap.String("bucket", bucketConfig.Bucket),
-		zap.String("bucket_enum", bucketEnum.String()),
 		zap.String("region", cfg.Linode.Region),
 		zap.String("base prefix", cfg.Linode.BasePrefix),
 	)
 
-	return NewClient(Config{
+	client, err := NewClient(Config{
 		Endpoint:   cfg.Linode.Endpoint,
 		Region:     cfg.Linode.Region,
 		AccessKey:  bucketConfig.AccessKey,
@@ -124,6 +123,11 @@ func NewClientFromConfigWithBucket(bucketEnum enums.LinodeBucketEnum) (*Client, 
 		Bucket:     bucketConfig.Bucket,
 		BasePrefix: cfg.Linode.BasePrefix,
 	})
+	if err != nil {
+		return nil, err
+	}
+	client.bucketEnum = bucketEnum
+	return client, nil
 }
 
 func MustInit() storage.IObjectStorage {
@@ -162,20 +166,22 @@ func (c *Client) normalizeKey(key string) string {
 }
 
 func (c *Client) HeadBucket(ctx context.Context) error {
-	exists, err := c.minioClient.BucketExists(ctx, c.bucket)
+	bucket := c.GetBucket()
+	exists, err := c.minioClient.BucketExists(ctx, bucket)
 	if err != nil {
 		return fmt.Errorf("failed to check bucket existence: %w", err)
 	}
 	if !exists {
-		return fmt.Errorf("bucket '%s' does not exist", c.bucket)
+		return fmt.Errorf("bucket '%s' does not exist", bucket)
 	}
 	return nil
 }
 
 func (c *Client) PutObject(ctx context.Context, key string, body io.Reader, contentType string) error {
 	normalizedKey := c.normalizeKey(key)
+	bucket := c.GetBucket()
 
-	_, err := c.minioClient.PutObject(ctx, c.bucket, normalizedKey, body, -1, minio.PutObjectOptions{
+	_, err := c.minioClient.PutObject(ctx, bucket, normalizedKey, body, -1, minio.PutObjectOptions{
 		ContentType: contentType,
 	})
 	if err != nil {
@@ -191,8 +197,9 @@ func (c *Client) PutObjectFromBytes(ctx context.Context, key string, data []byte
 
 func (c *Client) GetObject(ctx context.Context, key string) (io.ReadCloser, error) {
 	normalizedKey := c.normalizeKey(key)
+	bucket := c.GetBucket()
 
-	obj, err := c.minioClient.GetObject(ctx, c.bucket, normalizedKey, minio.GetObjectOptions{})
+	obj, err := c.minioClient.GetObject(ctx, bucket, normalizedKey, minio.GetObjectOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get object '%s': %w", normalizedKey, err)
 	}
@@ -212,8 +219,9 @@ func (c *Client) GetObjectBytes(ctx context.Context, key string) ([]byte, error)
 
 func (c *Client) DeleteObject(ctx context.Context, key string) error {
 	normalizedKey := c.normalizeKey(key)
+	bucket := c.GetBucket()
 
-	err := c.minioClient.RemoveObject(ctx, c.bucket, normalizedKey, minio.RemoveObjectOptions{})
+	err := c.minioClient.RemoveObject(ctx, bucket, normalizedKey, minio.RemoveObjectOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to delete object '%s': %w", normalizedKey, err)
 	}
@@ -223,8 +231,9 @@ func (c *Client) DeleteObject(ctx context.Context, key string) error {
 
 func (c *Client) ListObjects(ctx context.Context, prefix string, maxKeys int32) ([]ObjectInfo, error) {
 	normalizedPrefix := c.normalizeKey(prefix)
+	bucket := c.GetBucket()
 
-	objectCh := c.minioClient.ListObjects(ctx, c.bucket, minio.ListObjectsOptions{
+	objectCh := c.minioClient.ListObjects(ctx, bucket, minio.ListObjectsOptions{
 		Prefix:    normalizedPrefix,
 		Recursive: false,
 		MaxKeys:   int(maxKeys),
@@ -247,8 +256,9 @@ func (c *Client) ListObjects(ctx context.Context, prefix string, maxKeys int32) 
 
 func (c *Client) ListObjectsV2(ctx context.Context, prefix string, delimiter string, maxKeys int32) ([]ObjectInfo, []string, error) {
 	normalizedPrefix := c.normalizeKey(prefix)
+	bucket := c.GetBucket()
 
-	objectCh := c.minioClient.ListObjects(ctx, c.bucket, minio.ListObjectsOptions{
+	objectCh := c.minioClient.ListObjects(ctx, bucket, minio.ListObjectsOptions{
 		Prefix:    normalizedPrefix,
 		Recursive: delimiter == "",
 		MaxKeys:   int(maxKeys),
@@ -286,8 +296,9 @@ func (c *Client) ListObjectsV2(ctx context.Context, prefix string, delimiter str
 
 func (c *Client) HeadObject(ctx context.Context, key string) (*HeadObjectOutput, error) {
 	normalizedKey := c.normalizeKey(key)
+	bucket := c.GetBucket()
 
-	objInfo, err := c.minioClient.StatObject(ctx, c.bucket, normalizedKey, minio.StatObjectOptions{})
+	objInfo, err := c.minioClient.StatObject(ctx, bucket, normalizedKey, minio.StatObjectOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to head object '%s': %w", normalizedKey, err)
 	}
@@ -311,7 +322,16 @@ func (c *Client) ObjectExists(ctx context.Context, key string) (bool, error) {
 }
 
 func (c *Client) GetBucket() string {
-	return c.bucket
+	cfg := conf.Conf()
+	bucketConfig, ok := cfg.Linode.GetBucketConfig(c.bucketEnum)
+	if !ok {
+		return ""
+	}
+	return bucketConfig.Bucket
+}
+
+func (c *Client) GetBucketEnum() enums.LinodeBucketEnum {
+	return c.bucketEnum
 }
 
 func (c *Client) GetBasePrefix() string {
@@ -328,16 +348,18 @@ func (c *Client) ProviderEnum() storage.StorageProvider {
 
 func (c *Client) GetPublicURL(key string) string {
 	normalizedKey := c.normalizeKey(key)
+	bucket := c.GetBucket()
 	endpoint := strings.TrimPrefix(c.endpoint, "https://")
 	endpoint = strings.TrimPrefix(endpoint, "http://")
 	normalizedKey = strings.TrimPrefix(normalizedKey, "/")
-	url := fmt.Sprintf("https://%s.%s/%s", c.bucket, endpoint, normalizedKey)
+	url := fmt.Sprintf("https://%s.%s/%s", bucket, endpoint, normalizedKey)
 	return url
 }
 
 func (c *Client) PresignedGetObject(ctx context.Context, key string, expiry time.Duration) (string, error) {
 	normalizedKey := c.normalizeKey(key)
-	url, err := c.minioClient.PresignedGetObject(ctx, c.bucket, normalizedKey, expiry, nil)
+	bucket := c.GetBucket()
+	url, err := c.minioClient.PresignedGetObject(ctx, bucket, normalizedKey, expiry, nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate presigned URL for '%s': %w", normalizedKey, err)
 	}
