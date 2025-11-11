@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/storage/linode"
@@ -21,6 +22,7 @@ var flagsMigrateImagesLinode struct {
 	basePath         string
 	dryRun           bool
 	panicImmediately bool
+	bucket           string
 }
 
 func init() {
@@ -28,6 +30,7 @@ func init() {
 	f().StringVarP(&flagsMigrateImagesLinode.basePath, "basepath", "p", "./cmd/web/static/images", "Base path to images directory")
 	f().BoolVarP(&flagsMigrateImagesLinode.dryRun, "dry-run", "d", true, "Dry run mode (don't actually upload)")
 	f().BoolVarP(&flagsMigrateImagesLinode.panicImmediately, "panic-imm", "e", true, "Panic immediately on first error")
+	f().StringVarP(&flagsMigrateImagesLinode.bucket, "bucket", "b", "PRIVATE", "Bucket enum to use (PUBLIC or PRIVATE)")
 	rootCmd.AddCommand(cmdMigrateImagesLinode)
 }
 
@@ -35,7 +38,12 @@ var cmdMigrateImagesLinode = &cobra.Command{
 	Use:   "migrate_images_linode",
 	Short: "migrate product images and brand logos to Linode Object Storage",
 	Run: func(cmd *cobra.Command, args []string) {
-		client, err := linode.NewClientFromConfig()
+		bucketEnum := enums.ParseLinodeBucketEnum(strings.ToUpper(flagsMigrateImagesLinode.bucket))
+		if bucketEnum == enums.LINODE_BUCKET_UNDEFINED {
+			panic(errors.Join(errs.ErrCmd, fmt.Errorf("invalid bucket enum: %s (valid values: PUBLIC or PRIVATE)", flagsMigrateImagesLinode.bucket)))
+		}
+
+		client, err := linode.NewClientFromConfigWithBucket(bucketEnum)
 		if err != nil {
 			panic(errors.Join(errs.ErrCmd, fmt.Errorf("failed to initialize Linode client: %w", err)))
 		}
@@ -49,6 +57,7 @@ var cmdMigrateImagesLinode = &cobra.Command{
 		logs.Log().Info(
 			"Connected to Linode",
 			zap.String("bucket", client.GetBucket()),
+			zap.String("bucket_enum", bucketEnum.String()),
 			zap.String("prefix", client.GetBasePrefix()),
 			zap.Bool("dry_run", flagsMigrateImagesLinode.dryRun),
 		)
@@ -153,6 +162,7 @@ func migrateImages(
 		totalFiles++
 
 		s3Key := "static/images/" + normalizedPath
+		normalizedKey := strings.TrimPrefix(s3Key, "static/")
 		if !flagsMigrateImagesLinode.dryRun {
 			exists, err := client.ObjectExists(ctx, s3Key)
 			if err == nil && exists {
@@ -167,7 +177,7 @@ func migrateImages(
 				"Failed to migrate file",
 				zap.Error(err),
 				zap.String("file", filePath),
-				zap.String("s3_key", s3Key),
+				zap.String("s3_key", normalizedKey),
 			)
 			errorFiles++
 			if flagsMigrateImagesLinode.panicImmediately {
@@ -232,26 +242,27 @@ func migrateFile(ctx context.Context, client *linode.Client, filePath string, s3
 		return fmt.Errorf("file path is a directory, not a file: %s", filePath)
 	}
 
+	normalizedKey := strings.TrimPrefix(s3Key, "static/")
 	if !flagsMigrateImagesLinode.dryRun {
 		exists, err := client.ObjectExists(ctx, s3Key)
 		if err == nil && exists {
 			logs.Log().Debug(
 				"Object already exists, skipping",
-				zap.String("s3_key", s3Key),
+				zap.String("s3_key", normalizedKey),
 			)
 			return nil
 		}
 	}
 
 	if flagsMigrateImagesLinode.dryRun {
-		fmt.Println("Would upload", filePath, s3Key)
+		fmt.Printf("Would upload %s -> {%s}/%s\n", filePath, flagsMigrateImagesLinode.bucket, normalizedKey)
 		return nil
 	}
 
 	logs.Log().Info(
 		"Uploading file",
 		zap.String("local", filePath),
-		zap.String("s3_key", s3Key),
+		zap.String("s3_key", normalizedKey),
 		zap.Int64("size", info.Size()),
 	)
 
@@ -270,7 +281,7 @@ func migrateFile(ctx context.Context, client *linode.Client, filePath string, s3
 	logs.Log().Debug(
 		"Uploaded",
 		zap.String("local", filePath),
-		zap.String("s3_key", s3Key),
+		zap.String("s3_key", normalizedKey),
 		zap.String("content_type", contentType),
 		zap.Int64("size", info.Size()),
 	)

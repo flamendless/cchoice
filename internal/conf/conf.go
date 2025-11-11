@@ -2,6 +2,7 @@ package conf
 
 import (
 	"cchoice/cmd/web/static"
+	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"errors"
 	"fmt"
@@ -66,11 +67,34 @@ type BusinessConfig struct {
 
 type LinodeConfig struct {
 	Endpoint   string `env:"LINODE_ENDPOINT"`
-	AccessKey  string `env:"LINODE_ACCESS_KEY"`
-	SecretKey  string `env:"LINODE_SECRET_KEY"`
-	Bucket     string `env:"LINODE_BUCKET"`
 	Region     string `env:"LINODE_REGION" env-default:""`
 	BasePrefix string `env:"LINODE_BASE_PREFIX" env-default:""`
+
+	Public  LinodeBucketConfig `env-prefix:"LINODE_PUBLIC_"`
+	Private LinodeBucketConfig `env-prefix:"LINODE_PRIVATE_"`
+
+	buckets map[enums.LinodeBucketEnum]LinodeBucketConfig
+}
+
+type LinodeBucketConfig struct {
+	Bucket    string `env:"BUCKET"`
+	AccessKey string `env:"ACCESS_KEY"`
+	SecretKey string `env:"SECRET_KEY"`
+}
+
+func (lc *LinodeConfig) GetBuckets() map[enums.LinodeBucketEnum]LinodeBucketConfig {
+	if lc.buckets == nil {
+		lc.buckets = make(map[enums.LinodeBucketEnum]LinodeBucketConfig)
+		lc.buckets[enums.LINODE_BUCKET_PUBLIC] = lc.Public
+		lc.buckets[enums.LINODE_BUCKET_PRIVATE] = lc.Private
+	}
+	return lc.buckets
+}
+
+func (lc *LinodeConfig) GetBucketConfig(bucketEnum enums.LinodeBucketEnum) (LinodeBucketConfig, bool) {
+	buckets := lc.GetBuckets()
+	config, ok := buckets[bucketEnum]
+	return config, ok
 }
 
 func mustValidate(c *appConfig) {
@@ -121,8 +145,25 @@ func mustValidate(c *appConfig) {
 	}
 
 	if c.StorageProvider == "linode" {
-		if c.Linode.Endpoint == "" || c.Linode.AccessKey == "" || c.Linode.SecretKey == "" || c.Linode.Bucket == "" || c.Linode.Region == "" {
+		if c.Linode.Endpoint == "" || c.Linode.Region == "" {
 			panic(fmt.Errorf("[Linode Storage]: %w", errs.ErrEnvVarRequired))
+		}
+
+		buckets := c.Linode.GetBuckets()
+		for bucketEnum, bucketConfig := range buckets {
+			if bucketConfig.Bucket == "" {
+				continue
+			}
+			if bucketConfig.AccessKey == "" {
+				panic(fmt.Errorf("[Linode Storage %s]: access key must be configure", bucketEnum.String()))
+			}
+			if bucketConfig.SecretKey == "" {
+				panic(fmt.Errorf("[Linode Storage %s]: secret key must be configured", bucketEnum.String()))
+			}
+		}
+
+		if len(buckets) != 2 {
+			panic("[Linode Storage]: exactly two buckets must be configured")
 		}
 	}
 }

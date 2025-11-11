@@ -3,6 +3,7 @@ package linode
 import (
 	"bytes"
 	"cchoice/internal/conf"
+	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/storage"
@@ -82,15 +83,35 @@ func NewClient(cfg Config) (*Client, error) {
 }
 
 func NewClientFromConfig() (*Client, error) {
+	return NewClientFromConfigWithBucket(enums.LINODE_BUCKET_PRIVATE)
+}
+
+func NewClientFromConfigWithBucket(bucketEnum enums.LinodeBucketEnum) (*Client, error) {
 	cfg := conf.Conf()
 	if cfg.StorageProvider != "linode" {
 		return nil, errs.ErrLinodeServiceInit
 	}
 
+	bucketConfig, ok := cfg.Linode.GetBucketConfig(bucketEnum)
+	if !ok {
+		return nil, fmt.Errorf("bucket config for enum %s not found", bucketEnum.String())
+	}
+
+	if bucketConfig.Bucket == "" {
+		return nil, fmt.Errorf("bucket for enum %s is not configured", bucketEnum.String())
+	}
+	if bucketConfig.AccessKey == "" {
+		return nil, fmt.Errorf("access key for bucket enum %s is not configured", bucketEnum.String())
+	}
+	if bucketConfig.SecretKey == "" {
+		return nil, fmt.Errorf("secret key for bucket enum %s is not configured", bucketEnum.String())
+	}
+
 	logs.Log().Info(
 		"Linode",
 		zap.String("endpoint", cfg.Linode.Endpoint),
-		zap.String("bucket", cfg.Linode.Bucket),
+		zap.String("bucket", bucketConfig.Bucket),
+		zap.String("bucket_enum", bucketEnum.String()),
 		zap.String("region", cfg.Linode.Region),
 		zap.String("base prefix", cfg.Linode.BasePrefix),
 	)
@@ -98,9 +119,9 @@ func NewClientFromConfig() (*Client, error) {
 	return NewClient(Config{
 		Endpoint:   cfg.Linode.Endpoint,
 		Region:     cfg.Linode.Region,
-		AccessKey:  cfg.Linode.AccessKey,
-		SecretKey:  cfg.Linode.SecretKey,
-		Bucket:     cfg.Linode.Bucket,
+		AccessKey:  bucketConfig.AccessKey,
+		SecretKey:  bucketConfig.SecretKey,
+		Bucket:     bucketConfig.Bucket,
 		BasePrefix: cfg.Linode.BasePrefix,
 	})
 }
