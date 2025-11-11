@@ -281,6 +281,7 @@ func MigrateImagesToLinodeStorage() error {
 		Args: []string{
 			"migrate_images_linode",
 			"--dry-run=false",
+			"--bucket=PUBLIC",
 		},
 	}); err != nil {
 		return err
