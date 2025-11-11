@@ -1,6 +1,7 @@
 package linode
 
 import (
+	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/metrics"
 	"cchoice/internal/storage"
@@ -20,7 +21,7 @@ import (
 
 type LinodeFS struct {
 	objstorage *Client
-	bucket     string
+	bucketEnum enums.LinodeBucketEnum
 	basePrefix string
 }
 
@@ -60,7 +61,7 @@ func New(objstorage storage.IObjectStorage) storage.IFileSystem {
 
 	return &LinodeFS{
 		objstorage: linodeClient,
-		bucket:     linodeClient.GetBucket(),
+		bucketEnum: linodeClient.GetBucketEnum(),
 		basePrefix: linodeClient.GetBasePrefix(),
 	}
 }
@@ -80,12 +81,13 @@ func (l *LinodeFS) Open(name string) (http.File, error) {
 	body, err := l.objstorage.GetObject(ctx, name)
 	if err != nil {
 		metrics.Cache.LinodeAssetError()
+		bucket := l.objstorage.GetBucket()
 		if strings.Contains(err.Error(), "NoSuchKey") {
 			logs.Log().Debug(
 				logtag,
 				zap.String("error", "file not found"),
 				zap.String("key", name),
-				zap.String("bucket", l.bucket),
+				zap.String("bucket", bucket),
 			)
 			return nil, fmt.Errorf("file not found: %s", name)
 		}
@@ -93,7 +95,7 @@ func (l *LinodeFS) Open(name string) (http.File, error) {
 			logtag,
 			zap.Error(err),
 			zap.String("key", name),
-			zap.String("bucket", l.bucket),
+			zap.String("bucket", bucket),
 		)
 		return nil, fmt.Errorf("failed to get object from Linode: %w", err)
 	}
@@ -111,11 +113,12 @@ func (l *LinodeFS) Open(name string) (http.File, error) {
 	}
 
 	metrics.Cache.LinodeAssetHit()
+	bucket := l.objstorage.GetBucket()
 	logs.Log().Info(
 		logtag,
 		zap.String("action", "asset_retrieved"),
 		zap.String("key", name),
-		zap.String("bucket", l.bucket),
+		zap.String("bucket", bucket),
 		zap.Int64("size", size),
 	)
 
@@ -126,7 +129,7 @@ func (l *LinodeFS) Open(name string) (http.File, error) {
 		modTime:    modTime,
 		isDir:      false,
 		objstorage: l.objstorage,
-		bucket:     l.bucket,
+		bucket:     l.objstorage.GetBucket(),
 		key:        key,
 	}, nil
 }

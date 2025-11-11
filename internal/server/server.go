@@ -17,6 +17,7 @@ import (
 	"cchoice/internal/database"
 	"cchoice/internal/encode"
 	"cchoice/internal/encode/sqids"
+	"cchoice/internal/enums"
 	"cchoice/internal/geocoding"
 	"cchoice/internal/geocoding/googlemaps"
 	"cchoice/internal/logs"
@@ -102,7 +103,7 @@ func NewServer() *http.Server {
 
 	switch cfg.StorageProvider {
 	case "linode":
-		objStorage = linode.MustInit()
+		objStorage = linode.MustInitWithBucket(enums.LINODE_BUCKET_PUBLIC)
 		productImageFS = linode.New(objStorage)
 	case "local":
 		objStorage = nil
