@@ -127,12 +127,16 @@ func NewClientFromConfigWithBucket(bucketEnum enums.LinodeBucketEnum) (*Client, 
 }
 
 func MustInit() storage.IObjectStorage {
+	return MustInitWithBucket(enums.LINODE_BUCKET_PRIVATE)
+}
+
+func MustInitWithBucket(bucketEnum enums.LinodeBucketEnum) storage.IObjectStorage {
 	cfg := conf.Conf()
 	if cfg.StorageProvider != "linode" {
 		panic("'STORAGE_PROVIDER' must be 'linode' to use this")
 	}
 
-	client, err := NewClientFromConfig()
+	client, err := NewClientFromConfigWithBucket(bucketEnum)
 	if err != nil {
 		panic(errors.Join(errs.ErrLinodeServiceInit, fmt.Errorf("failed to initialize Linode client: %w", err)))
 	}
