@@ -43,23 +43,24 @@ type CreateOrderParams struct {
 }
 
 const (
-	orderRefPrefix       = "CO-"
-	orderRefRandomLength = 4
+	orderRefPrefix       = "CCO-"
+	orderRefRandomLength = 3
 )
 
+// INFO: (Brandon) - Format: CCO-{time}{upper 6 chars}
 func GenerateUniqueOrderReferenceNumber(ctx context.Context) (string, error) {
-	ts := time.Now().UTC().UnixNano()
+	ts := time.Now().UTC().UnixMilli()
 	tsEnc := strconv.FormatInt(ts, 36)
 
 	randomBytes := make([]byte, orderRefRandomLength)
 	if _, err := rand.Read(randomBytes); err != nil {
-		tsEnc = strconv.FormatInt(time.Now().UTC().UnixNano(), 36)
+		tsEnc = strconv.FormatInt(time.Now().UTC().UnixMilli(), 36)
 		randomHex := strconv.FormatInt(time.Now().UTC().UnixNano(), 16)
-		return fmt.Sprintf("%s%s-%s", orderRefPrefix, tsEnc, randomHex[:orderRefRandomLength*2]), nil
+		return strings.ToUpper(fmt.Sprintf("%s%s%s", orderRefPrefix, tsEnc, randomHex[:orderRefRandomLength*2])), nil
 	}
 
 	randomHex := hex.EncodeToString(randomBytes)
-	return fmt.Sprintf("%s%s-%s", orderRefPrefix, tsEnc, randomHex), nil
+	return strings.ToUpper(fmt.Sprintf("%s%s%s", orderRefPrefix, tsEnc, randomHex)), nil
 }
 
 func CreateOrderFromCheckout(

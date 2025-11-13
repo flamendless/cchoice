@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/goccy/go-json"
@@ -156,18 +157,20 @@ func (p PayMongo) CheckoutPaymentHandler(
 	return nil
 }
 
+// INFO: (Brandon) - Format: CC{gatewayenum}-{time}{upper 6 chars}
 func (p PayMongo) GenerateRefNo() string {
-	ts := time.Now().UTC().UnixNano()
-	tsEnc := strconv.FormatInt(ts, 36)
+	gatewayCode := p.GatewayEnum().Code()
 
-	//INFO: (Brandon) - if we ever encounter duplication, increase precision by increasing number of bytes
-	b := make([]byte, 4)
+	b := make([]byte, 3)
 	if _, err := rand.Read(b); err != nil {
-		return fmt.Sprintf("%s_%s_%d", p.GatewayEnum().Code(), tsEnc, time.Now().UnixNano())
+		ts := time.Now().UTC().UnixNano()
+		return strings.ToUpper(fmt.Sprintf("CC%s-%06x%d", gatewayCode, ts%0xFFFFFF, ts))
 	}
 
-	r := hex.EncodeToString(b)
-	return fmt.Sprintf("%s_%s_%s", p.GatewayEnum().Code(), tsEnc, r)
+	randomChars := hex.EncodeToString(b)
+	ts := time.Now().UTC().UnixMilli()
+	tsStr := strconv.FormatInt(ts, 36)
+	return strings.ToUpper(fmt.Sprintf("CC%s-%s%s", gatewayCode, tsStr, randomChars))
 }
 
 func (p PayMongo) CreatePayload(
