@@ -1,9 +1,12 @@
 package server
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 
 	"github.com/VictoriaMetrics/fastcache"
@@ -53,13 +56,33 @@ type Server struct {
 	useSSL          bool
 }
 
-func (s *Server) buildURL(path string) string {
-	//TODO: (Brandon) Implement CDN
-	return fmt.Sprintf(
-		`https://%s/cchoice/%s`,
-		s.address,
-		path,
-	)
+func (s *Server) GetProductImageProxyURL(ctx context.Context, thumbnailPath string, size string) (string, error) {
+	pathToUse := thumbnailPath
+	if size != "" {
+		parts := strings.Split(pathToUse, "/")
+		for i, part := range parts {
+			if part == "webp" && i+1 < len(parts) {
+				parts[i+1] = size
+				pathToUse = strings.Join(parts, "/")
+				break
+			}
+		}
+	}
+
+	cfg := conf.Conf()
+	if cfg.IsLocal() && s.objectStorage != nil {
+		presignedURL, err := s.objectStorage.PresignedGetObject(ctx, pathToUse, 24*time.Hour)
+		if err != nil {
+			return "", fmt.Errorf("failed to generate presigned URL: %w", err)
+		}
+		return presignedURL, nil
+	}
+
+	proxyURL := fmt.Sprintf("https://%s/cchoice/products/image?path=%s&thumbnail=1&quality=best", s.address, url.QueryEscape(pathToUse))
+	if size != "" {
+		proxyURL += "&size=" + url.QueryEscape(size)
+	}
+	return proxyURL, nil
 }
 
 func NewServer() *http.Server {

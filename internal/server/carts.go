@@ -484,11 +484,15 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		lineItems := make([]payments.LineItem, 0, len(cartCheckout.CheckoutIDs))
 		for _, checkoutLine := range checkoutLines {
+			imageURL, err := s.GetProductImageProxyURL(r.Context(), checkoutLine.ThumbnailPath, "256x256")
+			if err != nil {
+				logs.Log().Error(logtag, zap.Error(err), zap.String("thumbnail_path", checkoutLine.ThumbnailPath))
+			}
 			lineItems = append(lineItems, payments.LineItem{
 				Amount:      int32(checkoutLine.UnitPriceWithVat),
 				Currency:    money.PHP,
 				Description: checkoutLine.Description.String,
-				Images:      []string{s.buildURL(checkoutLine.ThumbnailPath)},
+				Images:      []string{imageURL},
 				Name:        checkoutLine.Name,
 				Quantity:    int32(checkoutLine.Quantity),
 			})
