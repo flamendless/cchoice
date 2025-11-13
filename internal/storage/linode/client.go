@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -20,10 +21,17 @@ import (
 )
 
 type Client struct {
-	minioClient *minio.Client
-	bucketEnum  enums.LinodeBucketEnum
-	basePrefix  string
-	endpoint    string
+	minioClient    *minio.Client
+	bucketEnum     enums.LinodeBucketEnum
+	basePrefix     string
+	endpoint       string
+	urlCache       sync.Map
+	presignedCache sync.Map // Cache for presigned URLs with expiry
+}
+
+type presignedCacheEntry struct {
+	url    string
+	expiry time.Time
 }
 
 type Config struct {
@@ -347,23 +355,46 @@ func (c *Client) ProviderEnum() storage.StorageProvider {
 }
 
 func (c *Client) GetPublicURL(key string) string {
+	if cachedURL, ok := c.urlCache.Load(key); ok {
+		return cachedURL.(string)
+	}
+
 	normalizedKey := c.normalizeKey(key)
 	bucket := c.GetBucket()
 	endpoint := strings.TrimPrefix(c.endpoint, "https://")
 	endpoint = strings.TrimPrefix(endpoint, "http://")
 	normalizedKey = strings.TrimPrefix(normalizedKey, "/")
 	url := fmt.Sprintf("https://%s.%s/%s", bucket, endpoint, normalizedKey)
+
+	c.urlCache.Store(key, url)
 	return url
 }
 
 func (c *Client) PresignedGetObject(ctx context.Context, key string, expiry time.Duration) (string, error) {
+	cacheKey := fmt.Sprintf("%s:%d", key, int64(expiry.Seconds()))
+	if cached, ok := c.presignedCache.Load(cacheKey); ok {
+		entry := cached.(presignedCacheEntry)
+		if time.Now().Before(entry.expiry) {
+			return entry.url, nil
+		}
+		c.presignedCache.Delete(cacheKey)
+	}
+
 	normalizedKey := c.normalizeKey(key)
 	bucket := c.GetBucket()
 	url, err := c.minioClient.PresignedGetObject(ctx, bucket, normalizedKey, expiry, nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate presigned URL for '%s': %w", normalizedKey, err)
 	}
-	return url.String(), nil
+
+	urlStr := url.String()
+	cacheEntry := presignedCacheEntry{
+		url:    urlStr,
+		expiry: time.Now().Add(expiry - time.Minute),
+	}
+	c.presignedCache.Store(cacheKey, cacheEntry)
+
+	return urlStr, nil
 }
 
 var _ storage.IObjectStorage = (*Client)(nil)
