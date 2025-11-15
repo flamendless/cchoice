@@ -103,10 +103,10 @@ func (s *CChoiceService) GetCapabilities() (*shipping.ServiceCapabilities, error
 
 func (s *CChoiceService) GetQuotation(req shipping.ShippingRequest) (*shipping.ShippingQuotation, error) {
 	if req.PickupLocation.Coordinates.Lat == "" || req.PickupLocation.Coordinates.Lng == "" {
-		return nil, errors.Join(errs.ErrShippingInvalidCoordinates, errors.New("pickup location"))
+		return nil, errors.Join(errs.ErrShippingInvalidCoordinates, errs.ErrShippingPickupLocation)
 	}
 	if req.DeliveryLocation.Coordinates.Lat == "" || req.DeliveryLocation.Coordinates.Lng == "" {
-		return nil, errors.Join(errs.ErrShippingInvalidCoordinates, errors.New("delivery location"))
+		return nil, errors.Join(errs.ErrShippingInvalidCoordinates, errs.ErrShippingDeliveryLocation)
 	}
 
 	distance, err := s.calculateDistance(
@@ -167,19 +167,19 @@ func (s *CChoiceService) CancelOrder(orderID string) error {
 func (s *CChoiceService) calculateDistance(pickup, delivery shipping.Coordinates) (float64, error) {
 	pickupLat, err := strconv.ParseFloat(pickup.Lat, 64)
 	if err != nil {
-		return 0, errors.Join(errs.ErrShippingInvalidLatitude, errors.New("pickup"))
+		return 0, errors.Join(errs.ErrShippingInvalidLatitude, errs.ErrShippingPickupLocation)
 	}
 	pickupLng, err := strconv.ParseFloat(pickup.Lng, 64)
 	if err != nil {
-		return 0, errors.Join(errs.ErrShippingInvalidLongitude, errors.New("pickup"))
+		return 0, errors.Join(errs.ErrShippingInvalidLongitude, errs.ErrShippingPickupLocation)
 	}
 	deliveryLat, err := strconv.ParseFloat(delivery.Lat, 64)
 	if err != nil {
-		return 0, errors.Join(errs.ErrShippingInvalidLatitude, errors.New("delivery"))
+		return 0, errors.Join(errs.ErrShippingInvalidLatitude, errs.ErrShippingDeliveryLocation)
 	}
 	deliveryLng, err := strconv.ParseFloat(delivery.Lng, 64)
 	if err != nil {
-		return 0, errors.Join(errs.ErrShippingInvalidLongitude, errors.New("delivery"))
+		return 0, errors.Join(errs.ErrShippingInvalidLongitude, errs.ErrShippingDeliveryLocation)
 	}
 
 	return haversineDistance(pickupLat, pickupLng, deliveryLat, deliveryLng), nil
