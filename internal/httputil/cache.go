@@ -98,3 +98,12 @@ func setCacheControlHeaders(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Vary", "Accept, Accept-Encoding")
 	}
 }
+
+// SetNoCacheHeaders sets headers to prevent caching of error responses
+// This is especially important for 404 responses to ensure browsers don't cache
+// missing assets, allowing them to be fetched immediately after upload.
+func SetNoCacheHeaders(w http.ResponseWriter) {
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+}

@@ -64,6 +64,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			notModified, file, err := httputil.CacheHeaders(w, r, s.staticFS, path)
 			if err != nil {
 				logs.Log().Debug("[Static Handler]", zap.Error(err), zap.String("path", path))
+				httputil.SetNoCacheHeaders(w)
 				http.NotFound(w, r)
 				return
 			}
@@ -76,6 +77,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			info, err := file.Stat()
 			if err != nil {
 				logs.Log().Error("[Static Handler]", zap.Error(err))
+				httputil.SetNoCacheHeaders(w)
 				http.NotFound(w, r)
 				return
 			}
@@ -169,6 +171,7 @@ func (s *Server) serveImage(w http.ResponseWriter, r *http.Request, path string,
 
 	if notModified, file, err := httputil.CacheHeaders(w, r, s.productImageFS, path); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
+		httputil.SetNoCacheHeaders(w)
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	} else {
