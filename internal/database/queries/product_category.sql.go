@@ -67,17 +67,11 @@ SELECT
 	COUNT(tbl_products_categories.product_id) AS products_count
 FROM tbl_product_categories
 INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
-WHERE promoted_at_homepage = ?
 GROUP BY tbl_products_categories.category_id
 HAVING tbl_products_categories.product_id
 ORDER BY tbl_product_categories.category ASC
 LIMIT ?
 `
-
-type GetProductCategoriesByPromotedParams struct {
-	PromotedAtHomepage sql.NullBool
-	Limit              int64
-}
 
 type GetProductCategoriesByPromotedRow struct {
 	ID            int64
@@ -85,8 +79,9 @@ type GetProductCategoriesByPromotedRow struct {
 	ProductsCount int64
 }
 
-func (q *Queries) GetProductCategoriesByPromoted(ctx context.Context, arg GetProductCategoriesByPromotedParams) ([]GetProductCategoriesByPromotedRow, error) {
-	rows, err := q.db.QueryContext(ctx, getProductCategoriesByPromoted, arg.PromotedAtHomepage, arg.Limit)
+// ORDER BY tbl_product_categories.promoted_at_homepage DESC, tbl_product_categories.category ASC
+func (q *Queries) GetProductCategoriesByPromoted(ctx context.Context, limit int64) ([]GetProductCategoriesByPromotedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductCategoriesByPromoted, limit)
 	if err != nil {
 		return nil, err
 	}

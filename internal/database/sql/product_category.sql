@@ -52,10 +52,10 @@ SELECT
 	COUNT(tbl_products_categories.product_id) AS products_count
 FROM tbl_product_categories
 INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
-WHERE promoted_at_homepage = ?
 GROUP BY tbl_products_categories.category_id
 HAVING tbl_products_categories.product_id
 ORDER BY tbl_product_categories.category ASC
+-- ORDER BY tbl_product_categories.promoted_at_homepage DESC, tbl_product_categories.category ASC
 LIMIT ?;
 
 -- name: GetProductsByCategoryID :many
