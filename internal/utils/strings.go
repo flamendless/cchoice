@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"cchoice/internal/enums"
 	"strings"
 	"unicode"
 
@@ -40,4 +41,17 @@ func SlugToTile(input string) string {
 
 func GetBoolFlag(flag string) bool {
 	return flag == "true" || flag == "1"
+}
+
+func LabelToID(module enums.Module, label string) string {
+	result := strings.ToLower(label)
+	result = strings.ReplaceAll(result, " ", "-")
+	var builder strings.Builder
+	for _, r := range result {
+		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') || r == '-' || r == '_' {
+			builder.WriteRune(r)
+		}
+	}
+	moduleStr := strings.ToLower(module.String())
+	return moduleStr + "-" + builder.String()
 }

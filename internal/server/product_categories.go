@@ -1,7 +1,6 @@
 package server
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -35,10 +34,6 @@ func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Reque
 		&s.SF,
 		s.dbRO,
 		[]byte("key_categories_side_panel"),
-		queries.GetProductCategoriesByPromotedParams{
-			PromotedAtHomepage: sql.NullBool{Bool: true, Valid: true},
-			Limit:              100,
-		},
 	)
 	if err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
@@ -144,7 +139,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 
 		imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, product.ThumbnailPath, images.IMAGE_FORMAT_WEBP)
 		if err != nil {
-			logs.Log().Error(logtag, zap.Error(err))
+			logs.Log().Error(logtag, zap.Error(err), zap.String("thumbnailPath", product.ThumbnailPath))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			continue
 		}

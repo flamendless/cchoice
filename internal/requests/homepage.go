@@ -14,6 +14,7 @@ import (
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
+	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/metrics"
 	"cchoice/internal/utils"
@@ -77,7 +78,6 @@ func GetCategoriesSidePanel(
 	sf *singleflight.Group,
 	dbRO database.Service,
 	cacheKey []byte,
-	params queries.GetProductCategoriesByPromotedParams,
 ) ([]models.CategorySidePanelText, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
 		buf := bytes.NewBuffer(data)
@@ -92,8 +92,9 @@ func GetCategoriesSidePanel(
 		metrics.Cache.MemMiss()
 	}
 
+	const limit = 100
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
-		res, err := dbRO.GetQueries().GetProductCategoriesByPromoted(ctx, params)
+		res, err := dbRO.GetQueries().GetProductCategoriesByPromoted(ctx, limit)
 		if err != nil {
 			return nil, err
 		}
@@ -113,8 +114,9 @@ func GetCategoriesSidePanel(
 			continue
 		}
 		categories = append(categories, models.CategorySidePanelText{
-			Label: label,
-			URL:   "/product-category/" + v.Category.String,
+			Label:          label,
+			URL:            "/product-category/" + v.Category.String,
+			ScrollTargetID: utils.LabelToID(enums.MODULE_CATEGORY, label),
 		})
 		found[label] = true
 	}
@@ -198,8 +200,9 @@ func GetCategorySectionHandler(
 			return v[i].Label < v[j].Label
 		})
 		categorySections = append(categorySections, models.GroupedCategorySection{
-			Label:         k,
-			Subcategories: v,
+			Label:          k,
+			ScrollTargetID: utils.LabelToID(enums.MODULE_CATEGORY, k),
+			Subcategories:  v,
 		})
 	}
 	sort.Slice(categorySections, func(i, j int) bool {
@@ -222,9 +225,8 @@ func GenerateSettingsCacheKey(keys []string) []byte {
 	return fmt.Appendf(nil, "hp_set_%s", hex.EncodeToString(hash[:])[:16])
 }
 
-func GenerateCategoriesSidePanelCacheKey(params queries.GetProductCategoriesByPromotedParams) []byte {
-	keyData := fmt.Sprintf("homepage:categories_side:%t:%t:%d",
-		params.PromotedAtHomepage.Valid, params.PromotedAtHomepage.Bool, params.Limit)
+func GenerateCategoriesSidePanelCacheKey(limit int64) []byte {
+	keyData := fmt.Sprintf("homepage:categories_side:%d", limit)
 	hash := sha256.Sum256([]byte(keyData))
 	return fmt.Appendf(nil, "hp_cat_%s", hex.EncodeToString(hash[:])[:16])
 }

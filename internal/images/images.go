@@ -39,6 +39,8 @@ func GetImageDataB64(
 	finalPath string,
 	ext ImageFormat,
 ) (string, error) {
+	const logtag = "[GetImageDataB64]"
+
 	finalPath = strings.TrimPrefix(finalPath, "static")
 	cacheKey := fmt.Appendf([]byte{}, "image_data_%s_%s", finalPath, ext.String())
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
@@ -50,6 +52,7 @@ func GetImageDataB64(
 
 	f, err := fs.Open(finalPath)
 	if err != nil {
+		logs.Log().Error(logtag, zap.String("finalPath", finalPath), zap.Error(err))
 		return "", errors.Join(errs.ErrFS, err)
 	}
 	defer func() {

@@ -16,8 +16,9 @@ type FooterRowText struct {
 }
 
 type CategorySidePanelText struct {
-	Label string
-	URL   string
+	Label          string
+	URL            string
+	ScrollTargetID string
 }
 
 type CategorySection struct {
@@ -31,8 +32,9 @@ type Subcategory struct {
 }
 
 type GroupedCategorySection struct {
-	Label         string
-	Subcategories []Subcategory
+	Label          string
+	ScrollTargetID string
+	Subcategories  []Subcategory
 }
 
 type CategorySectionProduct struct {

@@ -65,7 +65,10 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 templ CategorySection(page int, categories []models.GroupedCategorySection) {
 	for i, category := range categories {
 		<div>
-			<p class="text-base font-medium text-cchoice_dark m-2 my-0">
+			<p
+				id={ category.ScrollTargetID }
+				class="text-base font-medium text-cchoice_dark m-2 my-0 scroll-mt-20"
+			>
 				{ category.Label }
 			</p>
 			for _, subcategory := range category.Subcategories {
