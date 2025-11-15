@@ -129,7 +129,7 @@ templ CartPageBody() {
 			</form>
 		</div>
 		@Footer()
-		<script type="text/javascript" src={ string(templ.URL("/cchoice/static/js/cart.js?v=" + fmt.Sprintf("%d", time.Now().Unix()))) }>
+		<script type="text/javascript" src={ templ.URL("/cchoice/static/js/cart.js?v=" + fmt.Sprintf("%d", time.Now().Unix())) }>
 		</script>
 	</body>
 }

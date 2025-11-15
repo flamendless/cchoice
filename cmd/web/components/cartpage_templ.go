@@ -173,9 +173,9 @@ func CartPageBody() templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL("/cchoice/static/js/cart.js?v=" + fmt.Sprintf("%d", time.Now().Unix()))))
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(templ.URL("/cchoice/static/js/cart.js?v=" + fmt.Sprintf("%d", time.Now().Unix())))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 132, Col: 128}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 132, Col: 120}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {

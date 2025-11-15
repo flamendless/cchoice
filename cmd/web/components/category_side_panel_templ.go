@@ -36,57 +36,83 @@ func CategoriesSidePanelList(categories []models.CategorySidePanelText) templ.Co
 			return templ_7745c5c3_Err
 		}
 		for i, category := range categories {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<a id=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var2 templ.SafeURL
-			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs("/cchoice#" + category.ScrollTargetID)
+			var templ_7745c5c3_Var2 string
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("category-link-" + category.ScrollTargetID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_side_panel.templ`, Line: 12, Col: 48}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_side_panel.templ`, Line: 12, Col: 51}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"\n\t\t\t\t\ttext-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer\n\t\t\t\t\thover:underline hover:bg-cchoicesoft transition-colors\n\t\t\t\t\tcategory-scroll-link\n\t\t\t\t\" data-scroll-target=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(category.ScrollTargetID)
+			var templ_7745c5c3_Var3 templ.SafeURL
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs("/cchoice#" + category.ScrollTargetID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_side_panel.templ`, Line: 18, Col: 48}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_side_panel.templ`, Line: 13, Col: 48}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"><p class=\"text-ellipsis text-nowrap overflow-hidden\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"\n\t\t\t\t\ttext-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer\n\t\t\t\t\thover:underline hover:bg-cchoicesoft transition-colors\n\t\t\t\t\tcategory-scroll-link\n\t\t\t\t\" data-scroll-target=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(category.Label)
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(category.ScrollTargetID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_side_panel.templ`, Line: 21, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_side_panel.templ`, Line: 19, Col: 48}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</p></a> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"><p class=\"text-ellipsis text-nowrap overflow-hidden\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(category.Label)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_side_panel.templ`, Line: 22, Col: 21}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</p></a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if i == len(categories)-1 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"py-32\"></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"py-32\"></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<script>\n\t\t\tfunction setupCategoryScrollLinks() {\n\t\t\t\tdocument.querySelectorAll(\".category-scroll-link\").forEach(function(link) {\n\t\t\t\t\tif (link.dataset.scrollListenerAdded) return;\n\t\t\t\t\tlink.dataset.scrollListenerAdded = \"true\";\n\t\t\t\t\tlink.addEventListener(\"click\", function(e) {\n\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\tconst targetId = this.getAttribute(\"data-scroll-target\");\n\t\t\t\t\t\tconst target = document.getElementById(targetId);\n\t\t\t\t\t\tif (target) {\n\t\t\t\t\t\t\tconst header = document.querySelector(\"header\");\n\t\t\t\t\t\t\tconst headerHeight = header ? header.offsetHeight : 150;\n\t\t\t\t\t\t\tconst scrollPos = target.offsetTop - headerHeight;\n\t\t\t\t\t\t\twindow.scrollTo({top: scrollPos, behavior: \"smooth\"});\n\t\t\t\t\t\t}\n\t\t\t\t\t\treturn false;\n\t\t\t\t\t});\n\t\t\t\t});\n\t\t\t}\n\t\t\tif (document.readyState === \"loading\") {\n\t\t\t\tdocument.addEventListener(\"DOMContentLoaded\", setupCategoryScrollLinks);\n\t\t\t} else {\n\t\t\t\tsetupCategoryScrollLinks();\n\t\t\t}\n\t\t</script></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<script type=\"text/javascript\" src=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(templ.URL("/cchoice/static/js/category_side_panel.js"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_side_panel.templ`, Line: 29, Col: 93}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\">\n\t\t</script></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -110,12 +136,12 @@ func CategoriesSidePanel() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var5 == nil {
-			templ_7745c5c3_Var5 = templ.NopComponent
+		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var7 == nil {
+			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"\n\t\t\tfixed top-0 left-0 w-fit min-w-[15%] max-w-[15%] w-[15%]\n\t\t\tml-0.5 pr-6 flex flex-col\n\t\t\th-full overflow-auto pt-[128px]\n\t\t\" hx-trigger=\"load once, history:restore\" hx-get=\"/cchoice/product-categories/side-panel/list\" hx-select=\"#categories-side-panel-list\" hx-target=\"#categories-side-panel-list\" hx-swap=\"outerHTML\"><p class=\"text-xs font-normal m-2 my-0 text-nowrap\">Choose a Category</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"\n\t\t\tfixed top-0 left-0 w-fit min-w-[15%] max-w-[15%] w-[15%]\n\t\t\tml-0.5 pr-6 flex flex-col\n\t\t\th-full overflow-auto pt-[128px]\n\t\t\" hx-trigger=\"load once, history:restore\" hx-get=\"/cchoice/product-categories/side-panel/list\" hx-select=\"#categories-side-panel-list\" hx-target=\"#categories-side-panel-list\" hx-swap=\"outerHTML\"><p class=\"text-xs font-normal m-2 my-0 text-nowrap\">Choose a Category</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -127,7 +153,7 @@ func CategoriesSidePanel() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

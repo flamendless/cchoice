@@ -63,8 +63,8 @@ templ HeadMeta() {
 		<link rel="icon" type="image/png" sizes="180x180" href="/cchoice/static/images/favicons/180x180.png"/>
 		<link rel="icon" type="image/png" sizes="192x192" href="/cchoice/static/images/favicons/192x192.png"/>
 		<link href="/cchoice/static/css/tailwind.css" rel="stylesheet"/>
-		<script type="text/javascript" src={ string(templ.URL("/cchoice/static/js/htmx.min.js")) }></script>
-		<script async type="text/javascript" src={ string(templ.URL("/cchoice/static/js/hyperscript.min.js")) }></script>
+		<script type="text/javascript" src={ templ.URL("/cchoice/static/js/htmx.min.js") }></script>
+		<script async type="text/javascript" src={ templ.URL("/cchoice/static/js/hyperscript.min.js") }></script>
 		<script>
 			(function(){
 				if (!globalThis._G) {
