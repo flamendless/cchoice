@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
@@ -441,6 +442,21 @@ func GenAll() error {
 }
 
 func GenChlog() error {
+	fmt.Println("Always create a git tag first before running this command")
+	fmt.Print("Do you want to proceed? (y/N): ")
+
+	reader := bufio.NewReader(os.Stdin)
+	response, err := reader.ReadString('\n')
+	if err != nil {
+		return fmt.Errorf("failed to read input: %w", err)
+	}
+
+	response = strings.TrimSpace(strings.ToLower(response))
+	if response != "y" && response != "yes" {
+		fmt.Println("Cancelled.")
+		return nil
+	}
+
 	return run(Command{Type: CmdExec, Cmd: "go", Args: []string{"tool", "git-chglog", "-o", "CHANGELOGS.md"}})
 }
 
