@@ -257,7 +257,7 @@ func GenImages() error {
 	}
 	if err := run(Command{
 		Type: CmdTmpExec,
-		Cmd: "genimages",
+		Cmd:  "genimages",
 		Args: []string{
 			"convert_images", "--inpath=./cmd/web/static/images/brand_logos",
 			"--outpath=./cmd/web/static/images/brand_logos", "--format=webp"},
@@ -419,6 +419,21 @@ func GenAll() error {
 	if err := run(Command{Type: CmdExec, Cmd: "go", Args: []string{"generate", "./..."}}); err != nil {
 		return err
 	}
+	// Run genversion from internal/conf directory so it writes version_gen.go in the correct location
+	originalDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	if err := os.Chdir("internal/conf"); err != nil {
+		return err
+	}
+	if err := run(Command{Type: CmdExec, Cmd: "go", Args: []string{"run", "../../cmd/genversion/genversion.go"}}); err != nil {
+		_ = os.Chdir(originalDir)
+		return err
+	}
+	if err := os.Chdir(originalDir); err != nil {
+		return err
+	}
 	if err := GenSQL(); err != nil {
 		return err
 	}
@@ -450,7 +465,49 @@ func SC() error {
 	return nil
 }
 
+func hasGoFileChanges() (bool, error) {
+	cmd := exec.Command("git", "diff", "--name-only", "HEAD", "--", "*.go")
+	output, err := cmd.Output()
+	if err != nil {
+		cmd = exec.Command("git", "diff", "--name-only", "--cached", "--", "*.go")
+		output, err = cmd.Output()
+		if err != nil {
+			return true, nil
+		}
+	}
+	return strings.TrimSpace(string(output)) != "", nil
+}
+
+func hasPackageChanges(packages []string) (bool, error) {
+	var paths []string
+	for _, pkg := range packages {
+		paths = append(paths, fmt.Sprintf("internal/%s/", pkg))
+	}
+
+	args := append([]string{"diff", "--name-only", "HEAD", "--"}, paths...)
+	cmd := exec.Command("git", args...)
+	output, err := cmd.Output()
+	if err != nil {
+		args = append([]string{"diff", "--name-only", "--cached", "--"}, paths...)
+		cmd = exec.Command("git", args...)
+		output, err = cmd.Output()
+		if err != nil {
+			return true, nil
+		}
+	}
+	return strings.TrimSpace(string(output)) != "", nil
+}
+
 func TestAll() error {
+	hasChanges, err := hasGoFileChanges()
+	if err != nil {
+		return fmt.Errorf("failed to check for Go file changes: %w", err)
+	}
+	if !hasChanges {
+		fmt.Println("No changes in Go files detected. Skipping tests.")
+		return nil
+	}
+
 	if _, err := exec.LookPath("golangci-lint"); err == nil {
 		if err := run(Command{Type: CmdExec, Cmd: "golangci-lint", Args: []string{"config", "verify"}}); err != nil {
 			return err
@@ -468,6 +525,16 @@ func TestAll() error {
 }
 
 func TestInteg() error {
+	packages := []string{"storage/linode", "shipping/lalamove", "geocoding/googlemaps", "payments/paymongo"}
+	hasChanges, err := hasPackageChanges(packages)
+	if err != nil {
+		return fmt.Errorf("failed to check for package changes: %w", err)
+	}
+	if !hasChanges {
+		fmt.Println("No changes in integration test packages detected. Skipping integration tests.")
+		return nil
+	}
+
 	if err := run(Command{
 		Type: CmdGoBuild,
 		Out:  filepath.Join(tmpDir, "main"),

@@ -2,6 +2,6 @@
 package conf
 
 func init() {
-    GitTagDev = "dev-v0.0.7"
+    GitTagDev = "dev-v0.0.8"
     GitTagProd = "release"
 }
