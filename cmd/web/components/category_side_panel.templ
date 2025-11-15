@@ -9,6 +9,7 @@ templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 	>
 		for i, category := range categories {
 			<a
+				id={ "category-link-" + category.ScrollTargetID }
 				href={ "/cchoice#" + category.ScrollTargetID }
 				class="
 					text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer
@@ -25,30 +26,7 @@ templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 				<div class="py-32"></div>
 			}
 		}
-		<script>
-			function setupCategoryScrollLinks() {
-				document.querySelectorAll(".category-scroll-link").forEach(function(link) {
-					if (link.dataset.scrollListenerAdded) return;
-					link.dataset.scrollListenerAdded = "true";
-					link.addEventListener("click", function(e) {
-						e.preventDefault();
-						const targetId = this.getAttribute("data-scroll-target");
-						const target = document.getElementById(targetId);
-						if (target) {
-							const header = document.querySelector("header");
-							const headerHeight = header ? header.offsetHeight : 150;
-							const scrollPos = target.offsetTop - headerHeight;
-							window.scrollTo({top: scrollPos, behavior: "smooth"});
-						}
-						return false;
-					});
-				});
-			}
-			if (document.readyState === "loading") {
-				document.addEventListener("DOMContentLoaded", setupCategoryScrollLinks);
-			} else {
-				setupCategoryScrollLinks();
-			}
+		<script type="text/javascript" src={ templ.URL("/cchoice/static/js/category_side_panel.js") }>
 		</script>
 	</div>
 }
