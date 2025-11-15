@@ -2,6 +2,88 @@
 ## [Unreleased]
 
 ### Bugfix
+- Make others section on top
+
+### Deps
+- Update templ version
+- Upgrade dependencies
+
+### Feature
+- Indicate active category section in side panel
+- Scroll to category section from side panel
+- Implement canceled payment page
+
+### Maintenance
+- Organize errors
+- Update cmd and add testInteg
+
+### Script
+- Make parse products use public bucket
+- Add migrate_images_linode
+- Update test linode
+- Update scripts to pull git tags
+
+### Server
+- Cache busting for 404 assets
+- Update ref number generation
+- Use product image for paymongo checkout page
+- Use public bucket for product images and brand logos
+- Implement separate buckets for public and private assets
+- Use linode fs
+- Use S3 URL for brand logo
+- Add cmd for testing linode object storage connection
+- Implement linode storage and organize env vars
+- Add to session the shipping info
+- Add orders in database
+
+### Web
+- Increase footer z-index
+- Only include checked items in cart page for calculation
+- Improve cart page styles
+- Display product weight
+
+
+<a name="dev-v0.0.7"></a>
+## [dev-v0.0.7] - 2025-10-20
+### Bugfix
+- Address dropdown default getting value
+
+### Feature
+- Add version checking in browser
+- Implement db caching of geocode
+- Integrate shipping fee calculation in carts page
+- CCS-57 CCS-56 CCS-53 Geocoding, Lalamove, C-Choice services
+- Implement form sanitization
+- CCS-53 WIP Lalamove integration
+- Add prometheus and grafana
+
+### Maintenance
+- Refactor and add better errors
+- Cleanup and improvements
+- Cleanup
+- Use std http method and any keyword
+
+### Script
+- Update bosch weight column
+- CCS-54 Add golangci-lint
+- CCS-54 Introduce magefile
+- Update genimages
+
+### Server
+- Integrate weight
+- Add weight and weight unit in product specs
+- CCS-53 More shipping service work
+- CCS-55 Update product images structure
+- Use Prometheus for metrics
+- CCS-52 Implement headers caching and metrics
+
+### Web
+- Add delivery fee loading animation when calculating
+
+
+<a name="dev-v0.0.6"></a>
+## [dev-v0.0.6] - 2025-08-26
+### Bugfix
 - CCS-51 Fix quantity increase/decrease behavior
 - CCS-44 Use custom name for line items
 - CCS-39 Exclude products with no valid image in home page
@@ -16,6 +98,7 @@
 - CCS-29 Upgrade deps
 
 ### Docs
+- Generate changelogs
 - Move ENCODE_SALT to required section
 
 ### Featue
@@ -298,7 +381,9 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.0.5...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.0.7...HEAD
+[dev-v0.0.7]: https://github.com/flamendless/cchoice/compare/dev-v0.0.6...dev-v0.0.7
+[dev-v0.0.6]: https://github.com/flamendless/cchoice/compare/dev-v0.0.5...dev-v0.0.6
 [dev-v0.0.5]: https://github.com/flamendless/cchoice/compare/dev-v0.0.4...dev-v0.0.5
 [dev-v0.0.4]: https://github.com/flamendless/cchoice/compare/dev-v0.0.3...dev-v0.0.4
 [dev-v0.0.3]: https://github.com/flamendless/cchoice/compare/dev-v0.0.2...dev-v0.0.3
