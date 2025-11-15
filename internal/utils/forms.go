@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"errors"
+	"cchoice/internal/errs"
 	"net/http"
 	"reflect"
 
@@ -14,11 +14,11 @@ func FormToStruct(r *http.Request, dst any) error {
 	}
 
 	if reflect.TypeOf(dst).Kind() != reflect.Ptr {
-		return errors.New("target must be a pointer")
+		return errs.ErrValidationTargetMustBeAPointer
 	}
 	elem := reflect.TypeOf(dst).Elem()
 	if elem.Kind() != reflect.Struct {
-		return errors.New("target must be a pointer to struct")
+		return errs.ErrValidationTargetMustBeAStruct
 	}
 
 	sliceFields := map[string]struct{}{}

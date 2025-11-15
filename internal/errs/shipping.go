@@ -12,4 +12,6 @@ var (
 	ErrShippingInvalidLongitude    = errors.New("[SHIPPING]: Invalid longitude value")
 	ErrShippingInvalidWeightRange  = errors.New("[SHIPPING]: Weight must be greater than zero")
 	ErrShippingDistanceCalculation = errors.New("[SHIPPING]: Failed to calculate distance")
+	ErrShippingPickupLocation      = errors.New("[SHIPPING]: Pickup location")
+	ErrShippingDeliveryLocation    = errors.New("[SHIPPING]: Delivery location")
 )

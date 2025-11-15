@@ -2,11 +2,11 @@ package linode
 
 import (
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/metrics"
 	"cchoice/internal/storage"
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -86,16 +86,16 @@ func (l *LinodeFS) Open(name string) (http.File, error) {
 			logs.Log().Debug(
 				logtag,
 				zap.String("error", "file not found"),
-				zap.String("key", name),
 				zap.String("bucket", bucket),
+				zap.String("key", name),
 			)
 			return nil, fmt.Errorf("file not found: %s", name)
 		}
 		logs.Log().Error(
 			logtag,
 			zap.Error(err),
-			zap.String("key", name),
 			zap.String("bucket", bucket),
+			zap.String("key", name),
 		)
 		return nil, fmt.Errorf("failed to get object from Linode: %w", err)
 	}
@@ -117,8 +117,8 @@ func (l *LinodeFS) Open(name string) (http.File, error) {
 	logs.Log().Info(
 		logtag,
 		zap.String("action", "asset_retrieved"),
-		zap.String("key", name),
 		zap.String("bucket", bucket),
+		zap.String("key", name),
 		zap.Int64("size", size),
 	)
 
@@ -151,12 +151,12 @@ func (f *LinodeFile) Close() error {
 }
 
 func (f *LinodeFile) Seek(offset int64, whence int) (int64, error) {
-	return 0, errors.New("seek not supported for S3 objects")
+	return 0, errs.ErrSeekNotSupported
 }
 
 func (f *LinodeFile) Readdir(count int) ([]fs.FileInfo, error) {
 	if !f.isDir {
-		return nil, errors.New("not a directory")
+		return nil, errs.ErrNotADirectory
 	}
 
 	ctx := context.Background()

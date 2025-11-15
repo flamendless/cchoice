@@ -1,22 +1,22 @@
 package geocoding
 
 import (
-	"errors"
+	"cchoice/internal/errs"
 	"strings"
 )
 
 func ValidateAddress(address string) error {
 	if address == "" {
-		return errors.New("address cannot be empty")
+		return errs.ErrGeocodingEmptyAddress
 	}
 
 	address = strings.TrimSpace(address)
 	if address == "" {
-		return errors.New("address cannot be empty after trimming whitespace")
+		return errs.ErrGeocodingEmptyAddress
 	}
 
 	if len(address) < 10 {
-		return errors.New("address is too short, minimum 10 characters required")
+		return errs.ErrGeocodingAddressTooShort
 	}
 
 	return nil
@@ -48,14 +48,14 @@ func FormatAddressForGeocoding(address, city, province, country string) string {
 
 func ParseCoordinates(lat, lng string) (*Coordinates, error) {
 	if lat == "" || lng == "" {
-		return nil, errors.New("latitude and longitude cannot be empty")
+		return nil, errs.ErrGeocodingEmptyCoordinates
 	}
 
 	lat = strings.TrimSpace(lat)
 	lng = strings.TrimSpace(lng)
 
 	if lat == "" || lng == "" {
-		return nil, errors.New("latitude and longitude cannot be empty after trimming")
+		return nil, errs.ErrGeocodingEmptyCoordinates
 	}
 
 	return &Coordinates{
