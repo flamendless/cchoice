@@ -64,6 +64,34 @@ var cmdMigrateImagesLinode = &cobra.Command{
 
 		basePath := flagsMigrateImagesLinode.basePath
 
+		specificFiles := []string{"empty_96x96.webp", "logo.svg", "store.webp"}
+		logs.Log().Info(
+			"Migrating specific files from base images directory",
+			zap.Strings("files", specificFiles),
+		)
+		for _, fileName := range specificFiles {
+			filePath := filepath.Join(basePath, fileName)
+			if _, err := os.Stat(filePath); err == nil {
+				s3Key := "static/images/" + fileName
+				if err := migrateFile(ctx, client, filePath, s3Key); err != nil {
+					logs.Log().Error(
+						"Failed to migrate specific file",
+						zap.Error(err),
+						zap.String("file", filePath),
+					)
+					if flagsMigrateImagesLinode.panicImmediately {
+						panic(errors.Join(errs.ErrCmd, fmt.Errorf("failed to migrate file %s: %w", fileName, err)))
+					}
+				}
+			} else {
+				logs.Log().Warn(
+					"Specific file not found",
+					zap.String("file", filePath),
+				)
+			}
+		}
+
+
 		brandLogosPath := filepath.Join(basePath, "brand_logos")
 		if _, err := os.Stat(brandLogosPath); err == nil {
 			logs.Log().Info(
@@ -123,7 +151,7 @@ func migrateImages(
 		}
 
 		ext := strings.ToLower(filepath.Ext(filePath))
-		if ext != ".png" && ext != ".jpg" && ext != ".jpeg" && ext != ".webp" && ext != ".gif" {
+		if ext != ".png" && ext != ".jpg" && ext != ".jpeg" && ext != ".webp" && ext != ".gif" && ext != ".svg" {
 			return nil
 		}
 
@@ -219,6 +247,8 @@ func getContentType(ext string) string {
 		return "image/webp"
 	case ".gif":
 		return "image/gif"
+	case ".svg":
+		return "image/svg+xml"
 	case ".md":
 		return "text/markdown"
 	case ".txt":

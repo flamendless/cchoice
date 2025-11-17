@@ -197,7 +197,7 @@ func Build() error {
 	return run(Command{
 		Type: CmdGoBuild,
 		Out:  filepath.Join(tmpDir, "main"),
-		Tags: []string{"fts5", "staticfs"},
+		Tags: []string{"fts5", "staticfs", "imageprocessing"},
 	})
 }
 
@@ -233,6 +233,9 @@ func Setup() error {
 	}
 	if _, err := os.Stat("./.env"); os.IsNotExist(err) {
 		return run(Command{Type: CmdExec, Cmd: "cp", Args: []string{"./.env.sample", "./.env"}})
+	}
+	if _, err := os.Stat("./logs"); os.IsNotExist(err) {
+		return run(Command{Type: CmdExec, Cmd: "mkdir", Args: []string{"./logs"}})
 	}
 	return nil
 }

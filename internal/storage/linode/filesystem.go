@@ -116,7 +116,7 @@ func (l *LinodeFS) Open(name string) (http.File, error) {
 	bucket := l.objstorage.GetBucket()
 	logs.Log().Info(
 		logtag,
-		zap.String("action", "asset_retrieved"),
+		zap.String("action", "get"),
 		zap.String("bucket", bucket),
 		zap.String("key", name),
 		zap.Int64("size", size),
