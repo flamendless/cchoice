@@ -97,7 +97,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-trigger=\"click\" hx-target=\"#modal_image_viewer .modal-content img\" hx-select=\"img\" hx-swap=\"outerHTML\" class=\"w-24 max-w-24 h-24 cursor-zoom-in\" src=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-trigger=\"click\" hx-target=\"#modal_image_viewer .modal-content img\" hx-select=\"img\" hx-swap=\"none\" class=\"w-24 max-w-24 h-24 cursor-zoom-in\" src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

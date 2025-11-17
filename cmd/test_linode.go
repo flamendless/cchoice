@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cchoice/internal/enums"
 	"cchoice/internal/storage/linode"
 	"context"
 	"fmt"
@@ -20,7 +21,7 @@ var cmdTestLinode = &cobra.Command{
 		fmt.Println("Testing Linode Object Storage Connection...")
 		fmt.Println("==========================================")
 
-		client, err := linode.NewClientFromConfig()
+		client, err := linode.NewClientFromConfigWithBucket(enums.LINODE_BUCKET_PUBLIC)
 		if err != nil {
 			panic(err)
 		}
@@ -30,8 +31,8 @@ var cmdTestLinode = &cobra.Command{
 			panic(err)
 		}
 
-		fmt.Println("\nTesting object listing...")
-		objects, err := client.ListObjects(ctx, "", 5)
+		fmt.Println("\nTesting object listing in images/ folder...")
+		objects, err := client.ListObjects(ctx, "images/", 5)
 		if err != nil {
 			panic(err)
 		}

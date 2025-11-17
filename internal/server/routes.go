@@ -92,8 +92,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/", s.indexHandler)
 		r.Get("/settings/header-texts", s.headerTextsHandler)
 		r.Get("/settings/footer-texts", s.footerTextsHandler)
+		r.Get("/settings/store", s.storeHandler)
 		r.Get("/products/image", s.productsImageHandler)
 		r.Get("/brands/logo", s.brandLogoHandler)
+		r.Get("/assets/image", s.assetImageHandler)
 
 		r.Post("/search", s.searchHandler)
 
@@ -156,10 +158,36 @@ func (s *Server) brandLogoHandler(w http.ResponseWriter, r *http.Request) {
 	s.serveImage(w, r, path, ext, cacheKey, logtag)
 }
 
-func (s *Server) serveImage(w http.ResponseWriter, r *http.Request, path string, ext images.ImageFormat, cacheKey []byte, logtag string) {
+func (s *Server) assetImageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Asset Image Handler]"
+	filename := r.URL.Query().Get("filename")
+	if filename == "" {
+		logs.Log().Debug(
+			logtag,
+			zap.String("error", "missing filename parameter"),
+		)
+		http.Error(w, "missing filename parameter", http.StatusBadRequest)
+		return
+	}
+
+	path := "static/images/" + filename
+	ext := images.IMAGE_FORMAT_WEBP
+	cacheKey := buildImageCacheKey(path, "", "", "", ext)
+	s.serveImage(w, r, path, ext, cacheKey, logtag)
+}
+
+func (s *Server) serveImage(
+	w http.ResponseWriter,
+	r *http.Request,
+	path string,
+	ext images.ImageFormat,
+	cacheKey []byte,
+	logtag string,
+) {
 	if data, ok := s.cache.HasGet(nil, cacheKey); ok {
 		w.Header().Set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400")
-		if err := components.Image(string(data)).Render(r.Context(), w); err != nil {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		if _, err := w.Write(data); err != nil {
 			logs.Log().Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -188,7 +216,8 @@ func (s *Server) serveImage(w http.ResponseWriter, r *http.Request, path string,
 		return
 	}
 
-	if err := components.Image(imgData).Render(r.Context(), w); err != nil {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	if _, err := w.Write([]byte(imgData)); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -300,7 +329,14 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		&s.SF,
 		s.dbRO,
 		[]byte("key_footer_texts"),
-		[]string{"mobile_no", "email", "url_gmap", "url_facebook", "url_tiktok"},
+		[]string{
+			"mobile_no",
+			"email",
+			"address",
+			"url_gmap",
+			"url_facebook",
+			"url_tiktok",
+		},
 	)
 	if err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
@@ -338,6 +374,10 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 			URL:   settings["url_gmap"],
 		},
 		{
+			Label: "Store",
+			URL:   "/cchoice#store",
+		},
+		{
 			Label: "Facebook",
 			URL:   settings["url_facebook"],
 		},
@@ -351,6 +391,27 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+}
+
+func (s *Server) storeHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Store Handler]"
+	settings, err := requests.GetSettingsData(
+		r.Context(),
+		s.cache,
+		&s.SF,
+		s.dbRO,
+		[]byte("key_store"),
+		[]string{"address"},
+	)
+	if err != nil {
+		logs.Log().Error(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if addr, ok := settings["address"]; ok {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		_, _ = w.Write([]byte(addr))
 	}
 }
 

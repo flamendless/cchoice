@@ -65,6 +65,10 @@ setup() {
 	if [ ! -f "./.env" ]; then
 		cp "./.env.sample" "./.env"
 	fi
+
+	if [ ! -d "./logs" ]; then
+		mkdir "./logs"
+	fi
 }
 
 genimages() {

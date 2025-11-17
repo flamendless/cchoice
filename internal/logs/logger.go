@@ -35,6 +35,15 @@ func InitLog() {
 		panic(fmt.Errorf("%w. APP_ENV", errs.ErrEnvVarRequired))
 	}
 
+	config.OutputPaths = []string{
+		"stdout",
+		"logs/app.log",
+	}
+	config.ErrorOutputPaths = []string{
+		"stderr",
+		"logs/error.log",
+	}
+
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 
 	newLogger, err := config.Build()

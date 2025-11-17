@@ -41,10 +41,11 @@ func MustInit() *PayMongo {
 
 	address := cfg.Server.Address
 	if address == "localhost" {
-		address = "http://localhost"
+		address = fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
 	}
-	successURL := fmt.Sprintf("%s:%d%s", address, cfg.Server.Port, cfg.PayMongo.SuccessURL)
-	cancelURL := fmt.Sprintf("%s:%d%s", address, cfg.Server.Port, cfg.PayMongo.CancelURL)
+
+	successURL := fmt.Sprintf("%s%s", address, cfg.PayMongo.SuccessURL)
+	cancelURL := fmt.Sprintf("%s%s", address, cfg.PayMongo.CancelURL)
 
 	return &PayMongo{
 		paymentGateway: payments.PAYMENT_GATEWAY_PAYMONGO,
