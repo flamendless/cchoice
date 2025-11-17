@@ -122,12 +122,64 @@ func HomePageBody() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = LoadModalImage().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		return nil
 	})
+}
+
+func LoadImageSrc() templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_LoadImageSrc_0f39`,
+		Function: `function __templ_LoadImageSrc_0f39(){document.body.addEventListener('htmx:afterRequest', function(event) {
+		const target = event.detail.elt;
+		if (target.tagName === 'IMG' && event.detail.successful) {
+			const base64Data = event.detail.xhr.responseText;
+			if (base64Data) {
+				target.src = base64Data;
+			}
+		}
+	});
+}`,
+		Call:       templ.SafeScript(`__templ_LoadImageSrc_0f39`),
+		CallInline: templ.SafeScriptInline(`__templ_LoadImageSrc_0f39`),
+	}
+}
+
+func LoadModalImage() templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_LoadModalImage_a778`,
+		Function: `function __templ_LoadModalImage_a778(){document.addEventListener('get', function(event) {
+		const target = event.target;
+		if (!target || target.id !== 'modal_image_viewer_image')
+			return
+
+		const pathInput = document.getElementById('selected-product-thumbnail-path');
+		if (!pathInput || !pathInput.value)
+			return
+
+		const path = pathInput.value;
+		const url = '/cchoice/products/image?thumbnail=1&path=' + encodeURIComponent(path);
+		console.log('Fetching modal image from:', url);
+
+		fetch(url)
+			.then(response => response.text())
+			.then(base64Data => {
+				target.src = base64Data;
+				console.log('Modal image loaded successfully');
+			})
+			.catch(err => console.error('Error loading modal image:', err));
+	}, true);
+}`,
+		Call:       templ.SafeScript(`__templ_LoadModalImage_a778`),
+		CallInline: templ.SafeScriptInline(`__templ_LoadModalImage_a778`),
+	}
 }
 
 var _ = templruntime.GeneratedTemplate

@@ -15,22 +15,8 @@ import (
 	"go.uber.org/zap"
 )
 
-const (
-	PNG  = "data:image/png;base64,"
-	WEBP = "data:image/webp;base64,"
-)
-
 func ImageToB64(format ImageFormat, data []byte) string {
-	var base string
-	switch format {
-	case IMAGE_FORMAT_PNG:
-		base = PNG
-	case IMAGE_FORMAT_WEBP:
-		base = WEBP
-	default:
-		panic("unhandled image format")
-	}
-	return base + b64.ToBase64(data)
+	return format.DataURIPrefix() + b64.ToBase64(data)
 }
 
 func GetImageDataB64(

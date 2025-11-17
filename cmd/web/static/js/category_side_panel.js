@@ -8,7 +8,8 @@
 
 	function setupCategoryScrollLinks() {
 		document.querySelectorAll(".category-scroll-link").forEach(function(link) {
-			if (link.dataset.scrollListenerAdded) return;
+			if (link.dataset.scrollListenerAdded)
+				return
 			link.dataset.scrollListenerAdded = "true";
 			link.addEventListener("click", function(e) {
 				e.preventDefault();
@@ -30,7 +31,8 @@
 		}
 
 		const categoryLinks = document.querySelectorAll(".category-scroll-link");
-		if (categoryLinks.length === 0) return;
+		if (categoryLinks.length === 0)
+			return
 
 		const categorySections = Array.from(categoryLinks).map(function(link) {
 			const targetId = link.getAttribute("data-scroll-target");
@@ -42,7 +44,8 @@
 			return item.section !== null;
 		});
 
-		if (categorySections.length === 0) return;
+		if (categorySections.length === 0)
+			return
 
 		const headerHeight = getHeaderHeight();
 		const rootMargin = "-" + (headerHeight + 20) + "px 0px -60% 0px";

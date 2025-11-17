@@ -6,7 +6,9 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
+	"sync"
 
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
@@ -27,12 +29,65 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
 )
 
 func buildImageCacheKey(path, thumbnail, size, quality string, ext images.ImageFormat) []byte {
-	key := fmt.Sprintf("product_image_%s_t%s_s%s_q%s_%s",
-		path, thumbnail, size, quality, ext.String())
+	key := fmt.Sprintf(
+		"product_image_%s_t%s_s%s_q%s_%s",
+		path,
+		thumbnail,
+		size,
+		quality,
+		ext.String(),
+	)
 	return []byte(key)
+}
+
+func validateImagePath(path string, allowedPrefixes []string) (string, error) {
+	if path == "" {
+		return "", errs.ErrPathEmpty
+	}
+
+	if strings.Contains(path, "\x00") {
+		return "", errs.ErrPathEmpty
+	}
+
+	cleanPath := filepath.Clean(path)
+
+	if strings.Contains(cleanPath, "..") {
+		return "", errs.ErrPathTraversalAttempt
+	}
+
+	hasValidPrefix := false
+	for _, prefix := range allowedPrefixes {
+		if strings.HasPrefix(cleanPath, prefix) {
+			hasValidPrefix = true
+			break
+		}
+	}
+	if !hasValidPrefix {
+		return "", errs.ErrPathPrefix
+	}
+
+	ext := filepath.Ext(cleanPath)
+	allowedExts := []string{".webp", ".png", ".jpg", ".jpeg"}
+	validExt := false
+	for _, allowedExt := range allowedExts {
+		if strings.EqualFold(ext, allowedExt) {
+			validExt = true
+			break
+		}
+	}
+	if !validExt {
+		return "", errs.ErrPathInvalidExt
+	}
+
+	if len(cleanPath) > 512 {
+		return "", errs.ErrPathTooLong
+	}
+
+	return cleanPath, nil
 }
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -40,6 +95,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Use(middleware.CleanPath)
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
+	r.Use(SecurityHeadersMiddleware)
 	// r.Use(middleware.NoCache)
 	r.Use(middleware.Compress(5))
 	r.Use(cors.Handler(cors.Options{
@@ -114,12 +170,16 @@ func (s *Server) RegisterRoutes() http.Handler {
 func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Products Image Handler]"
 	path := r.URL.Query().Get("path")
-	if path == "" || !strings.HasPrefix(path, constants.PathProductImages) {
-		logs.Log().Debug(
+
+	cleanPath, err := validateImagePath(path, []string{constants.PathProductImages})
+	if err != nil {
+		logs.Log().Warn(
 			logtag,
-			zap.Error(errs.ErrImagePrefix),
+			zap.Error(err),
 			zap.String("path", path),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
+		http.Error(w, "Invalid image path", http.StatusBadRequest)
 		return
 	}
 
@@ -136,8 +196,8 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 		ext = images.IMAGE_FORMAT_WEBP
 	}
 
-	cacheKey := buildImageCacheKey(path, thumbnail, size, quality, ext)
-	s.serveImage(w, r, path, ext, cacheKey, logtag)
+	cacheKey := buildImageCacheKey(cleanPath, thumbnail, size, quality, ext)
+	s.serveImage(w, r, cleanPath, ext, cacheKey, logtag)
 }
 
 func (s *Server) brandLogoHandler(w http.ResponseWriter, r *http.Request) {
@@ -147,15 +207,29 @@ func (s *Server) brandLogoHandler(w http.ResponseWriter, r *http.Request) {
 		logs.Log().Debug(
 			logtag,
 			zap.String("error", "missing filename parameter"),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 		http.Error(w, "missing filename parameter", http.StatusBadRequest)
 		return
 	}
 
 	path := "static/images/brand_logos/" + filename
+
+	cleanPath, err := validateImagePath(path, []string{"static/images/brand_logos/"})
+	if err != nil {
+		logs.Log().Warn(
+			logtag,
+			zap.Error(err),
+			zap.String("path", path),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
+		)
+		http.Error(w, "Invalid image path", http.StatusBadRequest)
+		return
+	}
+
 	ext := images.IMAGE_FORMAT_WEBP
-	cacheKey := buildImageCacheKey(path, "", "", "", ext)
-	s.serveImage(w, r, path, ext, cacheKey, logtag)
+	cacheKey := buildImageCacheKey(cleanPath, "", "", "", ext)
+	s.serveImage(w, r, cleanPath, ext, cacheKey, logtag)
 }
 
 func (s *Server) assetImageHandler(w http.ResponseWriter, r *http.Request) {
@@ -165,15 +239,29 @@ func (s *Server) assetImageHandler(w http.ResponseWriter, r *http.Request) {
 		logs.Log().Debug(
 			logtag,
 			zap.String("error", "missing filename parameter"),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 		http.Error(w, "missing filename parameter", http.StatusBadRequest)
 		return
 	}
 
 	path := "static/images/" + filename
+
+	cleanPath, err := validateImagePath(path, []string{"static/images/"})
+	if err != nil {
+		logs.Log().Warn(
+			logtag,
+			zap.Error(err),
+			zap.String("path", path),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
+		)
+		http.Error(w, "Invalid image path", http.StatusBadRequest)
+		return
+	}
+
 	ext := images.IMAGE_FORMAT_WEBP
-	cacheKey := buildImageCacheKey(path, "", "", "", ext)
-	s.serveImage(w, r, path, ext, cacheKey, logtag)
+	cacheKey := buildImageCacheKey(cleanPath, "", "", "", ext)
+	s.serveImage(w, r, cleanPath, ext, cacheKey, logtag)
 }
 
 func (s *Server) serveImage(
@@ -211,7 +299,7 @@ func (s *Server) serveImage(
 
 	imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, path, ext)
 	if err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.String("path", path), zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -229,7 +317,12 @@ func (s *Server) serveImage(
 func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Index handler]"
 	if err := components.HomePage().Render(r.Context(), w); err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.Log().Error(logtag,
+			zap.Error(err),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
+			zap.String("path", r.URL.Path),
+			zap.String("method", r.Method),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -239,13 +332,19 @@ func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Changelogs Handler]"
 	f, err := os.Open("./CHANGELOGS.md")
 	if err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.Log().Error(logtag,
+			zap.Error(err),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer func() {
 		if err := f.Close(); err != nil {
-			logs.Log().Error(logtag, zap.Error(err))
+			logs.Log().Error(logtag,
+				zap.Error(err),
+				zap.String("request_id", middleware.GetReqID(r.Context())),
+			)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -253,7 +352,10 @@ func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	if _, err := io.Copy(w, f); err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.Log().Error(logtag,
+			zap.Error(err),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -263,12 +365,18 @@ func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Health Handler]"
 	jsonResp, err := json.Marshal(s.dbRO.Health())
 	if err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.Log().Error(logtag,
+			zap.Error(err),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if _, err := w.Write(jsonResp); err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.Log().Error(logtag,
+			zap.Error(err),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -294,7 +402,10 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		[]string{"email", "mobile_no"},
 	)
 	if err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.Log().Error(logtag,
+			zap.Error(err),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -315,7 +426,10 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := components.HeaderRow1Texts(texts).Render(r.Context(), w); err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.Log().Error(logtag,
+			zap.Error(err),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -339,7 +453,10 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	)
 	if err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.Log().Error(logtag,
+			zap.Error(err),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -388,7 +505,10 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := components.FooterRow1Texts(texts).Render(r.Context(), w); err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.Log().Error(logtag,
+			zap.Error(err),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -405,7 +525,10 @@ func (s *Server) storeHandler(w http.ResponseWriter, r *http.Request) {
 		[]string{"address"},
 	)
 	if err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.Log().Error(logtag,
+			zap.Error(err),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -441,30 +564,54 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		zap.Int("count", len(products)),
 		zap.Int("limit", constants.MaxSearchShowResults),
 		zap.String("query", search),
+		zap.String("request_id", middleware.GetReqID(r.Context())),
 	)
 
-	for _, product := range products {
-		if strings.HasSuffix(product.ThumbnailPath, constants.EmptyImageFilename) {
+	g, ctx := errgroup.WithContext(r.Context())
+	g.SetLimit(10)
+
+	var mu sync.Mutex
+	productResults := make([]models.SearchResultProduct, 0, len(products))
+
+	for i := range products {
+		if strings.HasSuffix(products[i].ThumbnailPath, constants.EmptyImageFilename) {
 			continue
 		}
 
-		imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, product.ThumbnailPath, images.IMAGE_FORMAT_WEBP)
-		if err != nil {
-			logs.Log().Error(logtag, zap.Error(err))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			continue
-		}
+		g.Go(func() error {
+			imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, products[i].ThumbnailPath, images.IMAGE_FORMAT_WEBP)
+			if err != nil {
+				logs.Log().Error(logtag,
+					zap.Error(err),
+					zap.String("request_id", middleware.GetReqID(ctx)),
+				)
+				return nil
+			}
 
-		product.ThumbnailData = imgData
+			products[i].ThumbnailData = imgData
 
-		if err := components.SearchResultProductCard(models.ToSearchResultProduct(s.encoder, product)).Render(r.Context(), w); err != nil {
-			logs.Log().Error(logtag, zap.Error(err))
+			mu.Lock()
+			productResults = append(productResults, models.ToSearchResultProduct(s.encoder, products[i]))
+			mu.Unlock()
+			return nil
+		})
+	}
+
+	if err := g.Wait(); err != nil {
+		logs.Log().Error(logtag, zap.Error(err), zap.String("request_id", middleware.GetReqID(r.Context())))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for _, product := range productResults {
+		if err := components.SearchResultProductCard(product).Render(r.Context(), w); err != nil {
+			logs.Log().Error(logtag, zap.Error(err), zap.String("request_id", middleware.GetReqID(r.Context())))
 			return
 		}
 	}
 
 	if err := components.SearchMore(search).Render(r.Context(), w); err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.Log().Error(logtag, zap.Error(err), zap.String("request_id", middleware.GetReqID(r.Context())))
 		return
 	}
 }
@@ -472,7 +619,10 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Checkouts Handler]"
 	if err := r.ParseForm(); err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.Log().Error(logtag,
+			zap.Error(err),
+			zap.String("request_id", middleware.GetReqID(r.Context())),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -1,6 +1,7 @@
 package components
 
 templ ModalProductImageViewer(productID string, imageData string) {
+	<input type="hidden" id="selected-product-thumbnail-path" value=""/>
 	<div
 		id="modal_image_viewer"
 		class="fixed hidden top-0 bottom-0 left-0 right-0 z-1000
@@ -18,7 +19,12 @@ templ ModalProductImageViewer(productID string, imageData string) {
 			class="modal-content w-[32rem] h-screen flex flex-col items-center justify-center"
 		>
 			<div class="relative inline-block">
-				@Image("")
+				<img
+					id="modal_image_viewer_image"
+					src={ placeholderImageSrc }
+					class="w-auto h-auto max-h-[75vh]"
+					alt="modal image viewer"
+				/>
 				<span
 					class="absolute top-0 right-0 size-8
 						rounded-full flex items-center justify-center transform translate-x-1/2 -translate-y-1/2

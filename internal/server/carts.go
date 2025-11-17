@@ -1,12 +1,14 @@
 package server
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"slices"
 	"strings"
+	"sync"
 
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
@@ -22,8 +24,11 @@ import (
 	"cchoice/internal/utils"
 
 	"github.com/Rhymond/go-money"
+	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
 )
 
 func AddCartsHandlers(s *Server, r chi.Router) {
@@ -37,6 +42,76 @@ func AddCartsHandlers(s *Server, r chi.Router) {
 	r.Patch("/carts/lines/{checkoutline_id}/toggle", s.toggleCartLineCheckboxHandler)
 	r.Get("/carts/payment-methods", s.cartsPaymentMethodsHandler)
 	r.Post("/carts/finalize", s.cartsFinalizeHandler)
+}
+
+type cartSummaryData struct {
+	Subtotal      string
+	TotalDiscount string
+	TotalWeight   string
+	DeliveryFee   string
+	Total         string
+}
+
+func (s *Server) calculateCartSummary(ctx context.Context) (cartSummaryData, error) {
+	token := s.sessionManager.Token(ctx)
+	checkedItems := GetCheckedItems(ctx, s.sessionManager)
+
+	var checkoutLines []queries.GetCheckoutLinesByCheckoutIDRow
+	var err error
+
+	if len(checkedItems) > 0 {
+		checkoutLines, err = cart.GetCheckedCheckoutLines(ctx, s.dbRO, token, checkedItems, s.encoder)
+	} else {
+		checkoutLines = []queries.GetCheckoutLinesByCheckoutIDRow{}
+	}
+
+	if err != nil {
+		return cartSummaryData{}, err
+	}
+
+	var subtotal = utils.NewMoney(0, "PHP")
+	deliveryFee := utils.NewMoney(0, "PHP")
+	totalDiscounts := utils.NewMoney(0, "PHP")
+
+	if quotation, ok := s.sessionManager.Get(ctx, skShippingQuotation).(*shipping.ShippingQuotation); ok && quotation != nil {
+		deliveryFee = utils.NewMoney(int64(quotation.Fee*100), quotation.Currency)
+	}
+
+	for _, checkoutLine := range checkoutLines {
+		sub := utils.NewMoney(checkoutLine.UnitPriceWithVat, checkoutLine.UnitPriceWithVatCurrency).Multiply(checkoutLine.Quantity)
+		newSubtotal, err := subtotal.Add(sub)
+		if err != nil {
+			continue
+		}
+		subtotal = newSubtotal
+	}
+
+	total, _ := subtotal.Add(deliveryFee)
+	total, _ = total.Subtract(totalDiscounts)
+	totalWeightKg, _ := utils.CalculateTotalWeightFromCheckoutLines(checkoutLines)
+
+	return cartSummaryData{
+		Subtotal:      subtotal.Display(),
+		TotalDiscount: "- " + totalDiscounts.Display(),
+		TotalWeight:   totalWeightKg + " kg",
+		DeliveryFee:   deliveryFee.Display(),
+		Total:         total.Display(),
+	}, nil
+}
+
+func (s *Server) generateCartSummaryComponent(ctx context.Context) templ.Component {
+	summaryData, err := s.calculateCartSummary(ctx)
+	if err != nil {
+		return components.CartSummaryContentEmpty()
+	}
+
+	return components.CartSummaryContent(
+		summaryData.Subtotal,
+		summaryData.TotalDiscount,
+		summaryData.TotalWeight,
+		summaryData.DeliveryFee,
+		summaryData.Total,
+	)
 }
 
 func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +155,10 @@ func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := components.CartPage(components.CartPageBody()).Render(r.Context(), w); err != nil {
+	// Pre-generate summary content
+	summaryContent := s.generateCartSummaryComponent(r.Context())
+
+	if err := components.CartPage(components.CartPageBody(summaryContent)).Render(r.Context(), w); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -109,14 +187,55 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	checkedItems := GetCheckedItems(r.Context(), s.sessionManager)
 
-	for _, checkoutLine := range checkoutLines {
-		var imgData string
-		if !strings.HasSuffix(checkoutLine.ThumbnailPath, constants.EmptyImageFilename) {
-			if imgDataB64, err := images.GetImageDataB64(s.cache, s.productImageFS, checkoutLine.ThumbnailPath, images.IMAGE_FORMAT_WEBP); err == nil {
-				imgData = imgDataB64
-			}
-		}
+	g, ctx := errgroup.WithContext(r.Context())
+	g.SetLimit(10)
 
+	type checkoutLineWithImage struct {
+		line    queries.GetCheckoutLinesByCheckoutIDRow
+		imgData string
+		index   int
+	}
+
+	var mu sync.Mutex
+	lineResults := make([]checkoutLineWithImage, 0, len(checkoutLines))
+
+	for i := range checkoutLines {
+		g.Go(func() error {
+			var imgData string
+			if !strings.HasSuffix(checkoutLines[i].ThumbnailPath, constants.EmptyImageFilename) {
+				if imgDataB64, err := images.GetImageDataB64(s.cache, s.productImageFS, checkoutLines[i].ThumbnailPath, images.IMAGE_FORMAT_WEBP); err == nil {
+					imgData = imgDataB64
+				} else {
+					logs.Log().Error(logtag,
+						zap.Error(err),
+						zap.String("request_id", middleware.GetReqID(ctx)),
+					)
+				}
+			}
+
+			mu.Lock()
+			lineResults = append(lineResults, checkoutLineWithImage{
+				line:    checkoutLines[i],
+				imgData: imgData,
+				index:   i,
+			})
+			mu.Unlock()
+			return nil
+		})
+	}
+
+	if err := g.Wait(); err != nil {
+		logs.Log().Error(logtag, zap.Error(err), zap.String("request_id", middleware.GetReqID(r.Context())))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	slices.SortFunc(lineResults, func(a, b checkoutLineWithImage) int {
+		return a.index - b.index
+	})
+
+	for _, result := range lineResults {
+		checkoutLine := result.line
 		price := utils.NewMoney(checkoutLine.UnitPriceWithVat, checkoutLine.UnitPriceWithVatCurrency)
 
 		//TODO: (Brandon) - Discounts/sales
@@ -139,7 +258,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 			BrandName:       checkoutLine.BrandName,
 			Quantity:        checkoutLine.Quantity,
 			ThumbnailPath:   checkoutLine.ThumbnailPath,
-			ThumbnailData:   imgData,
+			ThumbnailData:   result.imgData,
 			Price:           *price,
 			DiscountedPrice: *discountedPrice,
 			Total:           *discountedPrice.Multiply(checkoutLine.Quantity),
@@ -152,7 +271,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := components.CartCheckoutLineItem(cl).Render(r.Context(), w); err != nil {
-			logs.Log().Error(logtag, zap.Error(err))
+			logs.Log().Error(logtag, zap.Error(err), zap.String("request_id", middleware.GetReqID(r.Context())))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			continue
 		}
@@ -277,51 +396,10 @@ func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
 		)
 		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 
-	case "bar_items":
-		token := s.sessionManager.Token(r.Context())
-		checkedItems := GetCheckedItems(r.Context(), s.sessionManager)
-
-		var checkoutLines []queries.GetCheckoutLinesByCheckoutIDRow
-		var err error
-
-		if len(checkedItems) > 0 {
-			checkoutLines, err = cart.GetCheckedCheckoutLines(r.Context(), s.dbRO, token, checkedItems, s.encoder)
-		} else {
-			checkoutLines = []queries.GetCheckoutLinesByCheckoutIDRow{}
-		}
-
-		if err != nil {
-			logs.Log().Warn(logtag, zap.Error(err), zap.Error(errs.ErrCartMissingCheckoutLines), zap.String("token", token))
-			if _, err := w.Write([]byte("0 Items")); err != nil {
-				logs.Log().Error(logtag, zap.Error(err))
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
-			return
-		}
-
-		count := 0
-		for _, checkoutLine := range checkoutLines {
-			count += int(checkoutLine.Quantity)
-		}
-		if _, err := w.Write(fmt.Appendf(nil, "%d Items", count)); err != nil {
-			logs.Log().Error(logtag, zap.Error(err))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-
 	case "summary_total":
-		token := s.sessionManager.Token(r.Context())
-		checkedItems := GetCheckedItems(r.Context(), s.sessionManager)
-
-		var checkoutLines []queries.GetCheckoutLinesByCheckoutIDRow
-		var err error
-
-		if len(checkedItems) > 0 {
-			checkoutLines, err = cart.GetCheckedCheckoutLines(r.Context(), s.dbRO, token, checkedItems, s.encoder)
-		} else {
-			checkoutLines = []queries.GetCheckoutLinesByCheckoutIDRow{}
-		}
-
+		summaryData, err := s.calculateCartSummary(r.Context())
 		if err != nil {
+			token := s.sessionManager.Token(r.Context())
 			logs.Log().Warn(logtag, zap.Error(err), zap.Error(errs.ErrCartMissingCheckoutLines), zap.String("token", token))
 			if _, err := w.Write([]byte("0 Items")); err != nil {
 				logs.Log().Error(logtag, zap.Error(err))
@@ -330,40 +408,17 @@ func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var errs error
-		subtotal := utils.NewMoney(0, "PHP")
-		deliveryFee := utils.NewMoney(0, "PHP")
-		totalDiscounts := utils.NewMoney(0, "PHP")
+		var renderErrs error
+		renderErrs = errors.Join(renderErrs, components.CartSummaryRow("Subtotal", summaryData.Subtotal, "text-gray-500").Render(r.Context(), w))
+		renderErrs = errors.Join(renderErrs, components.CartSummaryRow("Total Discount", summaryData.TotalDiscount, "text-red-500").Render(r.Context(), w))
+		renderErrs = errors.Join(renderErrs, components.CartSummaryRow("Total Weight", summaryData.TotalWeight, "text-gray-500").Render(r.Context(), w))
+		renderErrs = errors.Join(renderErrs, components.CartSummaryRowWithID("delivery-fee-row", "Delivery Fee", summaryData.DeliveryFee, "text-gray-500").Render(r.Context(), w))
+		renderErrs = errors.Join(renderErrs, components.HR().Render(r.Context(), w))
+		renderErrs = errors.Join(renderErrs, components.CartSummaryRow("Total", summaryData.Total).Render(r.Context(), w))
 
-		if quotation, ok := s.sessionManager.Get(r.Context(), skShippingQuotation).(*shipping.ShippingQuotation); ok && quotation != nil {
-			deliveryFee = utils.NewMoney(int64(quotation.Fee*100), quotation.Currency)
-		}
-
-		for _, checkoutLine := range checkoutLines {
-			sub := utils.NewMoney(checkoutLine.UnitPriceWithVat, checkoutLine.UnitPriceWithVatCurrency).Multiply(checkoutLine.Quantity)
-
-			newSubtotal, err := subtotal.Add(sub)
-			if err != nil {
-				errs = errors.Join(errs, err)
-			}
-
-			subtotal = newSubtotal
-		}
-
-		total, _ := subtotal.Add(deliveryFee)
-		total, _ = total.Subtract(totalDiscounts)
-		totalWeightKg, _ := utils.CalculateTotalWeightFromCheckoutLines(checkoutLines)
-
-		errs = errors.Join(errs, components.CartSummaryRow("Subtotal", subtotal.Display(), "text-gray-500").Render(r.Context(), w))
-		errs = errors.Join(errs, components.CartSummaryRow("Total Discount", "- "+totalDiscounts.Display(), "text-red-500").Render(r.Context(), w))
-		errs = errors.Join(errs, components.CartSummaryRow("Total Weight", totalWeightKg+" kg", "text-gray-500").Render(r.Context(), w))
-		errs = errors.Join(errs, components.CartSummaryRowWithID("delivery-fee-row", "Delivery Fee", deliveryFee.Display(), "text-gray-500").Render(r.Context(), w))
-		errs = errors.Join(errs, components.HR().Render(r.Context(), w))
-		errs = errors.Join(errs, components.CartSummaryRow("Total", total.Display()).Render(r.Context(), w))
-
-		if errs != nil {
-			logs.Log().Error(logtag, zap.Error(errs))
-			http.Error(w, errs.Error(), http.StatusInternalServerError)
+		if renderErrs != nil {
+			logs.Log().Error(logtag, zap.Error(renderErrs))
+			http.Error(w, renderErrs.Error(), http.StatusInternalServerError)
 		}
 	}
 }
