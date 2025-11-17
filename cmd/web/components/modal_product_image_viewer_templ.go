@@ -29,15 +29,20 @@ func ModalProductImageViewer(productID string, imageData string) templ.Component
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"modal_image_viewer\" class=\"fixed hidden top-0 bottom-0 left-0 right-0 z-1000\n\t\t\tflex flex-col items-center\" _=\"\n\t\t\ton closeModal add .hidden\n\t\t\ton openModal wait 0.05s then remove .hidden\n\t\t\"><div class=\"absolute -z-1 top-0 bottom-0 left-0 right-0 bg-white/50\" _=\"on click trigger closeModal\"></div><div class=\"modal-content w-[32rem] h-screen flex flex-col items-center justify-center\"><div class=\"relative inline-block\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<input type=\"hidden\" id=\"selected-product-thumbnail-path\" value=\"\"><div id=\"modal_image_viewer\" class=\"fixed hidden top-0 bottom-0 left-0 right-0 z-1000\n\t\t\tflex flex-col items-center\" _=\"\n\t\t\ton closeModal add .hidden\n\t\t\ton openModal wait 0.05s then remove .hidden\n\t\t\"><div class=\"absolute -z-1 top-0 bottom-0 left-0 right-0 bg-white/50\" _=\"on click trigger closeModal\"></div><div class=\"modal-content w-[32rem] h-screen flex flex-col items-center justify-center\"><div class=\"relative inline-block\"><img id=\"modal_image_viewer_image\" src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = Image("").Render(ctx, templ_7745c5c3_Buffer)
+		var templ_7745c5c3_Var2 string
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(placeholderImageSrc)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/modal_product_image_viewer.templ`, Line: 24, Col: 30}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<span class=\"absolute top-0 right-0 size-8\n\t\t\t\t\t\trounded-full flex items-center justify-center transform translate-x-1/2 -translate-y-1/2\n\t\t\t\t\t\ttext-white bg-cchoice hover:bg-cchoice_dark font-medium text-xs cursor-pointer transition-colors\" title=\"close image viewer\" _=\"on click trigger closeModal\">X</span></div><div class=\"flex flex-row h-auto justify-center w-full bg-white p-2\"><button class=\"\n\t\t\t\t\t\tflex justify-center items-center w-12 h-12\n\t\t\t\t\t\tbg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group\n\t\t\t\t\t\trounded-full hover:bg-cchoicesoft\n\t\t\t\t\t\" title=\"go to product page\" alt=\"go to product page button\" _=\"on click log 'TODO'\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"w-auto h-auto max-h-[75vh]\" alt=\"modal image viewer\"> <span class=\"absolute top-0 right-0 size-8\n\t\t\t\t\t\trounded-full flex items-center justify-center transform translate-x-1/2 -translate-y-1/2\n\t\t\t\t\t\ttext-white bg-cchoice hover:bg-cchoice_dark font-medium text-xs cursor-pointer transition-colors\" title=\"close image viewer\" _=\"on click trigger closeModal\">X</span></div><div class=\"flex flex-row h-auto justify-center w-full bg-white p-2\"><button class=\"\n\t\t\t\t\t\tflex justify-center items-center w-12 h-12\n\t\t\t\t\t\tbg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group\n\t\t\t\t\t\trounded-full hover:bg-cchoicesoft\n\t\t\t\t\t\" title=\"go to product page\" alt=\"go to product page button\" _=\"on click log 'TODO'\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

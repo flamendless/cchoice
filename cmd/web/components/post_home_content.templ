@@ -1,7 +1,5 @@
 package components
 
-const placeholderImageSrc = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3C/svg%3E"
-
 type brandImage struct {
 	filename string
 	alt      string
@@ -131,7 +129,7 @@ templ PostHomeContentSections() {
 							<img
 								src={ placeholderImageSrc }
 								hx-get={ templ.URL(GetBrandLogoURL(postHomeContent.brandImage.filename)) }
-								hx-trigger="load"
+								hx-trigger="load once"
 								hx-swap="none"
 								class="w-3xs h-auto m-auto mt-8"
 								alt={ postHomeContent.brandImage.alt }
@@ -167,16 +165,4 @@ templ StoreSection() {
 			Fetching...
 		</div>
 	</div>
-}
-
-script LoadImageSrc() {
-	document.body.addEventListener('htmx:afterRequest', function(event) {
-		const target = event.detail.elt;
-		if (target.tagName === 'IMG' && event.detail.successful) {
-			const base64Data = event.detail.xhr.responseText;
-			if (base64Data) {
-				target.src = base64Data;
-			}
-		}
-	});
 }

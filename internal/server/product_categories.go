@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
@@ -17,7 +18,9 @@ import (
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
 )
 
 func AddProductCategoriesHandlers(s *Server, r chi.Router) {
@@ -130,22 +133,45 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	productsWithValidImages := make([]queries.GetProductsByCategoryIDRow, 0, len(products))
+	validProducts := make([]int, 0, len(products))
 	for i, product := range products {
-		if strings.HasSuffix(product.ThumbnailPath, constants.EmptyImageFilename) {
-			logs.Log().Info("No valid image/thumbnail", zap.Int64("product id", product.ID))
-			continue
+		if !strings.HasSuffix(product.ThumbnailPath, constants.EmptyImageFilename) {
+			validProducts = append(validProducts, i)
+		} else {
+			logs.Log().Debug("No valid image/thumbnail", zap.Int64("product id", product.ID))
 		}
+	}
 
-		imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, product.ThumbnailPath, images.IMAGE_FORMAT_WEBP)
-		if err != nil {
-			logs.Log().Error(logtag, zap.Error(err), zap.String("thumbnailPath", product.ThumbnailPath))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			continue
-		}
+	g, ctx := errgroup.WithContext(r.Context())
+	g.SetLimit(10)
 
-		products[i].ThumbnailData = imgData
-		productsWithValidImages = append(productsWithValidImages, products[i])
+	var mu sync.Mutex
+	productsWithValidImages := make([]queries.GetProductsByCategoryIDRow, 0, len(validProducts))
+
+	for _, i := range validProducts {
+		g.Go(func() error {
+			imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, products[i].ThumbnailPath, images.IMAGE_FORMAT_WEBP)
+			if err != nil {
+				logs.Log().Error(logtag,
+					zap.Error(err),
+					zap.String("thumbnailPath", products[i].ThumbnailPath),
+					zap.String("request_id", middleware.GetReqID(ctx)),
+				)
+				return nil
+			}
+
+			mu.Lock()
+			products[i].ThumbnailData = imgData
+			productsWithValidImages = append(productsWithValidImages, products[i])
+			mu.Unlock()
+			return nil
+		})
+	}
+
+	if err := g.Wait(); err != nil {
+		logs.Log().Error(logtag, zap.Error(err), zap.String("request_id", middleware.GetReqID(r.Context())))
+		http.Error(w, "Failed to load images", http.StatusInternalServerError)
+		return
 	}
 
 	categorySectionProducts := models.CategorySectionProducts{

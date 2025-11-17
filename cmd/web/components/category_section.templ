@@ -26,21 +26,21 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 				<div class="group flex flex-col items-center m-2 ml-4 hover:bg-cchoicesoft transition-colors">
 					<img
 						hx-get={ "/cchoice/products/image?thumbnail=1&quality=best&path=" + product.ThumbnailPath }
-						hx-trigger="click"
-						hx-target="#modal_image_viewer .modal-content img"
-						hx-select="img"
+						hx-trigger="load once"
 						hx-swap="none"
 						class="w-24 max-w-24 h-24 cursor-zoom-in"
-						src={ product.ThumbnailData }
+						src={ placeholderImageSrc }
 						title="show high-quality image"
 						alt={ product.Name + " thumbnail" }
 						loading="lazy"
 						data-product-id={ product.ProductID }
+						data-product-thumbnail-path={ product.ThumbnailPath }
 						_="
 							on click
 								set #selected-product-id.value to my @data-product-id
-								log 'selected: ' + #selected-product-id.value
-								log 'product-id: ' + @data-product-id
+								log 'selected product-id: ' + #selected-product-id.value
+								log 'selected thumbnail image path: ' + #selected-product-thumbnail-path.value
+								trigger get on #modal_image_viewer_image
 								trigger openModal on #modal_image_viewer
 							end
 						"
@@ -64,6 +64,9 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 
 templ CategorySection(page int, categories []models.GroupedCategorySection) {
 	for i, category := range categories {
+		if i == 20 {
+			continue
+		}
 		<div>
 			<p
 				id={ category.ScrollTargetID }
