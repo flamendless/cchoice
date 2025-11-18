@@ -3,6 +3,7 @@ package errs
 import "errors"
 
 var (
+	ErrGMapsServiceInit     = errors.New("[GMAPS]: Service must be configured")
 	ErrGMapsAPIKeyRequired  = errors.New("[GMAPS]: API key is required")
 	ErrGMapsInvalidResponse = errors.New("[GMAPS]: Invalid response")
 	ErrGMapsNoResults       = errors.New("[GMAPS]: No results found")

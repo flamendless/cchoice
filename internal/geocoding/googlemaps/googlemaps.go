@@ -34,7 +34,7 @@ type GoogleMapsGeocoder struct {
 func MustInit(db database.Service) *GoogleMapsGeocoder {
 	cfg := conf.Conf()
 	if cfg.GeocodingService != "googlemaps" {
-		panic("'GEOCODING_SERVICE' must be 'googlemaps' to use this")
+		panic(errs.ErrGMapsServiceInit)
 	}
 
 	return &GoogleMapsGeocoder{
@@ -52,7 +52,7 @@ func MustInit(db database.Service) *GoogleMapsGeocoder {
 func MustInitWithCache(db database.Service, cacheExpiry time.Duration) *GoogleMapsGeocoder {
 	cfg := conf.Conf()
 	if cfg.GeocodingService != "googlemaps" {
-		panic("'GEOCODING_SERVICE' must be 'googlemaps' to use this")
+		panic(errs.ErrGMapsServiceInit)
 	}
 
 	if cacheExpiry == 0 {

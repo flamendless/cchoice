@@ -120,10 +120,8 @@ func NewServer() *http.Server {
 	}
 
 	staticFS := localstorage.New()
-
 	var objStorage storage.IObjectStorage
 	var productImageFS storage.IFileSystem
-
 	switch cfg.StorageProvider {
 	case "linode":
 		objStorage = linode.MustInitWithBucket(enums.LINODE_BUCKET_PUBLIC)

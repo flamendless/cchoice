@@ -3,5 +3,5 @@ package errs
 import "errors"
 
 var (
-	ErrEnvVarRequired = errors.New("[Env]: Required")
+	ErrEnvVarRequired = errors.New("[ENV]: Required")
 )
