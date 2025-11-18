@@ -3,5 +3,5 @@ package errs
 import "errors"
 
 var (
-	ErrLinodeServiceInit   = errors.New("[LINODE]: Service must be configured for linode")
+	ErrLinodeServiceInit   = errors.New("[LINODE]: Service must be configured")
 )

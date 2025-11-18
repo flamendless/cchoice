@@ -34,7 +34,7 @@ type PayMongo struct {
 func MustInit() *PayMongo {
 	cfg := conf.Conf()
 	if cfg.PaymentService != "paymongo" {
-		panic("'PAYMENT_SERVICE' must be 'paymongo' to use this")
+		panic(errs.ErrPaymongoServiceInit)
 	}
 
 	apiKey := base64.StdEncoding.EncodeToString([]byte(cfg.PayMongo.APIKey))

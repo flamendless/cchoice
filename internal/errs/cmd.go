@@ -5,6 +5,7 @@ import "errors"
 var (
 	ErrCmd                     = errors.New("[CMD]: Error in command")
 	ErrCmdRequired             = errors.New("[CMD]: Required flag")
+	ErrCmdInvalidFlag          = errors.New("[CMD]: Invalid flag value")
 	ErrCmdUnimplementedService = errors.New("[CMD]: Unimplemented service")
 	ErrCmdInvalidService       = errors.New("[CMD]: Invalid service name")
 	ErrCmdUndefinedService     = errors.New("[CMD]: Undefined service")
