@@ -28,7 +28,7 @@ func (w *PrintWriter) Write(data *scanner.ReceiptData, outputPath string) error 
 	fmt.Printf("Name:     %s\n", valueOrEmpty(data.MerchantName))
 	fmt.Printf("Address:  %s\n", valueOrEmpty(data.MerchantAddress))
 	fmt.Printf("Phone:    %s\n", valueOrEmpty(data.MerchantPhone))
-	fmt.Printf("TIN:      %s\n", valueOrEmpty(data.CustomerTIN))
+	fmt.Printf("TIN:      %s\n", valueOrEmpty(data.MerchantTIN))
 	fmt.Printf("Prop:     %s\n", valueOrEmpty(data.MerchantProp))
 	fmt.Println()
 
