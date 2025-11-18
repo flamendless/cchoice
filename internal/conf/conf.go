@@ -15,21 +15,23 @@ var appCfg *appConfig
 var once sync.Once
 
 type appConfig struct {
-	Server           ServerConfig
-	AppEnv           string `env:"APP_ENV" env-required:""`
-	DBURL            string `env:"DB_URL" env-required:""`
-	PaymentService   string `env:"PAYMENT_SERVICE" env-required:""`
-	PayMongo         PayMongoConfig
-	ShippingService  string `env:"SHIPPING_SERVICE" env-required:""`
-	Lalamove         LalamoveConfig
-	GeocodingService string `env:"GEOCODING_SERVICE" env-required:""`
-	GoogleMaps       GoogleMapsConfig
-	Business         BusinessConfig
-	FSMode           string `env:"FSMODE" env-required:""`
-	EncodeSalt       string `env:"ENCODE_SALT" env-required:""`
-	LogMinLevel      int    `env:"LOG_MIN_LEVEL" env-default:"1"`
-	StorageProvider  string `env:"STORAGE_PROVIDER" env-default:"local"`
-	Linode           LinodeConfig
+	Server             ServerConfig
+	AppEnv             string `env:"APP_ENV" env-required:""`
+	DBURL              string `env:"DB_URL" env-required:""`
+	PaymentService     string `env:"PAYMENT_SERVICE" env-required:""`
+	PayMongo           PayMongoConfig
+	ShippingService    string `env:"SHIPPING_SERVICE" env-required:""`
+	Lalamove           LalamoveConfig
+	GeocodingService   string `env:"GEOCODING_SERVICE" env-required:""`
+	GoogleMaps         GoogleMapsConfig
+	OCRService         string `env:"OCR_SERVICE"`
+	GoogleVisionConfig GoogleVisionConfig
+	Business           BusinessConfig
+	FSMode             string `env:"FSMODE" env-required:""`
+	EncodeSalt         string `env:"ENCODE_SALT" env-required:""`
+	LogMinLevel        int    `env:"LOG_MIN_LEVEL" env-default:"1"`
+	StorageProvider    string `env:"STORAGE_PROVIDER" env-default:"local"`
+	Linode             LinodeConfig
 }
 
 type ServerConfig struct {
@@ -57,6 +59,10 @@ type LalamoveConfig struct {
 
 type GoogleMapsConfig struct {
 	APIKey string `env:"GOOGLE_MAPS_API_KEY"`
+}
+
+type GoogleVisionConfig struct {
+	APIKey string `env:"GOOGLE_VISION_API_KEY"`
 }
 
 type BusinessConfig struct {
@@ -100,7 +106,7 @@ func (lc *LinodeConfig) GetBucketConfig(bucketEnum enums.LinodeBucketEnum) (Lino
 func mustValidate(c *appConfig) {
 	if c.PaymentService == "paymongo" {
 		if c.PayMongo.BaseURL == "" || c.PayMongo.APIKey == "" || c.PayMongo.SuccessURL == "" || c.PayMongo.CancelURL == "" {
-			panic(fmt.Errorf("[PayMongo]: %w", errs.ErrEnvVarRequired))
+			panic(errs.ErrPaymongoAPIKeyRequired)
 		}
 	} else {
 		panic("Only 'paymongo' service is allowed for now")
@@ -109,19 +115,25 @@ func mustValidate(c *appConfig) {
 	switch c.ShippingService {
 	case "lalamove":
 		if c.Lalamove.BaseURL == "" || c.Lalamove.APIKey == "" || c.Lalamove.Secret == "" {
-			panic(fmt.Errorf("[Lalamove]: %w", errs.ErrEnvVarRequired))
+			panic(errs.ErrLalamoveAPIKeyRequired)
 		}
 	case "cchoice":
 	default:
-		panic("Only 'lalamove' service is allowed for now")
+		panic("Only 'lalamove' or 'cchoice' service is allowed for now")
 	}
 
 	if c.GeocodingService == "googlemaps" {
 		if c.GoogleMaps.APIKey == "" {
-			panic(fmt.Errorf("[GoogleMaps]: %w", errs.ErrEnvVarRequired))
+			panic(errs.ErrGMapsAPIKeyRequired)
 		}
 	} else {
 		panic("Only 'googlemaps' service is allowed for now")
+	}
+
+	if c.OCRService == "googlevision" {
+		if c.GoogleVisionConfig.APIKey == "" {
+			panic(errs.ErrGVisionAPIKeyRequired)
+		}
 	}
 
 	if c.IsLocal() {
