@@ -544,7 +544,13 @@ func TestAll() error {
 }
 
 func TestInteg() error {
-	packages := []string{"storage/linode", "shipping/lalamove", "geocoding/googlemaps", "payments/paymongo"}
+	packages := []string{
+		"storage/linode",
+		"shipping/lalamove",
+		"geocoding/googlemaps",
+		"payments/paymongo",
+		"receipt/scanner/googlevision",
+	}
 	hasChanges, err := hasPackageChanges(packages)
 	if err != nil {
 		return fmt.Errorf("failed to check for package changes: %w", err)
@@ -565,6 +571,13 @@ func TestInteg() error {
 		Type: CmdTmpExec,
 		Cmd:  "main",
 		Args: []string{"test_linode"},
+	}); err != nil {
+		return err
+	}
+	if err := run(Command{
+		Type: CmdTmpExec,
+		Cmd:  "main",
+		Args: []string{"test_gvision"},
 	}); err != nil {
 		return err
 	}
