@@ -17,4 +17,5 @@ data/
 logs/*.log
 .DS_Store
 assets/sample-receipt.jpeg
+assets/sample-receipt2.jpeg
 assets/sample-receipt.txt
