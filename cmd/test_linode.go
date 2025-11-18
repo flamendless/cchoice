@@ -16,7 +16,7 @@ func init() {
 
 var cmdTestLinode = &cobra.Command{
 	Use:   "test_linode",
-	Short: "test Linode Object Storage connection",
+	Short: "Test Linode Object Storage connection",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Testing Linode Object Storage Connection...")
 		fmt.Println("==========================================")
@@ -50,6 +50,7 @@ var cmdTestLinode = &cobra.Command{
 			fmt.Println("  Bucket is empty or no objects found with the specified prefix")
 		}
 
-		fmt.Println("\nAll tests passed! Linode Object Storage is accessible.")
+		fmt.Println("==========================================")
+		fmt.Println("All tests passed! Linode Object Storage is accessible.")
 	},
 }
