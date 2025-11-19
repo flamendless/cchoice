@@ -1,0 +1,70 @@
+package components
+
+import "cchoice/cmd/web/models"
+
+templ BrandsSidePanelList(brands []models.BrandSidePanelText) {
+	<div
+		id="brands-side-panel-list"
+		class="flex flex-col overflow-y-auto scrollbar-hide max-h-64"
+	>
+		for i, brand := range brands {
+			<a
+				id={ "brand-link-" + brand.BrandID }
+				href={ templ.SafeURL(brand.URL) }
+				class={
+					templ.KV("text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft transition-colors brand-filter-link", true),
+					templ.KV("underline bg-cchoice font-semibold text-white", i == 0),
+				}
+				data-brand-name={ brand.Label }
+				data-brand-id={ brand.BrandID }
+			>
+				<p class="text-ellipsis text-nowrap overflow-hidden">
+					{ brand.Label }
+				</p>
+			</a>
+		}
+		<script type="text/javascript" src={ templ.URL("/cchoice/static/js/brand_side_panel.js") }>
+		</script>
+	</div>
+}
+
+templ BrandsSidePanel() {
+	<div
+		id="brands-side-panel"
+		class="
+			w-full flex flex-col
+			border-b-2 border-cchoice_border
+		"
+	>
+		<div
+			class="flex items-center justify-between cursor-pointer p-2"
+			_="on click
+				toggle .hidden on #brands-side-panel-content
+				if #brands-side-panel-content matches .hidden
+					set #brands-chevron's *transform to 'rotate(0deg)'
+					set #brands-side-panel-content@data-collapsed to 'true'
+				else
+					set #brands-chevron's *transform to 'rotate(180deg)'
+					set #brands-side-panel-content@data-collapsed to 'false'
+				end
+			"
+		>
+			<p class="text-xs font-normal text-nowrap">
+				Brands
+			</p>
+			@svgChevron("brands-chevron")
+		</div>
+		<div
+			id="brands-side-panel-content"
+			hx-trigger="load once, history:restore"
+			hx-get="/cchoice/brands/side-panel/list"
+			hx-select="#brands-side-panel-list"
+			hx-target="#brands-side-panel-list"
+			hx-swap="outerHTML"
+			class="pb-[8px]"
+		>
+			@BrandsSidePanelList(nil)
+		</div>
+	</div>
+}
+

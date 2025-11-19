@@ -31,7 +31,7 @@ func CategoriesSidePanelList(categories []models.CategorySidePanelText) templ.Co
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"categories-side-panel-list\" class=\"flex flex-col h-screen overflow-y-scroll scrollbar-hide\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"categories-side-panel-list\" class=\"flex flex-col overflow-y-auto scrollbar-hide max-h-96\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -93,7 +93,7 @@ func CategoriesSidePanelList(categories []models.CategorySidePanelText) templ.Co
 				return templ_7745c5c3_Err
 			}
 			if i == len(categories)-1 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"py-32\"></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"py-8\"></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -141,11 +141,15 @@ func CategoriesSidePanel() templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"\n\t\t\tfixed top-0 left-0 w-fit min-w-[15%] max-w-[15%] w-[15%]\n\t\t\tml-0.5 pr-6 flex flex-col\n\t\t\th-full overflow-auto pt-[128px]\n\t\t\" hx-trigger=\"load once, history:restore\" hx-get=\"/cchoice/product-categories/side-panel/list\" hx-select=\"#categories-side-panel-list\" hx-target=\"#categories-side-panel-list\" hx-swap=\"outerHTML\"><p class=\"text-xs font-normal m-2 my-0 text-nowrap\">Choose a Category</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div id=\"categories-side-panel\" class=\"w-full flex flex-col\"><div class=\"flex items-center justify-between cursor-pointer p-2\" _=\"on click\n\t\t\t\ttoggle .hidden on #categories-side-panel-content\n\t\t\t\tif #categories-side-panel-content matches .hidden\n\t\t\t\t\tset #categories-chevron's *transform to 'rotate(0deg)'\n\t\t\t\t\tset #categories-side-panel-content@data-collapsed to 'true'\n\t\t\t\telse\n\t\t\t\t\tset #categories-chevron's *transform to 'rotate(180deg)'\n\t\t\t\t\tset #categories-side-panel-content@data-collapsed to 'false'\n\t\t\t\tend\n\t\t\t\"><p class=\"text-xs font-normal text-nowrap\">Categories</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = HR().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = svgChevron("categories-chevron").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div><div id=\"categories-side-panel-content\" class=\"\" hx-trigger=\"load once, history:restore\" hx-get=\"/cchoice/product-categories/side-panel/list\" hx-select=\"#categories-side-panel-list\" hx-target=\"#categories-side-panel-list\" hx-swap=\"outerHTML\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -153,7 +157,7 @@ func CategoriesSidePanel() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

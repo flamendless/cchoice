@@ -21,6 +21,12 @@ type CategorySidePanelText struct {
 	ScrollTargetID string
 }
 
+type BrandSidePanelText struct {
+	Label   string
+	URL     string
+	BrandID string
+}
+
 type CategorySection struct {
 	ID    string
 	Label string

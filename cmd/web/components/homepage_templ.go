@@ -90,7 +90,11 @@ func HomePageBody() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"flex flex-col\"><div class=\"flex items-start\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"flex flex-col\"><div class=\"flex items-start\"><div class=\"\n\t\t\t\t\t\tfixed top-0 left-0 w-fit\n\t\t\t\t\t\tmin-w-[15%] max-w-[15%] w-[15%]\n\t\t\t\t\t\tml-0.5 pr-6 flex flex-col\n\t\t\t\t\t\th-full overflow-auto pt-[128px]\n\t\t\t\t\t\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = BrandsSidePanel().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -98,7 +102,7 @@ func HomePageBody() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div name=\"right-panel\" class=\"flex items-start border-l-2 border-cchoice_border ml-[15%]\"><div class=\"w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div><div name=\"right-panel\" class=\"flex items-start border-l-2 border-cchoice_border ml-[15%]\"><div class=\"w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
