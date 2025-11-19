@@ -6,7 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
 			const response = await fetch("/cchoice/shipping/quotation/status");
 			return response.status === 200;
 		} catch (error) {
-			console.error("Error checking shipping quotation status:", error);
+			if (error.name !== "TypeError") {
+				console.error("Error checking shipping quotation status:", error);
+			}
 			return false;
 		}
 	}
@@ -77,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	}
 
+
 	document
 		.getElementById("cart-shipping")
 		.addEventListener("input", checkForm);
@@ -92,6 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	document.body.addEventListener("htmx:afterRequest", (event) => {
 		if (event.detail.elt && event.detail.elt.id === "shipping-form") {
 			checkForm();
+			document.body.dispatchEvent(new CustomEvent('cartUpdated'));
 		}
 	});
 
@@ -99,6 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	document.addEventListener("change", (event) => {
 		if (event.target.name === "checked_item") {
 			checkForm();
+			document.body.dispatchEvent(new CustomEvent('cartUpdated'));
 		}
 	});
 
@@ -109,6 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			event.detail.elt.closest("#cart-lines")
 		)) {
 			checkForm();
+			document.body.dispatchEvent(new CustomEvent('cartUpdated'));
 		}
 	});
 
