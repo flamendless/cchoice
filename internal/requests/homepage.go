@@ -130,6 +130,59 @@ func GetCategoriesSidePanel(
 	return categories, nil
 }
 
+func GetBrandsSidePanel(
+	ctx context.Context,
+	cache *fastcache.Cache,
+	sf *singleflight.Group,
+	dbRO database.Service,
+	encoder encode.IEncode,
+	cacheKey []byte,
+) ([]models.BrandSidePanelText, error) {
+	if data, ok := cache.HasGet(nil, cacheKey); ok {
+		buf := bytes.NewBuffer(data)
+		var res []models.BrandSidePanelText
+		if err := gob.NewDecoder(buf).Decode(&res); err != nil {
+			logs.GobError(cacheKey, err)
+			return nil, err
+		}
+		metrics.Cache.MemHit()
+		return res, nil
+	} else {
+		metrics.Cache.MemMiss()
+	}
+
+	const limit = 100
+	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
+		res, err := dbRO.GetQueries().GetBrandsForSidePanel(ctx, limit)
+		if err != nil {
+			return nil, err
+		}
+		return res, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	logs.SF(cacheKey, shared)
+	res := sfRes.([]queries.GetBrandsForSidePanelRow)
+
+	brands := make([]models.BrandSidePanelText, 0, len(res))
+	for _, v := range res {
+		brands = append(brands, models.BrandSidePanelText{
+			Label:   v.Name,
+			URL:     "/cchoice?brand=" + v.Name,
+			BrandID: encoder.Encode(v.ID),
+		})
+	}
+
+	buf := new(bytes.Buffer)
+	if err := gob.NewEncoder(buf).Encode(brands); err == nil {
+		cache.Set(cacheKey, buf.Bytes())
+		logs.CacheStore(cacheKey, buf)
+	}
+
+	return brands, nil
+}
+
 func GetCategorySectionHandler(
 	ctx context.Context,
 	cache *fastcache.Cache,

@@ -136,6 +136,44 @@ func (q *Queries) GetBrandsByID(ctx context.Context, id int64) (GetBrandsByIDRow
 	return i, err
 }
 
+const getBrandsForSidePanel = `-- name: GetBrandsForSidePanel :many
+SELECT
+	id,
+	name
+FROM tbl_brands
+WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+ORDER BY name ASC
+LIMIT ?
+`
+
+type GetBrandsForSidePanelRow struct {
+	ID   int64
+	Name string
+}
+
+func (q *Queries) GetBrandsForSidePanel(ctx context.Context, limit int64) ([]GetBrandsForSidePanelRow, error) {
+	rows, err := q.db.QueryContext(ctx, getBrandsForSidePanel, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetBrandsForSidePanelRow
+	for rows.Next() {
+		var i GetBrandsForSidePanelRow
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getBrandsIDByName = `-- name: GetBrandsIDByName :one
 SELECT id
 FROM tbl_brands

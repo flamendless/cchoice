@@ -61,3 +61,12 @@ INSERT INTO tbl_brand_images (
 	?, ?, ?, ?,
 	?, ?, ?
 ) RETURNING id;
+
+-- name: GetBrandsForSidePanel :many
+SELECT
+	id,
+	name
+FROM tbl_brands
+WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+ORDER BY name ASC
+LIMIT ?;

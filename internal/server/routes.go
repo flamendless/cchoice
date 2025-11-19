@@ -156,6 +156,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Post("/search", s.searchHandler)
 
 		AddProductCategoriesHandlers(s, r)
+		AddBrandsHandlers(s, r)
 		AddCartsHandlers(s, r)
 		AddShippingHandlers(s, r)
 		AddPaymentHandlers(s, r)
