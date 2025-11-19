@@ -22,8 +22,8 @@ type CChoiceService struct {
 
 func MustInit() *CChoiceService {
 	cfg := conf.Conf()
-	if cfg.ShippingService != "cchoice" {
-		panic("'SHIPPING_SERVICE' must be 'cchoice' to use this")
+	if cfg.ShippingService != shipping.SHIPPING_SERVICE_CCHOICE.String() {
+		panic("'SHIPPING_SERVICE' must be 'CCHOICE' to use this")
 	}
 
 	return &CChoiceService{

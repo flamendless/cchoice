@@ -4,6 +4,7 @@ import (
 	"cchoice/cmd/web/static"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+
 	"errors"
 	"fmt"
 	"sync"
@@ -30,7 +31,7 @@ type appConfig struct {
 	FSMode             string `env:"FSMODE" env-required:""`
 	EncodeSalt         string `env:"ENCODE_SALT" env-required:""`
 	LogMinLevel        int    `env:"LOG_MIN_LEVEL" env-default:"1"`
-	StorageProvider    string `env:"STORAGE_PROVIDER" env-default:"local"`
+	StorageProvider    string `env:"STORAGE_PROVIDER" env-default:"LOCAL"`
 	Linode             LinodeConfig
 }
 
@@ -104,38 +105,6 @@ func (lc *LinodeConfig) GetBucketConfig(bucketEnum enums.LinodeBucketEnum) (Lino
 }
 
 func mustValidate(c *appConfig) {
-	if c.PaymentService == "paymongo" {
-		if c.PayMongo.BaseURL == "" || c.PayMongo.APIKey == "" || c.PayMongo.SuccessURL == "" || c.PayMongo.CancelURL == "" {
-			panic(errs.ErrPaymongoAPIKeyRequired)
-		}
-	} else {
-		panic("Only 'paymongo' service is allowed for now")
-	}
-
-	switch c.ShippingService {
-	case "lalamove":
-		if c.Lalamove.BaseURL == "" || c.Lalamove.APIKey == "" || c.Lalamove.Secret == "" {
-			panic(errs.ErrLalamoveAPIKeyRequired)
-		}
-	case "cchoice":
-	default:
-		panic("Only 'lalamove' or 'cchoice' service is allowed for now")
-	}
-
-	if c.GeocodingService == "googlemaps" {
-		if c.GoogleMaps.APIKey == "" {
-			panic(errs.ErrGMapsAPIKeyRequired)
-		}
-	} else {
-		panic("Only 'googlemaps' service is allowed for now")
-	}
-
-	if c.OCRService == "googlevision" {
-		if c.GoogleVisionConfig.APIKey == "" {
-			panic(errs.ErrGVisionAPIKeyRequired)
-		}
-	}
-
 	if c.IsLocal() {
 		if c.Server.CertPath == "" || c.Server.KeyPath == "" {
 			panic(fmt.Errorf("[CertPath, KeyPath]: %w", errs.ErrEnvVarRequired))
@@ -154,29 +123,6 @@ func mustValidate(c *appConfig) {
 				static.GetMode(),
 			),
 		))
-	}
-
-	if c.StorageProvider == "linode" {
-		if c.Linode.Endpoint == "" || c.Linode.Region == "" {
-			panic(fmt.Errorf("[Linode Storage]: %w", errs.ErrEnvVarRequired))
-		}
-
-		buckets := c.Linode.GetBuckets()
-		for bucketEnum, bucketConfig := range buckets {
-			if bucketConfig.Bucket == "" {
-				continue
-			}
-			if bucketConfig.AccessKey == "" {
-				panic(fmt.Errorf("[Linode Storage %s]: access key must be configure", bucketEnum.String()))
-			}
-			if bucketConfig.SecretKey == "" {
-				panic(fmt.Errorf("[Linode Storage %s]: secret key must be configured", bucketEnum.String()))
-			}
-		}
-
-		if len(buckets) != 2 {
-			panic("[Linode Storage]: exactly two buckets must be configured")
-		}
 	}
 }
 

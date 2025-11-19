@@ -20,17 +20,11 @@ import (
 	"cchoice/internal/database"
 	"cchoice/internal/encode"
 	"cchoice/internal/encode/sqids"
-	"cchoice/internal/enums"
 	"cchoice/internal/geocoding"
-	"cchoice/internal/geocoding/googlemaps"
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
-	"cchoice/internal/payments/paymongo"
 	"cchoice/internal/shipping"
-	cchoiceservice "cchoice/internal/shipping/cchoice"
-	"cchoice/internal/shipping/lalamove"
 	"cchoice/internal/storage"
-	"cchoice/internal/storage/linode"
 	localstorage "cchoice/internal/storage/local"
 )
 
@@ -46,8 +40,8 @@ type Server struct {
 	sessionManager  *scs.SessionManager
 	paymentGateway  payments.IPaymentGateway
 	shippingService shipping.IShippingService
-	objectStorage   storage.IObjectStorage
 	geocoder        geocoding.IGeocoder
+	objectStorage   storage.IObjectStorage
 	encoder         encode.IEncode
 	address         string
 	port            int
@@ -92,46 +86,7 @@ func NewServer() *http.Server {
 
 	dbRO := database.New(database.DB_MODE_RO)
 	dbRW := database.New(database.DB_MODE_RW)
-
-	var paymentGateway payments.IPaymentGateway
-	switch cfg.PaymentService {
-	case "paymongo":
-		paymentGateway = paymongo.MustInit()
-	default:
-		panic("Unsupported payment service: " + cfg.PaymentService)
-	}
-
-	var shippingService shipping.IShippingService
-	switch cfg.ShippingService {
-	case "lalamove":
-		shippingService = lalamove.MustInit()
-	case "cchoice":
-		shippingService = cchoiceservice.MustInit()
-	default:
-		panic("Unsupported shipping service: " + cfg.ShippingService)
-	}
-
-	var geocoder geocoding.IGeocoder
-	switch cfg.GeocodingService {
-	case "googlemaps":
-		geocoder = googlemaps.MustInit(dbRW)
-	default:
-		panic("Unsupported geocoding service: " + cfg.GeocodingService)
-	}
-
-	staticFS := localstorage.New()
-	var objStorage storage.IObjectStorage
-	var productImageFS storage.IFileSystem
-	switch cfg.StorageProvider {
-	case "linode":
-		objStorage = linode.MustInitWithBucket(enums.LINODE_BUCKET_PUBLIC)
-		productImageFS = linode.New(objStorage)
-	case "local":
-		objStorage = nil
-		productImageFS = localstorage.New()
-	default:
-		panic("Unsupported storage provider: " + cfg.StorageProvider)
-	}
+	objStorage, productImageFS := mustInitStorageProvider()
 
 	NewServer := &Server{
 		address:         cfg.Server.Address,
@@ -139,14 +94,14 @@ func NewServer() *http.Server {
 		portFS:          cfg.Server.PortFS,
 		dbRO:            dbRO,
 		dbRW:            dbRW,
-		staticFS:        staticFS,
+		staticFS:        localstorage.New(),
 		productImageFS:  productImageFS,
 		cache:           fastcache.New(CACHE_MAX_BYTES),
 		sessionManager:  sessionManager,
-		paymentGateway:  paymentGateway,
-		shippingService: shippingService,
+		paymentGateway:  mustInitPaymentGateway(),
+		shippingService: mustInitShippingService(),
 		objectStorage:   objStorage,
-		geocoder:        geocoder,
+		geocoder:        mustInitGeocodingService(dbRW),
 		encoder:         sqids.MustSqids(),
 		useHTTP2:        cfg.Server.UseHTTP2,
 		useSSL:          cfg.Server.UseSSL,
@@ -191,19 +146,21 @@ func NewServer() *http.Server {
 	}
 
 	logs.Log().Info(
-		"Server",
+		"Server Config",
 		zap.String("Address", addr),
 		zap.Bool("Use caching", NewServer.cache != nil),
 		zap.Int("Caching max bytes", CACHE_MAX_BYTES),
 		zap.Bool("Use session manager", NewServer.sessionManager != nil),
 		zap.Duration("Session manager lifetime", NewServer.sessionManager.Lifetime),
-		zap.String("Payment gateway", NewServer.paymentGateway.GatewayEnum().String()),
-		zap.String("Shipping service", NewServer.shippingService.Enum().String()),
-		zap.String("Storage provider", cfg.StorageProvider),
 		zap.Bool("SSL", NewServer.useSSL),
 		zap.Bool("HTTP2", NewServer.useHTTP2),
 		zap.Duration("Read timeout", readTimeout),
 		zap.Duration("Write timeout", writeTimeout),
+		zap.String("Payment gateway", NewServer.paymentGateway.GatewayEnum().String()),
+		zap.String("Shipping service", NewServer.shippingService.Enum().String()),
+		zap.String("Geocoder service", NewServer.geocoder.Enum().String()),
+		zap.String("Storage provider", NewServer.objectStorage.ProviderEnum().String()),
+		zap.String("Encoder", NewServer.encoder.Name()),
 	)
 
 	return server
