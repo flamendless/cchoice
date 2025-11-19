@@ -23,7 +23,7 @@ type CChoiceService struct {
 func MustInit() *CChoiceService {
 	cfg := conf.Conf()
 	if cfg.ShippingService != shipping.SHIPPING_SERVICE_CCHOICE.String() {
-		panic("'SHIPPING_SERVICE' must be 'CCHOICE' to use this")
+		panic(errs.ErrCChoiceServiceInit)
 	}
 
 	return &CChoiceService{
@@ -103,10 +103,18 @@ func (s *CChoiceService) GetCapabilities() (*shipping.ServiceCapabilities, error
 
 func (s *CChoiceService) GetQuotation(req shipping.ShippingRequest) (*shipping.ShippingQuotation, error) {
 	if req.PickupLocation.Coordinates.Lat == "" || req.PickupLocation.Coordinates.Lng == "" {
-		return nil, errors.Join(errs.ErrShippingInvalidCoordinates, errs.ErrShippingPickupLocation)
+		return nil, errors.Join(
+			errs.ErrCChoice,
+			errs.ErrShippingInvalidCoordinates,
+			errs.ErrShippingPickupLocation,
+		)
 	}
 	if req.DeliveryLocation.Coordinates.Lat == "" || req.DeliveryLocation.Coordinates.Lng == "" {
-		return nil, errors.Join(errs.ErrShippingInvalidCoordinates, errs.ErrShippingDeliveryLocation)
+		return nil, errors.Join(
+			errs.ErrCChoice,
+			errs.ErrShippingInvalidCoordinates,
+			errs.ErrShippingDeliveryLocation,
+		)
 	}
 
 	distance, err := s.calculateDistance(
@@ -114,16 +122,28 @@ func (s *CChoiceService) GetQuotation(req shipping.ShippingRequest) (*shipping.S
 		req.DeliveryLocation.Coordinates,
 	)
 	if err != nil {
-		return nil, errors.Join(errs.ErrShippingDistanceCalculation, err)
+		return nil, errors.Join(
+			errs.ErrCChoice,
+			errs.ErrShippingDistanceCalculation,
+			err,
+		)
 	}
 
 	if distance > s.maxDistance {
-		return nil, errors.Join(errs.ErrShippingDistanceExceeded, fmt.Errorf("%.2f km > %.2f km max", distance, s.maxDistance))
+		return nil, errors.Join(
+			errs.ErrCChoice,
+			errs.ErrShippingDistanceExceeded,
+			fmt.Errorf("%.2f km > %.2f km max", distance, s.maxDistance),
+		)
 	}
 
 	weight, err := s.parseWeight(req.Package.Weight)
 	if err != nil {
-		return nil, errors.Join(errs.ErrShippingInvalidWeight, err)
+		return nil, errors.Join(
+			errs.ErrCChoice,
+			errs.ErrShippingInvalidWeight,
+			err,
+		)
 	}
 
 	fee := s.calculateFee(distance, weight, req.ServiceType)
@@ -153,33 +173,53 @@ func (s *CChoiceService) GetQuotation(req shipping.ShippingRequest) (*shipping.S
 }
 
 func (s *CChoiceService) CreateOrder(req shipping.ShippingRequest) (*shipping.ShippingOrder, error) {
-	return nil, errs.ErrShippingNotImplemented
+	return nil, errors.Join(errs.ErrCChoice, errs.ErrShippingNotImplemented)
 }
 
 func (s *CChoiceService) GetOrderStatus(orderID string) (*shipping.ShippingOrder, error) {
-	return nil, errs.ErrShippingNotImplemented
+	return nil, errors.Join(errs.ErrCChoice, errs.ErrShippingNotImplemented)
 }
 
 func (s *CChoiceService) CancelOrder(orderID string) error {
-	return errs.ErrShippingNotImplemented
+	return errors.Join(errs.ErrCChoice, errs.ErrShippingNotImplemented)
 }
 
 func (s *CChoiceService) calculateDistance(pickup, delivery shipping.Coordinates) (float64, error) {
 	pickupLat, err := strconv.ParseFloat(pickup.Lat, 64)
 	if err != nil {
-		return 0, errors.Join(errs.ErrShippingInvalidLatitude, errs.ErrShippingPickupLocation)
+		return 0, errors.Join(
+			errs.ErrCChoice,
+			errs.ErrShippingInvalidLatitude,
+			errs.ErrShippingPickupLocation,
+			err,
+		)
 	}
 	pickupLng, err := strconv.ParseFloat(pickup.Lng, 64)
 	if err != nil {
-		return 0, errors.Join(errs.ErrShippingInvalidLongitude, errs.ErrShippingPickupLocation)
+		return 0, errors.Join(
+			errs.ErrCChoice,
+			errs.ErrShippingInvalidLongitude,
+			errs.ErrShippingPickupLocation,
+			err,
+		)
 	}
 	deliveryLat, err := strconv.ParseFloat(delivery.Lat, 64)
 	if err != nil {
-		return 0, errors.Join(errs.ErrShippingInvalidLatitude, errs.ErrShippingDeliveryLocation)
+		return 0, errors.Join(
+			errs.ErrCChoice,
+			errs.ErrShippingInvalidLatitude,
+			errs.ErrShippingDeliveryLocation,
+			err,
+		)
 	}
 	deliveryLng, err := strconv.ParseFloat(delivery.Lng, 64)
 	if err != nil {
-		return 0, errors.Join(errs.ErrShippingInvalidLongitude, errs.ErrShippingDeliveryLocation)
+		return 0, errors.Join(
+			errs.ErrCChoice,
+			errs.ErrShippingInvalidLongitude,
+			errs.ErrShippingDeliveryLocation,
+			err,
+		)
 	}
 
 	return haversineDistance(pickupLat, pickupLng, deliveryLat, deliveryLng), nil
@@ -211,11 +251,15 @@ func (s *CChoiceService) parseWeight(weightStr string) (float64, error) {
 
 	weight, err := strconv.ParseFloat(weightStr, 64)
 	if err != nil {
-		return 0, errors.Join(errs.ErrShippingInvalidWeight, err)
+		return 0, errors.Join(
+			errs.ErrCChoice,
+			errs.ErrShippingInvalidWeight,
+			err,
+		)
 	}
 
 	if weight <= 0 {
-		return 0, errs.ErrShippingInvalidWeightRange
+		return 0, errors.Join(errs.ErrCChoice, errs.ErrShippingInvalidWeightRange)
 	}
 
 	return weight, nil

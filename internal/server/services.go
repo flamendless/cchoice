@@ -55,6 +55,8 @@ func mustInitStorageProvider() (storage.IObjectStorage, storage.IFileSystem) {
 		return nil, localstorage.New()
 	case storage.STORAGE_PROVIDER_LINODE.String():
 		objStorage := linode.MustInitWithBucket(enums.LINODE_BUCKET_PUBLIC)
+
+		//TODO: (Brandon) product images should be in private bucket
 		productImageFS := linode.New(objStorage)
 		return objStorage, productImageFS
 	default:
