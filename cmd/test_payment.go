@@ -16,7 +16,7 @@ var flagGateway string
 
 func init() {
 	f := cmdTestPayment.Flags
-	f().StringVarP(&flagGateway, "gateway", "g", "paymongo", "Gateway name")
+	f().StringVarP(&flagGateway, "gateway", "g", "PAYMONGO", "Gateway name")
 	rootCmd.AddCommand(cmdTestPayment)
 }
 
@@ -26,7 +26,7 @@ var cmdTestPayment = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		var pg payments.IPaymentGateway
 		switch flagGateway {
-		case "paymongo":
+		case payments.PAYMENT_GATEWAY_PAYMONGO.String():
 			pg = paymongo.MustInit()
 		default:
 			panic(fmt.Sprintf("Unimplemented gateway: '%s'", flagGateway))

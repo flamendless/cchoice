@@ -26,7 +26,7 @@ type Client struct {
 	basePrefix     string
 	endpoint       string
 	urlCache       sync.Map
-	presignedCache sync.Map // Cache for presigned URLs with expiry
+	presignedCache sync.Map
 }
 
 type presignedCacheEntry struct {
@@ -53,6 +53,30 @@ type ObjectInfo struct {
 type HeadObjectOutput struct {
 	ContentLength *int64
 	LastModified  *time.Time
+}
+
+func validate() {
+	cfg := conf.Conf()
+	if cfg.Linode.Endpoint == "" || cfg.Linode.Region == "" {
+		panic(fmt.Errorf("[Linode Storage]: %w", errs.ErrEnvVarRequired))
+	}
+
+	buckets := cfg.Linode.GetBuckets()
+	for bucketEnum, bucketConfig := range buckets {
+		if bucketConfig.Bucket == "" {
+			continue
+		}
+		if bucketConfig.AccessKey == "" {
+			panic(fmt.Errorf("[Linode Storage %s]: access key must be configure", bucketEnum.String()))
+		}
+		if bucketConfig.SecretKey == "" {
+			panic(fmt.Errorf("[Linode Storage %s]: secret key must be configured", bucketEnum.String()))
+		}
+	}
+
+	if len(buckets) != 2 {
+		panic("[Linode Storage]: exactly two buckets must be configured")
+	}
 }
 
 func NewClient(cfg Config) (*Client, error) {
@@ -96,7 +120,7 @@ func NewClientFromConfig() (*Client, error) {
 
 func NewClientFromConfigWithBucket(bucketEnum enums.LinodeBucketEnum) (*Client, error) {
 	cfg := conf.Conf()
-	if cfg.StorageProvider != "linode" {
+	if cfg.StorageProvider != storage.STORAGE_PROVIDER_LINODE.String() {
 		return nil, errs.ErrLinodeServiceInit
 	}
 
@@ -143,8 +167,9 @@ func MustInit() storage.IObjectStorage {
 }
 
 func MustInitWithBucket(bucketEnum enums.LinodeBucketEnum) storage.IObjectStorage {
+	validate()
 	cfg := conf.Conf()
-	if cfg.StorageProvider != "linode" {
+	if cfg.StorageProvider != storage.STORAGE_PROVIDER_LINODE.String() {
 		panic("'STORAGE_PROVIDER' must be 'linode' to use this")
 	}
 

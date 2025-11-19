@@ -23,6 +23,7 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/storage"
 	"cchoice/internal/storage/linode"
 )
 
@@ -192,7 +193,7 @@ var cmdParseProducts = &cobra.Command{
 			}
 
 			cfg := conf.Conf()
-			if cfg.StorageProvider == "linode" {
+			if cfg.StorageProvider == storage.STORAGE_PROVIDER_LINODE.String() {
 				objStorage := linode.MustInitWithBucket(enums.LINODE_BUCKET_PUBLIC)
 				brandImage.S3URL = objStorage.GetPublicURL(path)
 			}

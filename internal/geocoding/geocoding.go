@@ -34,6 +34,7 @@ type ReverseGeocodeRequest struct {
 }
 
 type IGeocoder interface {
+	Enum() GeocodingService
 	Geocode(req GeocodeRequest) (*GeocodeResponse, error)
 	ReverseGeocode(req ReverseGeocodeRequest) (*GeocodeResponse, error)
 	GeocodeShippingAddress(address string) (*Coordinates, error)

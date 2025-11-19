@@ -4,6 +4,7 @@ import (
 	"cchoice/internal/conf"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/receipt"
 	"cchoice/internal/receipt/scanner"
 	"context"
 	"errors"
@@ -29,12 +30,19 @@ type WordInfo struct {
 	Y          float32
 }
 
-func MustInit() *GoogleVisionScanner {
+func validate() {
 	cfg := conf.Conf()
-	if cfg.OCRService != "googlevision" {
+	if cfg.OCRService != receipt.RECEIPT_SCANNER_GOOGLEVISION.String() {
 		panic(errs.ErrGVisionServiceInit)
 	}
+	if cfg.GoogleVisionConfig.APIKey == "" {
+		panic(errs.ErrGVisionAPIKeyRequired)
+	}
+}
 
+func MustInit() *GoogleVisionScanner {
+	validate()
+	cfg := conf.Conf()
 	ctx := context.Background()
 	client, err := vision.NewImageAnnotatorClient(ctx, option.WithAPIKey(cfg.GoogleVisionConfig.APIKey))
 	if err != nil {

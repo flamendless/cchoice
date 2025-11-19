@@ -18,7 +18,7 @@ var flagShippingService string
 
 func init() {
 	f := cmdTestShipping.Flags
-	f().StringVarP(&flagShippingService, "service", "s", "cchoice", "Shipping service name (lalamove, cchoice)")
+	f().StringVarP(&flagShippingService, "service", "s", "CCHOICE", "Shipping service name (LALAMOVE, CCHOICE)")
 	rootCmd.AddCommand(cmdTestShipping)
 }
 
@@ -28,9 +28,9 @@ var cmdTestShipping = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		var ss shipping.IShippingService
 		switch flagShippingService {
-		case "cchoice":
+		case shipping.SHIPPING_SERVICE_CCHOICE.String():
 			ss = cchoice.MustInit()
-		case "lalamove":
+		case shipping.SHIPPING_SERVICE_LALAMOVE.String():
 			ss = lalamove.MustInit()
 		default:
 			panic(fmt.Errorf("%w: '%s'", errs.ErrCmdUnimplementedService, flagShippingService))
@@ -137,7 +137,7 @@ var cmdTestShipping = &cobra.Command{
 		}
 		dump.Println("Quotation Metadata:", quotation.Metadata)
 
-		if flagShippingService == "cchoice" {
+		if flagShippingService == shipping.SHIPPING_SERVICE_CCHOICE.String() {
 			fmt.Println("\n=== C-Choice Service: Testing Unsupported Operations (Should Fail) ===")
 
 			fmt.Println("Testing CreateOrder (should fail)...")
@@ -227,9 +227,9 @@ var cmdTestShipping = &cobra.Command{
 
 func getPackageWeight(service string) string {
 	switch service {
-	case "cchoice":
+	case shipping.SHIPPING_SERVICE_CCHOICE.String():
 		return "2.5"
-	case "lalamove":
+	case shipping.SHIPPING_SERVICE_LALAMOVE.String():
 		return "LESS_THAN_3KG"
 	default:
 		return "2.5"

@@ -3,6 +3,7 @@ package cmd
 import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/receipt"
 	"cchoice/internal/receipt/scanner"
 	"cchoice/internal/receipt/scanner/googlevision"
 	"cchoice/internal/receipt/writer"
@@ -27,7 +28,7 @@ var (
 )
 
 func init() {
-	scanReceiptCmd.Flags().StringVarP(&ocrServiceName, "service", "s", "googlevision", "OCR service to use")
+	scanReceiptCmd.Flags().StringVarP(&ocrServiceName, "service", "s", "GOOGLEVISION", "OCR service to use")
 	scanReceiptCmd.Flags().StringVarP(&scanImagePath, "image", "i", "", "Path to receipt image file (required)")
 	scanReceiptCmd.Flags().StringVarP(&scanOutputPath, "output", "o", "", "Output file path (required for csv/json)")
 	scanReceiptCmd.Flags().StringVarP(&scanOutputFmt, "format", "f", "", "Output format: csv, json, or both (comma-separated)")
@@ -47,7 +48,7 @@ var scanReceiptCmd = &cobra.Command{
 	Long:  "Scan receipt images to extract data using OCR service",
 	Run: func(cmd *cobra.Command, args []string) {
 		var ocrService scanner.IReceiptScanner
-		if ocrServiceName == "googlevision" {
+		if ocrServiceName == receipt.RECEIPT_SCANNER_GOOGLEVISION.String() {
 			ocrService = googlevision.MustInit()
 			defer func(){
 				if err := ocrService.Close(); err != nil {

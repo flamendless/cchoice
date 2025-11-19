@@ -31,12 +31,19 @@ type GoogleMapsGeocoder struct {
 	cacheExpiry time.Duration
 }
 
-func MustInit(db database.Service) *GoogleMapsGeocoder {
+func validate() {
 	cfg := conf.Conf()
-	if cfg.GeocodingService != "googlemaps" {
+	if cfg.GeocodingService != geocoding.GEOCODING_SERVICE_GOOGLEMAPS.String() {
 		panic(errs.ErrGMapsServiceInit)
 	}
+	if cfg.GoogleMaps.APIKey == "" {
+		panic(errs.ErrGMapsAPIKeyRequired)
+	}
+}
 
+func MustInit(db database.Service) *GoogleMapsGeocoder {
+	validate()
+	cfg := conf.Conf()
 	return &GoogleMapsGeocoder{
 		apiKey:  cfg.GoogleMaps.APIKey,
 		baseURL: "https://maps.googleapis.com/maps/api/geocode/json",
@@ -50,10 +57,8 @@ func MustInit(db database.Service) *GoogleMapsGeocoder {
 }
 
 func MustInitWithCache(db database.Service, cacheExpiry time.Duration) *GoogleMapsGeocoder {
+	validate()
 	cfg := conf.Conf()
-	if cfg.GeocodingService != "googlemaps" {
-		panic(errs.ErrGMapsServiceInit)
-	}
 
 	if cacheExpiry == 0 {
 		cacheExpiry = 30 * 24 * time.Hour
@@ -69,6 +74,10 @@ func MustInitWithCache(db database.Service, cacheExpiry time.Duration) *GoogleMa
 		db:          db,
 		cacheExpiry: cacheExpiry,
 	}
+}
+
+func (g *GoogleMapsGeocoder) Enum() geocoding.GeocodingService {
+	return geocoding.GEOCODING_SERVICE_GOOGLEMAPS
 }
 
 func (g *GoogleMapsGeocoder) SetRegion(region string) {

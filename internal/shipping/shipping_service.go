@@ -1,6 +1,6 @@
-//go:generate go tool stringer -type=ShippingService -trimprefix=SHIPPING_SERVICE_
-
 package shipping
+
+//go:generate go tool stringer -type=ShippingService -trimprefix=SHIPPING_SERVICE_
 
 import (
 	"cchoice/internal/errs"

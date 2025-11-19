@@ -27,12 +27,19 @@ type Lalamove struct {
 	businessLocation *shipping.Location
 }
 
-func MustInit() *Lalamove {
+func validate() {
 	cfg := conf.Conf()
-	if cfg.ShippingService != "lalamove" {
+	if cfg.ShippingService != shipping.SHIPPING_SERVICE_LALAMOVE.String() {
 		panic(errs.ErrLalamoveServiceInit)
 	}
+	if cfg.Lalamove.BaseURL == "" || cfg.Lalamove.APIKey == "" || cfg.Lalamove.Secret == "" {
+		panic(errs.ErrLalamoveAPIKeyRequired)
+	}
+}
 
+func MustInit() *Lalamove {
+	validate()
+	cfg := conf.Conf()
 	return &Lalamove{
 		shippingService: shipping.SHIPPING_SERVICE_LALAMOVE,
 		apiKey:          cfg.Lalamove.APIKey,

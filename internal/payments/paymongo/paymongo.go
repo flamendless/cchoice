@@ -31,12 +31,20 @@ type PayMongo struct {
 	paymentGateway payments.PaymentGateway
 }
 
-func MustInit() *PayMongo {
+func validate() {
 	cfg := conf.Conf()
-	if cfg.PaymentService != "paymongo" {
+	if cfg.PaymentService != payments.PAYMENT_GATEWAY_PAYMONGO.String() {
 		panic(errs.ErrPaymongoServiceInit)
 	}
+	if cfg.PayMongo.BaseURL == "" || cfg.PayMongo.APIKey == "" || cfg.PayMongo.SuccessURL == "" || cfg.PayMongo.CancelURL == "" {
+		panic(errs.ErrPaymongoAPIKeyRequired)
+	}
+}
 
+func MustInit() *PayMongo {
+	validate()
+
+	cfg := conf.Conf()
 	apiKey := base64.StdEncoding.EncodeToString([]byte(cfg.PayMongo.APIKey))
 
 	address := cfg.Server.Address
