@@ -52,7 +52,7 @@ func (brand *Brand) InsertToDB(ctx context.Context, db database.Service) (int64,
 		Name:      brand.Name,
 		CreatedAt: brand.CreatedAt,
 		UpdatedAt: brand.UpdatedAt,
-		DeletedAt: brand.UpdatedAt,
+		DeletedAt: brand.DeletedAt,
 	})
 	if err != nil {
 		return 0, err
