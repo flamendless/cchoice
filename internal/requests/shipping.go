@@ -3,9 +3,11 @@ package requests
 import (
 	"bytes"
 	"cchoice/internal/conf"
+	"cchoice/internal/database"
 	"cchoice/internal/logs"
 	"cchoice/internal/metrics"
 	"cchoice/internal/shipping"
+	"context"
 	"crypto/sha256"
 	"encoding/gob"
 	"encoding/hex"
@@ -17,10 +19,12 @@ import (
 )
 
 func GetShippingQuotation(
+	ctx context.Context,
 	cache *fastcache.Cache,
 	sf *singleflight.Group,
 	shippingService shipping.IShippingService,
 	shippingRequest shipping.ShippingRequest,
+	db database.Service,
 ) (*shipping.ShippingQuotation, error) {
 	cacheKey := []byte(generateShippingCacheKey(shippingRequest.DeliveryLocation.Address, shippingRequest.Package.Weight, shippingRequest.ServiceType.String()))
 
@@ -35,18 +39,33 @@ func GetShippingQuotation(
 		metrics.Cache.MemMiss()
 	}
 
+	var quotation *shipping.ShippingQuotation
+
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
-		quotation, err := shippingService.GetQuotation(shippingRequest)
-		if err != nil {
-			return nil, err
+		q, e := shippingService.GetQuotation(shippingRequest)
+		quotation = q
+
+		logs.LogExternalAPICall(ctx, db.GetQueries(), logs.ExternalAPILogParams{
+			CheckoutID: nil,
+			Service:    "shipping",
+			API:        shippingService.Enum(),
+			Endpoint:   "/v3/quotations",
+			HTTPMethod: "POST",
+			Payload:    shippingRequest,
+			Response:   q,
+			Error:      e,
+		})
+
+		if e != nil {
+			return nil, e
 		}
-		return quotation, nil
+		return q, nil
 	})
 	if err != nil {
 		return nil, err
 	}
 	logs.SF(cacheKey, shared)
-	quotation := sfRes.(*shipping.ShippingQuotation)
+	quotation = sfRes.(*shipping.ShippingQuotation)
 
 	buf := new(bytes.Buffer)
 	if err := gob.NewEncoder(buf).Encode(quotation); err == nil {

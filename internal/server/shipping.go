@@ -167,7 +167,7 @@ func (s *Server) shippingQuotationHandler(w http.ResponseWriter, r *http.Request
 		ServiceType: shipping.SERVICE_TYPE_STANDARD,
 	}
 
-	quotation, err := requests.GetShippingQuotation(s.cache, &s.SF, s.shippingService, shippingRequest)
+	quotation, err := requests.GetShippingQuotation(r.Context(), s.cache, &s.SF, s.shippingService, shippingRequest, s.dbRW)
 	if err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
