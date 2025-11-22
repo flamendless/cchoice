@@ -6,6 +6,7 @@
 - `go install github.com/magefile/mage@latest`
 - `mage deps`
 - `mage setup`
+- `mage setupprod`
 - `mage genAll`
 - `mage cleanDB`
 - `mage genImages`
