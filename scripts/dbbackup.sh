@@ -5,8 +5,8 @@ set -e
 # CONFIGURATION (edit these for your environment)
 ###
 
-DB_PATH="./test.db"
-LOG_PATH="./logs/*.log"
+DB_PATH="/root/cchoice/test.db"
+LOG_PATH="/root/cchoice/logs/*.log"
 TS=$(date +"%Y-%m-%d_%H-%M-%S")
 TMP="/tmp/db_backup_${TS}.tar.gz"
 
