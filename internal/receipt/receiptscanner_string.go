@@ -17,8 +17,9 @@ const _ReceiptScanner_name = "UNDEFINEDGOOGLEVISION"
 var _ReceiptScanner_index = [...]uint8{0, 9, 21}
 
 func (i ReceiptScanner) String() string {
-	if i < 0 || i >= ReceiptScanner(len(_ReceiptScanner_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_ReceiptScanner_index)-1 {
 		return "ReceiptScanner(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _ReceiptScanner_name[_ReceiptScanner_index[i]:_ReceiptScanner_index[i+1]]
+	return _ReceiptScanner_name[_ReceiptScanner_index[idx]:_ReceiptScanner_index[idx+1]]
 }

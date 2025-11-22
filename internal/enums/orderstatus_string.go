@@ -23,8 +23,9 @@ const _OrderStatus_name = "UNDEFINEDPENDINGCONFIRMEDPROCESSINGSHIPPEDDELIVEREDCA
 var _OrderStatus_index = [...]uint8{0, 9, 16, 25, 35, 42, 51, 60, 68}
 
 func (i OrderStatus) String() string {
-	if i < 0 || i >= OrderStatus(len(_OrderStatus_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_OrderStatus_index)-1 {
 		return "OrderStatus(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _OrderStatus_name[_OrderStatus_index[i]:_OrderStatus_index[i+1]]
+	return _OrderStatus_name[_OrderStatus_index[idx]:_OrderStatus_index[idx+1]]
 }

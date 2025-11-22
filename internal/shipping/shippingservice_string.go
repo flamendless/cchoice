@@ -18,8 +18,9 @@ const _ShippingService_name = "UNDEFINEDLALAMOVECCHOICE"
 var _ShippingService_index = [...]uint8{0, 9, 17, 24}
 
 func (i ShippingService) String() string {
-	if i < 0 || i >= ShippingService(len(_ShippingService_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_ShippingService_index)-1 {
 		return "ShippingService(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _ShippingService_name[_ShippingService_index[i]:_ShippingService_index[i+1]]
+	return _ShippingService_name[_ShippingService_index[idx]:_ShippingService_index[idx+1]]
 }

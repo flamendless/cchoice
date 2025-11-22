@@ -24,8 +24,9 @@ const _TemplateKind_name = "UNDEFINEDSAMPLEDELTAPLUSBOSCHSPARTANSHINSETSUREDMAXB
 var _TemplateKind_index = [...]uint8{0, 9, 15, 24, 29, 36, 45, 51, 59, 66}
 
 func (i TemplateKind) String() string {
-	if i < 0 || i >= TemplateKind(len(_TemplateKind_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_TemplateKind_index)-1 {
 		return "TemplateKind(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _TemplateKind_name[_TemplateKind_index[i]:_TemplateKind_index[i+1]]
+	return _TemplateKind_name[_TemplateKind_index[idx]:_TemplateKind_index[idx+1]]
 }

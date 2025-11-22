@@ -28,8 +28,9 @@ const _PaymentMethod_name = "UNDEFINEDCODQRPHBILLEASECARDDOBDOB_UBPBRANKAS_BDOBR
 var _PaymentMethod_index = [...]uint8{0, 9, 12, 16, 24, 28, 31, 38, 49, 65, 82, 87, 95, 102}
 
 func (i PaymentMethod) String() string {
-	if i < 0 || i >= PaymentMethod(len(_PaymentMethod_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_PaymentMethod_index)-1 {
 		return "PaymentMethod(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _PaymentMethod_name[_PaymentMethod_index[i]:_PaymentMethod_index[i+1]]
+	return _PaymentMethod_name[_PaymentMethod_index[idx]:_PaymentMethod_index[idx+1]]
 }

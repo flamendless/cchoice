@@ -17,8 +17,9 @@ const _GeocodingService_name = "UNDEFINEDGOOGLEMAPS"
 var _GeocodingService_index = [...]uint8{0, 9, 19}
 
 func (i GeocodingService) String() string {
-	if i < 0 || i >= GeocodingService(len(_GeocodingService_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_GeocodingService_index)-1 {
 		return "GeocodingService(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _GeocodingService_name[_GeocodingService_index[i]:_GeocodingService_index[i+1]]
+	return _GeocodingService_name[_GeocodingService_index[idx]:_GeocodingService_index[idx+1]]
 }

@@ -20,8 +20,9 @@ const _WeightUnit_name = "UNDEFINEDKGGLBOZ"
 var _WeightUnit_index = [...]uint8{0, 9, 11, 12, 14, 16}
 
 func (i WeightUnit) String() string {
-	if i < 0 || i >= WeightUnit(len(_WeightUnit_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_WeightUnit_index)-1 {
 		return "WeightUnit(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _WeightUnit_name[_WeightUnit_index[i]:_WeightUnit_index[i+1]]
+	return _WeightUnit_name[_WeightUnit_index[idx]:_WeightUnit_index[idx+1]]
 }

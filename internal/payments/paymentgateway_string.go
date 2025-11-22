@@ -17,8 +17,9 @@ const _PaymentGateway_name = "UNDEFINEDPAYMONGO"
 var _PaymentGateway_index = [...]uint8{0, 9, 17}
 
 func (i PaymentGateway) String() string {
-	if i < 0 || i >= PaymentGateway(len(_PaymentGateway_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_PaymentGateway_index)-1 {
 		return "PaymentGateway(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _PaymentGateway_name[_PaymentGateway_index[i]:_PaymentGateway_index[i+1]]
+	return _PaymentGateway_name[_PaymentGateway_index[idx]:_PaymentGateway_index[idx+1]]
 }

@@ -18,8 +18,9 @@ const _StorageProvider_name = "UNDEFINEDLOCALLINODE"
 var _StorageProvider_index = [...]uint8{0, 9, 14, 20}
 
 func (i StorageProvider) String() string {
-	if i < 0 || i >= StorageProvider(len(_StorageProvider_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_StorageProvider_index)-1 {
 		return "StorageProvider(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _StorageProvider_name[_StorageProvider_index[i]:_StorageProvider_index[i+1]]
+	return _StorageProvider_name[_StorageProvider_index[idx]:_StorageProvider_index[idx+1]]
 }

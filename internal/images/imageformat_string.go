@@ -18,8 +18,9 @@ const _ImageFormat_name = "UNDEFINEDPNGWEBP"
 var _ImageFormat_index = [...]uint8{0, 9, 12, 16}
 
 func (i ImageFormat) String() string {
-	if i < 0 || i >= ImageFormat(len(_ImageFormat_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_ImageFormat_index)-1 {
 		return "ImageFormat(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _ImageFormat_name[_ImageFormat_index[i]:_ImageFormat_index[i+1]]
+	return _ImageFormat_name[_ImageFormat_index[idx]:_ImageFormat_index[idx+1]]
 }

@@ -19,8 +19,9 @@ const _Module_name = "UNDEFINEDCATEGORYPRODUCTBRAND"
 var _Module_index = [...]uint8{0, 9, 17, 24, 29}
 
 func (i Module) String() string {
-	if i < 0 || i >= Module(len(_Module_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_Module_index)-1 {
 		return "Module(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _Module_name[_Module_index[i]:_Module_index[i+1]]
+	return _Module_name[_Module_index[idx]:_Module_index[idx+1]]
 }
