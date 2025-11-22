@@ -26,6 +26,8 @@ var (
 	bgProcs []*exec.Cmd
 )
 
+const PERM = 0755
+
 // ---------------- Command Abstraction ----------------
 
 type CommandType int
@@ -202,10 +204,16 @@ func Build() error {
 }
 
 func BuildGoose() error {
-	if err := run(Command{Type: CmdExec, Cmd: "git", Args: []string{"submodule", "update", "--init", "--recursive"}}); err != nil {
+	if err := run(Command{
+		Type: CmdExec,
+		Cmd:  "git",
+		Args: []string{"submodule", "update", "--init", "--recursive"},
+	}); err != nil {
 		return err
 	}
-	if err := os.Chdir("./cmd/goose"); err != nil {
+
+	const pathGoose = "./cmd/goose"
+	if err := os.Chdir(pathGoose); err != nil {
 		return err
 	}
 	if err := run(Command{Type: CmdExec, Cmd: "go", Args: []string{"mod", "tidy"}}); err != nil {
@@ -214,29 +222,72 @@ func BuildGoose() error {
 	if err := run(Command{
 		Type: CmdGoBuild,
 		Out:  "../../" + filepath.Join(tmpDir, "goose"),
-		Tags: []string{"no_postgres", "no_mysql", "no_clickhouse", "no_mssql", "no_vertica", "no_ydb"},
-		Args: []string{"./cmd/goose"},
+		Tags: []string{
+			"no_postgres",
+			"no_mysql",
+			"no_clickhouse",
+			"no_mssql",
+			"no_vertica",
+			"no_ydb",
+		},
+		Args: []string{pathGoose},
 	}); err != nil {
 		return err
 	}
-	return os.Chmod("../../"+filepath.Join(tmpDir, "goose"), 0755)
+	return os.Chmod("../../"+filepath.Join(tmpDir, "goose"), PERM)
 }
 
 func Setup() error {
-	if _, err := os.Stat("./.git/hooks/pre-commit"); os.IsNotExist(err) {
-		if err := run(Command{Type: CmdExec, Cmd: "cp", Args: []string{"./scripts/pre-commit-unit-test.sh", "./.git/hooks/pre-commit"}}); err != nil {
+	const pathPreCommitHook = "./git/hooks/pre-commit"
+	if _, err := os.Stat(pathPreCommitHook); os.IsNotExist(err) {
+		if err := run(Command{Type: CmdExec, Cmd: "cp", Args: []string{"./scripts/pre-commit-unit-test.sh", pathPreCommitHook}}); err != nil {
 			return err
 		}
-		if err := os.Chmod("./.git/hooks/pre-commit", 0755); err != nil {
+		if err := os.Chmod(pathPreCommitHook, PERM); err != nil {
 			return err
 		}
 	}
-	if _, err := os.Stat("./.env"); os.IsNotExist(err) {
-		return run(Command{Type: CmdExec, Cmd: "cp", Args: []string{"./.env.sample", "./.env"}})
+
+	const pathEnv = "./.env"
+	if _, err := os.Stat(pathEnv); os.IsNotExist(err) {
+		return run(Command{Type: CmdExec, Cmd: "cp", Args: []string{"./.env.sample", pathEnv}})
 	}
-	if _, err := os.Stat("./logs"); os.IsNotExist(err) {
-		return run(Command{Type: CmdExec, Cmd: "mkdir", Args: []string{"./logs"}})
+
+	const pathLogs = "./logs"
+	if _, err := os.Stat(pathLogs); os.IsNotExist(err) {
+		return run(Command{Type: CmdExec, Cmd: "mkdir", Args: []string{pathLogs}})
 	}
+	return nil
+}
+
+func SetupProd() error {
+	cmdInstall := exec.Command("sudo", "apt", "install", "rclone")
+	if err := cmdInstall.Run(); err != nil {
+		return err
+	}
+	fmt.Println("Run `rclone config`")
+
+	if err := os.Chmod("./scripts/dbbackup.sh", PERM); err != nil {
+		return err
+	}
+
+	cronJob := "0 3 * * * /usr/local/bin/backup_sqlite.sh >> /var/log/backup.log 2>&1"
+	checkCmd := exec.Command("bash", "-c", fmt.Sprintf("crontab -l 2>/dev/null | grep -F '%s'", cronJob))
+	if err := checkCmd.Run(); err != nil {
+		addCronCmd := exec.Command(
+			"bash",
+			"-c",
+			fmt.Sprintf(
+				"(crontab -l 2>/dev/null; echo '%s') | crontab -",
+				cronJob,
+			),
+		)
+		if err := addCronCmd.Run(); err != nil {
+			return err
+		}
+		fmt.Println("Cron job added successfully")
+	}
+
 	return nil
 }
 
@@ -344,7 +395,7 @@ func Deps() error {
 		if err := run(Command{Type: CmdExec, Cmd: "curl", Args: []string{"-LO", url}}); err != nil {
 			return err
 		}
-		if err := os.Chmod(bin, 0755); err != nil {
+		if err := os.Chmod(bin, PERM); err != nil {
 			return err
 		}
 		if err := os.Rename(bin, "tailwindcss"); err != nil {
