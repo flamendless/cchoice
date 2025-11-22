@@ -69,6 +69,22 @@ type TblCheckoutPayment struct {
 	UpdatedAt              time.Time
 }
 
+type TblExternalApiLog struct {
+	ID           int64
+	CheckoutID   sql.NullInt64
+	Service      string
+	Api          string
+	Endpoint     string
+	HttpMethod   string
+	Payload      sql.NullString
+	Response     sql.NullString
+	StatusCode   sql.NullInt64
+	ErrorMessage sql.NullString
+	IsSuccessful int64
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}
+
 type TblGeocodingCache struct {
 	ID                int64
 	Address           string
