@@ -533,7 +533,7 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 				PostalCode: cartCheckout.Postal,
 				Country:    "PH",
 			},
-			Name:  cartCheckout.Email,
+			Name:  cartCheckout.FullName,
 			Email: cartCheckout.Email,
 			Phone: cartCheckout.MobileNo,
 		}

@@ -3,6 +3,7 @@ package cart
 import "cchoice/internal/encode"
 
 type CartCheckout struct {
+	FullName      string   `json:"fullname"`
 	AddressLine1  string   `json:"address_line1"`
 	AddressLine2  string   `json:"address_line2"`
 	Province      string   `json:"province"`
