@@ -270,7 +270,7 @@ func SetupProd() error {
 	const pathScript = "/usr/local/bin/dbbackup.sh"
 	if err := run(Command{
 		Type: CmdExec,
-		Cmd: "cp",
+		Cmd:  "cp",
 		Args: []string{"./scripts/dbbackup.sh", pathScript},
 	}); err != nil {
 		return err
@@ -279,7 +279,7 @@ func SetupProd() error {
 		return err
 	}
 
-	cronJob := "0 3 * * * /usr/local/bin/backup_sqlite.sh >> /var/log/backup.log 2>&1"
+	cronJob := "0 3 * * * /usr/local/bin/dbbackup.sh >> /var/log/backup.log 2>&1"
 	checkCmd := exec.Command("bash", "-c", fmt.Sprintf("crontab -l 2>/dev/null | grep -F '%s'", cronJob))
 	if err := checkCmd.Run(); err != nil {
 		addCronCmd := exec.Command(
