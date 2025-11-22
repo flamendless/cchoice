@@ -18,8 +18,9 @@ const _LinodeBucketEnum_name = "UNDEFINEDPUBLICPRIVATE"
 var _LinodeBucketEnum_index = [...]uint8{0, 9, 15, 22}
 
 func (i LinodeBucketEnum) String() string {
-	if i < 0 || i >= LinodeBucketEnum(len(_LinodeBucketEnum_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_LinodeBucketEnum_index)-1 {
 		return "LinodeBucketEnum(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _LinodeBucketEnum_name[_LinodeBucketEnum_index[i]:_LinodeBucketEnum_index[i+1]]
+	return _LinodeBucketEnum_name[_LinodeBucketEnum_index[idx]:_LinodeBucketEnum_index[idx+1]]
 }

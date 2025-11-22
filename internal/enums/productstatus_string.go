@@ -18,8 +18,9 @@ const _ProductStatus_name = "UNDEFINEDACTIVEDELETED"
 var _ProductStatus_index = [...]uint8{0, 9, 15, 22}
 
 func (i ProductStatus) String() string {
-	if i < 0 || i >= ProductStatus(len(_ProductStatus_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_ProductStatus_index)-1 {
 		return "ProductStatus(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _ProductStatus_name[_ProductStatus_index[i]:_ProductStatus_index[i+1]]
+	return _ProductStatus_name[_ProductStatus_index[idx]:_ProductStatus_index[idx+1]]
 }
