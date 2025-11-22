@@ -267,7 +267,15 @@ func SetupProd() error {
 	}
 	fmt.Println("Run `rclone config`")
 
-	if err := os.Chmod("./scripts/dbbackup.sh", PERM); err != nil {
+	const pathScript = "/usr/local/bin/dbbackup.sh"
+	if err := run(Command{
+		Type: CmdExec,
+		Cmd: "cp",
+		Args: []string{"./scripts/dbbackup.sh", pathScript},
+	}); err != nil {
+		return err
+	}
+	if err := os.Chmod(pathScript, PERM); err != nil {
 		return err
 	}
 
