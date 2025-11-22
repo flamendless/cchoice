@@ -22,8 +22,9 @@ const _Level_name = "UNDEFINEDREGIONPROVINCEMUNICIPALITYSUB_MUNICIPALITYCITYBARA
 var _Level_index = [...]uint8{0, 9, 15, 23, 35, 51, 55, 63}
 
 func (i Level) String() string {
-	if i < 0 || i >= Level(len(_Level_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_Level_index)-1 {
 		return "Level(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _Level_name[_Level_index[i]:_Level_index[i+1]]
+	return _Level_name[_Level_index[idx]:_Level_index[idx+1]]
 }

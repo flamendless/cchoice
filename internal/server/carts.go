@@ -521,6 +521,13 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	checkoutID, err := s.dbRO.GetQueries().GetCheckoutIDBySessionID(r.Context(), token)
+	if err != nil {
+		logs.Log().Error(logtag, zap.Error(err), zap.String("token", token))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	switch s.paymentGateway.GatewayEnum() {
 	case payments.PAYMENT_GATEWAY_PAYMONGO:
 		paymentMethods := []payments.PaymentMethod{payments.ParsePaymentMethodToEnum(cartCheckout.PaymentMethod)}
@@ -541,7 +548,7 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 		for _, checkoutLine := range checkoutLines {
 			imageURL, err := s.GetProductImageProxyURL(r.Context(), checkoutLine.ThumbnailPath, "256x256")
 			if err != nil {
-				logs.Log().Error(logtag, zap.Error(err), zap.String("thumbnail_path", checkoutLine.ThumbnailPath))
+				logs.Log().Warn(logtag, zap.Error(err), zap.String("thumbnail_path", checkoutLine.ThumbnailPath))
 			}
 			lineItems = append(lineItems, payments.LineItem{
 				Amount:      int32(checkoutLine.UnitPriceWithVat),
@@ -554,17 +561,19 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		payload := s.paymentGateway.CreatePayload(billing, lineItems, paymentMethods)
-
 		resCheckout, err := s.paymentGateway.CreateCheckoutPaymentSession(payload)
+		logs.LogExternalAPICall(r.Context(), s.dbRW.GetQueries(), logs.ExternalAPILogParams{
+			CheckoutID: &checkoutID,
+			Service:    "payment",
+			API:        s.paymentGateway.GatewayEnum(),
+			Endpoint:   "/checkout_sessions",
+			HTTPMethod: "POST",
+			Payload:    payload,
+			Response:   resCheckout,
+			Error:      err,
+		})
 		if err != nil {
 			logs.Log().Error(logtag, zap.Error(err), zap.Any("payload", payload))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		checkoutID, err := s.dbRO.GetQueries().GetCheckoutIDBySessionID(r.Context(), token)
-		if err != nil {
-			logs.Log().Error(logtag, zap.Error(err), zap.String("token", token))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

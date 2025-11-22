@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"cchoice/internal/database"
+	"cchoice/internal/logs"
 	"cchoice/internal/payments"
 	"cchoice/internal/payments/paymongo"
 	"fmt"
+	"strings"
 
 	"github.com/Rhymond/go-money"
 	"github.com/gookit/goutil/dump"
@@ -44,6 +46,12 @@ var cmdTestPayment = &cobra.Command{
 			panic(err)
 		}
 
+		pms := resPaymentMethods.ToPaymentMethods()
+		paymentMethodNames := make([]string, 0, len(pms))
+		for _, pm := range pms {
+			paymentMethodNames = append(paymentMethodNames, strings.ToLower(pm.String()))
+		}
+
 		payload := paymongo.CreateCheckoutSessionPayload{
 			Data: paymongo.CreateCheckoutSessionData{
 				Attributes: paymongo.CreateCheckoutSessionAttr{
@@ -73,7 +81,7 @@ var cmdTestPayment = &cobra.Command{
 						},
 					},
 					Description:         "test description",
-					PaymentMethodTypes:  resPaymentMethods.ToPaymentMethods(),
+					PaymentMethodTypes:  paymentMethodNames,
 					ReferenceNumber:     "test-ref-number",
 					SendEmailReceipt:    false,
 					ShowDescription:     true,
@@ -83,12 +91,24 @@ var cmdTestPayment = &cobra.Command{
 			},
 		}
 		resCheckout, err := pg.CreateCheckoutPaymentSession(payload)
+
+		db := database.New(database.DB_MODE_RW)
+		checkoutIDPtr := &checkout.ID
+		logs.LogExternalAPICall(cmd.Context(), db.GetQueries(), logs.ExternalAPILogParams{
+			CheckoutID: checkoutIDPtr,
+			Service:    "payment",
+			API:        pg.GatewayEnum(),
+			Endpoint:   "/checkout_sessions",
+			HTTPMethod: "POST",
+			Payload:    payload,
+			Response:   resCheckout,
+			Error:      err,
+		})
+
 		if err != nil {
 			panic(err)
 		}
 		dump.Println("Checkout", resCheckout)
-
-		db := database.New(database.DB_MODE_RW)
 		inserted, err := db.GetQueries().CreateCheckoutPayment(
 			cmd.Context(),
 			*resCheckout.ToCheckoutPayment(pg),

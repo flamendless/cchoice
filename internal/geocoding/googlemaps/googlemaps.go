@@ -198,7 +198,7 @@ func (g *GoogleMapsGeocoder) storeDBCache(address string, response *geocoding.Ge
 	}
 }
 
-func (g *GoogleMapsGeocoder) geocodeAPI(req geocoding.GeocodeRequest) (*geocoding.GeocodeResponse, error) {
+func (g *GoogleMapsGeocoder) geocodeAPI(ctx context.Context, req geocoding.GeocodeRequest) (*geocoding.GeocodeResponse, error) {
 	if req.Address == "" {
 		return nil, errs.ErrGMapsInvalidRequest
 	}
@@ -232,34 +232,56 @@ func (g *GoogleMapsGeocoder) geocodeAPI(req geocoding.GeocodeRequest) (*geocodin
 	logs.Log().Debug("Making Google Maps API request", zap.String("address", req.Address))
 
 	resp, err := g.httpClient.Get(requestURL)
-	if err != nil || resp == nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Join(errs.ErrGMapsInvalidResponse, errs.ErrIORead, err)
-	}
 
 	var apiResp GoogleMapsGeocodeResponse
-	if err := json.Unmarshal(body, &apiResp); err != nil {
-		return nil, errors.Join(errs.ErrGMapsInvalidResponse, errs.ErrJSONUnmarshal, err)
+	var result *geocoding.GeocodeResponse
+
+	if err == nil && resp != nil {
+		defer resp.Body.Close()
+
+		body, readErr := io.ReadAll(resp.Body)
+		if readErr != nil {
+			err = errors.Join(errs.ErrGMapsInvalidResponse, errs.ErrIORead, readErr)
+		} else {
+			if unmarshalErr := json.Unmarshal(body, &apiResp); unmarshalErr != nil {
+				err = errors.Join(errs.ErrGMapsInvalidResponse, errs.ErrJSONUnmarshal, unmarshalErr)
+			} else {
+				if statusErr := g.checkStatus(apiResp.Status); statusErr != nil {
+					err = statusErr
+				} else if len(apiResp.Results) == 0 {
+					err = errs.ErrGMapsNoResults
+				} else {
+					result = g.convertToGeocodeResponse(apiResp.Results[0])
+				}
+			}
+		}
 	}
 
-	if err := g.checkStatus(apiResp.Status); err != nil {
+	if g.db != nil {
+		logs.LogExternalAPICall(ctx, g.db.GetQueries(), logs.ExternalAPILogParams{
+			CheckoutID: nil,
+			Service:    "geocoding",
+			API:        g.Enum(),
+			Endpoint:   "/geocode/json",
+			HTTPMethod: "GET",
+			Payload:    req,
+			Response:   apiResp,
+			Error:      err,
+		})
+	}
+
+	if err != nil {
 		return nil, err
 	}
 
-	if len(apiResp.Results) == 0 {
-		return nil, errs.ErrGMapsNoResults
-	}
-
-	result := apiResp.Results[0]
-	return g.convertToGeocodeResponse(result), nil
+	return result, nil
 }
 
 func (g *GoogleMapsGeocoder) Geocode(req geocoding.GeocodeRequest) (*geocoding.GeocodeResponse, error) {
+	return g.GeocodeWithContext(context.Background(), req)
+}
+
+func (g *GoogleMapsGeocoder) GeocodeWithContext(ctx context.Context, req geocoding.GeocodeRequest) (*geocoding.GeocodeResponse, error) {
 	if req.Address == "" {
 		return nil, errs.ErrGMapsInvalidRequest
 	}
@@ -270,7 +292,7 @@ func (g *GoogleMapsGeocoder) Geocode(req geocoding.GeocodeRequest) (*geocoding.G
 	}
 
 	logs.Log().Info("Making API call for geocoding", zap.String("address", req.Address))
-	response, err := g.geocodeAPI(req)
+	response, err := g.geocodeAPI(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -282,6 +304,10 @@ func (g *GoogleMapsGeocoder) Geocode(req geocoding.GeocodeRequest) (*geocoding.G
 }
 
 func (g *GoogleMapsGeocoder) ReverseGeocode(req geocoding.ReverseGeocodeRequest) (*geocoding.GeocodeResponse, error) {
+	return g.ReverseGeocodeWithContext(context.Background(), req)
+}
+
+func (g *GoogleMapsGeocoder) ReverseGeocodeWithContext(ctx context.Context, req geocoding.ReverseGeocodeRequest) (*geocoding.GeocodeResponse, error) {
 	if req.Coordinates.Lat == "" || req.Coordinates.Lng == "" {
 		return nil, errs.ErrGMapsInvalidRequest
 	}
@@ -301,31 +327,49 @@ func (g *GoogleMapsGeocoder) ReverseGeocode(req geocoding.ReverseGeocodeRequest)
 	requestURL := fmt.Sprintf("%s?%s", g.baseURL, params.Encode())
 
 	resp, err := g.httpClient.Get(requestURL)
-	if err != nil || resp == nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Join(errs.ErrGMapsInvalidResponse, errs.ErrIORead, err)
-	}
 
 	var apiResp GoogleMapsGeocodeResponse
-	if err := json.Unmarshal(body, &apiResp); err != nil {
-		return nil, errors.Join(errs.ErrGMapsInvalidResponse, errs.ErrJSONUnmarshal, err)
+	var result *geocoding.GeocodeResponse
+
+	if err == nil && resp != nil {
+		defer resp.Body.Close()
+
+		body, readErr := io.ReadAll(resp.Body)
+		if readErr != nil {
+			err = errors.Join(errs.ErrGMapsInvalidResponse, errs.ErrIORead, readErr)
+		} else {
+			if unmarshalErr := json.Unmarshal(body, &apiResp); unmarshalErr != nil {
+				err = errors.Join(errs.ErrGMapsInvalidResponse, errs.ErrJSONUnmarshal, unmarshalErr)
+			} else {
+				if statusErr := g.checkStatus(apiResp.Status); statusErr != nil {
+					err = statusErr
+				} else if len(apiResp.Results) == 0 {
+					err = errs.ErrGMapsNoResults
+				} else {
+					result = g.convertToGeocodeResponse(apiResp.Results[0])
+				}
+			}
+		}
 	}
 
-	if err := g.checkStatus(apiResp.Status); err != nil {
+	if g.db != nil {
+		logs.LogExternalAPICall(ctx, g.db.GetQueries(), logs.ExternalAPILogParams{
+			CheckoutID: nil,
+			Service:    "geocoding",
+			API:        g.Enum(),
+			Endpoint:   "/geocode/json",
+			HTTPMethod: "GET",
+			Payload:    req,
+			Response:   apiResp,
+			Error:      err,
+		})
+	}
+
+	if err != nil {
 		return nil, err
 	}
 
-	if len(apiResp.Results) == 0 {
-		return nil, errs.ErrGMapsNoResults
-	}
-
-	result := apiResp.Results[0]
-	return g.convertToGeocodeResponse(result), nil
+	return result, nil
 }
 
 func (g *GoogleMapsGeocoder) GeocodeShippingAddress(address string) (*geocoding.Coordinates, error) {

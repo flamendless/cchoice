@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/goccy/go-json"
+	"github.com/gookit/goutil/dump"
 	"go.uber.org/zap"
 )
 
@@ -205,6 +206,12 @@ func (p PayMongo) CreatePayload(
 		successURLWithRef = u.String()
 	}
 
+	billing.Phone = strings.TrimPrefix(billing.Phone, "+63")
+	paymentMethodNames := make([]string, 0, len(paymentMethods))
+	for _, pm := range paymentMethods {
+		paymentMethodNames = append(paymentMethodNames, strings.ToLower(pm.String()))
+	}
+
 	payload := CreateCheckoutSessionPayload{
 		Data: CreateCheckoutSessionData{
 			Attributes: CreateCheckoutSessionAttr{
@@ -212,7 +219,7 @@ func (p PayMongo) CreatePayload(
 				SuccessURL:          successURLWithRef,
 				Billing:             billing,
 				LineItems:           lineItems,
-				PaymentMethodTypes:  paymentMethods,
+				PaymentMethodTypes:  paymentMethodNames,
 				Description:         "C-Choice Checkout",
 				ReferenceNumber:     referenceNumber,
 				SendEmailReceipt:    false,
@@ -221,6 +228,9 @@ func (p PayMongo) CreatePayload(
 				StatementDescriptor: "C-Choice Checkout Statement",
 			},
 		},
+	}
+	if conf.Conf().IsLocal() {
+		dump.Println("PAYMONGO PAYLOAD", payload)
 	}
 	return payload
 }

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cchoice/internal/database"
 	"cchoice/internal/geocoding"
 	"cchoice/internal/geocoding/googlemaps"
 	"cchoice/internal/shipping"
@@ -21,7 +22,8 @@ var testGeocodingCmd = &cobra.Command{
 		fmt.Println("Testing Google Maps Geocoding Integration")
 		fmt.Println("=========================================")
 
-		geocoder := googlemaps.MustInit(nil)
+		dbRW := database.New(database.DB_MODE_RW)
+		geocoder := googlemaps.MustInit(dbRW)
 
 		testAddresses := []string{
 			"EDSA cor. Ortigas Avenue, Pasig City, Metro Manila, Philippines",
