@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"cchoice/internal/database"
 	"cchoice/internal/errs"
 	"cchoice/internal/geocoding/googlemaps"
+	"cchoice/internal/logs"
 	"cchoice/internal/shipping"
 	"cchoice/internal/shipping/cchoice"
 	"cchoice/internal/shipping/lalamove"
@@ -123,6 +125,19 @@ var cmdTestShipping = &cobra.Command{
 		fmt.Println("Quotation Request:", reqShipping)
 
 		quotation, err := ss.GetQuotation(reqShipping)
+
+		db := database.New(database.DB_MODE_RW)
+		logs.LogExternalAPICall(cmd.Context(), db.GetQueries(), logs.ExternalAPILogParams{
+			CheckoutID: nil,
+			Service:    "shipping",
+			API:        ss.Enum(),
+			Endpoint:   "/v3/quotations",
+			HTTPMethod: "POST",
+			Payload:    reqShipping,
+			Response:   quotation,
+			Error:      err,
+		})
+
 		if err != nil {
 			panic(err)
 		}
@@ -193,6 +208,18 @@ var cmdTestShipping = &cobra.Command{
 		dump.Println("  Metadata:", orderReq.Options["metadata"])
 
 		order, err := ss.CreateOrder(orderReq)
+
+		logs.LogExternalAPICall(cmd.Context(), db.GetQueries(), logs.ExternalAPILogParams{
+			CheckoutID: nil,
+			Service:    "shipping",
+			API:        ss.Enum(),
+			Endpoint:   "/v3/orders",
+			HTTPMethod: "POST",
+			Payload:    orderReq,
+			Response:   order,
+			Error:      err,
+		})
+
 		if err != nil {
 			panic(err)
 		}
@@ -203,6 +230,18 @@ var cmdTestShipping = &cobra.Command{
 
 		fmt.Println("=== Testing GetOrderStatus ===")
 		orderStatus, err := ss.GetOrderStatus(order.ID)
+
+		logs.LogExternalAPICall(cmd.Context(), db.GetQueries(), logs.ExternalAPILogParams{
+			CheckoutID: nil,
+			Service:    "shipping",
+			API:        ss.Enum(),
+			Endpoint:   "/v3/orders/" + order.ID,
+			HTTPMethod: "GET",
+			Payload:    map[string]string{"order_id": order.ID},
+			Response:   orderStatus,
+			Error:      err,
+		})
+
 		if err != nil {
 			panic(err)
 		}
