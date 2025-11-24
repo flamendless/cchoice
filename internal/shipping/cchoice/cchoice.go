@@ -3,12 +3,16 @@ package cchoice
 import (
 	"cchoice/internal/conf"
 	"cchoice/internal/errs"
+	"cchoice/internal/logs"
 	"cchoice/internal/shipping"
 	"errors"
 	"fmt"
 	"math"
 	"strconv"
+	"strings"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 type CChoiceService struct {
@@ -146,7 +150,8 @@ func (s *CChoiceService) GetQuotation(req shipping.ShippingRequest) (*shipping.S
 		)
 	}
 
-	fee := s.calculateFee(distance, weight, req.ServiceType)
+	isFreeDelivery := s.isCaviteProvince(req.DeliveryLocation)
+	fee := s.calculateFee(distance, weight, req.ServiceType, isFreeDelivery)
 
 	serviceType := req.ServiceType
 	if serviceType == shipping.SERVICE_TYPE_UNDEFINED {
@@ -154,6 +159,17 @@ func (s *CChoiceService) GetQuotation(req shipping.ShippingRequest) (*shipping.S
 	}
 
 	eta := s.calculateETA(distance, serviceType)
+
+	metadata := map[string]any{
+		"base_fee":     s.baseFee,
+		"distance_fee": distance * s.feePerKm,
+		"weight_fee":   weight * s.feePerKg,
+		"weight_kg":    weight,
+	}
+	if isFreeDelivery {
+		metadata["free_delivery"] = true
+		metadata["free_delivery_reason"] = "Cavite Province"
+	}
 
 	return &shipping.ShippingQuotation{
 		ID:           s.generateQuotationID(),
@@ -163,12 +179,7 @@ func (s *CChoiceService) GetQuotation(req shipping.ShippingRequest) (*shipping.S
 		DistanceKm:   distance,
 		EstimatedETA: eta,
 		ExpiresAt:    time.Now().Add(1 * time.Hour).Format(time.RFC3339),
-		Metadata: map[string]any{
-			"base_fee":     s.baseFee,
-			"distance_fee": distance * s.feePerKm,
-			"weight_fee":   weight * s.feePerKg,
-			"weight_kg":    weight,
-		},
+		Metadata:     metadata,
 	}, nil
 }
 
@@ -265,7 +276,11 @@ func (s *CChoiceService) parseWeight(weightStr string) (float64, error) {
 	return weight, nil
 }
 
-func (s *CChoiceService) calculateFee(distance, weight float64, serviceType shipping.ServiceType) float64 {
+func (s *CChoiceService) calculateFee(distance, weight float64, serviceType shipping.ServiceType, isFreeDelivery bool) float64 {
+	if isFreeDelivery {
+		return 0.0
+	}
+
 	baseFee := s.baseFee
 	distanceFee := distance * s.feePerKm
 	weightFee := weight * s.feePerKg
@@ -291,9 +306,19 @@ func (s *CChoiceService) calculateFee(distance, weight float64, serviceType ship
 		totalFee *= 2.2 // Heavy duty services
 	case shipping.SERVICE_TYPE_STANDARD:
 	default:
+		logs.Log().Warn("Invalid service type", zap.String("service_type", serviceType.String()))
 	}
 
 	return math.Round(totalFee*100) / 100
+}
+
+func (s *CChoiceService) isCaviteProvince(location shipping.Location) bool {
+	state := location.OriginalAddress.State
+	if state == "" {
+		return false
+	}
+
+	return strings.Contains(strings.ToLower(state), "cavite")
 }
 
 func (s *CChoiceService) calculateETA(distance float64, serviceType shipping.ServiceType) int {
