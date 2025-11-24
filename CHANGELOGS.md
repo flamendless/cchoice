@@ -1,12 +1,54 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="dev-v0.0.9"></a>
+## [dev-v0.0.9] - 2025-11-22
+### Deps
+- Update
+
+### Maintenance
+- Log in test shipping
+- Update enums
+- Update errs
+- Reduce hardcoded strings and use enums
+- Add test_gvision
+- Update errs
+- Update image loading
+
+### Script
+- Update dbbackup.sh
+- Update paths
+- Copy script to usr path
+- Add dbbackup
+- Update genchlog
+- Update scripts
+
+### Server
+- Use external api logs
+- Add external api logs table
+- Implement brand routes
+- Update googlevision usage
+- Implement receipt image -> data
+- Add store
+
+### Web
+- Add fullname in checkout page
+- Add brands in side panel
+- Update layout of checkout page
+
+
+<a name="dev-v0.0.8"></a>
+## [dev-v0.0.8] - 2025-11-15
 ### Bugfix
 - Make others section on top
 
 ### Deps
 - Update templ version
 - Upgrade dependencies
+
+### Docs
+- Update changelogs
 
 ### Feature
 - Indicate active category section in side panel
@@ -381,7 +423,9 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.0.7...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.0.9...HEAD
+[dev-v0.0.9]: https://github.com/flamendless/cchoice/compare/dev-v0.0.8...dev-v0.0.9
+[dev-v0.0.8]: https://github.com/flamendless/cchoice/compare/dev-v0.0.7...dev-v0.0.8
 [dev-v0.0.7]: https://github.com/flamendless/cchoice/compare/dev-v0.0.6...dev-v0.0.7
 [dev-v0.0.6]: https://github.com/flamendless/cchoice/compare/dev-v0.0.5...dev-v0.0.6
 [dev-v0.0.5]: https://github.com/flamendless/cchoice/compare/dev-v0.0.4...dev-v0.0.5
