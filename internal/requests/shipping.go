@@ -26,7 +26,11 @@ func GetShippingQuotation(
 	shippingRequest shipping.ShippingRequest,
 	db database.Service,
 ) (*shipping.ShippingQuotation, error) {
-	cacheKey := []byte(generateShippingCacheKey(shippingRequest.DeliveryLocation.Address, shippingRequest.Package.Weight, shippingRequest.ServiceType.String()))
+	cacheKey := []byte(generateShippingCacheKey(
+		shippingRequest.DeliveryLocation.Address,
+		shippingRequest.Package.Weight,
+		shippingRequest.ServiceType.String(),
+	))
 
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
 		buf := bytes.NewBuffer(data)

@@ -6,6 +6,7 @@ func init() {
 	gob.Register(&ShippingQuotation{})
 	gob.Register(&ShippingRequest{})
 	gob.Register(&Coordinates{})
+	gob.Register(&Address{})
 	gob.Register(ServiceType(0))
 }
 
@@ -14,10 +15,20 @@ type Coordinates struct {
 	Lng string `json:"lng"`
 }
 
+type Address struct {
+	Line1      string `json:"line1"`
+	Line2      string `json:"line2"`
+	City       string `json:"city"`
+	State      string `json:"state"`
+	PostalCode string `json:"postal_code"`
+	Country    string `json:"country"`
+}
+
 type Location struct {
-	Coordinates Coordinates `json:"coordinates"`
-	Address     string      `json:"address"`
-	Contact     Contact     `json:"contact"`
+	Coordinates     Coordinates `json:"coordinates"`
+	Address         string      `json:"address"`
+	OriginalAddress Address     `json:"original_address"`
+	Contact         Contact     `json:"contact"`
 }
 
 type Contact struct {
