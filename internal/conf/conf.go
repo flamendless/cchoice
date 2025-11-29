@@ -67,9 +67,15 @@ type GoogleVisionConfig struct {
 }
 
 type BusinessConfig struct {
-	Lat     string `env:"BUSINESS_LAT" env-default:"14.3866"`
-	Lng     string `env:"BUSINESS_LNG" env-default:"120.8811"`
-	Address string `env:"BUSINESS_ADDRESS" env-default:"General Trias, Cavite, Philippines"`
+	Lat        string `env:"BUSINESS_LAT" env-required:""`
+	Lng        string `env:"BUSINESS_LNG" env-required:""`
+	Address    string `env:"BUSINESS_ADDRESS" env-required:""`
+	Line1      string `env:"BUSINESS_LINE1" env-required:""`
+	Line2      string `env:"BUSINESS_LINE2" env-required:""`
+	City       string `env:"BUSINESS_CITY" env-required:""`
+	State      string `env:"BUSINESS_STATE" env-required:""`
+	PostalCode string `env:"BUSINESS_POSTAL_CODE" env-required:""`
+	Country    string `env:"BUSINESS_COUNTRY" env-required:""`
 }
 
 type LinodeConfig struct {
@@ -123,6 +129,10 @@ func mustValidate(c *appConfig) {
 				static.GetMode(),
 			),
 		))
+	}
+
+	if c.Business.Lat == "" || c.Business.Lng == "" || c.Business.Address == "" || c.Business.Line1 == "" || c.Business.Line2 == "" || c.Business.City == "" || c.Business.State == "" || c.Business.PostalCode == "" || c.Business.Country == "" {
+		panic(fmt.Errorf("[Business]: %w", errs.ErrEnvVarRequired))
 	}
 }
 
