@@ -42,6 +42,14 @@ func MustInit() *CChoiceService {
 				Lng: cfg.Business.Lng,
 			},
 			Address: cfg.Business.Address,
+			OriginalAddress: shipping.Address{
+				Line1:      cfg.Business.Line1,
+				Line2:      cfg.Business.Line2,
+				City:       cfg.Business.City,
+				State:      cfg.Business.State,
+				PostalCode: cfg.Business.PostalCode,
+				Country:    cfg.Business.Country,
+			},
 		},
 	}
 }

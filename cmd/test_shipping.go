@@ -68,11 +68,10 @@ func testCChoiceService(ctx context.Context) {
 	fmt.Println("=== C-Choice Shipping Service - Matrix Test ===")
 	fmt.Println()
 
-	pickupLocation := TestLocation{
-		Name:    "General Trias, Cavite",
-		Address: "General Trias, Cavite, Philippines",
-		State:   "Cavite",
-	}
+	businessLocation := ss.GetBusinessLocation()
+	fmt.Printf("Pickup Location: %s\n", businessLocation.Address)
+	fmt.Printf("Coordinates: %s, %s\n\n", businessLocation.Coordinates.Lat, businessLocation.Coordinates.Lng)
+
 	deliveryLocations := []TestLocation{
 		{Name: "Imus, Cavite", Address: "Imus, Cavite, Philippines", State: "Cavite"},
 		{Name: "Pasay City", Address: "Pasay City, Metro Manila, Philippines", State: "Metro Manila"},
@@ -85,11 +84,6 @@ func testCChoiceService(ctx context.Context) {
 		Phone: "+639171234567",
 	}
 
-	pickupCoords, err := geocoder.GeocodeShippingAddress(pickupLocation.Address)
-	if err != nil {
-		panic(err)
-	}
-
 	results := []QuotationResult{}
 	for _, location := range deliveryLocations {
 		deliveryCoords, err := geocoder.GeocodeShippingAddress(location.Address)
@@ -100,18 +94,7 @@ func testCChoiceService(ctx context.Context) {
 
 		for _, weight := range weights {
 			req := shipping.ShippingRequest{
-				PickupLocation: shipping.Location{
-					Address: pickupLocation.Address,
-					Coordinates: shipping.Coordinates{
-						Lat: pickupCoords.Lat,
-						Lng: pickupCoords.Lng,
-					},
-					OriginalAddress: shipping.Address{
-						State:   pickupLocation.State,
-						Country: "Philippines",
-					},
-					Contact: contact,
-				},
+				PickupLocation: *businessLocation,
 				DeliveryLocation: shipping.Location{
 					Address: location.Address,
 					Coordinates: shipping.Coordinates{
@@ -176,11 +159,9 @@ func testLalamoveService(ctx context.Context) {
 	fmt.Println("=== Lalamove Shipping Service - Matrix Test ===")
 	fmt.Println()
 
-	pickupLocation := TestLocation{
-		Name:    "General Trias, Cavite",
-		Address: "General Trias, Cavite, Philippines",
-		State:   "Cavite",
-	}
+	businessLocation := ss.GetBusinessLocation()
+	fmt.Printf("Pickup Location: %s\n", businessLocation.Address)
+	fmt.Printf("Coordinates: %s, %s\n\n", businessLocation.Coordinates.Lat, businessLocation.Coordinates.Lng)
 
 	deliveryLocations := []TestLocation{
 		{Name: "Imus, Cavite", Address: "Imus, Cavite, Philippines", State: "Cavite"},
@@ -196,11 +177,6 @@ func testLalamoveService(ctx context.Context) {
 		Phone: "+639171234567",
 	}
 
-	pickupCoords, err := geocoder.GeocodeShippingAddress(pickupLocation.Address)
-	if err != nil {
-		panic(err)
-	}
-
 	results := []QuotationResult{}
 	for _, location := range deliveryLocations {
 		deliveryCoords, err := geocoder.GeocodeShippingAddress(location.Address)
@@ -211,14 +187,7 @@ func testLalamoveService(ctx context.Context) {
 
 		for i, weight := range weights {
 			req := shipping.ShippingRequest{
-				PickupLocation: shipping.Location{
-					Address: pickupLocation.Address,
-					Coordinates: shipping.Coordinates{
-						Lat: pickupCoords.Lat,
-						Lng: pickupCoords.Lng,
-					},
-					Contact: contact,
-				},
+				PickupLocation: *businessLocation,
 				DeliveryLocation: shipping.Location{
 					Address: location.Address,
 					Coordinates: shipping.Coordinates{
