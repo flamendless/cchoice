@@ -15,10 +15,12 @@ import (
 )
 
 var flagGateway string
+var fetchAvailablePaymentMethodsOnly bool
 
 func init() {
 	f := cmdTestPayment.Flags
 	f().StringVarP(&flagGateway, "gateway", "g", "PAYMONGO", "Gateway name")
+	f().BoolVarP(&fetchAvailablePaymentMethodsOnly, "available", "a", true, "Fetch available payment methods only")
 	rootCmd.AddCommand(cmdTestPayment)
 }
 
@@ -39,6 +41,9 @@ var cmdTestPayment = &cobra.Command{
 			panic(err)
 		}
 		dump.Println("Available payment methods", resPaymentMethods)
+		if fetchAvailablePaymentMethodsOnly {
+			return
+		}
 
 		dbRW := database.New(database.DB_MODE_RW)
 		checkout, err := dbRW.GetQueries().CreateCheckout(cmd.Context(), "test_session_token")

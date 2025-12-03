@@ -301,6 +301,24 @@ func SetupProd() error {
 
 func GenImages() error {
 	if err := run(Command{
+		Type: CmdTmpExec,
+		Cmd:  "genimages",
+		Args: []string{
+			"convert_images", "--inpath=./cmd/web/static/images/brand_logos",
+			"--outpath=./cmd/web/static/images/brand_logos", "--format=webp"},
+	}); err != nil {
+		return err
+	}
+	if err := run(Command{
+		Type: CmdTmpExec,
+		Cmd:  "genimages",
+		Args: []string{
+			"convert_images", "--inpath=./cmd/web/static/images/payments",
+			"--outpath=./cmd/web/static/images/payments", "--format=webp"},
+	}); err != nil {
+		return err
+	}
+	if err := run(Command{
 		Type: CmdGoBuild,
 		Out:  filepath.Join(tmpDir, "genimages"),
 		Tags: []string{"imageprocessing", "staticfs"},
@@ -315,15 +333,6 @@ func GenImages() error {
 			"--inpath=./cmd/web/static/images/product_images/bosch",
 			"--outpath=./cmd/web/static/images/product_images",
 		},
-	}); err != nil {
-		return err
-	}
-	if err := run(Command{
-		Type: CmdTmpExec,
-		Cmd:  "genimages",
-		Args: []string{
-			"convert_images", "--inpath=./cmd/web/static/images/brand_logos",
-			"--outpath=./cmd/web/static/images/brand_logos", "--format=webp"},
 	}); err != nil {
 		return err
 	}
