@@ -14,23 +14,48 @@ templ ProvinceSelect() {
 			hx-get="/cchoice/shipping/address?data=provinces"
 			hx-trigger="load once"
 			hx-swap="beforeend"
+			hx-delete="/cchoice/shipping/quotation"
 			_="
 				on change
 					if my value is not ''
-						trigger reset on #city
-						trigger get on #city
+						-- Check if NCR is selected (special case)
+						put my options[my.selectedIndex].text into provinceName
+						if provinceName contains 'National Capital Region'
+							-- NCR special case: set city and barangay to NCR and disable them
+							set #city.innerHTML to '<option value=&quot;National Capital Region (NCR)&quot; selected>National Capital Region (NCR)</option>'
+							set #city.disabled to true
+							set #barangay.innerHTML to '<option value=&quot;National Capital Region (NCR)&quot; selected>National Capital Region (NCR)</option>'
+							set #barangay.disabled to true
+							-- Trigger change on barangay to activate the form's validation logic
+							trigger change on #barangay
+						else
+							-- Normal case: enable city and barangay, load cities
+							set #city.disabled to false
+							set #barangay.disabled to false
+							trigger reset on #city
+							trigger get on #city
 
-						if #barangay's value is not ''
-							trigger reset on #barangay
+							if #barangay's value is not ''
+								trigger reset on #barangay
+							end
+
+							-- Clear quotation for non-NCR provinces since user needs to select city/barangay
+							fetch /cchoice/shipping/quotation with method:'DELETE'
+							then trigger cartUpdated on the body
 						end
 					else
 						set #city's value to ''
 						set #barangay's value to ''
+						set #city.disabled to false
+						set #barangay.disabled to false
+						-- Clear quotation when province is cleared
+						fetch /cchoice/shipping/quotation with method:'DELETE'
+						then trigger cartUpdated on the body
 					end
 				end
 			"
 		>
-			<option value=""> </option>
+			<option value="">Select Province</option>
 		</select>
 		<label
 			class="absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none"
@@ -45,7 +70,7 @@ templ CitySelect() {
 		<select
 			id="city"
 			name="city"
-			class="border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent required-field"
+			class="border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent required-field disabled:opacity-50 disabled:cursor-not-allowed"
 			required
 			hx-get="/cchoice/shipping/address?data=cities"
 			hx-trigger="change, get"
@@ -57,10 +82,10 @@ templ CitySelect() {
 				end
 
 				on change
-					if my value is not ''
+					if my value is not '' and my.disabled is false
 						trigger reset on #barangay
 						trigger get on #barangay
-					else
+					else if my.disabled is false
 						set #barangay's value to ''
 					end
 				end
@@ -81,7 +106,7 @@ templ BarangaySelect() {
 		<select
 			id="barangay"
 			name="barangay"
-			class="border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent required-field"
+			class="border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent required-field disabled:opacity-50 disabled:cursor-not-allowed"
 			required
 			hx-get="/cchoice/shipping/address?data=barangays"
 			hx-trigger="change, get"
@@ -205,6 +230,13 @@ templ ShippingAddressSelect() {
 			<span>Calculating...</span>
 		</h1>
 	</div>
+	<div id="delivery-eta-loading-template" class="hidden">
+		<h1>Estimated Delivery Time</h1>
+		<h1 class="text-right flex items-center gap-1">
+			@svgInfinite("delivery-eta-spinner")
+			<span>Calculating...</span>
+		</h1>
+	</div>
 	<div
 		class="flex flex-col gap-2 w-full max-w-lg"
 		id="shipping-form"
@@ -213,8 +245,8 @@ templ ShippingAddressSelect() {
 		hx-swap="none"
 		_="
 			on change from .required-field
-				if #address_line1.value !== '' and #city.value !== '' and #province.value !== '' and #barangay.value !== ''
-					log 'All fields completed, calculating shipping...'
+				if #city.value !== '' and #province.value !== '' and #barangay.value !== ''
+					log 'Province, city, and barangay completed, calculating shipping...'
 					trigger post on #shipping-form
 				end
 			end
@@ -222,17 +254,30 @@ templ ShippingAddressSelect() {
 			on htmx:beforeRequest
 				if event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/cchoice/shipping/quotation'
 					put #delivery-fee-row into deliveryRow
-					put #delivery-fee-loading-template into loadingTemplate
-					if deliveryRow is not null and loadingTemplate is not null
-						set deliveryRow.innerHTML to loadingTemplate.innerHTML
+					put #delivery-fee-loading-template into feeLoadingTemplate
+					if deliveryRow is not null and feeLoadingTemplate is not null
+						set deliveryRow.innerHTML to feeLoadingTemplate.innerHTML
+					end
+
+					put #delivery-eta-row into etaRow
+					put #delivery-eta-loading-template into etaLoadingTemplate
+					if etaRow is not null and etaLoadingTemplate is not null
+						set etaRow.innerHTML to etaLoadingTemplate.innerHTML
 					end
 				end
 			end
 
 			on htmx:afterRequest
 				if event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/cchoice/shipping/quotation'
-					trigger get on #cart-summary
+					trigger get on #cart-summary-content
+					-- Save shipping form values to sessionStorage for page refresh
+					call saveShippingFormState()
 				end
+			end
+
+			on load
+				-- Restore shipping form values from sessionStorage on page load
+				call restoreShippingFormState()
 			end
 		"
 	>
@@ -300,4 +345,72 @@ templ ShippingAddressSelect() {
 		@CitySelect()
 		@BarangaySelect()
 	</div>
+	<script type="text/javascript">
+		function saveShippingFormState() {
+			const formData = {
+				province: document.getElementById('province')?.value || '',
+				city: document.getElementById('city')?.value || '',
+				barangay: document.getElementById('barangay')?.value || '',
+				provinceText: document.getElementById('province')?.selectedOptions[0]?.text || '',
+				cityDisabled: document.getElementById('city')?.disabled || false,
+				barangayDisabled: document.getElementById('barangay')?.disabled || false
+			};
+			sessionStorage.setItem('shippingFormState', JSON.stringify(formData));
+		}
+
+		function restoreShippingFormState() {
+			const saved = sessionStorage.getItem('shippingFormState');
+			if (!saved)
+				return
+
+			try {
+				const formData = JSON.parse(saved);
+				const provinceSelect = document.getElementById('province');
+				const citySelect = document.getElementById('city');
+				const barangaySelect = document.getElementById('barangay');
+
+				// Wait for province options to load
+				if (provinceSelect && formData.province) {
+					const checkAndRestore = () => {
+						if (provinceSelect.options.length > 1) {
+							provinceSelect.value = formData.province;
+
+							// Check if NCR
+							if (formData.provinceText && formData.provinceText.includes('National Capital Region')) {
+								// Restore NCR state
+								citySelect.innerHTML = '<option value="' + formData.city + '" selected>' + formData.city + '</option>';
+								citySelect.disabled = formData.cityDisabled;
+								barangaySelect.innerHTML = '<option value="' + formData.barangay + '" selected>' + formData.barangay + '</option>';
+								barangaySelect.disabled = formData.barangayDisabled;
+							} else {
+								// For other provinces, trigger the change to load cities
+								provinceSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+								// Wait for cities to load, then restore
+								setTimeout(() => {
+									if (citySelect && formData.city) {
+										citySelect.value = formData.city;
+										citySelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+										// Wait for barangays to load
+										setTimeout(() => {
+											if (barangaySelect && formData.barangay) {
+												barangaySelect.value = formData.barangay;
+											}
+										}, 300);
+									}
+								}, 300);
+							}
+						} else {
+							// Options not loaded yet, wait a bit
+							setTimeout(checkAndRestore, 100);
+						}
+					};
+					checkAndRestore();
+				}
+			} catch (e) {
+				console.error('Failed to restore shipping form state:', e);
+			}
+		}
+	</script>
 }

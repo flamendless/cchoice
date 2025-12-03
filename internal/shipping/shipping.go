@@ -1,6 +1,9 @@
 package shipping
 
-import "encoding/gob"
+import (
+	"context"
+	"encoding/gob"
+)
 
 func init() {
 	gob.Register(&ShippingQuotation{})
@@ -102,4 +105,5 @@ type IShippingService interface {
 	GetOrderStatus(string) (*ShippingOrder, error)
 	CancelOrder(string) error
 	GetBusinessLocation() *Location
+	GetDeliveryETA(ctx context.Context, province string) string
 }

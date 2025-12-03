@@ -116,10 +116,17 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		// Custom static file handler with caching
 		r.Handle("/static/*", http.StripPrefix("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			const logtag = "[Static Handler]"
+			ctx := r.Context()
+
 			path := r.URL.Path
 			notModified, file, err := httputil.CacheHeaders(w, r, s.staticFS, path)
 			if err != nil {
-				logs.Log().Debug("[Static Handler]", zap.Error(err), zap.String("path", path))
+				logs.LogCtx(ctx).Debug(
+					logtag,
+					zap.String("path", path),
+					zap.Error(err),
+				)
 				httputil.SetNoCacheHeaders(w)
 				http.NotFound(w, r)
 				return
@@ -132,7 +139,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 			info, err := file.Stat()
 			if err != nil {
-				logs.Log().Error("[Static Handler]", zap.Error(err))
+				logs.LogCtx(ctx).Error(
+					logtag,
+					zap.Error(err),
+				)
 				httputil.SetNoCacheHeaders(w)
 				http.NotFound(w, r)
 				return
@@ -170,15 +180,16 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Products Image Handler]"
+	ctx := r.Context()
+
 	path := r.URL.Query().Get("path")
 
 	cleanPath, err := validateImagePath(path, []string{constants.PathProductImages})
 	if err != nil {
-		logs.Log().Warn(
+		logs.LogCtx(ctx).Warn(
 			logtag,
-			zap.Error(err),
 			zap.String("path", path),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
+			zap.Error(err),
 		)
 		http.Error(w, "Invalid image path", http.StatusBadRequest)
 		return
@@ -203,12 +214,13 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) brandLogoHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Brand Logo Handler]"
+	ctx := r.Context()
+
 	filename := r.URL.Query().Get("filename")
 	if filename == "" {
-		logs.Log().Debug(
+		logs.LogCtx(ctx).Debug(
 			logtag,
 			zap.String("error", "missing filename parameter"),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 		http.Error(w, "missing filename parameter", http.StatusBadRequest)
 		return
@@ -218,11 +230,10 @@ func (s *Server) brandLogoHandler(w http.ResponseWriter, r *http.Request) {
 
 	cleanPath, err := validateImagePath(path, []string{"static/images/brand_logos/"})
 	if err != nil {
-		logs.Log().Warn(
+		logs.LogCtx(ctx).Warn(
 			logtag,
-			zap.Error(err),
 			zap.String("path", path),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
+			zap.Error(err),
 		)
 		http.Error(w, "Invalid image path", http.StatusBadRequest)
 		return
@@ -235,12 +246,13 @@ func (s *Server) brandLogoHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) assetImageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Asset Image Handler]"
+	ctx := r.Context()
+
 	filename := r.URL.Query().Get("filename")
 	if filename == "" {
-		logs.Log().Debug(
+		logs.LogCtx(ctx).Debug(
 			logtag,
 			zap.String("error", "missing filename parameter"),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 		http.Error(w, "missing filename parameter", http.StatusBadRequest)
 		return
@@ -250,11 +262,10 @@ func (s *Server) assetImageHandler(w http.ResponseWriter, r *http.Request) {
 
 	cleanPath, err := validateImagePath(path, []string{"static/images/"})
 	if err != nil {
-		logs.Log().Warn(
+		logs.LogCtx(ctx).Warn(
 			logtag,
-			zap.Error(err),
 			zap.String("path", path),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
+			zap.Error(err),
 		)
 		http.Error(w, "Invalid image path", http.StatusBadRequest)
 		return
@@ -273,11 +284,15 @@ func (s *Server) serveImage(
 	cacheKey []byte,
 	logtag string,
 ) {
+	ctx := r.Context()
 	if data, ok := s.cache.HasGet(nil, cacheKey); ok {
 		w.Header().Set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400")
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		if _, err := w.Write(data); err != nil {
-			logs.Log().Error(logtag, zap.Error(err))
+			logs.LogCtx(ctx).Error(
+				logtag,
+				zap.Error(err),
+			)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		metrics.Cache.MemHit()
@@ -287,7 +302,10 @@ func (s *Server) serveImage(
 	}
 
 	if notModified, file, err := httputil.CacheHeaders(w, r, s.productImageFS, path); err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
 		httputil.SetNoCacheHeaders(w)
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -300,14 +318,21 @@ func (s *Server) serveImage(
 
 	imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, path, ext)
 	if err != nil {
-		logs.Log().Error(logtag, zap.String("path", path), zap.Error(err))
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("path", path),
+			zap.Error(err),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	if _, err := w.Write([]byte(imgData)); err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -317,12 +342,14 @@ func (s *Server) serveImage(
 
 func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Index handler]"
-	if err := components.HomePage().Render(r.Context(), w); err != nil {
-		logs.Log().Error(logtag,
-			zap.Error(err),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
+	ctx := r.Context()
+
+	if err := components.HomePage().Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
 			zap.String("path", r.URL.Path),
 			zap.String("method", r.Method),
+			zap.Error(err),
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -331,20 +358,22 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Changelogs Handler]"
+	ctx := r.Context()
+
 	f, err := os.Open("./CHANGELOGS.md")
 	if err != nil {
-		logs.Log().Error(logtag,
+		logs.LogCtx(ctx).Error(
+			logtag,
 			zap.Error(err),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer func() {
 		if err := f.Close(); err != nil {
-			logs.Log().Error(logtag,
+			logs.LogCtx(ctx).Error(
+				logtag,
 				zap.Error(err),
-				zap.String("request_id", middleware.GetReqID(r.Context())),
 			)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -353,9 +382,9 @@ func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	if _, err := io.Copy(w, f); err != nil {
-		logs.Log().Error(logtag,
+		logs.LogCtx(ctx).Error(
+			logtag,
 			zap.Error(err),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -364,19 +393,21 @@ func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Health Handler]"
+	ctx := r.Context()
+
 	jsonResp, err := json.Marshal(s.dbRO.Health())
 	if err != nil {
-		logs.Log().Error(logtag,
+		logs.LogCtx(ctx).Error(
+			logtag,
 			zap.Error(err),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if _, err := w.Write(jsonResp); err != nil {
-		logs.Log().Error(logtag,
+		logs.LogCtx(ctx).Error(
+			logtag,
 			zap.Error(err),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -394,8 +425,10 @@ func (s *Server) versionHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Header Texts Handler]"
+	ctx := r.Context()
+
 	settings, err := requests.GetSettingsData(
-		r.Context(),
+		ctx,
 		s.cache,
 		&s.SF,
 		s.dbRO,
@@ -403,9 +436,9 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		[]string{"email", "mobile_no"},
 	)
 	if err != nil {
-		logs.Log().Error(logtag,
+		logs.LogCtx(ctx).Error(
+			logtag,
 			zap.Error(err),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -426,10 +459,10 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	if err := components.HeaderRow1Texts(texts).Render(r.Context(), w); err != nil {
-		logs.Log().Error(logtag,
+	if err := components.HeaderRow1Texts(texts).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
 			zap.Error(err),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -438,8 +471,10 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Footer Texts Handler]"
+	ctx := r.Context()
+
 	settings, err := requests.GetSettingsData(
-		r.Context(),
+		ctx,
 		s.cache,
 		&s.SF,
 		s.dbRO,
@@ -454,9 +489,9 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	)
 	if err != nil {
-		logs.Log().Error(logtag,
+		logs.LogCtx(ctx).Error(
+			logtag,
 			zap.Error(err),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -505,10 +540,10 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	if err := components.FooterRow1Texts(texts).Render(r.Context(), w); err != nil {
-		logs.Log().Error(logtag,
+	if err := components.FooterRow1Texts(texts).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
 			zap.Error(err),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -517,8 +552,9 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) storeHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Store Handler]"
+	ctx := r.Context()
 	settings, err := requests.GetSettingsData(
-		r.Context(),
+		ctx,
 		s.cache,
 		&s.SF,
 		s.dbRO,
@@ -526,9 +562,9 @@ func (s *Server) storeHandler(w http.ResponseWriter, r *http.Request) {
 		[]string{"address"},
 	)
 	if err != nil {
-		logs.Log().Error(logtag,
+		logs.LogCtx(ctx).Error(
+			logtag,
 			zap.Error(err),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -541,34 +577,41 @@ func (s *Server) storeHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Search Handler]"
+	ctx := r.Context()
+
 	if err := r.ParseForm(); err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	search := r.PostFormValue("search")
 	products, err := s.dbRO.GetQueries().GetProductsBySearchQuery(
-		r.Context(),
+		ctx,
 		queries.GetProductsBySearchQueryParams{
 			Name:  search,
 			Limit: constants.MaxSearchShowResults,
 		},
 	)
 	if err != nil || len(products) == 0 {
-		logs.Log().Info(logtag, zap.String("query", search))
+		logs.LogCtx(ctx).Info(
+			logtag,
+			zap.String("query", search),
+		)
 		return
 	}
 
-	logs.Log().Info(
+	logs.LogCtx(ctx).Info(
 		logtag,
 		zap.Int("count", len(products)),
 		zap.Int("limit", constants.MaxSearchShowResults),
 		zap.String("query", search),
-		zap.String("request_id", middleware.GetReqID(r.Context())),
 	)
 
-	g, ctx := errgroup.WithContext(r.Context())
+	g, gctx := errgroup.WithContext(ctx)
 	g.SetLimit(10)
 
 	var mu sync.Mutex
@@ -582,9 +625,9 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		g.Go(func() error {
 			imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, products[i].ThumbnailPath, images.IMAGE_FORMAT_WEBP)
 			if err != nil {
-				logs.Log().Error(logtag,
+				logs.LogCtx(gctx).Error(
+					logtag,
 					zap.Error(err),
-					zap.String("request_id", middleware.GetReqID(ctx)),
 				)
 				return nil
 			}
@@ -599,30 +642,41 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := g.Wait(); err != nil {
-		logs.Log().Error(logtag, zap.Error(err), zap.String("request_id", middleware.GetReqID(r.Context())))
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	for _, product := range productResults {
-		if err := components.SearchResultProductCard(product).Render(r.Context(), w); err != nil {
-			logs.Log().Error(logtag, zap.Error(err), zap.String("request_id", middleware.GetReqID(r.Context())))
+		if err := components.SearchResultProductCard(product).Render(ctx, w); err != nil {
+			logs.LogCtx(ctx).Error(
+				logtag,
+				zap.Error(err),
+			)
 			return
 		}
 	}
 
-	if err := components.SearchMore(search).Render(r.Context(), w); err != nil {
-		logs.Log().Error(logtag, zap.Error(err), zap.String("request_id", middleware.GetReqID(r.Context())))
+	if err := components.SearchMore(search).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
 		return
 	}
 }
 
 func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Checkouts Handler]"
+	ctx := r.Context()
+
 	if err := r.ParseForm(); err != nil {
-		logs.Log().Error(logtag,
+		logs.LogCtx(ctx).Error(
+			logtag,
 			zap.Error(err),
-			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -631,13 +685,16 @@ func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
 	switch s.paymentGateway.GatewayEnum() {
 	case payments.PAYMENT_GATEWAY_PAYMONGO:
 		// if err := s.paymentGateway.CheckoutPaymentHandler(w, r); err != nil {
-		// 	logs.Log().Error("[PayMongo] Checkouts handler", zap.Error(err))
+		// 	logs.LogCtx(ctx).Error("[PayMongo] Checkouts handler", zap.Error(err))
 		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
 		// 	return
 		// }
 	default:
 		err := errs.ErrServerUnimplementedGateway
-		logs.Log().Error(err.Error(), zap.String("gateway", s.paymentGateway.GatewayEnum().String()))
+		logs.LogCtx(ctx).Error(
+			err.Error(),
+			zap.String("gateway", s.paymentGateway.GatewayEnum().String()),
+		)
 		http.Error(w, err.Error(), http.StatusNotImplemented)
 		return
 	}

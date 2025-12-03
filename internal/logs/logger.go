@@ -5,6 +5,7 @@ import (
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/errs"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -12,6 +13,7 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -64,6 +66,21 @@ func Log() *zap.Logger {
 	loggerOnce.Do(func() {
 		InitLog()
 	})
+	return logger
+}
+
+func LogCtx(ctx context.Context) *zap.Logger {
+	logger := Log()
+
+	if ctx == nil {
+		return logger
+	}
+
+	requestID := middleware.GetReqID(ctx)
+	if requestID != "" {
+		return logger.With(zap.String("request_id", requestID))
+	}
+
 	return logger
 }
 
