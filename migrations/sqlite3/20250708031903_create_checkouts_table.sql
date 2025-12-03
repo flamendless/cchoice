@@ -39,7 +39,6 @@ CREATE TABLE tbl_checkout_payments (
 	checkout_url TEXT NOT NULL,
 	client_key TEXT NOT NULL,
 	reference_number TEXT NOT NULL,
-	payment_status TEXT NOT NULL,
 	payment_method_type TEXT NOT NULL,
 	paid_at DATETIME NOT NULL,
 	metadata_remarks TEXT NOT NULL,

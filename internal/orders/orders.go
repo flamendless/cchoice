@@ -82,22 +82,30 @@ func CreateOrderFromCheckout(
 		totalAmount += int64(params.ShippingQuotation.Fee * 100)
 	}
 
+	var paymentIntentID sql.NullString
+	if paymongoResponse.Data.Attributes.PaymentIntent.ID != "" {
+		paymentIntentID = sql.NullString{
+			String: paymongoResponse.Data.Attributes.PaymentIntent.ID,
+			Valid:  true,
+		}
+	}
+
 	placeholderPayment := queries.CreateCheckoutPaymentParams{
 		ID:                     checkoutSessionID,
 		Gateway:                params.PaymentGateway.GatewayEnum().String(),
 		CheckoutID:             params.CheckoutID,
-		Status:                 "pending",
+		Status:                 enums.PAYMENT_STATUS_PENDING.String(),
 		Description:            "Order payment - status pending",
 		TotalAmount:            totalAmount,
 		CheckoutUrl:            paymongoResponse.Data.Attributes.CheckoutURL,
 		ClientKey:              paymongoResponse.Data.Attributes.ClientKey,
 		ReferenceNumber:        paymongoResponse.Data.Attributes.ReferenceNumber,
-		PaymentStatus:          "pending",
 		PaymentMethodType:      strings.Join(paymongoResponse.Data.Attributes.PaymentMethodTypes, ","),
 		PaidAt:                 time.Time{},
 		MetadataRemarks:        "",
 		MetadataNotes:          "",
 		MetadataCustomerNumber: "",
+		PaymentIntentID:        paymentIntentID,
 	}
 
 	checkoutPayment, err := dbRW.GetQueries().CreateCheckoutPayment(ctx, placeholderPayment)

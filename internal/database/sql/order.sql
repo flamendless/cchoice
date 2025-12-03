@@ -75,6 +75,14 @@ SET status = ?,
 WHERE id = ?
 RETURNING *;
 
+-- name: UpdateOrderOnPaymentSuccess :one
+UPDATE tbl_orders
+SET status = ?,
+	paid_at = DATETIME('now'),
+	updated_at = DATETIME('now')
+WHERE id = ?
+RETURNING *;
+
 -- name: UpdateOrderShippingInfo :one
 UPDATE tbl_orders
 SET shipping_service = ?,
