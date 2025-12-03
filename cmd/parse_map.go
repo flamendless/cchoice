@@ -152,6 +152,23 @@ var cmdParseMap = &cobra.Command{
 		// dump.Println(data)
 		dump.Println("Done parsing map data")
 
+		// Special case: Add NCR as a province within NCR region
+		for _, region := range data {
+			if region.Name == "National Capital Region (NCR)" && region.Level == enums.LEVEL_REGION {
+				ncrProvince := &maps_models.Map{
+					ID:       region.ID + "_PROVINCE",
+					Name:     "National Capital Region (NCR)",
+					Code:     region.Code,
+					Level:    enums.LEVEL_PROVINCE,
+					Contents: make([]*maps_models.Map, 0, 1),
+					Parent:   region,
+				}
+				region.Contents = append([]*maps_models.Map{ncrProvince}, region.Contents...)
+				logs.Log().Info("Added NCR as province", zap.String("id", ncrProvince.ID))
+				break
+			}
+		}
+
 		processTimeSort := time.Now()
 		maps_models.SortMap(data)
 		metrics.Add("sorting", time.Since(processTimeSort))

@@ -42090,6 +42090,14 @@ var PhilippinesMap = []*Map{
 		Name:  "National Capital Region (NCR)",
 		Code:  "130000000",
 		Level: enums.LEVEL_REGION,
+		Contents: []*Map{
+			{
+				ID:    "1300000000_PROVINCE",
+				Name:  "National Capital Region (NCR)",
+				Code:  "130000000",
+				Level: enums.LEVEL_PROVINCE,
+			},
+		},
 	},
 	{
 		ID:    "1800000000",
