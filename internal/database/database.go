@@ -26,6 +26,7 @@ type Service interface {
 	Health() map[string]string
 	Close() error
 	GetQueries() *queries.Queries
+	GetDB() *sql.DB
 }
 
 type service struct {
@@ -35,6 +36,10 @@ type service struct {
 
 func (s *service) GetQueries() *queries.Queries {
 	return s.queries
+}
+
+func (s *service) GetDB() *sql.DB {
+	return s.db
 }
 
 var (

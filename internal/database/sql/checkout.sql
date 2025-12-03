@@ -102,14 +102,39 @@ INSERT INTO tbl_checkout_payments(
 	checkout_url,
 	client_key,
 	reference_number,
-	payment_status,
 	payment_method_type,
 	paid_at,
 	metadata_remarks,
 	metadata_notes,
-	metadata_customer_number
+	metadata_customer_number,
+	payment_intent_id
 ) VALUES (
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?
 ) RETURNING *;
+
+-- name: GetCheckoutPaymentByCheckoutID :one
+SELECT * FROM tbl_checkout_payments
+WHERE checkout_id = ?
+LIMIT 1;
+
+-- name: GetCheckoutPaymentByReferenceNumber :one
+SELECT * FROM tbl_checkout_payments
+WHERE reference_number = ?
+LIMIT 1;
+
+-- name: UpdateCheckoutPaymentOnSuccess :one
+UPDATE tbl_checkout_payments
+SET status = ?,
+	paid_at = DATETIME('now'),
+	updated_at = DATETIME('now')
+WHERE id = ?
+RETURNING *;
+
+-- name: UpdateCheckoutStatus :one
+UPDATE tbl_checkouts
+SET status = ?,
+	updated_at = DATETIME('now')
+WHERE id = ?
+RETURNING *;

@@ -40,6 +40,16 @@ func validate() {
 	if cfg.PayMongo.BaseURL == "" || cfg.PayMongo.APIKey == "" || cfg.PayMongo.SuccessURL == "" || cfg.PayMongo.CancelURL == "" {
 		panic(errs.ErrPaymongoAPIKeyRequired)
 	}
+
+	if cfg.IsProd() {
+		if !strings.HasPrefix(cfg.PayMongo.APIKey, "sk_live_") {
+			panic(fmt.Errorf("%w: production environment requires 'sk_live_' API key", errs.ErrPaymongoAPIKeyInvalid))
+		}
+	} else {
+		if !strings.HasPrefix(cfg.PayMongo.APIKey, "sk_test_") {
+			panic(fmt.Errorf("%w: non-production environment requires 'sk_test_' API key", errs.ErrPaymongoAPIKeyInvalid))
+		}
+	}
 }
 
 func MustInit() *PayMongo {
@@ -77,6 +87,7 @@ func (p PayMongo) GetAuth() string {
 func (p PayMongo) CreateCheckoutPaymentSession(
 	payload payments.CreateCheckoutSessionPayload,
 ) (payments.CreateCheckoutSessionResponse, error) {
+	const logTag = "[PayMongo Create Checkout Payment Session]"
 	paymongoPayload, ok := payload.(CreateCheckoutSessionPayload)
 	if !ok {
 		return nil, fmt.Errorf("%w. Not for PayMongo", errs.ErrPaymentPayload)
@@ -98,7 +109,7 @@ func (p PayMongo) CreateCheckoutPaymentSession(
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil || resp == nil || resp.StatusCode != http.StatusOK {
-		logs.JSONResponse("[PayMongo] CreateCheckoutSession", resp)
+		logs.JSONResponse(logTag, resp)
 		return nil, errors.Join(errs.ErrPaymentClient, err)
 	}
 
@@ -110,13 +121,14 @@ func (p PayMongo) CreateCheckoutPaymentSession(
 
 	var res CreateCheckoutSessionResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		logs.JSONResponse("[PayMongo] CreateCheckoutSession", resp)
+		logs.JSONResponse(logTag, resp)
 		return nil, errors.Join(errs.ErrPaymentResponse, err)
 	}
 	return &res, nil
 }
 
 func (p PayMongo) GetAvailablePaymentMethods() (payments.GetAvailablePaymentMethodsResponse, error) {
+	const logTag = "[PayMongo Get Available Payment Methods]"
 	URL := p.baseURL + "/merchants/capabilities/payment_methods"
 	req, err := http.NewRequest(http.MethodGet, URL, nil)
 	if err != nil {
@@ -127,7 +139,7 @@ func (p PayMongo) GetAvailablePaymentMethods() (payments.GetAvailablePaymentMeth
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil || resp == nil || resp.StatusCode != http.StatusOK {
-		logs.JSONResponse("[PayMongo] GetAvailablePaymentMethods", resp)
+		logs.JSONResponse(logTag, resp)
 		return nil, errors.Join(errs.ErrPaymentClient, err)
 	}
 
@@ -139,13 +151,13 @@ func (p PayMongo) GetAvailablePaymentMethods() (payments.GetAvailablePaymentMeth
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		logs.JSONResponse("[PayMongo] GetAvailablePaymentMethods", resp)
+		logs.JSONResponse(logTag, resp)
 		return nil, errors.Join(errs.ErrPaymentResponse, err)
 	}
 
 	var res GetAvailablePaymentMethodsResponse
 	if err := json.Unmarshal(data, &res.Data); err != nil {
-		logs.JSONResponse("[PayMongo] GetAvailablePaymentMethods", resp)
+		logs.JSONResponse(logTag, resp)
 		return nil, errors.Join(errs.ErrPaymentResponse, err)
 	}
 	return &res, nil
@@ -193,7 +205,7 @@ func (p PayMongo) CreatePayload(
 	cancelURLWithRef := p.cancelURL
 	if u, err := url.Parse(cancelURLWithRef); err == nil {
 		q := u.Query()
-		q.Set("order_ref", referenceNumber)
+		q.Set("payment_ref", referenceNumber)
 		u.RawQuery = q.Encode()
 		cancelURLWithRef = u.String()
 	}
@@ -201,7 +213,7 @@ func (p PayMongo) CreatePayload(
 	successURLWithRef := p.successURL
 	if u, err := url.Parse(successURLWithRef); err == nil {
 		q := u.Query()
-		q.Set("order_ref", referenceNumber)
+		q.Set("payment_ref", referenceNumber)
 		u.RawQuery = q.Encode()
 		successURLWithRef = u.String()
 	}
@@ -233,6 +245,36 @@ func (p PayMongo) CreatePayload(
 		dump.Println("PAYMONGO PAYLOAD", payload)
 	}
 	return payload
+}
+
+func (p PayMongo) GetPaymentIntent(paymentIntentID string) (*GetPaymentIntentResponse, error) {
+	const logTag = "[PayMongo Get Payment Intent]"
+	URL := fmt.Sprintf("%s/payment_intents/%s", p.baseURL, paymentIntentID)
+	req, err := http.NewRequest(http.MethodGet, URL, nil)
+	if err != nil {
+		return nil, errors.Join(errs.ErrPaymentClient, err)
+	}
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", p.GetAuth())
+
+	resp, err := p.client.Do(req)
+	if err != nil || resp == nil || resp.StatusCode != http.StatusOK {
+		logs.JSONResponse(logTag, resp)
+		return nil, errors.Join(errs.ErrPaymentClient, err)
+	}
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			logs.Log().Error("Deferred", zap.Error(err))
+		}
+	}()
+
+	var res GetPaymentIntentResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		logs.JSONResponse(logTag, resp)
+		return nil, errors.Join(errs.ErrPaymentResponse, err)
+	}
+	return &res, nil
 }
 
 var _ payments.IPaymentGateway = (*PayMongo)(nil)

@@ -33,6 +33,7 @@ type TblCheckout struct {
 	SessionID string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	Status    string
 }
 
 type TblCheckoutLine struct {
@@ -59,7 +60,6 @@ type TblCheckoutPayment struct {
 	CheckoutUrl            string
 	ClientKey              string
 	ReferenceNumber        string
-	PaymentStatus          string
 	PaymentMethodType      string
 	PaidAt                 time.Time
 	MetadataRemarks        string
@@ -67,6 +67,7 @@ type TblCheckoutPayment struct {
 	MetadataCustomerNumber string
 	CreatedAt              time.Time
 	UpdatedAt              time.Time
+	PaymentIntentID        sql.NullString
 }
 
 type TblExternalApiLog struct {
@@ -140,6 +141,7 @@ type TblOrder struct {
 	Remarks                  sql.NullString
 	CreatedAt                time.Time
 	UpdatedAt                time.Time
+	PaidAt                   sql.NullTime
 }
 
 type TblOrderLine struct {

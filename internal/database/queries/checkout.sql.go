@@ -51,7 +51,7 @@ INSERT INTO tbl_checkouts(
 	session_id
 ) VALUES (
 	?
-) RETURNING id, session_id, created_at, updated_at
+) RETURNING id, session_id, created_at, updated_at, status
 `
 
 func (q *Queries) CreateCheckout(ctx context.Context, sessionID string) (TblCheckout, error) {
@@ -62,6 +62,7 @@ func (q *Queries) CreateCheckout(ctx context.Context, sessionID string) (TblChec
 		&i.SessionID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Status,
 	)
 	return i, err
 }
@@ -132,17 +133,17 @@ INSERT INTO tbl_checkout_payments(
 	checkout_url,
 	client_key,
 	reference_number,
-	payment_status,
 	payment_method_type,
 	paid_at,
 	metadata_remarks,
 	metadata_notes,
-	metadata_customer_number
+	metadata_customer_number,
+	payment_intent_id
 ) VALUES (
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?
-) RETURNING id, gateway, checkout_id, status, description, total_amount, checkout_url, client_key, reference_number, payment_status, payment_method_type, paid_at, metadata_remarks, metadata_notes, metadata_customer_number, created_at, updated_at
+) RETURNING id, gateway, checkout_id, status, description, total_amount, checkout_url, client_key, reference_number, payment_method_type, paid_at, metadata_remarks, metadata_notes, metadata_customer_number, created_at, updated_at, payment_intent_id
 `
 
 type CreateCheckoutPaymentParams struct {
@@ -155,12 +156,12 @@ type CreateCheckoutPaymentParams struct {
 	CheckoutUrl            string
 	ClientKey              string
 	ReferenceNumber        string
-	PaymentStatus          string
 	PaymentMethodType      string
 	PaidAt                 time.Time
 	MetadataRemarks        string
 	MetadataNotes          string
 	MetadataCustomerNumber string
+	PaymentIntentID        sql.NullString
 }
 
 func (q *Queries) CreateCheckoutPayment(ctx context.Context, arg CreateCheckoutPaymentParams) (TblCheckoutPayment, error) {
@@ -174,12 +175,12 @@ func (q *Queries) CreateCheckoutPayment(ctx context.Context, arg CreateCheckoutP
 		arg.CheckoutUrl,
 		arg.ClientKey,
 		arg.ReferenceNumber,
-		arg.PaymentStatus,
 		arg.PaymentMethodType,
 		arg.PaidAt,
 		arg.MetadataRemarks,
 		arg.MetadataNotes,
 		arg.MetadataCustomerNumber,
+		arg.PaymentIntentID,
 	)
 	var i TblCheckoutPayment
 	err := row.Scan(
@@ -192,7 +193,6 @@ func (q *Queries) CreateCheckoutPayment(ctx context.Context, arg CreateCheckoutP
 		&i.CheckoutUrl,
 		&i.ClientKey,
 		&i.ReferenceNumber,
-		&i.PaymentStatus,
 		&i.PaymentMethodType,
 		&i.PaidAt,
 		&i.MetadataRemarks,
@@ -200,6 +200,7 @@ func (q *Queries) CreateCheckoutPayment(ctx context.Context, arg CreateCheckoutP
 		&i.MetadataCustomerNumber,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.PaymentIntentID,
 	)
 	return i, err
 }
@@ -343,6 +344,68 @@ func (q *Queries) GetCheckoutLinesByCheckoutID(ctx context.Context, checkoutID i
 	return items, nil
 }
 
+const getCheckoutPaymentByCheckoutID = `-- name: GetCheckoutPaymentByCheckoutID :one
+SELECT id, gateway, checkout_id, status, description, total_amount, checkout_url, client_key, reference_number, payment_method_type, paid_at, metadata_remarks, metadata_notes, metadata_customer_number, created_at, updated_at, payment_intent_id FROM tbl_checkout_payments
+WHERE checkout_id = ?
+LIMIT 1
+`
+
+func (q *Queries) GetCheckoutPaymentByCheckoutID(ctx context.Context, checkoutID int64) (TblCheckoutPayment, error) {
+	row := q.db.QueryRowContext(ctx, getCheckoutPaymentByCheckoutID, checkoutID)
+	var i TblCheckoutPayment
+	err := row.Scan(
+		&i.ID,
+		&i.Gateway,
+		&i.CheckoutID,
+		&i.Status,
+		&i.Description,
+		&i.TotalAmount,
+		&i.CheckoutUrl,
+		&i.ClientKey,
+		&i.ReferenceNumber,
+		&i.PaymentMethodType,
+		&i.PaidAt,
+		&i.MetadataRemarks,
+		&i.MetadataNotes,
+		&i.MetadataCustomerNumber,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.PaymentIntentID,
+	)
+	return i, err
+}
+
+const getCheckoutPaymentByReferenceNumber = `-- name: GetCheckoutPaymentByReferenceNumber :one
+SELECT id, gateway, checkout_id, status, description, total_amount, checkout_url, client_key, reference_number, payment_method_type, paid_at, metadata_remarks, metadata_notes, metadata_customer_number, created_at, updated_at, payment_intent_id FROM tbl_checkout_payments
+WHERE reference_number = ?
+LIMIT 1
+`
+
+func (q *Queries) GetCheckoutPaymentByReferenceNumber(ctx context.Context, referenceNumber string) (TblCheckoutPayment, error) {
+	row := q.db.QueryRowContext(ctx, getCheckoutPaymentByReferenceNumber, referenceNumber)
+	var i TblCheckoutPayment
+	err := row.Scan(
+		&i.ID,
+		&i.Gateway,
+		&i.CheckoutID,
+		&i.Status,
+		&i.Description,
+		&i.TotalAmount,
+		&i.CheckoutUrl,
+		&i.ClientKey,
+		&i.ReferenceNumber,
+		&i.PaymentMethodType,
+		&i.PaidAt,
+		&i.MetadataRemarks,
+		&i.MetadataNotes,
+		&i.MetadataCustomerNumber,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.PaymentIntentID,
+	)
+	return i, err
+}
+
 const removeItemInCheckoutLinesByID = `-- name: RemoveItemInCheckoutLinesByID :exec
 DELETE FROM tbl_checkout_lines
 WHERE checkout_id = ?
@@ -387,4 +450,69 @@ func (q *Queries) UpdateCheckoutLineQtyByID(ctx context.Context, arg UpdateCheck
 	var quantity int64
 	err := row.Scan(&quantity)
 	return quantity, err
+}
+
+const updateCheckoutPaymentOnSuccess = `-- name: UpdateCheckoutPaymentOnSuccess :one
+UPDATE tbl_checkout_payments
+SET status = ?,
+	paid_at = DATETIME('now'),
+	updated_at = DATETIME('now')
+WHERE id = ?
+RETURNING id, gateway, checkout_id, status, description, total_amount, checkout_url, client_key, reference_number, payment_method_type, paid_at, metadata_remarks, metadata_notes, metadata_customer_number, created_at, updated_at, payment_intent_id
+`
+
+type UpdateCheckoutPaymentOnSuccessParams struct {
+	Status string
+	ID     string
+}
+
+func (q *Queries) UpdateCheckoutPaymentOnSuccess(ctx context.Context, arg UpdateCheckoutPaymentOnSuccessParams) (TblCheckoutPayment, error) {
+	row := q.db.QueryRowContext(ctx, updateCheckoutPaymentOnSuccess, arg.Status, arg.ID)
+	var i TblCheckoutPayment
+	err := row.Scan(
+		&i.ID,
+		&i.Gateway,
+		&i.CheckoutID,
+		&i.Status,
+		&i.Description,
+		&i.TotalAmount,
+		&i.CheckoutUrl,
+		&i.ClientKey,
+		&i.ReferenceNumber,
+		&i.PaymentMethodType,
+		&i.PaidAt,
+		&i.MetadataRemarks,
+		&i.MetadataNotes,
+		&i.MetadataCustomerNumber,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.PaymentIntentID,
+	)
+	return i, err
+}
+
+const updateCheckoutStatus = `-- name: UpdateCheckoutStatus :one
+UPDATE tbl_checkouts
+SET status = ?,
+	updated_at = DATETIME('now')
+WHERE id = ?
+RETURNING id, session_id, created_at, updated_at, status
+`
+
+type UpdateCheckoutStatusParams struct {
+	Status string
+	ID     int64
+}
+
+func (q *Queries) UpdateCheckoutStatus(ctx context.Context, arg UpdateCheckoutStatusParams) (TblCheckout, error) {
+	row := q.db.QueryRowContext(ctx, updateCheckoutStatus, arg.Status, arg.ID)
+	var i TblCheckout
+	err := row.Scan(
+		&i.ID,
+		&i.SessionID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Status,
+	)
+	return i, err
 }
