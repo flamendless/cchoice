@@ -91,6 +91,21 @@ var cmdMigrateImagesLinode = &cobra.Command{
 			}
 		}
 
+		paymentLogosPath := filepath.Join(basePath, "payments")
+		if _, err := os.Stat(paymentLogosPath); err == nil {
+			logs.Log().Info(
+				"Migrating payment logos",
+				zap.String("path", paymentLogosPath),
+			)
+			if err := migrateImages(ctx, client, paymentLogosPath, basePath, "Payment logos", true); err != nil {
+				panic(errors.Join(errs.ErrCmd, fmt.Errorf("failed to migrate payment logos: %w", err)))
+			}
+		} else {
+			logs.Log().Warn(
+				"Payment logos directory not found",
+				zap.String("path", paymentLogosPath),
+			)
+		}
 
 		brandLogosPath := filepath.Join(basePath, "brand_logos")
 		if _, err := os.Stat(brandLogosPath); err == nil {

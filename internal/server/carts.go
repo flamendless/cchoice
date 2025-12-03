@@ -530,7 +530,9 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch s.paymentGateway.GatewayEnum() {
 	case payments.PAYMENT_GATEWAY_PAYMONGO:
-		paymentMethods := []payments.PaymentMethod{payments.ParsePaymentMethodToEnum(cartCheckout.PaymentMethod)}
+		paymentMethods := []payments.PaymentMethod{
+			payments.ParsePaymentMethodToEnum(cartCheckout.PaymentMethod),
+		}
 		billing := payments.Billing{
 			Address: payments.Address{
 				Line1:      cartCheckout.AddressLine1,

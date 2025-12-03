@@ -12,6 +12,7 @@ node_modules/
 cmd/web/static/images/product_images/bosch/*.webp
 cmd/web/static/images/product_images/bosch/webp/*/*.webp
 cmd/web/static/images/brand_logos/*.webp
+cmd/web/static/images/payments/*.webp
 tailwindcss
 data/
 logs/*.log
