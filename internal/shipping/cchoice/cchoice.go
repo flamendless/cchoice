@@ -5,9 +5,11 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/shipping"
+	"context"
 	"errors"
 	"fmt"
 	"math"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -21,6 +23,7 @@ type CChoiceService struct {
 	feePerKm         float64
 	feePerKg         float64
 	maxDistance      float64
+	limitDistance    bool
 	businessLocation *shipping.Location
 }
 
@@ -36,6 +39,7 @@ func MustInit() *CChoiceService {
 		feePerKm:        8.0,
 		feePerKg:        5.0,
 		maxDistance:     100.0,
+		limitDistance:   false,
 		businessLocation: &shipping.Location{
 			Coordinates: shipping.Coordinates{
 				Lat: cfg.Business.Lat,
@@ -105,10 +109,11 @@ func (s *CChoiceService) GetCapabilities() (*shipping.ServiceCapabilities, error
 			ContactlessDelivery: true,
 		},
 		Metadata: map[string]any{
-			"base_fee":     s.baseFee,
-			"fee_per_km":   s.feePerKm,
-			"fee_per_kg":   s.feePerKg,
-			"max_distance": s.maxDistance,
+			"base_fee":       s.baseFee,
+			"fee_per_km":     s.feePerKm,
+			"fee_per_kg":     s.feePerKg,
+			"max_distance":   s.maxDistance,
+			"limit_distance": s.limitDistance,
 		},
 	}, nil
 }
@@ -141,7 +146,7 @@ func (s *CChoiceService) GetQuotation(req shipping.ShippingRequest) (*shipping.S
 		)
 	}
 
-	if distance > s.maxDistance {
+	if s.limitDistance && distance > s.maxDistance {
 		return nil, errors.Join(
 			errs.ErrCChoice,
 			errs.ErrShippingDistanceExceeded,
@@ -359,6 +364,63 @@ func (s *CChoiceService) calculateETA(distance float64, serviceType shipping.Ser
 func (s *CChoiceService) generateQuotationID() string {
 	timestamp := time.Now().UnixNano()
 	return fmt.Sprintf("INT-%d", timestamp)
+}
+
+func (s *CChoiceService) GetDeliveryETA(ctx context.Context, province string) string {
+	const logtag = "[CChoice Get Delivery ETA]"
+	originalProvince := province
+	province = strings.ToUpper(strings.TrimSpace(province))
+
+	// NCR (National Capital Region)
+	ncrProvinces := []string{
+		"METROPOLITAN MANILA",
+		"METRO MANILA",
+		"NCR",
+		"NATIONAL CAPITAL REGION",
+		"NATIONAL CAPITAL REGION (NCR)",
+	}
+
+	// CALABARZON (Cavite, Laguna, Batangas, Rizal, Quezon)
+	calabarzonProvinces := []string{
+		"CAVITE",
+		"LAGUNA",
+		"BATANGAS",
+		"RIZAL",
+		"QUEZON",
+	}
+
+	var eta string
+	if slices.Contains(ncrProvinces, province) {
+		eta = "3-5 days"
+		logs.LogCtx(ctx).Info(
+			logtag,
+			zap.String("province", originalProvince),
+			zap.String("region", "NCR"),
+			zap.String("eta", eta),
+		)
+		return eta
+	}
+
+	if slices.Contains(calabarzonProvinces, province) {
+		eta = "3-5 days"
+		logs.LogCtx(ctx).Info(
+			logtag,
+			zap.String("province", originalProvince),
+			zap.String("region", "CALABARZON"),
+			zap.String("eta", eta),
+		)
+		return eta
+	}
+
+	// Nationwide (all other provinces)
+	eta = "5-7 days"
+	logs.LogCtx(ctx).Info(
+		logtag,
+		zap.String("province", originalProvince),
+		zap.String("region", "Nationwide"),
+		zap.String("eta", eta),
+	)
+	return eta
 }
 
 var _ shipping.IShippingService = (*CChoiceService)(nil)

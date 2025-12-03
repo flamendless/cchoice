@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"cchoice/internal/conf"
 	"cchoice/internal/errs"
+	"cchoice/internal/logs"
 	"cchoice/internal/shipping"
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -15,6 +17,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 type Lalamove struct {
@@ -282,6 +286,17 @@ func (c *Lalamove) GetCapabilities() (*shipping.ServiceCapabilities, error) {
 			"cities_data": cities,
 		},
 	}, nil
+}
+
+func (c *Lalamove) GetDeliveryETA(ctx context.Context, province string) string {
+	const logtag = "[Lalamove Get Delivery ETA]"
+	eta := "Same day or next day"
+	logs.LogCtx(ctx).Info(
+		logtag,
+		zap.String("province", province),
+		zap.String("eta", eta),
+	)
+	return eta
 }
 
 var _ shipping.IShippingService = (*Lalamove)(nil)

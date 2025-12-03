@@ -18,7 +18,6 @@ import (
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 )
@@ -31,21 +30,29 @@ func AddProductCategoriesHandlers(s *Server, r chi.Router) {
 
 func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Categories Side Panel Handler]"
+	ctx := r.Context()
+
 	categories, err := requests.GetCategoriesSidePanel(
-		r.Context(),
+		ctx,
 		s.cache,
 		&s.SF,
 		s.dbRO,
 		[]byte("key_categories_side_panel"),
 	)
 	if err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err := components.CategoriesSidePanelList(categories).Render(r.Context(), w); err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+	if err := components.CategoriesSidePanelList(categories).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -53,6 +60,8 @@ func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Reque
 
 func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Categories Section Handler]"
+	ctx := r.Context()
+
 	page := 0
 	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
 		if parsed, err := strconv.Atoi(paramPage); err == nil {
@@ -68,7 +77,7 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	res, err := requests.GetCategorySectionHandler(
-		r.Context(),
+		ctx,
 		s.cache,
 		&s.SF,
 		s.dbRO,
@@ -78,12 +87,18 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 		limit,
 	)
 	if err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := components.CategorySection(page, res).Render(r.Context(), w); err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+	if err := components.CategorySection(page, res).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -91,23 +106,31 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 
 func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Category Products Handler]"
+	ctx := r.Context()
+
 	categoryID := chi.URLParam(r, "category_id")
 	if categoryID == "" {
-		logs.Log().Error(logtag, zap.Error(errs.ErrInvalidParams))
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(errs.ErrInvalidParams),
+		)
 		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
 
 	categoryDBID := s.encoder.Decode(categoryID)
-	category, err := s.dbRO.GetQueries().GetProductCategoryByID(r.Context(), categoryDBID)
+	category, err := s.dbRO.GetQueries().GetProductCategoryByID(ctx, categoryDBID)
 	if err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if category.Category.String == "" {
-		logs.Log().Warn(
+		logs.LogCtx(ctx).Warn(
 			logtag,
 			zap.Int64("category id", category.ID),
 			zap.String("subcategory", category.Subcategory.String),
@@ -115,17 +138,20 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	products, err := s.dbRO.GetQueries().GetProductsByCategoryID(r.Context(), queries.GetProductsByCategoryIDParams{
+	products, err := s.dbRO.GetQueries().GetProductsByCategoryID(ctx, queries.GetProductsByCategoryIDParams{
 		CategoryID: categoryDBID,
 		Limit:      constants.DefaultLimitProducts,
 	})
 	if err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if len(products) == 0 {
-		logs.Log().Debug(
+		logs.LogCtx(ctx).Debug(
 			logtag,
 			zap.Int64("category id", category.ID),
 			zap.String("category name", category.Category.String),
@@ -138,11 +164,14 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		if !strings.HasSuffix(product.ThumbnailPath, constants.EmptyImageFilename) {
 			validProducts = append(validProducts, i)
 		} else {
-			logs.Log().Debug("No valid image/thumbnail", zap.Int64("product id", product.ID))
+			logs.LogCtx(ctx).Debug(
+				"No valid image/thumbnail",
+				zap.Int64("product id", product.ID),
+			)
 		}
 	}
 
-	g, ctx := errgroup.WithContext(r.Context())
+	g, gctx := errgroup.WithContext(ctx)
 	g.SetLimit(10)
 
 	var mu sync.Mutex
@@ -152,10 +181,10 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		g.Go(func() error {
 			imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, products[i].ThumbnailPath, images.IMAGE_FORMAT_WEBP)
 			if err != nil {
-				logs.Log().Error(logtag,
-					zap.Error(err),
+				logs.LogCtx(gctx).Error(
+					logtag,
 					zap.String("thumbnailPath", products[i].ThumbnailPath),
-					zap.String("request_id", middleware.GetReqID(ctx)),
+					zap.Error(err),
 				)
 				return nil
 			}
@@ -169,7 +198,10 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	if err := g.Wait(); err != nil {
-		logs.Log().Error(logtag, zap.Error(err), zap.String("request_id", middleware.GetReqID(r.Context())))
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
 		http.Error(w, "Failed to load images", http.StatusInternalServerError)
 		return
 	}
@@ -181,8 +213,11 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		Products:    models.ToCategorySectionProducts(s.encoder, productsWithValidImages),
 	}
 
-	if err := components.CategorySectionProducts(categorySectionProducts).Render(r.Context(), w); err != nil {
-		logs.Log().Error(logtag, zap.Error(err))
+	if err := components.CategorySectionProducts(categorySectionProducts).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

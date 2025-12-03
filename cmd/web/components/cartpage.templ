@@ -123,7 +123,7 @@ templ CartPageBody(summaryContent templ.Component) {
 								id="cart-summary-content"
 								class="flex flex-col gap-1 p-2"
 								hx-get="/cchoice/carts/summary?data=summary_total"
-								hx-trigger="load, every 3s, cartUpdated from:body"
+								hx-trigger="load, cartUpdated from:body"
 								hx-swap="innerHTML"
 								data-check-delivery-fee="true"
 							>
@@ -177,11 +177,12 @@ templ CartSummaryRowWithID(id string, left string, right string, class ...string
 	</div>
 }
 
-templ CartSummaryContent(subtotal string, totalDiscount string, totalWeight string, deliveryFee string, total string) {
+templ CartSummaryContent(subtotal string, totalDiscount string, totalWeight string, deliveryFee string, total string, eta string) {
 	@CartSummaryRow("Subtotal", subtotal, "text-gray-500")
 	@CartSummaryRow("Total Discount", totalDiscount, "text-red-500")
 	@CartSummaryRow("Total Weight", totalWeight, "text-gray-500")
 	@CartSummaryRowWithID("delivery-fee-row", "Delivery Fee", deliveryFee, "text-gray-500")
+	@CartSummaryRowWithID("delivery-eta-row", "Estimated Delivery Time", eta, "text-gray-500")
 	@HR()
 	@CartSummaryRow("Total", total)
 }
