@@ -674,6 +674,31 @@ func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	// INFO: (Brandon) - Sort payment methods:
+	// 1. Enabled methods first (alphabetically)
+	// 2. Disabled methods (COD first, then alphabetically)
+	slices.SortFunc(paymentMethods, func(a, b models.AvailablePaymentMethod) int {
+		if a.Enabled != b.Enabled {
+			if a.Enabled {
+				return -1
+			}
+			return 1
+		}
+
+		if !a.Enabled && !b.Enabled {
+			aCOD := a.Value == payments.PAYMENT_METHOD_COD
+			bCOD := b.Value == payments.PAYMENT_METHOD_COD
+			if aCOD != bCOD {
+				if aCOD {
+					return -1
+				}
+				return 1
+			}
+		}
+
+		return strings.Compare(a.Value.String(), b.Value.String())
+	})
+
 	for _, pm := range paymentMethods {
 		if err := components.CartPaymentMethod(pm).Render(r.Context(), w); err != nil {
 			logs.Log().Error(logtag, zap.Error(err))
