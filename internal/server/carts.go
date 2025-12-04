@@ -693,8 +693,10 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var shippingCoordinates *shipping.Coordinates
+		var deliveryETA string
 		if shippingReq, ok := s.sessionManager.Get(ctx, skShippingRequest).(*shipping.ShippingRequest); ok && shippingReq != nil {
 			shippingCoordinates = &shippingReq.DeliveryLocation.Coordinates
+			deliveryETA = s.shippingService.GetDeliveryETA(ctx, shippingReq.DeliveryLocation.OriginalAddress.State)
 		}
 
 		orderParams := orders.CreateOrderParams{
@@ -704,6 +706,7 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 			CheckoutSessionResponse: resCheckout,
 			ShippingQuotation:       shippingQuotation,
 			ShippingCoordinates:     shippingCoordinates,
+			DeliveryETA:             deliveryETA,
 			PaymentGateway:          s.paymentGateway,
 			Geocoder:                s.geocoder,
 			Cache:                   s.cache,

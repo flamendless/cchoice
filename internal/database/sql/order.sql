@@ -35,6 +35,7 @@ INSERT INTO tbl_orders(
 	shipping_service,
 	shipping_order_id,
 	shipping_tracking_number,
+	shipping_eta,
 	notes,
 	remarks
 ) VALUES (
@@ -45,7 +46,7 @@ INSERT INTO tbl_orders(
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
-	?, ?
+	?, ?, ?
 ) RETURNING *;
 
 -- name: GetOrderByID :one
@@ -88,6 +89,7 @@ UPDATE tbl_orders
 SET shipping_service = ?,
 	shipping_order_id = ?,
 	shipping_tracking_number = ?,
+	shipping_eta = ?,
 	updated_at = DATETIME('now')
 WHERE id = ?
 RETURNING *;
