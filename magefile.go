@@ -566,16 +566,25 @@ func hasGoFileChanges() (bool, error) {
 }
 
 func hasPackageChanges(packages []string) (bool, error) {
-	var paths []string
 	for _, pkg := range packages {
-		paths = append(paths, fmt.Sprintf("internal/%s/", pkg))
+		changed, err := hasPackageChanged(pkg)
+		if err != nil {
+			return false, err
+		}
+		if changed {
+			return true, nil
+		}
 	}
+	return false, nil
+}
 
-	args := append([]string{"diff", "--name-only", "HEAD", "--"}, paths...)
+func hasPackageChanged(pkg string) (bool, error) {
+	path := fmt.Sprintf("internal/%s/", pkg)
+	args := []string{"diff", "--name-only", "HEAD", "--", path}
 	cmd := exec.Command("git", args...)
 	output, err := cmd.Output()
 	if err != nil {
-		args = append([]string{"diff", "--name-only", "--cached", "--"}, paths...)
+		args = []string{"diff", "--name-only", "--cached", "--", path}
 		cmd = exec.Command("git", args...)
 		output, err = cmd.Output()
 		if err != nil {
@@ -612,18 +621,31 @@ func TestAll() error {
 }
 
 func TestInteg() error {
-	packages := []string{
-		"storage/linode",
-		"shipping/lalamove",
-		"geocoding/googlemaps",
-		"payments/paymongo",
-		"receipt/scanner/googlevision",
+	type integTest struct {
+		pkg  string
+		args []string
 	}
-	hasChanges, err := hasPackageChanges(packages)
-	if err != nil {
-		return fmt.Errorf("failed to check for package changes: %w", err)
+
+	tests := []integTest{
+		{pkg: "storage/linode", args: []string{"test_linode"}},
+		{pkg: "receipt/scanner/googlevision", args: []string{"test_gvision"}},
+		{pkg: "payments/paymongo", args: []string{"test_payment"}},
+		{pkg: "shipping/lalamove", args: []string{"test_shipping"}},
+		{pkg: "mail/maileroo", args: []string{"test_mail", "-t", "flamendless8@gmail.com"}},
 	}
-	if !hasChanges {
+
+	var testsToRun []integTest
+	for _, t := range tests {
+		changed, err := hasPackageChanged(t.pkg)
+		if err != nil {
+			return fmt.Errorf("failed to check for package changes: %w", err)
+		}
+		if changed {
+			testsToRun = append(testsToRun, t)
+		}
+	}
+
+	if len(testsToRun) == 0 {
 		fmt.Println("No changes in integration test packages detected. Skipping integration tests.")
 		return nil
 	}
@@ -635,34 +657,18 @@ func TestInteg() error {
 	}); err != nil {
 		return err
 	}
-	if err := run(Command{
-		Type: CmdTmpExec,
-		Cmd:  "main",
-		Args: []string{"test_linode"},
-	}); err != nil {
-		return err
+
+	for _, t := range testsToRun {
+		fmt.Printf("Running integration test for %s\n", t.pkg)
+		if err := run(Command{
+			Type: CmdTmpExec,
+			Cmd:  "main",
+			Args: t.args,
+		}); err != nil {
+			return err
+		}
 	}
-	if err := run(Command{
-		Type: CmdTmpExec,
-		Cmd:  "main",
-		Args: []string{"test_gvision"},
-	}); err != nil {
-		return err
-	}
-	if err := run(Command{
-		Type: CmdTmpExec,
-		Cmd:  "main",
-		Args: []string{"test_payment"},
-	}); err != nil {
-		return err
-	}
-	if err := run(Command{
-		Type: CmdTmpExec,
-		Cmd:  "main",
-		Args: []string{"test_shipping"},
-	}); err != nil {
-		return err
-	}
+
 	return nil
 }
 

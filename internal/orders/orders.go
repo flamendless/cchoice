@@ -35,6 +35,7 @@ type CreateOrderParams struct {
 	CheckoutSessionResponse payments.CreateCheckoutSessionResponse
 	ShippingQuotation       *shipping.ShippingQuotation
 	ShippingCoordinates     *shipping.Coordinates
+	DeliveryETA             string
 	PaymentGateway          payments.IPaymentGateway
 	Geocoder                geocoding.IGeocoder
 	Cache                   *fastcache.Cache
@@ -201,6 +202,7 @@ func CreateOrderFromCheckout(
 		ShippingService:          sql.NullString{Valid: false},
 		ShippingOrderID:          sql.NullString{Valid: false},
 		ShippingTrackingNumber:   sql.NullString{Valid: false},
+		ShippingEta:              sql.NullString{String: params.DeliveryETA, Valid: params.DeliveryETA != ""},
 		Notes:                    sql.NullString{Valid: false},
 		Remarks:                  sql.NullString{Valid: false},
 	}

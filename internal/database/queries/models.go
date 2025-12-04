@@ -142,6 +142,7 @@ type TblOrder struct {
 	CreatedAt                time.Time
 	UpdatedAt                time.Time
 	PaidAt                   sql.NullTime
+	ShippingEta              sql.NullString
 }
 
 type TblOrderLine struct {

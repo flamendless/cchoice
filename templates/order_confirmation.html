@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Confirmation - C-Choice Construction Supply Shop</title>
+  </head>
+  <body style="margin:0; padding:0; font-family:Arial, sans-serif; background-color:#F7EFEA;">
+    <table align="center" cellpadding="0" cellspacing="0" width="100%" style="padding: 20px;">
+      <tr>
+        <td>
+          <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(246,116,47,0.15);">
+            <!-- Header -->
+            <tr>
+              <td align="center" style="background-color:#F6742F; color:#ffffff; padding: 30px 20px;">
+                {{if .LogoURL}}
+                <img src="{{.LogoURL}}" alt="C-Choice" style="max-width:200px; height:auto; margin-bottom:15px;" />
+                {{else}}
+                <h2 style="margin:0 0 10px; font-size:28px; font-weight:bold; letter-spacing:1px;">C-CHOICE</h2>
+                <p style="margin:0; font-size:12px; color:#ffffffcc;">Construction Supply Shop</p>
+                {{end}}
+                <h1 style="margin:20px 0 0; font-size:24px; font-weight:normal;">Order Confirmed!</h1>
+                <p style="margin:10px 0 0; font-size:14px; color:#ffffffcc;">Thank you for your purchase</p>
+              </td>
+            </tr>
+
+            <!-- Order Details -->
+            <tr>
+              <td style="padding: 30px;">
+                <table cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td style="padding-bottom: 20px;">
+                      <h2 style="margin:0 0 15px; font-size:18px; color:#F6742F; border-bottom:2px solid #F6b08A; padding-bottom:10px;">Order Details</h2>
+                      <table cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                          <td style="padding:5px 0; color:#666666; font-size:14px;">Order Number:</td>
+                          <td style="padding:5px 0; color:#333333; font-size:14px; font-weight:bold; text-align:right;">{{.OrderNumber}}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding:5px 0; color:#666666; font-size:14px;">Payment Reference:</td>
+                          <td style="padding:5px 0; color:#333333; font-size:14px; font-weight:bold; text-align:right;">{{.PaymentReference}}</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Line Items Table -->
+                <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:20px;">
+                  <tr>
+                    <td>
+                      <h2 style="margin:0 0 15px; font-size:18px; color:#F6742F; border-bottom:2px solid #F6b08A; padding-bottom:10px;">Items Ordered</h2>
+                      <table cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                        <thead>
+                          <tr style="background-color:#F7EFEA;">
+                            <th style="padding:12px 10px; text-align:left; font-size:13px; color:#F46133; font-weight:600; border-bottom:2px solid #F6b08A;">Item</th>
+                            <th style="padding:12px 10px; text-align:center; font-size:13px; color:#F46133; font-weight:600; border-bottom:2px solid #F6b08A;">Qty</th>
+                            <th style="padding:12px 10px; text-align:right; font-size:13px; color:#F46133; font-weight:600; border-bottom:2px solid #F6b08A;">Price</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {{range .LineItems}}
+                          <tr>
+                            <td style="padding:12px 10px; font-size:14px; color:#333333; border-bottom:1px solid #F6b08A;">{{.Name}}</td>
+                            <td style="padding:12px 10px; font-size:14px; color:#333333; border-bottom:1px solid #F6b08A; text-align:center;">{{.Quantity}}</td>
+                            <td style="padding:12px 10px; font-size:14px; color:#333333; border-bottom:1px solid #F6b08A; text-align:right;">{{.Price}}</td>
+                          </tr>
+                          {{end}}
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Order Summary -->
+                <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:20px; background-color:#F7EFEA; border-radius:6px; border:1px solid #F6b08A;">
+                  <tr>
+                    <td style="padding:20px;">
+                      <table cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                          <td style="padding:5px 0; font-size:14px; color:#666666;">Subtotal:</td>
+                          <td style="padding:5px 0; font-size:14px; color:#333333; text-align:right;">{{.Subtotal}}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding:5px 0; font-size:14px; color:#666666;">Shipping Fee:</td>
+                          <td style="padding:5px 0; font-size:14px; color:#333333; text-align:right;">{{.ShippingFee}}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding:10px 0 5px; font-size:18px; color:#F6742F; font-weight:bold; border-top:2px solid #F6b08A;">Total:</td>
+                          <td style="padding:10px 0 5px; font-size:18px; color:#F6742F; font-weight:bold; text-align:right; border-top:2px solid #F6b08A;">{{.Total}}</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Shipping Information -->
+                <table cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td style="padding-bottom:20px;">
+                      <h2 style="margin:0 0 15px; font-size:18px; color:#F6742F; border-bottom:2px solid #F6b08A; padding-bottom:10px;">Shipping Information</h2>
+                      <table cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                          <td style="padding:5px 0; color:#666666; font-size:14px; vertical-align:top;">Delivery Address:</td>
+                          <td style="padding:5px 0; color:#333333; font-size:14px; text-align:right;">{{.ShippingAddress}}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding:5px 0; color:#666666; font-size:14px;">Estimated Delivery:</td>
+                          <td style="padding:5px 0; color:#F6742F; font-size:14px; font-weight:bold; text-align:right;">{{.DeliveryETA}}</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td align="center" style="background-color:#F46133; color:#ffffff; padding: 20px; font-size:12px;">
+                <p style="margin:0 0 10px;">If you have any questions about your order, please contact us.</p>
+                <p style="margin:0; color:#ffffffcc;">This is an automated message — please do not reply directly to this email.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

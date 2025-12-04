@@ -49,7 +49,7 @@ func MustInit() *Maileroo {
 	return &Maileroo{
 		mailService: mail.MAIL_SERVICE_MAILEROO,
 		client:      client,
-		from:        maileroo.NewEmail(cfg.MailerooConfig.From, ""),
+		from:        maileroo.NewEmail(cfg.MailerooConfig.From, "C-Choice Construction Supply Shop"),
 	}
 }
 
