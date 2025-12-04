@@ -33,6 +33,13 @@ type appConfig struct {
 	LogMinLevel        int    `env:"LOG_MIN_LEVEL" env-default:"1"`
 	StorageProvider    string `env:"STORAGE_PROVIDER" env-default:"LOCAL"`
 	Linode             LinodeConfig
+	MailService        string `env:"MAIL_SERVICE"`
+	MailerooConfig     MailerooConfig
+}
+
+type MailerooConfig struct {
+	APIKey string `env:"MAILEROO_API_KEY"`
+	From   string `env:"MAILEROO_FROM"`
 }
 
 type ServerConfig struct {

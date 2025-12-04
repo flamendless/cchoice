@@ -22,6 +22,7 @@ import (
 	"cchoice/internal/encode/sqids"
 	"cchoice/internal/geocoding"
 	"cchoice/internal/logs"
+	"cchoice/internal/mail"
 	"cchoice/internal/payments"
 	"cchoice/internal/shipping"
 	"cchoice/internal/storage"
@@ -43,6 +44,7 @@ type Server struct {
 	geocoder        geocoding.IGeocoder
 	objectStorage   storage.IObjectStorage
 	encoder         encode.IEncode
+	mailService     mail.IMailService
 	address         string
 	port            int
 	portFS          int
@@ -103,6 +105,7 @@ func NewServer() *http.Server {
 		objectStorage:   objStorage,
 		geocoder:        mustInitGeocodingService(dbRW),
 		encoder:         sqids.MustSqids(),
+		mailService:     mustInitMailService(),
 		useHTTP2:        cfg.Server.UseHTTP2,
 		useSSL:          cfg.Server.UseSSL,
 	}
@@ -161,6 +164,7 @@ func NewServer() *http.Server {
 		zap.String("Geocoder service", NewServer.geocoder.Enum().String()),
 		zap.String("Storage provider", NewServer.objectStorage.ProviderEnum().String()),
 		zap.String("Encoder", NewServer.encoder.Name()),
+		zap.String("Mail service", NewServer.mailService.Enum().String()),
 	)
 
 	return server

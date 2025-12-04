@@ -6,6 +6,8 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/geocoding"
 	"cchoice/internal/geocoding/googlemaps"
+	"cchoice/internal/mail"
+	"cchoice/internal/mail/maileroo"
 	"cchoice/internal/payments"
 	"cchoice/internal/payments/paymongo"
 	"cchoice/internal/shipping"
@@ -61,5 +63,15 @@ func mustInitStorageProvider() (storage.IObjectStorage, storage.IFileSystem) {
 		return objStorage, productImageFS
 	default:
 		panic("Unsupported storage provider: " + cfg.StorageProvider)
+	}
+}
+
+func mustInitMailService() mail.IMailService {
+	cfg := conf.Conf()
+	switch cfg.MailService {
+	case mail.MAIL_SERVICE_MAILEROO.String():
+		return maileroo.MustInit()
+	default:
+		panic("Unsupported mail service: " + cfg.MailService)
 	}
 }
