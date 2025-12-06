@@ -57,11 +57,11 @@ func (m *Maileroo) Enum() mail.MailService {
 	return m.mailService
 }
 
-func (m *Maileroo) SendEmail(to []string, subject, body string) error {
-	return m.sendEmail(context.Background(), to, subject, body, false)
+func (m *Maileroo) SendEmail(to string, cc []string, subject, body string) error {
+	return m.sendEmail(context.Background(), to, cc, subject, body, false)
 }
 
-func (m *Maileroo) SendTemplateEmail(to []string, subject, templateName string, data mail.TemplateData) error {
+func (m *Maileroo) SendTemplateEmail(to string, cc []string, subject, templateName string, data mail.TemplateData) error {
 	templatePath := filepath.Join("templates", templateName)
 	tmplContent, err := os.ReadFile(templatePath)
 	if err != nil {
@@ -78,20 +78,23 @@ func (m *Maileroo) SendTemplateEmail(to []string, subject, templateName string, 
 		return errors.Join(errs.ErrTemplateExecute, err)
 	}
 
-	return m.sendEmail(context.Background(), to, subject, buf.String(), true)
+	return m.sendEmail(context.Background(), to, cc, subject, buf.String(), true)
 }
 
-func (m *Maileroo) sendEmail(ctx context.Context, to []string, subject, body string, isHTML bool) error {
+func (m *Maileroo) sendEmail(ctx context.Context, to string, cc []string, subject, body string, isHTML bool) error {
 	const logTag = "[Maileroo Send Email]"
 
-	toAddresses := make([]maileroo.EmailAddress, 0, len(to))
-	for _, addr := range to {
-		toAddresses = append(toAddresses, maileroo.NewEmail(addr, ""))
+	toAddresses := []maileroo.EmailAddress{maileroo.NewEmail(to, "")}
+
+	ccAddresses := make([]maileroo.EmailAddress, 0, len(cc))
+	for _, addr := range cc {
+		ccAddresses = append(ccAddresses, maileroo.NewEmail(addr, ""))
 	}
 
 	emailData := maileroo.BasicEmailData{
 		From:    m.from,
 		To:      toAddresses,
+		Cc:      ccAddresses,
 		Subject: subject,
 	}
 
@@ -109,7 +112,8 @@ func (m *Maileroo) sendEmail(ctx context.Context, to []string, subject, body str
 
 	logs.Log().Info(
 		logTag,
-		zap.Strings("to", to),
+		zap.String("to", to),
+		zap.Strings("cc", cc),
 		zap.String("subject", subject),
 		zap.String("reference_id", referenceID),
 	)

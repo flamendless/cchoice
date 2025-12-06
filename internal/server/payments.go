@@ -2,9 +2,11 @@ package server
 
 import (
 	"cchoice/cmd/web/components"
+	"cchoice/internal/conf"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/jobs"
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
 	"cchoice/internal/payments/paymongo"
@@ -277,6 +279,29 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 		zap.String("order_number", updatedOrder.OrderNumber),
 		zap.Int64("order_id", updatedOrder.ID),
 	)
+
+	if err := s.emailJobRunner.QueueEmailJob(ctx, jobs.EmailJobParams{
+		Recipient:         updatedOrder.CustomerEmail,
+		CC:                conf.Conf().MailerooConfig.CC,
+		Subject:           "Order Confirmation - " + updatedOrder.OrderNumber,
+		TemplateName:      enums.EMAIL_TEMPLATE_ORDER_CONFIRMATION,
+		OrderID:           &updatedOrder.ID,
+		CheckoutPaymentID: &updatedOrder.CheckoutPaymentID,
+	}); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("action", "queue_email_failed"),
+			zap.Int64("order_id", updatedOrder.ID),
+			zap.Error(err),
+		)
+	} else {
+		logs.LogCtx(ctx).Info(
+			logtag,
+			zap.String("action", "email_queued"),
+			zap.Int64("order_id", updatedOrder.ID),
+			zap.String("recipient", updatedOrder.CustomerEmail),
+		)
+	}
 
 	if err := components.SuccessPaymentPage(components.SuccessPaymentPageBody(updatedOrder.OrderNumber)).Render(r.Context(), w); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))

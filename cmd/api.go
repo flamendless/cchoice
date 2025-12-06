@@ -18,7 +18,7 @@ func init() {
 	rootCmd.AddCommand(cmdAPI)
 }
 
-func gracefulShutdown(apiServer *http.Server, done chan bool) {
+func gracefulShutdown(serverInstance *server.ServerInstance, done chan bool) {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
@@ -26,9 +26,11 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 
 	logs.Log().Info("shutting down gracefully, press Ctrl+C again to force")
 
+	serverInstance.StopBackgroundJobs()
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	if err := apiServer.Shutdown(ctx); err != nil {
+	if err := serverInstance.HTTPServer.Shutdown(ctx); err != nil {
 		logs.Log().Error("Server forced to shutdown with error: %v", zap.Error(err))
 	}
 
@@ -41,18 +43,22 @@ var cmdAPI = &cobra.Command{
 	Use:   "api",
 	Short: "Run the api",
 	Run: func(cmd *cobra.Command, args []string) {
-		server := server.NewServer()
+		serverInstance := server.NewServer()
 		done := make(chan bool, 1)
-		go gracefulShutdown(server, done)
 
-		if server.TLSConfig != nil && len(server.TLSConfig.Certificates) > 0 {
+		serverInstance.StartBackgroundJobs()
+
+		go gracefulShutdown(serverInstance, done)
+
+		httpServer := serverInstance.HTTPServer
+		if httpServer.TLSConfig != nil && len(httpServer.TLSConfig.Certificates) > 0 {
 			logs.Log().Info("Serving secure HTTP")
-			if err := server.ListenAndServeTLS("", ""); err != nil && err != http.ErrServerClosed {
+			if err := httpServer.ListenAndServeTLS("", ""); err != nil && err != http.ErrServerClosed {
 				panic(fmt.Sprintf("http server error: %s", err))
 			}
 		} else {
 			logs.Log().Info("Serving HTTP")
-			if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 				panic(fmt.Sprintf("http server error: %s", err))
 			}
 		}

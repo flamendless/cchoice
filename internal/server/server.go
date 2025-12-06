@@ -21,6 +21,7 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/encode/sqids"
 	"cchoice/internal/geocoding"
+	"cchoice/internal/jobs"
 	"cchoice/internal/logs"
 	"cchoice/internal/mail"
 	"cchoice/internal/payments"
@@ -45,6 +46,7 @@ type Server struct {
 	objectStorage   storage.IObjectStorage
 	encoder         encode.IEncode
 	mailService     mail.IMailService
+	emailJobRunner  *jobs.EmailJobRunner
 	address         string
 	port            int
 	portFS          int
@@ -81,7 +83,7 @@ func (s *Server) GetProductImageProxyURL(ctx context.Context, thumbnailPath stri
 	return proxyURL, nil
 }
 
-func NewServer() *http.Server {
+func NewServer() *ServerInstance {
 	cfg := conf.Conf()
 	sessionManager := scs.New()
 	sessionManager.Lifetime = 1 * time.Hour
@@ -89,8 +91,11 @@ func NewServer() *http.Server {
 	dbRO := database.New(database.DB_MODE_RO)
 	dbRW := database.New(database.DB_MODE_RW)
 	objStorage, productImageFS := mustInitStorageProvider()
+	mailService := mustInitMailService()
 
-	NewServer := &Server{
+	emailJobRunner := jobs.NewEmailJobRunner(dbRW.GetDB(), dbRO, dbRW, mailService)
+
+	newServer := &Server{
 		address:         cfg.Server.Address,
 		port:            cfg.Server.Port,
 		portFS:          cfg.Server.PortFS,
@@ -105,17 +110,18 @@ func NewServer() *http.Server {
 		objectStorage:   objStorage,
 		geocoder:        mustInitGeocodingService(dbRW),
 		encoder:         sqids.MustSqids(),
-		mailService:     mustInitMailService(),
+		mailService:     mailService,
+		emailJobRunner:  emailJobRunner,
 		useHTTP2:        cfg.Server.UseHTTP2,
 		useSSL:          cfg.Server.UseSSL,
 	}
 
-	addr := fmt.Sprintf("%s:%d", NewServer.address, NewServer.port)
+	addr := fmt.Sprintf("%s:%d", newServer.address, newServer.port)
 	readTimeout := 10 * time.Second
 	writeTimeout := 30 * time.Second
 
 	var tlsConfig *tls.Config
-	if NewServer.useSSL {
+	if newServer.useSSL {
 		logs.Log().Info(
 			"SSL: opening files",
 			zap.String("cert", cfg.Server.CertPath),
@@ -130,9 +136,9 @@ func NewServer() *http.Server {
 		}
 	}
 
-	handler := sessionManager.LoadAndSave(NewServer.RegisterRoutes())
+	handler := sessionManager.LoadAndSave(newServer.RegisterRoutes())
 
-	server := &http.Server{
+	httpServer := &http.Server{
 		Addr:         addr,
 		Handler:      handler,
 		IdleTimeout:  time.Minute,
@@ -140,8 +146,8 @@ func NewServer() *http.Server {
 		WriteTimeout: writeTimeout,
 		TLSConfig:    tlsConfig,
 	}
-	if NewServer.useHTTP2 {
-		if err := http2.ConfigureServer(server, &http2.Server{
+	if newServer.useHTTP2 {
+		if err := http2.ConfigureServer(httpServer, &http2.Server{
 			MaxConcurrentStreams: 256,
 		}); err != nil {
 			logs.Log().Error("Server configure", zap.Error(err))
@@ -151,21 +157,24 @@ func NewServer() *http.Server {
 	logs.Log().Info(
 		"Server Config",
 		zap.String("Address", addr),
-		zap.Bool("Use caching", NewServer.cache != nil),
+		zap.Bool("Use caching", newServer.cache != nil),
 		zap.Int("Caching max bytes", CACHE_MAX_BYTES),
-		zap.Bool("Use session manager", NewServer.sessionManager != nil),
-		zap.Duration("Session manager lifetime", NewServer.sessionManager.Lifetime),
-		zap.Bool("SSL", NewServer.useSSL),
-		zap.Bool("HTTP2", NewServer.useHTTP2),
+		zap.Bool("Use session manager", newServer.sessionManager != nil),
+		zap.Duration("Session manager lifetime", newServer.sessionManager.Lifetime),
+		zap.Bool("SSL", newServer.useSSL),
+		zap.Bool("HTTP2", newServer.useHTTP2),
 		zap.Duration("Read timeout", readTimeout),
 		zap.Duration("Write timeout", writeTimeout),
-		zap.String("Payment gateway", NewServer.paymentGateway.GatewayEnum().String()),
-		zap.String("Shipping service", NewServer.shippingService.Enum().String()),
-		zap.String("Geocoder service", NewServer.geocoder.Enum().String()),
-		zap.String("Storage provider", NewServer.objectStorage.ProviderEnum().String()),
-		zap.String("Encoder", NewServer.encoder.Name()),
-		zap.String("Mail service", NewServer.mailService.Enum().String()),
+		zap.String("Payment gateway", newServer.paymentGateway.GatewayEnum().String()),
+		zap.String("Shipping service", newServer.shippingService.Enum().String()),
+		zap.String("Geocoder service", newServer.geocoder.Enum().String()),
+		zap.String("Storage provider", newServer.objectStorage.ProviderEnum().String()),
+		zap.String("Encoder", newServer.encoder.Name()),
+		zap.String("Mail service", newServer.mailService.Enum().String()),
 	)
 
-	return server
+	return &ServerInstance{
+		HTTPServer: httpServer,
+		internal:   newServer,
+	}
 }
