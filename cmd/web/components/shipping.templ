@@ -251,6 +251,10 @@ templ ShippingAddressSelect() {
 				end
 			end
 
+			on change from <input/> or change from <select/>
+				call saveShippingFormState()
+			end
+
 			on htmx:beforeRequest
 				if event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/cchoice/shipping/quotation'
 					put #delivery-fee-row into deliveryRow
@@ -347,7 +351,14 @@ templ ShippingAddressSelect() {
 	</div>
 	<script type="text/javascript">
 		function saveShippingFormState() {
+			const form = document.getElementById('shipping-form');
 			const formData = {
+				email: form.querySelector('[name="email"]')?.value || '',
+				fullname: form.querySelector('[name="fullname"]')?.value || '',
+				mobile_no: form.querySelector('[name="mobile_no"]')?.value || '',
+				address_line1: form.querySelector('[name="address_line1"]')?.value || '',
+				address_line2: form.querySelector('[name="address_line2"]')?.value || '',
+				postal: form.querySelector('[name="postal"]')?.value || '',
 				province: document.getElementById('province')?.value || '',
 				city: document.getElementById('city')?.value || '',
 				barangay: document.getElementById('barangay')?.value || '',
@@ -355,19 +366,48 @@ templ ShippingAddressSelect() {
 				cityDisabled: document.getElementById('city')?.disabled || false,
 				barangayDisabled: document.getElementById('barangay')?.disabled || false
 			};
+			console.log('Saving shipping form state:', formData);
 			sessionStorage.setItem('shippingFormState', JSON.stringify(formData));
 		}
 
 		function restoreShippingFormState() {
 			const saved = sessionStorage.getItem('shippingFormState');
+			console.log('Restoring shipping form state:', saved);
 			if (!saved)
 				return
 
 			try {
 				const formData = JSON.parse(saved);
+				const form = document.getElementById('shipping-form');
 				const provinceSelect = document.getElementById('province');
 				const citySelect = document.getElementById('city');
 				const barangaySelect = document.getElementById('barangay');
+				console.log('Restoring shipping form state:', formData);
+
+				if (formData.email) {
+					const emailInput = form.querySelector('[name="email"]');
+					if (emailInput) emailInput.value = formData.email;
+				}
+				if (formData.fullname) {
+					const fullnameInput = form.querySelector('[name="fullname"]');
+					if (fullnameInput) fullnameInput.value = formData.fullname;
+				}
+				if (formData.mobile_no) {
+					const mobileInput = form.querySelector('[name="mobile_no"]');
+					if (mobileInput) mobileInput.value = formData.mobile_no;
+				}
+				if (formData.address_line1) {
+					const address1Input = form.querySelector('[name="address_line1"]');
+					if (address1Input) address1Input.value = formData.address_line1;
+				}
+				if (formData.address_line2) {
+					const address2Input = form.querySelector('[name="address_line2"]');
+					if (address2Input) address2Input.value = formData.address_line2;
+				}
+				if (formData.postal) {
+					const postalInput = form.querySelector('[name="postal"]');
+					if (postalInput) postalInput.value = formData.postal;
+				}
 
 				// Wait for province options to load
 				if (provinceSelect && formData.province) {
