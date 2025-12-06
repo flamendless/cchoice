@@ -114,6 +114,11 @@ INSERT INTO tbl_checkout_payments(
 	?, ?, ?, ?, ?
 ) RETURNING *;
 
+-- name: GetCheckoutPaymentByID :one
+SELECT * FROM tbl_checkout_payments
+WHERE id = ?
+LIMIT 1;
+
 -- name: GetCheckoutPaymentByCheckoutID :one
 SELECT * FROM tbl_checkout_payments
 WHERE checkout_id = ?

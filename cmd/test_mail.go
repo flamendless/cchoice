@@ -12,7 +12,8 @@ import (
 
 type testMailFlags struct {
 	Service  string
-	To       []string
+	To       string
+	CC       []string
 	Subject  string
 	Body     string
 	Template string
@@ -23,7 +24,8 @@ var flagTestMail testMailFlags
 func init() {
 	f := cmdTestMail.Flags
 	f().StringVarP(&flagTestMail.Service, "service", "s", "MAILEROO", "Mail service name")
-	f().StringSliceVarP(&flagTestMail.To, "to", "t", nil, "Recipient email address(es)")
+	f().StringVarP(&flagTestMail.To, "to", "t", "", "Recipient email address")
+	f().StringSliceVarP(&flagTestMail.CC, "cc", "c", nil, "CC email address(es)")
 	f().StringVarP(&flagTestMail.Subject, "subject", "j", "Test Email", "Email subject")
 	f().StringVarP(&flagTestMail.Body, "body", "b", "This is a test email from cchoice.", "Email body")
 	f().StringVarP(&flagTestMail.Template, "template", "m", "", "Template file name (e.g., order_confirmation.html)")
@@ -64,9 +66,9 @@ var cmdTestMail = &cobra.Command{
 				"ShippingAddress": "123 Test Street, Barangay Test, Test City, Metro Manila 1234",
 				"DeliveryETA":     "3-5 business days",
 			}
-			err = ms.SendTemplateEmail(flagTestMail.To, flagTestMail.Subject, flagTestMail.Template, data)
+			err = ms.SendTemplateEmail(flagTestMail.To, flagTestMail.CC, flagTestMail.Subject, flagTestMail.Template, data)
 		} else {
-			err = ms.SendEmail(flagTestMail.To, flagTestMail.Subject, flagTestMail.Body)
+			err = ms.SendEmail(flagTestMail.To, flagTestMail.CC, flagTestMail.Subject, flagTestMail.Body)
 		}
 
 		if err != nil {

@@ -9,6 +9,16 @@ import (
 	"time"
 )
 
+type Goqite struct {
+	ID       string
+	Created  string
+	Updated  string
+	Queue    string
+	Body     []byte
+	Timeout  string
+	Received int64
+}
+
 type TblBrand struct {
 	ID        int64
 	Name      string
@@ -68,6 +78,19 @@ type TblCheckoutPayment struct {
 	CreatedAt              time.Time
 	UpdatedAt              time.Time
 	PaymentIntentID        sql.NullString
+}
+
+type TblEmailJob struct {
+	ID                int64
+	QueueID           string
+	Recipient         string
+	Cc                sql.NullString
+	Subject           string
+	TemplateName      string
+	OrderID           sql.NullInt64
+	CheckoutPaymentID sql.NullString
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
 }
 
 type TblExternalApiLog struct {

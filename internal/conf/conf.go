@@ -40,6 +40,7 @@ type appConfig struct {
 type MailerooConfig struct {
 	APIKey string `env:"MAILEROO_API_KEY"`
 	From   string `env:"MAILEROO_FROM"`
+	CC     string `env:"MAILEROO_CC"`
 }
 
 type ServerConfig struct {

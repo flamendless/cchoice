@@ -20,6 +20,7 @@ require (
 	github.com/govalues/decimal v0.1.36
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/joho/godotenv v1.5.1
+	github.com/maileroo/maileroo-go-sdk v1.0.0
 	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/minio/minio-go/v7 v7.0.97
 	github.com/prometheus/client_golang v1.23.2
@@ -32,6 +33,7 @@ require (
 	golang.org/x/sync v0.18.0
 	golang.org/x/text v0.31.0
 	google.golang.org/api v0.256.0
+	maragu.dev/goqite v0.3.1
 )
 
 require (
@@ -109,7 +111,6 @@ require (
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
 	github.com/kyokomi/emoji/v2 v2.2.13 // indirect
-	github.com/maileroo/maileroo-go-sdk v1.0.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mdempsky/unconvert v0.0.0-20250216222326-4a038b3d31f5 // indirect

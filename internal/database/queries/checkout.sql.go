@@ -375,6 +375,37 @@ func (q *Queries) GetCheckoutPaymentByCheckoutID(ctx context.Context, checkoutID
 	return i, err
 }
 
+const getCheckoutPaymentByID = `-- name: GetCheckoutPaymentByID :one
+SELECT id, gateway, checkout_id, status, description, total_amount, checkout_url, client_key, reference_number, payment_method_type, paid_at, metadata_remarks, metadata_notes, metadata_customer_number, created_at, updated_at, payment_intent_id FROM tbl_checkout_payments
+WHERE id = ?
+LIMIT 1
+`
+
+func (q *Queries) GetCheckoutPaymentByID(ctx context.Context, id string) (TblCheckoutPayment, error) {
+	row := q.db.QueryRowContext(ctx, getCheckoutPaymentByID, id)
+	var i TblCheckoutPayment
+	err := row.Scan(
+		&i.ID,
+		&i.Gateway,
+		&i.CheckoutID,
+		&i.Status,
+		&i.Description,
+		&i.TotalAmount,
+		&i.CheckoutUrl,
+		&i.ClientKey,
+		&i.ReferenceNumber,
+		&i.PaymentMethodType,
+		&i.PaidAt,
+		&i.MetadataRemarks,
+		&i.MetadataNotes,
+		&i.MetadataCustomerNumber,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.PaymentIntentID,
+	)
+	return i, err
+}
+
 const getCheckoutPaymentByReferenceNumber = `-- name: GetCheckoutPaymentByReferenceNumber :one
 SELECT id, gateway, checkout_id, status, description, total_amount, checkout_url, client_key, reference_number, payment_method_type, paid_at, metadata_remarks, metadata_notes, metadata_customer_number, created_at, updated_at, payment_intent_id FROM tbl_checkout_payments
 WHERE reference_number = ?
