@@ -5,4 +5,5 @@ const (
 	PathEmptyImage     = "static/images/empty_96x96.webp"
 	PathProductImages  = "static/images/product_images/"
 	PathPaymentImages  = "static/images/payments/"
+	PathEmailLogo      = "https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/c89c033a-ebd3-4eed-0b79-09bfbcd16800/public"
 )
