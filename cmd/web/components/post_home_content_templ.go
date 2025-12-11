@@ -8,107 +8,9 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-type brandImage struct {
-	filename string
-	alt      string
-}
+import "cchoice/cmd/web/models"
 
-type postHomeContent struct {
-	title       string
-	description string
-	brandImage  *brandImage
-}
-
-type postHomeContentSection struct {
-	title  string
-	href   string
-	others []postHomeContent
-	custom templ.Component
-}
-
-var postHomeContentSections = []postHomeContentSection{
-	postHomeContentSection{
-		title: "About Us",
-		href:  "about-us",
-		others: []postHomeContent{
-			postHomeContent{
-				title:       "Who We Are",
-				description: "We are a dedicated company and trusted dealer, committed to selecting the right partners who provide high-quality tools and accessories to drive better progress in the future",
-			},
-			postHomeContent{
-				title:       "Vision",
-				description: "To be one of the leading importers of advance and innovative construction and fabrication tools and equipments",
-			},
-			postHomeContent{
-				title:       "Mission",
-				description: "To provide quality products certified by international manufacturers in both construction and fabrication materials industries",
-			},
-		},
-	},
-	postHomeContentSection{
-		title:  "Our Store",
-		href:   "store",
-		others: []postHomeContent{},
-		custom: StoreSection(),
-	},
-
-	postHomeContentSection{
-		title: "Our Services",
-		href:  "services",
-		others: []postHomeContent{
-			postHomeContent{
-				title:       "Delivery",
-				description: "Expect delivery at soonest",
-			},
-			postHomeContent{
-				title:       "Here when you need us",
-				description: "Always available and right around the corner",
-			},
-			postHomeContent{
-				title:       "Expect high-quality products",
-				description: "Authorized and trusted",
-			},
-		},
-	},
-	postHomeContentSection{
-		title: "Our Partners",
-		href:  "partners",
-		others: []postHomeContent{
-			postHomeContent{
-				brandImage: &brandImage{
-					filename: "BOSCH.webp",
-					alt:      "Bosch image",
-				},
-			},
-			postHomeContent{
-				brandImage: &brandImage{
-					filename: "TAILIN.webp",
-					alt:      "Tailin image",
-				},
-			},
-			postHomeContent{
-				brandImage: &brandImage{
-					filename: "DELTAPLUS.webp",
-					alt:      "DeltaPlus image",
-				},
-			},
-			postHomeContent{
-				brandImage: &brandImage{
-					filename: "BOSUN.webp",
-					alt:      "Bosun image",
-				},
-			},
-			postHomeContent{
-				brandImage: &brandImage{
-					filename: "STANLEY.webp",
-					alt:      "Stanley image",
-				},
-			},
-		},
-	},
-}
-
-func PostHomeContentSections() templ.Component {
+func PostHomeContentSections(data models.HomePageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -133,15 +35,15 @@ func PostHomeContentSections() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, postHomeContentSection := range postHomeContentSections {
+		for _, section := range data.Sections {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<span class=\"font-bold text-lg mt-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var2 string
-			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(postHomeContentSection.title)
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(section.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 109, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 11, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -152,9 +54,9 @@ func PostHomeContentSections() templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(postHomeContentSection.href)
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(section.Href)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 110, Col: 44}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 12, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -164,18 +66,18 @@ func PostHomeContentSections() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if postHomeContentSection.custom != nil {
-				templ_7745c5c3_Err = postHomeContentSection.custom.Render(ctx, templ_7745c5c3_Buffer)
+			if section.Href == "store" {
+				templ_7745c5c3_Err = StoreSection(data.StoreImageURL).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			for _, postHomeContent := range postHomeContentSection.others {
+			for _, content := range section.Others {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				if postHomeContent.brandImage == nil {
+				if content.BrandImage == nil {
 					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " class=\"w-1/4 border-t-4 border-cchoice_border\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -191,9 +93,9 @@ func PostHomeContentSections() templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var4 string
-				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(postHomeContent.title)
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(content.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 123, Col: 30}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 25, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -204,9 +106,9 @@ func PostHomeContentSections() templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var5 string
-				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(postHomeContent.description)
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(content.Description)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 126, Col: 36}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 28, Col: 28}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -216,62 +118,49 @@ func PostHomeContentSections() templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				if postHomeContent.brandImage != nil {
+				if content.BrandImage != nil {
 					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<img src=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var6 string
-					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(placeholderImageSrc)
+					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(content.BrandImage.CDNURL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 130, Col: 33}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 32, Col: 39}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" hx-get=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" hx-trigger=\"load once\" hx-swap=\"none\" class=\"w-3xs h-auto m-auto mt-8\" alt=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var7 string
-					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(templ.URL(GetBrandLogoURL(postHomeContent.brandImage.filename)))
+					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(content.BrandImage.Alt)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 131, Col: 80}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 36, Col: 36}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" hx-trigger=\"load once\" hx-swap=\"none\" class=\"w-3xs h-auto m-auto mt-8\" alt=\"")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var8 string
-					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(postHomeContent.brandImage.alt)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 135, Col: 44}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" loading=\"lazy\" width=\"256\" height=\"256\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" loading=\"lazy\" width=\"256\" height=\"256\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -279,7 +168,7 @@ func PostHomeContentSections() templ.Component {
 	})
 }
 
-func StoreSection() templ.Component {
+func StoreSection(storeImageURL string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -295,38 +184,25 @@ func StoreSection() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var9 == nil {
-			templ_7745c5c3_Var9 = templ.NopComponent
+		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var8 == nil {
+			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"flex-col content-center w-screen\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"flex-col content-center w-screen\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var10 string
-		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(placeholderImageSrc)
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(storeImageURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 151, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 52, Col: 22}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" hx-get=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var11 string
-		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(templ.URL(GetAssetImageURL("store.webp")))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/post_home_content.templ`, Line: 152, Col: 53}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" hx-trigger=\"load once\" hx-swap=\"none\" class=\"w-auto h-[256px] m-4 ml-auto mr-auto\" alt=\"Store location\" loading=\"lazy\"><div hx-trigger=\"load once\" hx-get=\"/cchoice/settings/store\" hx-swap=\"textContent\" class=\"my-4 font-normal text-base text-center\">Fetching...</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" hx-trigger=\"load once\" hx-swap=\"none\" class=\"w-auto h-[256px] m-4 ml-auto mr-auto\" alt=\"Store location\" loading=\"lazy\"><div hx-trigger=\"load once\" hx-get=\"/cchoice/settings/store\" hx-swap=\"textContent\" class=\"my-4 font-normal text-base text-center\">Fetching...</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -3,13 +3,10 @@ package payments
 import (
 	"cchoice/internal/constants"
 	"cchoice/internal/errs"
-	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"fmt"
-	"net/http"
 	"strings"
 
-	"github.com/VictoriaMetrics/fastcache"
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
 )
@@ -72,45 +69,32 @@ func (pm PaymentMethod) GetDisplayText() string {
 	}
 }
 
-func (pm PaymentMethod) GetImageData(cache *fastcache.Cache, fs http.FileSystem) string {
-	imgURL := constants.PathPaymentImages
+func (pm PaymentMethod) GetImagePath() string {
+	imgPath := constants.PathPaymentImages
 	switch pm {
 	case PAYMENT_METHOD_COD:
-		imgURL += "cod.webp"
+		imgPath += "cod.webp"
 	case PAYMENT_METHOD_QRPH:
-		imgURL += "qrph.webp"
-	// case PAYMENT_METHOD_BILLEASE:
-	// 	imgURL += "billease.svg"
-	// case PAYMENT_METHOD_CARD:
-	// 	imgURL += "qrph.webp"
+		imgPath += "qrph.webp"
 	case PAYMENT_METHOD_DOB:
-		imgURL += "bpi.webp"
+		imgPath += "bpi.webp"
 	case PAYMENT_METHOD_DOB_UBP:
-		imgURL += "unionbank.webp"
+		imgPath += "unionbank.webp"
 	case PAYMENT_METHOD_BRANKAS_BDO:
-		imgURL += "bdo.webp"
+		imgPath += "bdo.webp"
 	case PAYMENT_METHOD_BRANKAS_LANDBANK:
-		imgURL += "landbank.webp"
+		imgPath += "landbank.webp"
 	case PAYMENT_METHOD_BRANKAS_METROBANK:
-		imgURL += "metrobank.webp"
+		imgPath += "metrobank.webp"
 	case PAYMENT_METHOD_GCASH:
-		imgURL += "gcash.webp"
-	// case PAYMENT_METHOD_GRAB_PAY:
-	// 	imgURL += "qrph.webp"
+		imgPath += "gcash.webp"
 	case PAYMENT_METHOD_PAYMAYA:
-		imgURL += "maya.webp"
+		imgPath += "maya.webp"
 	default:
 		logs.Log().Warn("Unhandled payment method", zap.Any("pm", pm))
 		return ""
 	}
-
-	imgDataB64, err := images.GetImageDataB64(cache, fs, imgURL, images.IMAGE_FORMAT_WEBP)
-	if err != nil {
-		logs.Log().Info("PaymentMethod image data", zap.Error(err))
-		return ""
-	}
-
-	return imgDataB64
+	return imgPath
 }
 
 func ParsePaymentMethodToEnum(pm string) PaymentMethod {

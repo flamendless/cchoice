@@ -24,6 +24,7 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/storage"
+	"cchoice/internal/storage/cloudflare"
 	"cchoice/internal/storage/linode"
 )
 
@@ -193,8 +194,12 @@ var cmdParseProducts = &cobra.Command{
 			}
 
 			cfg := conf.Conf()
-			if cfg.StorageProvider == storage.STORAGE_PROVIDER_LINODE.String() {
+			switch cfg.StorageProvider {
+			case storage.STORAGE_PROVIDER_LINODE.String():
 				objStorage := linode.MustInitWithBucket(enums.LINODE_BUCKET_PUBLIC)
+				brandImage.S3URL = objStorage.GetPublicURL(path)
+			case storage.STORAGE_PROVIDER_CLOUDFLARE_IMAGES.String():
+				objStorage := cloudflare.MustInit()
 				brandImage.S3URL = objStorage.GetPublicURL(path)
 			}
 

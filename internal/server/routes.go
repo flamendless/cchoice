@@ -170,6 +170,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		AddCartsHandlers(s, r)
 		AddShippingHandlers(s, r)
 		AddPaymentHandlers(s, r)
+		RegisterPaymentWebhooks(s, r)
 
 		//INFO: (Brandon) - unused routes
 		r.Post("/checkouts", s.checkoutsHandler)
@@ -344,7 +345,12 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Index handler]"
 	ctx := r.Context()
 
-	if err := components.HomePage().Render(ctx, w); err != nil {
+	homePageData := models.HomePageData{
+		Sections:      models.BuildPostHomeContentSections(s.GetBrandLogoCDNURL),
+		StoreImageURL: s.GetAssetCDNURL("store.webp"),
+	}
+
+	if err := components.HomePage(homePageData).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),

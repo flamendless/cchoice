@@ -1,17 +1,19 @@
 package components
 
-templ HomePage() {
+import "cchoice/cmd/web/models"
+
+templ HomePage(data models.HomePageData) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
 			@HeadMeta()
 			@TabTitle("Home")
 		</head>
-		@HomePageBody()
+		@HomePageBody(data)
 	</html>
 }
 
-templ HomePageBody() {
+templ HomePageBody(data models.HomePageData) {
 	<body class="m-0 p-0 overflow-x-hidden custom-scrollbar">
 		@ErrorBanner()
 		@Header()
@@ -34,7 +36,7 @@ templ HomePageBody() {
 				>
 					<div class="w-full">
 						@AllCategorySections()
-						@PostHomeContentSections()
+						@PostHomeContentSections(data)
 					</div>
 				</div>
 			</div>

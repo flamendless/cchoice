@@ -21,6 +21,7 @@ import (
 	"cchoice/internal/orders"
 	"cchoice/internal/payments"
 	"cchoice/internal/shipping"
+	"cchoice/internal/storage"
 	"cchoice/internal/utils"
 
 	"github.com/Rhymond/go-money"
@@ -744,6 +745,17 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s *Server) getPaymentImageURL(pm payments.PaymentMethod) string {
+	imgPath := pm.GetImagePath()
+	if imgPath == "" {
+		return ""
+	}
+	if s.objectStorage != nil && s.objectStorage.ProviderEnum() == storage.STORAGE_PROVIDER_CLOUDFLARE_IMAGES {
+		return s.objectStorage.GetPublicURL(imgPath)
+	}
+	return "/cchoice/assets/image?filename=payments/" + strings.TrimPrefix(imgPath, constants.PathPaymentImages)
+}
+
 func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Cart Payment Methods Handler]"
 	ctx := r.Context()
@@ -751,9 +763,9 @@ func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Reque
 	cod, err := s.dbRO.GetQueries().GetSettingsCOD(ctx)
 	paymentMethods := []models.AvailablePaymentMethod{
 		{
-			Value:     payments.PAYMENT_METHOD_COD,
-			Enabled:   (err == nil && cod),
-			ImageData: payments.PAYMENT_METHOD_COD.GetImageData(s.cache, s.staticFS),
+			Value:    payments.PAYMENT_METHOD_COD,
+			Enabled:  (err == nil && cod),
+			ImageURL: s.getPaymentImageURL(payments.PAYMENT_METHOD_COD),
 		},
 	}
 
@@ -783,9 +795,9 @@ func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Reque
 				continue
 			}
 			paymentMethods = append(paymentMethods, models.AvailablePaymentMethod{
-				Value:     pm,
-				Enabled:   enabled,
-				ImageData: pm.GetImageData(s.cache, s.staticFS),
+				Value:    pm,
+				Enabled:  enabled,
+				ImageURL: s.getPaymentImageURL(pm),
 			})
 		}
 
