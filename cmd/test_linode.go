@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"cchoice/internal/conf"
 	"cchoice/internal/enums"
+	"cchoice/internal/storage"
 	"cchoice/internal/storage/linode"
 	"context"
 	"fmt"
@@ -21,10 +23,15 @@ var cmdTestLinode = &cobra.Command{
 		fmt.Println("Testing Linode Object Storage Connection...")
 		fmt.Println("==========================================")
 
+		cfg := conf.Conf()
+		if cfg.StorageProvider != storage.STORAGE_PROVIDER_LINODE.String() {
+			fmt.Println("storage provider is not set to LINODE. Skipping...")
+			return
+		}
+
 		client, err := linode.NewClientFromConfigWithBucket(enums.LINODE_BUCKET_PUBLIC)
 		if err != nil {
-			fmt.Println(err)
-			return
+			panic(err)
 		}
 
 		ctx := context.Background()
