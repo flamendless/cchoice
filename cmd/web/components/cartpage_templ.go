@@ -478,9 +478,9 @@ func CartPaymentItem(paymentMethod models.AvailablePaymentMethod) templ.Componen
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 string
-		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(paymentMethod.ImageData)
+		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(paymentMethod.ImageURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 198, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 198, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {

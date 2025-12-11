@@ -11,11 +11,12 @@ func _() {
 	_ = x[STORAGE_PROVIDER_UNDEFINED-0]
 	_ = x[STORAGE_PROVIDER_LOCAL-1]
 	_ = x[STORAGE_PROVIDER_LINODE-2]
+	_ = x[STORAGE_PROVIDER_CLOUDFLARE_IMAGES-3]
 }
 
-const _StorageProvider_name = "UNDEFINEDLOCALLINODE"
+const _StorageProvider_name = "UNDEFINEDLOCALLINODECLOUDFLARE_IMAGES"
 
-var _StorageProvider_index = [...]uint8{0, 9, 14, 20}
+var _StorageProvider_index = [...]uint8{0, 9, 14, 20, 37}
 
 func (i StorageProvider) String() string {
 	idx := int(i) - 0

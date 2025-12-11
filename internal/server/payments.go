@@ -1,16 +1,15 @@
 package server
 
 import (
+	"net/http"
+
 	"cchoice/cmd/web/components"
-	"cchoice/internal/conf"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
-	"cchoice/internal/jobs"
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
 	"cchoice/internal/payments/paymongo"
-	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
@@ -97,17 +96,6 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	order, err := s.dbRO.GetQueries().GetOrderByCheckoutPaymentID(ctx, checkoutPayment.ID)
-	if err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.String("checkout_payment_id", checkoutPayment.ID),
-			zap.Error(err),
-		)
-		http.Error(w, "Order not found", http.StatusNotFound)
-		return
-	}
-
 	logs.LogCtx(ctx).Info(
 		logtag,
 		zap.String("checkout_payment_id", checkoutPayment.ID),
@@ -181,131 +169,35 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	tx, err := s.dbRW.GetDB().BeginTx(ctx, nil)
+	result, err := payments.OnOrderPaid(ctx, payments.OnOrderPaidParams{
+		ReferenceNumber: paymentRef,
+		DBRO:            s.dbRO,
+		DBRW:            s.dbRW,
+		EmailJobRunner:  s.emailJobRunner,
+	})
 	if err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Error(err),
-		)
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, "Failed to process payment", http.StatusInternalServerError)
 		return
 	}
-	defer func() {
-		if err := tx.Rollback(); err != nil {
-			logs.LogCtx(ctx).Error(
-				logtag,
-				zap.Error(err),
-			)
-		}
-	}()
 
-	qtx := s.dbRW.GetQueries().WithTx(tx)
-
-	updatedCheckoutPayment, err := qtx.UpdateCheckoutPaymentOnSuccess(ctx, queries.UpdateCheckoutPaymentOnSuccessParams{
-		Status: enums.PAYMENT_STATUS_PAID.String(),
-		ID:     checkoutPayment.ID,
-	})
-	if err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.String("checkout_payment_id", checkoutPayment.ID),
-			zap.Error(err),
-		)
-		http.Error(w, "Failed to update payment status", http.StatusInternalServerError)
-		return
-	}
-	logs.LogCtx(ctx).Info(
-		logtag,
-		zap.String("action", "updated_checkout_payment"),
-		zap.String("checkout_payment_id", updatedCheckoutPayment.ID),
-		zap.String("new_status", updatedCheckoutPayment.Status),
-	)
-
-	updatedCheckout, err := qtx.UpdateCheckoutStatus(ctx, queries.UpdateCheckoutStatusParams{
-		Status: enums.CHECKOUT_STATUS_COMPLETED.String(),
-		ID:     order.CheckoutID,
-	})
-	if err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Int64("checkout_id", order.CheckoutID),
-			zap.Error(err),
-		)
-		http.Error(w, "Failed to update checkout status", http.StatusInternalServerError)
-		return
-	}
-	logs.LogCtx(ctx).Info(
-		logtag,
-		zap.String("action", "updated_checkout"),
-		zap.Int64("checkout_id", updatedCheckout.ID),
-		zap.String("new_status", updatedCheckout.Status),
-	)
-
-	updatedOrder, err := qtx.UpdateOrderOnPaymentSuccess(ctx, queries.UpdateOrderOnPaymentSuccessParams{
-		Status: enums.ORDER_STATUS_CONFIRMED.String(),
-		ID:     order.ID,
-	})
-	if err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Int64("order_id", order.ID),
-			zap.Error(err),
-		)
-		http.Error(w, "Failed to update order status", http.StatusInternalServerError)
-		return
-	}
-	logs.LogCtx(ctx).Info(
-		logtag,
-		zap.String("action", "updated_order"),
-		zap.Int64("order_id", updatedOrder.ID),
-		zap.String("order_number", updatedOrder.OrderNumber),
-		zap.String("new_status", updatedOrder.Status),
-		zap.Time("paid_at", updatedOrder.PaidAt.Time),
-	)
-
-	if err := tx.Commit(); err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Error(err),
-		)
-		http.Error(w, "Failed to finalize payment", http.StatusInternalServerError)
-		return
-	}
-
-	logs.LogCtx(ctx).Info(
-		logtag,
-		zap.String("result", "success"),
-		zap.String("payment_ref", paymentRef),
-		zap.String("order_number", updatedOrder.OrderNumber),
-		zap.Int64("order_id", updatedOrder.ID),
-	)
-
-	if err := s.emailJobRunner.QueueEmailJob(ctx, jobs.EmailJobParams{
-		Recipient:         updatedOrder.CustomerEmail,
-		CC:                conf.Conf().MailerooConfig.CC,
-		Subject:           "Order Confirmation - " + updatedOrder.OrderNumber,
-		TemplateName:      enums.EMAIL_TEMPLATE_ORDER_CONFIRMATION,
-		OrderID:           &updatedOrder.ID,
-		CheckoutPaymentID: &updatedOrder.CheckoutPaymentID,
-	}); err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.String("action", "queue_email_failed"),
-			zap.Int64("order_id", updatedOrder.ID),
-			zap.Error(err),
-		)
-	} else {
-		logs.LogCtx(ctx).Info(
-			logtag,
-			zap.String("action", "email_queued"),
-			zap.Int64("order_id", updatedOrder.ID),
-			zap.String("recipient", updatedOrder.CustomerEmail),
-		)
-	}
-
-	if err := components.SuccessPaymentPage(components.SuccessPaymentPageBody(updatedOrder.OrderNumber)).Render(r.Context(), w); err != nil {
+	if err := components.SuccessPaymentPage(components.SuccessPaymentPageBody(result.OrderNumber)).Render(ctx, w); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func RegisterPaymentWebhooks(s *Server, r chi.Router) {
+	if s.paymentGateway.GatewayEnum() == payments.PAYMENT_GATEWAY_PAYMONGO {
+		handler := paymongo.NewWebhookHandler(paymongo.WebhookHandlerConfig{
+			DBRO:           s.dbRO,
+			DBRW:           s.dbRW,
+			EmailJobRunner: s.emailJobRunner,
+		})
+		r.Post("/webhooks/paymongo", handler)
+		return
+	}
+
+	logs.Log().Warn("No payment webhooks registered")
 }

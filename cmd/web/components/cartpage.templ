@@ -195,7 +195,7 @@ templ CartPaymentItem(paymentMethod models.AvailablePaymentMethod) {
 	<img
 		class="w-12 h-12 object-contain mb-1"
 		title={ "image of " + paymentMethod.Value.String() }
-		src={ paymentMethod.ImageData }
+		src={ paymentMethod.ImageURL }
 		alt={ paymentMethod.Value.String() + " thumbnail" }
 	/>
 	<h1 class="text-center text-xs">{ paymentMethod.Value.GetDisplayText() }</h1>

@@ -23,7 +23,8 @@ var cmdTestLinode = &cobra.Command{
 
 		client, err := linode.NewClientFromConfigWithBucket(enums.LINODE_BUCKET_PUBLIC)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			return
 		}
 
 		ctx := context.Background()

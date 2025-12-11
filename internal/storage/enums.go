@@ -14,6 +14,7 @@ const (
 	STORAGE_PROVIDER_UNDEFINED StorageProvider = iota
 	STORAGE_PROVIDER_LOCAL
 	STORAGE_PROVIDER_LINODE
+	STORAGE_PROVIDER_CLOUDFLARE_IMAGES
 )
 
 func ParseStorageProviderToEnum(sp string) StorageProvider {
@@ -22,6 +23,8 @@ func ParseStorageProviderToEnum(sp string) StorageProvider {
 		return STORAGE_PROVIDER_LOCAL
 	case STORAGE_PROVIDER_LINODE.String():
 		return STORAGE_PROVIDER_LINODE
+	case STORAGE_PROVIDER_CLOUDFLARE_IMAGES.String():
+		return STORAGE_PROVIDER_CLOUDFLARE_IMAGES
 	default:
 		panic(fmt.Errorf("%w: '%s'", errs.ErrCmdUndefinedService, sp))
 	}

@@ -46,6 +46,7 @@ type GroupedCategorySection struct {
 type CategorySectionProduct struct {
 	queries.GetProductsByCategoryIDRow
 	ProductID string
+	CDNURL    string
 }
 
 type CategorySectionProducts struct {
@@ -55,8 +56,11 @@ type CategorySectionProducts struct {
 	Products    []CategorySectionProduct
 }
 
+type CDNURLFunc func(path string) string
+
 func ToCategorySectionProducts[T queries.GetProductsByCategoryIDRow](
 	encoder encode.IEncode,
+	getCDNURL CDNURLFunc,
 	data []T,
 ) []CategorySectionProduct {
 	res := make([]CategorySectionProduct, 0, len(data))
@@ -65,6 +69,7 @@ func ToCategorySectionProducts[T queries.GetProductsByCategoryIDRow](
 		res = append(res, CategorySectionProduct{
 			GetProductsByCategoryIDRow: r,
 			ProductID:                  encoder.Encode(r.ID),
+			CDNURL:                     getCDNURL(r.ThumbnailPath),
 		})
 	}
 	return res

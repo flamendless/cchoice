@@ -84,14 +84,14 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 			return templ_7745c5c3_Err
 		}
 		for _, product := range data.Products {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"group flex flex-col items-center m-2 ml-4 hover:bg-cchoicesoft transition-colors\"><img hx-get=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"group flex flex-col items-center m-2 ml-4 hover:bg-cchoicesoft transition-colors\"><img src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs("/cchoice/products/image?thumbnail=1&quality=best&path=" + product.ThumbnailPath)
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(product.CDNURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 28, Col: 95}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 28, Col: 26}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -141,9 +141,9 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var8 string
-			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(product.ThumbnailPath)
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(product.CDNURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 37, Col: 57}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 37, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {

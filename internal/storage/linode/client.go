@@ -140,7 +140,7 @@ func NewClientFromConfigWithBucket(bucketEnum enums.LinodeBucketEnum) (*Client, 
 	}
 
 	logs.Log().Info(
-		"Linode",
+		"New client",
 		zap.String("endpoint", cfg.Linode.Endpoint),
 		zap.String("bucket", bucketConfig.Bucket),
 		zap.String("region", cfg.Linode.Region),

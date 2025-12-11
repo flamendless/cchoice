@@ -353,7 +353,28 @@ func MigrateImagesToLinodeStorage() error {
 		Args: []string{
 			"migrate_images_linode",
 			"--dry-run=false",
-			"--bucket=PUBLIC",
+			"--bucket=PRIVATE",
+		},
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MigrateImagesToCloudflare() error {
+	if err := run(Command{
+		Type: CmdGoBuild,
+		Out:  filepath.Join(tmpDir, "migrate_images_cloudflare"),
+		Tags: []string{"staticfs"},
+	}); err != nil {
+		return err
+	}
+	if err := run(Command{
+		Type: CmdTmpExec,
+		Cmd:  "migrate_images_cloudflare",
+		Args: []string{
+			"migrate_images_cloudflare",
+			"--dry-run=false",
 		},
 	}); err != nil {
 		return err

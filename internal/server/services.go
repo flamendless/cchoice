@@ -14,6 +14,7 @@ import (
 	cchoiceservice "cchoice/internal/shipping/cchoice"
 	"cchoice/internal/shipping/lalamove"
 	"cchoice/internal/storage"
+	"cchoice/internal/storage/cloudflare"
 	"cchoice/internal/storage/linode"
 	localstorage "cchoice/internal/storage/local"
 )
@@ -57,10 +58,11 @@ func mustInitStorageProvider() (storage.IObjectStorage, storage.IFileSystem) {
 		return nil, localstorage.New()
 	case storage.STORAGE_PROVIDER_LINODE.String():
 		objStorage := linode.MustInitWithBucket(enums.LINODE_BUCKET_PUBLIC)
-
-		//TODO: (Brandon) product images should be in private bucket
 		productImageFS := linode.New(objStorage)
 		return objStorage, productImageFS
+	case storage.STORAGE_PROVIDER_CLOUDFLARE_IMAGES.String():
+		objStorage := cloudflare.MustInit()
+		return objStorage, localstorage.New()
 	default:
 		panic("Unsupported storage provider: " + cfg.StorageProvider)
 	}

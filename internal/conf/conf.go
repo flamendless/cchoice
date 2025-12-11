@@ -33,6 +33,7 @@ type appConfig struct {
 	LogMinLevel        int    `env:"LOG_MIN_LEVEL" env-default:"1"`
 	StorageProvider    string `env:"STORAGE_PROVIDER" env-default:"LOCAL"`
 	Linode             LinodeConfig
+	CloudflareImages   CloudflareImagesConfig
 	MailService        string `env:"MAIL_SERVICE"`
 	MailerooConfig     MailerooConfig
 }
@@ -101,6 +102,13 @@ type LinodeBucketConfig struct {
 	Bucket    string `env:"BUCKET"`
 	AccessKey string `env:"ACCESS_KEY"`
 	SecretKey string `env:"SECRET_KEY"`
+}
+
+type CloudflareImagesConfig struct {
+	AccountID   string `env:"CLOUDFLARE_ACCOUNT_ID"`
+	AccountHash string `env:"CLOUDFLARE_ACCOUNT_HASH"`
+	APIToken    string `env:"CLOUDFLARE_IMAGES_API_TOKEN"`
+	Variant     string `env:"CLOUDFLARE_IMAGES_VARIANT" env-default:"public"`
 }
 
 func (lc *LinodeConfig) GetBuckets() map[enums.LinodeBucketEnum]LinodeBucketConfig {

@@ -1,138 +1,39 @@
 package components
 
-type brandImage struct {
-	filename string
-	alt      string
-}
+import "cchoice/cmd/web/models"
 
-type postHomeContent struct {
-	title       string
-	description string
-	brandImage  *brandImage
-}
-
-type postHomeContentSection struct {
-	title  string
-	href   string
-	others []postHomeContent
-	custom templ.Component
-}
-
-var postHomeContentSections = []postHomeContentSection{
-	postHomeContentSection{
-		title: "About Us",
-		href:  "about-us",
-		others: []postHomeContent{
-			postHomeContent{
-				title:       "Who We Are",
-				description: "We are a dedicated company and trusted dealer, committed to selecting the right partners who provide high-quality tools and accessories to drive better progress in the future",
-			},
-			postHomeContent{
-				title:       "Vision",
-				description: "To be one of the leading importers of advance and innovative construction and fabrication tools and equipments",
-			},
-			postHomeContent{
-				title:       "Mission",
-				description: "To provide quality products certified by international manufacturers in both construction and fabrication materials industries",
-			},
-		},
-	},
-	postHomeContentSection{
-		title: "Our Store",
-		href:  "store",
-		others: []postHomeContent{},
-		custom: StoreSection(),
-	},
-
-	postHomeContentSection{
-		title: "Our Services",
-		href:  "services",
-		others: []postHomeContent{
-			postHomeContent{
-				title:       "Delivery",
-				description: "Expect delivery at soonest",
-			},
-			postHomeContent{
-				title:       "Here when you need us",
-				description: "Always available and right around the corner",
-			},
-			postHomeContent{
-				title:       "Expect high-quality products",
-				description: "Authorized and trusted",
-			},
-		},
-	},
-	postHomeContentSection{
-		title: "Our Partners",
-		href:  "partners",
-		others: []postHomeContent{
-			postHomeContent{
-				brandImage: &brandImage{
-					filename: "BOSCH.webp",
-					alt:      "Bosch image",
-				},
-			},
-			postHomeContent{
-				brandImage: &brandImage{
-					filename: "TAILIN.webp",
-					alt:      "Tailin image",
-				},
-			},
-			postHomeContent{
-				brandImage: &brandImage{
-					filename: "DELTAPLUS.webp",
-					alt:      "DeltaPlus image",
-				},
-			},
-			postHomeContent{
-				brandImage: &brandImage{
-					filename: "BOSUN.webp",
-					alt:      "Bosun image",
-				},
-			},
-			postHomeContent{
-				brandImage: &brandImage{
-					filename: "STANLEY.webp",
-					alt:      "Stanley image",
-				},
-			},
-		},
-	},
-}
-
-templ PostHomeContentSections() {
+templ PostHomeContentSections(data models.HomePageData) {
 	<div
 		id="others"
 		class="absolute flex flex-col left-0 px-8 pt-4 pb-16 w-screen border-t-4 border-cchoice_border z-999 bg-white"
 	>
-		for _, postHomeContentSection := range postHomeContentSections {
-			<span class="font-bold text-lg mt-4">{ postHomeContentSection.title }</span>
-			<section id={ postHomeContentSection.href } class="flex flex-row justify-between my-6 w-full pr-4">
-				if postHomeContentSection.custom != nil {
-					@postHomeContentSection.custom
+		for _, section := range data.Sections {
+			<span class="font-bold text-lg mt-4">{ section.Title }</span>
+			<section id={ section.Href } class="flex flex-row justify-between my-6 w-full pr-4">
+				if section.Href == "store" {
+					@StoreSection(data.StoreImageURL)
 				}
-				for _, postHomeContent := range postHomeContentSection.others {
+				for _, content := range section.Others {
 					<div
-						if postHomeContent.brandImage == nil {
+						if content.BrandImage == nil {
 							class="w-1/4 border-t-4 border-cchoice_border"
 						} else {
 							class="w-1/4 border-t-4 border-cchoice_border content-center mx-8"
 						}
 					>
 						<div class="my-2 text-center font-medium text-base">
-							{ postHomeContent.title }
+							{ content.Title }
 						</div>
 						<div class="my-2 font-normal text-sm text-wrap">
-							{ postHomeContent.description }
+							{ content.Description }
 						</div>
-						if postHomeContent.brandImage != nil {
+						if content.BrandImage != nil {
 							<img
-								src={ placeholderImageSrc }
-								hx-get={ templ.URL(GetBrandLogoURL(postHomeContent.brandImage.filename)) }
+								src={ content.BrandImage.CDNURL }
 								hx-trigger="load once"
 								hx-swap="none"
 								class="w-3xs h-auto m-auto mt-8"
-								alt={ postHomeContent.brandImage.alt }
+								alt={ content.BrandImage.Alt }
 								loading="lazy"
 								width="256"
 								height="256"
@@ -145,11 +46,10 @@ templ PostHomeContentSections() {
 	</div>
 }
 
-templ StoreSection() {
+templ StoreSection(storeImageURL string) {
 	<div class="flex-col content-center w-screen">
 		<img
-			src={ placeholderImageSrc }
-			hx-get={ templ.URL(GetAssetImageURL("store.webp")) }
+			src={ storeImageURL }
 			hx-trigger="load once"
 			hx-swap="none"
 			class="w-auto h-[256px] m-4 ml-auto mr-auto"

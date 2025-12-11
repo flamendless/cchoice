@@ -210,7 +210,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		ID:          categoryID,
 		Category:    utils.SlugToTile(category.Category.String),
 		Subcategory: utils.SlugToTile(category.Subcategory.String),
-		Products:    models.ToCategorySectionProducts(s.encoder, productsWithValidImages),
+		Products:    models.ToCategorySectionProducts(s.encoder, s.GetCDNURL, productsWithValidImages),
 	}
 
 	if err := components.CategorySectionProducts(categorySectionProducts).Render(ctx, w); err != nil {
