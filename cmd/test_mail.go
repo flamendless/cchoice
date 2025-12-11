@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cchoice/internal/constants"
 	"cchoice/internal/mail"
 	"cchoice/internal/mail/maileroo"
 	"fmt"
@@ -51,9 +52,8 @@ var cmdTestMail = &cobra.Command{
 
 		var err error
 		if flagTestMail.Template != "" {
-			logoURL := "https://cchoice.shop/cchoice/static/images/logos/cchoice_with_text.webp"
 			data := mail.TemplateData{
-				"LogoURL":          logoURL,
+				"LogoURL":          constants.PathEmailLogo,
 				"OrderNumber":      "CC-TEST-123456",
 				"PaymentReference": "CCPM-ABC123DEF456",
 				"LineItems": []map[string]any{
