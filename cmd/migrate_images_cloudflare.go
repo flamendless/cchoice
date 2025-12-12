@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"cchoice/internal/constants"
 	"cchoice/internal/errs"
+	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/storage/cloudflare"
 	"context"
@@ -35,7 +37,7 @@ func init() {
 
 var cmdMigrateImagesCloudflare = &cobra.Command{
 	Use:   "migrate_images_cloudflare",
-	Short: "migrate product images and brand logos to Cloudflare Images",
+	Short: "migrate images to Cloudflare Images",
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := cloudflare.NewClientFromConfig()
 		if err != nil {
@@ -60,7 +62,11 @@ var cmdMigrateImagesCloudflare = &cobra.Command{
 
 		var allImages []imageToUpload
 
-		specificFiles := []string{"empty_96x96.webp", "logo.svg", "store.webp"}
+		specificFiles := []string{
+			constants.EmptyImageFilename,
+			"logo.svg",
+			"store.webp",
+		}
 		logs.Log().Info(
 			"Collecting specific files from base images directory",
 			zap.Strings("files", specificFiles),
@@ -195,7 +201,7 @@ type imageToUpload struct {
 }
 
 func collectImagesCloudflare(imagesPath string, basePath string, isBrandLogos bool) ([]imageToUpload, error) {
-	var images []imageToUpload
+	var imgsToUpload []imageToUpload
 
 	err := filepath.Walk(imagesPath, func(filePath string, info fs.FileInfo, err error) error {
 		if err != nil {
@@ -207,11 +213,12 @@ func collectImagesCloudflare(imagesPath string, basePath string, isBrandLogos bo
 		}
 
 		ext := strings.ToLower(filepath.Ext(filePath))
-		if ext != ".png" && ext != ".jpg" && ext != ".jpeg" && ext != ".webp" && ext != ".gif" && ext != ".svg" {
+		imgFormat := images.ParseImageFormatExtToEnum(ext)
+		if imgFormat == images.IMAGE_FORMAT_UNDEFINED {
 			return nil
 		}
 
-		if isBrandLogos && ext == ".png" {
+		if isBrandLogos && imgFormat == images.IMAGE_FORMAT_PNG {
 			logs.Log().Debug(
 				"Skipping PNG file for brand logos (only WebP allowed)",
 				zap.String("file", filePath),
@@ -243,7 +250,7 @@ func collectImagesCloudflare(imagesPath string, basePath string, isBrandLogos bo
 		}
 
 		cfKey := "static/images/" + normalizedPath
-		images = append(images, imageToUpload{
+		imgsToUpload = append(imgsToUpload, imageToUpload{
 			localPath: filePath,
 			key:       cfKey,
 		})
@@ -251,7 +258,7 @@ func collectImagesCloudflare(imagesPath string, basePath string, isBrandLogos bo
 		return nil
 	})
 
-	return images, err
+	return imgsToUpload, err
 }
 
 func processBatchCloudflare(ctx context.Context, client *cloudflare.Client, batch []imageToUpload) (uploaded, skipped, errCount int) {
@@ -314,7 +321,8 @@ func processBatchCloudflare(ctx context.Context, client *cloudflare.Client, batc
 		}
 
 		ext := strings.ToLower(filepath.Ext(img.localPath))
-		contentType := getContentType(ext)
+		imgFormat := images.ParseImageFormatExtToEnum(ext)
+		contentType := imgFormat.MIMEType()
 
 		if err := client.PutObjectFromBytes(ctx, img.key, data, contentType); err != nil {
 			logs.Log().Error(

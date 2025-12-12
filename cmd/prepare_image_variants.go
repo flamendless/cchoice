@@ -4,8 +4,8 @@ package cmd
 
 import (
 	"cchoice/internal/errs"
+	"cchoice/internal/images"
 	"cchoice/internal/logs"
-	"cchoice/internal/utils"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -30,9 +30,8 @@ type imageSize struct {
 }
 
 var imageSizes = []imageSize{
-	{96, 96},
-	{256, 256},
 	{640, 640},
+	{1280, 1280},
 }
 
 var flagsPrepareImageVariants prepareImageVariantsFlags
@@ -50,7 +49,7 @@ func getImageFiles(inpath string) ([]string, error) {
 		}
 
 		ext := filepath.Ext(info.Name())
-		if utils.IsValidImageExtension(ext) {
+		if images.IsValidImageExtension(ext) {
 			imageFiles = append(imageFiles, path)
 		} else {
 			logs.Log().Info("Skipping non-image file", zap.String("path", path))

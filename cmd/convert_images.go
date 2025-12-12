@@ -4,8 +4,8 @@ package cmd
 
 import (
 	"cchoice/internal/errs"
+	"cchoice/internal/images"
 	"cchoice/internal/logs"
-	"cchoice/internal/utils"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -79,7 +79,7 @@ var cmdConvertImages = &cobra.Command{
 			}
 
 			ext := filepath.Ext(info.Name())
-			if !utils.IsValidImageExtension(ext) {
+			if !images.IsValidImageExtension(ext) {
 				logs.Log().Info("Skipping non-image file", zap.String("path", path))
 				return nil
 			}

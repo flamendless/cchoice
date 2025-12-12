@@ -71,15 +71,8 @@ func validateImagePath(path string, allowedPrefixes []string) (string, error) {
 	}
 
 	ext := filepath.Ext(cleanPath)
-	allowedExts := []string{".webp", ".png", ".jpg", ".jpeg"}
-	validExt := false
-	for _, allowedExt := range allowedExts {
-		if strings.EqualFold(ext, allowedExt) {
-			validExt = true
-			break
-		}
-	}
-	if !validExt {
+	imgFormat := images.ParseImageFormatExtToEnum(ext)
+	if imgFormat == images.IMAGE_FORMAT_UNDEFINED {
 		return "", errs.ErrPathInvalidExt
 	}
 
