@@ -88,6 +88,8 @@ func (pm PaymentMethod) GetImagePath() string {
 		imgPath += "metrobank.webp"
 	case PAYMENT_METHOD_GCASH:
 		imgPath += "gcash.webp"
+	case PAYMENT_METHOD_GRAB_PAY:
+		imgPath += "grabpay.webp"
 	case PAYMENT_METHOD_PAYMAYA:
 		imgPath += "maya.webp"
 	default:
