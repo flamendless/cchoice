@@ -13,6 +13,8 @@ type CheckoutLine struct {
 	BrandName       string
 	ThumbnailPath   string
 	ThumbnailData   string
+	CDNURL          string
+	CDNURL1280      string
 	Quantity        int64
 	WeightKg        float64
 	WeightDisplay   string

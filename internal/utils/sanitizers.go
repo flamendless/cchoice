@@ -1,9 +1,10 @@
 package utils
 
 import (
-	"regexp"
 	"strings"
 	"sync"
+
+	"cchoice/internal/constants"
 
 	"github.com/Rhymond/go-money"
 	"github.com/gertd/go-pluralize"
@@ -11,11 +12,6 @@ import (
 
 var pluralizerOnce sync.Once
 var pluralizer *pluralize.Client
-
-var (
-	multipleSpacesRegex *regexp.Regexp
-	regexOnce           sync.Once
-)
 
 func SanitizePrice(price string) (*money.Money, []error) {
 	errsRes := make([]error, 0, 2)
@@ -92,10 +88,7 @@ func SanitizeCategory(input string) string {
 }
 
 func SanitizeString(s string) string {
-	regexOnce.Do(func() {
-		multipleSpacesRegex = regexp.MustCompile(`\s+`)
-	})
 	s = strings.TrimSpace(s)
-	s = multipleSpacesRegex.ReplaceAllString(s, " ")
+	s = constants.MultipleSpacesRegex.ReplaceAllString(s, " ")
 	return strings.TrimSpace(s)
 }
