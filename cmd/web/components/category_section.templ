@@ -34,10 +34,11 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 						alt={ product.Name + " thumbnail" }
 						loading="lazy"
 						data-product-id={ product.ProductID }
-						data-product-thumbnail-path={ product.CDNURL }
+						data-product-thumbnail-path={ product.CDNURL1280 }
 						_="
 							on click
 								set #selected-product-id.value to my @data-product-id
+								set #selected-product-thumbnail-path.value to my @data-product-thumbnail-path
 								log 'selected product-id: ' + #selected-product-id.value
 								log 'selected thumbnail image path: ' + #selected-product-thumbnail-path.value
 								trigger get on #modal_image_viewer_image

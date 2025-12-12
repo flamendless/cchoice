@@ -160,8 +160,8 @@ func LoadImageSrc() templ.ComponentScript {
 
 func LoadModalImage() templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_LoadModalImage_a778`,
-		Function: `function __templ_LoadModalImage_a778(){document.addEventListener('get', function(event) {
+		Name: `__templ_LoadModalImage_382a`,
+		Function: `function __templ_LoadModalImage_382a(){document.addEventListener('get', function(event) {
 		const target = event.target;
 		if (!target || target.id !== 'modal_image_viewer_image')
 			return
@@ -170,21 +170,11 @@ func LoadModalImage() templ.ComponentScript {
 		if (!pathInput || !pathInput.value)
 			return
 
-		const path = pathInput.value;
-		const url = '/cchoice/products/image?thumbnail=1&path=' + encodeURIComponent(path);
-		console.log('Fetching modal image from:', url);
-
-		fetch(url)
-			.then(response => response.text())
-			.then(base64Data => {
-				target.src = base64Data;
-				console.log('Modal image loaded successfully');
-			})
-			.catch(err => console.error('Error loading modal image:', err));
+		target.src = pathInput.value;
 	}, true);
 }`,
-		Call:       templ.SafeScript(`__templ_LoadModalImage_a778`),
-		CallInline: templ.SafeScriptInline(`__templ_LoadModalImage_a778`),
+		Call:       templ.SafeScript(`__templ_LoadModalImage_382a`),
+		CallInline: templ.SafeScriptInline(`__templ_LoadModalImage_382a`),
 	}
 }
 

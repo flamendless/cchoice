@@ -1,6 +1,7 @@
 package models
 
 import (
+	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
 )
@@ -45,8 +46,9 @@ type GroupedCategorySection struct {
 
 type CategorySectionProduct struct {
 	queries.GetProductsByCategoryIDRow
-	ProductID string
-	CDNURL    string
+	ProductID  string
+	CDNURL     string
+	CDNURL1280 string
 }
 
 type CategorySectionProducts struct {
@@ -70,6 +72,7 @@ func ToCategorySectionProducts[T queries.GetProductsByCategoryIDRow](
 			GetProductsByCategoryIDRow: r,
 			ProductID:                  encoder.Encode(r.ID),
 			CDNURL:                     getCDNURL(r.ThumbnailPath),
+			CDNURL1280:                 getCDNURL(constants.ToPath1280(r.ThumbnailPath)),
 		})
 	}
 	return res
