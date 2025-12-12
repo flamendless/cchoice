@@ -10,11 +10,19 @@ var tblImageFormat = map[ImageFormat]string{
 	IMAGE_FORMAT_UNDEFINED: "UNDEFINED",
 	IMAGE_FORMAT_PNG:       "PNG",
 	IMAGE_FORMAT_WEBP:      "WEBP",
+	IMAGE_FORMAT_JPEG:      "JPEG",
+	IMAGE_FORMAT_GIF:       "GIF",
+	IMAGE_FORMAT_SVG:       "SVG",
+	IMAGE_FORMAT_BMP:       "BMP",
 }
 
 var tblImageFormatExt = map[ImageFormat][]string{
 	IMAGE_FORMAT_PNG:  {"png", ".png"},
 	IMAGE_FORMAT_WEBP: {"webp", ".webp"},
+	IMAGE_FORMAT_JPEG: {"jpg", ".jpg", "jpeg", ".jpeg"},
+	IMAGE_FORMAT_GIF:  {"gif", ".gif"},
+	IMAGE_FORMAT_SVG:  {"svg", ".svg"},
+	IMAGE_FORMAT_BMP:  {"bmp", ".bmp"},
 }
 
 func TestImageFormatToString(t *testing.T) {

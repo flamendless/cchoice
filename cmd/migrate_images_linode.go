@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/storage/linode"
 	"context"
@@ -36,7 +38,7 @@ func init() {
 
 var cmdMigrateImagesLinode = &cobra.Command{
 	Use:   "migrate_images_linode",
-	Short: "migrate product images and brand logos to Linode Object Storage",
+	Short: "migrate images to Linode Object Storage",
 	Run: func(cmd *cobra.Command, args []string) {
 		bucketEnum := enums.ParseLinodeBucketEnum(strings.ToUpper(flagsMigrateImagesLinode.bucket))
 		if bucketEnum == enums.LINODE_BUCKET_UNDEFINED {
@@ -64,7 +66,11 @@ var cmdMigrateImagesLinode = &cobra.Command{
 
 		basePath := flagsMigrateImagesLinode.basePath
 
-		specificFiles := []string{"empty_96x96.webp", "logo.svg", "store.webp"}
+		specificFiles := []string{
+			constants.EmptyImageFilename,
+			"logo.svg",
+			"store.webp",
+		}
 		logs.Log().Info(
 			"Migrating specific files from base images directory",
 			zap.Strings("files", specificFiles),
@@ -182,11 +188,12 @@ func migrateImages(
 		}
 
 		ext := strings.ToLower(filepath.Ext(filePath))
-		if ext != ".png" && ext != ".jpg" && ext != ".jpeg" && ext != ".webp" && ext != ".gif" && ext != ".svg" {
+		imgFormat := images.ParseImageFormatExtToEnum(ext)
+		if imgFormat == images.IMAGE_FORMAT_UNDEFINED {
 			return nil
 		}
 
-		if isBrandLogos && ext == ".png" {
+		if isBrandLogos && imgFormat == images.IMAGE_FORMAT_PNG {
 			logs.Log().Debug(
 				"Skipping PNG file for brand logos (only WebP allowed)",
 				zap.String("file", filePath),
@@ -269,17 +276,12 @@ func migrateImages(
 }
 
 func getContentType(ext string) string {
+	imgFormat := images.ParseImageFormatExtToEnum(ext)
+	if imgFormat != images.IMAGE_FORMAT_UNDEFINED {
+		return imgFormat.MIMEType()
+	}
+	// Non-image content types
 	switch ext {
-	case ".png":
-		return "image/png"
-	case ".jpg", ".jpeg":
-		return "image/jpeg"
-	case ".webp":
-		return "image/webp"
-	case ".gif":
-		return "image/gif"
-	case ".svg":
-		return "image/svg+xml"
 	case ".md":
 		return "text/markdown"
 	case ".txt":

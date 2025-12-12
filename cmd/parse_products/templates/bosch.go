@@ -4,6 +4,7 @@ import (
 	"cchoice/cmd/parse_products/models"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 	"fmt"
@@ -301,7 +302,7 @@ func BoschProcessProductImage(tpl *Template, product *models.Product) (*models.P
 	basepath := strings.TrimPrefix(tpl.AppFlags.ImagesBasePath, "./cmd/web/")
 	basepath = strings.TrimSuffix(basepath, "/")
 	filename := strings.ReplaceAll(product.Name, " ", "_")
-	path := fmt.Sprintf("%s/%s.png", basepath, filename)
+	path := fmt.Sprintf("%s/%s%s", basepath, filename, images.IMAGE_FORMAT_PNG.Extension())
 
 	imagePath := "./cmd/web/" + path
 	_, err := os.Stat(imagePath)
@@ -316,11 +317,12 @@ func BoschProcessProductImage(tpl *Template, product *models.Product) (*models.P
 	}
 
 	var thumbnail string
-	switch tpl.AppFlags.ImagesFormat {
-	case "png":
+	imgFormat := images.ParseImageFormatExtToEnum(tpl.AppFlags.ImagesFormat)
+	switch imgFormat {
+	case images.IMAGE_FORMAT_PNG:
 		thumbnail = path
-	case "webp":
-		path := fmt.Sprintf("%s/640x640/%s.webp", basepath, filename)
+	case images.IMAGE_FORMAT_WEBP:
+		path := fmt.Sprintf("%s/640x640/%s%s", basepath, filename, images.IMAGE_FORMAT_WEBP.Extension())
 		path = strings.Replace(path, "original", "webp", 1)
 		thumbnailPath := "./cmd/web/" + path
 		_, err := os.Stat(thumbnailPath)
