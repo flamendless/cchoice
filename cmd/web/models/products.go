@@ -81,15 +81,18 @@ func ToCategorySectionProducts[T queries.GetProductsByCategoryIDRow](
 type SearchResultProduct struct {
 	queries.GetProductsBySearchQueryRow
 	ProductID string
+	CDNURL    string
 }
 
 func ToSearchResultProduct[T queries.GetProductsBySearchQueryRow](
 	encoder encode.IEncode,
+	getCDNURL CDNURLFunc,
 	data T,
 ) SearchResultProduct {
 	r := queries.GetProductsBySearchQueryRow(data)
 	return SearchResultProduct{
 		GetProductsBySearchQueryRow: r,
 		ProductID:                   encoder.Encode(r.ID),
+		CDNURL:                      getCDNURL(r.ThumbnailPath),
 	}
 }

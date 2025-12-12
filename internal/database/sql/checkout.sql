@@ -51,7 +51,6 @@ SELECT
 		tbl_product_images.thumbnail,
 		'static/images/empty_96x96.webp'
 	) AS thumbnail_path,
-	'' as thumbnail_data,
 	tbl_product_specs.weight,
 	tbl_product_specs.weight_unit
 FROM tbl_checkout_lines
