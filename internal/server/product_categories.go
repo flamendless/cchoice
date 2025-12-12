@@ -5,21 +5,18 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"sync"
 
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/errs"
-	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
-	"golang.org/x/sync/errgroup"
 )
 
 func AddProductCategoriesHandlers(s *Server, r chi.Router) {
@@ -171,39 +168,9 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	g, gctx := errgroup.WithContext(ctx)
-	g.SetLimit(10)
-
-	var mu sync.Mutex
 	productsWithValidImages := make([]queries.GetProductsByCategoryIDRow, 0, len(validProducts))
-
 	for _, i := range validProducts {
-		g.Go(func() error {
-			imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, products[i].ThumbnailPath, images.IMAGE_FORMAT_WEBP)
-			if err != nil {
-				logs.LogCtx(gctx).Error(
-					logtag,
-					zap.String("thumbnailPath", products[i].ThumbnailPath),
-					zap.Error(err),
-				)
-				return nil
-			}
-
-			mu.Lock()
-			products[i].ThumbnailData = imgData
-			productsWithValidImages = append(productsWithValidImages, products[i])
-			mu.Unlock()
-			return nil
-		})
-	}
-
-	if err := g.Wait(); err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Error(err),
-		)
-		http.Error(w, "Failed to load images", http.StatusInternalServerError)
-		return
+		productsWithValidImages = append(productsWithValidImages, products[i])
 	}
 
 	categorySectionProducts := models.CategorySectionProducts{

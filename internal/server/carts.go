@@ -296,7 +296,6 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 			BrandName:       checkoutLine.BrandName,
 			Quantity:        checkoutLine.Quantity,
 			ThumbnailPath:   checkoutLine.ThumbnailPath,
-			ThumbnailData:   result.imgData,
 			CDNURL:          s.GetCDNURL(checkoutLine.ThumbnailPath),
 			CDNURL1280:      s.GetCDNURL(constants.ToPath1280(checkoutLine.ThumbnailPath)),
 			Price:           *price,

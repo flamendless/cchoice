@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
@@ -29,7 +28,6 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
-	"golang.org/x/sync/errgroup"
 )
 
 func buildImageCacheKey(path, thumbnail, size, quality string, ext images.ImageFormat) []byte {
@@ -610,43 +608,12 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		zap.String("query", search),
 	)
 
-	g, gctx := errgroup.WithContext(ctx)
-	g.SetLimit(10)
-
-	var mu sync.Mutex
 	productResults := make([]models.SearchResultProduct, 0, len(products))
-
 	for i := range products {
 		if strings.HasSuffix(products[i].ThumbnailPath, constants.EmptyImageFilename) {
 			continue
 		}
-
-		g.Go(func() error {
-			imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, products[i].ThumbnailPath, images.IMAGE_FORMAT_WEBP)
-			if err != nil {
-				logs.LogCtx(gctx).Error(
-					logtag,
-					zap.Error(err),
-				)
-				return nil
-			}
-
-			products[i].ThumbnailData = imgData
-
-			mu.Lock()
-			productResults = append(productResults, models.ToSearchResultProduct(s.encoder, products[i]))
-			mu.Unlock()
-			return nil
-		})
-	}
-
-	if err := g.Wait(); err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Error(err),
-		)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		productResults = append(productResults, models.ToSearchResultProduct(s.encoder, s.GetCDNURL, products[i]))
 	}
 
 	for _, product := range productResults {

@@ -2,10 +2,11 @@ package orders
 
 import (
 	"context"
-	"regexp"
 	"strings"
 	"testing"
 	"time"
+
+	"cchoice/internal/constants"
 
 	"github.com/stretchr/testify/require"
 )
@@ -50,8 +51,7 @@ func TestGenerateUniqueOrderReferenceNumber(t *testing.T) {
 	t.Run("format matches expected pattern", func(t *testing.T) {
 		ref, err := GenerateUniqueOrderReferenceNumber(ctx)
 		require.NoError(t, err)
-		pattern := regexp.MustCompile(`^CCO-[0-9a-zA-Z]+[0-9A-F]{6}$`)
-		require.True(t, pattern.MatchString(ref), "reference %s does not match expected pattern", ref)
+		require.True(t, constants.OrderReferenceRegex.MatchString(ref), "reference %s does not match expected pattern", ref)
 	})
 
 	t.Run("timestamp increases over time", func(t *testing.T) {

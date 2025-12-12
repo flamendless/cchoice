@@ -12,7 +12,6 @@ type CheckoutLine struct {
 	Name            string
 	BrandName       string
 	ThumbnailPath   string
-	ThumbnailData   string
 	CDNURL          string
 	CDNURL1280      string
 	Quantity        int64

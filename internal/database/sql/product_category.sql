@@ -69,8 +69,7 @@ SELECT
 	COALESCE(
 		tbl_product_images.thumbnail,
 		'static/images/empty_96x96.webp'
-	) AS thumbnail_path,
-	'' as thumbnail_data
+	) AS thumbnail_path
 FROM tbl_products
 INNER JOIN
 	tbl_brands ON tbl_brands.id = tbl_products.brand_id
