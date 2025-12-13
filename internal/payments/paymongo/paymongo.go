@@ -58,13 +58,14 @@ func MustInit() *PayMongo {
 	cfg := conf.Conf()
 	apiKey := base64.StdEncoding.EncodeToString([]byte(cfg.PayMongo.APIKey))
 
-	address := cfg.Server.Address
-	if address == "localhost" {
-		address = fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
+	var successURL, cancelURL string
+	if cfg.Server.Address == "localhost" {
+		successURL = fmt.Sprintf("http://localhost:%d%s", cfg.Server.Port, cfg.PayMongo.SuccessURL)
+		cancelURL = fmt.Sprintf("http://localhost:%d%s", cfg.Server.Port, cfg.PayMongo.CancelURL)
+	} else {
+		successURL = cfg.PayMongo.SuccessURL
+		cancelURL = cfg.PayMongo.CancelURL
 	}
-
-	successURL := fmt.Sprintf("%s%s", address, cfg.PayMongo.SuccessURL)
-	cancelURL := fmt.Sprintf("%s%s", address, cfg.PayMongo.CancelURL)
 
 	return &PayMongo{
 		paymentGateway: payments.PAYMENT_GATEWAY_PAYMONGO,
