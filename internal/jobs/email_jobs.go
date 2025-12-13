@@ -2,6 +2,7 @@ package jobs
 
 import (
 	"cchoice/internal/conf"
+	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
@@ -171,12 +172,13 @@ func (ejr *EmailJobRunner) handleSendEmail(ctx context.Context, m []byte) error 
 		return errors.Join(errs.ErrJobsEmailNotFound, err)
 	}
 
-	templateName := enums.ParseEmailTemplateNameFromDB(emailJob.TemplateName)
-	recipient := emailJob.Recipient
 	var cc []string
 	if emailJob.Cc.Valid && emailJob.Cc.String != "" {
 		cc = strings.Split(emailJob.Cc.String, ",")
 	}
+
+	recipient := emailJob.Recipient
+	templateName := enums.ParseEmailTemplateNameFromDB(emailJob.TemplateName)
 
 	logs.LogCtx(ctx).Info(
 		logtag,
@@ -236,6 +238,7 @@ func (ejr *EmailJobRunner) sendOrderConfirmationEmail(ctx context.Context, email
 	)
 
 	templateData := mail.TemplateData{
+		"LogoURL":          constants.PathEmailLogo,
 		"OrderNumber":      order.OrderNumber,
 		"PaymentReference": order.CheckoutPaymentID,
 		"LineItems":        lineItems,

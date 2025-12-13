@@ -55,10 +55,11 @@ type ServerConfig struct {
 }
 
 type PayMongoConfig struct {
-	APIKey     string `env:"PAYMONGO_API_KEY"`
-	BaseURL    string `env:"PAYMONGO_BASE_URL"`
-	SuccessURL string `env:"PAYMONGO_SUCCESS_URL"`
-	CancelURL  string `env:"PAYMONGO_CANCEL_URL"`
+	APIKey           string `env:"PAYMONGO_API_KEY"`
+	BaseURL          string `env:"PAYMONGO_BASE_URL"`
+	SuccessURL       string `env:"PAYMONGO_SUCCESS_URL"`
+	CancelURL        string `env:"PAYMONGO_CANCEL_URL"`
+	WebhookSecretKey string `env:"PAYMONGO_WEBHOOK_SECRET_KEY"`
 }
 
 type LalamoveConfig struct {
