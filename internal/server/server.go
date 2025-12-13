@@ -116,9 +116,13 @@ func NewServer() *ServerInstance {
 		useSSL:          cfg.Server.UseSSL,
 	}
 
-	addr := fmt.Sprintf("%s:%d", newServer.address, newServer.port)
-	readTimeout := 10 * time.Second
-	writeTimeout := 30 * time.Second
+	var addr string
+	switch cfg.AppEnv {
+	case "local":
+		addr = fmt.Sprintf("%s:%d", newServer.address, newServer.port)
+	case "prod":
+		addr = fmt.Sprintf(":%d", newServer.port)
+	}
 
 	var tlsConfig *tls.Config
 	if newServer.useSSL {
@@ -135,6 +139,9 @@ func NewServer() *ServerInstance {
 			Certificates: []tls.Certificate{serverTLSCert},
 		}
 	}
+
+	readTimeout := 10 * time.Second
+	writeTimeout := 30 * time.Second
 
 	handler := sessionManager.LoadAndSave(newServer.RegisterRoutes())
 
