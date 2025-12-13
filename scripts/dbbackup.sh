@@ -5,13 +5,16 @@ usage() {
     echo "Usage: $0 [OPTIONS]"
     echo ""
     echo "Options:"
+    echo "  -d, --db <NAME>      Database to backup: 'prod' or 'test' (default: test)"
     echo "  -l, --local [DIR]    Save backup to local storage instead of object storage"
-    echo "                       Default local directory: /root/cchoice/backups"
+    echo "                       Default local directory: /root/backups"
     echo "  -h, --help           Show this help message"
     echo ""
     echo "Examples:"
-    echo "  $0                   # Backup to Linode object storage"
-    echo "  $0 --local           # Backup to default local directory"
+    echo "  $0                         # Backup test.db to Linode object storage"
+    echo "  $0 -d prod                 # Backup prod.db to Linode object storage"
+    echo "  $0 --local                 # Backup test.db to default local directory"
+    echo "  $0 -d prod --local         # Backup prod.db to default local directory"
     echo "  $0 --local /path/to/backups  # Backup to custom local directory"
     exit 0
 }
@@ -21,7 +24,7 @@ usage() {
 ###
 
 CCHOICE_DIR="/root/cchoice"
-DB_PATH="$CCHOICE_DIR/test.db"
+DB_NAME="test"
 LOGS_DIR="$CCHOICE_DIR/logs"
 TS=$(date +"%Y-%m-%d_%H-%M-%S")
 TMP="/tmp/db_backup_${TS}.tar.gz"
@@ -31,6 +34,18 @@ LOCAL_BACKUP_DIR="/root/backups"
 USE_LOCAL=false
 while [[ $# -gt 0 ]]; do
     case $1 in
+        -d|--db)
+            if [[ -z "$2" || "$2" =~ ^- ]]; then
+                echo "Error: -d/--db requires a value (prod or test)"
+                exit 1
+            fi
+            if [[ "$2" != "prod" && "$2" != "test" ]]; then
+                echo "Error: -d/--db must be 'prod' or 'test'"
+                exit 1
+            fi
+            DB_NAME="$2"
+            shift 2
+            ;;
         -l|--local)
             USE_LOCAL=true
             if [[ -n "$2" && ! "$2" =~ ^- ]]; then
@@ -49,12 +64,14 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+DB_PATH="$CCHOICE_DIR/${DB_NAME}.db"
+
 ###
 # SQLite SAFE BACKUP
 # This avoids copying the DB while it's being written
 ###
 SQLITE_BACKUP="/tmp/sqlite_backup_${TS}.sqlite"
-echo "Creating SQLite backup..."
+echo "Backing up database: $DB_PATH"
 sqlite3 "$DB_PATH" ".backup '$SQLITE_BACKUP'"
 
 ###
@@ -90,4 +107,4 @@ fi
 echo "Cleaning up temporary files..."
 rm -f "$TMP" "$SQLITE_BACKUP"
 
-echo "Backup completed successfully: backup_${TS}.tar.gz"
+echo "Backup completed successfully: backup_${TS}.tar.gz (${DB_NAME}.db)"
