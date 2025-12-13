@@ -2,6 +2,42 @@
 ## [Unreleased]
 
 
+<a name="dev-v0.1.0"></a>
+## [dev-v0.1.0] - 2025-12-13
+### Deps
+- Update packages
+
+### Docs
+- Update changelogs
+
+### Feature
+- Job/Queue system for email
+- Order confirmation mail
+- Mail
+- Add delivery ETA
+- Checkout -> Success flow
+
+### Maintenance
+- Cleanup
+- Remove thumbnail data
+- Use image extension enums and minimize variants
+- Update test_linode
+- Use CDN URL for email logo
+
+### Server
+- Add GrabPay
+- Fix modal image viewer and use now the CDN
+- Use Cloudflare Image instead of Linode Object Storage
+- Add NCR in province selection
+- Sort available payment methods
+- Add other available payment methods
+- Use business conf as pickup location
+- Implement free shipping
+
+### Web
+- Update saving/restoring of shipping form
+
+
 <a name="dev-v0.0.9"></a>
 ## [dev-v0.0.9] - 2025-11-22
 ### Deps
@@ -423,7 +459,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.0.9...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.1.0...HEAD
+[dev-v0.1.0]: https://github.com/flamendless/cchoice/compare/dev-v0.0.9...dev-v0.1.0
 [dev-v0.0.9]: https://github.com/flamendless/cchoice/compare/dev-v0.0.8...dev-v0.0.9
 [dev-v0.0.8]: https://github.com/flamendless/cchoice/compare/dev-v0.0.7...dev-v0.0.8
 [dev-v0.0.7]: https://github.com/flamendless/cchoice/compare/dev-v0.0.6...dev-v0.0.7
