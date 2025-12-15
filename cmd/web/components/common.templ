@@ -3,6 +3,7 @@ package components
 import "fmt"
 import "cchoice/internal/constants"
 import "cchoice/internal/conf"
+import "cchoice/internal/utils"
 
 var (
 	onceHeadLinks = templ.NewOnceHandle()
@@ -29,16 +30,16 @@ templ HeadMeta() {
 	<meta name="keywords" content="cchoice, c-choice, construction, power tools"/>
 	<meta name="viewport" content="width=1024"/>
 	<!--<link rel="dns-prefetch" href="https://images1.cchoice.com"/>-->
-	<link rel="preload" href={ URL("/static/svg/logo_complete.svg") } as="image" type="image/svg+xml"/>
+	<link rel="preload" href={ utils.URL("/static/svg/logo_complete.svg") } as="image" type="image/svg+xml"/>
 	<link
 		rel="preload"
-		href={ URL("/" + constants.PathEmptyImage) }
+		href={ utils.URL("/" + constants.PathEmptyImage) }
 		as="image"
 		type="image/png"
 	/>
 	<!--
 		TODO: (Brandon) - preload product images here
-		<link rel="preload" href={ URL("/static/images/product_images/bosch/") } as="image" type="image/png"/>
+		<link rel="preload" href={ utils.URL("/static/images/product_images/bosch/") } as="image" type="image/png"/>
 	-->
 	<meta property="og:title" content="C-Choice Construction Supplies"/>
 	<meta
@@ -47,25 +48,25 @@ templ HeadMeta() {
 	/>
 	<meta property="og:type" content="website"/>
 	<!--<meta property="og:url" content="https://www.cchoice.com/"/>-->
-	<meta property="og:image" content={ URL("/static/images/favicons/192x192.png") }/>
+	<meta property="og:image" content={ utils.URL("/static/images/favicons/192x192.png") }/>
 	<meta
 		property="og:image:secure_url"
-		content={ URL("/static/images/favicons/192x192.png") }
+		content={ utils.URL("/static/images/favicons/192x192.png") }
 	/>
 	<meta name="twitter:card" content="summary"/>
 	<meta charset="UTF-8"/>
 	@onceHeadLinks.Once() {
-		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ URL("/static/images/favicons/favicon.ico") }/>
-		<link rel="icon" type="image/png" sizes="114x114" href={ URL("/static/images/favicons/114x114.png") }/>
-		<link rel="icon" type="image/png" sizes="128x128" href={ URL("/static/images/favicons/128x128.png") }/>
-		<link rel="icon" type="image/png" sizes="152x152" href={ URL("/static/images/favicons/152x152.png") }/>
-		<link rel="icon" type="image/png" sizes="167x167" href={ URL("/static/images/favicons/167x167.png") }/>
-		<link rel="icon" type="image/png" sizes="180x180" href={ URL("/static/images/favicons/180x180.png") }/>
-		<link rel="icon" type="image/png" sizes="192x192" href={ URL("/static/images/favicons/192x192.png") }/>
-		<link href={ URL("/static/css/tailwind.css") } rel="stylesheet"/>
-		<script type="text/javascript" src={ templ.URL(URL("/static/js/htmx.min.js")) }></script>
-		<script async type="text/javascript" src={ templ.URL(URL("/static/js/hyperscript.min.js")) }></script>
-		@templ.JSONScript("url-prefix", URL(""))
+		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ utils.URL("/static/images/favicons/favicon.ico") }/>
+		<link rel="icon" type="image/png" sizes="114x114" href={ utils.URL("/static/images/favicons/114x114.png") }/>
+		<link rel="icon" type="image/png" sizes="128x128" href={ utils.URL("/static/images/favicons/128x128.png") }/>
+		<link rel="icon" type="image/png" sizes="152x152" href={ utils.URL("/static/images/favicons/152x152.png") }/>
+		<link rel="icon" type="image/png" sizes="167x167" href={ utils.URL("/static/images/favicons/167x167.png") }/>
+		<link rel="icon" type="image/png" sizes="180x180" href={ utils.URL("/static/images/favicons/180x180.png") }/>
+		<link rel="icon" type="image/png" sizes="192x192" href={ utils.URL("/static/images/favicons/192x192.png") }/>
+		<link href={ utils.URL("/static/css/tailwind.css") } rel="stylesheet"/>
+		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/htmx.min.js")) }></script>
+		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/hyperscript.min.js")) }></script>
+		@templ.JSONScript("url-prefix", utils.URL(""))
 		<script>
 			(function(){
 				if (!globalThis._G) {

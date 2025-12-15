@@ -21,6 +21,7 @@ import (
 	"cchoice/internal/metrics"
 	"cchoice/internal/payments"
 	"cchoice/internal/requests"
+	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -29,13 +30,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 )
-
-func URL(path string) string {
-	if conf.Conf().IsProd() {
-		return path
-	}
-	return "/cchoice" + path
-}
 
 func buildImageCacheKey(path, thumbnail, size, quality string, ext images.ImageFormat) []byte {
 	key := fmt.Sprintf(
@@ -104,7 +98,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		MaxAge:           300,
 	}))
 
-	urlPrefix := URL("")
+	urlPrefix := utils.URL("")
 	if urlPrefix != "" {
 		r.Route(urlPrefix, func(r chi.Router) {
 			r.Use(middleware.StripPrefix(urlPrefix))
@@ -512,19 +506,19 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	texts := []models.FooterRowText{
 		{
 			Label: "Home",
-			URL:   URL("/"),
+			URL:   utils.URL("/"),
 		},
 		{
 			Label: "About Us",
-			URL:   URL("#about-us"),
+			URL:   utils.URL("#about-us"),
 		},
 		{
 			Label: "Services",
-			URL:   URL("#services"),
+			URL:   utils.URL("#services"),
 		},
 		{
 			Label: "Partners",
-			URL:   URL("#partners"),
+			URL:   utils.URL("#partners"),
 		},
 		{
 			Label: "Call Us",
@@ -540,7 +534,7 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		},
 		{
 			Label: "Store",
-			URL:   URL("#store"),
+			URL:   utils.URL("#store"),
 		},
 		{
 			Label: "Facebook",

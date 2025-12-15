@@ -10,6 +10,7 @@ import (
 	"cchoice/internal/logs"
 	"cchoice/internal/payments"
 	"cchoice/internal/payments/paymongo"
+	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
@@ -165,7 +166,7 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 			zap.String("expected_status", "succeeded"),
 			zap.String("actual_status", paymentStatus),
 		)
-		http.Redirect(w, r, URL("/payments/cancel?payment_ref="+paymentRef), http.StatusSeeOther)
+		http.Redirect(w, r, utils.URL("/payments/cancel?payment_ref="+paymentRef), http.StatusSeeOther)
 		return
 	}
 
@@ -189,6 +190,9 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func RegisterPaymentWebhooks(s *Server, r chi.Router) {
+	if s.paymentGateway == nil {
+		return
+	}
 	if s.paymentGateway.GatewayEnum() == payments.PAYMENT_GATEWAY_PAYMONGO {
 		handler := paymongo.NewWebhookHandler(paymongo.WebhookHandlerConfig{
 			DBRO:           s.dbRO,

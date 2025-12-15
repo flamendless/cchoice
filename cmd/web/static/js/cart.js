@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	async function checkShippingQuotationStatus() {
 		try {
-			const response = await fetch("/cchoice/shipping/quotation/status");
+			const response = await fetch(_G.URL_PREFIX + "/shipping/quotation/status");
 			return response.status === 200;
 		} catch (error) {
 			if (error.name !== "TypeError") {

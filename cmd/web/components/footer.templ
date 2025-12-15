@@ -1,6 +1,7 @@
 package components
 
 import "cchoice/cmd/web/models"
+import "cchoice/internal/utils"
 
 templ FooterRow1Texts(texts []models.FooterRowText) {
 	<div
@@ -34,7 +35,7 @@ templ Footer() {
 				id="footer-row1"
 				class="flex flex-row grow"
 				hx-trigger="load once"
-				hx-get={ URL("/settings/footer-texts") }
+				hx-get={ utils.URL("/settings/footer-texts") }
 				hx-select="#footer-row1-texts"
 				hx-target="#footer-row1-texts"
 				hx-swap="outerHTML"
