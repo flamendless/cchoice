@@ -91,10 +91,26 @@ func NewServer() *ServerInstance {
 
 	dbRO := database.New(database.DB_MODE_RO)
 	dbRW := database.New(database.DB_MODE_RW)
-	objStorage, productImageFS := mustInitStorageProvider()
-	mailService := mustInitMailService()
 
-	emailJobRunner := jobs.NewEmailJobRunner(dbRW.GetDB(), dbRO, dbRW, mailService)
+	var objStorage storage.IObjectStorage
+	var productImageFS http.FileSystem
+	var mailService mail.IMailService
+	var emailJobRunner *jobs.EmailJobRunner
+	var paymentGateway payments.IPaymentGateway
+	var shippingService shipping.IShippingService
+	var geocoder geocoding.IGeocoder
+
+	if cfg.IsWeb() {
+		productImageFS = localstorage.New()
+		logs.Log().Info("Web mode: skipping payment, shipping, geocoding, mail services")
+	} else {
+		objStorage, productImageFS = mustInitStorageProvider()
+		mailService = mustInitMailService()
+		emailJobRunner = jobs.NewEmailJobRunner(dbRW.GetDB(), dbRO, dbRW, mailService)
+		paymentGateway = mustInitPaymentGateway()
+		shippingService = mustInitShippingService()
+		geocoder = mustInitGeocodingService(dbRW)
+	}
 
 	newServer := &Server{
 		address:         cfg.Server.Address,
@@ -106,10 +122,10 @@ func NewServer() *ServerInstance {
 		productImageFS:  productImageFS,
 		cache:           fastcache.New(CACHE_MAX_BYTES),
 		sessionManager:  sessionManager,
-		paymentGateway:  mustInitPaymentGateway(),
-		shippingService: mustInitShippingService(),
+		paymentGateway:  paymentGateway,
+		shippingService: shippingService,
 		objectStorage:   objStorage,
-		geocoder:        mustInitGeocodingService(dbRW),
+		geocoder:        geocoder,
 		encoder:         sqids.MustSqids(),
 		mailService:     mailService,
 		emailJobRunner:  emailJobRunner,
@@ -119,7 +135,7 @@ func NewServer() *ServerInstance {
 
 	var addr string
 	switch cfg.AppEnv {
-	case "local":
+	case "local", "web":
 		addr = fmt.Sprintf("%s:%d", newServer.address, newServer.port)
 	case "prod":
 		addr = fmt.Sprintf(":%d", newServer.port)
@@ -162,9 +178,9 @@ func NewServer() *ServerInstance {
 		}
 	}
 
-	logs.Log().Info(
-		"Server Config",
+	logFields := []zap.Field{
 		zap.String("Address", addr),
+		zap.String("AppEnv", cfg.AppEnv),
 		zap.Bool("Use caching", newServer.cache != nil),
 		zap.Int("Caching max bytes", CACHE_MAX_BYTES),
 		zap.Bool("Use session manager", newServer.sessionManager != nil),
@@ -173,13 +189,23 @@ func NewServer() *ServerInstance {
 		zap.Bool("HTTP2", newServer.useHTTP2),
 		zap.Duration("Read timeout", readTimeout),
 		zap.Duration("Write timeout", writeTimeout),
-		// zap.String("Payment gateway", newServer.paymentGateway.GatewayEnum().String()),
-		zap.String("Shipping service", newServer.shippingService.Enum().String()),
-		zap.String("Geocoder service", newServer.geocoder.Enum().String()),
-		zap.String("Storage provider", newServer.objectStorage.ProviderEnum().String()),
 		zap.String("Encoder", newServer.encoder.Name()),
-		zap.String("Mail service", newServer.mailService.Enum().String()),
-	)
+	}
+
+	if newServer.shippingService != nil {
+		logFields = append(logFields, zap.String("Shipping service", newServer.shippingService.Enum().String()))
+	}
+	if newServer.geocoder != nil {
+		logFields = append(logFields, zap.String("Geocoder service", newServer.geocoder.Enum().String()))
+	}
+	if newServer.objectStorage != nil {
+		logFields = append(logFields, zap.String("Storage provider", newServer.objectStorage.ProviderEnum().String()))
+	}
+	if newServer.mailService != nil {
+		logFields = append(logFields, zap.String("Mail service", newServer.mailService.Enum().String()))
+	}
+
+	logs.Log().Info("Server Config", logFields...)
 
 	return &ServerInstance{
 		HTTPServer: httpServer,

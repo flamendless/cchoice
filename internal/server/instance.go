@@ -15,6 +15,10 @@ type ServerInstance struct {
 }
 
 func (si *ServerInstance) StartBackgroundJobs() {
+	if si.internal.emailJobRunner == nil {
+		panic("No email job runner initialized")
+	}
+
 	si.jobRunnerCtx, si.jobRunnerStop = context.WithCancel(context.Background())
 	go si.internal.emailJobRunner.Start(si.jobRunnerCtx)
 	logs.Log().Info("Background job runners started")
