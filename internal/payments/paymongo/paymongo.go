@@ -235,7 +235,7 @@ func (p PayMongo) CreatePayload(
 				PaymentMethodTypes:  paymentMethodNames,
 				Description:         "C-Choice Checkout",
 				ReferenceNumber:     referenceNumber,
-				SendEmailReceipt:    false,
+				SendEmailReceipt:    conf.Conf().IsProd(),
 				ShowDescription:     true,
 				ShowLineItems:       true,
 				StatementDescriptor: "C-Choice Checkout Statement",
