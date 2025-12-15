@@ -2,6 +2,31 @@
 ## [Unreleased]
 
 
+<a name="release-v1.0.0"></a>
+## [release-v1.0.0] - 2025-12-15
+### Docs
+- Update env
+- dev-0.1.0
+
+### Feature
+- Mobile responsiveness
+
+### Script
+- Implement cmd/web for fast web changes
+- Update prod
+- Update dbbackup
+- Allow local backup
+
+### Server
+- Update routes
+- Update routes
+- Fix IP binding
+- WIP webhook
+
+### Web
+- Add prices in homepage and product details in modal
+
+
 <a name="dev-v0.1.0"></a>
 ## [dev-v0.1.0] - 2025-12-13
 ### Deps
@@ -459,7 +484,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.1.0...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.0...HEAD
+[release-v1.0.0]: https://github.com/flamendless/cchoice/compare/dev-v0.1.0...release-v1.0.0
 [dev-v0.1.0]: https://github.com/flamendless/cchoice/compare/dev-v0.0.9...dev-v0.1.0
 [dev-v0.0.9]: https://github.com/flamendless/cchoice/compare/dev-v0.0.8...dev-v0.0.9
 [dev-v0.0.8]: https://github.com/flamendless/cchoice/compare/dev-v0.0.7...dev-v0.0.8
