@@ -730,11 +730,13 @@ func Prod() error {
 	if err := GenAll(); err != nil {
 		return err
 	}
-	return run(Command{
+	if err := run(Command{
 		Type: CmdGoBuild,
 		Out:  filepath.Join(tmpDir, "cchoiceprod"),
 		Tags: []string{"fts5", "staticfs", "imageprocessing"},
-	})
+	}); err != nil {
+		return err
+	}
 	fmt.Println("Run: ./tmp/cchoiceprod api > out 2>&1 &")
 	return nil
 }
