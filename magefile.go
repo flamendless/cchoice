@@ -203,6 +203,35 @@ func Build() error {
 	})
 }
 
+func ServeWeb() error {
+	if err := GenTempl(); err != nil {
+		return err
+	}
+	openBrowser("http://localhost:7331/cchoice")
+
+	templCmd := exec.Command("go", "tool", "templ", "generate",
+		"--watch", "--proxy=http://localhost:2626", "--open-browser=false")
+	if err := runBackground(templCmd); err != nil {
+		return err
+	}
+
+	airCmd := exec.Command("go", "tool", "air", "-c", ".air.web.toml")
+	airCmd.Stdout = os.Stdout
+	airCmd.Stderr = os.Stderr
+	return airCmd.Run()
+}
+
+func BuildWeb() error {
+	if err := GenTempl(); err != nil {
+		return err
+	}
+	return run(Command{
+		Type: CmdGoBuild,
+		Out:  filepath.Join(tmpDir, "web"),
+		Tags: []string{"fts5", "staticfs"},
+	})
+}
+
 func BuildGoose() error {
 	if err := run(Command{
 		Type: CmdExec,

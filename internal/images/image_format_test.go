@@ -14,6 +14,7 @@ var tblImageFormat = map[ImageFormat]string{
 	IMAGE_FORMAT_GIF:       "GIF",
 	IMAGE_FORMAT_SVG:       "SVG",
 	IMAGE_FORMAT_BMP:       "BMP",
+	IMAGE_FORMAT_ICO:       "ICO",
 }
 
 var tblImageFormatExt = map[ImageFormat][]string{
@@ -23,6 +24,7 @@ var tblImageFormatExt = map[ImageFormat][]string{
 	IMAGE_FORMAT_GIF:  {"gif", ".gif"},
 	IMAGE_FORMAT_SVG:  {"svg", ".svg"},
 	IMAGE_FORMAT_BMP:  {"bmp", ".bmp"},
+	IMAGE_FORMAT_ICO:  {"ico", ".ico"},
 }
 
 func TestImageFormatToString(t *testing.T) {

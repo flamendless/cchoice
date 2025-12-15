@@ -15,11 +15,12 @@ func _() {
 	_ = x[IMAGE_FORMAT_GIF-4]
 	_ = x[IMAGE_FORMAT_SVG-5]
 	_ = x[IMAGE_FORMAT_BMP-6]
+	_ = x[IMAGE_FORMAT_ICO-7]
 }
 
-const _ImageFormat_name = "UNDEFINEDPNGWEBPJPEGGIFSVGBMP"
+const _ImageFormat_name = "UNDEFINEDPNGWEBPJPEGGIFSVGBMPICO"
 
-var _ImageFormat_index = [...]uint8{0, 9, 12, 16, 20, 23, 26, 29}
+var _ImageFormat_index = [...]uint8{0, 9, 12, 16, 20, 23, 26, 29, 32}
 
 func (i ImageFormat) String() string {
 	idx := int(i) - 0

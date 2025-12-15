@@ -14,6 +14,7 @@ const (
 	IMAGE_FORMAT_GIF
 	IMAGE_FORMAT_SVG
 	IMAGE_FORMAT_BMP
+	IMAGE_FORMAT_ICO
 )
 
 var AllImageFormats = []ImageFormat{
@@ -23,6 +24,7 @@ var AllImageFormats = []ImageFormat{
 	IMAGE_FORMAT_GIF,
 	IMAGE_FORMAT_SVG,
 	IMAGE_FORMAT_BMP,
+	IMAGE_FORMAT_ICO,
 }
 
 func ParseImageFormatToEnum(format string) ImageFormat {
@@ -39,6 +41,8 @@ func ParseImageFormatToEnum(format string) ImageFormat {
 		return IMAGE_FORMAT_SVG
 	case IMAGE_FORMAT_BMP.String():
 		return IMAGE_FORMAT_BMP
+	case IMAGE_FORMAT_ICO.String():
+		return IMAGE_FORMAT_ICO
 	default:
 		return IMAGE_FORMAT_UNDEFINED
 	}
@@ -58,6 +62,8 @@ func ParseImageFormatExtToEnum(format string) ImageFormat {
 		return IMAGE_FORMAT_SVG
 	case ".bmp", "bmp":
 		return IMAGE_FORMAT_BMP
+	case ".ico", "ico":
+		return IMAGE_FORMAT_ICO
 	default:
 		return IMAGE_FORMAT_UNDEFINED
 	}
@@ -77,6 +83,8 @@ func (f ImageFormat) Extension() string {
 		return ".svg"
 	case IMAGE_FORMAT_BMP:
 		return ".bmp"
+	case IMAGE_FORMAT_ICO:
+		return ".ico"
 	default:
 		return ""
 	}
@@ -96,6 +104,8 @@ func (f ImageFormat) MIMEType() string {
 		return "image/svg+xml"
 	case IMAGE_FORMAT_BMP:
 		return "image/bmp"
+	case IMAGE_FORMAT_ICO:
+		return "image/x-icon"
 	default:
 		return "application/octet-stream"
 	}
@@ -115,6 +125,8 @@ func (f ImageFormat) DataURIPrefix() string {
 		return "data:image/svg+xml;base64,"
 	case IMAGE_FORMAT_BMP:
 		return "data:image/bmp;base64,"
+	case IMAGE_FORMAT_ICO:
+		return "data:image/x-icon;base64,"
 	default:
 		return "data:application/octet-stream;base64,"
 	}

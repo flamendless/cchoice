@@ -175,3 +175,7 @@ func (c *appConfig) IsLocal() bool {
 func (c *appConfig) IsProd() bool {
 	return c.AppEnv == "prod"
 }
+
+func (c *appConfig) IsWeb() bool {
+	return c.AppEnv == "web"
+}
