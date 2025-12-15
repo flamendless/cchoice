@@ -61,7 +61,7 @@ templ CategoriesSidePanel() {
 			hx-trigger="load once, history:restore"
 			hx-get={ utils.URL("/product-categories/side-panel/list") }
 			hx-select="#categories-side-panel-list"
-			hx-target="#categories-side-panel-list"
+			hx-target="find #categories-side-panel-list"
 			hx-swap="outerHTML"
 		>
 			@CategoriesSidePanelList(nil)

@@ -1,6 +1,24 @@
 package components
 
+var modalImageViewerStyleOnce = templ.NewOnceHandle()
+
 templ ModalProductImageViewer(productID string, imageData string) {
+	@modalImageViewerStyleOnce.Once() {
+		<style>
+			#modal_image_viewer_image {
+				max-width: 90vw;
+				max-height: 64vh;
+			}
+
+			@media (min-width: 768px) {
+				#modal_image_viewer_image {
+					max-width: 90vw;
+					max-height: 70vh;
+				}
+			}
+		</style>
+	}
+
 	<input type="hidden" id="selected-product-thumbnail-path" value=""/>
 	<input type="hidden" id="selected-product-name" value=""/>
 	<input type="hidden" id="selected-product-brand" value=""/>
@@ -25,13 +43,13 @@ templ ModalProductImageViewer(productID string, imageData string) {
 			_="on click trigger closeModal"
 		></div>
 		<div
-			class="modal-content w-[32rem] h-screen flex flex-col items-center justify-center"
+			class="modal-content w-full max-w-[32rem] h-screen flex flex-col items-center justify-center px-4"
 		>
 			<div class="relative inline-block">
 				<img
 					id="modal_image_viewer_image"
 					src={ placeholderImageSrc }
-					class="w-auto h-auto max-h-[75vh]"
+					class="w-auto h-auto"
 					alt="modal image viewer"
 				/>
 				<span

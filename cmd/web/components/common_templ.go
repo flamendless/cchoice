@@ -129,7 +129,7 @@ func HeadMeta() templ.Component {
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<base href=\"/\"><meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\"><meta name=\"description\" content=\"Your Partner in Progress\"><meta name=\"google\" content=\"nositelinkssearchbox\"><meta name=\"robots\" content=\"noarchive, noimageindex\"><meta name=\"keywords\" content=\"cchoice, c-choice, construction, power tools\"><meta name=\"viewport\" content=\"width=1024\"><!--<link rel=\"dns-prefetch\" href=\"https://images1.cchoice.com\"/>--><link rel=\"preload\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<base href=\"/\"><meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\"><meta name=\"description\" content=\"Your Partner in Progress\"><meta name=\"google\" content=\"nositelinkssearchbox\"><meta name=\"robots\" content=\"noarchive, noimageindex\"><meta name=\"keywords\" content=\"cchoice, c-choice, construction, power tools\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><!--<link rel=\"dns-prefetch\" href=\"https://images1.cchoice.com\"/>--><link rel=\"preload\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

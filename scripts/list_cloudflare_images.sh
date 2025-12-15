@@ -60,6 +60,8 @@ while true; do
     matching_ids=$(echo "$response" | jq -r --arg pattern "$PATTERN" \
         '.result.images[] | select(.id | test($pattern)) | .id')
 
+    echo "$matching_ids"
+
     if [[ -n "$matching_ids" ]]; then
         while IFS= read -r image_id; do
             ((total_found++))

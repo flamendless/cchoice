@@ -38,7 +38,7 @@ func CartPage(body templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"overflow-x-hidden\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -162,20 +162,20 @@ func CartPageBody(summaryContent templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-swap=\"none\"><div class=\"flex w-screen gap-4 justify-center px-8 my-4\"><!-- Column 1: Line Items (1/2 width) --><div id=\"cart-lines\" class=\"flex flex-col gap-[8px] w-1/2\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-swap=\"none\" class=\"w-full\"><div class=\"flex flex-col lg:flex-row w-full gap-4 justify-center px-2 lg:px-8 my-4\"><!-- Column 1: Line Items (full width on mobile, 1/2 on desktop) --><div id=\"cart-lines\" class=\"flex flex-col gap-[8px] w-full lg:w-1/2\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/lines"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 73, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 74, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-trigger=\"load\" hx-swap=\"beforeend\"></div><!-- Column 2: Shipping Address (1/4 width) --><div class=\"flex flex-col gap-[8px] w-1/4\"><div id=\"cart-shipping\" class=\"flex flex-col gap-1 border rounded h-auto\"><div id=\"cart-shipping-content\" class=\"flex flex-col gap-1 p-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-trigger=\"load\" hx-swap=\"beforeend\"></div><!-- Column 2: Shipping Address (full width on mobile, 1/4 on desktop) --><div class=\"flex flex-col gap-[8px] w-full lg:w-1/4\"><div id=\"cart-shipping\" class=\"flex flex-col gap-1 border rounded h-auto\"><div id=\"cart-shipping-content\" class=\"flex flex-col gap-1 p-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -183,14 +183,14 @@ func CartPageBody(summaryContent templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></div></div><!-- Column 3: Payment & Summary (1/4 width) --><div class=\"flex flex-col gap-[8px] w-1/4\"><div id=\"cart-payments\" class=\"flex flex-col gap-1 border rounded h-auto\"><div id=\"cart-payments-content\" class=\"flex flex-row flex-wrap justify-center gap-1 p-2\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></div></div><!-- Column 3: Payment & Summary (full width on mobile, 1/4 on desktop) --><div class=\"flex flex-col gap-[8px] w-full lg:w-1/4\"><div id=\"cart-payments\" class=\"flex flex-col gap-1 border rounded h-auto\"><div id=\"cart-payments-content\" class=\"flex flex-row flex-wrap justify-center gap-1 p-2\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/payment-methods"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 104, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 105, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -219,7 +219,7 @@ func CartPageBody(summaryContent templ.Component) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/summary?data=summary_total"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 126, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 127, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -250,7 +250,7 @@ func CartPageBody(summaryContent templ.Component) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(templ.URL(utils.URL("/static/js/cart.js?v=" + fmt.Sprintf("%d", time.Now().Unix()))))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 162, Col: 123}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 163, Col: 123}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -310,7 +310,7 @@ func CartSummaryRow(left string, right string, class ...string) templ.Component 
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(left)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 169, Col: 12}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 170, Col: 12}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -323,7 +323,7 @@ func CartSummaryRow(left string, right string, class ...string) templ.Component 
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(right)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 170, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 171, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -370,7 +370,7 @@ func CartSummaryRowWithID(id string, left string, right string, class ...string)
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 175, Col: 13}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 176, Col: 13}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
@@ -396,7 +396,7 @@ func CartSummaryRowWithID(id string, left string, right string, class ...string)
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(left)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 176, Col: 12}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 177, Col: 12}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -409,7 +409,7 @@ func CartSummaryRowWithID(id string, left string, right string, class ...string)
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(right)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 177, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 178, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -533,7 +533,7 @@ func CartPaymentItem(paymentMethod models.AvailablePaymentMethod) templ.Componen
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs("image of " + paymentMethod.Value.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 198, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 199, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
@@ -546,7 +546,7 @@ func CartPaymentItem(paymentMethod models.AvailablePaymentMethod) templ.Componen
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(paymentMethod.ImageURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 199, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 200, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
@@ -559,7 +559,7 @@ func CartPaymentItem(paymentMethod models.AvailablePaymentMethod) templ.Componen
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(paymentMethod.Value.String() + " thumbnail")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 200, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 201, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
@@ -572,7 +572,7 @@ func CartPaymentItem(paymentMethod models.AvailablePaymentMethod) templ.Componen
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(paymentMethod.Value.GetDisplayText())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 202, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 203, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
@@ -614,7 +614,7 @@ func CartPaymentMethod(paymentMethod models.AvailablePaymentMethod) templ.Compon
 		var templ_7745c5c3_Var29 string
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(paymentMethod.Value.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 213, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 214, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
@@ -791,7 +791,7 @@ func btnQtyDecrease(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var33 string
 		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs("btn-minus-" + cl.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 262, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 263, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 		if templ_7745c5c3_Err != nil {
@@ -814,7 +814,7 @@ func btnQtyDecrease(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var34 string
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/lines/" + cl.ID + "?dec=1"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 268, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 269, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
@@ -827,7 +827,7 @@ func btnQtyDecrease(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var35 string
 		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("[name=qty-%s]", cl.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 269, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 270, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 		if templ_7745c5c3_Err != nil {
@@ -869,7 +869,7 @@ func btnQtyIncrease(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var37 string
 		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs("btn-plus-" + cl.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 308, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 309, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 		if templ_7745c5c3_Err != nil {
@@ -892,7 +892,7 @@ func btnQtyIncrease(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var38 string
 		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/lines/" + cl.ID + "?inc=1"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 314, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 315, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 		if templ_7745c5c3_Err != nil {
@@ -905,7 +905,7 @@ func btnQtyIncrease(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var39 string
 		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("[name=qty-%s]", cl.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 315, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 316, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 		if templ_7745c5c3_Err != nil {
@@ -947,20 +947,20 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var41 string
 		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs("cart-checkout-line-item-" + cl.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 353, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 354, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "\" class=\"flex items-center gap-4 border rounded h-auto\"><div class=\"flex items-center gap-2 pl-3\"><input type=\"checkbox\" class=\"w-5 h-5 accent-cchoice_border hover:accent-cchoice\" aria-label=\"Select item\" name=\"checked_item\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "\" class=\"flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 border rounded h-auto p-2 sm:p-0\"><div class=\"flex items-center gap-2 pl-0 sm:pl-3\"><input type=\"checkbox\" class=\"w-5 h-5 accent-cchoice_border hover:accent-cchoice\" aria-label=\"Select item\" name=\"checked_item\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var42 string
 		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(cl.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 362, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 363, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 		if templ_7745c5c3_Err != nil {
@@ -983,20 +983,20 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var43 string
 		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/lines/" + cl.ID + "/toggle"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 364, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 365, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\" hx-swap=\"none\" _=\"on htmx:afterRequest trigger cartUpdated on the body\"> <img class=\"m-2 w-32 max-w-32 h-32\" title=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\" hx-swap=\"none\" _=\"on htmx:afterRequest trigger cartUpdated on the body\"> <img class=\"m-2 w-20 max-w-20 h-20 sm:w-32 sm:max-w-32 sm:h-32\" title=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var44 string
 		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs("product image of " + cl.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 370, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 371, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 		if templ_7745c5c3_Err != nil {
@@ -1009,7 +1009,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var45 string
 		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(cl.CDNURL1280)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 371, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 372, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 		if templ_7745c5c3_Err != nil {
@@ -1022,7 +1022,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var46 string
 		templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.JoinStringErrs(cl.Name + " thumbnail")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 372, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 373, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var46))
 		if templ_7745c5c3_Err != nil {
@@ -1035,20 +1035,20 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var47 string
 		templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinStringErrs(cl.ProductID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 373, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 374, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "\"></div><div class=\"flex flex-row grow\"><div class=\"flex-1\"><h2 class=\"text-base font-semibold\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "\"></div><div class=\"flex flex-row grow w-full\"><div class=\"flex-1\"><h2 class=\"text-sm sm:text-base font-semibold\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var48 string
 		templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.JoinStringErrs(cl.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 378, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 379, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var48))
 		if templ_7745c5c3_Err != nil {
@@ -1061,7 +1061,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var49 string
 		templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.JoinStringErrs(cl.BrandName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 379, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 380, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var49))
 		if templ_7745c5c3_Err != nil {
@@ -1074,7 +1074,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var50 string
 		templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(cl.WeightDisplay)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 380, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 381, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 		if templ_7745c5c3_Err != nil {
@@ -1092,7 +1092,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 			var templ_7745c5c3_Var51 string
 			templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.JoinStringErrs(cl.Price.Display())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 384, Col: 27}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 385, Col: 27}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var51))
 			if templ_7745c5c3_Err != nil {
@@ -1105,7 +1105,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 			var templ_7745c5c3_Var52 string
 			templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.JoinStringErrs(cl.DiscountedPrice.Display())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 387, Col: 37}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 388, Col: 37}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var52))
 			if templ_7745c5c3_Err != nil {
@@ -1123,7 +1123,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 			var templ_7745c5c3_Var53 string
 			templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinStringErrs(cl.DiscountedPrice.Display())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 391, Col: 37}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 392, Col: 37}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
 			if templ_7745c5c3_Err != nil {
@@ -1149,7 +1149,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var54 string
 		templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinStringErrs("qty-" + cl.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 398, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 399, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
 		if templ_7745c5c3_Err != nil {
@@ -1162,7 +1162,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var55 string
 		templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.JoinStringErrs(cl.Quantity)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 401, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 402, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var55))
 		if templ_7745c5c3_Err != nil {
@@ -1183,7 +1183,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var56 string
 		templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.JoinStringErrs(cl.Total.Display())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 406, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 407, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var56))
 		if templ_7745c5c3_Err != nil {
@@ -1196,7 +1196,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var57 string
 		templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/lines/" + cl.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 414, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 415, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var57))
 		if templ_7745c5c3_Err != nil {
@@ -1209,7 +1209,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 		var templ_7745c5c3_Var58 string
 		templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.JoinStringErrs("#cart-checkout-line-item-" + cl.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 415, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 416, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var58))
 		if templ_7745c5c3_Err != nil {
@@ -1259,7 +1259,7 @@ func CartSubcard(id string, label string, others ...templ.Component) templ.Compo
 		var templ_7745c5c3_Var60 string
 		templ_7745c5c3_Var60, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 431, Col: 67}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 432, Col: 67}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var60))
 		if templ_7745c5c3_Err != nil {
@@ -1272,7 +1272,7 @@ func CartSubcard(id string, label string, others ...templ.Component) templ.Compo
 		var templ_7745c5c3_Var61 string
 		templ_7745c5c3_Var61, templ_7745c5c3_Err = templ.JoinStringErrs(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 433, Col: 9}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cartpage.templ`, Line: 434, Col: 9}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var61))
 		if templ_7745c5c3_Err != nil {

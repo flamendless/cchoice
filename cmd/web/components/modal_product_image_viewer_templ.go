@@ -8,6 +8,8 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+var modalImageViewerStyleOnce = templ.NewOnceHandle()
+
 func ModalProductImageViewer(productID string, imageData string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -29,20 +31,42 @@ func ModalProductImageViewer(productID string, imageData string) templ.Component
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<input type=\"hidden\" id=\"selected-product-thumbnail-path\" value=\"\"> <input type=\"hidden\" id=\"selected-product-name\" value=\"\"> <input type=\"hidden\" id=\"selected-product-brand\" value=\"\"> <input type=\"hidden\" id=\"selected-product-price\" value=\"\"><div id=\"modal_image_viewer\" class=\"fixed hidden top-0 bottom-0 left-0 right-0 z-1000\n\t\t\tflex flex-col items-center\" _=\"\n\t\t\ton closeModal add .hidden\n\t\t\ton openModal\n\t\t\t\twait 0.05s\n\t\t\t\tremove .hidden\n\t\t\t\tset #modal-product-name.textContent to #selected-product-name.value\n\t\t\t\tset #modal-product-brand.textContent to #selected-product-brand.value\n\t\t\t\tset #modal-product-price.textContent to #selected-product-price.value\n\t\t\tend\n\t\t\"><div class=\"absolute -z-1 top-0 bottom-0 left-0 right-0 bg-white/50\" _=\"on click trigger closeModal\"></div><div class=\"modal-content w-[32rem] h-screen flex flex-col items-center justify-center\"><div class=\"relative inline-block\"><img id=\"modal_image_viewer_image\" src=\"")
+		templ_7745c5c3_Var2 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+			if !templ_7745c5c3_IsBuffer {
+				defer func() {
+					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err == nil {
+						templ_7745c5c3_Err = templ_7745c5c3_BufErr
+					}
+				}()
+			}
+			ctx = templ.InitializeContext(ctx)
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<style>\n\t\t\t#modal_image_viewer_image {\n\t\t\t\tmax-width: 90vw;\n\t\t\t\tmax-height: 64vh;\n\t\t\t}\n\n\t\t\t@media (min-width: 768px) {\n\t\t\t\t#modal_image_viewer_image {\n\t\t\t\t\tmax-width: 90vw;\n\t\t\t\t\tmax-height: 70vh;\n\t\t\t\t}\n\t\t\t}\n\t\t</style>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			return nil
+		})
+		templ_7745c5c3_Err = modalImageViewerStyleOnce.Once().Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(placeholderImageSrc)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/modal_product_image_viewer.templ`, Line: 33, Col: 30}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<input type=\"hidden\" id=\"selected-product-thumbnail-path\" value=\"\"> <input type=\"hidden\" id=\"selected-product-name\" value=\"\"> <input type=\"hidden\" id=\"selected-product-brand\" value=\"\"> <input type=\"hidden\" id=\"selected-product-price\" value=\"\"><div id=\"modal_image_viewer\" class=\"fixed hidden top-0 bottom-0 left-0 right-0 z-1000\n\t\t\tflex flex-col items-center\" _=\"\n\t\t\ton closeModal add .hidden\n\t\t\ton openModal\n\t\t\t\twait 0.05s\n\t\t\t\tremove .hidden\n\t\t\t\tset #modal-product-name.textContent to #selected-product-name.value\n\t\t\t\tset #modal-product-brand.textContent to #selected-product-brand.value\n\t\t\t\tset #modal-product-price.textContent to #selected-product-price.value\n\t\t\tend\n\t\t\"><div class=\"absolute -z-1 top-0 bottom-0 left-0 right-0 bg-white/50\" _=\"on click trigger closeModal\"></div><div class=\"modal-content w-full max-w-[32rem] h-screen flex flex-col items-center justify-center px-4\"><div class=\"relative inline-block\"><img id=\"modal_image_viewer_image\" src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"w-auto h-auto max-h-[75vh]\" alt=\"modal image viewer\"> <span class=\"absolute top-0 right-0 size-8\n\t\t\t\t\t\trounded-full flex items-center justify-center transform translate-x-1/2 -translate-y-1/2\n\t\t\t\t\t\ttext-white bg-cchoice hover:bg-cchoice_dark font-medium text-xs cursor-pointer transition-colors\" title=\"close image viewer\" _=\"on click trigger closeModal\">X</span></div><div class=\"flex flex-col items-center bg-white w-full px-4 pt-4\"><p id=\"modal-product-name\" class=\"text-base font-semibold text-center\"></p><p id=\"modal-product-brand\" class=\"text-sm font-light text-gray-600\"></p><p id=\"modal-product-price\" class=\"text-sm font-semibold text-cchoice\"></p></div><div class=\"flex flex-row h-auto justify-center w-full bg-white p-2\">")
+		var templ_7745c5c3_Var3 string
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(placeholderImageSrc)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/modal_product_image_viewer.templ`, Line: 51, Col: 30}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"w-auto h-auto\" alt=\"modal image viewer\"> <span class=\"absolute top-0 right-0 size-8\n\t\t\t\t\t\trounded-full flex items-center justify-center transform translate-x-1/2 -translate-y-1/2\n\t\t\t\t\t\ttext-white bg-cchoice hover:bg-cchoice_dark font-medium text-xs cursor-pointer transition-colors\" title=\"close image viewer\" _=\"on click trigger closeModal\">X</span></div><div class=\"flex flex-col items-center bg-white w-full px-4 pt-4\"><p id=\"modal-product-name\" class=\"text-base font-semibold text-center\"></p><p id=\"modal-product-brand\" class=\"text-sm font-light text-gray-600\"></p><p id=\"modal-product-price\" class=\"text-sm font-semibold text-cchoice\"></p></div><div class=\"flex flex-row h-auto justify-center w-full bg-white p-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -50,7 +74,7 @@ func ModalProductImageViewer(productID string, imageData string) templ.Component
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

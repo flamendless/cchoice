@@ -190,7 +190,7 @@ func BrandsSidePanel() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" hx-select=\"#brands-side-panel-list\" hx-target=\"#brands-side-panel-list\" hx-swap=\"outerHTML\" class=\"pb-[8px]\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" hx-select=\"#brands-side-panel-list\" hx-target=\"find #brands-side-panel-list\" hx-swap=\"outerHTML\" class=\"pb-[8px]\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

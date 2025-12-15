@@ -3,33 +3,39 @@ package components
 import "cchoice/cmd/web/models"
 import "cchoice/internal/utils"
 
-var logoWithTextHandlerOnce = templ.NewOnceHandle()
+var logoStyleOnce = templ.NewOnceHandle()
 
-templ LogoWithText(width string, height string) {
-	@logoWithTextHandlerOnce.Once() {
-		<a
-			href={ templ.SafeURL(utils.URL("/")) }
-			class="
-				w-fit flex items-center mb-4
-				md:-mt-8 md:-mb-4 md:ml-4
-			"
-		>
-			<img
-				src={ string(templ.URL(utils.URL("/static/svg/logo_complete.svg"))) }
-				alt="cchoice logo and text"
-				width={ width }
-				height={ height }
-				class="
-					h-[72px] w-auto object-contain
-					md:h-[96px] lg:h-[128px]
-				"
-			/>
-		</a>
+templ LogoWithText() {
+	@logoStyleOnce.Once() {
+		<style>
+			.logo-responsive {
+				max-height: 48px;
+			}
+			@media (min-width: 1024px) {
+				.logo-responsive {
+					max-height: 128px;
+				}
+			}
+		</style>
 	}
+	<a
+		href={ templ.SafeURL(utils.URL("/")) }
+		class="
+			w-fit flex items-center
+			my-4 lg:my-0
+			lg:-mt-8 lg:-mb-4 lg:ml-4
+		"
+	>
+		<img
+			src={ string(templ.URL(utils.URL("/static/svg/logo_complete.svg"))) }
+			alt="cchoice logo and text"
+			class="object-contain logo-responsive"
+		/>
+	</a>
 }
 
 templ SearchBar() {
-	<form class="w-6/12">
+	<form class="w-full lg:w-6/12">
 		<label for="search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
 		<div class="relative">
 			<div
@@ -220,28 +226,77 @@ templ HeaderRow1Texts(texts []models.HeaderRowText) {
 templ Header() {
 	<header
 		class="
-			sticky top-0 left-0 pt-2 pb-1.5 w-full z-50 bg-white
-			max-h-none md:max-h-[128px]
-			truncate overflow-visible
+			sticky top-0 left-0 pt-2 pb-1.5 w-full max-w-full z-50 bg-white
+			max-h-none
+			overflow-visible
 		"
 	>
-		<div class="w-full flex flex-col sm:flex-col md:flex-col">
-		<div
-			id="header-row1"
-			class="w-full flex flex-row hidden sm:hidden md:hidden lg:flex"
-			hx-trigger="load once"
-			hx-get={ utils.URL("/settings/header-texts") }
-			hx-select="#header-row1-texts"
-			hx-target="#header-row1-texts"
-			hx-swap="outerHTML"
-		>
-				@HeaderRow1Texts(nil)
-			</div>
+		<div class="w-full max-w-full flex flex-col sm:flex-col md:flex-col">
 			<div
-				id="header-row2"
-				class="w-full flex flex-col items-center md:flex-row"
+				id="header-row1"
+				class="w-full flex flex-row hidden sm:hidden md:hidden lg:flex"
+				hx-trigger="load once"
+				hx-get={ utils.URL("/settings/header-texts") }
+				hx-select="#header-row1-texts"
+				hx-target="#header-row1-texts"
+				hx-swap="outerHTML"
 			>
-				@LogoWithText("256", "128")
+					@HeaderRow1Texts(nil)
+			</div>
+
+			<div
+				id="header-row2-mobile"
+				class="w-full flex flex-row items-center px-2 lg:hidden"
+			>
+				<div class="flex-shrink-0">
+					@LogoWithText()
+				</div>
+				<div
+					id="search-wrapper-mobile"
+					class="flex-1 flex items-center place-content-center px-2"
+					_="
+						on click from document
+							if event.target.closest('#search-wrapper-mobile') == null
+								add .hidden to #search-results
+							end
+						end
+
+						on keyup[key is 'Escape'] from document
+							add .hidden to #search-results
+						end
+					"
+				>
+					@SearchBar()
+				</div>
+				<div class="flex-shrink-0">
+					@Cart()
+				</div>
+				<button
+					id="btn-hamburger"
+					type="button"
+					class="
+						flex-shrink-0 p-2 rounded-lg
+						hover:bg-cchoicesoft focus:outline-none focus:ring-2 focus:ring-cchoice
+						cursor-pointer
+					"
+					aria-label="Toggle navigation menu"
+					title="Toggle navigation menu"
+					_="
+						on click
+							toggle .hidden on #mobile-sidebar
+							toggle .hidden on #mobile-sidebar-overlay
+						end
+					"
+				>
+					@svgHamburger("text-cchoice")
+				</button>
+			</div>
+
+			<div
+				id="header-row2-desktop"
+				class="hidden lg:flex w-full flex-row items-center"
+			>
+				@LogoWithText()
 				<div
 					id="search-wrapper"
 					class="w-full flex items-center place-content-center px-8 py-2"

@@ -80,7 +80,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"flex flex-row flex-wrap justify-center sm:justify-start\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"flex flex-row flex-wrap\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -300,7 +300,7 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 				return templ_7745c5c3_Err
 			}
 			for _, subcategory := range category.Subcategories {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<div class=\"w-full ml-0.5 pr-6 border-cchoice_border\" hx-trigger=\"load once, history:restore\" hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<div class=\"w-full max-w-full ml-0.5 pr-2 lg:pr-6 border-cchoice_border\" hx-trigger=\"load once, history:restore\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

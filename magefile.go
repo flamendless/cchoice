@@ -174,24 +174,6 @@ func detectDistro() string {
 
 // ---------------- Mage Targets ----------------
 
-func Serve() error {
-	if err := GenAll(); err != nil {
-		return err
-	}
-	openBrowser("http://localhost:7331/cchoice")
-
-	templCmd := exec.Command("go", "tool", "templ", "generate",
-		"--watch", "--proxy=http://localhost:2626", "--open-browser=false")
-	if err := runBackground(templCmd); err != nil {
-		return err
-	}
-
-	airCmd := exec.Command("go", "tool", "air", "-c", ".air.api.toml", "api")
-	airCmd.Stdout = os.Stdout
-	airCmd.Stderr = os.Stderr
-	return airCmd.Run()
-}
-
 func Build() error {
 	if err := GenAll(); err != nil {
 		return err
@@ -203,8 +185,16 @@ func Build() error {
 	})
 }
 
-func ServeWeb() error {
-	if err := GenTempl(); err != nil {
+func BuildWeb() error {
+	return run(Command{
+		Type: CmdGoBuild,
+		Out:  filepath.Join(tmpDir, "web"),
+		Tags: []string{"fts5", "staticfs"},
+	})
+}
+
+func serve(airpath string) error {
+	if err := GenAll(); err != nil {
 		return err
 	}
 	openBrowser("http://localhost:7331/cchoice")
@@ -215,21 +205,19 @@ func ServeWeb() error {
 		return err
 	}
 
-	airCmd := exec.Command("go", "tool", "air", "-c", ".air.web.toml")
+	airCmd := exec.Command("go", "tool", "air", "-c", airpath, "api")
 	airCmd.Stdout = os.Stdout
 	airCmd.Stderr = os.Stderr
 	return airCmd.Run()
 }
 
-func BuildWeb() error {
-	if err := GenTempl(); err != nil {
-		return err
-	}
-	return run(Command{
-		Type: CmdGoBuild,
-		Out:  filepath.Join(tmpDir, "web"),
-		Tags: []string{"fts5", "staticfs"},
-	})
+func Serve() error {
+	return serve(".air.api.toml")
+}
+
+
+func ServeWeb() error {
+	return serve(".air.web.toml")
 }
 
 func BuildGoose() error {
