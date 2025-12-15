@@ -4,6 +4,7 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
+	"cchoice/internal/utils"
 )
 
 type HeaderRowText struct {
@@ -46,9 +47,10 @@ type GroupedCategorySection struct {
 
 type CategorySectionProduct struct {
 	queries.GetProductsByCategoryIDRow
-	ProductID  string
-	CDNURL     string
-	CDNURL1280 string
+	ProductID    string
+	CDNURL       string
+	CDNURL1280   string
+	PriceDisplay string
 }
 
 type CategorySectionProducts struct {
@@ -68,11 +70,13 @@ func ToCategorySectionProducts[T queries.GetProductsByCategoryIDRow](
 	res := make([]CategorySectionProduct, 0, len(data))
 	for _, d := range data {
 		r := queries.GetProductsByCategoryIDRow(d)
+		price := utils.NewMoney(r.UnitPriceWithVat, r.UnitPriceWithVatCurrency)
 		res = append(res, CategorySectionProduct{
 			GetProductsByCategoryIDRow: r,
 			ProductID:                  encoder.Encode(r.ID),
 			CDNURL:                     getCDNURL(r.ThumbnailPath),
 			CDNURL1280:                 getCDNURL(constants.ToPath1280(r.ThumbnailPath)),
+			PriceDisplay:               price.Display(),
 		})
 	}
 	return res
