@@ -25,7 +25,8 @@ func mustInitPaymentGateway() payments.IPaymentGateway {
 	case payments.PAYMENT_GATEWAY_PAYMONGO.String():
 		return paymongo.MustInit()
 	default:
-		panic("Unsupported payment service: " + cfg.PaymentService)
+		// panic("Unsupported payment service: " + cfg.PaymentService)
+		return nil
 	}
 }
 

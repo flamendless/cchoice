@@ -28,6 +28,7 @@ import (
 	"cchoice/internal/shipping"
 	"cchoice/internal/storage"
 	localstorage "cchoice/internal/storage/local"
+	"cchoice/internal/utils"
 )
 
 const CACHE_MAX_BYTES int = 100 * 1024 * 1024 // 100MB cache for better cost efficiency
@@ -76,7 +77,7 @@ func (s *Server) GetProductImageProxyURL(ctx context.Context, thumbnailPath stri
 		return presignedURL, nil
 	}
 
-	proxyURL := fmt.Sprintf("https://%s%s?path=%s&thumbnail=1&quality=best", s.address, URL("/products/image"), url.QueryEscape(pathToUse))
+	proxyURL := fmt.Sprintf("https://%s%s?path=%s&thumbnail=1&quality=best", s.address, utils.URL("/products/image"), url.QueryEscape(pathToUse))
 	if size != "" {
 		proxyURL += "&size=" + url.QueryEscape(size)
 	}
@@ -172,7 +173,7 @@ func NewServer() *ServerInstance {
 		zap.Bool("HTTP2", newServer.useHTTP2),
 		zap.Duration("Read timeout", readTimeout),
 		zap.Duration("Write timeout", writeTimeout),
-		zap.String("Payment gateway", newServer.paymentGateway.GatewayEnum().String()),
+		// zap.String("Payment gateway", newServer.paymentGateway.GatewayEnum().String()),
 		zap.String("Shipping service", newServer.shippingService.Enum().String()),
 		zap.String("Geocoder service", newServer.geocoder.Enum().String()),
 		zap.String("Storage provider", newServer.objectStorage.ProviderEnum().String()),

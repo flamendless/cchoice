@@ -1,6 +1,7 @@
 package components
 
 import "cchoice/cmd/web/models"
+import "cchoice/internal/utils"
 
 templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 	<div
@@ -10,7 +11,7 @@ templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 		for i, category := range categories {
 			<a
 				id={ "category-link-" + category.ScrollTargetID }
-				href={ templ.SafeURL(URL("#" + category.ScrollTargetID)) }
+				href={ templ.SafeURL(utils.URL("#" + category.ScrollTargetID)) }
 				class="
 					text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer
 					hover:underline hover:bg-cchoicesoft transition-colors
@@ -26,7 +27,7 @@ templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 				<div class="py-8"></div>
 			}
 		}
-		<script type="text/javascript" src={ templ.URL(URL("/static/js/category_side_panel.js")) }>
+		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/category_side_panel.js")) }>
 		</script>
 	</div>
 }
@@ -58,7 +59,7 @@ templ CategoriesSidePanel() {
 			id="categories-side-panel-content"
 			class=""
 			hx-trigger="load once, history:restore"
-			hx-get={ URL("/product-categories/side-panel/list") }
+			hx-get={ utils.URL("/product-categories/side-panel/list") }
 			hx-select="#categories-side-panel-list"
 			hx-target="#categories-side-panel-list"
 			hx-swap="outerHTML"

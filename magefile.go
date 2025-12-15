@@ -718,11 +718,24 @@ func Prof(pkg, profType string) error {
 	})
 }
 
-func Prod() error {
+func Dev() error {
 	if err := Build(); err != nil {
 		return err
 	}
-	fmt.Println("Run: ./tmp/main api > out 2>&1 &")
+	fmt.Println("Run: ./tmp/cchoicedev api > out 2>&1 &")
+	return nil
+}
+
+func Prod() error {
+	if err := GenAll(); err != nil {
+		return err
+	}
+	return run(Command{
+		Type: CmdGoBuild,
+		Out:  filepath.Join(tmpDir, "cchoiceprod"),
+		Tags: []string{"fts5", "staticfs", "imageprocessing"},
+	})
+	fmt.Println("Run: ./tmp/cchoiceprod api > out 2>&1 &")
 	return nil
 }
 

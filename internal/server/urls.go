@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"cchoice/internal/storage"
+	"cchoice/internal/utils"
 )
 
 var cdnURLCache sync.Map
@@ -18,7 +19,7 @@ func (s *Server) GetCDNURL(path string) string {
 		url = s.objectStorage.GetPublicURL(path)
 	}
 	if url == "" {
-		url = URL("/products/image?thumbnail=1&quality=best&path=" + path)
+		url = utils.URL("/products/image?thumbnail=1&quality=best&path=" + path)
 	}
 
 	cdnURLCache.Store(path, url)
@@ -37,7 +38,7 @@ func (s *Server) GetBrandLogoCDNURL(filename string) string {
 		url = s.objectStorage.GetPublicURL(path)
 	}
 	if url == "" {
-		url = URL("/brands/logo?filename=" + filename)
+		url = utils.URL("/brands/logo?filename=" + filename)
 	}
 
 	cdnURLCache.Store(cacheKey, url)
@@ -56,7 +57,7 @@ func (s *Server) GetAssetCDNURL(filename string) string {
 		url = s.objectStorage.GetPublicURL(path)
 	}
 	if url == "" {
-		url = URL("/assets/image?filename=" + filename)
+		url = utils.URL("/assets/image?filename=" + filename)
 	}
 
 	cdnURLCache.Store(cacheKey, url)

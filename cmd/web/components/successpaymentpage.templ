@@ -1,5 +1,7 @@
 package components
 
+import "cchoice/internal/utils"
+
 templ SuccessPaymentPage(body templ.Component) {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -35,7 +37,7 @@ templ SuccessPaymentPageBody(orderRefNumber string) {
 				</p>
 				<div class="flex flex-row gap-4 mt-4">
 					<a
-						href={ templ.SafeURL(URL("/")) }
+						href={ templ.SafeURL(utils.URL("/")) }
 						class="
 							flex justify-center items-center relative inline-block px-6 py-3
 							bg-cchoice font-medium rounded-lg text-white cursor-pointer
@@ -47,7 +49,7 @@ templ SuccessPaymentPageBody(orderRefNumber string) {
 						Continue Shopping
 					</a>
 					<a
-						href={ templ.SafeURL(URL("/carts")) }
+						href={ templ.SafeURL(utils.URL("/carts")) }
 						class="
 							flex justify-center items-center relative inline-block px-6 py-3
 							bg-gray-200 font-medium rounded-lg text-gray-700 cursor-pointer

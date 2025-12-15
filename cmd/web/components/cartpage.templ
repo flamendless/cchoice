@@ -3,6 +3,7 @@ package components
 import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
+	"cchoice/internal/utils"
 	"fmt"
 	"strings"
 	"time"
@@ -29,7 +30,7 @@ templ AddToCart() {
 		"
 		title="add to cart"
 		alt="add to cart button"
-		hx-post={ URL("/carts/lines") }
+		hx-post={ utils.URL("/carts/lines") }
 		hx-include="#selected-product-id"
 		hx-swap="none"
 		_="
@@ -61,7 +62,7 @@ templ CartPageBody(summaryContent templ.Component) {
 		<div class="flex flex-col items-center content-center px-2 pb-32 gap-4">
 			<form
 				id="checkout-form"
-				hx-post={ URL("/carts/finalize") }
+				hx-post={ utils.URL("/carts/finalize") }
 				hx-swap="none"
 			>
 				<div class="flex w-screen gap-4 justify-center px-8 my-4">
@@ -69,7 +70,7 @@ templ CartPageBody(summaryContent templ.Component) {
 					<div
 						id="cart-lines"
 						class="flex flex-col gap-[8px] w-1/2"
-						hx-get={ URL("/carts/lines") }
+						hx-get={ utils.URL("/carts/lines") }
 						hx-trigger="load"
 						hx-swap="beforeend"
 					>
@@ -100,7 +101,7 @@ templ CartPageBody(summaryContent templ.Component) {
 							<div
 								id="cart-payments-content"
 								class="flex flex-row flex-wrap justify-center gap-1 p-2"
-								hx-get={ URL("/carts/payment-methods") }
+								hx-get={ utils.URL("/carts/payment-methods") }
 								hx-trigger="load"
 								hx-swap="beforeend"
 								hx-target="#payment-methods"
@@ -122,7 +123,7 @@ templ CartPageBody(summaryContent templ.Component) {
 							<div
 								id="cart-summary-content"
 								class="flex flex-col gap-1 p-2"
-								hx-get={ URL("/carts/summary?data=summary_total") }
+								hx-get={ utils.URL("/carts/summary?data=summary_total") }
 								hx-trigger="load, cartUpdated from:body"
 								hx-swap="innerHTML"
 								data-check-delivery-fee="true"
@@ -158,7 +159,7 @@ templ CartPageBody(summaryContent templ.Component) {
 			</form>
 		</div>
 		@Footer()
-		<script type="text/javascript" src={ templ.URL(URL("/static/js/cart.js?v=" + fmt.Sprintf("%d", time.Now().Unix()))) }>
+		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/cart.js?v=" + fmt.Sprintf("%d", time.Now().Unix()))) }>
 		</script>
 	</body>
 }
@@ -264,7 +265,7 @@ templ btnQtyDecrease(cl models.CheckoutLine) {
 		title="Decrease quantity"
 		class="p-1 border rounded disabled:opacity-40 group hover:bg-cchoice cursor-pointer disabled:cursor-not-allowed"
 		disabled?={ cl.Quantity <= 1 }
-		hx-patch={ URL("/carts/lines/" + cl.ID + "?dec=1") }
+		hx-patch={ utils.URL("/carts/lines/" + cl.ID + "?dec=1") }
 		hx-target={ fmt.Sprintf("[name=qty-%s]", cl.ID) }
 		hx-swap="textContent"
 		_="
@@ -310,7 +311,7 @@ templ btnQtyIncrease(cl models.CheckoutLine) {
 		title="Increase quantity"
 		class="p-1 border rounded disabled:opacity-40 group hover:bg-cchoice cursor-pointer disabled:cursor-not-allowed"
 		disabled?={ cl.Quantity >= constants.MaxCartLineQty }
-		hx-patch={ URL("/carts/lines/" + cl.ID + "?inc=1") }
+		hx-patch={ utils.URL("/carts/lines/" + cl.ID + "?inc=1") }
 		hx-target={ fmt.Sprintf("[name=qty-%s]", cl.ID) }
 		hx-swap="textContent"
 		_="
@@ -360,7 +361,7 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 				name="checked_item"
 				value={ cl.ID }
 				checked?={ cl.Checked }
-				hx-patch={ URL("/carts/lines/" + cl.ID + "/toggle") }
+				hx-patch={ utils.URL("/carts/lines/" + cl.ID + "/toggle") }
 				hx-swap="none"
 				_="on htmx:afterRequest trigger cartUpdated on the body"
 			/>
@@ -410,7 +411,7 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 					alt="Remove item from cart button"
 					aria-label="Remove item in cart"
 					title="Remove item from cart"
-					hx-delete={ URL("/carts/lines/" + cl.ID) }
+					hx-delete={ utils.URL("/carts/lines/" + cl.ID) }
 					hx-target={ "#cart-checkout-line-item-" + cl.ID }
 					hx-swap="outerHTML"
 					hx-push-url="false"

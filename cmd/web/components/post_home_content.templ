@@ -1,6 +1,7 @@
 package components
 
 import "cchoice/cmd/web/models"
+import "cchoice/internal/utils"
 
 templ PostHomeContentSections(data models.HomePageData) {
 	<div
@@ -58,7 +59,7 @@ templ StoreSection(storeImageURL string) {
 		/>
 		<div
 			hx-trigger="load once"
-			hx-get={ URL("/settings/store") }
+			hx-get={ utils.URL("/settings/store") }
 			hx-swap="textContent"
 			class="my-4 font-normal text-base text-center"
 		>

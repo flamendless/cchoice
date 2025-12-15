@@ -1,6 +1,7 @@
 package components
 
 import "cchoice/cmd/web/models"
+import "cchoice/internal/utils"
 
 templ BrandsSidePanelList(brands []models.BrandSidePanelText) {
 	<div
@@ -23,7 +24,7 @@ templ BrandsSidePanelList(brands []models.BrandSidePanelText) {
 				</p>
 			</a>
 		}
-		<script type="text/javascript" src={ templ.URL(URL("/static/js/brand_side_panel.js")) }>
+		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/brand_side_panel.js")) }>
 		</script>
 	</div>
 }
@@ -57,7 +58,7 @@ templ BrandsSidePanel() {
 		<div
 			id="brands-side-panel-content"
 			hx-trigger="load once, history:restore"
-			hx-get={ URL("/brands/side-panel/list") }
+			hx-get={ utils.URL("/brands/side-panel/list") }
 			hx-select="#brands-side-panel-list"
 			hx-target="#brands-side-panel-list"
 			hx-swap="outerHTML"
