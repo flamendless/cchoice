@@ -76,7 +76,7 @@ func (s *Server) GetProductImageProxyURL(ctx context.Context, thumbnailPath stri
 		return presignedURL, nil
 	}
 
-	proxyURL := fmt.Sprintf("https://%s/cchoice/products/image?path=%s&thumbnail=1&quality=best", s.address, url.QueryEscape(pathToUse))
+	proxyURL := fmt.Sprintf("https://%s%s?path=%s&thumbnail=1&quality=best", s.address, URL("/products/image"), url.QueryEscape(pathToUse))
 	if size != "" {
 		proxyURL += "&size=" + url.QueryEscape(size)
 	}

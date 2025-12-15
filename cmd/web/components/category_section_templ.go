@@ -252,9 +252,9 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var14 string
-				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs("/cchoice/product-categories/" + subcategory.CategoryID + "/products")
+				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(URL("/product-categories/" + subcategory.CategoryID + "/products"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 79, Col: 83}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 79, Col: 80}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
@@ -323,9 +323,9 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var17 string
-				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/cchoice/product-categories/sections?page=%d", page+1))
+				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(URL(fmt.Sprintf("/product-categories/sections?page=%d", page+1)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 99, Col: 80}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 99, Col: 77}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
@@ -384,9 +384,9 @@ func AllCategorySections() templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 string
-		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/cchoice/product-categories/sections?page=%d", 0))
+		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(URL("/product-categories/sections?page=0"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 114, Col: 73}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_section.templ`, Line: 114, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {

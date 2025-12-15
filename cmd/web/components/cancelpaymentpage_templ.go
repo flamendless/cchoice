@@ -103,7 +103,33 @@ func CancelPaymentPageBody(orderRefNumber string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</p></div><p class=\"text-base text-gray-500 text-center\">If you'd like to complete your purchase, you can return to your cart to try again.</p><div class=\"flex flex-row gap-4 mt-4\"><a href=\"/cchoice/carts\" class=\"\n\t\t\t\t\t\t\tflex justify-center items-center relative inline-block px-6 py-3\n\t\t\t\t\t\t\tbg-cchoice font-medium rounded-lg text-white cursor-pointer\n\t\t\t\t\t\t\ttransition-colors rounded-full hover:bg-cchoicesoft\n\t\t\t\t\t\t\" title=\"Return to cart\" alt=\"Return to cart button\">Return to Cart</a> <a href=\"/cchoice\" class=\"\n\t\t\t\t\t\t\tflex justify-center items-center relative inline-block px-6 py-3\n\t\t\t\t\t\t\tbg-gray-200 font-medium rounded-lg text-gray-700 cursor-pointer\n\t\t\t\t\t\t\ttransition-colors rounded-full hover:bg-gray-300\n\t\t\t\t\t\t\" title=\"Go to home\" alt=\"Go to home button\">Go to Home</a></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</p></div><p class=\"text-base text-gray-500 text-center\">If you'd like to complete your purchase, you can return to your cart to try again.</p><div class=\"flex flex-row gap-4 mt-4\"><a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 templ.SafeURL
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(URL("/carts")))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cancelpaymentpage.templ`, Line: 33, Col: 41}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"\n\t\t\t\t\t\t\tflex justify-center items-center relative inline-block px-6 py-3\n\t\t\t\t\t\t\tbg-cchoice font-medium rounded-lg text-white cursor-pointer\n\t\t\t\t\t\t\ttransition-colors rounded-full hover:bg-cchoicesoft\n\t\t\t\t\t\t\" title=\"Return to cart\" alt=\"Return to cart button\">Return to Cart</a> <a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 templ.SafeURL
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(URL("/")))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/cancelpaymentpage.templ`, Line: 45, Col: 36}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"\n\t\t\t\t\t\t\tflex justify-center items-center relative inline-block px-6 py-3\n\t\t\t\t\t\t\tbg-gray-200 font-medium rounded-lg text-gray-700 cursor-pointer\n\t\t\t\t\t\t\ttransition-colors rounded-full hover:bg-gray-300\n\t\t\t\t\t\t\" title=\"Go to home\" alt=\"Go to home button\">Go to Home</a></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -111,7 +137,7 @@ func CancelPaymentPageBody(orderRefNumber string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</body>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

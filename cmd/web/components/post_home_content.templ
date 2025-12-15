@@ -58,7 +58,7 @@ templ StoreSection(storeImageURL string) {
 		/>
 		<div
 			hx-trigger="load once"
-			hx-get="/cchoice/settings/store"
+			hx-get={ URL("/settings/store") }
 			hx-swap="textContent"
 			class="my-4 font-normal text-base text-center"
 		>

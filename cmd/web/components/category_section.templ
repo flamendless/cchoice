@@ -76,7 +76,7 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 				<div
 					class="w-full ml-0.5 pr-6 border-cchoice_border"
 					hx-trigger="load once, history:restore"
-					hx-get={ "/cchoice/product-categories/" + subcategory.CategoryID + "/products" }
+					hx-get={ URL("/product-categories/" + subcategory.CategoryID + "/products") }
 					hx-target={ "#category-sections-" + subcategory.CategoryID }
 					hx-swap="innerHTML"
 				>
@@ -96,7 +96,7 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 		if i == len(categories)-1 {
 			<div
 				class="category-sections-inf-load"
-				hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", page+1) }
+				hx-get={ URL(fmt.Sprintf("/product-categories/sections?page=%d", page+1)) }
 				hx-target=".category-sections-inf-load"
 				hx-swap="outerHTML"
 				hx-trigger={ fmt.Sprintf("load delay:%fs, history:restore", float64(page)*fetchMult) }
@@ -111,7 +111,7 @@ templ AllCategorySections() {
 		id="all-category-sections"
 		class="w-full overflow-x-hidden"
 		hx-trigger="load once, history:restore"
-		hx-get={ fmt.Sprintf("/cchoice/product-categories/sections?page=%d", 0) }
+		hx-get={ URL("/product-categories/sections?page=0") }
 		hx-target="#category-sections"
 		hx-swap="beforeend"
 	>

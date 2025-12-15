@@ -103,7 +103,33 @@ func SuccessPaymentPageBody(orderRefNumber string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</p></div><p class=\"text-base text-gray-500 text-center\">You will receive a confirmation email shortly with your order details.</p><div class=\"flex flex-row gap-4 mt-4\"><a href=\"/cchoice\" class=\"\n\t\t\t\t\t\t\tflex justify-center items-center relative inline-block px-6 py-3\n\t\t\t\t\t\t\tbg-cchoice font-medium rounded-lg text-white cursor-pointer\n\t\t\t\t\t\t\ttransition-colors rounded-full hover:bg-cchoicesoft\n\t\t\t\t\t\t\" title=\"Continue shopping\" alt=\"Continue shopping button\">Continue Shopping</a> <a href=\"/cchoice/carts\" class=\"\n\t\t\t\t\t\t\tflex justify-center items-center relative inline-block px-6 py-3\n\t\t\t\t\t\t\tbg-gray-200 font-medium rounded-lg text-gray-700 cursor-pointer\n\t\t\t\t\t\t\ttransition-colors rounded-full hover:bg-gray-300\n\t\t\t\t\t\t\" title=\"View cart\" alt=\"View cart button\">View Cart</a></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</p></div><p class=\"text-base text-gray-500 text-center\">You will receive a confirmation email shortly with your order details.</p><div class=\"flex flex-row gap-4 mt-4\"><a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 templ.SafeURL
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(URL("/")))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/successpaymentpage.templ`, Line: 38, Col: 36}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"\n\t\t\t\t\t\t\tflex justify-center items-center relative inline-block px-6 py-3\n\t\t\t\t\t\t\tbg-cchoice font-medium rounded-lg text-white cursor-pointer\n\t\t\t\t\t\t\ttransition-colors rounded-full hover:bg-cchoicesoft\n\t\t\t\t\t\t\" title=\"Continue shopping\" alt=\"Continue shopping button\">Continue Shopping</a> <a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 templ.SafeURL
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(URL("/carts")))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/successpaymentpage.templ`, Line: 50, Col: 41}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"\n\t\t\t\t\t\t\tflex justify-center items-center relative inline-block px-6 py-3\n\t\t\t\t\t\t\tbg-gray-200 font-medium rounded-lg text-gray-700 cursor-pointer\n\t\t\t\t\t\t\ttransition-colors rounded-full hover:bg-gray-300\n\t\t\t\t\t\t\" title=\"View cart\" alt=\"View cart button\">View Cart</a></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -111,7 +137,7 @@ func SuccessPaymentPageBody(orderRefNumber string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</body>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

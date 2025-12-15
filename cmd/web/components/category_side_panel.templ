@@ -10,7 +10,7 @@ templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 		for i, category := range categories {
 			<a
 				id={ "category-link-" + category.ScrollTargetID }
-				href={ "/cchoice#" + category.ScrollTargetID }
+				href={ templ.SafeURL(URL("#" + category.ScrollTargetID)) }
 				class="
 					text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer
 					hover:underline hover:bg-cchoicesoft transition-colors
@@ -26,7 +26,7 @@ templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 				<div class="py-8"></div>
 			}
 		}
-		<script type="text/javascript" src={ templ.URL("/cchoice/static/js/category_side_panel.js") }>
+		<script type="text/javascript" src={ templ.URL(URL("/static/js/category_side_panel.js")) }>
 		</script>
 	</div>
 }
@@ -58,7 +58,7 @@ templ CategoriesSidePanel() {
 			id="categories-side-panel-content"
 			class=""
 			hx-trigger="load once, history:restore"
-			hx-get="/cchoice/product-categories/side-panel/list"
+			hx-get={ URL("/product-categories/side-panel/list") }
 			hx-select="#categories-side-panel-list"
 			hx-target="#categories-side-panel-list"
 			hx-swap="outerHTML"
