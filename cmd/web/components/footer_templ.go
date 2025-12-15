@@ -103,7 +103,7 @@ func Footer() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<footer class=\"fixed left-0 bottom-0 py-2 px-1.5 w-full z-999 bg-white\"><hr class=\"border-2 border-cchoice_border my-0.5\"><div class=\"w-full flex flex-row\"><div id=\"footer-row1\" class=\"flex flex-row grow\" hx-trigger=\"load once\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<footer class=\"fixed left-0 bottom-0 py-2 px-1.5 w-full max-w-full z-999 bg-white overflow-hidden\"><hr class=\"border-2 border-cchoice_border my-0.5\"><div class=\"w-full max-w-full flex flex-col lg:flex-row\"><div id=\"footer-row1\" class=\"flex flex-row grow\" hx-trigger=\"load once\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -124,7 +124,7 @@ func Footer() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div><div class=\"self-end\"><p class=\"px-2 font-light text-xs\">By using this website, you agree to our Terms and Conditions and Privacy Policy</p></div></div></footer>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div><div class=\"self-end\"><p class=\"px-2 font-light text-xs text-wrap\">By using this website, you agree to our Terms and Conditions and Privacy Policy</p></div></div></footer>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -13,8 +13,9 @@ type HeaderRowText struct {
 }
 
 type FooterRowText struct {
-	Label string
-	URL   string
+	Label    string
+	URL      string
+	Hideable bool
 }
 
 type CategorySidePanelText struct {

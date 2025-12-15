@@ -509,12 +509,14 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 			URL:   utils.URL("/"),
 		},
 		{
-			Label: "About Us",
-			URL:   utils.URL("#about-us"),
+			Label:    "About Us",
+			URL:      utils.URL("#about-us"),
+			Hideable: true,
 		},
 		{
-			Label: "Services",
-			URL:   utils.URL("#services"),
+			Label:    "Services",
+			URL:      utils.URL("#services"),
+			Hideable: true,
 		},
 		{
 			Label: "Partners",
@@ -533,16 +535,19 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 			URL:   settings["url_gmap"],
 		},
 		{
-			Label: "Store",
-			URL:   utils.URL("#store"),
+			Label:    "Store",
+			URL:      utils.URL("#store"),
+			Hideable: true,
 		},
 		{
-			Label: "Facebook",
-			URL:   settings["url_facebook"],
+			Label:    "Facebook",
+			URL:      settings["url_facebook"],
+			Hideable: true,
 		},
 		{
-			Label: "TikTok",
-			URL:   settings["url_tiktok"],
+			Label:    "TikTok",
+			URL:      settings["url_tiktok"],
+			Hideable: true,
 		},
 	}
 

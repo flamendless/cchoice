@@ -32,7 +32,7 @@ func SearchResults() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"search-results\" class=\"\n\t\t\tabsolute flex flex-col w-9/12 left-1/2 -translate-x-1/2 hidden\n\t\t\ttransform scale-y-100 origin-top transition-transform duration-200\n\t\t\tleft-0 top-full bg-white shadow-xl border-cchoice_border z-10\n\t\t\"><ul></ul></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"search-results\" class=\"\n\t\t\tabsolute flex flex-col w-full max-w-full hidden\n\t\t\ttransform scale-y-100 origin-top transition-transform duration-200\n\t\t\tleft-0 top-full bg-white shadow-xl border-cchoice_border z-10\n\t\t\"><ul></ul></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

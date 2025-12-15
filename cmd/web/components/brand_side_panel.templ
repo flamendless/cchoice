@@ -60,7 +60,7 @@ templ BrandsSidePanel() {
 			hx-trigger="load once, history:restore"
 			hx-get={ utils.URL("/brands/side-panel/list") }
 			hx-select="#brands-side-panel-list"
-			hx-target="#brands-side-panel-list"
+			hx-target="find #brands-side-panel-list"
 			hx-swap="outerHTML"
 			class="pb-[8px]"
 		>

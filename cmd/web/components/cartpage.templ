@@ -11,7 +11,7 @@ import (
 
 templ CartPage(body templ.Component) {
 	<!DOCTYPE html>
-	<html lang="en">
+	<html lang="en" class="overflow-x-hidden">
 		<head>
 			@HeadMeta()
 			@TabTitle("Cart")
@@ -64,12 +64,13 @@ templ CartPageBody(summaryContent templ.Component) {
 				id="checkout-form"
 				hx-post={ utils.URL("/carts/finalize") }
 				hx-swap="none"
+				class="w-full"
 			>
-				<div class="flex w-screen gap-4 justify-center px-8 my-4">
-					<!-- Column 1: Line Items (1/2 width) -->
+				<div class="flex flex-col lg:flex-row w-full gap-4 justify-center px-2 lg:px-8 my-4">
+					<!-- Column 1: Line Items (full width on mobile, 1/2 on desktop) -->
 					<div
 						id="cart-lines"
-						class="flex flex-col gap-[8px] w-1/2"
+						class="flex flex-col gap-[8px] w-full lg:w-1/2"
 						hx-get={ utils.URL("/carts/lines") }
 						hx-trigger="load"
 						hx-swap="beforeend"
@@ -77,8 +78,8 @@ templ CartPageBody(summaryContent templ.Component) {
 						//CartCheckoutLineItem
 					</div>
 
-					<!-- Column 2: Shipping Address (1/4 width) -->
-					<div class="flex flex-col gap-[8px] w-1/4">
+					<!-- Column 2: Shipping Address (full width on mobile, 1/4 on desktop) -->
+					<div class="flex flex-col gap-[8px] w-full lg:w-1/4">
 						<div
 							id="cart-shipping"
 							class="flex flex-col gap-1 border rounded h-auto"
@@ -92,8 +93,8 @@ templ CartPageBody(summaryContent templ.Component) {
 						</div>
 					</div>
 
-					<!-- Column 3: Payment & Summary (1/4 width) -->
-					<div class="flex flex-col gap-[8px] w-1/4">
+					<!-- Column 3: Payment & Summary (full width on mobile, 1/4 on desktop) -->
+					<div class="flex flex-col gap-[8px] w-full lg:w-1/4">
 						<div
 							id="cart-payments"
 							class="flex flex-col gap-1 border rounded h-auto"
@@ -351,9 +352,9 @@ templ btnQtyIncrease(cl models.CheckoutLine) {
 templ CartCheckoutLineItem(cl models.CheckoutLine) {
 	<div
 		id={ "cart-checkout-line-item-" + cl.ID }
-		class="flex items-center gap-4 border rounded h-auto"
+		class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 border rounded h-auto p-2 sm:p-0"
 	>
-		<div class="flex items-center gap-2 pl-3">
+		<div class="flex items-center gap-2 pl-0 sm:pl-3">
 			<input
 				type="checkbox"
 				class="w-5 h-5 accent-cchoice_border hover:accent-cchoice"
@@ -366,16 +367,16 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 				_="on htmx:afterRequest trigger cartUpdated on the body"
 			/>
 			<img
-				class="m-2 w-32 max-w-32 h-32"
+				class="m-2 w-20 max-w-20 h-20 sm:w-32 sm:max-w-32 sm:h-32"
 				title={ "product image of " + cl.Name }
 				src={ cl.CDNURL1280 }
 				alt={ cl.Name + " thumbnail" }
 				data-product-id={ cl.ProductID }
 			/>
 		</div>
-		<div class="flex flex-row grow">
+		<div class="flex flex-row grow w-full">
 			<div class="flex-1">
-				<h2 class="text-base font-semibold">{ cl.Name }</h2>
+				<h2 class="text-sm sm:text-base font-semibold">{ cl.Name }</h2>
 				<p class="text-xs text-gray-600">{ cl.BrandName }</p>
 				<p class="text-xs text-gray-600">{ cl.WeightDisplay }</p>
 				<span class="flex gap-[4px]">

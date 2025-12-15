@@ -89,3 +89,31 @@ templ svgChevron(id string) {
 		<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
 	</svg>
 }
+
+//https://heroicons.com
+templ svgHamburger(cls string) {
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		fill="none"
+		viewBox="0 0 24 24"
+		stroke-width="1.5"
+		stroke="currentColor"
+		class={ fmt.Sprintf("size-6 %s", cls) }
+	>
+		<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+	</svg>
+}
+
+//https://heroicons.com
+templ svgClose(cls string) {
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		fill="none"
+		viewBox="0 0 24 24"
+		stroke-width="1.5"
+		stroke="currentColor"
+		class={ fmt.Sprintf("size-6 %s", cls) }
+	>
+		<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+	</svg>
+}

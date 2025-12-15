@@ -3,13 +3,13 @@ testdata_dir = "testdata"
 tmp_dir = "tmp"
 
 [build]
-  args_bin = ["web"]
+  args_bin = []
   bin = "./tmp/web"
-  cmd = "mage buildWeb"
+  cmd = "mage genall && mage buildweb"
   delay = 100
   exclude_dir = ["cmd/web/static/images/", "cmd/web/static/thumbnails/", "cmd/web/static/svg/"]
   exclude_file = []
-  exclude_regex = [".*_templ.go"]
+  exclude_regex = [".*_templ.go", ".*.sql.go"]
   exclude_unchanged = false
   follow_symlink = false
   full_bin = ""

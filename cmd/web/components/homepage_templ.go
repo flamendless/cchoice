@@ -31,7 +31,7 @@ func HomePage(data models.HomePageData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"overflow-x-hidden\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -92,7 +92,11 @@ func HomePageBody(data models.HomePageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"flex flex-col\"><div class=\"flex items-start\"><div class=\"\n\t\t\t\t\t\tfixed top-0 left-0 w-fit\n\t\t\t\t\t\tmin-w-[15%] max-w-[15%] w-[15%]\n\t\t\t\t\t\tml-0.5 pr-6 flex flex-col\n\t\t\t\t\t\th-full overflow-auto pt-[128px]\n\t\t\t\t\t\">")
+		templ_7745c5c3_Err = MobileSidebar().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<style>\n\t\t\t#desktop-sidebar {\n\t\t\t\tposition: sticky;\n\t\t\t\ttop: 0;\n\t\t\t\tleft: 0;\n\t\t\t\tz-index: 40;\n\t\t\t\tmin-width: 15%;\n\t\t\t\tmax-width: 15%;\n\t\t\t\twidth: 15%;\n\t\t\t\tmargin-left: 0.125rem;\n\t\t\t\tpadding-right: 1.5rem;\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\theight: 100%;\n\t\t\t\toverflow: auto;\n\t\t\t}\n\t\t\t#main-content {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: flex-start;\n\t\t\t\twidth: 100%;\n\t\t\t\tborder-left: 2px solid #F6b08A;\n\t\t\t}\n\t\t\t@media (max-width: 1023px) {\n\t\t\t\t#desktop-sidebar {\n\t\t\t\t\tdisplay: none !important;\n\t\t\t\t}\n\t\t\t\t#main-content {\n\t\t\t\t\twidth: 100% !important;\n\t\t\t\t\tborder-left: none !important;\n\t\t\t\t}\n\t\t\t}\n\t\t</style><div class=\"flex flex-col\"><div class=\"flex items-start\"><div id=\"desktop-sidebar\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -104,7 +108,7 @@ func HomePageBody(data models.HomePageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div><div name=\"right-panel\" class=\"flex items-start border-l-2 border-cchoice_border ml-[15%]\"><div class=\"w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div><div id=\"main-content\" name=\"right-panel\"><div class=\"w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -133,6 +137,47 @@ func HomePageBody(data models.HomePageData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</body>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func MobileSidebar() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div id=\"mobile-sidebar-overlay\" class=\"hidden fixed inset-0 bg-black/50 z-[9998] lg:hidden\" _=\"on click\n\t\t\tadd .hidden to #mobile-sidebar\n\t\t\tadd .hidden to me\n\t\t\"></div><div id=\"mobile-sidebar\" class=\"\n\t\t\thidden fixed top-0 left-0 h-full w-[75%] max-w-[300px]\n\t\t\tbg-white z-[9999] overflow-y-auto\n\t\t\tshadow-xl pt-4 pb-16\n\t\t\tlg:hidden\n\t\t\"><div class=\"flex justify-end px-4 mb-4\"><button type=\"button\" class=\"p-2 rounded-lg hover:bg-cchoicesoft\" aria-label=\"Close menu\" _=\"on click\n\t\t\t\t\tadd .hidden to #mobile-sidebar\n\t\t\t\t\tadd .hidden to #mobile-sidebar-overlay\n\t\t\t\t\"><svg class=\"w-6 h-6 text-cchoice\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div><div class=\"px-2\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = BrandsSidePanel().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = CategoriesSidePanel().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

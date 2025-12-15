@@ -22,7 +22,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 				{ data.Subcategory }
 			</p>
 		}
-		<div class="flex flex-row flex-wrap justify-center sm:justify-start">
+		<div class="flex flex-row flex-wrap">
 			for _, product := range data.Products {
 				<div class="group flex flex-col items-center m-1 sm:m-2 ml-2 sm:ml-4 p-2 rounded-lg hover:bg-cchoicesoft transition-colors">
 					<img
@@ -84,7 +84,7 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 			</p>
 			for _, subcategory := range category.Subcategories {
 				<div
-					class="w-full ml-0.5 pr-6 border-cchoice_border"
+					class="w-full max-w-full ml-0.5 pr-2 lg:pr-6 border-cchoice_border"
 					hx-trigger="load once, history:restore"
 					hx-get={ utils.URL("/product-categories/" + subcategory.CategoryID + "/products") }
 					hx-target={ "#category-sections-" + subcategory.CategoryID }
