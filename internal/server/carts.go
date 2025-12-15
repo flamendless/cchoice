@@ -433,7 +433,7 @@ func (s *Server) removeProductFromCartHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 	if remaining == 0 {
-		w.Header().Set("HX-Redirect", "/cchoice/carts")
+		w.Header().Set("HX-Redirect", URL("/carts"))
 	}
 	w.WriteHeader(http.StatusOK)
 }
@@ -754,7 +754,7 @@ func (s *Server) getPaymentImageURL(pm payments.PaymentMethod) string {
 	if s.objectStorage != nil && s.objectStorage.ProviderEnum() == storage.STORAGE_PROVIDER_CLOUDFLARE_IMAGES {
 		return s.objectStorage.GetPublicURL(imgPath)
 	}
-	return "/cchoice/assets/image?filename=payments/" + strings.TrimPrefix(imgPath, constants.PathPaymentImages)
+	return URL("/assets/image?filename=payments/" + strings.TrimPrefix(imgPath, constants.PathPaymentImages))
 }
 
 func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Request) {

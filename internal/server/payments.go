@@ -165,7 +165,7 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 			zap.String("expected_status", "succeeded"),
 			zap.String("actual_status", paymentStatus),
 		)
-		http.Redirect(w, r, "/cchoice/payments/cancel?payment_ref="+paymentRef, http.StatusSeeOther)
+		http.Redirect(w, r, URL("/payments/cancel?payment_ref="+paymentRef), http.StatusSeeOther)
 		return
 	}
 

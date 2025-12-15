@@ -35,7 +35,7 @@ templ SuccessPaymentPageBody(orderRefNumber string) {
 				</p>
 				<div class="flex flex-row gap-4 mt-4">
 					<a
-						href="/cchoice"
+						href={ templ.SafeURL(URL("/")) }
 						class="
 							flex justify-center items-center relative inline-block px-6 py-3
 							bg-cchoice font-medium rounded-lg text-white cursor-pointer
@@ -47,7 +47,7 @@ templ SuccessPaymentPageBody(orderRefNumber string) {
 						Continue Shopping
 					</a>
 					<a
-						href="/cchoice/carts"
+						href={ templ.SafeURL(URL("/carts")) }
 						class="
 							flex justify-center items-center relative inline-block px-6 py-3
 							bg-gray-200 font-medium rounded-lg text-gray-700 cursor-pointer

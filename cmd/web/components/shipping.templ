@@ -11,10 +11,10 @@ templ ProvinceSelect() {
 			name="province"
 			class="border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent required-field"
 			required
-			hx-get="/cchoice/shipping/address?data=provinces"
+			hx-get={ URL("/shipping/address?data=provinces") }
 			hx-trigger="load once"
 			hx-swap="beforeend"
-			hx-delete="/cchoice/shipping/quotation"
+			hx-delete={ URL("/shipping/quotation") }
 			_="
 				on change
 					if my value is not ''
@@ -40,7 +40,7 @@ templ ProvinceSelect() {
 							end
 
 							-- Clear quotation for non-NCR provinces since user needs to select city/barangay
-							fetch /cchoice/shipping/quotation with method:'DELETE'
+							fetch `${_G.URL_PREFIX}/shipping/quotation` with method:'DELETE'
 							then trigger cartUpdated on the body
 						end
 					else
@@ -49,7 +49,7 @@ templ ProvinceSelect() {
 						set #city.disabled to false
 						set #barangay.disabled to false
 						-- Clear quotation when province is cleared
-						fetch /cchoice/shipping/quotation with method:'DELETE'
+						fetch `${_G.URL_PREFIX}/shipping/quotation` with method:'DELETE'
 						then trigger cartUpdated on the body
 					end
 				end
@@ -72,7 +72,7 @@ templ CitySelect() {
 			name="city"
 			class="border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent required-field disabled:opacity-50 disabled:cursor-not-allowed"
 			required
-			hx-get="/cchoice/shipping/address?data=cities"
+			hx-get={ URL("/shipping/address?data=cities") }
 			hx-trigger="change, get"
 			hx-include="#province"
 			hx-swap="beforeend"
@@ -108,7 +108,7 @@ templ BarangaySelect() {
 			name="barangay"
 			class="border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent required-field disabled:opacity-50 disabled:cursor-not-allowed"
 			required
-			hx-get="/cchoice/shipping/address?data=barangays"
+			hx-get={ URL("/shipping/address?data=barangays") }
 			hx-trigger="change, get"
 			hx-include="#city"
 			hx-swap="beforeend"
@@ -240,7 +240,7 @@ templ ShippingAddressSelect() {
 	<div
 		class="flex flex-col gap-2 w-full max-w-lg"
 		id="shipping-form"
-		hx-post="/cchoice/shipping/quotation"
+		hx-post={ URL("/shipping/quotation") }
 		hx-trigger="post"
 		hx-swap="none"
 		_="
@@ -256,7 +256,7 @@ templ ShippingAddressSelect() {
 			end
 
 			on htmx:beforeRequest
-				if event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/cchoice/shipping/quotation'
+				if event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/shipping/quotation'
 					put #delivery-fee-row into deliveryRow
 					put #delivery-fee-loading-template into feeLoadingTemplate
 					if deliveryRow is not null and feeLoadingTemplate is not null
@@ -272,7 +272,7 @@ templ ShippingAddressSelect() {
 			end
 
 			on htmx:afterRequest
-				if event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/cchoice/shipping/quotation'
+				if event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/shipping/quotation'
 					trigger get on #cart-summary-content
 					-- Save shipping form values to sessionStorage for page refresh
 					call saveShippingFormState()

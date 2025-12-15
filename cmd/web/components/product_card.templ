@@ -18,7 +18,7 @@ templ SearchResults() {
 templ SearchMore(query string) {
 	<li class="flex items-center justify-center">
 		<a
-			href={ templ.SafeURL("/cchoice/search?query=" + query) }
+			href={ templ.SafeURL(URL("/search?query=" + query)) }
 			class="
 				text-center w-full border-t-2 border-cchoice_border p-2
 				hover:bg-cchoice hover:text-white transition-colors

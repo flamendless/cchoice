@@ -7,14 +7,14 @@ var logoWithTextHandlerOnce = templ.NewOnceHandle()
 templ LogoWithText(width string, height string) {
 	@logoWithTextHandlerOnce.Once() {
 		<a
-			href="/cchoice"
+			href={ templ.SafeURL(URL("/")) }
 			class="
 				w-fit flex items-center mb-4
 				md:-mt-8 md:-mb-4 md:ml-4
 			"
 		>
 			<img
-				src={ string(templ.URL("/cchoice/static/svg/logo_complete.svg")) }
+				src={ string(templ.URL(URL("/static/svg/logo_complete.svg"))) }
 				alt="cchoice logo and text"
 				width={ width }
 				height={ height }
@@ -90,7 +90,7 @@ templ SearchBar() {
 					focus:ring-cchoice focus:border-cchoice
 
 				"
-				hx-post="/cchoice/search"
+				hx-post={ URL("/search") }
 				hx-trigger="input[this.value.length >= 3] changed delay:1000ms, keyup[key=='Enter'], search[target.value.length >= 3]"
 				hx-validate="true"
 				hx-include="#search"
@@ -168,7 +168,7 @@ templ CartCount(n int) {
 	<span
 		id="cart-count"
 		class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs font-bold rounded-md px-1.5 shadow"
-		hx-get="/cchoice/carts/lines/count"
+		hx-get={ URL("/carts/lines/count") }
 		hx-trigger="load once, every 30s, get"
 		hx-swap="textContent"
 	>
@@ -187,7 +187,7 @@ templ Cart() {
 				group p-2 stroke-cchoice rounded-full
 				cursor-pointer hover:bg-cchoice_border
 			"
-			_="on click go to url '/cchoice/carts'"
+			_={ "on click go to url '" + URL("/carts") + "'" }
 		>
 			@svgCart("stroke-cchoice group-hover:stroke-white")
 			@CartCount(0)
@@ -225,15 +225,15 @@ templ Header() {
 		"
 	>
 		<div class="w-full flex flex-col sm:flex-col md:flex-col">
-			<div
-				id="header-row1"
-				class="w-full flex flex-row hidden sm:hidden md:hidden lg:flex"
-				hx-trigger="load once"
-				hx-get="/cchoice/settings/header-texts"
-				hx-select="#header-row1-texts"
-				hx-target="#header-row1-texts"
-				hx-swap="outerHTML"
-			>
+		<div
+			id="header-row1"
+			class="w-full flex flex-row hidden sm:hidden md:hidden lg:flex"
+			hx-trigger="load once"
+			hx-get={ URL("/settings/header-texts") }
+			hx-select="#header-row1-texts"
+			hx-target="#header-row1-texts"
+			hx-swap="outerHTML"
+		>
 				@HeaderRow1Texts(nil)
 			</div>
 			<div

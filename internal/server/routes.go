@@ -30,6 +30,13 @@ import (
 	"go.uber.org/zap"
 )
 
+func URL(path string) string {
+	if conf.Conf().IsProd() {
+		return path
+	}
+	return "/cchoice" + path
+}
+
 func buildImageCacheKey(path, thumbnail, size, quality string, ext images.ImageFormat) []byte {
 	key := fmt.Sprintf(
 		"product_image_%s_t%s_s%s_q%s_%s",
@@ -97,77 +104,85 @@ func (s *Server) RegisterRoutes() http.Handler {
 		MaxAge:           300,
 	}))
 
-	r.Route("/cchoice", func(r chi.Router) {
-		r.Use(middleware.StripPrefix("/cchoice"))
-
-		// Use staticFS for static assets (JS, CSS, icons)
-		if s.staticFS == nil {
-			panic(errors.Join(errs.ErrServerInit, errs.ErrServerFSNotSetup))
-		}
-
-		// Custom static file handler with caching
-		r.Handle("/static/*", http.StripPrefix("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			const logtag = "[Static Handler]"
-			ctx := r.Context()
-
-			path := r.URL.Path
-			notModified, file, err := httputil.CacheHeaders(w, r, s.staticFS, path)
-			if err != nil {
-				logs.LogCtx(ctx).Debug(
-					logtag,
-					zap.String("path", path),
-					zap.Error(err),
-				)
-				httputil.SetNoCacheHeaders(w)
-				http.NotFound(w, r)
-				return
-			}
-			defer file.Close()
-
-			if notModified {
-				return
-			}
-
-			info, err := file.Stat()
-			if err != nil {
-				logs.LogCtx(ctx).Error(
-					logtag,
-					zap.Error(err),
-				)
-				httputil.SetNoCacheHeaders(w)
-				http.NotFound(w, r)
-				return
-			}
-
-			http.ServeContent(w, r, info.Name(), info.ModTime(), file)
-		})))
-
-		r.Get("/changelogs", s.changelogsHandler)
-		r.Get("/health", s.healthHandler)
-		r.Get("/version", s.versionHandler)
-		r.Handle("/metrics", promhttp.Handler())
-		r.Get("/", s.indexHandler)
-		r.Get("/settings/header-texts", s.headerTextsHandler)
-		r.Get("/settings/footer-texts", s.footerTextsHandler)
-		r.Get("/settings/store", s.storeHandler)
-		r.Get("/products/image", s.productsImageHandler)
-		r.Get("/brands/logo", s.brandLogoHandler)
-		r.Get("/assets/image", s.assetImageHandler)
-
-		r.Post("/search", s.searchHandler)
-
-		AddProductCategoriesHandlers(s, r)
-		AddBrandsHandlers(s, r)
-		AddCartsHandlers(s, r)
-		AddShippingHandlers(s, r)
-		AddPaymentHandlers(s, r)
-		RegisterPaymentWebhooks(s, r)
-
-		//INFO: (Brandon) - unused routes
-		r.Post("/checkouts", s.checkoutsHandler)
-	})
+	urlPrefix := URL("")
+	if urlPrefix != "" {
+		r.Route(urlPrefix, func(r chi.Router) {
+			r.Use(middleware.StripPrefix(urlPrefix))
+			s.registerAllRoutes(r)
+		})
+	} else {
+		s.registerAllRoutes(r)
+	}
 
 	return r
+}
+
+func (s *Server) registerAllRoutes(r chi.Router) {
+	// Use staticFS for static assets (JS, CSS, icons)
+	if s.staticFS == nil {
+		panic(errors.Join(errs.ErrServerInit, errs.ErrServerFSNotSetup))
+	}
+
+	// Custom static file handler with caching
+	r.Handle("/static/*", http.StripPrefix("/static/", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		const logtag = "[Static Handler]"
+		ctx := req.Context()
+
+		path := req.URL.Path
+		notModified, file, err := httputil.CacheHeaders(w, req, s.staticFS, path)
+		if err != nil {
+			logs.LogCtx(ctx).Debug(
+				logtag,
+				zap.String("path", path),
+				zap.Error(err),
+			)
+			httputil.SetNoCacheHeaders(w)
+			http.NotFound(w, req)
+			return
+		}
+		defer file.Close()
+
+		if notModified {
+			return
+		}
+
+		info, err := file.Stat()
+		if err != nil {
+			logs.LogCtx(ctx).Error(
+				logtag,
+				zap.Error(err),
+			)
+			httputil.SetNoCacheHeaders(w)
+			http.NotFound(w, req)
+			return
+		}
+
+		http.ServeContent(w, req, info.Name(), info.ModTime(), file)
+	})))
+
+	r.Get("/changelogs", s.changelogsHandler)
+	r.Get("/health", s.healthHandler)
+	r.Get("/version", s.versionHandler)
+	r.Handle("/metrics", promhttp.Handler())
+	r.Get("/", s.indexHandler)
+	r.Get("/settings/header-texts", s.headerTextsHandler)
+	r.Get("/settings/footer-texts", s.footerTextsHandler)
+	r.Get("/settings/store", s.storeHandler)
+	r.Get("/products/image", s.productsImageHandler)
+	r.Get("/brands/logo", s.brandLogoHandler)
+	r.Get("/assets/image", s.assetImageHandler)
+
+	r.Post("/search", s.searchHandler)
+
+	AddProductCategoriesHandlers(s, r)
+	AddBrandsHandlers(s, r)
+	AddCartsHandlers(s, r)
+	AddShippingHandlers(s, r)
+	AddPaymentHandlers(s, r)
+	RegisterPaymentWebhooks(s, r)
+
+	//INFO: (Brandon) - unused routes
+	r.Post("/checkouts", s.checkoutsHandler)
 }
 
 func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
@@ -497,19 +512,19 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	texts := []models.FooterRowText{
 		{
 			Label: "Home",
-			URL:   "/cchoice/",
+			URL:   URL("/"),
 		},
 		{
 			Label: "About Us",
-			URL:   "/cchoice#about-us",
+			URL:   URL("#about-us"),
 		},
 		{
 			Label: "Services",
-			URL:   "/cchoice#services",
+			URL:   URL("#services"),
 		},
 		{
 			Label: "Partners",
-			URL:   "/cchoice#partners",
+			URL:   URL("#partners"),
 		},
 		{
 			Label: "Call Us",
@@ -525,7 +540,7 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		},
 		{
 			Label: "Store",
-			URL:   "/cchoice#store",
+			URL:   URL("#store"),
 		},
 		{
 			Label: "Facebook",

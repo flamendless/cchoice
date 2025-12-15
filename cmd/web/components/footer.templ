@@ -34,7 +34,7 @@ templ Footer() {
 				id="footer-row1"
 				class="flex flex-row grow"
 				hx-trigger="load once"
-				hx-get="/cchoice/settings/footer-texts"
+				hx-get={ URL("/settings/footer-texts") }
 				hx-select="#footer-row1-texts"
 				hx-target="#footer-row1-texts"
 				hx-swap="outerHTML"
