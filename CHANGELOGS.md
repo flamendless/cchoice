@@ -1,6 +1,20 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Docs
+- Release v1.0.1
+
+
+<a name="release-v1.0.1"></a>
+## [release-v1.0.1] - 2025-12-16
+### Docs
+- Release v1.0.0
+
+### Server
+- Fix searchbar
+- WIP fixing searchbar
+- Send email receipt for prod
+
 
 <a name="release-v1.0.0"></a>
 ## [release-v1.0.0] - 2025-12-15
@@ -484,7 +498,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.0...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.1...HEAD
+[release-v1.0.1]: https://github.com/flamendless/cchoice/compare/release-v1.0.0...release-v1.0.1
 [release-v1.0.0]: https://github.com/flamendless/cchoice/compare/dev-v0.1.0...release-v1.0.0
 [dev-v0.1.0]: https://github.com/flamendless/cchoice/compare/dev-v0.0.9...dev-v0.1.0
 [dev-v0.0.9]: https://github.com/flamendless/cchoice/compare/dev-v0.0.8...dev-v0.0.9
