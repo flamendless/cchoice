@@ -1,6 +1,7 @@
 package server
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"io"
@@ -600,17 +601,20 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	search := r.PostFormValue("search")
+	searchMobile := r.PostFormValue("search-mobile")
+	searchQuery := cmp.Or(search, searchMobile)
+
 	products, err := s.dbRO.GetQueries().GetProductsBySearchQuery(
 		ctx,
 		queries.GetProductsBySearchQueryParams{
-			Name:  search,
+			Name:  searchQuery,
 			Limit: constants.MaxSearchShowResults,
 		},
 	)
 	if err != nil || len(products) == 0 {
 		logs.LogCtx(ctx).Info(
 			logtag,
-			zap.String("query", search),
+			zap.String("query", searchQuery),
 		)
 		return
 	}
@@ -619,7 +623,7 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		logtag,
 		zap.Int("count", len(products)),
 		zap.Int("limit", constants.MaxSearchShowResults),
-		zap.String("query", search),
+		zap.String("query", searchQuery),
 	)
 
 	productResults := make([]models.SearchResultProduct, 0, len(products))
@@ -640,7 +644,7 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if err := components.SearchMore(search).Render(ctx, w); err != nil {
+	if err := components.SearchMore(searchQuery).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
