@@ -1,8 +1,8 @@
 window.onload = function() {
-	const mobile = (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(navigator.userAgent.toLowerCase()));
-	if (mobile) {
-		alert("This site is still in development. Visit this on a computer for better view.");
-	}
+	// const mobile = (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(navigator.userAgent.toLowerCase()));
+	// if (mobile) {
+	// 	alert("This site is still in development. Visit this on a computer for better view.");
+	// }
 };
 
 document.body.addEventListener("htmx:afterRequest", function(evt) {

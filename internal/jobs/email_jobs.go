@@ -238,7 +238,7 @@ func (ejr *EmailJobRunner) sendOrderConfirmationEmail(ctx context.Context, email
 	)
 
 	templateData := mail.TemplateData{
-		"LogoURL":          constants.PathEmailLogo,
+		"LogoURL":          constants.PathEmailLogoCDN,
 		"OrderNumber":      order.OrderNumber,
 		"PaymentReference": order.CheckoutPaymentID,
 		"LineItems":        lineItems,

@@ -53,7 +53,7 @@ var cmdTestMail = &cobra.Command{
 		var err error
 		if flagTestMail.Template != "" {
 			data := mail.TemplateData{
-				"LogoURL":          constants.PathEmailLogo,
+				"LogoURL":          constants.PathEmailLogoCDN,
 				"OrderNumber":      "CC-TEST-123456",
 				"PaymentReference": "CCPM-ABC123DEF456",
 				"LineItems": []map[string]any{
