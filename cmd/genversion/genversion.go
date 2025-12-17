@@ -5,16 +5,43 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 func gitDescribe(pattern string) string {
-	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0", "--match", pattern)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	if err := cmd.Run(); err != nil {
+	revCmd := exec.Command(
+		"git",
+		"rev-list",
+		"--tags",
+		"--max-count=1",
+	)
+	var revOut bytes.Buffer
+	revCmd.Stdout = &revOut
+	if err := revCmd.Run(); err != nil {
 		return ""
 	}
-	return string(bytes.TrimSpace(out.Bytes()))
+
+	rev := strings.TrimSpace(revOut.String())
+	if rev == "" {
+		return ""
+	}
+
+	descCmd := exec.Command(
+		"git",
+		"describe",
+		"--tags",
+		"--abbrev=0",
+		"--match",
+		pattern,
+		rev,
+	)
+
+	var out bytes.Buffer
+	descCmd.Stdout = &out
+	if err := descCmd.Run(); err != nil {
+		return ""
+	}
+	return strings.TrimSpace(out.String())
 }
 
 func main() {
