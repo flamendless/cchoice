@@ -86,7 +86,8 @@ func processImageForSize(imagePath string, size imageSize, webpPath string, webp
 		return fmt.Errorf("failed to write image variant: %w", err)
 	}
 
-	logs.Log().Info("Created image variant",
+	logs.Log().Info(
+		"Created image variant",
 		zap.String("size", folderName),
 		zap.String("input", imagePath),
 		zap.String("output", outputFile),
@@ -161,15 +162,19 @@ var cmdPrepareImageVariants = &cobra.Command{
 			logs.Log().Info("Processing size variant", zap.String("size", folderName))
 
 			for _, imagePath := range imageFiles {
-				logs.Log().Info("Processing image",
+				logs.Log().Info(
+					"Processing image",
 					zap.String("path", imagePath),
-					zap.String("size", folderName))
+					zap.String("size", folderName)
+				)
 
 				if err := processImageForSize(imagePath, size, webpPath, webpExport); err != nil {
-					logs.Log().Error("Failed to process image variant",
+					logs.Log().Error(
+						"Failed to process image variant",
 						zap.Error(err),
 						zap.String("path", imagePath),
-						zap.String("size", folderName))
+						zap.String("size", folderName)
+					)
 					continue
 				}
 			}

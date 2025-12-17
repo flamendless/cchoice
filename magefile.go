@@ -316,7 +316,7 @@ func SetupProd() error {
 	return nil
 }
 
-func GenImages() error {
+func GenBrandLogos() error {
 	if err := run(Command{
 		Type: CmdTmpExec,
 		Cmd:  "genimages",
@@ -326,6 +326,10 @@ func GenImages() error {
 	}); err != nil {
 		return err
 	}
+	return nil
+}
+
+func GenPaymentLogos() error {
 	if err := run(Command{
 		Type: CmdTmpExec,
 		Cmd:  "genimages",
@@ -335,6 +339,12 @@ func GenImages() error {
 	}); err != nil {
 		return err
 	}
+	return nil
+}
+
+func GenImages() error {
+	if err := GenBrandLogos(); err != nil { return err }
+	if err := GenPaymentLogos(); err != nil { return err }
 	if err := run(Command{
 		Type: CmdGoBuild,
 		Out:  filepath.Join(tmpDir, "genimages"),

@@ -55,19 +55,20 @@ func BuildPostHomeContentSections(getBrandLogoURL BrandLogoURLFunc) []PostHomeCo
 			Href:  "services",
 			Others: []PostHomeContent{
 				{
-					Title:       "Delivery",
-					Description: "Expect delivery at soonest",
+					Title:       "Sales",
+					Description: "Quality construction tools and materials, competitively priced and sourced from trusted brands for every project scale",
 				},
 				{
-					Title:       "Here when you need us",
-					Description: "Always available and right around the corner",
+					Title:       "Service",
+					Description: "Reliable soonest delivery, after-sales support, product guidance, and technical assistance to keep your operations running smoothly",
 				},
 				{
-					Title:       "Expect high-quality products",
-					Description: "Authorized and trusted",
+					Title:       "Spare Parts",
+					Description: "Genuine spare parts availability to extend equipment life and minimize downtime on site",
 				},
 			},
 		},
+
 		{
 			Title: "Our Partners",
 			Href:  "partners",
@@ -88,13 +89,6 @@ func BuildPostHomeContentSections(getBrandLogoURL BrandLogoURLFunc) []PostHomeCo
 				},
 				{
 					BrandImage: &BrandImage{
-						Filename: "DELTAPLUS.webp",
-						Alt:      "DeltaPlus image",
-						CDNURL:   getBrandLogoURL("DELTAPLUS.webp"),
-					},
-				},
-				{
-					BrandImage: &BrandImage{
 						Filename: "BOSUN.webp",
 						Alt:      "Bosun image",
 						CDNURL:   getBrandLogoURL("BOSUN.webp"),
@@ -102,9 +96,37 @@ func BuildPostHomeContentSections(getBrandLogoURL BrandLogoURLFunc) []PostHomeCo
 				},
 				{
 					BrandImage: &BrandImage{
-						Filename: "STANLEY.webp",
-						Alt:      "Stanley image",
-						CDNURL:   getBrandLogoURL("STANLEY.webp"),
+						Filename: "NORTON.webp",
+						Alt:      "NORTON image",
+						CDNURL:   getBrandLogoURL("NORTON.webp"),
+					},
+				},
+				{
+					BrandImage: &BrandImage{
+						Filename: "DONGCHENG.webp",
+						Alt:      "DONGCHENG image",
+						CDNURL:   getBrandLogoURL("DONGCHENG.webp"),
+					},
+				},
+				{
+					BrandImage: &BrandImage{
+						Filename: "BERNMANN.webp",
+						Alt:      "BERNMANN image",
+						CDNURL:   getBrandLogoURL("BERNMANN.webp"),
+					},
+				},
+				{
+					BrandImage: &BrandImage{
+						Filename: "YOHINO.webp",
+						Alt:      "YOHINO image",
+						CDNURL:   getBrandLogoURL("YOHINO.webp"),
+					},
+				},
+				{
+					BrandImage: &BrandImage{
+						Filename: "ZEKOKI.webp",
+						Alt:      "ZEKOKI image",
+						CDNURL:   getBrandLogoURL("ZEKOKI.webp"),
 					},
 				},
 			},

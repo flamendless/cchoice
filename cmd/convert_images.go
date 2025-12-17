@@ -120,9 +120,11 @@ var cmdConvertImages = &cobra.Command{
 				return err
 			}
 
-			logs.Log().Info("Successfully converted image",
+			logs.Log().Info(
+				"Successfully converted image",
 				zap.String("input", path),
-				zap.String("output", output))
+				zap.String("output", output)
+			)
 
 			img.Close()
 			return nil

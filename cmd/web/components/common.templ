@@ -55,6 +55,7 @@ templ HeadMeta() {
 	/>
 	<meta name="twitter:card" content="summary"/>
 	<meta charset="UTF-8"/>
+
 	@onceHeadLinks.Once() {
 		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ utils.URL("/static/images/favicons/favicon.ico") }/>
 		<link rel="icon" type="image/png" sizes="114x114" href={ utils.URL("/static/images/favicons/114x114.png") }/>
@@ -67,6 +68,7 @@ templ HeadMeta() {
 		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/htmx.min.js")) }></script>
 		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/hyperscript.min.js")) }></script>
 		@templ.JSONScript("url-prefix", utils.URL(""))
+
 		<script>
 			(function(){
 				if (!globalThis._G) {
