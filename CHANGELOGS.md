@@ -2,10 +2,23 @@
 ## [Unreleased]
 
 
+<a name="release-v1.0.4"></a>
+## [release-v1.0.4] - 2025-12-18
+### Bugfix
+- Use git rev-list to correctly get latest tag
+
+### Server
+- Implement changelogs parsing
+- Allow cloudflare in CSP
+
+### Web
+- Improve changelogs view
+
+
 <a name="release-v1.0.3"></a>
 ## [release-v1.0.3] - 2025-12-17
 ### Docs
-- Release v1.0.1
+- Release v1.0.3
 
 ### Server
 - Allow cloudflare in CSP
@@ -14,7 +27,7 @@
 <a name="release-v1.0.2"></a>
 ## [release-v1.0.2] - 2025-12-17
 ### Docs
-- Release v1.0.1
+- Release v1.0.2
 
 ### Web
 - More responsive fixes and more brand logs
@@ -513,7 +526,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.3...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.4...HEAD
+[release-v1.0.4]: https://github.com/flamendless/cchoice/compare/release-v1.0.3...release-v1.0.4
 [release-v1.0.3]: https://github.com/flamendless/cchoice/compare/release-v1.0.2...release-v1.0.3
 [release-v1.0.2]: https://github.com/flamendless/cchoice/compare/release-v1.0.1...release-v1.0.2
 [release-v1.0.1]: https://github.com/flamendless/cchoice/compare/release-v1.0.0...release-v1.0.1
