@@ -24,6 +24,16 @@ templ BrandsSidePanelList(brands []models.BrandSidePanelText) {
 				</p>
 			</a>
 		}
+
+		<a
+			disabled
+			class="text-xs font-light ml-2 my-0.5 py-0.5"
+		>
+			<p class="text-ellipsis text-nowrap overflow-hidden">
+				More coming soon...
+			</p>
+		</a>
+
 		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/brand_side_panel.js")) }>
 		</script>
 	</div>

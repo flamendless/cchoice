@@ -10,60 +10,98 @@ templ PostHomeContentSections(data models.HomePageData) {
 	>
 		for _, section := range data.Sections {
 			<span class="font-bold text-lg mt-4">{ section.Title }</span>
-			<section id={ section.Href } class="flex flex-col lg:flex-row justify-between my-6 w-full max-w-full pr-4">
-				if section.Href == "store" {
-					@StoreSection(data.StoreImageURL)
-				}
-				for _, content := range section.Others {
-					<div
-						if content.BrandImage == nil {
-							class="w-full lg:w-1/4 border-t-4 border-cchoice_border"
-						} else {
-							class="w-full lg:w-1/4 border-t-4 border-cchoice_border content-center mx-0 lg:mx-8"
-						}
-					>
-						<div class="my-2 text-center font-medium text-base">
-							{ content.Title }
-						</div>
-						<div class="my-2 font-normal text-sm text-wrap">
-							{ content.Description }
-						</div>
-						if content.BrandImage != nil {
-							<img
-								src={ content.BrandImage.CDNURL }
-								hx-trigger="load once"
-								hx-swap="none"
-								class="w-3xs h-auto m-auto mt-8"
-								alt={ content.BrandImage.Alt }
-								loading="lazy"
-								width="256"
-								height="256"
-							/>
-						}
-					</div>
-				}
-			</section>
+
+			if section.Href == "about-us" {
+				@CommonSection(section)
+			} else if section.Href == "store" {
+				@StoreSection(section, data.StoreImageURL)
+			} else if section.Href == "services" {
+				@CommonSection(section)
+			} else if section.Href == "partners" {
+				@PartnerSection(section)
+			}
 		}
 	</div>
 }
 
-templ StoreSection(storeImageURL string) {
-	<div class="flex-col content-center w-full max-w-full">
-		<img
-			src={ storeImageURL }
-			hx-trigger="load once"
-			hx-swap="none"
-			class="w-auto h-[256px] m-4 ml-auto mr-auto"
-			alt="Store location"
-			loading="lazy"
-		/>
-		<div
-			hx-trigger="load once"
-			hx-get={ utils.URL("/settings/store") }
-			hx-swap="textContent"
-			class="my-4 font-normal text-base text-center"
-		>
-			Fetching...
+templ CommonSection(section models.PostHomeContentSection) {
+	<section
+		id={ section.Href }
+		class="flex flex-col lg:flex-row justify-between my-6 w-full max-w-full pr-4"
+	>
+		for _, content := range section.Others {
+			<div
+				class="w-full lg:w-1/4 border-t-4 border-cchoice_border"
+			>
+				<div class="my-2 text-center font-medium text-base">
+					{ content.Title }
+				</div>
+				<div class="my-2 font-normal text-sm text-wrap">
+					{ content.Description }
+				</div>
+			</div>
+		}
+	</section>
+}
+
+templ StoreSection(section models.PostHomeContentSection, storeImageURL string) {
+	<section
+		id={ section.Href }
+		class="flex flex-col lg:flex-row justify-between my-6 w-full max-w-full pr-4"
+	>
+		<div class="flex-col content-center w-full max-w-full">
+			<img
+				src={ storeImageURL }
+				hx-trigger="load once"
+				hx-swap="none"
+				class="w-auto h-[256px] m-4 ml-auto mr-auto"
+				alt="Store location"
+				loading="lazy"
+			/>
+			<div
+				hx-trigger="load once"
+				hx-get={ utils.URL("/settings/store") }
+				hx-swap="textContent"
+				class="my-4 font-normal text-base text-center"
+			>
+				Fetching...
+			</div>
 		</div>
-	</div>
+		for _, content := range section.Others {
+			<div
+				class="w-full lg:w-1/4 border-t-4 border-cchoice_border"
+			>
+				<div class="my-2 text-center font-medium text-base">
+					{ content.Title }
+				</div>
+				<div class="my-2 font-normal text-sm text-wrap">
+					{ content.Description }
+				</div>
+			</div>
+		}
+	</section>
+}
+
+templ PartnerSection(section models.PostHomeContentSection) {
+	<section
+		id={ section.Href }
+		class="flex flex-wrap my-6 w-full max-w-full pr-4 justify-center items-center"
+	>
+		for _, content := range section.Others {
+			<div
+				class="px-2 my-auto basis-1/2 lg:basis-1/6 flex-shrink-0"
+			>
+				<img
+					src={ content.BrandImage.CDNURL }
+					hx-trigger="load once"
+					hx-swap="none"
+					class="w-3xs h-auto m-auto mt-8"
+					alt={ content.BrandImage.Alt }
+					loading="lazy"
+					width="256"
+					height="256"
+				/>
+			</div>
+		}
+	</section>
 }
