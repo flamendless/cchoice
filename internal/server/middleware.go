@@ -12,10 +12,10 @@ func SecurityHeadersMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
 		w.Header().Set("X-Download-Options", "noopen")
 		csp := "default-src 'self'; " +
-			"script-src 'self' 'unsafe-eval' 'unsafe-inline' https://unpkg.com; " +
+			"script-src 'self' 'unsafe-eval' 'unsafe-inline' https://unpkg.com ajax.cloudflare.com static.cloudflareinsights.com; " +
 			"style-src 'self' 'unsafe-inline'; " +
 			"img-src 'self' data: https:; " +
-			"connect-src 'self'; " +
+			"connect-src 'self' cloudflareinsights.com; " +
 			"font-src 'self' data: fonts.googleapis.com fonts.gstatic.com; " +
 			"object-src 'none'; " +
 			"media-src 'self'; " +
