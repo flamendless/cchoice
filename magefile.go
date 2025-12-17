@@ -576,7 +576,16 @@ func GenChlog() error {
 		return nil
 	}
 
-	return run(Command{Type: CmdExec, Cmd: "go", Args: []string{"tool", "git-chglog", "-o", "CHANGELOGS.md"}})
+	return run(Command{
+		Type: CmdExec,
+		Cmd: "go",
+		Args: []string{
+			"tool",
+			"git-chglog",
+			"-o",
+			"CHANGELOGS.md",
+		},
+	})
 }
 
 func SC() error {

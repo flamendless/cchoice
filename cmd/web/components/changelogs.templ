@@ -1,0 +1,70 @@
+package components
+
+import "cchoice/internal/changelogs"
+
+templ ChangeLogs(logs []changelogs.ChangeLog, limit int) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@HeadMeta()
+			@TabTitle("[CHANGELOGS] C-Choice Construction Supplies")
+		</head>
+
+		<div class="flex flex-col justify-center items-center max-w-5xl mx-auto px-4 py-4 space-y-4">
+			<div class="w-[50vw] my-2 py-4 flex flex-col justify-center items-center p-4 border border-cchoice">
+				<h1 class="text-2xl font-semibold tracking-tight text-cchoice">
+					C-Choice Changelogs
+				</h1>
+				<h2>
+					<a
+						href="https://github.com/flamendless"
+						class="
+							px-2 bg-cchoice font-medium rounded-lg text-white cursor-pointer
+							transition-colors rounded-full hover:bg-cchoicesoft
+						"
+					>
+						Made by @flamendless
+					</a>
+					<br>
+					Displaying up to { limit } sections
+				</h2>
+			</div>
+			<hr>
+
+			for _, log := range logs {
+				<section id={ log.Anchor } class="w-[50vw] border border-cchoice rounded-xl">
+					<header class="px-5 py-4 bg-cchoice rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+						<div class="flex items-center gap-3">
+							<span class="text-lg font-bold">
+								{ log.Version }
+							</span>
+							if log.Date != "" {
+								<span class="text-lg font-bold">
+									({ log.Date })
+								</span>
+							}
+						</div>
+					</header>
+
+					<div class="px-5 py-4 space-y-6">
+						for _, section := range log.Sections {
+							<div>
+								<div class="flex items-center gap-2 mb-2">
+									<span class="inline-flex items-center rounded-md bg-cchoice px-2 py-0.5 text-xs font-medium text-slate-700">
+										{ section.Title }
+									</span>
+								</div>
+
+								<ul class="list-disc pl-5 space-y-1 text-sm text-gray-800">
+									for _, item := range section.Items {
+										<li>{ item.Text }</li>
+									}
+								</ul>
+							</div>
+						}
+					</div>
+				</section>
+			}
+		</div>
+	</html>
+}
