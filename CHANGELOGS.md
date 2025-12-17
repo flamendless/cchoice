@@ -1,8 +1,14 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="release-v1.0.2"></a>
+## [release-v1.0.2] - 2025-12-17
 ### Docs
 - Release v1.0.1
+
+### Web
+- More responsive fixes and more brand logs
 
 
 <a name="release-v1.0.1"></a>
@@ -498,7 +504,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.1...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.2...HEAD
+[release-v1.0.2]: https://github.com/flamendless/cchoice/compare/release-v1.0.1...release-v1.0.2
 [release-v1.0.1]: https://github.com/flamendless/cchoice/compare/release-v1.0.0...release-v1.0.1
 [release-v1.0.0]: https://github.com/flamendless/cchoice/compare/dev-v0.1.0...release-v1.0.0
 [dev-v0.1.0]: https://github.com/flamendless/cchoice/compare/dev-v0.0.9...dev-v0.1.0

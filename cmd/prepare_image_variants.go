@@ -165,7 +165,7 @@ var cmdPrepareImageVariants = &cobra.Command{
 				logs.Log().Info(
 					"Processing image",
 					zap.String("path", imagePath),
-					zap.String("size", folderName)
+					zap.String("size", folderName),
 				)
 
 				if err := processImageForSize(imagePath, size, webpPath, webpExport); err != nil {
@@ -173,7 +173,7 @@ var cmdPrepareImageVariants = &cobra.Command{
 						"Failed to process image variant",
 						zap.Error(err),
 						zap.String("path", imagePath),
-						zap.String("size", folderName)
+						zap.String("size", folderName),
 					)
 					continue
 				}
