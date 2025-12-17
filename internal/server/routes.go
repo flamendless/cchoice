@@ -4,9 +4,7 @@ import (
 	"cmp"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -365,36 +363,43 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Changelogs Handler]"
-	ctx := r.Context()
+	const limit = 8
 
-	f, err := os.Open("./CHANGELOGS.md")
+	queryAppEnv := r.URL.Query().Get("appenv")
+	if queryAppEnv == "" {
+		queryAppEnv = conf.Conf().AppEnv
+	}
+
+	ctx := r.Context()
+	cacheKey := []byte("changelogs:" + queryAppEnv)
+	logsData, err := requests.GetChangeLogs(
+		ctx,
+		s.cache,
+		&s.SF,
+		cacheKey,
+		queryAppEnv,
+		limit,
+	)
 	if err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
+			zap.String("query", queryAppEnv),
+			zap.Int("limit", limit),
 			zap.Error(err),
 		)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "failed to load changelogs", http.StatusInternalServerError)
 		return
 	}
-	defer func() {
-		if err := f.Close(); err != nil {
-			logs.LogCtx(ctx).Error(
-				logtag,
-				zap.Error(err),
-			)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}()
 
-	w.Header().Set("Content-Type", "text/plain")
-	if _, err := io.Copy(w, f); err != nil {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := components.ChangeLogs(logsData, limit).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
+			zap.String("query", queryAppEnv),
+			zap.Int("limit", limit),
 			zap.Error(err),
 		)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		http.Error(w, "render error", http.StatusInternalServerError)
 	}
 }
 
