@@ -6,7 +6,7 @@ import "cchoice/internal/utils"
 templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 	<div
 		id="categories-side-panel-list"
-		class="flex flex-col overflow-y-auto scrollbar-hide max-h-96"
+		class="flex flex-col scrollbar-hide max-h-96"
 	>
 		for i, category := range categories {
 			<a
@@ -35,7 +35,7 @@ templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 templ CategoriesSidePanel() {
 	<div
 		id="categories-side-panel"
-		class="w-full flex flex-col"
+		class="w-full h-screen flex flex-col"
 	>
 		<div
 			class="flex items-center justify-between cursor-pointer p-2"

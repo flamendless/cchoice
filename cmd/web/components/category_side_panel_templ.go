@@ -32,7 +32,7 @@ func CategoriesSidePanelList(categories []models.CategorySidePanelText) templ.Co
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"categories-side-panel-list\" class=\"flex flex-col overflow-y-auto scrollbar-hide max-h-96\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"categories-side-panel-list\" class=\"flex flex-col scrollbar-hide max-h-96\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -142,7 +142,7 @@ func CategoriesSidePanel() templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div id=\"categories-side-panel\" class=\"w-full flex flex-col\"><div class=\"flex items-center justify-between cursor-pointer p-2\" _=\"on click\n\t\t\t\ttoggle .hidden on #categories-side-panel-content\n\t\t\t\tif #categories-side-panel-content matches .hidden\n\t\t\t\t\tset #categories-chevron's *transform to 'rotate(0deg)'\n\t\t\t\t\tset #categories-side-panel-content@data-collapsed to 'true'\n\t\t\t\telse\n\t\t\t\t\tset #categories-chevron's *transform to 'rotate(180deg)'\n\t\t\t\t\tset #categories-side-panel-content@data-collapsed to 'false'\n\t\t\t\tend\n\t\t\t\"><p class=\"text-xs font-normal text-nowrap\">Categories</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div id=\"categories-side-panel\" class=\"w-full h-screen flex flex-col\"><div class=\"flex items-center justify-between cursor-pointer p-2\" _=\"on click\n\t\t\t\ttoggle .hidden on #categories-side-panel-content\n\t\t\t\tif #categories-side-panel-content matches .hidden\n\t\t\t\t\tset #categories-chevron's *transform to 'rotate(0deg)'\n\t\t\t\t\tset #categories-side-panel-content@data-collapsed to 'true'\n\t\t\t\telse\n\t\t\t\t\tset #categories-chevron's *transform to 'rotate(180deg)'\n\t\t\t\t\tset #categories-side-panel-content@data-collapsed to 'false'\n\t\t\t\tend\n\t\t\t\"><p class=\"text-xs font-normal text-nowrap\">Categories</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
