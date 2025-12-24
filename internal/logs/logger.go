@@ -34,7 +34,7 @@ func InitLog() {
 	case cfg.IsProd():
 		config = zap.NewProductionConfig()
 	default:
-		panic(fmt.Errorf("%w. APP_ENV", errs.ErrEnvVarRequired))
+		panic(fmt.Errorf("%w. APP_ENV. Got '%s'", errs.ErrEnvVarRequired, cfg.AppEnv))
 	}
 
 	config.OutputPaths = []string{

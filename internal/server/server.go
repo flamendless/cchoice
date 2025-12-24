@@ -101,7 +101,7 @@ func NewServer() *ServerInstance {
 	var geocoder geocoding.IGeocoder
 
 	if cfg.IsWeb() {
-		productImageFS = localstorage.New()
+		objStorage, productImageFS = mustInitStorageProvider()
 		logs.Log().Info("Web mode: skipping payment, shipping, geocoding, mail services")
 	} else {
 		objStorage, productImageFS = mustInitStorageProvider()

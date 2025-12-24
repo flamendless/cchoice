@@ -2,9 +2,12 @@ root = "."
 testdata_dir = "testdata"
 tmp_dir = "tmp"
 
+[env]
+  APP_ENV = "web"
+
 [build]
-  args_bin = []
-  bin = "./tmp/web"
+  args_bin = [""]
+  bin = ""
   cmd = "mage genall && mage buildweb"
   delay = 100
   exclude_dir = ["cmd/web/static/images/", "cmd/web/static/thumbnails/", "cmd/web/static/svg/", "internal/"]
@@ -12,7 +15,7 @@ tmp_dir = "tmp"
   exclude_regex = [".*_templ.go", ".*.sql.go"]
   exclude_unchanged = false
   follow_symlink = false
-  full_bin = ""
+  full_bin = "APP_ENV='web' ./tmp/web"
   include_dir = ["cmd/web"]
   include_ext = ["templ", "html", "css"]
   include_file = []
