@@ -17,6 +17,7 @@ import (
 	"golang.org/x/sync/singleflight"
 
 	"cchoice/internal/conf"
+	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/encode"
 	"cchoice/internal/encode/sqids"
@@ -25,13 +26,12 @@ import (
 	"cchoice/internal/logs"
 	"cchoice/internal/mail"
 	"cchoice/internal/payments"
+	"cchoice/internal/requests"
 	"cchoice/internal/shipping"
 	"cchoice/internal/storage"
 	localstorage "cchoice/internal/storage/local"
 	"cchoice/internal/utils"
 )
-
-const CACHE_MAX_BYTES int = 100 * 1024 * 1024 // 100MB cache for better cost efficiency
 
 type Server struct {
 	dbRO            database.Service
@@ -120,7 +120,7 @@ func NewServer() *ServerInstance {
 		dbRW:            dbRW,
 		staticFS:        localstorage.New(),
 		productImageFS:  productImageFS,
-		cache:           fastcache.New(CACHE_MAX_BYTES),
+		cache:           fastcache.New(constants.CACHE_MAX_BYTES),
 		sessionManager:  sessionManager,
 		paymentGateway:  paymentGateway,
 		shippingService: shippingService,
@@ -132,6 +132,28 @@ func NewServer() *ServerInstance {
 		useHTTP2:        cfg.Server.UseHTTP2,
 		useSSL:          cfg.Server.UseSSL,
 	}
+
+	ctx := context.Background()
+	settings, err := requests.GetSettingsData(
+		ctx,
+		newServer.cache,
+		&newServer.SF,
+		newServer.dbRO,
+		[]byte("server_settings"),
+		[]string{
+			"mobile_no",
+			"email",
+			"address",
+			"url_gmap",
+			"url_facebook",
+			"url_tiktok",
+		},
+	)
+	if err != nil {
+		logs.LogCtx(ctx).Error("[New Server] failed to get settings", zap.Error(err))
+		return nil
+	}
+	cfg.SetSettings(settings)
 
 	var addr string
 	switch cfg.AppEnv {
@@ -182,7 +204,7 @@ func NewServer() *ServerInstance {
 		zap.String("Address", addr),
 		zap.String("AppEnv", cfg.AppEnv),
 		zap.Bool("Use caching", newServer.cache != nil),
-		zap.Int("Caching max bytes", CACHE_MAX_BYTES),
+		zap.Int("Caching max bytes", constants.CACHE_MAX_BYTES),
 		zap.Bool("Use session manager", newServer.sessionManager != nil),
 		zap.Duration("Session manager lifetime", newServer.sessionManager.Lifetime),
 		zap.Bool("SSL", newServer.useSSL),
