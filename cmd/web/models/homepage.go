@@ -1,9 +1,10 @@
 package models
 
 type BrandImage struct {
-	Filename string
-	Alt      string
-	CDNURL   string
+	Filename     string
+	Alt          string
+	CDNURL       string
+	IsComingSoon bool
 }
 
 type PostHomeContent struct {
@@ -82,51 +83,74 @@ func BuildPostHomeContentSections(getBrandLogoURL BrandLogoURLFunc) []PostHomeCo
 				},
 				{
 					BrandImage: &BrandImage{
-						Filename: "TAILIN.webp",
-						Alt:      "Tailin image",
-						CDNURL:   getBrandLogoURL("TAILIN.webp"),
+						Filename:     "TAILIN.webp",
+						Alt:          "Tailin image",
+						CDNURL:       getBrandLogoURL("TAILIN.webp"),
+						IsComingSoon: true,
 					},
 				},
 				{
 					BrandImage: &BrandImage{
-						Filename: "BOSUN.webp",
-						Alt:      "Bosun image",
-						CDNURL:   getBrandLogoURL("BOSUN.webp"),
+						Filename:     "BOSUN.webp",
+						Alt:          "Bosun image",
+						CDNURL:       getBrandLogoURL("BOSUN.webp"),
+						IsComingSoon: true,
 					},
 				},
 				{
 					BrandImage: &BrandImage{
-						Filename: "NORTON.webp",
-						Alt:      "NORTON image",
-						CDNURL:   getBrandLogoURL("NORTON.webp"),
+						Filename:     "NORTON.webp",
+						Alt:          "NORTON image",
+						CDNURL:       getBrandLogoURL("NORTON.webp"),
+						IsComingSoon: true,
 					},
 				},
 				{
 					BrandImage: &BrandImage{
-						Filename: "DONGCHENG.webp",
-						Alt:      "DONGCHENG image",
-						CDNURL:   getBrandLogoURL("DONGCHENG.webp"),
+						Filename:     "DONGCHENG.webp",
+						Alt:          "DONGCHENG image",
+						CDNURL:       getBrandLogoURL("DONGCHENG.webp"),
+						IsComingSoon: true,
 					},
 				},
 				{
 					BrandImage: &BrandImage{
-						Filename: "BERNMANN.webp",
-						Alt:      "BERNMANN image",
-						CDNURL:   getBrandLogoURL("BERNMANN.webp"),
+						Filename:     "BERNMANN.webp",
+						Alt:          "BERNMANN image",
+						CDNURL:       getBrandLogoURL("BERNMANN.webp"),
+						IsComingSoon: true,
 					},
 				},
 				{
 					BrandImage: &BrandImage{
-						Filename: "YOHINO.webp",
-						Alt:      "YOHINO image",
-						CDNURL:   getBrandLogoURL("YOHINO.webp"),
+						Filename:     "YOHINO.webp",
+						Alt:          "YOHINO image",
+						CDNURL:       getBrandLogoURL("YOHINO.webp"),
+						IsComingSoon: true,
 					},
 				},
 				{
 					BrandImage: &BrandImage{
-						Filename: "ZEKOKI.webp",
-						Alt:      "ZEKOKI image",
-						CDNURL:   getBrandLogoURL("ZEKOKI.webp"),
+						Filename:     "ZEKOKI.webp",
+						Alt:          "ZEKOKI image",
+						CDNURL:       getBrandLogoURL("ZEKOKI.webp"),
+						IsComingSoon: true,
+					},
+				},
+				{
+					BrandImage: &BrandImage{
+						Filename:     "POWERCRAFT.webp",
+						Alt:          "POWERCRAFT image",
+						CDNURL:       getBrandLogoURL("POWERCRAFT.webp"),
+						IsComingSoon: true,
+					},
+				},
+				{
+					BrandImage: &BrandImage{
+						Filename:     "TATARA.webp",
+						Alt:          "TATARA image",
+						CDNURL:       getBrandLogoURL("TATARA.webp"),
+						IsComingSoon: true,
 					},
 				},
 			},
