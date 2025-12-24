@@ -1,14 +1,20 @@
 package cmd
 
 import (
+	"cchoice/internal/conf"
 	"cchoice/internal/constants"
+	"cchoice/internal/database"
 	"cchoice/internal/mail"
 	"cchoice/internal/mail/maileroo"
+	"cchoice/internal/requests"
+	"context"
 	"fmt"
 
+	"github.com/VictoriaMetrics/fastcache"
 	"github.com/gookit/goutil/dump"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/spf13/cobra"
+	"golang.org/x/sync/singleflight"
 )
 
 type testMailFlags struct {
@@ -50,8 +56,31 @@ var cmdTestMail = &cobra.Command{
 
 		dump.Println(flagTestMail)
 
-		var err error
+		var errSendMail error
 		if flagTestMail.Template != "" {
+			ctx := context.Background()
+			dbRO := database.New(database.DB_MODE_RO)
+			settings, err := requests.GetSettingsData(
+				ctx,
+				fastcache.New(constants.CACHE_MAX_BYTES),
+				&singleflight.Group{},
+				dbRO,
+				[]byte("test_mail_settings"),
+				[]string{
+					"mobile_no",
+					"email",
+					"address",
+					"url_gmap",
+					"url_facebook",
+					"url_tiktok",
+				},
+			)
+			if err != nil {
+				panic(err)
+			}
+			cfg := conf.Conf()
+			cfg.SetSettings(settings)
+
 			data := mail.TemplateData{
 				"LogoURL":          constants.PathEmailLogoCDN,
 				"OrderNumber":      "CC-TEST-123456",
@@ -65,14 +94,17 @@ var cmdTestMail = &cobra.Command{
 				"Total":           "₱2,650.00",
 				"ShippingAddress": "123 Test Street, Barangay Test, Test City, Metro Manila 1234",
 				"DeliveryETA":     "3-5 business days",
+				"MobileNo":        cfg.Settings.MobileNo,
+				"EMail":           cfg.Settings.EMail,
 			}
-			err = ms.SendTemplateEmail(flagTestMail.To, flagTestMail.CC, flagTestMail.Subject, flagTestMail.Template, data)
+			dump.Println(data)
+			errSendMail = ms.SendTemplateEmail(flagTestMail.To, flagTestMail.CC, flagTestMail.Subject, flagTestMail.Template, data)
 		} else {
-			err = ms.SendEmail(flagTestMail.To, flagTestMail.CC, flagTestMail.Subject, flagTestMail.Body)
+			errSendMail = ms.SendEmail(flagTestMail.To, flagTestMail.CC, flagTestMail.Subject, flagTestMail.Body)
 		}
 
-		if err != nil {
-			panic(err)
+		if errSendMail != nil {
+			panic(errSendMail)
 		}
 
 		fmt.Println("Email sent successfully!")

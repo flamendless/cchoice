@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"cchoice/internal/conf"
+	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
@@ -165,6 +166,8 @@ func OnOrderPaid(ctx context.Context, params OnOrderPaidParams) (*OnOrderPaidRes
 			TemplateName:      enums.EMAIL_TEMPLATE_ORDER_CONFIRMATION,
 			OrderID:           &updatedOrder.ID,
 			CheckoutPaymentID: &updatedOrder.CheckoutPaymentID,
+			MobileNo:          constants.ViberURIPrefix + cfg.Settings.MobileNo,
+			EMail:             cfg.Settings.EMail,
 		}); err != nil {
 			logs.LogCtx(ctx).Error(
 				logtag,
