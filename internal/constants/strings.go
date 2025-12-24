@@ -5,4 +5,5 @@ const (
 	CacheStore           = "cache store"
 	Singleflight         = "singleflight"
 	Gob                  = "gob"
+	ViberURIPrefix       = "viber://chat?number="
 )

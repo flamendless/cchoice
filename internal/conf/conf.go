@@ -36,6 +36,16 @@ type appConfig struct {
 	CloudflareImages   CloudflareImagesConfig
 	MailService        string `env:"MAIL_SERVICE"`
 	MailerooConfig     MailerooConfig
+	Settings           Settings
+}
+
+type Settings struct {
+	MobileNo    string
+	EMail       string
+	Address     string
+	URLGMap     string
+	URLFacebook string
+	URLTikTok   string
 }
 
 type MailerooConfig struct {
@@ -166,6 +176,15 @@ func Conf() *appConfig {
 		panic("Conf should have been initialized at this point")
 	}
 	return appCfg
+}
+
+func (c *appConfig) SetSettings(settings map[string]string) {
+	c.Settings.MobileNo = settings["mobile_no"]
+	c.Settings.EMail = settings["email"]
+	c.Settings.Address = settings["address"]
+	c.Settings.URLGMap = settings["url_gmap"]
+	c.Settings.URLFacebook = settings["url_facebook"]
+	c.Settings.URLTikTok = settings["url_tiktok"]
 }
 
 func (c *appConfig) IsLocal() bool {

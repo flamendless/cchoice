@@ -437,33 +437,16 @@ func (s *Server) versionHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Header Texts Handler]"
-	ctx := r.Context()
-
-	settings, err := requests.GetSettingsData(
-		ctx,
-		s.cache,
-		&s.SF,
-		s.dbRO,
-		[]byte("key_header_texts"),
-		[]string{"email", "mobile_no"},
-	)
-	if err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Error(err),
-		)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	cfg := conf.Conf()
 
 	texts := []models.HeaderRowText{
 		{
 			Label: "Call Us",
-			URL:   "viber://chat?number=" + settings["mobile_no"],
+			URL:   constants.ViberURIPrefix + cfg.Settings.MobileNo,
 		},
 		{
 			Label: "E-Mail Us",
-			URL:   "mailto:" + settings["email"],
+			URL:   "mailto:" + cfg.Settings.EMail,
 		},
 		{
 			Label: "Log In",
@@ -471,6 +454,7 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
+	ctx := r.Context()
 	if err := components.HeaderRow1Texts(texts).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -483,31 +467,7 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Footer Texts Handler]"
-	ctx := r.Context()
-
-	settings, err := requests.GetSettingsData(
-		ctx,
-		s.cache,
-		&s.SF,
-		s.dbRO,
-		[]byte("key_footer_texts"),
-		[]string{
-			"mobile_no",
-			"email",
-			"address",
-			"url_gmap",
-			"url_facebook",
-			"url_tiktok",
-		},
-	)
-	if err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Error(err),
-		)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	cfg := conf.Conf()
 
 	texts := []models.FooterRowText{
 		{
@@ -530,15 +490,15 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		},
 		{
 			Label: "Call Us",
-			URL:   "viber://chat?number=" + settings["mobile_no"],
+			URL:   constants.ViberURIPrefix + cfg.Settings.MobileNo,
 		},
 		{
 			Label: "E-Mail Us",
-			URL:   "mailto:" + settings["email"],
+			URL:   "mailto:" + cfg.Settings.EMail,
 		},
 		{
 			Label: "Location",
-			URL:   settings["url_gmap"],
+			URL:   cfg.Settings.URLGMap,
 		},
 		{
 			Label:    "Store",
@@ -547,16 +507,17 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		},
 		{
 			Label:    "Facebook",
-			URL:      settings["url_facebook"],
+			URL:      cfg.Settings.URLFacebook,
 			Hideable: true,
 		},
 		{
 			Label:    "TikTok",
-			URL:      settings["url_tiktok"],
+			URL:      cfg.Settings.URLTikTok,
 			Hideable: true,
 		},
 	}
 
+	ctx := r.Context()
 	if err := components.FooterRow1Texts(texts).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -569,26 +530,13 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) storeHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Store Handler]"
-	ctx := r.Context()
-	settings, err := requests.GetSettingsData(
-		ctx,
-		s.cache,
-		&s.SF,
-		s.dbRO,
-		[]byte("key_store"),
-		[]string{"address"},
-	)
-	if err != nil {
-		logs.LogCtx(ctx).Error(
+	cfg := conf.Conf()
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	if _, err := w.Write([]byte(cfg.Settings.Address)); err != nil {
+		logs.LogCtx(r.Context()).Error(
 			logtag,
 			zap.Error(err),
 		)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if addr, ok := settings["address"]; ok {
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		_, _ = w.Write([]byte(addr))
 	}
 }
 
