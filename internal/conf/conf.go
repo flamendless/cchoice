@@ -188,7 +188,7 @@ func (c *appConfig) SetSettings(settings map[string]string) {
 }
 
 func (c *appConfig) IsLocal() bool {
-	return c.AppEnv == "local"
+	return c.AppEnv == "local" || c.AppEnv == "web"
 }
 
 func (c *appConfig) IsProd() bool {

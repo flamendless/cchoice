@@ -193,7 +193,10 @@ func BuildWeb() error {
 	})
 }
 
-func serve(airpath string) error {
+func serve(
+	airpath string,
+	app string,
+) error {
 	if err := GenAll(); err != nil {
 		return err
 	}
@@ -205,19 +208,19 @@ func serve(airpath string) error {
 		return err
 	}
 
-	airCmd := exec.Command("go", "tool", "air", "-c", airpath, "api")
+	airCmd := exec.Command("go", "tool", "air", "-c", airpath, app)
 	airCmd.Stdout = os.Stdout
 	airCmd.Stderr = os.Stderr
 	return airCmd.Run()
 }
 
 func Serve() error {
-	return serve(".air.api.toml")
+	return serve(".air.api.toml", "api")
 }
 
 
 func ServeWeb() error {
-	return serve(".air.web.toml")
+	return serve(".air.web.toml", "web")
 }
 
 func BuildGoose() error {
