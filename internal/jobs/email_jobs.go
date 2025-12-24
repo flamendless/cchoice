@@ -40,6 +40,8 @@ type EmailJobParams struct {
 	TemplateName      enums.EmailTemplateName
 	OrderID           *int64
 	CheckoutPaymentID *string
+	MobileNo          string
+	EMail             string
 }
 
 type EmailJobRunner struct {
@@ -201,7 +203,13 @@ func (ejr *EmailJobRunner) handleSendEmail(ctx context.Context, m []byte) error 
 	}
 }
 
-func (ejr *EmailJobRunner) sendOrderConfirmationEmail(ctx context.Context, emailJob queries.TblEmailJob, recipient string, cc []string, subject string) error {
+func (ejr *EmailJobRunner) sendOrderConfirmationEmail(
+	ctx context.Context,
+	emailJob queries.TblEmailJob,
+	recipient string,
+	cc []string,
+	subject string,
+) error {
 	const logtag = "[EmailJobRunner sendOrderConfirmationEmail]"
 
 	if !emailJob.OrderID.Valid {
@@ -237,6 +245,9 @@ func (ejr *EmailJobRunner) sendOrderConfirmationEmail(ctx context.Context, email
 		order.ShippingPostalCode,
 	)
 
+	cfg := conf.Conf()
+	mobileNo := constants.ViberURIPrefix + cfg.Settings.MobileNo
+	email := cfg.Settings.EMail
 	templateData := mail.TemplateData{
 		"LogoURL":          constants.PathEmailLogoCDN,
 		"OrderNumber":      order.OrderNumber,
@@ -247,6 +258,8 @@ func (ejr *EmailJobRunner) sendOrderConfirmationEmail(ctx context.Context, email
 		"Total":            utils.NewMoney(order.TotalAmount, order.Currency).Display(),
 		"ShippingAddress":  shippingAddress,
 		"DeliveryETA":      order.ShippingEta.String,
+		"MobileNo":         mobileNo,
+		"EMail":            email,
 	}
 
 	if err := ejr.mailService.SendTemplateEmail(recipient, cc, subject, enums.EMAIL_TEMPLATE_ORDER_CONFIRMATION.FileName(), templateData); err != nil {
@@ -260,6 +273,7 @@ func (ejr *EmailJobRunner) sendOrderConfirmationEmail(ctx context.Context, email
 		zap.String("order_number", order.OrderNumber),
 		zap.String("recipient", recipient),
 		zap.Strings("cc", cc),
+		zap.String("mobile_no", mobileNo),
 	)
 
 	return nil
