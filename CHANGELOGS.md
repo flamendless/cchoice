@@ -2,10 +2,42 @@
 ## [Unreleased]
 
 
+<a name="dev-v0.1.1"></a>
+## [dev-v0.1.1] - 2025-12-25
+### Bugfix
+- Use git rev-list to correctly get latest tag
+
+### Docs
+- Release v1.0.4
+- Release v1.0.3
+- Release v1.0.2
+- Release v1.0.2
+
+### Script
+- Fix serveweb
+
+### Server
+- Orders routes
+- Refactor how settings are used
+- Implement changelogs parsing
+- Allow cloudflare in CSP
+
+### Web
+- Order tracker page
+- Add tatara and powercraft + coming soon ribbon in brand logos
+- Add mobile number and email in order confirmation template
+- Improve changelogs view
+- More responsive fixes and more brand logos
+
+
 <a name="release-v1.0.4"></a>
 ## [release-v1.0.4] - 2025-12-18
 ### Bugfix
 - Use git rev-list to correctly get latest tag
+
+### Docs
+- Release v1.0.3
+- Release v1.0.2
 
 ### Server
 - Implement changelogs parsing
@@ -18,7 +50,7 @@
 <a name="release-v1.0.3"></a>
 ## [release-v1.0.3] - 2025-12-17
 ### Docs
-- Release v1.0.3
+- Release v1.0.1
 
 ### Server
 - Allow cloudflare in CSP
@@ -27,7 +59,7 @@
 <a name="release-v1.0.2"></a>
 ## [release-v1.0.2] - 2025-12-17
 ### Docs
-- Release v1.0.2
+- Release v1.0.1
 
 ### Web
 - More responsive fixes and more brand logs
@@ -526,7 +558,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.4...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.1.1...HEAD
+[dev-v0.1.1]: https://github.com/flamendless/cchoice/compare/release-v1.0.4...dev-v0.1.1
 [release-v1.0.4]: https://github.com/flamendless/cchoice/compare/release-v1.0.3...release-v1.0.4
 [release-v1.0.3]: https://github.com/flamendless/cchoice/compare/release-v1.0.2...release-v1.0.3
 [release-v1.0.2]: https://github.com/flamendless/cchoice/compare/release-v1.0.1...release-v1.0.2
