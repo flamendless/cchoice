@@ -5,6 +5,8 @@ import "cchoice/internal/utils"
 
 var logoStyleOnce = templ.NewOnceHandle()
 
+const clsHeaderIconButton = "w-full stroke-cchoice group-hover:stroke-white"
+
 templ LogoWithText() {
 	@logoStyleOnce.Once() {
 		<style>
@@ -44,25 +46,6 @@ templ CartCount(n int) {
 	>
 		{ n }
 	</span>
-}
-
-templ Cart() {
-	<div class="m-2 flex flex-col place-conter-center">
-		<button
-			alt="cart logo"
-			aria-label="Cart"
-			title="Cart"
-			class="
-				relative inline-block
-				group p-2 stroke-cchoice rounded-full
-				cursor-pointer hover:bg-cchoice_border
-			"
-			_={ "on click go to url '" + utils.URL("/carts") + "'" }
-		>
-			@svgCart("stroke-cchoice group-hover:stroke-white")
-			@CartCount(0)
-		</button>
-	</div>
 }
 
 templ HeaderRow1Texts(texts []models.HeaderRowText) {
@@ -109,8 +92,18 @@ templ HeaderDesktop() {
 		>
 			@SearchBarDesktop()
 		</div>
-		<div class="px-8 py-2">
-			@Cart()
+		<div class="flex flex-row px-8 py-2">
+			@IconActionButton(
+				"Cart",
+				"/carts",
+				svgCart(clsHeaderIconButton),
+				CartCount(0),
+			)
+			@IconActionButton(
+				"Track Order",
+				"/orders/track",
+				svgTrackOrder(clsHeaderIconButton),
+			)
 		</div>
 	</div>
 }
@@ -141,7 +134,17 @@ templ HeaderMobile() {
 			@SearchBarMobile()
 		</div>
 		<div class="flex-shrink-0">
-			@Cart()
+			@IconActionButton(
+				"Cart",
+				"/carts",
+				svgCart(clsHeaderIconButton),
+				CartCount(0),
+			)
+			@IconActionButton(
+				"Track Order",
+				"/orders/track",
+				svgTrackOrder(clsHeaderIconButton),
+			)
 		</div>
 		<button
 			id="btn-hamburger"

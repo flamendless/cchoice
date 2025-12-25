@@ -97,3 +97,44 @@ templ HeadMeta() {
 		</script>
 	}
 }
+
+templ IconActionButton(
+	label string,
+	href string,
+	children ...templ.Component,
+) {
+	<div class="m-2 flex flex-col place-center">
+		<button
+			aria-label={ label }
+			title={ label }
+			class="
+				relative inline-block
+				group p-2 stroke-cchoice rounded-full
+				cursor-pointer hover:bg-cchoice_border
+				text-nowrap items-center flex flex-col text-xs text-cchoice
+				hover:text-white
+			"
+			_={ "on click go to url '" + utils.URL(href) + "'" }
+		>
+			for _, child := range children {
+				@child
+			}
+			<span>{ label }</span>
+		</button>
+	</div>
+}
+
+templ ContinueShopping() {
+	<a
+		href={ templ.SafeURL(utils.URL("/")) }
+		class="
+			flex justify-center items-center relative inline-block px-6 py-3
+			bg-cchoice font-medium rounded-lg text-white cursor-pointer
+			transition-colors rounded-full hover:bg-cchoicesoft
+		"
+		title="Continue shopping"
+		alt="Continue shopping button"
+	>
+		Continue Shopping
+	</a>
+}
