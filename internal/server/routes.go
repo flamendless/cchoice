@@ -543,14 +543,12 @@ func (s *Server) storeHandler(w http.ResponseWriter, r *http.Request) {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}
 
-	gmapsURL := cfg.Settings.URLGMap
-	if err := components.GMapsLink(gmapsURL).Render(ctx, w); err != nil {
+	if err := components.GMapsAndWaze(
+		cfg.Settings.URLGMap,
+		cfg.Settings.URLWaze,
+	).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}
-
-	// if _, err := components.WazeLink(wazeURL).Render(ctx, w); err != nil {
-	// 	logs.LogCtx(r.Context()).Error(logtag, zap.Error(err))
-	// }
 }
 
 func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {

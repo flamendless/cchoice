@@ -166,3 +166,29 @@ templ GMapsLink(url string) {
 	</a>
 }
 
+templ WazeLink(url string) {
+	<a
+		href={url}
+		target="_blank"
+		rel="noopener noreferrer"
+		aria-label="Open in Waze"
+		title="Open in Waze"
+		class="
+			inline-flex items-center gap-2
+			p-2 rounded-md
+			text-sky-600 hover:text-sky-700
+			hover:bg-sky-50
+			transition
+		"
+	>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			fill="currentColor"
+			class="w-6 h-6"
+		>
+			<path d="M12 2C6.48 2 2 6.03 2 11c0 3.04 1.74 5.73 4.4 7.4L6 22l4.07-2.03c.63.1 1.27.15 1.93.15 5.52 0 10-4.03 10-9s-4.48-9-10-9zm-3 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+		</svg>
+		<span class="text-sm font-medium">Waze</span>
+	</a>
+}

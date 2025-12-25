@@ -43,6 +43,13 @@ templ CommonSection(section models.PostHomeContentSection) {
 	</section>
 }
 
+templ GMapsAndWaze(gmaps string, waze string) {
+	<div class="flex flex-row items-center">
+		@GMapsLink(gmaps)
+		@WazeLink(waze)
+	</div>
+}
+
 templ StoreSection(section models.PostHomeContentSection, storeImageURL string) {
 	<section
 		id={ section.Href }
