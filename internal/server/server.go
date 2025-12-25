@@ -145,6 +145,7 @@ func NewServer() *ServerInstance {
 			"email",
 			"address",
 			"url_gmap",
+			"url_waze",
 			"url_facebook",
 			"url_tiktok",
 		},

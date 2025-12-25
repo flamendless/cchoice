@@ -44,6 +44,7 @@ type Settings struct {
 	EMail       string
 	Address     string
 	URLGMap     string
+	URLWaze     string
 	URLFacebook string
 	URLTikTok   string
 }
@@ -183,6 +184,7 @@ func (c *appConfig) SetSettings(settings map[string]string) {
 	c.Settings.EMail = settings["email"]
 	c.Settings.Address = settings["address"]
 	c.Settings.URLGMap = settings["url_gmap"]
+	c.Settings.URLWaze = settings["url_waze"]
 	c.Settings.URLFacebook = settings["url_facebook"]
 	c.Settings.URLTikTok = settings["url_tiktok"]
 }

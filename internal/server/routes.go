@@ -498,8 +498,12 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 			URL:   "mailto:" + cfg.Settings.EMail,
 		},
 		{
-			Label: "Location",
+			Label: "GMaps",
 			URL:   cfg.Settings.URLGMap,
+		},
+		{
+			Label: "Waze",
+			URL:   cfg.Settings.URLWaze,
 		},
 		{
 			Label:    "Store",
