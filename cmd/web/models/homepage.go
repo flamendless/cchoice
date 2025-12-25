@@ -46,11 +46,13 @@ func BuildPostHomeContentSections(getBrandLogoURL BrandLogoURLFunc) []PostHomeCo
 				},
 			},
 		},
+
 		{
 			Title:  "Our Store",
 			Href:   "store",
 			Others: []PostHomeContent{},
 		},
+
 		{
 			Title: "Our Services",
 			Href:  "services",

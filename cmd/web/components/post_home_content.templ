@@ -11,13 +11,12 @@ templ PostHomeContentSections(data models.HomePageData) {
 		for _, section := range data.Sections {
 			<span class="font-bold text-lg mt-4">{ section.Title }</span>
 
-			if section.Href == "about-us" {
+			switch section.Href {
+			case "about-us", "services":
 				@CommonSection(section)
-			} else if section.Href == "store" {
+			case "store":
 				@StoreSection(section, data.StoreImageURL)
-			} else if section.Href == "services" {
-				@CommonSection(section)
-			} else if section.Href == "partners" {
+			case "partners":
 				@PartnerSection(section)
 			}
 		}
@@ -61,8 +60,9 @@ templ StoreSection(section models.PostHomeContentSection, storeImageURL string) 
 			<div
 				hx-trigger="load once"
 				hx-get={ utils.URL("/settings/store") }
-				hx-swap="textContent"
-				class="my-4 font-normal text-base text-center"
+				hx-swap="innerHTML"
+				hx-target="this"
+				class="my-4 font-normal text-base text-center flex flex-col items-center"
 			>
 				Fetching...
 			</div>

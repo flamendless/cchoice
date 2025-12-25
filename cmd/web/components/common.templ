@@ -138,3 +138,31 @@ templ ContinueShopping() {
 		Continue Shopping
 	</a>
 }
+
+templ GMapsLink(url string) {
+	<a
+		href={url}
+		target="_blank"
+		rel="noopener noreferrer"
+		aria-label="Open in Google Maps"
+		title="Open in Google Maps"
+		class="
+			inline-flex items-center gap-2
+			p-2 rounded-md
+			text-emerald-600 hover:text-emerald-700
+			hover:bg-emerald-50
+			transition
+		"
+	>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			fill="currentColor"
+			class="w-6 h-6"
+		>
+			<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/>
+		</svg>
+		<span class="text-sm font-medium">Google Maps</span>
+	</a>
+}
+

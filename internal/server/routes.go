@@ -531,14 +531,22 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) storeHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Store Handler]"
+	ctx := r.Context()
 	cfg := conf.Conf()
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+
 	if _, err := w.Write([]byte(cfg.Settings.Address)); err != nil {
-		logs.LogCtx(r.Context()).Error(
-			logtag,
-			zap.Error(err),
-		)
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}
+
+	gmapsURL := cfg.Settings.URLGMap
+	if err := components.GMapsLink(gmapsURL).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
+
+	// if _, err := components.WazeLink(wazeURL).Render(ctx, w); err != nil {
+	// 	logs.LogCtx(r.Context()).Error(logtag, zap.Error(err))
+	// }
 }
 
 func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
