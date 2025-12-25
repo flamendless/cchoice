@@ -758,7 +758,14 @@ func Prof(pkg, profType string) error {
 }
 
 func Dev() error {
-	if err := Build(); err != nil {
+	if err := GenAll(); err != nil {
+		return err
+	}
+	if err := run(Command{
+		Type: CmdGoBuild,
+		Out:  filepath.Join(tmpDir, "cchoicedev"),
+		Tags: []string{"fts5", "staticfs", "imageprocessing"},
+	}); err != nil {
 		return err
 	}
 	fmt.Println("Run: ./tmp/cchoicedev api > out 2>&1 &")
