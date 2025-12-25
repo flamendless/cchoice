@@ -4,7 +4,6 @@ import (
 	"cchoice/cmd/web/components"
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
-	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"net/http"
 	"fmt"
@@ -26,8 +25,10 @@ func (s *Server) ordersTrackPageHandler(w http.ResponseWriter, r *http.Request) 
 
 	orderNo := r.URL.Query().Get("order_no")
 	if orderNo == "" {
-		logs.LogCtx(ctx).Warn(logtag, zap.Error(errs.ErrInvalidParams))
-		http.Error(w, "Order reference number is required", http.StatusBadRequest)
+		if err := components.OrderTrackerPage(components.OrderTrackerPageBody(orderNo, email, mobileNo)).Render(ctx, w); err != nil {
+			logs.Log().Error(logtag, zap.String("order_no", orderNo), zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 
