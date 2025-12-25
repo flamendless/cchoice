@@ -170,6 +170,7 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 	AddProductCategoriesHandlers(s, r)
 	AddBrandsHandlers(s, r)
 	AddCartsHandlers(s, r)
+	AddOrdersHandlers(s, r)
 	AddShippingHandlers(s, r)
 	AddPaymentHandlers(s, r)
 	RegisterPaymentWebhooks(s, r)

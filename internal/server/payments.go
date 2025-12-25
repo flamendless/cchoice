@@ -21,25 +21,35 @@ func AddPaymentHandlers(s *Server, r chi.Router) {
 	r.Get("/payments/success", s.paymentsSuccessHandler)
 }
 
+func RegisterPaymentWebhooks(s *Server, r chi.Router) {
+	if s.paymentGateway == nil {
+		return
+	}
+	if s.paymentGateway.GatewayEnum() == payments.PAYMENT_GATEWAY_PAYMONGO {
+		handler := paymongo.NewWebhookHandler(paymongo.WebhookHandlerConfig{
+			DBRO:           s.dbRO,
+			DBRW:           s.dbRW,
+			EmailJobRunner: s.emailJobRunner,
+		})
+		r.Post("/webhooks/paymongo", handler)
+		return
+	}
+
+	logs.Log().Warn("No payment webhooks registered")
+}
+
 func (s *Server) paymentsCancelHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Payments Cancel Handler]"
 	ctx := r.Context()
 
 	paymentRef := r.URL.Query().Get("payment_ref")
 	if paymentRef == "" {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Error(errs.ErrInvalidParams),
-		)
+		logs.LogCtx(ctx).Error(logtag, zap.Error(errs.ErrInvalidParams))
 		http.Error(w, "Payment reference number is required", http.StatusBadRequest)
 		return
 	}
 
-	logs.LogCtx(ctx).Info(
-		logtag,
-		zap.String("payment_ref", paymentRef),
-		zap.String("query_params", r.URL.RawQuery),
-	)
+	logs.LogCtx(ctx).Info(logtag, zap.String("payment_ref", paymentRef))
 
 	if checkoutPayment, err := s.dbRO.GetQueries().GetCheckoutPaymentByReferenceNumber(ctx, paymentRef); err == nil {
 		if order, err := s.dbRO.GetQueries().GetOrderByCheckoutPaymentID(ctx, checkoutPayment.ID); err == nil {
@@ -80,12 +90,6 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	logs.LogCtx(ctx).Info(
-		logtag,
-		zap.String("payment_ref", paymentRef),
-		zap.String("query_params", r.URL.RawQuery),
-	)
-
 	checkoutPayment, err := s.dbRO.GetQueries().GetCheckoutPaymentByReferenceNumber(ctx, paymentRef)
 	if err != nil {
 		logs.LogCtx(ctx).Error(
@@ -99,6 +103,7 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 
 	logs.LogCtx(ctx).Info(
 		logtag,
+		zap.String("payment_ref", paymentRef),
 		zap.String("checkout_payment_id", checkoutPayment.ID),
 		zap.String("payment_intent_id", checkoutPayment.PaymentIntentID.String),
 		zap.String("payment_status", checkoutPayment.Status),
@@ -187,21 +192,4 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-}
-
-func RegisterPaymentWebhooks(s *Server, r chi.Router) {
-	if s.paymentGateway == nil {
-		return
-	}
-	if s.paymentGateway.GatewayEnum() == payments.PAYMENT_GATEWAY_PAYMONGO {
-		handler := paymongo.NewWebhookHandler(paymongo.WebhookHandlerConfig{
-			DBRO:           s.dbRO,
-			DBRW:           s.dbRW,
-			EmailJobRunner: s.emailJobRunner,
-		})
-		r.Post("/webhooks/paymongo", handler)
-		return
-	}
-
-	logs.Log().Warn("No payment webhooks registered")
 }
