@@ -2,6 +2,23 @@
 ## [Unreleased]
 
 
+<a name="release-v1.0.5"></a>
+## [release-v1.0.5] - 2025-12-25
+### Docs
+- Dev v0.1.1
+
+### Script
+- Update dev
+
+### Server
+- Add waze
+
+### Web
+- Add waze
+- Add gmaps in store section
+- Add searchbox for order tracking
+
+
 <a name="dev-v0.1.1"></a>
 ## [dev-v0.1.1] - 2025-12-25
 ### Bugfix
@@ -558,7 +575,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/dev-v0.1.1...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.5...HEAD
+[release-v1.0.5]: https://github.com/flamendless/cchoice/compare/dev-v0.1.1...release-v1.0.5
 [dev-v0.1.1]: https://github.com/flamendless/cchoice/compare/release-v1.0.4...dev-v0.1.1
 [release-v1.0.4]: https://github.com/flamendless/cchoice/compare/release-v1.0.3...release-v1.0.4
 [release-v1.0.3]: https://github.com/flamendless/cchoice/compare/release-v1.0.2...release-v1.0.3
