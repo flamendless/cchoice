@@ -26,8 +26,8 @@ jobs:
           source ~/.bashrc
           bash cchoice/scripts/deploy.sh
 
-    - name: Send Success Email
-      uses: ksatriow/action-mailer@v1
+    - name: Send Email
+      uses: ksatriow/action-mailer@v1.0.0
       with:
         smtp-server: smtp.gmail.com
         smtp-port: 465
