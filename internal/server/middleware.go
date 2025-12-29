@@ -1,7 +1,11 @@
 package server
 
 import (
+	"cchoice/internal/conf"
+	"crypto/subtle"
 	"net/http"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func SecurityHeadersMiddleware(next http.Handler) http.Handler {
@@ -50,4 +54,35 @@ func RateLimitInfoMiddleware(limit int, remaining int, reset int64) func(http.Ha
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func MetricsBasicAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user, pass, ok := r.BasicAuth()
+		if !ok {
+			unauthorized(w)
+			return
+		}
+
+		cfg := conf.Conf()
+		expectedUser := cfg.BasicAuth.Username
+		passHash := cfg.BasicAuth.PasswordHash
+
+		if subtle.ConstantTimeCompare([]byte(user), []byte(expectedUser)) != 1 {
+			unauthorized(w)
+			return
+		}
+
+		if bcrypt.CompareHashAndPassword([]byte(passHash), []byte(pass)) != nil {
+			unauthorized(w)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func unauthorized(w http.ResponseWriter) {
+	w.Header().Set("WWW-Authenticate", `Basic realm="metrics"`)
+	w.WriteHeader(http.StatusUnauthorized)
 }

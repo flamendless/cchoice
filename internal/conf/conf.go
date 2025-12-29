@@ -37,6 +37,12 @@ type appConfig struct {
 	MailService        string `env:"MAIL_SERVICE"`
 	MailerooConfig     MailerooConfig
 	Settings           Settings
+	BasicAuth          BasicAuth
+}
+
+type BasicAuth struct {
+	Username     string `env:"BASIC_AUTH_USERNAME"`
+	PasswordHash string `env:"BASIC_AUTH_PASSWORD_HASH"`
 }
 
 type Settings struct {
