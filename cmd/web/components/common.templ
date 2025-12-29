@@ -103,13 +103,13 @@ templ IconActionButton(
 	href string,
 	children ...templ.Component,
 ) {
-	<div class="m-2 flex flex-col place-center">
+	<div class="my-2 flex flex-col place-center">
 		<button
 			aria-label={ label }
 			title={ label }
 			class="
 				relative inline-block
-				group p-2 stroke-cchoice rounded-full
+				group py-2 stroke-cchoice rounded-full
 				cursor-pointer hover:bg-cchoice_border
 				text-nowrap items-center flex flex-col text-xs text-cchoice
 				hover:text-white
@@ -119,8 +119,31 @@ templ IconActionButton(
 			for _, child := range children {
 				@child
 			}
-			<span>{ label }</span>
+			<!-- <span class="hidden md:block">{ label }</span> -->
+			<!-- <span>{ label }</span> -->
 		</button>
+	</div>
+}
+
+templ IconAction(
+	label string,
+	href string,
+	children ...templ.Component,
+) {
+	<div
+		class="
+			my-2 flex flex-col place-center
+			relative inline-block
+			group py-2 stroke-cchoice rounded-full w-16
+			cursor-pointer hover:bg-cchoice_border
+			text-nowrap items-center flex flex-col text-xs text-cchoice
+			hover:text-white
+		"
+		_={ "on click go to url '" + utils.URL(href) + "'" }
+	>
+		for _, child := range children {
+			@child
+		}
 	</div>
 }
 

@@ -2,12 +2,13 @@ package components
 
 import "cchoice/cmd/web/models"
 import "cchoice/internal/utils"
+import "cchoice/internal/constants"
 
 var logoStyleOnce = templ.NewOnceHandle()
 
 const clsHeaderIconButton = "w-full stroke-cchoice group-hover:stroke-white"
 
-templ LogoWithText() {
+templ headerLogo(platform string) {
 	@logoStyleOnce.Once() {
 		<style>
 			.logo-responsive {
@@ -28,11 +29,19 @@ templ LogoWithText() {
 			lg:-mt-8 lg:-mb-4 lg:ml-4
 		"
 	>
-		<img
-			src={ string(templ.URL(utils.URL("/static/svg/logo_complete.svg"))) }
-			alt="cchoice logo and text"
-			class="object-contain logo-responsive"
-		/>
+		if platform == "desktop" {
+			<img
+				src={ constants.PathSVGLogoWithCompleteText }
+				alt="cchoice logo and text"
+				class="object-contain logo-responsive"
+			/>
+		} else {
+			<img
+				src={ constants.PathSVGLogoOnly }
+				alt="cchoice logo"
+				class="object-contain logo-responsive"
+			/>
+		}
 	</a>
 }
 
@@ -74,7 +83,7 @@ templ HeaderDesktop() {
 		id="header-row2-desktop"
 		class="hidden lg:flex w-full flex-row items-center"
 	>
-		@LogoWithText()
+		@headerLogo("desktop")
 		<div
 			id="search-wrapper"
 			class="w-full flex items-center place-content-center px-8 py-2"
@@ -93,13 +102,13 @@ templ HeaderDesktop() {
 			@SearchBarDesktop()
 		</div>
 		<div class="flex flex-row px-8 py-2">
-			@IconActionButton(
+			@IconAction(
 				"Cart",
 				"/carts",
 				svgCart(clsHeaderIconButton),
 				CartCount(0),
 			)
-			@IconActionButton(
+			@IconAction(
 				"Track Order",
 				"/orders/track",
 				svgTrackOrder(clsHeaderIconButton),
@@ -114,57 +123,64 @@ templ HeaderMobile() {
 		class="w-full flex flex-row items-center px-2 lg:hidden"
 	>
 		<div class="flex-shrink-0">
-			@LogoWithText()
+			@headerLogo("mobile")
 		</div>
-		<div
-			id="search-mobile-wrapper"
-			class="flex-1 flex items-center place-content-center px-2"
-			_="
-				on click from document
-					if event.target.closest('#search-mobile-wrapper') == null
+		<div class="flex w-full justify-end">
+			<div
+				id="search-mobile-wrapper"
+				class="
+					flex flex-col items-center place-center place-content-center
+					group py-2 stroke-cchoice rounded-full
+					cursor-pointer hover:bg-cchoice_border
+					text-nowrap text-xs text-cchoice
+					hover:text-white
+				"
+				_="
+					on click from document
+						if event.target.closest('#search-mobile-wrapper') == null
+							add .hidden to #search-mobile-results
+						end
+					end
+
+					on keyup[key is 'Escape'] from document
 						add .hidden to #search-mobile-results
 					end
-				end
-
-				on keyup[key is 'Escape'] from document
-					add .hidden to #search-mobile-results
-				end
-			"
-		>
-			@SearchBarMobile()
-		</div>
-		<div class="flex-shrink-0">
-			@IconActionButton(
+				"
+			>
+				@MobileSearchToggle()
+				@MobileSearchPanel()
+			</div>
+			@IconAction(
 				"Cart",
 				"/carts",
 				svgCart(clsHeaderIconButton),
 				CartCount(0),
 			)
-			@IconActionButton(
+			@IconAction(
 				"Track Order",
 				"/orders/track",
 				svgTrackOrder(clsHeaderIconButton),
 			)
+			<button
+				id="btn-hamburger"
+				type="button"
+				class="
+					flex-shrink-0 p-2 rounded-lg
+					hover:bg-cchoicesoft focus:outline-none focus:ring-2 focus:ring-cchoice
+					cursor-pointer
+				"
+				aria-label="Toggle navigation menu"
+				title="Toggle navigation menu"
+				_="
+					on click
+						toggle .hidden on #mobile-sidebar
+						toggle .hidden on #mobile-sidebar-overlay
+					end
+				"
+			>
+				@svgHamburger("text-cchoice")
+			</button>
 		</div>
-		<button
-			id="btn-hamburger"
-			type="button"
-			class="
-				flex-shrink-0 p-2 rounded-lg
-				hover:bg-cchoicesoft focus:outline-none focus:ring-2 focus:ring-cchoice
-				cursor-pointer
-			"
-			aria-label="Toggle navigation menu"
-			title="Toggle navigation menu"
-			_="
-				on click
-					toggle .hidden on #mobile-sidebar
-					toggle .hidden on #mobile-sidebar-overlay
-				end
-			"
-		>
-			@svgHamburger("text-cchoice")
-		</button>
 	</div>
 }
 
