@@ -37,7 +37,8 @@ jobs:
           SUBJECT="[C-CHOICE SHOP] New Release ${TAG_NAME}"
           echo "${RELEASE_NOTES}" | mail \
             -s "${SUBJECT}" \
-            "${EMAIL_TO}"
+            "${EMAIL_TO}" \
+            -aFrom:dev@cchoice.shop
         env:
           EMAIL_TO: ${{ secrets.RECIPIENTS }}
 
