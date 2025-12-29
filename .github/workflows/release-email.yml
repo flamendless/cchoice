@@ -1,0 +1,45 @@
+name: Release Email Notification
+
+on:
+  push:
+    tags:
+      - "release-v*"
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get tag name
+        run: echo "TAG_NAME=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+
+      - name: Extract changelog section
+        run: |
+          TAG="${TAG_NAME}"
+
+          awk -v tag="$TAG" '
+            $0 ~ "<a name=\"" tag "\">" { p=1 }
+            p && $0 ~ "<a name=\"release-" && $0 !~ tag { exit }
+            p { print }
+          ' CHANGELOGS.md > release_notes.txt
+
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          cat release_notes.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Install mailutils
+        run: sudo apt-get update && sudo apt-get install -y mailutils
+
+      - name: Send release email
+        run: |
+          SUBJECT="[C-CHOICE SHOP] New Release ${TAG_NAME}"
+          echo "${RELEASE_NOTES}" | mail \
+            -s "${SUBJECT}" \
+            -c "${EMAIL_CC}" \
+            "${EMAIL_TO}"
+        env:
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_CC: ${{ secrets.EMAIL_CC }}
+
