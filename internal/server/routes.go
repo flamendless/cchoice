@@ -156,7 +156,9 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 	r.Get("/changelogs", s.changelogsHandler)
 	r.Get("/health", s.healthHandler)
 	r.Get("/version", s.versionHandler)
-	r.Handle("/metrics", promhttp.Handler())
+
+	r.With(MetricsBasicAuth).Handle("/metrics", promhttp.Handler())
+
 	r.Get("/", s.indexHandler)
 	r.Get("/settings/header-texts", s.headerTextsHandler)
 	r.Get("/settings/footer-texts", s.footerTextsHandler)
