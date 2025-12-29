@@ -21,6 +21,7 @@ import (
 
 var flagsMigrateImagesCloudflare struct {
 	basePath         string
+	svgPath          string
 	dryRun           bool
 	panicImmediately bool
 	batchSize        int
@@ -29,6 +30,7 @@ var flagsMigrateImagesCloudflare struct {
 func init() {
 	f := cmdMigrateImagesCloudflare.Flags
 	f().StringVarP(&flagsMigrateImagesCloudflare.basePath, "basepath", "p", "./cmd/web/static/images", "Base path to images directory")
+	f().StringVarP(&flagsMigrateImagesCloudflare.svgPath, "svgpath", "s", "./cmd/web/static/svg", "Base path to svg directory")
 	f().BoolVarP(&flagsMigrateImagesCloudflare.dryRun, "dry-run", "d", true, "Dry run mode (don't actually upload)")
 	f().BoolVarP(&flagsMigrateImagesCloudflare.panicImmediately, "panic-imm", "e", true, "Panic immediately on first error")
 	f().IntVarP(&flagsMigrateImagesCloudflare.batchSize, "batch-size", "b", 100, "Number of images per batch upload")
@@ -59,6 +61,7 @@ var cmdMigrateImagesCloudflare = &cobra.Command{
 		)
 
 		basePath := flagsMigrateImagesCloudflare.basePath
+		svgPath := flagsMigrateImagesCloudflare.svgPath
 
 		var allImages []imageToUpload
 
@@ -85,6 +88,24 @@ var cmdMigrateImagesCloudflare = &cobra.Command{
 					zap.String("file", filePath),
 				)
 			}
+		}
+
+		svgsPath := filepath.Join(svgPath, "")
+		if _, err := os.Stat(svgsPath); err == nil {
+			logs.Log().Info(
+				"Collecting svg",
+				zap.String("path", svgsPath),
+			)
+			images, err := collectImagesCloudflare(svgsPath, svgPath, false)
+			if err != nil {
+				panic(errors.Join(errs.ErrCmd, fmt.Errorf("failed to collect svgs: %w", err)))
+			}
+			allImages = append(allImages, images...)
+		} else {
+			logs.Log().Warn(
+				"svgs directory not found",
+				zap.String("path", svgsPath),
+			)
 		}
 
 		logosPath := filepath.Join(basePath, "logos")
@@ -147,7 +168,7 @@ var cmdMigrateImagesCloudflare = &cobra.Command{
 				"Collecting product images",
 				zap.String("path", productImagesPath),
 			)
-			images, err := collectImagesCloudflare(productImagesPath, basePath, false)
+			images, err := collectImagesCloudflare(productImagesPath, basePath, true)
 			if err != nil {
 				panic(errors.Join(errs.ErrCmd, fmt.Errorf("failed to collect product images: %w", err)))
 			}
@@ -200,10 +221,18 @@ type imageToUpload struct {
 	key       string
 }
 
-func collectImagesCloudflare(imagesPath string, basePath string, isBrandLogos bool) ([]imageToUpload, error) {
+func collectImagesCloudflare(
+	imagesPath string,
+	basePath string,
+	webpOnly bool,
+) ([]imageToUpload, error) {
 	var imgsToUpload []imageToUpload
 
-	err := filepath.Walk(imagesPath, func(filePath string, info fs.FileInfo, err error) error {
+	err := filepath.Walk(imagesPath, func(
+		filePath string,
+		info fs.FileInfo,
+		err error,
+	) error {
 		if err != nil {
 			return err
 		}
@@ -218,9 +247,10 @@ func collectImagesCloudflare(imagesPath string, basePath string, isBrandLogos bo
 			return nil
 		}
 
-		if isBrandLogos && imgFormat == images.IMAGE_FORMAT_PNG {
+		if webpOnly && imgFormat != images.IMAGE_FORMAT_WEBP {
 			logs.Log().Debug(
-				"Skipping PNG file for brand logos (only WebP allowed)",
+				"Skipping file",
+				zap.Bool("webp only", webpOnly),
 				zap.String("file", filePath),
 			)
 			return nil
@@ -249,7 +279,15 @@ func collectImagesCloudflare(imagesPath string, basePath string, isBrandLogos bo
 			return nil
 		}
 
-		cfKey := "static/images/" + normalizedPath
+		var keyprefix string
+		switch basePath {
+		case flagsMigrateImagesCloudflare.basePath:
+			keyprefix = "images"
+		case flagsMigrateImagesCloudflare.svgPath:
+			keyprefix = "svg"
+		}
+
+		cfKey := fmt.Sprintf("static/%s/%s", keyprefix, normalizedPath)
 		imgsToUpload = append(imgsToUpload, imageToUpload{
 			localPath: filePath,
 			key:       cfKey,
