@@ -40,22 +40,7 @@ templ OrderTrackerSearchBox() {
 				"
 			>
 				<!-- Search icon -->
-				<svg
-					id="order-track-icon-search"
-					class="w-5 text-cchoice"
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 20 20"
-				>
-					<path
-						stroke="currentColor"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-					/>
-				</svg>
+				@svgSearch("order-track-icon-search", "")
 
 				<!-- Spinner -->
 				<svg
@@ -113,21 +98,7 @@ templ OrderTrackerSearchBox() {
 				aria-label="Track order"
 				title="Track order"
 			>
-				<svg
-					class="w-5 h-5 lg:hidden"
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 20 20"
-				>
-					<path
-						stroke="currentColor"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-					/>
-				</svg>
+				@svgSearch("", "lg:hidden")
 				<span class="hidden lg:inline">Track</span>
 			</button>
 		</div>
@@ -168,7 +139,7 @@ templ OrderTrackerSearchBoxPlain() {
 	</form>
 }
 
-templ OrderTrackerPageBody(orderNo string, email string, mobileNo string) {
+templ OrderTrackerPageBody(orderNo string, deliveryETA string, email string, mobileNo string) {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
 		@ErrorBanner()
 		@Header()
@@ -189,6 +160,8 @@ templ OrderTrackerPageBody(orderNo string, email string, mobileNo string) {
 					<div class="bg-green-50 border border-green-200 rounded-lg p-4 mt-2 flex flex-col items-center">
 						<p class="text-sm text-gray-600 mb-1">Order Reference Number:</p>
 						<p class="text-base font-mono font-semibold text-green-800">{ orderNo }</p>
+						<p class="text-sm text-gray-600 mb-1">Delivery ETA:</p>
+						<p class="text-base font-mono font-semibold text-green-800">{ deliveryETA }</p>
 					</div>
 				}
 

@@ -25,22 +25,8 @@ templ SearchBarDesktop() {
 					end
 				"
 			>
-				<svg
-					id="icon-search"
-					class="w-5 text-cchoice"
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 20 20"
-				>
-					<path
-						stroke="currentColor"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-					></path>
-				</svg>
+				@svgSearch("icon-search", "text-cchoice")
+
 				<svg
 					id="icon-spinner-search"
 					class="w-7 text-cchoice hidden"
@@ -60,7 +46,7 @@ templ SearchBarDesktop() {
 				name="search"
 				autocomplete="off"
 				placeholder="Search by product name..."
-				class="block w-full p-3 ps-10 pe-12 text-sm text-black border border-searchbar rounded-lg bg-searchbar
+				class="block w-full p-3 ps-10 text-sm text-black border border-searchbar rounded-lg bg-searchbar
 						focus:ring-cchoice focus:border-cchoice"
 				hx-post={ utils.URL("/search") }
 				hx-trigger="
@@ -73,13 +59,6 @@ templ SearchBarDesktop() {
 				hx-target="#search-results > ul"
 				hx-swap="innerHTML"
 				_="
-					on input
-						if my value == ''
-							add .hidden to #btn-clear
-						else
-							remove .hidden from #btn-clear
-					end
-
 					on focus
 						if my value != '' and #search-results.children.length > 0
 						then remove .hidden from #search-results
@@ -87,196 +66,38 @@ templ SearchBarDesktop() {
 				"
 			/>
 
-			<button
-				id="btn-clear"
-				type="button"
-				class="
-					hidden absolute end-[72px] bottom-2 text-base text-gray-400
-					hover:text-cchoice text-sm px-2 py-1
-				"
-				aria-label="clear search"
-				title="clear search"
-				_="
-					on click
-						set #search.value to ''
-						trigger input on #search
-					end
-				"
-			>
-				x
-			</button>
-
-			<button
-				type="submit"
-				class="
-					flex items-center justify-center gap-1
-					text-white absolute end-2.5 bottom-2 bg-cchoice
-					font-medium rounded-lg text-sm px-2 py-1
-					hover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice transition-colors
-				"
-				alt="search button"
-				aria-label="Search"
-				title="Search"
-			>
-				<svg
-					class="w-5 h-5 lg:hidden"
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 20 20"
-				>
-					<path
-						stroke="currentColor"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-					></path>
-				</svg>
-				<span class="hidden lg:inline">
-					Search
-				</span>
-			</button>
+			<!-- <button -->
+			<!-- 	type="submit" -->
+			<!-- 	class=" -->
+			<!-- 		flex items-center justify-center gap-1 -->
+			<!-- 		text-white absolute end-2.5 bottom-2 bg-cchoice -->
+			<!-- 		font-medium rounded-lg text-sm px-2 py-1 -->
+			<!-- 		hover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice transition-colors -->
+			<!-- 	" -->
+			<!-- 	alt="search button" -->
+			<!-- 	aria-label="Search" -->
+			<!-- 	title="Search" -->
+			<!-- > -->
+			<!-- 	<svg -->
+			<!-- 		class="w-5 h-5 lg:hidden" -->
+			<!-- 		aria-hidden="true" -->
+			<!-- 		xmlns="http://www.w3.org/2000/svg" -->
+			<!-- 		fill="none" -->
+			<!-- 		viewBox="0 0 20 20" -->
+			<!-- 	> -->
+			<!-- 		<path -->
+			<!-- 			stroke="currentColor" -->
+			<!-- 			stroke-linecap="round" -->
+			<!-- 			stroke-linejoin="round" -->
+			<!-- 			stroke-width="2" -->
+			<!-- 			d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" -->
+			<!-- 		></path> -->
+			<!-- 	</svg> -->
+			<!-- 	<span class="hidden lg:inline"> -->
+			<!-- 		@svgSearch("", "") -->
+			<!-- 	</span> -->
+			<!-- </button> -->
 			@SearchResults()
-		</div>
-	</form>
-}
-
-templ SearchBarMobile() {
-	<form class="w-full lg:w-6/12">
-		<label for="search-mobile" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
-		<div class="relative">
-			<div
-				class="hidden absolute inset-y-0 start-0 sm:flex items-center ps-2 pointer-events-none"
-				_="
-					on htmx:beforeRequest from #search-mobile
-						log 'search-mobile is triggered'
-						add .hidden to #icon-search-mobile
-						add .hidden to #search-mobile-results
-						remove .hidden from #icon-spinner-search-mobile
-					end
-
-					on htmx:afterRequest from #search-mobile
-						log 'search-mobile is done'
-						wait 0.25s
-						remove .hidden from #icon-search-mobile
-						remove .hidden from #search-mobile-results
-						add .hidden to #icon-spinner-search-mobile
-					end
-				"
-			>
-				<svg
-					id="icon-search-mobile"
-					class="w-5 text-cchoice"
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 20 20"
-				>
-					<path
-						stroke="currentColor"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-					></path>
-				</svg>
-				<svg
-					id="icon-spinner-search-mobile"
-					class="w-7 text-cchoice hidden"
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 300 150"
-				>
-					<path fill="none" stroke="#F6742F" stroke-width="15" stroke-linecap="round" stroke-dasharray="300 385" stroke-dashoffset="0" d="M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z">
-						<animate attributeName="stroke-dashoffset" calcMode="spline" dur="2" values="685;-685" keySplines="0 0 1 1" repeatCount="indefinite"></animate>
-					</path>
-				</svg>
-			</div>
-
-			<input
-				type="search-mobile"
-				id="search-mobile"
-				name="search-mobile"
-				autocomplete="off"
-				placeholder="Search by product name..."
-				class="block w-full p-3 ps-10 pe-12 text-sm text-black border border-searchbar rounded-lg bg-searchbar
-						focus:ring-cchoice focus:border-cchoice"
-				hx-post={ utils.URL("/search") }
-				hx-trigger="
-					input[this.value.length >= 3] delay:300ms,
-					changed[this.value.length >= 3],
-					keyup[key=='Enter'],
-					search-mobile
-				"
-				hx-validate="false"
-				hx-target="#search-mobile-results > ul"
-				hx-swap="innerHTML"
-				_="
-					on input
-						if my value == ''
-							add .hidden to #btn-clear-mobile
-						else
-							remove .hidden from #btn-clear-mobile
-					end
-
-					on focus
-						if my value != '' and #search-mobile-results.children.length > 0
-						then remove .hidden from #search-mobile-results
-					end
-				"
-			/>
-
-			<button
-				id="btn-clear-mobile"
-				type="button"
-				class="
-					hidden absolute end-[72px] bottom-2 text-base text-gray-400
-					hover:text-cchoice text-sm px-2 py-1
-				"
-				aria-label="clear search-mobile"
-				title="clear search-mobile"
-				_="
-					on click
-						set #search-mobile.value to ''
-						trigger input on #search-mobile
-					end
-				"
-			>
-				x
-			</button>
-			<button
-				type="submit"
-				class="
-					flex items-center justify-center gap-1
-					text-white absolute end-2.5 bottom-2 bg-cchoice
-					font-medium rounded-lg text-sm px-2 py-1
-					hover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice transition-colors
-				"
-				alt="search button"
-				aria-label="Search"
-				title="Search"
-			>
-				<svg
-					class="w-5 h-5 lg:hidden"
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 20 20"
-				>
-					<path
-						stroke="currentColor"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-					></path>
-				</svg>
-				<span class="hidden lg:inline">
-					Search
-				</span>
-			</button>
-			@SearchResultsMobile()
 		</div>
 	</form>
 }

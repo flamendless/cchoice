@@ -31,20 +31,28 @@ func SearchBarDesktop() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form class=\"w-full lg:w-6/12\"><label for=\"search\" class=\"mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white\">Search</label><div class=\"relative\"><div class=\"hidden absolute inset-y-0 start-0 sm:flex items-center ps-2 pointer-events-none\" _=\"\n\t\t\t\t\ton htmx:beforeRequest from #search\n\t\t\t\t\t\tlog 'search is triggered'\n\t\t\t\t\t\tadd .hidden to #icon-search\n\t\t\t\t\t\tadd .hidden to #search-results\n\t\t\t\t\t\tremove .hidden from #icon-spinner-search\n\t\t\t\t\tend\n\n\t\t\t\t\ton htmx:afterRequest from #search\n\t\t\t\t\t\tlog 'search is done'\n\t\t\t\t\t\twait 0.25s\n\t\t\t\t\t\tremove .hidden from #icon-search\n\t\t\t\t\t\tremove .hidden from #search-results\n\t\t\t\t\t\tadd .hidden to #icon-spinner-search\n\t\t\t\t\tend\n\t\t\t\t\"><svg id=\"icon-search\" class=\"w-5 text-cchoice\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 20 20\"><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z\"></path></svg> <svg id=\"icon-spinner-search\" class=\"w-7 text-cchoice hidden\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\"><path fill=\"none\" stroke=\"#F6742F\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-dasharray=\"300 385\" stroke-dashoffset=\"0\" d=\"M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z\"><animate attributeName=\"stroke-dashoffset\" calcMode=\"spline\" dur=\"2\" values=\"685;-685\" keySplines=\"0 0 1 1\" repeatCount=\"indefinite\"></animate></path></svg></div><input type=\"search\" id=\"search\" name=\"search\" autocomplete=\"off\" placeholder=\"Search by product name...\" class=\"block w-full p-3 ps-10 pe-12 text-sm text-black border border-searchbar rounded-lg bg-searchbar\n\t\t\t\t\t\tfocus:ring-cchoice focus:border-cchoice\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form class=\"w-full lg:w-6/12\"><label for=\"search\" class=\"mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white\">Search</label><div class=\"relative\"><div class=\"hidden absolute inset-y-0 start-0 sm:flex items-center ps-2 pointer-events-none\" _=\"\n\t\t\t\t\ton htmx:beforeRequest from #search\n\t\t\t\t\t\tlog 'search is triggered'\n\t\t\t\t\t\tadd .hidden to #icon-search\n\t\t\t\t\t\tadd .hidden to #search-results\n\t\t\t\t\t\tremove .hidden from #icon-spinner-search\n\t\t\t\t\tend\n\n\t\t\t\t\ton htmx:afterRequest from #search\n\t\t\t\t\t\tlog 'search is done'\n\t\t\t\t\t\twait 0.25s\n\t\t\t\t\t\tremove .hidden from #icon-search\n\t\t\t\t\t\tremove .hidden from #search-results\n\t\t\t\t\t\tadd .hidden to #icon-spinner-search\n\t\t\t\t\tend\n\t\t\t\t\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = svgSearch("icon-search", "text-cchoice").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<svg id=\"icon-spinner-search\" class=\"w-7 text-cchoice hidden\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\"><path fill=\"none\" stroke=\"#F6742F\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-dasharray=\"300 385\" stroke-dashoffset=\"0\" d=\"M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z\"><animate attributeName=\"stroke-dashoffset\" calcMode=\"spline\" dur=\"2\" values=\"685;-685\" keySplines=\"0 0 1 1\" repeatCount=\"indefinite\"></animate></path></svg></div><input type=\"search\" id=\"search\" name=\"search\" autocomplete=\"off\" placeholder=\"Search by product name...\" class=\"block w-full p-3 ps-10 text-sm text-black border border-searchbar rounded-lg bg-searchbar\n\t\t\t\t\t\tfocus:ring-cchoice focus:border-cchoice\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/search"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/searchbar.templ`, Line: 65, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/searchbar.templ`, Line: 51, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-trigger=\"\n\t\t\t\t\tinput[this.value.length >= 3] delay:300ms,\n\t\t\t\t\tchanged[this.value.length >= 3],\n\t\t\t\t\tkeyup[key=='Enter'],\n\t\t\t\t\tsearch\n\t\t\t\t\" hx-validate=\"false\" hx-target=\"#search-results > ul\" hx-swap=\"innerHTML\" _=\"\n\t\t\t\t\ton input\n\t\t\t\t\t\tif my value == ''\n\t\t\t\t\t\t\tadd .hidden to #btn-clear\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tremove .hidden from #btn-clear\n\t\t\t\t\tend\n\n\t\t\t\t\ton focus\n\t\t\t\t\t\tif my value != '' and #search-results.children.length > 0\n\t\t\t\t\t\tthen remove .hidden from #search-results\n\t\t\t\t\tend\n\t\t\t\t\"> <button id=\"btn-clear\" type=\"button\" class=\"\n\t\t\t\t\thidden absolute end-[72px] bottom-2 text-base text-gray-400\n\t\t\t\t\thover:text-cchoice text-sm px-2 py-1\n\t\t\t\t\" aria-label=\"clear search\" title=\"clear search\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tset #search.value to ''\n\t\t\t\t\t\ttrigger input on #search\n\t\t\t\t\tend\n\t\t\t\t\">x</button> <button type=\"submit\" class=\"\n\t\t\t\t\tflex items-center justify-center gap-1\n\t\t\t\t\ttext-white absolute end-2.5 bottom-2 bg-cchoice\n\t\t\t\t\tfont-medium rounded-lg text-sm px-2 py-1\n\t\t\t\t\thover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice transition-colors\n\t\t\t\t\" alt=\"search button\" aria-label=\"Search\" title=\"Search\"><svg class=\"w-5 h-5 lg:hidden\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 20 20\"><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z\"></path></svg> <span class=\"hidden lg:inline\">Search</span></button>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" hx-trigger=\"\n\t\t\t\t\tinput[this.value.length >= 3] delay:300ms,\n\t\t\t\t\tchanged[this.value.length >= 3],\n\t\t\t\t\tkeyup[key=='Enter'],\n\t\t\t\t\tsearch\n\t\t\t\t\" hx-validate=\"false\" hx-target=\"#search-results > ul\" hx-swap=\"innerHTML\" _=\"\n\t\t\t\t\ton focus\n\t\t\t\t\t\tif my value != '' and #search-results.children.length > 0\n\t\t\t\t\t\tthen remove .hidden from #search-results\n\t\t\t\t\tend\n\t\t\t\t\"><!-- <button --><!-- \ttype=\"submit\" --><!-- \tclass=\" --><!-- \t\tflex items-center justify-center gap-1 --><!-- \t\ttext-white absolute end-2.5 bottom-2 bg-cchoice --><!-- \t\tfont-medium rounded-lg text-sm px-2 py-1 --><!-- \t\thover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice transition-colors --><!-- \t\" --><!-- \talt=\"search button\" --><!-- \taria-label=\"Search\" --><!-- \ttitle=\"Search\" --><!-- > --><!-- \t<svg --><!-- \t\tclass=\"w-5 h-5 lg:hidden\" --><!-- \t\taria-hidden=\"true\" --><!-- \t\txmlns=\"http://www.w3.org/2000/svg\" --><!-- \t\tfill=\"none\" --><!-- \t\tviewBox=\"0 0 20 20\" --><!-- \t> --><!-- \t\t<path --><!-- \t\t\tstroke=\"currentColor\" --><!-- \t\t\tstroke-linecap=\"round\" --><!-- \t\t\tstroke-linejoin=\"round\" --><!-- \t\t\tstroke-width=\"2\" --><!-- \t\t\td=\"m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z\" --><!-- \t\t></path> --><!-- \t</svg> --><!-- \t<span class=\"hidden lg:inline\"> --><!-- \t\t@svgSearch(\"\", \"\") --><!-- \t</span> --><!-- </button> -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -52,57 +60,7 @@ func SearchBarDesktop() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div></form>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		return nil
-	})
-}
-
-func SearchBarMobile() templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var3 == nil {
-			templ_7745c5c3_Var3 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<form class=\"w-full lg:w-6/12\"><label for=\"search-mobile\" class=\"mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white\">Search</label><div class=\"relative\"><div class=\"hidden absolute inset-y-0 start-0 sm:flex items-center ps-2 pointer-events-none\" _=\"\n\t\t\t\t\ton htmx:beforeRequest from #search-mobile\n\t\t\t\t\t\tlog 'search-mobile is triggered'\n\t\t\t\t\t\tadd .hidden to #icon-search-mobile\n\t\t\t\t\t\tadd .hidden to #search-mobile-results\n\t\t\t\t\t\tremove .hidden from #icon-spinner-search-mobile\n\t\t\t\t\tend\n\n\t\t\t\t\ton htmx:afterRequest from #search-mobile\n\t\t\t\t\t\tlog 'search-mobile is done'\n\t\t\t\t\t\twait 0.25s\n\t\t\t\t\t\tremove .hidden from #icon-search-mobile\n\t\t\t\t\t\tremove .hidden from #search-mobile-results\n\t\t\t\t\t\tadd .hidden to #icon-spinner-search-mobile\n\t\t\t\t\tend\n\t\t\t\t\"><svg id=\"icon-search-mobile\" class=\"w-5 text-cchoice\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 20 20\"><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z\"></path></svg> <svg id=\"icon-spinner-search-mobile\" class=\"w-7 text-cchoice hidden\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\"><path fill=\"none\" stroke=\"#F6742F\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-dasharray=\"300 385\" stroke-dashoffset=\"0\" d=\"M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z\"><animate attributeName=\"stroke-dashoffset\" calcMode=\"spline\" dur=\"2\" values=\"685;-685\" keySplines=\"0 0 1 1\" repeatCount=\"indefinite\"></animate></path></svg></div><input type=\"search-mobile\" id=\"search-mobile\" name=\"search-mobile\" autocomplete=\"off\" placeholder=\"Search by product name...\" class=\"block w-full p-3 ps-10 pe-12 text-sm text-black border border-searchbar rounded-lg bg-searchbar\n\t\t\t\t\t\tfocus:ring-cchoice focus:border-cchoice\" hx-post=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/search"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/searchbar.templ`, Line: 205, Col: 34}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-trigger=\"\n\t\t\t\t\tinput[this.value.length >= 3] delay:300ms,\n\t\t\t\t\tchanged[this.value.length >= 3],\n\t\t\t\t\tkeyup[key=='Enter'],\n\t\t\t\t\tsearch-mobile\n\t\t\t\t\" hx-validate=\"false\" hx-target=\"#search-mobile-results > ul\" hx-swap=\"innerHTML\" _=\"\n\t\t\t\t\ton input\n\t\t\t\t\t\tif my value == ''\n\t\t\t\t\t\t\tadd .hidden to #btn-clear-mobile\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tremove .hidden from #btn-clear-mobile\n\t\t\t\t\tend\n\n\t\t\t\t\ton focus\n\t\t\t\t\t\tif my value != '' and #search-mobile-results.children.length > 0\n\t\t\t\t\t\tthen remove .hidden from #search-mobile-results\n\t\t\t\t\tend\n\t\t\t\t\"> <button id=\"btn-clear-mobile\" type=\"button\" class=\"\n\t\t\t\t\thidden absolute end-[72px] bottom-2 text-base text-gray-400\n\t\t\t\t\thover:text-cchoice text-sm px-2 py-1\n\t\t\t\t\" aria-label=\"clear search-mobile\" title=\"clear search-mobile\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tset #search-mobile.value to ''\n\t\t\t\t\t\ttrigger input on #search-mobile\n\t\t\t\t\tend\n\t\t\t\t\">x</button> <button type=\"submit\" class=\"\n\t\t\t\t\tflex items-center justify-center gap-1\n\t\t\t\t\ttext-white absolute end-2.5 bottom-2 bg-cchoice\n\t\t\t\t\tfont-medium rounded-lg text-sm px-2 py-1\n\t\t\t\t\thover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice transition-colors\n\t\t\t\t\" alt=\"search button\" aria-label=\"Search\" title=\"Search\"><svg class=\"w-5 h-5 lg:hidden\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 20 20\"><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z\"></path></svg> <span class=\"hidden lg:inline\">Search</span></button>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = SearchResultsMobile().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
