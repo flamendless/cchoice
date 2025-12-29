@@ -2,6 +2,21 @@
 ## [Unreleased]
 
 
+<a name="release-v1.0.6"></a>
+## [release-v1.0.6] - 2025-12-29
+### Docs
+- Release v1.0.5
+
+### Script
+- Add svgs in migrate images to cloudflare script
+
+### Server
+- Add delivery ETA in tracker page
+
+### Web
+- Improve header and searchbar (desktop and mobile)
+
+
 <a name="release-v1.0.5"></a>
 ## [release-v1.0.5] - 2025-12-25
 ### Docs
@@ -575,7 +590,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.5...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.6...HEAD
+[release-v1.0.6]: https://github.com/flamendless/cchoice/compare/release-v1.0.5...release-v1.0.6
 [release-v1.0.5]: https://github.com/flamendless/cchoice/compare/dev-v0.1.1...release-v1.0.5
 [dev-v0.1.1]: https://github.com/flamendless/cchoice/compare/release-v1.0.4...dev-v0.1.1
 [release-v1.0.4]: https://github.com/flamendless/cchoice/compare/release-v1.0.3...release-v1.0.4

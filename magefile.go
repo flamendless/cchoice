@@ -564,7 +564,7 @@ func GenAll() error {
 }
 
 func GenChlog() error {
-	fmt.Println("Always create a `git tag` and `mage genall` first before running this command")
+	fmt.Println("Always create a `git tag` first before running this command")
 	fmt.Print("Do you want to proceed? (y/N): ")
 
 	reader := bufio.NewReader(os.Stdin)
@@ -577,6 +577,10 @@ func GenChlog() error {
 	if response != "y" && response != "yes" {
 		fmt.Println("Cancelled.")
 		return nil
+	}
+
+	if err := GenAll(); err != nil {
+		return err
 	}
 
 	return run(Command{
