@@ -5,9 +5,11 @@
 <a name="release-v1.0.8"></a>
 ## [release-v1.0.8] - 2025-12-29
 ### CICD
+- Remove CC
 - Test release notes email
 
 ### Docs
+- Release v1.0.8
 - Release v1.0.7
 
 
