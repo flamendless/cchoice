@@ -60,7 +60,7 @@ func ModalProductImageViewer(productID string, imageData string) templ.Component
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(placeholderImageSrc)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/modal_product_image_viewer.templ`, Line: 51, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/modal_product_image_viewer.templ`, Line: 54, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {

@@ -23,6 +23,7 @@ templ ModalProductImageViewer(productID string, imageData string) {
 	<input type="hidden" id="selected-product-name" value=""/>
 	<input type="hidden" id="selected-product-brand" value=""/>
 	<input type="hidden" id="selected-product-price" value=""/>
+
 	<div
 		id="modal_image_viewer"
 		class="fixed hidden top-0 bottom-0 left-0 right-0 z-1000
@@ -41,7 +42,9 @@ templ ModalProductImageViewer(productID string, imageData string) {
 		<div
 			class="absolute -z-1 top-0 bottom-0 left-0 right-0 bg-white/50"
 			_="on click trigger closeModal"
-		></div>
+		>
+		</div>
+
 		<div
 			class="modal-content w-full max-w-[32rem] h-screen flex flex-col items-center justify-center px-4"
 		>

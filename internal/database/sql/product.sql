@@ -180,6 +180,8 @@ LIMIT ?
 SELECT
 	tbl_products.id,
 	tbl_products.name,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
 	tbl_brands.name AS brand_name,
 	COALESCE(
 		tbl_product_images.thumbnail,

@@ -85,8 +85,10 @@ func ToCategorySectionProducts[T queries.GetProductsByCategoryIDRow](
 
 type SearchResultProduct struct {
 	queries.GetProductsBySearchQueryRow
-	ProductID string
-	CDNURL    string
+	ProductID    string
+	CDNURL       string
+	CDNURL1280   string
+	PriceDisplay string
 }
 
 func ToSearchResultProduct[T queries.GetProductsBySearchQueryRow](
@@ -95,9 +97,12 @@ func ToSearchResultProduct[T queries.GetProductsBySearchQueryRow](
 	data T,
 ) SearchResultProduct {
 	r := queries.GetProductsBySearchQueryRow(data)
+	price := utils.NewMoney(r.UnitPriceWithVat, r.UnitPriceWithVatCurrency)
 	return SearchResultProduct{
 		GetProductsBySearchQueryRow: r,
 		ProductID:                   encoder.Encode(r.ID),
 		CDNURL:                      getCDNURL(r.ThumbnailPath),
+		CDNURL1280:                  getCDNURL(constants.ToPath1280(r.ThumbnailPath)),
+		PriceDisplay:                price.Display(),
 	}
 }
