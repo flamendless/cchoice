@@ -19,7 +19,7 @@ mage dbUp
 
 echo "Building..."
 go generate ./...
-mage prod
+mage dev
 
 echo "Running API..."
 ./tmp/main api > out 2>&1 &
