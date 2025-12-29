@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'dev-v*.*.*'
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -12,34 +13,40 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    # - name: Execute remote SSH commands using SSH key
+    #   uses: appleboy/ssh-action@v1
+    #   with:
+    #     host: ${{ secrets.HOST }}
+    #     username: ${{ secrets.USERNAME }}
+    #     key: ${{ secrets.SSH_KEY }}
+    #     script: |
+    #       source ~/.bashrc
+    #       bash cchoice/scripts/deploy.sh
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        fetch-depth: 0
-        clean: true
+        node-version: '20'
 
-    - name: Execute remote SSH commands using SSH key
-      uses: appleboy/ssh-action@v1
+    - name: Send Email
+      uses: ksatriow/action-mailer@v1.0.0
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.SSH_KEY }}
-        script: |
-          source ~/.bashrc
-          bash cchoice/scripts/deploy.sh
-
-  send-email:
-    needs: deploy
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Send Email via Gmail
-      uses: Raghul-M/gmail-sender-action@v1
-      with:
-        sender_email: ${{ secrets.GMAIL_SENDER }}
-        app_password: ${{ secrets.GMAIL_APP_PASSWORD }}
-        receiver_emails: ${{ secrets.RECIPIENTS }}
-        template_path: "templates/dev_email_template.html"
-        subject: "C-Choice Website (Dev) Notification"
+        smtp-server: smtp.gmail.com
+        smtp-port: 465
+        smtp-secure: true
+        from-email: ${{ secrets.GMAIL_SENDER }}
+        to-email: ${{ secrets.RECIPIENTS }}
+        username: ${{ secrets.GMAIL_SENDER }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: "✅ Deployment Success - ${{ github.ref_name }}"
+        html-template: "./templates/dev_email_template.html"
+        template-variables: |
+          {
+            "name": "${{ github.actor }}",
+            "job_name": "${{ github.job }}",
+            "status": "SUCCESS",
+            "branch": "${{ github.ref_name }}",
+            "commit": "${{ github.sha }}",
+            "workflow": "${{ github.workflow }}"
+          }
