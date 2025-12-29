@@ -6,7 +6,6 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/logs"
 	"net/http"
-	"fmt"
 
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
@@ -25,7 +24,7 @@ func (s *Server) ordersTrackPageHandler(w http.ResponseWriter, r *http.Request) 
 
 	orderNo := r.URL.Query().Get("order_no")
 	if orderNo == "" {
-		if err := components.OrderTrackerPage(components.OrderTrackerPageBody(orderNo, email, mobileNo)).Render(ctx, w); err != nil {
+		if err := components.OrderTrackerPage(components.OrderTrackerPageBody(orderNo, "", email, mobileNo)).Render(ctx, w); err != nil {
 			logs.Log().Error(logtag, zap.String("order_no", orderNo), zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -44,9 +43,7 @@ func (s *Server) ordersTrackPageHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	fmt.Println(order)
-
-	if err := components.OrderTrackerPage(components.OrderTrackerPageBody(orderNo, email, mobileNo)).Render(ctx, w); err != nil {
+	if err := components.OrderTrackerPage(components.OrderTrackerPageBody(orderNo, order.ShippingEta.String, email, mobileNo)).Render(ctx, w); err != nil {
 		logs.Log().Error(logtag, zap.String("order_no", orderNo), zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
