@@ -434,6 +434,8 @@ const getProductsBySearchQuery = `-- name: GetProductsBySearchQuery :many
 SELECT
 	tbl_products.id,
 	tbl_products.name,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
 	tbl_brands.name AS brand_name,
 	COALESCE(
 		tbl_product_images.thumbnail,
@@ -454,10 +456,12 @@ type GetProductsBySearchQueryParams struct {
 }
 
 type GetProductsBySearchQueryRow struct {
-	ID            int64
-	Name          string
-	BrandName     string
-	ThumbnailPath string
+	ID                       int64
+	Name                     string
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	BrandName                string
+	ThumbnailPath            string
 }
 
 // TODO: (Brandon) if sqlc releases PR #3498
@@ -475,6 +479,8 @@ func (q *Queries) GetProductsBySearchQuery(ctx context.Context, arg GetProductsB
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
 			&i.BrandName,
 			&i.ThumbnailPath,
 		); err != nil {

@@ -556,10 +556,7 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	if err := r.ParseForm(); err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Error(err),
-		)
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

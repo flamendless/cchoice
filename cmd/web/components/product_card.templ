@@ -45,7 +45,27 @@ templ SearchMore(query string) {
 
 templ SearchResultProductCard(product models.SearchResultProduct) {
 	<li>
-		<div class="group flex flex-row items-center py-2 bg-white hover:bg-cchoicesoft transition-colors">
+		<div
+			class="group flex flex-row items-center py-2 bg-white hover:bg-cchoicesoft transition-colors cursor-pointer"
+			data-product-id={ product.ProductID }
+			data-product-thumbnail-path={ product.CDNURL1280 }
+			data-product-name={ product.Name }
+			data-product-brand={ product.BrandName }
+			data-product-price={ product.PriceDisplay }
+			_="
+				on click
+					set #selected-product-id.value to my @data-product-id
+					set #selected-product-thumbnail-path.value to my @data-product-thumbnail-path
+					set #selected-product-name.value to my @data-product-name
+					set #selected-product-brand.value to my @data-product-brand
+					set #selected-product-price.value to my @data-product-price
+					log 'selected product-id: ' + #selected-product-id.value
+					log 'selected thumbnail image path: ' + #selected-product-thumbnail-path.value
+					trigger get on #modal_image_viewer_image
+					trigger openModal on #modal_image_viewer
+				end
+			"
+		>
 			<img
 				class="w-16 max-w-16 h-16 mx-4"
 				src={ product.CDNURL }
