@@ -2,6 +2,15 @@
 ## [Unreleased]
 
 
+<a name="release-v1.0.7"></a>
+## [release-v1.0.7] - 2025-12-29
+### Docs
+- Release v1.0.6
+
+### Web
+- On search click, display the modal
+
+
 <a name="release-v1.0.6"></a>
 ## [release-v1.0.6] - 2025-12-29
 ### Docs
@@ -590,7 +599,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.6...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.7...HEAD
+[release-v1.0.7]: https://github.com/flamendless/cchoice/compare/release-v1.0.6...release-v1.0.7
 [release-v1.0.6]: https://github.com/flamendless/cchoice/compare/release-v1.0.5...release-v1.0.6
 [release-v1.0.5]: https://github.com/flamendless/cchoice/compare/dev-v0.1.1...release-v1.0.5
 [dev-v0.1.1]: https://github.com/flamendless/cchoice/compare/release-v1.0.4...dev-v0.1.1
