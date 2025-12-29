@@ -7,6 +7,14 @@ import "cchoice/internal/utils"
 
 var (
 	onceHeadLinks = templ.NewOnceHandle()
+	faviconsizes = []string{
+		"114x114",
+		"128x128",
+		"152x152",
+		"167x167",
+		"180x180",
+		"192x192",
+	}
 )
 
 templ TabTitle(page string) {
@@ -30,7 +38,7 @@ templ HeadMeta() {
 	<meta name="keywords" content="cchoice, c-choice, construction, power tools"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<!--<link rel="dns-prefetch" href="https://images1.cchoice.com"/>-->
-	<link rel="preload" href={ utils.URL("/static/svg/logo_complete.svg") } as="image" type="image/svg+xml"/>
+	<link rel="preload" href={ constants.PathSVGLogoWithCompleteText } as="image" type="image/svg+xml"/>
 	<link
 		rel="preload"
 		href={ constants.PathEmptyImageCDN }
@@ -48,7 +56,7 @@ templ HeadMeta() {
 	/>
 	<meta property="og:type" content="website"/>
 	<!--<meta property="og:url" content="https://www.cchoice.com/"/>-->
-	<meta property="og:image" content={ utils.URL("/static/images/favicons/192x192.png") }/>
+	<meta property="og:image" content="https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-192x192/public"/>
 	<meta
 		property="og:image:secure_url"
 		content={ utils.URL("/static/images/favicons/192x192.png") }
@@ -58,12 +66,11 @@ templ HeadMeta() {
 
 	@onceHeadLinks.Once() {
 		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ utils.URL("/static/images/favicons/favicon.ico") }/>
-		<link rel="icon" type="image/png" sizes="114x114" href={ utils.URL("/static/images/favicons/114x114.png") }/>
-		<link rel="icon" type="image/png" sizes="128x128" href={ utils.URL("/static/images/favicons/128x128.png") }/>
-		<link rel="icon" type="image/png" sizes="152x152" href={ utils.URL("/static/images/favicons/152x152.png") }/>
-		<link rel="icon" type="image/png" sizes="167x167" href={ utils.URL("/static/images/favicons/167x167.png") }/>
-		<link rel="icon" type="image/png" sizes="180x180" href={ utils.URL("/static/images/favicons/180x180.png") }/>
-		<link rel="icon" type="image/png" sizes="192x192" href={ utils.URL("/static/images/favicons/192x192.png") }/>
+
+		for _, size := range faviconsizes {
+			<link rel="icon" type="image/png" sizes={ size } href={ fmt.Sprintf("https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-%s/public", size) }/>
+		}
+
 		<link href={ utils.URL("/static/css/tailwind.css") } rel="stylesheet"/>
 		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/htmx.min.js")) }></script>
 		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/hyperscript.min.js")) }></script>
