@@ -40,6 +40,7 @@ templ CategoriesSidePanel() {
 		<div
 			class="flex items-center justify-between cursor-pointer p-2"
 			_="on click
+				async call metrics_event('category_side_panel_click')
 				toggle .hidden on #categories-side-panel-content
 				if #categories-side-panel-content matches .hidden
 					set #categories-chevron's *transform to 'rotate(0deg)'

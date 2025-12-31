@@ -1,6 +1,9 @@
 package utils
 
-import "cchoice/internal/conf"
+import (
+	"cchoice/internal/conf"
+	"fmt"
+)
 
 func URL(path string) string {
 	if conf.Conf().IsProd() {
@@ -14,4 +17,8 @@ func MatchPath(path string, target string) bool {
 		return path == ("/cchoice" + target)
 	}
 	return path == target
+}
+
+func MetricsEvent(event string) string {
+	return fmt.Sprintf("%s?event=%s", URL("/metrics/event"), event)
 }

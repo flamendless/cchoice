@@ -93,7 +93,7 @@ func OrderTrackerSearchBox() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-trigger=\"submit\" hx-target=\"#order-result\" hx-push-url=\"true\"><div class=\"relative\"><div class=\"hidden absolute inset-y-0 start-0 sm:flex items-center ps-2 pointer-events-none\" _=\"\n\t\t\t\t\ton htmx:beforeRequest from #order-track-input\n\t\t\t\t\t\tadd .hidden to #order-track-icon-search\n\t\t\t\t\t\tremove .hidden from #order-track-icon-spinner\n\t\t\t\t\tend\n\n\t\t\t\t\ton htmx:afterRequest from #order-track-input\n\t\t\t\t\t\twait 0.25s\n\t\t\t\t\t\tremove .hidden from #order-track-icon-search\n\t\t\t\t\t\tadd .hidden to #order-track-icon-spinner\n\t\t\t\t\tend\n\t\t\t\t\"><!-- Search icon -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-trigger=\"submit\" hx-target=\"#order-result\" hx-push-url=\"true\" _=\"\n\t\t\ton submit\n\t\t\t\tasync call metrics_event('order_track_search', #order-track-input.value)\n\t\t\tend\n\t\t\"><div class=\"relative\"><div class=\"hidden absolute inset-y-0 start-0 sm:flex items-center ps-2 pointer-events-none\" _=\"\n\t\t\t\t\ton htmx:beforeRequest from #order-track-input\n\t\t\t\t\t\tadd .hidden to #order-track-icon-search\n\t\t\t\t\t\tremove .hidden from #order-track-icon-spinner\n\t\t\t\t\tend\n\n\t\t\t\t\ton htmx:afterRequest from #order-track-input\n\t\t\t\t\t\twait 0.25s\n\t\t\t\t\t\tremove .hidden from #order-track-icon-search\n\t\t\t\t\t\tadd .hidden to #order-track-icon-spinner\n\t\t\t\t\tend\n\t\t\t\t\"><!-- Search icon -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -145,7 +145,7 @@ func OrderTrackerSearchBoxPlain() templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/orders/track"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 110, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 115, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -220,7 +220,7 @@ func OrderTrackerPageBody(orderNo string, deliveryETA string, email string, mobi
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(orderNo)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 162, Col: 75}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 167, Col: 75}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -233,7 +233,7 @@ func OrderTrackerPageBody(orderNo string, deliveryETA string, email string, mobi
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(deliveryETA)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 164, Col: 79}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 169, Col: 79}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -251,7 +251,7 @@ func OrderTrackerPageBody(orderNo string, deliveryETA string, email string, mobi
 		var templ_7745c5c3_Var9 templ.SafeURL
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(email))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 171, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 176, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -264,7 +264,7 @@ func OrderTrackerPageBody(orderNo string, deliveryETA string, email string, mobi
 		var templ_7745c5c3_Var10 templ.SafeURL
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(mobileNo))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 175, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 180, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -350,7 +350,7 @@ func OrderTrackerPageBodyError(orderNo string, email string, mobileNo string) te
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(orderNo)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 208, Col: 72}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 213, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -363,7 +363,7 @@ func OrderTrackerPageBodyError(orderNo string, email string, mobileNo string) te
 		var templ_7745c5c3_Var13 templ.SafeURL
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(email))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 218, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 223, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -376,7 +376,7 @@ func OrderTrackerPageBodyError(orderNo string, email string, mobileNo string) te
 		var templ_7745c5c3_Var14 templ.SafeURL
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(mobileNo))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 222, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/order_tracker_page.templ`, Line: 227, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {

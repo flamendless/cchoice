@@ -169,7 +169,7 @@ func BrandsSidePanel() templ.Component {
 			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div id=\"brands-side-panel\" class=\"\n\t\t\tw-full flex flex-col\n\t\t\tborder-b-2 border-cchoice_border\n\t\t\"><div class=\"flex items-center justify-between cursor-pointer p-2\" _=\"on click\n\t\t\t\ttoggle .hidden on #brands-side-panel-content\n\t\t\t\tif #brands-side-panel-content matches .hidden\n\t\t\t\t\tset #brands-chevron's *transform to 'rotate(0deg)'\n\t\t\t\t\tset #brands-side-panel-content@data-collapsed to 'true'\n\t\t\t\telse\n\t\t\t\t\tset #brands-chevron's *transform to 'rotate(180deg)'\n\t\t\t\t\tset #brands-side-panel-content@data-collapsed to 'false'\n\t\t\t\tend\n\t\t\t\"><p class=\"text-xs font-normal text-nowrap\">Brands</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div id=\"brands-side-panel\" class=\"\n\t\t\tw-full flex flex-col\n\t\t\tborder-b-2 border-cchoice_border\n\t\t\"><div class=\"flex items-center justify-between cursor-pointer p-2\" _=\"on click\n\t\t\t\tasync call metrics_event('brands_side_panel_click')\n\t\t\t\ttoggle .hidden on #brands-side-panel-content\n\t\t\t\tif #brands-side-panel-content matches .hidden\n\t\t\t\t\tset #brands-chevron's *transform to 'rotate(0deg)'\n\t\t\t\t\tset #brands-side-panel-content@data-collapsed to 'true'\n\t\t\t\telse\n\t\t\t\t\tset #brands-chevron's *transform to 'rotate(180deg)'\n\t\t\t\t\tset #brands-side-panel-content@data-collapsed to 'false'\n\t\t\t\tend\n\t\t\t\"><p class=\"text-xs font-normal text-nowrap\">Brands</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -184,7 +184,7 @@ func BrandsSidePanel() templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/brands/side-panel/list"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/brand_side_panel.templ`, Line: 71, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/brand_side_panel.templ`, Line: 72, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {

@@ -31,7 +31,7 @@ func MobileSearchToggle() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<button type=\"button\" aria-label=\"Open search\" class=\"\n\t\t\ttext-cchoice p-2 rounded-full\n\t\t\tlg:hidden\n\t\t\thover:bg-cchoice_border\n\t\t\" _=\"\n\t\t\ton click\n\t\t\t\ttoggle .hidden on #mobile-search-panel\n\t\t\t\tif #mobile-search-panel does not match .hidden\n\t\t\t\t\twait 0.05s\n\t\t\t\t\tfocus() on #search-mobile\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<button type=\"button\" aria-label=\"Open search\" class=\"\n\t\t\ttext-cchoice p-2 rounded-full\n\t\t\tlg:hidden\n\t\t\thover:bg-cchoice_border\n\t\t\" _=\"\n\t\t\ton click\n\t\t\t\tasync call metrics_event('mobile_search_toggle')\n\t\t\t\ttoggle .hidden on #mobile-search-panel\n\t\t\t\tif #mobile-search-panel does not match .hidden\n\t\t\t\t\twait 0.05s\n\t\t\t\t\tfocus() on #search-mobile\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -105,14 +105,14 @@ func SearchBarMobile() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form class=\"w-full\"><div class=\"relative\"><input id=\"search-mobile\" type=\"search\" name=\"search\" placeholder=\"Search products…\" autocomplete=\"off\" class=\"\n\t\t\t\t\tw-full p-2.5\n\t\t\t\t\ttext-xs\n\t\t\t\t\tborder border-searchbar rounded-lg\n\t\t\t\t\tbg-searchbar\n\t\t\t\t\tfocus:ring-cchoice focus:border-cchoice\n\t\t\t\t\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form class=\"w-full\" _=\"\n\t\t\ton submit\n\t\t\t\tasync call metrics_event('search_mobile', #search-mobile.value)\n\t\t\tend\n\t\t\"><div class=\"relative\"><input id=\"search-mobile\" type=\"search\" name=\"search\" placeholder=\"Search products…\" autocomplete=\"off\" class=\"\n\t\t\t\t\tw-full p-2.5\n\t\t\t\t\ttext-xs\n\t\t\t\t\tborder border-searchbar rounded-lg\n\t\t\t\t\tbg-searchbar\n\t\t\t\t\tfocus:ring-cchoice focus:border-cchoice\n\t\t\t\t\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/search"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/searchbar_mobile.templ`, Line: 58, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/searchbar_mobile.templ`, Line: 66, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {

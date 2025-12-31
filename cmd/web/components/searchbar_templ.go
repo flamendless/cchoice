@@ -31,7 +31,7 @@ func SearchBarDesktop() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form class=\"w-full lg:w-6/12\"><label for=\"search\" class=\"mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white\">Search</label><div class=\"relative\"><div class=\"hidden absolute inset-y-0 start-0 sm:flex items-center ps-2 pointer-events-none\" _=\"\n\t\t\t\t\ton htmx:beforeRequest from #search\n\t\t\t\t\t\tlog 'search is triggered'\n\t\t\t\t\t\tadd .hidden to #icon-search\n\t\t\t\t\t\tadd .hidden to #search-results\n\t\t\t\t\t\tremove .hidden from #icon-spinner-search\n\t\t\t\t\tend\n\n\t\t\t\t\ton htmx:afterRequest from #search\n\t\t\t\t\t\tlog 'search is done'\n\t\t\t\t\t\twait 0.25s\n\t\t\t\t\t\tremove .hidden from #icon-search\n\t\t\t\t\t\tremove .hidden from #search-results\n\t\t\t\t\t\tadd .hidden to #icon-spinner-search\n\t\t\t\t\tend\n\t\t\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form class=\"w-full lg:w-6/12\" _=\"\n\t\t\ton submit\n\t\t\t\tasync call metrics_event('search_desktop', #search.value)\n\t\t\tend\n\t\t\"><label for=\"search\" class=\"mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white\">Search</label><div class=\"relative\"><div class=\"hidden absolute inset-y-0 start-0 sm:flex items-center ps-2 pointer-events-none\" _=\"\n\t\t\t\t\ton htmx:beforeRequest from #search\n\t\t\t\t\t\tlog 'search is triggered'\n\t\t\t\t\t\tadd .hidden to #icon-search\n\t\t\t\t\t\tadd .hidden to #search-results\n\t\t\t\t\t\tremove .hidden from #icon-spinner-search\n\t\t\t\t\tend\n\n\t\t\t\t\ton htmx:afterRequest from #search\n\t\t\t\t\t\tlog 'search is done'\n\t\t\t\t\t\twait 0.25s\n\t\t\t\t\t\tremove .hidden from #icon-search\n\t\t\t\t\t\tremove .hidden from #search-results\n\t\t\t\t\t\tadd .hidden to #icon-spinner-search\n\t\t\t\t\tend\n\t\t\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -46,7 +46,7 @@ func SearchBarDesktop() templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/search"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/searchbar.templ`, Line: 51, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/searchbar.templ`, Line: 58, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {

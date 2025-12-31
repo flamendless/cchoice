@@ -34,7 +34,10 @@ templ AddToCart() {
 		hx-include="#selected-product-id"
 		hx-swap="none"
 		_="
-			on click log 'Added to cart: ' + #selected-product-id.value end
+			on click
+				async call metrics_event('add_to_cart', #selected-product-id.value)
+				log 'Added to cart: ' + #selected-product-id.value
+			end
 			on htmx:afterRequest
 				trigger get on #cart-count
 			end

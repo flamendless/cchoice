@@ -50,6 +50,7 @@ templ BrandsSidePanel() {
 		<div
 			class="flex items-center justify-between cursor-pointer p-2"
 			_="on click
+				async call metrics_event('brands_side_panel_click')
 				toggle .hidden on #brands-side-panel-content
 				if #brands-side-panel-content matches .hidden
 					set #brands-chevron's *transform to 'rotate(0deg)'

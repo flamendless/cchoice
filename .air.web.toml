@@ -17,7 +17,7 @@ tmp_dir = "tmp"
   follow_symlink = false
   full_bin = "APP_ENV='web' ./tmp/web"
   include_dir = ["cmd/web"]
-  include_ext = ["templ", "html", "css"]
+  include_ext = ["templ", "html", "css", "js"]
   include_file = []
   kill_delay = "0s"
   log = "build-errors.log"

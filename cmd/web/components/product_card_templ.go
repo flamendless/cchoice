@@ -197,14 +197,14 @@ func SearchResultProductCard(product models.SearchResultProduct) templ.Component
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" _=\"\n\t\t\t\ton click\n\t\t\t\t\tset #selected-product-id.value to my @data-product-id\n\t\t\t\t\tset #selected-product-thumbnail-path.value to my @data-product-thumbnail-path\n\t\t\t\t\tset #selected-product-name.value to my @data-product-name\n\t\t\t\t\tset #selected-product-brand.value to my @data-product-brand\n\t\t\t\t\tset #selected-product-price.value to my @data-product-price\n\t\t\t\t\tlog 'selected product-id: ' + #selected-product-id.value\n\t\t\t\t\tlog 'selected thumbnail image path: ' + #selected-product-thumbnail-path.value\n\t\t\t\t\ttrigger get on #modal_image_viewer_image\n\t\t\t\t\ttrigger openModal on #modal_image_viewer\n\t\t\t\tend\n\t\t\t\"><img class=\"w-16 max-w-16 h-16 mx-4\" src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" _=\"\n\t\t\t\ton click\n\t\t\t\t\tasync call metrics_event('search_result_clicked', #selected-product-id.value)\n\t\t\t\t\tset #selected-product-id.value to my @data-product-id\n\t\t\t\t\tset #selected-product-thumbnail-path.value to my @data-product-thumbnail-path\n\t\t\t\t\tset #selected-product-name.value to my @data-product-name\n\t\t\t\t\tset #selected-product-brand.value to my @data-product-brand\n\t\t\t\t\tset #selected-product-price.value to my @data-product-price\n\t\t\t\t\tlog 'selected product-id: ' + #selected-product-id.value\n\t\t\t\t\tlog 'selected thumbnail image path: ' + #selected-product-thumbnail-path.value\n\t\t\t\t\ttrigger get on #modal_image_viewer_image\n\t\t\t\t\ttrigger openModal on #modal_image_viewer\n\t\t\t\tend\n\t\t\t\"><img class=\"w-16 max-w-16 h-16 mx-4\" src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(product.CDNURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/product_card.templ`, Line: 71, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/product_card.templ`, Line: 72, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -217,7 +217,7 @@ func SearchResultProductCard(product models.SearchResultProduct) templ.Component
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(product.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/product_card.templ`, Line: 72, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/product_card.templ`, Line: 73, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -230,7 +230,7 @@ func SearchResultProductCard(product models.SearchResultProduct) templ.Component
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(product.Name + " thumbnail")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/product_card.templ`, Line: 73, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/product_card.templ`, Line: 74, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -243,7 +243,7 @@ func SearchResultProductCard(product models.SearchResultProduct) templ.Component
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(product.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/product_card.templ`, Line: 76, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/product_card.templ`, Line: 77, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -256,7 +256,7 @@ func SearchResultProductCard(product models.SearchResultProduct) templ.Component
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(product.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/product_card.templ`, Line: 79, Col: 18}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/product_card.templ`, Line: 80, Col: 18}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {

@@ -39,6 +39,8 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 						data-product-price={ product.PriceDisplay }
 						_="
 							on click
+								async call metrics_event('product_clicked', #selected-product-id.value)
+
 								set #selected-product-id.value to my @data-product-id
 								set #selected-product-thumbnail-path.value to my @data-product-thumbnail-path
 								set #selected-product-name.value to my @data-product-name
