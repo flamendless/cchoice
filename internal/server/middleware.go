@@ -2,9 +2,13 @@ package server
 
 import (
 	"cchoice/internal/conf"
+	"cchoice/internal/metrics"
+	"cchoice/internal/utils"
 	"crypto/subtle"
 	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi/v5/middleware"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -85,4 +89,28 @@ func MetricsBasicAuth(next http.Handler) http.Handler {
 func unauthorized(w http.ResponseWriter) {
 	w.Header().Set("WWW-Authenticate", `Basic realm="metrics"`)
 	w.WriteHeader(http.StatusUnauthorized)
+}
+
+func PrometheusMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path
+
+		if utils.MatchPath(path, "/metrics") || utils.MatchPath(path, "/health") {
+			metrics.HTTP.RoutesSkippedHit(r.Method, path)
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
+
+		next.ServeHTTP(ww, r)
+
+		status := ww.Status()
+
+		metrics.HTTP.RequestsHit(r.Method, path, strconv.Itoa(status))
+
+		if status >= 500 {
+			metrics.HTTP.ErrorsHit(r.Method, path, strconv.Itoa(status))
+		}
+	})
 }

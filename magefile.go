@@ -809,10 +809,16 @@ func DBDown() error {
 
 func Prom() error {
 	if !checkProc("./tmp/main", 7331) {
-		return fmt.Errorf("main process not running")
+		return fmt.Errorf("api process not running")
 	}
 	openBrowser("http://localhost:9090/")
-	return run(Command{Type: CmdExec, Cmd: "prometheus"})
+	return run(Command{
+		Type: CmdExec,
+		Cmd: "prometheus",
+		Args: []string{
+			"--config.file=prometheus/prometheus.yml",
+		},
+	})
 }
 
 func Graf() error {

@@ -85,6 +85,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.CleanPath)
 	r.Use(middleware.RequestID)
+	r.Use(PrometheusMiddleware)
 	r.Use(middleware.Logger)
 	r.Use(SecurityHeadersMiddleware)
 	// r.Use(middleware.NoCache)
