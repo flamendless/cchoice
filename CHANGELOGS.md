@@ -2,6 +2,32 @@
 ## [Unreleased]
 
 
+<a name="release-v1.0.9"></a>
+## [release-v1.0.9] - 2025-12-31
+### CICD
+- Change email step for dev
+
+### Server
+- Implement http requests prometheus metrics
+- Use basic auth for metrics endpoint
+- Address preload warnings
+
+
+<a name="dev-v0.1.3"></a>
+## [dev-v0.1.3] - 2025-12-29
+### CICD
+- Update tag
+
+
+<a name="dev-v0.1.2"></a>
+## [dev-v0.1.2] - 2025-12-29
+### CICD
+- Change email step for dev
+
+### Docs
+- Release v1.0.8
+
+
 <a name="release-v1.0.8"></a>
 ## [release-v1.0.8] - 2025-12-29
 ### CICD
@@ -612,7 +638,10 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.8...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.9...HEAD
+[release-v1.0.9]: https://github.com/flamendless/cchoice/compare/dev-v0.1.3...release-v1.0.9
+[dev-v0.1.3]: https://github.com/flamendless/cchoice/compare/dev-v0.1.2...dev-v0.1.3
+[dev-v0.1.2]: https://github.com/flamendless/cchoice/compare/release-v1.0.8...dev-v0.1.2
 [release-v1.0.8]: https://github.com/flamendless/cchoice/compare/release-v1.0.7...release-v1.0.8
 [release-v1.0.7]: https://github.com/flamendless/cchoice/compare/release-v1.0.6...release-v1.0.7
 [release-v1.0.6]: https://github.com/flamendless/cchoice/compare/release-v1.0.5...release-v1.0.6
