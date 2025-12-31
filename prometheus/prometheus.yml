@@ -1,5 +1,5 @@
 scrape_configs:
-  - job_name: cchoice
+  - job_name: 'cchoice'
     metrics_path: '/cchoice/metrics'
     static_configs:
       - targets:

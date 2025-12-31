@@ -53,8 +53,6 @@ func init() {
 	prometheus.MustRegister(headersHit, memHit, reset, linodeAssetHit, linodeAssetError)
 }
 
-var Cache metricsCache
-
 type metricsCache struct{}
 
 func (c *metricsCache) HeadersHit()       { headersHit.Inc() }
@@ -64,3 +62,5 @@ func (c *metricsCache) MemMiss()          { memMiss.Inc() }
 func (c *metricsCache) ResetAll()         { reset.Inc() }
 func (c *metricsCache) LinodeAssetHit()   { linodeAssetHit.Inc() }
 func (c *metricsCache) LinodeAssetError() { linodeAssetError.Inc() }
+
+var Cache metricsCache

@@ -8,3 +8,10 @@ func URL(path string) string {
 	}
 	return "/cchoice" + path
 }
+
+func MatchPath(path string, target string) bool {
+	if conf.Conf().IsLocal() || conf.Conf().IsWeb() {
+		return path == ("/cchoice" + target)
+	}
+	return path == target
+}
