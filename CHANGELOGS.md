@@ -2,6 +2,15 @@
 ## [Unreleased]
 
 
+<a name="release-v1.0.10"></a>
+## [release-v1.0.10] - 2025-12-31
+### Docs
+- Release v1.0.9
+
+### Server
+- Implement basic event metrics
+
+
 <a name="release-v1.0.9"></a>
 ## [release-v1.0.9] - 2025-12-31
 ### CICD
@@ -638,7 +647,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.9...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.10...HEAD
+[release-v1.0.10]: https://github.com/flamendless/cchoice/compare/release-v1.0.9...release-v1.0.10
 [release-v1.0.9]: https://github.com/flamendless/cchoice/compare/dev-v0.1.3...release-v1.0.9
 [dev-v0.1.3]: https://github.com/flamendless/cchoice/compare/dev-v0.1.2...dev-v0.1.3
 [dev-v0.1.2]: https://github.com/flamendless/cchoice/compare/release-v1.0.8...dev-v0.1.2
