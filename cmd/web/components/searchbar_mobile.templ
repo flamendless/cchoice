@@ -13,6 +13,7 @@ templ MobileSearchToggle() {
 		"
 		_="
 			on click
+				async call metrics_event('mobile_search_toggle')
 				toggle .hidden on #mobile-search-panel
 				if #mobile-search-panel does not match .hidden
 					wait 0.05s
@@ -40,7 +41,14 @@ templ MobileSearchPanel() {
 }
 
 templ SearchBarMobile() {
-	<form class="w-full">
+	<form
+		class="w-full"
+		_="
+			on submit
+				async call metrics_event('search_mobile', #search-mobile.value)
+			end
+		"
+	>
 		<div class="relative">
 			<input
 				id="search-mobile"

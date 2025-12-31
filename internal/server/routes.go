@@ -159,6 +159,7 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 	r.Get("/version", s.versionHandler)
 
 	r.With(MetricsBasicAuth).Handle("/metrics", promhttp.Handler())
+	r.Post("/metrics/event", s.metricsEventHandler)
 
 	r.Get("/", s.indexHandler)
 	r.Get("/settings/header-texts", s.headerTextsHandler)
@@ -646,4 +647,22 @@ func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotImplemented)
 		return
 	}
+}
+
+func (s *Server) metricsEventHandler(w http.ResponseWriter, r *http.Request) {
+	event := r.URL.Query().Get("event")
+	if event == "" {
+		http.Error(w, "missing event", http.StatusBadRequest)
+		return
+	}
+	value := r.URL.Query().Get("value")
+
+	logs.Log().Info(
+		"Got client event",
+		zap.String("event", event),
+		zap.String("value", value),
+	)
+
+	metrics.ClientEvent.ClientEventHit(event, value)
+	w.WriteHeader(http.StatusNoContent)
 }

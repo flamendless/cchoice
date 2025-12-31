@@ -142,7 +142,7 @@ func CategoriesSidePanel() templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div id=\"categories-side-panel\" class=\"w-full h-screen flex flex-col\"><div class=\"flex items-center justify-between cursor-pointer p-2\" _=\"on click\n\t\t\t\ttoggle .hidden on #categories-side-panel-content\n\t\t\t\tif #categories-side-panel-content matches .hidden\n\t\t\t\t\tset #categories-chevron's *transform to 'rotate(0deg)'\n\t\t\t\t\tset #categories-side-panel-content@data-collapsed to 'true'\n\t\t\t\telse\n\t\t\t\t\tset #categories-chevron's *transform to 'rotate(180deg)'\n\t\t\t\t\tset #categories-side-panel-content@data-collapsed to 'false'\n\t\t\t\tend\n\t\t\t\"><p class=\"text-xs font-normal text-nowrap\">Categories</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div id=\"categories-side-panel\" class=\"w-full h-screen flex flex-col\"><div class=\"flex items-center justify-between cursor-pointer p-2\" _=\"on click\n\t\t\t\tasync call metrics_event('category_side_panel_click')\n\t\t\t\ttoggle .hidden on #categories-side-panel-content\n\t\t\t\tif #categories-side-panel-content matches .hidden\n\t\t\t\t\tset #categories-chevron's *transform to 'rotate(0deg)'\n\t\t\t\t\tset #categories-side-panel-content@data-collapsed to 'true'\n\t\t\t\telse\n\t\t\t\t\tset #categories-chevron's *transform to 'rotate(180deg)'\n\t\t\t\t\tset #categories-side-panel-content@data-collapsed to 'false'\n\t\t\t\tend\n\t\t\t\"><p class=\"text-xs font-normal text-nowrap\">Categories</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -157,7 +157,7 @@ func CategoriesSidePanel() templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/product-categories/side-panel/list"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_side_panel.templ`, Line: 62, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/category_side_panel.templ`, Line: 63, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {

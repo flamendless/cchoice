@@ -22,6 +22,11 @@ templ OrderTrackerSearchBox() {
 		hx-trigger="submit"
 		hx-target="#order-result"
 		hx-push-url="true"
+		_="
+			on submit
+				async call metrics_event('order_track_search', #order-track-input.value)
+			end
+		"
 	>
 		<div class="relative">
 			<div

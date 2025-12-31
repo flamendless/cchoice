@@ -74,6 +74,8 @@ templ HeadMeta() {
 		<link href={ utils.URL("/static/css/tailwind.css") } rel="stylesheet"/>
 		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/htmx.min.js")) }></script>
 		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/hyperscript.min.js")) }></script>
+
+		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/metrics.js")) }></script>
 		@templ.JSONScript("url-prefix", utils.URL(""))
 
 		<script>

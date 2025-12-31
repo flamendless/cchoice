@@ -3,7 +3,14 @@ package components
 import "cchoice/internal/utils"
 
 templ SearchBarDesktop() {
-	<form class="w-full lg:w-6/12">
+	<form
+		class="w-full lg:w-6/12"
+		_="
+			on submit
+				async call metrics_event('search_desktop', #search.value)
+			end
+		"
+	>
 		<label for="search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
 		<div class="relative">
 			<div
