@@ -107,10 +107,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 
 	categoryID := chi.URLParam(r, "category_id")
 	if categoryID == "" {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Error(errs.ErrInvalidParams),
-		)
+		logs.LogCtx(ctx).Error(logtag, zap.Error(errs.ErrInvalidParams))
 		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
@@ -118,10 +115,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 	categoryDBID := s.encoder.Decode(categoryID)
 	category, err := s.dbRO.GetQueries().GetProductCategoryByID(ctx, categoryDBID)
 	if err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Error(err),
-		)
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -278,6 +278,14 @@ SELECT
 	tbl_products.description,
 	tbl_products.unit_price_with_vat,
 	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
 	tbl_brands.name AS brand_name,
 	COALESCE(
 		tbl_product_images.thumbnail,
@@ -290,6 +298,11 @@ INNER JOIN
 	tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
 LEFT JOIN
 	tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
 WHERE tbl_products_categories.category_id = ?
 ORDER BY tbl_products.created_at DESC
 LIMIT ?
@@ -306,6 +319,11 @@ type GetProductsByCategoryIDRow struct {
 	Description              sql.NullString
 	UnitPriceWithVat         int64
 	UnitPriceWithVatCurrency string
+	SalePriceWithVat         sql.NullInt64
+	SalePriceWithVatCurrency sql.NullString
+	IsOnSale                 int64
+	DiscountType             sql.NullString
+	DiscountValue            sql.NullInt64
 	BrandName                string
 	ThumbnailPath            string
 }
@@ -325,6 +343,11 @@ func (q *Queries) GetProductsByCategoryID(ctx context.Context, arg GetProductsBy
 			&i.Description,
 			&i.UnitPriceWithVat,
 			&i.UnitPriceWithVatCurrency,
+			&i.SalePriceWithVat,
+			&i.SalePriceWithVatCurrency,
+			&i.IsOnSale,
+			&i.DiscountType,
+			&i.DiscountValue,
 			&i.BrandName,
 			&i.ThumbnailPath,
 		); err != nil {
