@@ -218,6 +218,23 @@ type TblProductImage struct {
 	DeletedAt time.Time
 }
 
+type TblProductSale struct {
+	ID                          int64
+	ProductID                   int64
+	SalePriceWithoutVat         int64
+	SalePriceWithVat            int64
+	SalePriceWithoutVatCurrency string
+	SalePriceWithVatCurrency    string
+	DiscountType                string
+	DiscountValue               int64
+	StartsAt                    time.Time
+	EndsAt                      time.Time
+	IsActive                    bool
+	CreatedAt                   time.Time
+	UpdatedAt                   time.Time
+	DeletedAt                   time.Time
+}
+
 type TblProductSpec struct {
 	ID            int64
 	Colours       sql.NullString
