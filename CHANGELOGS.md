@@ -2,6 +2,18 @@
 ## [Unreleased]
 
 
+<a name="release-v1.0.11"></a>
+## [release-v1.0.11] - 2026-01-15
+### Docs
+- Release v1.0.10
+
+### Server
+- Set cache age for js files
+- Address lighthouse reports
+- Add robots.txt
+- WIP product sales
+
+
 <a name="release-v1.0.10"></a>
 ## [release-v1.0.10] - 2025-12-31
 ### Docs
@@ -647,7 +659,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.10...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.11...HEAD
+[release-v1.0.11]: https://github.com/flamendless/cchoice/compare/release-v1.0.10...release-v1.0.11
 [release-v1.0.10]: https://github.com/flamendless/cchoice/compare/release-v1.0.9...release-v1.0.10
 [release-v1.0.9]: https://github.com/flamendless/cchoice/compare/dev-v0.1.3...release-v1.0.9
 [dev-v0.1.3]: https://github.com/flamendless/cchoice/compare/dev-v0.1.2...dev-v0.1.3
