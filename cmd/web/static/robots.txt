@@ -1,0 +1,24 @@
+User-agent: *
+# Infrastructure
+Disallow: /health
+Disallow: /version
+Disallow: /metrics
+Disallow: /metrics/
+Disallow: /metrics/event
+
+# Internal configuration
+Disallow: /settings/
+
+# Non-crawlable actions
+Disallow: /search
+
+# Prevent query param explosion
+Disallow: /*?*
+
+# Allow images & assets
+Allow: /products/image
+Allow: /brands/logo
+Allow: /assets/image
+
+# Optional (add when ready)
+# Sitemap: https://cchoice.shop/sitemap.xml
