@@ -91,11 +91,14 @@ func setCacheControlHeaders(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case strings.Contains(r.URL.Path, "/static/"):
 		w.Header().Set("Cache-Control", "public, max-age=86400") // 1 day
+	case strings.HasPrefix(r.URL.Path, "js/") && strings.HasSuffix(r.URL.Path, ".js"):
+		w.Header().Set("Cache-Control", "public, max-age=604800") // 7 day
 	case r.URL.Path == "robots.txt":
 		w.Header().Set("Cache-Control", "public, max-age=604800") // 1 week
 	default:
 		w.Header().Set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400") // 1 hour, stale 1 day
 	}
+
 
 	if r.URL.RawQuery != "" {
 		w.Header().Set("Vary", "Accept, Accept-Encoding")
