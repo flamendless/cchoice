@@ -88,9 +88,12 @@ func parseAndSortQuery(rawQuery string) string {
 }
 
 func setCacheControlHeaders(w http.ResponseWriter, r *http.Request) {
-	if strings.Contains(r.URL.Path, "/static/") {
+	switch {
+	case strings.Contains(r.URL.Path, "/static/"):
 		w.Header().Set("Cache-Control", "public, max-age=86400") // 1 day
-	} else {
+	case r.URL.Path == "robots.txt":
+		w.Header().Set("Cache-Control", "public, max-age=604800") // 1 week
+	default:
 		w.Header().Set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400") // 1 hour, stale 1 day
 	}
 
