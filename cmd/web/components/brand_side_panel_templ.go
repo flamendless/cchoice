@@ -122,12 +122,12 @@ func BrandsSidePanelList(brands []models.BrandSidePanelText) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</p></a> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</p></a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<a disabled class=\"text-xs font-light ml-2 my-0.5 py-0.5\"><p class=\"text-ellipsis text-nowrap overflow-hidden\">More coming soon...</p></a><script type=\"text/javascript\" src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<p class=\"\n\t\t\t\ttext-ellipsis text-nowrap overflow-hidden\n\t\t\t\ttext-xs font-light ml-2 my-0.5 py-0.5\n\t\t\t\">More coming soon...</p><script type=\"text/javascript\" src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -34,12 +34,14 @@ templ headerLogo(platform string) {
 				src={ constants.PathSVGLogoWithCompleteText }
 				alt="cchoice logo and text"
 				class="object-contain logo-responsive"
+				loading="lazy"
 			/>
 		} else {
 			<img
 				src={ constants.PathSVGLogoOnly }
 				alt="cchoice logo"
 				class="object-contain logo-responsive"
+				loading="lazy"
 			/>
 		}
 	</a>
