@@ -12,12 +12,12 @@ module.exports = {
     },
     extend: {
       colors: {
-        cchoice: "#F6742F",
+        cchoice: "#d9480f",
         cchoice_c: "#2FB1F6",
-        cchoice_border: "#F6b08A",
+        cchoice_border: "#EE531B",
         searchbar: "#F7EFEA",
         cchoicesoft: "#F7EFEA",
-        cchoice_dark: "#F46133",
+        cchoice_dark: "#EE531B",
       }
     },
   },
