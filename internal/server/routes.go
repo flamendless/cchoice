@@ -351,7 +351,7 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	homePageData := models.HomePageData{
 		Sections:      models.BuildPostHomeContentSections(s.GetBrandLogoCDNURL),
-		StoreImageURL: s.GetAssetCDNURL("store.webp"),
+		StoreImageURL: constants.PathStoreImageCDN,
 	}
 
 	if err := components.HomePage(homePageData).Render(ctx, w); err != nil {
