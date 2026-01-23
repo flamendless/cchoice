@@ -9,6 +9,17 @@ INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 WHERE tbl_products.id = ?
 LIMIT 1;
 
+-- name: GetProductByName :one
+SELECT
+	*
+	-- tbl_brands.name AS brand_name
+FROM tbl_products
+-- INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
+-- INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
+-- INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE tbl_products.name = ?
+LIMIT 1;
+
 -- name: GetProductsBySerial :one
 SELECT
 	*,
