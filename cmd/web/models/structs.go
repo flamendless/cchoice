@@ -54,6 +54,7 @@ type CategorySectionProduct struct {
 	ProductID          string
 	CDNURL             string
 	CDNURL1280         string
+	OrigPriceDisplay   string
 	PriceDisplay       string
 	DiscountPercentage string
 }
@@ -75,6 +76,7 @@ func ToCategorySectionProducts[T queries.GetProductsByCategoryIDRow](
 	res := make([]CategorySectionProduct, 0, len(data))
 	for _, d := range data {
 		r := queries.GetProductsByCategoryIDRow(d)
+		origPrice := utils.NewMoney(r.UnitPriceWithVat, r.UnitPriceWithVatCurrency)
 		var price *money.Money
 		var discountPercentage string
 		if r.IsOnSale == 1 {
@@ -82,13 +84,14 @@ func ToCategorySectionProducts[T queries.GetProductsByCategoryIDRow](
 			discount := ((r.UnitPriceWithVat - r.SalePriceWithVat.Int64) * 100.0) / r.UnitPriceWithVat
 			discountPercentage = fmt.Sprintf("%d%%", discount)
 		} else {
-			price = utils.NewMoney(r.UnitPriceWithVat, r.UnitPriceWithVatCurrency)
+			price = origPrice
 		}
 		res = append(res, CategorySectionProduct{
 			GetProductsByCategoryIDRow: r,
 			ProductID:                  encoder.Encode(r.ID),
 			CDNURL:                     getCDNURL(r.ThumbnailPath),
 			CDNURL1280:                 getCDNURL(constants.ToPath1280(r.ThumbnailPath)),
+			OrigPriceDisplay:           origPrice.Display(),
 			PriceDisplay:               price.Display(),
 			DiscountPercentage:         discountPercentage,
 		})

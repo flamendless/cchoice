@@ -100,6 +100,40 @@ func (q *Queries) CreateProducts(ctx context.Context, arg CreateProductsParams) 
 	return i, err
 }
 
+const getProductByName = `-- name: GetProductByName :one
+SELECT
+	id, serial, name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at
+	-- tbl_brands.name AS brand_name
+FROM tbl_products
+WHERE tbl_products.name = ?
+LIMIT 1
+`
+
+// INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
+// INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
+// INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+func (q *Queries) GetProductByName(ctx context.Context, name string) (TblProduct, error) {
+	row := q.db.QueryRowContext(ctx, getProductByName, name)
+	var i TblProduct
+	err := row.Scan(
+		&i.ID,
+		&i.Serial,
+		&i.Name,
+		&i.Description,
+		&i.BrandID,
+		&i.Status,
+		&i.ProductSpecsID,
+		&i.UnitPriceWithoutVat,
+		&i.UnitPriceWithVat,
+		&i.UnitPriceWithoutVatCurrency,
+		&i.UnitPriceWithVatCurrency,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const getProductIDBySerial = `-- name: GetProductIDBySerial :one
 ;
 

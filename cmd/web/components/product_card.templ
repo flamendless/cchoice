@@ -54,7 +54,7 @@ templ SearchResultProductCard(product models.SearchResultProduct) {
 			data-product-price={ product.PriceDisplay }
 			_="
 				on click
-					async call metrics_event('search_result_clicked', #selected-product-id.value)
+					async call metrics_event('search_result_click', #selected-product-id.value)
 					set #selected-product-id.value to my @data-product-id
 					set #selected-product-thumbnail-path.value to my @data-product-thumbnail-path
 					set #selected-product-name.value to my @data-product-name
