@@ -5,6 +5,8 @@ import "cchoice/internal/constants"
 import "cchoice/internal/conf"
 import "cchoice/internal/utils"
 
+const DISCOUNT_RIBBON = true
+
 var (
 	onceHeadLinks = templ.NewOnceHandle()
 	faviconsizes = []string{
@@ -228,4 +230,20 @@ templ WazeLink(url string) {
 		</svg>
 		<span class="text-sm font-medium">Waze</span>
 	</a>
+}
+
+
+templ DiscountRibbon(percentage string) {
+	if DISCOUNT_RIBBON && percentage != "" {
+		<div
+			class="
+				absolute w-full bottom-0
+				mb-1 bg-white/50
+				text-cchoice text-sm font-bold tracking-wide
+				text-center
+			"
+		>
+			-{ percentage }
+		</div>
+	}
 }

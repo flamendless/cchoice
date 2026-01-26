@@ -5,6 +5,7 @@ import (
 	"cchoice/cmd/web/components"
 	"cchoice/internal/cart"
 	"cchoice/internal/errs"
+	"cchoice/internal/geocoding"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
 	"cchoice/internal/shipping"
@@ -154,10 +155,15 @@ func (s *Server) shippingQuotationHandler(w http.ResponseWriter, r *http.Request
 	barangay := strings.TrimSpace(r.Form.Get("barangay"))
 	postal := strings.TrimSpace(r.Form.Get("postal"))
 
-	if city == "" || province == "" || barangay == "" {
+	if province == "National Capital Region (NCR)" {
+		fmt.Println("NCR province selected")
+	} else if province == "" || city == "" || barangay == "" {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(errs.ErrInvalidParams),
+			zap.String("province", province),
+			zap.String("city", city),
+			zap.String("barangay", barangay),
 		)
 		http.Error(w, "Missing required address fields (city, province, barangay)", http.StatusBadRequest)
 		return
@@ -173,14 +179,18 @@ func (s *Server) shippingQuotationHandler(w http.ResponseWriter, r *http.Request
 	address := strings.Join(addressParts, ", ")
 
 	coordinates, err := requests.GetGeocodingCoordinates(s.cache, &s.SF, s.geocoder, address)
+	fallbackSF := false
 	if err != nil {
-		logs.LogCtx(ctx).Error(
+		logs.LogCtx(ctx).Warn(
 			logtag,
 			zap.String("address", address),
 			zap.Error(err),
 		)
-		http.Error(w, "Failed to geocode address", http.StatusInternalServerError)
-		return
+		coordinates = &geocoding.Coordinates{
+			Lat: "0.0",
+			Lng: "0.0",
+		}
+		fallbackSF = true
 	}
 
 	totalWeight, err := utils.CalculateTotalWeightFromCheckoutLines(checkoutLines)
@@ -227,6 +237,11 @@ func (s *Server) shippingQuotationHandler(w http.ResponseWriter, r *http.Request
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	isFreeDelivery, ok := quotation.Metadata["free_delivery"].(bool)
+	if fallbackSF && (!ok || !isFreeDelivery) {
+		quotation.Fee = 100
 	}
 
 	logs.LogCtx(ctx).Info(

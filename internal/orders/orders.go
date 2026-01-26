@@ -2,6 +2,7 @@ package orders
 
 import (
 	"cchoice/internal/cart"
+	"cchoice/internal/conf"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
@@ -24,6 +25,7 @@ import (
 	"time"
 
 	"github.com/VictoriaMetrics/fastcache"
+	"github.com/gookit/goutil/dump"
 	"go.uber.org/zap"
 	"golang.org/x/sync/singleflight"
 )
@@ -77,7 +79,14 @@ func CreateOrderFromCheckout(
 
 	totalAmount := int64(0)
 	for _, checkoutLine := range params.CheckoutLines {
-		totalAmount += checkoutLine.UnitPriceWithVat * checkoutLine.Quantity
+		_, discountedPrice, _ := utils.GetOrigAndDiscounted(
+			checkoutLine.IsOnSale,
+			checkoutLine.UnitPriceWithVat,
+			checkoutLine.UnitPriceWithVatCurrency,
+			checkoutLine.SalePriceWithVat,
+			checkoutLine.SalePriceWithVatCurrency,
+		)
+		totalAmount += discountedPrice.Amount() * checkoutLine.Quantity
 	}
 	if params.ShippingQuotation != nil {
 		totalAmount += int64(params.ShippingQuotation.Fee * 100)
@@ -151,6 +160,19 @@ func CreateOrderFromCheckout(
 			return nil, "", err
 		}
 		subtotal = newSubtotal
+
+		discount := utils.GetDiscountAmount(
+			checkoutLine.IsOnSale,
+			checkoutLine.UnitPriceWithVat,
+			checkoutLine.UnitPriceWithVatCurrency,
+			checkoutLine.SalePriceWithVat,
+			checkoutLine.SalePriceWithVatCurrency,
+		)
+		newDiscountTotal, err := totalDiscounts.Add(discount)
+		if err != nil {
+			return nil, "", err
+		}
+		totalDiscounts = newDiscountTotal
 	}
 
 	total, _ := subtotal.Add(deliveryFee)
@@ -205,6 +227,10 @@ func CreateOrderFromCheckout(
 		ShippingEta:              sql.NullString{String: params.DeliveryETA, Valid: params.DeliveryETA != ""},
 		Notes:                    sql.NullString{Valid: false},
 		Remarks:                  sql.NullString{Valid: false},
+	}
+
+	if conf.Conf().IsLocal() {
+		dump.Println("ORDER", orderParams)
 	}
 
 	order, err := dbRW.GetQueries().CreateOrder(ctx, orderParams)
