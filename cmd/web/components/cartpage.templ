@@ -376,23 +376,25 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 				alt={ cl.Name + " thumbnail" }
 				data-product-id={ cl.ProductID }
 			/>
+			@DiscountRibbon(cl.DiscountPercentage)
 		</div>
+
 		<div class="flex flex-row grow w-full">
 			<div class="flex-1">
 				<h2 class="text-sm sm:text-base font-semibold">{ cl.Name }</h2>
 				<p class="text-xs text-gray-600">{ cl.BrandName }</p>
 				<p class="text-xs text-gray-600">{ cl.WeightDisplay }</p>
 				<span class="flex gap-[4px]">
-					if res, _ := cl.Price.Compare(&cl.DiscountedPrice); res != 0 {
-						<p class="text-sm text-gray-600 line-through">
+					if cl.DiscountPercentage != "" {
+						<p class="text-sm font-semibold text-cchoice text-center">
 							{ cl.Price.Display() }
 						</p>
-						<p class="text-sm text-gray-700">
-							{ cl.DiscountedPrice.Display() }
+						<p class="text-xs font-semibold text-black line-through text-center">
+							{ cl.OrigPrice.Display() }
 						</p>
 					} else {
-						<p class="text-sm text-gray-700">
-							{ cl.DiscountedPrice.Display() }
+						<p class="text-xs font-semibold text-cchoice">
+							{ cl.OrigPrice.Display() }
 						</p>
 					}
 				</span>

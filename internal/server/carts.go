@@ -79,7 +79,15 @@ func (s *Server) calculateCartSummary(ctx context.Context) (cartSummaryData, err
 	}
 
 	for _, checkoutLine := range checkoutLines {
-		sub := utils.NewMoney(checkoutLine.UnitPriceWithVat, checkoutLine.UnitPriceWithVatCurrency).Multiply(checkoutLine.Quantity)
+		_, discountedPrice, _ := utils.GetOrigAndDiscounted(
+			checkoutLine.IsOnSale,
+			checkoutLine.UnitPriceWithVat,
+			checkoutLine.UnitPriceWithVatCurrency,
+			checkoutLine.SalePriceWithVat,
+			checkoutLine.SalePriceWithVatCurrency,
+		)
+
+		sub := discountedPrice.Multiply(checkoutLine.Quantity)
 		newSubtotal, err := subtotal.Add(sub)
 		if err != nil {
 			continue
@@ -274,34 +282,33 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 
 	for _, result := range lineResults {
 		checkoutLine := result.line
-		price := utils.NewMoney(checkoutLine.UnitPriceWithVat, checkoutLine.UnitPriceWithVatCurrency)
 
-		//TODO: (Brandon) - Discounts/sales
-		discountedPrice := utils.NewMoney(checkoutLine.UnitPriceWithVat, checkoutLine.UnitPriceWithVatCurrency)
+		origPrice, discountedPrice, discountPercentage := utils.GetOrigAndDiscounted(
+			checkoutLine.IsOnSale,
+			checkoutLine.UnitPriceWithVat,
+			checkoutLine.UnitPriceWithVatCurrency,
+			checkoutLine.SalePriceWithVat,
+			checkoutLine.SalePriceWithVatCurrency,
+		)
 
 		encodedID := s.encoder.Encode(checkoutLine.ID)
-		isChecked := false
-		for _, checkedID := range checkedItems {
-			if checkedID == encodedID {
-				isChecked = true
-				break
-			}
-		}
+		isChecked := slices.Contains(checkedItems, encodedID)
 
 		cl := models.CheckoutLine{
-			ID:              encodedID,
-			CheckoutID:      s.encoder.Encode(checkoutLine.CheckoutID),
-			ProductID:       s.encoder.Encode(checkoutLine.ProductID),
-			Name:            checkoutLine.Name,
-			BrandName:       checkoutLine.BrandName,
-			Quantity:        checkoutLine.Quantity,
-			ThumbnailPath:   checkoutLine.ThumbnailPath,
-			CDNURL:          s.GetCDNURL(checkoutLine.ThumbnailPath),
-			CDNURL1280:      s.GetCDNURL(constants.ToPath1280(checkoutLine.ThumbnailPath)),
-			Price:           *price,
-			DiscountedPrice: *discountedPrice,
-			Total:           *discountedPrice.Multiply(checkoutLine.Quantity),
-			Checked:         isChecked,
+			ID:                 encodedID,
+			CheckoutID:         s.encoder.Encode(checkoutLine.CheckoutID),
+			ProductID:          s.encoder.Encode(checkoutLine.ProductID),
+			Name:               checkoutLine.Name,
+			BrandName:          checkoutLine.BrandName,
+			Quantity:           checkoutLine.Quantity,
+			ThumbnailPath:      checkoutLine.ThumbnailPath,
+			CDNURL:             s.GetCDNURL(checkoutLine.ThumbnailPath),
+			CDNURL1280:         s.GetCDNURL(constants.ToPath1280(checkoutLine.ThumbnailPath)),
+			OrigPrice:          *origPrice,
+			Price:              *discountedPrice,
+			Total:              *discountedPrice.Multiply(checkoutLine.Quantity),
+			Checked:            isChecked,
+			DiscountPercentage: discountPercentage,
 		}
 
 		if weightKg, err := utils.ConvertWeightToKg(checkoutLine.Weight, checkoutLine.WeightUnit); err == nil {
@@ -657,13 +664,45 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 					zap.Error(err),
 				)
 			}
+
+			_, discountedPrice, _ := utils.GetOrigAndDiscounted(
+				checkoutLine.IsOnSale,
+				checkoutLine.UnitPriceWithVat,
+				checkoutLine.UnitPriceWithVatCurrency,
+				checkoutLine.SalePriceWithVat,
+				checkoutLine.SalePriceWithVatCurrency,
+			)
+
 			lineItems = append(lineItems, payments.LineItem{
-				Amount:      int32(checkoutLine.UnitPriceWithVat),
+				Amount:      int32(discountedPrice.Amount()),
 				Currency:    money.PHP,
 				Description: checkoutLine.Description.String,
 				Images:      []string{imageURL},
 				Name:        checkoutLine.Name,
 				Quantity:    int32(checkoutLine.Quantity),
+			})
+		}
+
+		var shippingQuotation *shipping.ShippingQuotation
+		if quotation, ok := s.sessionManager.Get(ctx, skShippingQuotation).(*shipping.ShippingQuotation); ok && quotation != nil {
+			shippingQuotation = quotation
+		}
+
+		var shippingCoordinates *shipping.Coordinates
+		var deliveryETA string
+		if shippingReq, ok := s.sessionManager.Get(ctx, skShippingRequest).(*shipping.ShippingRequest); ok && shippingReq != nil {
+			shippingCoordinates = &shippingReq.DeliveryLocation.Coordinates
+			deliveryETA = s.shippingService.GetDeliveryETA(ctx, shippingReq.DeliveryLocation.OriginalAddress.State)
+		}
+
+		if shippingQuotation.Fee != 0 {
+			lineItems = append(lineItems, payments.LineItem{
+				Amount:      int32(shippingQuotation.Fee*100),
+				Currency:    money.PHP,
+				Description: "Shipping Fee",
+				// Images:      []string{imageURL}, //TODO: (Brandon)
+				Name:        "Shipping Fee",
+				Quantity:    1,
 			})
 		}
 
@@ -687,18 +726,6 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 			)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
-		}
-
-		var shippingQuotation *shipping.ShippingQuotation
-		if quotation, ok := s.sessionManager.Get(ctx, skShippingQuotation).(*shipping.ShippingQuotation); ok && quotation != nil {
-			shippingQuotation = quotation
-		}
-
-		var shippingCoordinates *shipping.Coordinates
-		var deliveryETA string
-		if shippingReq, ok := s.sessionManager.Get(ctx, skShippingRequest).(*shipping.ShippingRequest); ok && shippingReq != nil {
-			shippingCoordinates = &shippingReq.DeliveryLocation.Coordinates
-			deliveryETA = s.shippingService.GetDeliveryETA(ctx, shippingReq.DeliveryLocation.OriginalAddress.State)
 		}
 
 		orderParams := orders.CreateOrderParams{

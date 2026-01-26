@@ -8,6 +8,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 
 	"go.uber.org/zap"
 )
@@ -138,11 +139,8 @@ func GetCheckedCheckoutLines(
 
 	var filteredLines []queries.GetCheckoutLinesByCheckoutIDRow
 	for _, line := range checkoutLines {
-		for _, checkedID := range dbCheckoutLineIDs {
-			if line.ID == checkedID {
-				filteredLines = append(filteredLines, line)
-				break
-			}
+		if slices.Contains(dbCheckoutLineIDs, line.ID) {
+			filteredLines = append(filteredLines, line)
 		}
 	}
 

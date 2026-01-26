@@ -5,9 +5,6 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
 	"cchoice/internal/utils"
-	"fmt"
-
-	"github.com/Rhymond/go-money"
 )
 
 type HeaderRowText struct {
@@ -76,23 +73,21 @@ func ToCategorySectionProducts[T queries.GetProductsByCategoryIDRow](
 	res := make([]CategorySectionProduct, 0, len(data))
 	for _, d := range data {
 		r := queries.GetProductsByCategoryIDRow(d)
-		origPrice := utils.NewMoney(r.UnitPriceWithVat, r.UnitPriceWithVatCurrency)
-		var price *money.Money
-		var discountPercentage string
-		if r.IsOnSale == 1 {
-			price = utils.NewMoney(r.SalePriceWithVat.Int64, r.SalePriceWithVatCurrency.String)
-			discount := ((r.UnitPriceWithVat - r.SalePriceWithVat.Int64) * 100.0) / r.UnitPriceWithVat
-			discountPercentage = fmt.Sprintf("%d%%", discount)
-		} else {
-			price = origPrice
-		}
+		origPrice, discountedPrice, discountPercentage := utils.GetOrigAndDiscounted(
+			r.IsOnSale,
+			r.UnitPriceWithVat,
+			r.UnitPriceWithVatCurrency,
+			r.SalePriceWithVat,
+			r.SalePriceWithVatCurrency,
+		)
+
 		res = append(res, CategorySectionProduct{
 			GetProductsByCategoryIDRow: r,
 			ProductID:                  encoder.Encode(r.ID),
 			CDNURL:                     getCDNURL(r.ThumbnailPath),
 			CDNURL1280:                 getCDNURL(constants.ToPath1280(r.ThumbnailPath)),
 			OrigPriceDisplay:           origPrice.Display(),
-			PriceDisplay:               price.Display(),
+			PriceDisplay:               discountedPrice.Display(),
 			DiscountPercentage:         discountPercentage,
 		})
 	}
