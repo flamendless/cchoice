@@ -2,6 +2,15 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.1"></a>
+## [release-v1.1.1] - 2026-01-26
+### Docs
+- Release v1.1.0
+
+### Server
+- Update checkout to use discounts
+
+
 <a name="release-v1.1.0"></a>
 ## [release-v1.1.0] - 2026-01-26
 ### Docs
@@ -670,7 +679,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.0...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.1...HEAD
+[release-v1.1.1]: https://github.com/flamendless/cchoice/compare/release-v1.1.0...release-v1.1.1
 [release-v1.1.0]: https://github.com/flamendless/cchoice/compare/release-v1.0.11...release-v1.1.0
 [release-v1.0.11]: https://github.com/flamendless/cchoice/compare/release-v1.0.10...release-v1.0.11
 [release-v1.0.10]: https://github.com/flamendless/cchoice/compare/release-v1.0.9...release-v1.0.10
