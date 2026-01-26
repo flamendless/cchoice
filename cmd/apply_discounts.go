@@ -74,10 +74,14 @@ var cmdApplyDiscount = &cobra.Command{
 			col[strings.ToLower(h)] = i
 		}
 
+		success := 0
+		total := 0
+
 		for i, row := range records[1:] {
 			line := i + 2
 			name := row[col["name"]]
 			rawDiscount := row[col["discount"]]
+			total += 1
 
 			pd, err := parseDiscount(rawDiscount)
 			if err != nil {
@@ -132,6 +136,7 @@ var cmdApplyDiscount = &cobra.Command{
 
 			logs.Log().Info(
 				"Update",
+				zap.Bool("dry run", flagDryRun),
 				zap.String("name", name),
 				zap.Any("old price", oldPrice),
 				zap.String("discount", pd.Raw),
@@ -159,7 +164,15 @@ var cmdApplyDiscount = &cobra.Command{
 					return err
 				}
 			}
+
+			success += 1
 		}
+
+		logs.Log().Info(
+			"Finished",
+			zap.Int("success", success),
+			zap.Int("total", total),
+		)
 
 		return nil
 	},
