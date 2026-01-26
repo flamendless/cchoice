@@ -2,6 +2,17 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.0"></a>
+## [release-v1.1.0] - 2026-01-26
+### Docs
+- Release v1.0.11
+
+### Server
+- Update sale discount style
+- Implement CSV input for creating product sales
+- Address more lighthouse reports
+
+
 <a name="release-v1.0.11"></a>
 ## [release-v1.0.11] - 2026-01-15
 ### Docs
@@ -659,7 +670,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.0.11...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.0...HEAD
+[release-v1.1.0]: https://github.com/flamendless/cchoice/compare/release-v1.0.11...release-v1.1.0
 [release-v1.0.11]: https://github.com/flamendless/cchoice/compare/release-v1.0.10...release-v1.0.11
 [release-v1.0.10]: https://github.com/flamendless/cchoice/compare/release-v1.0.9...release-v1.0.10
 [release-v1.0.9]: https://github.com/flamendless/cchoice/compare/dev-v0.1.3...release-v1.0.9
