@@ -304,7 +304,7 @@ LEFT JOIN tbl_product_sales
 	AND datetime('now') BETWEEN
 		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
 WHERE tbl_products_categories.category_id = ?
-ORDER BY tbl_products.created_at DESC
+ORDER BY is_on_sale DESC, tbl_products.created_at DESC
 LIMIT ?
 `
 

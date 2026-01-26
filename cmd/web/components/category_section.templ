@@ -7,6 +7,8 @@ import (
 	"fmt"
 )
 
+const DISCOUNT_RIBBON = true
+
 var fetchMult = 0.4
 
 func init() {
@@ -54,7 +56,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 								end
 							"
 						/>
-						if product.DiscountPercentage != "" {
+						if DISCOUNT_RIBBON && product.DiscountPercentage != "" {
 							<div
 								class="
 									absolute w-full bottom-0
@@ -84,9 +86,6 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 								</p>
 								<p class="text-xs font-semibold text-black line-through text-center">
 									{ product.OrigPriceDisplay }
-								</p>
-								<p class="text-xs font-semibold text-black text-center">
-									-{ product.DiscountPercentage }
 								</p>
 							} else {
 								<p class="text-xs font-semibold text-cchoice">
