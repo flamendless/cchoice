@@ -92,3 +92,11 @@ func SanitizeString(s string) string {
 	s = constants.MultipleSpacesRegex.ReplaceAllString(s, " ")
 	return strings.TrimSpace(s)
 }
+
+func SanitizeName(s string) string {
+	s = strings.ReplaceAll(s, "\r\n", " ")
+	s = strings.ReplaceAll(s, "\n", " ")
+	s = strings.ReplaceAll(s, "\r", " ")
+	s = SanitizeString(s)
+	return s
+}
