@@ -60,6 +60,7 @@ func (product *Product) PostProcess(rowIdx int) {
 	}
 	brandInitials := utils.GetInitials(product.Brand.Name)
 	nameInitials := utils.GetInitials(product.Name)
+	product.Name = utils.SanitizeName(product.Name)
 	product.Serial = fmt.Sprintf("%s-%s-%d-%d", brandInitials, nameInitials, rowIdx, product.ID)
 	if product.ProductCategory != nil {
 		product.ProductCategory.Category = slug.Make(product.ProductCategory.Category)
