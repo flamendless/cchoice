@@ -350,8 +350,7 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	homePageData := models.HomePageData{
-		Sections:      models.BuildPostHomeContentSections(s.GetBrandLogoCDNURL),
-		StoreImageURL: constants.PathStoreImageCDN,
+		Sections: models.BuildPostHomeContentSections(s.GetBrandLogoCDNURL),
 	}
 
 	if err := components.HomePage(homePageData).Render(ctx, w); err != nil {
