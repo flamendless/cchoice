@@ -2,6 +2,15 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.3"></a>
+## [release-v1.1.3] - 2026-02-05
+### Docs
+- Release v1.1.2
+
+### Web
+- Add COR seal
+
+
 <a name="release-v1.1.2"></a>
 ## [release-v1.1.2] - 2026-02-02
 ### Docs
@@ -690,7 +699,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.2...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.3...HEAD
+[release-v1.1.3]: https://github.com/flamendless/cchoice/compare/release-v1.1.2...release-v1.1.3
 [release-v1.1.2]: https://github.com/flamendless/cchoice/compare/release-v1.1.1...release-v1.1.2
 [release-v1.1.1]: https://github.com/flamendless/cchoice/compare/release-v1.1.0...release-v1.1.1
 [release-v1.1.0]: https://github.com/flamendless/cchoice/compare/release-v1.0.11...release-v1.1.0
