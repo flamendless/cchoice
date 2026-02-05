@@ -61,7 +61,6 @@ var cmdMigrateImagesCloudflare = &cobra.Command{
 		)
 
 		basePath := flagsMigrateImagesCloudflare.basePath
-		svgPath := flagsMigrateImagesCloudflare.svgPath
 
 		var allImages []imageToUpload
 
@@ -69,6 +68,7 @@ var cmdMigrateImagesCloudflare = &cobra.Command{
 			constants.EmptyImageFilename,
 			"logo.svg",
 			"store.webp",
+			"CORSeal.webp",
 		}
 		logs.Log().Info(
 			"Collecting specific files from base images directory",
@@ -90,6 +90,7 @@ var cmdMigrateImagesCloudflare = &cobra.Command{
 			}
 		}
 
+		svgPath := flagsMigrateImagesCloudflare.svgPath
 		svgsPath := filepath.Join(svgPath, "")
 		if _, err := os.Stat(svgsPath); err == nil {
 			logs.Log().Info(

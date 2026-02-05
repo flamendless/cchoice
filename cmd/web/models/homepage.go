@@ -20,8 +20,7 @@ type PostHomeContentSection struct {
 }
 
 type HomePageData struct {
-	Sections      []PostHomeContentSection
-	StoreImageURL string
+	Sections []PostHomeContentSection
 }
 
 type BrandLogoURLFunc func(filename string) string
