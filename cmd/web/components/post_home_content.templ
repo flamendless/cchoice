@@ -56,7 +56,7 @@ templ StoreSection(section models.PostHomeContentSection) {
 		class="flex flex-col lg:flex-row justify-between my-6 w-full max-w-full pr-4"
 	>
 		<div class="flex flex-col content-center w-full max-w-full">
-			<div class="flex flex-row justify-center w-full max-w-full gap-4">
+			<div class="flex flex-row justify-center items-center w-full max-w-full gap-4">
 				<img
 					src={ constants.PathStoreImageCDN }
 					hx-trigger="load once"
@@ -71,7 +71,7 @@ templ StoreSection(section models.PostHomeContentSection) {
 					src={ constants.PathCORSealImageCDN }
 					hx-trigger="load once"
 					hx-swap="none"
-					class="w-auto h-[256px] m-4"
+					class="w-auto h-[128px] m-4"
 					alt="COR seal"
 					fetchpriority="high"
 					loading="eager"

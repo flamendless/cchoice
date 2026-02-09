@@ -234,7 +234,7 @@ func StoreSection(section models.PostHomeContentSection) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"flex flex-col lg:flex-row justify-between my-6 w-full max-w-full pr-4\"><div class=\"flex flex-col content-center w-full max-w-full\"><div class=\"flex flex-row justify-center w-full max-w-full gap-4\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"flex flex-col lg:flex-row justify-between my-6 w-full max-w-full pr-4\"><div class=\"flex flex-col content-center w-full max-w-full\"><div class=\"flex flex-row justify-center items-center w-full max-w-full gap-4\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -260,7 +260,7 @@ func StoreSection(section models.PostHomeContentSection) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" hx-trigger=\"load once\" hx-swap=\"none\" class=\"w-auto h-[256px] m-4\" alt=\"COR seal\" fetchpriority=\"high\" loading=\"eager\" decoding=\"async\"></div><div hx-trigger=\"load once\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" hx-trigger=\"load once\" hx-swap=\"none\" class=\"w-auto h-[128px] m-4\" alt=\"COR seal\" fetchpriority=\"high\" loading=\"eager\" decoding=\"async\"></div><div hx-trigger=\"load once\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
