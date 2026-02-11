@@ -1,5 +1,7 @@
 package models
 
+import "cchoice/internal/database/queries"
+
 type BrandImage struct {
 	Filename     string
 	Alt          string
@@ -20,7 +22,18 @@ type PostHomeContentSection struct {
 }
 
 type HomePageData struct {
-	Sections []PostHomeContentSection
+	Sections          []PostHomeContentSection
+	RandomSaleProduct *RandomSaleProduct
+}
+
+type RandomSaleProduct struct {
+	queries.GetRandomProductOnSaleRow
+	ProductID          string
+	CDNURL             string
+	CDNURL1280         string
+	OrigPriceDisplay   string
+	PriceDisplay       string
+	DiscountPercentage string
 }
 
 type BrandLogoURLFunc func(filename string) string

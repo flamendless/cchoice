@@ -16,6 +16,7 @@ templ HomePage(data models.HomePageData) {
 templ HomePageBody(data models.HomePageData) {
 	<body class="m-0 p-0 overflow-x-hidden custom-scrollbar">
 		@ErrorBanner()
+		@SaleBanner(data.RandomSaleProduct)
 		@Header()
 		@MobileSidebar()
 
