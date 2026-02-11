@@ -148,6 +148,7 @@ func NewServer() *ServerInstance {
 			"url_waze",
 			"url_facebook",
 			"url_tiktok",
+			"show_promo_banner",
 		},
 	)
 	if err != nil {

@@ -349,8 +349,33 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Index handler]"
 	ctx := r.Context()
 
+	var randomSaleProduct *models.RandomSaleProduct
+	if conf.Conf().Settings.ShowPromoBanner {
+		saleProductCacheKey := requests.GenerateRandomSaleProductCacheKey()
+		res, err := requests.GetRandomSaleProduct(
+			ctx,
+			s.cache,
+			&s.SF,
+			s.dbRO,
+			s.encoder,
+			s.GetCDNURL,
+			saleProductCacheKey,
+		)
+		if err != nil {
+			logs.LogCtx(ctx).Error(
+				logtag,
+				zap.Error(err),
+				zap.String("message", "failed to get random sale product"),
+			)
+		}
+		randomSaleProduct = res
+	}
+
+	logs.Log().Info(logtag, zap.Bool("promo product banner", randomSaleProduct != nil))
+
 	homePageData := models.HomePageData{
-		Sections: models.BuildPostHomeContentSections(s.GetBrandLogoCDNURL),
+		Sections:          models.BuildPostHomeContentSections(s.GetBrandLogoCDNURL),
+		RandomSaleProduct: randomSaleProduct,
 	}
 
 	if err := components.HomePage(homePageData).Render(ctx, w); err != nil {

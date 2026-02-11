@@ -205,3 +205,35 @@ LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 WHERE
 	tbl_products_fts.name MATCH ?
 LIMIT ?;
+
+-- name: GetRandomProductOnSale :one
+SELECT
+	tbl_products.id,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	COALESCE(
+		tbl_product_images.thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+WHERE tbl_product_sales.id IS NOT NULL
+ORDER BY RANDOM()
+LIMIT 1;

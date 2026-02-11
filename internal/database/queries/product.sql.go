@@ -1258,6 +1258,74 @@ func (q *Queries) GetProductsWithSort(ctx context.Context) ([]TblProduct, error)
 	return items, nil
 }
 
+const getRandomProductOnSale = `-- name: GetRandomProductOnSale :one
+SELECT
+	tbl_products.id,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	COALESCE(
+		tbl_product_images.thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+WHERE tbl_product_sales.id IS NOT NULL
+ORDER BY RANDOM()
+LIMIT 1
+`
+
+type GetRandomProductOnSaleRow struct {
+	ID                       int64
+	Name                     string
+	Description              sql.NullString
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	SalePriceWithVat         sql.NullInt64
+	SalePriceWithVatCurrency sql.NullString
+	IsOnSale                 int64
+	DiscountType             sql.NullString
+	DiscountValue            sql.NullInt64
+	BrandName                string
+	ThumbnailPath            string
+}
+
+func (q *Queries) GetRandomProductOnSale(ctx context.Context) (GetRandomProductOnSaleRow, error) {
+	row := q.db.QueryRowContext(ctx, getRandomProductOnSale)
+	var i GetRandomProductOnSaleRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.UnitPriceWithVat,
+		&i.UnitPriceWithVatCurrency,
+		&i.SalePriceWithVat,
+		&i.SalePriceWithVatCurrency,
+		&i.IsOnSale,
+		&i.DiscountType,
+		&i.DiscountValue,
+		&i.BrandName,
+		&i.ThumbnailPath,
+	)
+	return i, err
+}
+
 const updateProducts = `-- name: UpdateProducts :execlastid
 UPDATE tbl_products
 SET

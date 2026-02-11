@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
@@ -288,4 +289,80 @@ func GenerateCategorySectionCacheKey(page, limit int) []byte {
 	keyData := fmt.Sprintf("homepage:category_sections:%d:%d", page, limit)
 	hash := sha256.Sum256([]byte(keyData))
 	return fmt.Appendf(nil, "hp_sec_%s", hex.EncodeToString(hash[:])[:16])
+}
+
+func GetRandomSaleProduct(
+	ctx context.Context,
+	cache *fastcache.Cache,
+	sf *singleflight.Group,
+	dbRO database.Service,
+	encoder encode.IEncode,
+	getCDNURL models.CDNURLFunc,
+	cacheKey []byte,
+) (*models.RandomSaleProduct, error) {
+	if data, ok := cache.HasGet(nil, cacheKey); ok {
+		buf := bytes.NewBuffer(data)
+		var res *models.RandomSaleProduct
+		if err := gob.NewDecoder(buf).Decode(&res); err != nil {
+			logs.GobError(cacheKey, err)
+			return nil, err
+		}
+		metrics.Cache.MemHit()
+		return res, nil
+	} else {
+		metrics.Cache.MemMiss()
+	}
+
+	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
+		res, err := dbRO.GetQueries().GetRandomProductOnSale(ctx)
+		fmt.Println(11111, res, err)
+		if err != nil {
+			return nil, err
+		}
+		if res.ID == 0 {
+			return nil, nil
+		}
+		return res, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	logs.SF(cacheKey, shared)
+
+	if sfRes == nil {
+		return nil, nil
+	}
+
+	product := sfRes.(queries.GetRandomProductOnSaleRow)
+	origPrice, discountedPrice, discountPercentage := utils.GetOrigAndDiscounted(
+		product.IsOnSale,
+		product.UnitPriceWithVat,
+		product.UnitPriceWithVatCurrency,
+		product.SalePriceWithVat,
+		product.SalePriceWithVatCurrency,
+	)
+
+	saleProduct := &models.RandomSaleProduct{
+		GetRandomProductOnSaleRow: product,
+		ProductID:                 encoder.Encode(product.ID),
+		CDNURL:                    getCDNURL(product.ThumbnailPath),
+		CDNURL1280:                getCDNURL(constants.ToPath1280(product.ThumbnailPath)),
+		OrigPriceDisplay:          origPrice.Display(),
+		PriceDisplay:              discountedPrice.Display(),
+		DiscountPercentage:        discountPercentage,
+	}
+
+	buf := new(bytes.Buffer)
+	if err := gob.NewEncoder(buf).Encode(saleProduct); err == nil {
+		cache.Set(cacheKey, buf.Bytes())
+		logs.CacheStore(cacheKey, buf)
+	}
+
+	return saleProduct, nil
+}
+
+func GenerateRandomSaleProductCacheKey() []byte {
+	keyData := "homepage:random_sale_product"
+	hash := sha256.Sum256([]byte(keyData))
+	return fmt.Appendf(nil, "hp_rsp_%s", hex.EncodeToString(hash[:])[:16])
 }

@@ -46,13 +46,14 @@ type BasicAuth struct {
 }
 
 type Settings struct {
-	MobileNo    string
-	EMail       string
-	Address     string
-	URLGMap     string
-	URLWaze     string
-	URLFacebook string
-	URLTikTok   string
+	MobileNo        string
+	EMail           string
+	Address         string
+	URLGMap         string
+	URLWaze         string
+	URLFacebook     string
+	URLTikTok       string
+	ShowPromoBanner bool
 }
 
 type MailerooConfig struct {
@@ -185,6 +186,7 @@ func Conf() *appConfig {
 	return appCfg
 }
 
+//INFO: (Brandon) don't forget to update `requests.GetSettingsData`
 func (c *appConfig) SetSettings(settings map[string]string) {
 	c.Settings.MobileNo = settings["mobile_no"]
 	c.Settings.EMail = settings["email"]
@@ -193,6 +195,10 @@ func (c *appConfig) SetSettings(settings map[string]string) {
 	c.Settings.URLWaze = settings["url_waze"]
 	c.Settings.URLFacebook = settings["url_facebook"]
 	c.Settings.URLTikTok = settings["url_tiktok"]
+	spb := settings["show_promo_banner"]
+	if spb == "true" || spb == "1" {
+		c.Settings.ShowPromoBanner = true
+	}
 }
 
 func (c *appConfig) IsLocal() bool {
