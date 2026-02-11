@@ -4,6 +4,7 @@ import "fmt"
 import "cchoice/internal/constants"
 import "cchoice/internal/conf"
 import "cchoice/internal/utils"
+import "cchoice/cmd/web/models"
 
 const DISCOUNT_RIBBON = true
 
@@ -244,6 +245,107 @@ templ DiscountRibbon(percentage string) {
 			"
 		>
 			-{ percentage }
+		</div>
+	}
+}
+
+templ SaleBanner(product *models.RandomSaleProduct) {
+	if product != nil && product.DiscountPercentage != "" {
+		<div
+			id="sale-banner"
+			class="
+				fixed inset-0 z-1000 flex items-center justify-center
+				bg-black/50 backdrop-blur-sm
+				hidden
+			"
+			_="
+				init
+					if sessionStorage.getItem('saleBannerShown') !== 'true' then
+						remove .hidden from me
+						sessionStorage.setItem('saleBannerShown', 'true')
+					end
+				on click
+					if target is not #sale-banner-content then
+						add .hidden to #sale-banner
+					end
+			"
+		>
+			<div
+				id="sale-banner-content"
+				class="
+					relative w-full max-w-md mx-4
+					bg-white rounded-2xl shadow-2xl
+					overflow-hidden cursor-pointer
+					transform transition-transform hover:scale-105
+				"
+				_={ "on click go to url '/product/" + product.ProductID + "'" }
+			>
+				<!-- Product Image -->
+				<img
+					src={ product.CDNURL1280 }
+					alt={ product.Name }
+					class="w-full h-64 object-cover"
+					loading="lazy"
+				/>
+
+				<!-- Sale Ribbon Overlay -->
+				<div
+					class="
+						absolute top-4 right-4
+						bg-red-600 text-white
+						px-4 py-2 rounded-full
+						font-bold text-lg shadow-lg
+						transform rotate-12
+					"
+				>
+					-{ product.DiscountPercentage }
+				</div>
+
+				<!-- Product Info -->
+				<div class="p-6 bg-gradient-to-r from-cchoicesoft to-white">
+					<h3 class="text-xl font-bold text-gray-900 mb-2 truncate">
+						{ product.Name }
+					</h3>
+					<p class="text-sm text-gray-600 mb-4 truncate">
+						{ product.BrandName }
+					</p>
+					<div class="flex items-center justify-between">
+						<div>
+							<p class="text-2xl font-bold text-cchoice">
+								{ product.PriceDisplay }
+							</p>
+							<p class="text-sm text-gray-500 line-through">
+								{ product.OrigPriceDisplay }
+							</p>
+						</div>
+						<div class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
+							Limited Offer
+						</div>
+					</div>
+				</div>
+
+				<!-- Close Button -->
+				<button
+					type="button"
+					class="
+						absolute top-2 right-2
+						bg-white/80 hover:bg-white
+						text-gray-700 hover:text-gray-900
+						rounded-full p-2
+						transition-colors
+						backdrop-blur-sm
+					"
+					aria-label="Close banner"
+					_="on click
+						add .hidden to #sale-banner
+						halt
+					"
+				>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
 		</div>
 	}
 }
