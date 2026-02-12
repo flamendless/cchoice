@@ -1,8 +1,6 @@
 package metrics
 
 import (
-	"time"
-
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -12,9 +10,9 @@ var (
 			Namespace: "cchoice",
 			Subsystem: "promo",
 			Name:      "product_impressions_total",
-			Help:      "Total number of times a random promo product was shown",
+			Help:      "Random product shown",
 		},
-		[]string{"product_id", "datetime"},
+		[]string{"product_id", "product_name"},
 	)
 )
 
@@ -24,9 +22,8 @@ func init() {
 
 type metricsPromo struct{}
 
-func (p *metricsPromo) ProductImpressionHit(productID string) {
-	dt := time.Now().UTC().Format("2006-01-02T15:04:05Z")
-	promoProductImpressions.WithLabelValues(productID, dt).Inc()
+func (p *metricsPromo) ProductImpressionHit(productID string, productName string) {
+	promoProductImpressions.WithLabelValues(productID, productName).Inc()
 }
 
 var Promo metricsPromo
