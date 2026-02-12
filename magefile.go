@@ -126,6 +126,18 @@ func setupSignalHandler() {
 
 // ---------------- Helpers ----------------
 
+func checkMigrations() error {
+	cmd := exec.Command(filepath.Join(tmpDir, "goose"), "status")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to check migration status: %w", err)
+	}
+	if strings.Contains(string(output), "Pending") {
+		return fmt.Errorf("there are pending migrations. Run 'mage DBUp' to apply them")
+	}
+	return nil
+}
+
 func getenv(k, def string) string {
 	if v := os.Getenv(k); v != "" {
 		return v
@@ -197,6 +209,9 @@ func serve(
 	airpath string,
 	app string,
 ) error {
+	if err := checkMigrations(); err != nil {
+		return err
+	}
 	if err := GenAll(); err != nil {
 		return err
 	}
@@ -217,7 +232,6 @@ func serve(
 func Serve() error {
 	return serve(".air.api.toml", "api")
 }
-
 
 func ServeWeb() error {
 	return serve(".air.web.toml", "web")
@@ -346,8 +360,12 @@ func GenPaymentLogos() error {
 }
 
 func GenImages() error {
-	if err := GenBrandLogos(); err != nil { return err }
-	if err := GenPaymentLogos(); err != nil { return err }
+	if err := GenBrandLogos(); err != nil {
+		return err
+	}
+	if err := GenPaymentLogos(); err != nil {
+		return err
+	}
 	if err := run(Command{
 		Type: CmdGoBuild,
 		Out:  filepath.Join(tmpDir, "genimages"),
@@ -585,7 +603,7 @@ func GenChlog() error {
 
 	return run(Command{
 		Type: CmdExec,
-		Cmd: "go",
+		Cmd:  "go",
 		Args: []string{
 			"tool",
 			"git-chglog",
@@ -777,6 +795,9 @@ func Dev() error {
 }
 
 func Prod() error {
+	if err := checkMigrations(); err != nil {
+		return err
+	}
 	if err := GenAll(); err != nil {
 		return err
 	}
@@ -814,7 +835,7 @@ func Prom() error {
 	openBrowser("http://localhost:9090/")
 	return run(Command{
 		Type: CmdExec,
-		Cmd: "prometheus",
+		Cmd:  "prometheus",
 		Args: []string{
 			"--config.file=prometheus/prometheus.yml",
 		},
