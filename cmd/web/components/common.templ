@@ -278,7 +278,7 @@ templ SaleBanner(product *models.RandomSaleProduct) {
 					overflow-hidden cursor-pointer
 					transform transition-transform hover:scale-105
 				"
-				_={ "on click go to url '/product/" + product.ProductID + "'" }
+				_={ "on click go to url '" + utils.URL("/product/"+product.ProductID) + "'" }
 			>
 				<!-- Product Image -->
 				<img
@@ -290,7 +290,6 @@ templ SaleBanner(product *models.RandomSaleProduct) {
 
 				<!-- Product Info -->
 				<div class="p-6 bg-gradient-to-r from-cchoicesoft to-white">
-					<!-- First row: name | limited offer -->
 					<div class="flex items-center justify-between mb-3">
 						<div>
 							<h3 class="text-xl font-bold text-gray-900 truncate">
@@ -305,7 +304,6 @@ templ SaleBanner(product *models.RandomSaleProduct) {
 						</div>
 					</div>
 
-					<!-- Second row: price | discount ribbon -->
 					<div class="flex items-center justify-between">
 						<div>
 							<p class="text-2xl font-bold text-cchoice">
@@ -328,7 +326,6 @@ templ SaleBanner(product *models.RandomSaleProduct) {
 					</div>
 				</div>
 
-				<!-- Close Button -->
 				<button
 					type="button"
 					class="
