@@ -674,7 +674,7 @@ func SaleBanner(product *models.RandomSaleProduct) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if product != nil && product.DiscountPercentage != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<div id=\"sale-banner\" class=\"\n\t\t\t\tfixed inset-0 z-1000 flex items-center justify-center\n\t\t\t\tbg-black/50 backdrop-blur-sm\n\t\t\t\thidden\n\t\t\t\" _=\"\n\t\t\t\tinit\n\t\t\t\t\tif sessionStorage.getItem('saleBannerShownTODO') !== 'true' then\n\t\t\t\t\t\tremove .hidden from me\n\t\t\t\t\t\tsessionStorage.setItem('saleBannerShown', 'true')\n\t\t\t\t\tend\n\t\t\t\ton click\n\t\t\t\t\tif target is not #sale-banner-content then\n\t\t\t\t\t\tadd .hidden to #sale-banner\n\t\t\t\t\tend\n\t\t\t\"><div id=\"sale-banner-content\" class=\"\n\t\t\t\t\trelative w-full max-w-md mx-4\n\t\t\t\t\tbg-white rounded-2xl shadow-2xl\n\t\t\t\t\toverflow-hidden cursor-pointer\n\t\t\t\t\ttransform transition-transform hover:scale-105\n\t\t\t\t\" _=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<div id=\"sale-banner\" class=\"\n\t\t\t\tfixed inset-0 z-1000 flex items-center justify-center\n\t\t\t\tbg-black/50 backdrop-blur-sm\n\t\t\t\thidden\n\t\t\t\" _=\"\n\t\t\t\tinit\n\t\t\t\t\tif sessionStorage.getItem('saleBannerShown') !== 'true' then\n\t\t\t\t\t\tremove .hidden from me\n\t\t\t\t\t\tsessionStorage.setItem('saleBannerShown', 'true')\n\t\t\t\t\tend\n\t\t\t\ton click\n\t\t\t\t\tif target is not #sale-banner-content then\n\t\t\t\t\t\tadd .hidden to #sale-banner\n\t\t\t\t\tend\n\t\t\t\"><div id=\"sale-banner-content\" class=\"\n\t\t\t\t\trelative w-full max-w-md mx-4\n\t\t\t\t\tbg-white rounded-2xl shadow-2xl\n\t\t\t\t\toverflow-hidden cursor-pointer\n\t\t\t\t\ttransform transition-transform hover:scale-105\n\t\t\t\t\" _=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -713,72 +713,72 @@ func SaleBanner(product *models.RandomSaleProduct) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\" class=\"w-full h-64 object-cover\" loading=\"lazy\"><!-- Sale Ribbon Overlay --><div class=\"\n\t\t\t\t\t\tabsolute top-4 right-4\n\t\t\t\t\t\tbg-red-600 text-white\n\t\t\t\t\t\tpx-4 py-2 rounded-full\n\t\t\t\t\t\tfont-bold text-lg shadow-lg\n\t\t\t\t\t\ttransform rotate-12\n\t\t\t\t\t\">-")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\" class=\"w-full h-64 object-cover\" loading=\"lazy\"><!-- Product Info --><div class=\"p-6 bg-gradient-to-r from-cchoicesoft to-white\"><h3 class=\"text-xl font-bold text-gray-900 mb-2 truncate\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var37 string
-			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(product.DiscountPercentage)
+			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(product.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 301, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 294, Col: 20}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</div><!-- Product Info --><div class=\"p-6 bg-gradient-to-r from-cchoicesoft to-white\"><h3 class=\"text-xl font-bold text-gray-900 mb-2 truncate\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</h3><p class=\"text-sm text-gray-600 mb-4 truncate\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var38 string
-			templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(product.Name)
+			templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(product.BrandName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 307, Col: 20}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 297, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</h3><p class=\"text-sm text-gray-600 mb-4 truncate\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</p><div class=\"flex items-center justify-between\"><!-- Price --><div><p class=\"text-2xl font-bold text-cchoice\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var39 string
-			templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(product.BrandName)
+			templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(product.PriceDisplay)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 310, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 303, Col: 30}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</p><div class=\"flex items-center justify-between\"><div><p class=\"text-2xl font-bold text-cchoice\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</p><p class=\"text-sm text-gray-500 line-through\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var40 string
-			templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(product.PriceDisplay)
+			templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(product.OrigPriceDisplay)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 315, Col: 30}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 306, Col: 34}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</p><p class=\"text-sm text-gray-500 line-through\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</p></div><!-- Discount Ribbon --><div class=\"\n\t\t\t\t\t\t\t\tbg-red-600 text-white\n\t\t\t\t\t\t\t\tpx-4 py-2 rounded-full\n\t\t\t\t\t\t\t\tfont-bold text-lg shadow-lg\n\t\t\t\t\t\t\t\">-")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var41 string
-			templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(product.OrigPriceDisplay)
+			templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(product.DiscountPercentage)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 318, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 318, Col: 36}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</p></div><div class=\"bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold\">Limited Offer</div></div></div><!-- Close Button --><button type=\"button\" class=\"\n\t\t\t\t\t\tabsolute top-2 right-2\n\t\t\t\t\t\tbg-white/80 hover:bg-white\n\t\t\t\t\t\ttext-gray-700 hover:text-gray-900\n\t\t\t\t\t\trounded-full p-2\n\t\t\t\t\t\ttransition-colors\n\t\t\t\t\t\tbackdrop-blur-sm\n\t\t\t\t\t\" aria-label=\"Close banner\" _=\"on click\n\t\t\t\t\t\tadd .hidden to #sale-banner\n\t\t\t\t\t\thalt\n\t\t\t\t\t\"><svg class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</div><!-- Limited Offer --><div class=\"bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold text-center\">Limited Offer</div></div></div><!-- Close Button --><button type=\"button\" class=\"\n\t\t\t\t\t\tabsolute top-2 right-2\n\t\t\t\t\t\tbg-white/80 hover:bg-white\n\t\t\t\t\t\ttext-gray-700 hover:text-gray-900\n\t\t\t\t\t\trounded-full p-2\n\t\t\t\t\t\ttransition-colors\n\t\t\t\t\t\tbackdrop-blur-sm\n\t\t\t\t\t\" aria-label=\"Close banner\" _=\"on click\n\t\t\t\t\t\tadd .hidden to #sale-banner\n\t\t\t\t\t\thalt\n\t\t\t\t\t\"><svg class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
