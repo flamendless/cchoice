@@ -371,7 +371,7 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 		randomSaleProduct = res
 
 		if randomSaleProduct != nil {
-			metrics.Promo.ProductImpressionHit(randomSaleProduct.ProductID)
+			metrics.Promo.ProductImpressionHit(randomSaleProduct.ProductID, randomSaleProduct.Name)
 		}
 	}
 
