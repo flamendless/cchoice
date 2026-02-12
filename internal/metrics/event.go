@@ -23,7 +23,7 @@ func init() {
 type metricsClientEvent struct{}
 
 func (c *metricsClientEvent) ClientEventHit(event string, value string) {
-	clientEvent.WithLabelValues(event, value)
+	clientEvent.WithLabelValues(event, value).Inc()
 }
 
 var ClientEvent metricsClientEvent
