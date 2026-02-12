@@ -679,9 +679,9 @@ func SaleBanner(product *models.RandomSaleProduct) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var34 string
-			templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs("on click go to url '/product/" + product.ProductID + "'")
+			templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs("on click go to url '" + utils.URL("/product/"+product.ProductID) + "'")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 281, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 281, Col: 79}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 			if templ_7745c5c3_Err != nil {
@@ -713,14 +713,14 @@ func SaleBanner(product *models.RandomSaleProduct) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\" class=\"w-full h-64 object-cover\" loading=\"lazy\"><!-- Product Info --><div class=\"p-6 bg-gradient-to-r from-cchoicesoft to-white\"><!-- First row: name | limited offer --><div class=\"flex items-center justify-between mb-3\"><div><h3 class=\"text-xl font-bold text-gray-900 truncate\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\" class=\"w-full h-64 object-cover\" loading=\"lazy\"><!-- Product Info --><div class=\"p-6 bg-gradient-to-r from-cchoicesoft to-white\"><div class=\"flex items-center justify-between mb-3\"><div><h3 class=\"text-xl font-bold text-gray-900 truncate\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var37 string
 			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(product.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 297, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 296, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 			if templ_7745c5c3_Err != nil {
@@ -733,20 +733,20 @@ func SaleBanner(product *models.RandomSaleProduct) templ.Component {
 			var templ_7745c5c3_Var38 string
 			templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(product.BrandName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 300, Col: 27}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 299, Col: 27}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</p></div><div class=\"bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold text-center\">Limited Offer</div></div><!-- Second row: price | discount ribbon --><div class=\"flex items-center justify-between\"><div><p class=\"text-2xl font-bold text-cchoice\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</p></div><div class=\"bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold text-center\">Limited Offer</div></div><div class=\"flex items-center justify-between\"><div><p class=\"text-2xl font-bold text-cchoice\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var39 string
 			templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(product.PriceDisplay)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 312, Col: 30}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 310, Col: 30}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 			if templ_7745c5c3_Err != nil {
@@ -759,7 +759,7 @@ func SaleBanner(product *models.RandomSaleProduct) templ.Component {
 			var templ_7745c5c3_Var40 string
 			templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(product.OrigPriceDisplay)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 315, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 313, Col: 34}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 			if templ_7745c5c3_Err != nil {
@@ -772,13 +772,13 @@ func SaleBanner(product *models.RandomSaleProduct) templ.Component {
 			var templ_7745c5c3_Var41 string
 			templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(product.DiscountPercentage)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 326, Col: 36}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common.templ`, Line: 324, Col: 36}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</div></div></div><!-- Close Button --><button type=\"button\" class=\"\n\t\t\t\t\t\tabsolute top-2 right-2\n\t\t\t\t\t\tbg-white/80 hover:bg-white\n\t\t\t\t\t\ttext-gray-700 hover:text-gray-900\n\t\t\t\t\t\trounded-full p-2\n\t\t\t\t\t\ttransition-colors\n\t\t\t\t\t\tbackdrop-blur-sm\n\t\t\t\t\t\" aria-label=\"Close banner\" _=\"on click\n\t\t\t\t\t\tadd .hidden to #sale-banner\n\t\t\t\t\t\thalt\n\t\t\t\t\t\"><svg class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</div></div></div><button type=\"button\" class=\"\n\t\t\t\t\t\tabsolute top-2 right-2\n\t\t\t\t\t\tbg-white/80 hover:bg-white\n\t\t\t\t\t\ttext-gray-700 hover:text-gray-900\n\t\t\t\t\t\trounded-full p-2\n\t\t\t\t\t\ttransition-colors\n\t\t\t\t\t\tbackdrop-blur-sm\n\t\t\t\t\t\" aria-label=\"Close banner\" _=\"on click\n\t\t\t\t\t\tadd .hidden to #sale-banner\n\t\t\t\t\t\thalt\n\t\t\t\t\t\"><svg class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
