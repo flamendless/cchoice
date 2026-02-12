@@ -315,7 +315,6 @@ func GetRandomSaleProduct(
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
 		res, err := dbRO.GetQueries().GetRandomProductOnSale(ctx)
-		fmt.Println(11111, res, err)
 		if err != nil {
 			return nil, err
 		}
@@ -361,8 +360,12 @@ func GetRandomSaleProduct(
 	return saleProduct, nil
 }
 
-func GenerateRandomSaleProductCacheKey() []byte {
+func GenerateRandomSaleProductCacheKey(requestID string) []byte {
 	keyData := "homepage:random_sale_product"
+	if requestID == "" {
+		requestID = utils.GenString(12)
+	}
+	keyData += ":" + requestID
 	hash := sha256.Sum256([]byte(keyData))
 	return fmt.Appendf(nil, "hp_rsp_%s", hex.EncodeToString(hash[:])[:16])
 }

@@ -181,6 +181,10 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 
 	//INFO: (Brandon) - unused routes
 	r.Post("/checkouts", s.checkoutsHandler)
+
+	//INFO: (Brandon) Maintenance page for undefined routes
+	r.Get("/product/{id}", s.maintenancePageHandler)
+	r.NotFound(s.maintenancePageHandler)
 }
 
 func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
@@ -351,7 +355,8 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	var randomSaleProduct *models.RandomSaleProduct
 	if conf.Conf().Settings.ShowPromoBanner {
-		saleProductCacheKey := requests.GenerateRandomSaleProductCacheKey()
+		requestID := middleware.GetReqID(ctx)
+		saleProductCacheKey := requests.GenerateRandomSaleProductCacheKey(requestID)
 		res, err := requests.GetRandomSaleProduct(
 			ctx,
 			s.cache,
@@ -693,4 +698,21 @@ func (s *Server) metricsEventHandler(w http.ResponseWriter, r *http.Request) {
 
 	metrics.ClientEvent.ClientEventHit(event, value)
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (s *Server) maintenancePageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Maintenance Page Handler]"
+	ctx := r.Context()
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := components.MaintenancePage().Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("path", r.URL.Path),
+			zap.String("method", r.Method),
+			zap.Error(err),
+		)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
