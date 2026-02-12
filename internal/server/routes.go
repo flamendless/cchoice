@@ -369,6 +369,10 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 			)
 		}
 		randomSaleProduct = res
+
+		if randomSaleProduct != nil {
+			metrics.Promo.ProductImpressionHit(randomSaleProduct.ProductID)
+		}
 	}
 
 	logs.Log().Info(logtag, zap.Bool("promo product banner", randomSaleProduct != nil))
