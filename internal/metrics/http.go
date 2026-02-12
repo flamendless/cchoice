@@ -44,8 +44,8 @@ func init() {
 
 type metricsHTTP struct{}
 
-func (h *metricsHTTP) RequestsHit(params ...string) { httpRequestsTotal.WithLabelValues(params...) }
-func (h *metricsHTTP) ErrorsHit(params ...string) { httpErrorsTotal.WithLabelValues(params...) }
-func (h *metricsHTTP) RoutesSkippedHit(params ...string) { httpRoutesSkippedTotal.WithLabelValues(params...) }
+func (h *metricsHTTP) RequestsHit(params ...string) { httpRequestsTotal.WithLabelValues(params...).Inc() }
+func (h *metricsHTTP) ErrorsHit(params ...string) { httpErrorsTotal.WithLabelValues(params...).Inc() }
+func (h *metricsHTTP) RoutesSkippedHit(params ...string) { httpRoutesSkippedTotal.WithLabelValues(params...).Inc() }
 
 var HTTP metricsHTTP
