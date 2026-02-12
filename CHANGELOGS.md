@@ -2,6 +2,22 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.4"></a>
+## [release-v1.1.4] - 2026-02-12
+### Docs
+- Release v1.1.3
+
+### Server
+- Add random promo product metrics
+- Add random promo product
+
+### Web
+- Update promo position
+- Update random promo product banner pos
+- Display random promo product banner
+- Decrease CORSeal logo
+
+
 <a name="release-v1.1.3"></a>
 ## [release-v1.1.3] - 2026-02-05
 ### Docs
@@ -699,7 +715,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.3...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.4...HEAD
+[release-v1.1.4]: https://github.com/flamendless/cchoice/compare/release-v1.1.3...release-v1.1.4
 [release-v1.1.3]: https://github.com/flamendless/cchoice/compare/release-v1.1.2...release-v1.1.3
 [release-v1.1.2]: https://github.com/flamendless/cchoice/compare/release-v1.1.1...release-v1.1.2
 [release-v1.1.1]: https://github.com/flamendless/cchoice/compare/release-v1.1.0...release-v1.1.1
