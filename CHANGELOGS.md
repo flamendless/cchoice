@@ -2,6 +2,24 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.6"></a>
+## [release-v1.1.6] - 2026-02-12
+### Server
+- Use product name instead of time for promo metrics
+
+
+<a name="release-v1.1.5"></a>
+## [release-v1.1.5] - 2026-02-12
+### Docs
+- Release v1.1.4
+
+### Script
+- Add checkMigrations
+
+### Server
+- Add missing Inc call in metrics
+
+
 <a name="release-v1.1.4"></a>
 ## [release-v1.1.4] - 2026-02-12
 ### Docs
@@ -715,7 +733,9 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.4...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.6...HEAD
+[release-v1.1.6]: https://github.com/flamendless/cchoice/compare/release-v1.1.5...release-v1.1.6
+[release-v1.1.5]: https://github.com/flamendless/cchoice/compare/release-v1.1.4...release-v1.1.5
 [release-v1.1.4]: https://github.com/flamendless/cchoice/compare/release-v1.1.3...release-v1.1.4
 [release-v1.1.3]: https://github.com/flamendless/cchoice/compare/release-v1.1.2...release-v1.1.3
 [release-v1.1.2]: https://github.com/flamendless/cchoice/compare/release-v1.1.1...release-v1.1.2
