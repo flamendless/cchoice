@@ -2,6 +2,15 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.8"></a>
+## [release-v1.1.8] - 2026-02-14
+### Docs
+- Release v1.1.7
+
+### Web
+- Add metrics to promo product click and checked payment method
+
+
 <a name="release-v1.1.7"></a>
 ## [release-v1.1.7] - 2026-02-12
 ### Docs
@@ -745,7 +754,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.7...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.8...HEAD
+[release-v1.1.8]: https://github.com/flamendless/cchoice/compare/release-v1.1.7...release-v1.1.8
 [release-v1.1.7]: https://github.com/flamendless/cchoice/compare/release-v1.1.6...release-v1.1.7
 [release-v1.1.6]: https://github.com/flamendless/cchoice/compare/release-v1.1.5...release-v1.1.6
 [release-v1.1.5]: https://github.com/flamendless/cchoice/compare/release-v1.1.4...release-v1.1.5
