@@ -18,6 +18,7 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
+	"cchoice/internal/metrics"
 	"cchoice/internal/orders"
 	"cchoice/internal/payments"
 	"cchoice/internal/shipping"
@@ -654,6 +655,7 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 			Email: cartCheckout.Email,
 			Phone: cartCheckout.MobileNo,
 		}
+
 		lineItems := make([]payments.LineItem, 0, len(cartCheckout.CheckoutIDs))
 		for _, checkoutLine := range checkoutLines {
 			imageURL, err := s.GetProductImageProxyURL(ctx, checkoutLine.ThumbnailPath, "256x256")
@@ -760,8 +762,11 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 			zap.String("order_number", order.OrderNumber),
 		)
 
+		metrics.ClientEvent.ClientEventHit("checked_payment_method", cartCheckout.PaymentMethod)
+
 		// Redirect to payment gateway
 		w.Header().Set("HX-Redirect", checkoutURL)
+
 	default:
 		err := fmt.Errorf("%s. %w", logtag, errs.ErrServerUnimplementedGateway)
 		logs.LogCtx(ctx).Error(
