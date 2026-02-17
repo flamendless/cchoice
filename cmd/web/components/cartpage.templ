@@ -44,10 +44,20 @@ templ AddToCart() {
 			on htmx:afterRequest
 				trigger get on #cart-count-desktop
 				trigger get on #cart-count-mobile
+				if #cart-icon-desktop
+					add .cart-icon-animate to #cart-icon-desktop
+					wait 400ms
+					remove .cart-icon-animate from #cart-icon-desktop
+				end
+				if #cart-icon-mobile
+					add .cart-icon-animate to #cart-icon-mobile
+					wait 400ms
+					remove .cart-icon-animate from #cart-icon-mobile
+				end
 			end
 		"
 	>
-		@svgCart("stroke-white group-hover:stroke-cchoice_border w-full h-full p-2")
+		@svgCart("", "stroke-white group-hover:stroke-cchoice_border w-full h-full p-2")
 		<span
 			class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow"
 		>
@@ -84,10 +94,20 @@ templ AddToCartPromoProduct() {
 			on htmx:afterRequest
 				trigger get on #cart-count-desktop
 				trigger get on #cart-count-mobile
+				if #cart-icon-desktop
+					add .cart-icon-animate to #cart-icon-desktop
+					wait 400ms
+					remove .cart-icon-animate from #cart-icon-desktop
+				end
+				if #cart-icon-mobile
+					add .cart-icon-animate to #cart-icon-mobile
+					wait 400ms
+					remove .cart-icon-animate from #cart-icon-mobile
+				end
 			end
 		"
 	>
-		@svgCart("stroke-white group-hover:stroke-cchoice_border w-full h-full p-2")
+		@svgCart("", "stroke-white group-hover:stroke-cchoice_border w-full h-full p-2")
 		<span
 			class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow"
 		>
@@ -295,7 +315,7 @@ templ CartPageBodyEmpty() {
 templ EmptyCart() {
 	<div class="h-[50vh] flex flex-col justify-center items-center">
 		<h1 class="text-2xl text-cchoice-800">Your cart is empty</h1>
-		@svgCart("size-32 my-4 stroke-cchoice")
+		@svgCart("", "size-32 my-4 stroke-cchoice")
 	</div>
 }
 
