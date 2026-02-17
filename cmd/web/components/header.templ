@@ -47,9 +47,9 @@ templ headerLogo(platform string) {
 	</a>
 }
 
-templ CartCount(n int) {
+templ CartCount(id string, n int) {
 	<span
-		id="cart-count"
+		id={ id }
 		class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs font-bold rounded-md px-1.5 shadow"
 		hx-get={ utils.URL("/carts/lines/count") }
 		hx-trigger="load once, get"
@@ -108,7 +108,7 @@ templ HeaderDesktop() {
 				"Cart",
 				"/carts",
 				svgCart(clsHeaderIconButton),
-				CartCount(0),
+				CartCount("cart-count-desktop", 0),
 			)
 			@IconAction(
 				"Track Order",
@@ -156,7 +156,7 @@ templ HeaderMobile() {
 				"Cart",
 				"/carts",
 				svgCart(clsHeaderIconButton),
-				CartCount(0),
+				CartCount("cart-count-mobile", 0),
 			)
 			@IconAction(
 				"Track Order",

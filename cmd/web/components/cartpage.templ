@@ -42,7 +42,8 @@ templ AddToCart() {
 				halt
 			end
 			on htmx:afterRequest
-				trigger get on #cart-count
+				trigger get on #cart-count-desktop
+				trigger get on #cart-count-mobile
 			end
 		"
 	>
@@ -81,7 +82,8 @@ templ AddToCartPromoProduct() {
 				halt
 			end
 			on htmx:afterRequest
-				trigger get on #cart-count
+				trigger get on #cart-count-desktop
+				trigger get on #cart-count-mobile
 			end
 		"
 	>
