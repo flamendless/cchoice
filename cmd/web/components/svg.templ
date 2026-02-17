@@ -3,7 +3,7 @@ package components
 import "fmt"
 
 //https://heroicons.com
-templ svgCart(cls string) {
+templ svgCart(id string, cls string) {
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
 		fill="none"
@@ -11,6 +11,9 @@ templ svgCart(cls string) {
 		stroke-width="1.5"
 		stroke="currentColor"
 		class={ fmt.Sprintf("size-8 %s", cls) }
+		if id != "" {
+			id={ id }
+		}
 	>
 		<path
 			stroke-linecap="round"

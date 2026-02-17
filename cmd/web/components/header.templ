@@ -47,13 +47,37 @@ templ headerLogo(platform string) {
 	</a>
 }
 
+var cartCountStyleOnce = templ.NewOnceHandle()
+
 templ CartCount(id string, n int) {
+	@cartCountStyleOnce.Once() {
+		<style>
+			@keyframes cart-count-pulse {
+				0% { transform: scale(1); }
+				50% { transform: scale(1.5); }
+				100% { transform: scale(1); }
+			}
+			@keyframes cart-icon-bounce {
+				0% { transform: scale(1); }
+				30% { transform: scale(1.2); }
+				60% { transform: scale(0.9); }
+				100% { transform: scale(1); }
+			}
+			.cart-count-animate {
+				animation: cart-count-pulse 0.3s ease-in-out;
+			}
+			.cart-icon-animate {
+				animation: cart-icon-bounce 0.4s ease-in-out;
+			}
+		</style>
+	}
 	<span
 		id={ id }
 		class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs font-bold rounded-md px-1.5 shadow"
 		hx-get={ utils.URL("/carts/lines/count") }
 		hx-trigger="load once, get"
 		hx-swap="textContent"
+		_="on htmx:afterSwap add .cart-count-animate to me then wait 300ms then remove .cart-count-animate from me"
 	>
 		{ n }
 	</span>
@@ -107,7 +131,7 @@ templ HeaderDesktop() {
 			@IconAction(
 				"Cart",
 				"/carts",
-				svgCart(clsHeaderIconButton),
+				svgCart("cart-icon-desktop", clsHeaderIconButton),
 				CartCount("cart-count-desktop", 0),
 			)
 			@IconAction(
@@ -155,7 +179,7 @@ templ HeaderMobile() {
 			@IconAction(
 				"Cart",
 				"/carts",
-				svgCart(clsHeaderIconButton),
+				svgCart("cart-icon-mobile", clsHeaderIconButton),
 				CartCount("cart-count-mobile", 0),
 			)
 			@IconAction(
