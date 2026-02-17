@@ -6,8 +6,10 @@ import "fmt"
 
 templ SaleBanner(product *models.RandomSaleProduct) {
 	if product != nil && product.DiscountPercentage != "" {
+		<input type="hidden" id="promo-product-id" value="" name="product_id"/>
 		<div
 			id="sale-banner"
+			data-product-id={ product.ProductID }
 			class="
 				fixed inset-0 z-50 flex items-center justify-center
 				bg-black/50 backdrop-blur-sm
@@ -19,10 +21,15 @@ templ SaleBanner(product *models.RandomSaleProduct) {
 						remove .hidden from me
 						sessionStorage.setItem('saleBannerShown', 'true')
 					end
+
+					set #promo-product-id.value to my @data-product-id
+				end
+
 				on click
 					if target is not #sale-banner-content then
 						add .hidden to #sale-banner
 					end
+				end
 			"
 		>
 			<div
@@ -38,6 +45,7 @@ templ SaleBanner(product *models.RandomSaleProduct) {
 						on click
 							async call metrics_event('promo_product_click', '%s')
 							go to url '%s'
+						end
 						`,
 						product.ProductID,
 						utils.URL("/product/"+product.ProductID),
@@ -87,6 +95,8 @@ templ SaleBanner(product *models.RandomSaleProduct) {
 						>
 							-{ product.DiscountPercentage }
 						</div>
+
+						@AddToCartPromoProduct()
 					</div>
 				</div>
 

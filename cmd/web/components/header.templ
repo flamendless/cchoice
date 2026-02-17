@@ -52,7 +52,7 @@ templ CartCount(n int) {
 		id="cart-count"
 		class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs font-bold rounded-md px-1.5 shadow"
 		hx-get={ utils.URL("/carts/lines/count") }
-		hx-trigger="load once, every 30s, get"
+		hx-trigger="load once, get"
 		hx-swap="textContent"
 	>
 		{ n }
