@@ -20,7 +20,7 @@ function metrics_event(ev, value) {
 	})
 	.catch(error => console.error("Error:", error));
 
-	console.debug("Event", ev, "Value", value);
+	console.debug(`Event: '${ev}'. Value: '${value}'`);
 }
 
 console.log("metrics event loaded");

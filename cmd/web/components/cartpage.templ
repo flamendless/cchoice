@@ -20,6 +20,8 @@ templ CartPage(body templ.Component) {
 	</html>
 }
 
+//INFO: (Brandon) - when adding this component, make sure to add the
+//                  relevant '<input type="hidden" id="id" value="" name="product_id"/>' as well
 templ AddToCart() {
 	<button
 		id="btn-add-to-cart"
@@ -37,6 +39,7 @@ templ AddToCart() {
 			on click
 				async call metrics_event('add_to_cart', #selected-product-id.value)
 				log 'Added to cart: ' + #selected-product-id.value
+				halt
 			end
 			on htmx:afterRequest
 				trigger get on #cart-count
@@ -56,6 +59,39 @@ templ AddToCart() {
 		name="product_id"
 		value=""
 	/>
+}
+
+templ AddToCartPromoProduct() {
+	<button
+		id="btn-add-to-cart"
+		class="
+			flex justify-center items-center relative inline-block w-12 h-12
+			bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors
+			group rounded-full hover:bg-cchoicesoft
+		"
+		title="add to cart"
+		alt="add to cart button"
+		hx-post={ utils.URL("/carts/lines") }
+		hx-include="#promo-product-id"
+		hx-swap="none"
+		_="
+			on click
+				async call metrics_event('add_to_cart', #promo-product-id.value)
+				log 'Added to cart: ' + #promo-product-id.value
+				halt
+			end
+			on htmx:afterRequest
+				trigger get on #cart-count
+			end
+		"
+	>
+		@svgCart("stroke-white group-hover:stroke-cchoice_border w-full h-full p-2")
+		<span
+			class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow"
+		>
+			+1
+		</span>
+	</button>
 }
 
 templ CartPageBody(summaryContent templ.Component) {
