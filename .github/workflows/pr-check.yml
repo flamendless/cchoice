@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: blimmer/action-check-strings@v1
+      - uses: harupy/find-trailing-whitespace@master
 
   security:
     name: Security Scan
@@ -55,23 +55,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: amannn/action-semantic-pull-request@v5
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          types: |
-            Feature
-            Maintenance
-            Deps
-            Toolings
-            Script
-            CICD
-            Config
-            Docs
-            Performance
-            Server
-            Web
-            Bugfix
+      - name: Check commit messages
+        run: |
+          COMMITS=$(git log --format=%s ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+          if echo "$COMMITS" | grep -vE '^(Feature|Maintenance|Deps|Toolings|Script|CICD|Config|Docs|Performance|Server|Web|Bugfix)(\(.+\))?: ' > /dev/null; then
+            echo "::error::Commit messages must follow conventional commits format (e.g., 'Feature: message', 'Bugfix: message')"
+            echo "Invalid commits:"
+            echo "$COMMITS" | grep -vE '^(Feature|Maintenance|Deps|Toolings|Script|CICD|Config|Docs|Performance|Server|Web|Bugfix)(\(.+\))?: '
+            exit 1
+          fi
 
   vuln:
     name: Vulnerability Scan
@@ -80,9 +72,9 @@ jobs:
     if: needs.changes.outputs.go == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: golang/vuln@latest
+      - uses: golang/vulncheck-action@v1
         with:
-          modules: ./...
+          packages: ./...
 
   gensql:
     name: Generate SQL
@@ -108,6 +100,11 @@ jobs:
         with:
           go-version: stable
       - run: go install github.com/magefile/mage@latest
+      - name: Install tailwindcss
+        run: |
+          curl -LO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
+          chmod +x tailwindcss-linux-x64
+          mv tailwindcss-linux-x64 tailwindcss
       - run: mage gentempl
 
   build:
@@ -133,7 +130,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: stable
-      - uses: golangci/golangci-lint-action@v8
+      - uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.3
+          version: latest
           args: --config=${{ github.workspace }}/.golangci.yml
