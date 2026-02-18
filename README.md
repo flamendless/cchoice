@@ -1,24 +1,31 @@
 # Setup
 
-- `git clone --recurse-submodules --shallow-submodules -j8 <repo>`
+- `git clone --recurse-submodules --shallow-submodules -j8 <repo url>`
 - `go mod download`
 - `go mod tidy`
 - `go install github.com/magefile/mage@latest`
 - `mage deps`
 - `mage setup`
 - `mage setupprod`
-- `mage genAll`
-- `mage cleanDB`
-- `mage genImages`
-- `mage genMaps`
-- `mage testAll`
+- `mage genall`
+- `mage cleandb`
+- `mage genimages`
+- `mage genmaps`
+- `mage testall`
 - `mage benchmark`
 
 # Env Vars
 
 See `.env.sample`
 
-# Generate local cert
+# Running
+
+- run `mage serve`
+- or `mage serveweb` for faster iteration for frontend changes only
+
+---
+
+# Generate local cert (for STAGING and PROD environment only)
 
 ```
 mkdir ~/certs
@@ -27,7 +34,9 @@ mkcert -install
 mkcert localhost 127.0.0.1 ::1
 ```
 
-# Commits
+---
+
+# Commit Prefix
 - Feature
 - Maintenance:
     - simple fix or revision
