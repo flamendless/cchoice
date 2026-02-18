@@ -140,6 +140,10 @@ func HomePageBody(data models.HomePageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = PrefetchProductImage().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -191,10 +195,10 @@ func MobileSidebar() templ.Component {
 
 func LoadImageSrc() templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_LoadImageSrc_0f39`,
-		Function: `function __templ_LoadImageSrc_0f39(){document.body.addEventListener('htmx:afterRequest', function(event) {
+		Name: `__templ_LoadImageSrc_902f`,
+		Function: `function __templ_LoadImageSrc_902f(){document.body.addEventListener("htmx:afterRequest", function(event) {
 		const target = event.detail.elt;
-		if (target.tagName === 'IMG' && event.detail.successful) {
+		if (target.tagName === "IMG" && event.detail.successful) {
 			const base64Data = event.detail.xhr.responseText;
 			if (base64Data) {
 				target.src = base64Data;
@@ -202,28 +206,55 @@ func LoadImageSrc() templ.ComponentScript {
 		}
 	});
 }`,
-		Call:       templ.SafeScript(`__templ_LoadImageSrc_0f39`),
-		CallInline: templ.SafeScriptInline(`__templ_LoadImageSrc_0f39`),
+		Call:       templ.SafeScript(`__templ_LoadImageSrc_902f`),
+		CallInline: templ.SafeScriptInline(`__templ_LoadImageSrc_902f`),
 	}
 }
 
 func LoadModalImage() templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_LoadModalImage_382a`,
-		Function: `function __templ_LoadModalImage_382a(){document.addEventListener('get', function(event) {
+		Name: `__templ_LoadModalImage_77f0`,
+		Function: `function __templ_LoadModalImage_77f0(){document.addEventListener("get", function(event) {
 		const target = event.target;
-		if (!target || target.id !== 'modal_image_viewer_image')
+		if (!target || target.id !== "modal_image_viewer_image")
 			return
 
-		const pathInput = document.getElementById('selected-product-thumbnail-path');
+		const pathInput = document.getElementById("selected-product-thumbnail-path");
 		if (!pathInput || !pathInput.value)
 			return
 
 		target.src = pathInput.value;
 	}, true);
 }`,
-		Call:       templ.SafeScript(`__templ_LoadModalImage_382a`),
-		CallInline: templ.SafeScriptInline(`__templ_LoadModalImage_382a`),
+		Call:       templ.SafeScript(`__templ_LoadModalImage_77f0`),
+		CallInline: templ.SafeScriptInline(`__templ_LoadModalImage_77f0`),
+	}
+}
+
+func PrefetchProductImage() templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_PrefetchProductImage_bf8b`,
+		Function: `function __templ_PrefetchProductImage_bf8b(){document.addEventListener("mouseover", function(event) {
+		var target = event.target;
+		if (!target) return;
+
+		var highResPath = target.dataset.productThumbnailPath;
+		if (!highResPath) {
+			var parent = target.closest("[data-product-thumbnail-path]");
+			if (parent) {
+				highResPath = parent.dataset.productThumbnailPath;
+			}
+		}
+
+		console.debug(` + "`" + `Prefetching '${highResPath}'` + "`" + `);
+		if (highResPath) {
+			var img = new Image();
+			img.src = highResPath;
+		}
+	});
+}`,
+		Call:       templ.SafeScript(`__templ_PrefetchProductImage_bf8b`),
+		CallInline: templ.SafeScriptInline(`__templ_PrefetchProductImage_bf8b`),
 	}
 }
 
