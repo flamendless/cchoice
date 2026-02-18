@@ -144,6 +144,10 @@ func HomePageBody(data models.HomePageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = PrefetchSaleProductImages().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -255,6 +259,23 @@ func PrefetchProductImage() templ.ComponentScript {
 }`,
 		Call:       templ.SafeScript(`__templ_PrefetchProductImage_bf8b`),
 		CallInline: templ.SafeScriptInline(`__templ_PrefetchProductImage_bf8b`),
+	}
+}
+
+func PrefetchSaleProductImages() templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_PrefetchSaleProductImages_13c5`,
+		Function: `function __templ_PrefetchSaleProductImages_13c5(){var saleProducts = document.querySelectorAll('[data-product-on-sale="true"]');
+	saleProducts.forEach(function(el) {
+		var highResPath = el.dataset.productThumbnailPath;
+		if (highResPath) {
+			var img = new Image();
+			img.src = highResPath;
+		}
+	});
+}`,
+		Call:       templ.SafeScript(`__templ_PrefetchSaleProductImages_13c5`),
+		CallInline: templ.SafeScriptInline(`__templ_PrefetchSaleProductImages_13c5`),
 	}
 }
 
