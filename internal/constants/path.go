@@ -12,4 +12,5 @@ const (
 	PathStoreImageCDN           = "https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/store/public"
 	PathCORSealImageCDN         = "https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/CORSeal/public"
 	PathChangelogs              = "./CHANGELOGS.md"
+	MaxImagePathLength          = 512
 )

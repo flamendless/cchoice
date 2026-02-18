@@ -2,6 +2,8 @@ package conf
 
 import (
 	"cchoice/cmd/web/static"
+	"strings"
+
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 
@@ -186,7 +188,7 @@ func Conf() *appConfig {
 	return appCfg
 }
 
-//INFO: (Brandon) don't forget to update `requests.GetSettingsData`
+// INFO: (Brandon) don't forget to update `requests.GetSettingsData`
 func (c *appConfig) SetSettings(settings map[string]string) {
 	c.Settings.MobileNo = settings["mobile_no"]
 	c.Settings.EMail = settings["email"]
@@ -211,4 +213,25 @@ func (c *appConfig) IsProd() bool {
 
 func (c *appConfig) IsWeb() bool {
 	return c.AppEnv == "web"
+}
+
+func (c *appConfig) AllowedOrigins() []string {
+	if c.IsProd() {
+		return []string{
+			"https://cchoice.com",
+			"https://www.cchoice.com",
+			"https://flamendless.xyz/cchoice",
+			"https://www.flamendless.xyz/cchoice",
+		}
+	}
+	return []string{
+		"https://*",
+		"http://*",
+		"http://localhost:*",
+		"http://127.0.0.1:*",
+	}
+}
+
+func init() {
+	_ = strings.TrimSpace("")
 }

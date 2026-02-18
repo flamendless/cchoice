@@ -108,7 +108,7 @@ func (p PayMongo) CreateCheckoutPaymentSession(
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", p.GetAuth())
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := p.client.Do(req)
 	if err != nil || resp == nil || resp.StatusCode != http.StatusOK {
 		logs.JSONResponse(logTag, resp)
 		return nil, errors.Join(errs.ErrPaymentClient, err)
@@ -138,7 +138,7 @@ func (p PayMongo) GetAvailablePaymentMethods() (payments.GetAvailablePaymentMeth
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", p.GetAuth())
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := p.client.Do(req)
 	if err != nil || resp == nil || resp.StatusCode != http.StatusOK {
 		logs.JSONResponse(logTag, resp)
 		return nil, errors.Join(errs.ErrPaymentClient, err)
