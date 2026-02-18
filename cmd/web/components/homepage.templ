@@ -71,6 +71,7 @@ templ HomePageBody(data models.HomePageData) {
 		@Footer()
 		@LoadImageSrc()
 		@LoadModalImage()
+		@PrefetchProductImage()
 	</body>
 }
 
@@ -115,9 +116,9 @@ templ MobileSidebar() {
 }
 
 script LoadImageSrc() {
-	document.body.addEventListener('htmx:afterRequest', function(event) {
+	document.body.addEventListener("htmx:afterRequest", function(event) {
 		const target = event.detail.elt;
-		if (target.tagName === 'IMG' && event.detail.successful) {
+		if (target.tagName === "IMG" && event.detail.successful) {
 			const base64Data = event.detail.xhr.responseText;
 			if (base64Data) {
 				target.src = base64Data;
@@ -127,15 +128,36 @@ script LoadImageSrc() {
 }
 
 script LoadModalImage() {
-	document.addEventListener('get', function(event) {
+	document.addEventListener("get", function(event) {
 		const target = event.target;
-		if (!target || target.id !== 'modal_image_viewer_image')
+		if (!target || target.id !== "modal_image_viewer_image")
 			return
 
-		const pathInput = document.getElementById('selected-product-thumbnail-path');
+		const pathInput = document.getElementById("selected-product-thumbnail-path");
 		if (!pathInput || !pathInput.value)
 			return
 
 		target.src = pathInput.value;
 	}, true);
+}
+
+script PrefetchProductImage() {
+	document.addEventListener("mouseover", function(event) {
+		var target = event.target;
+		if (!target) return;
+
+		var highResPath = target.dataset.productThumbnailPath;
+		if (!highResPath) {
+			var parent = target.closest("[data-product-thumbnail-path]");
+			if (parent) {
+				highResPath = parent.dataset.productThumbnailPath;
+			}
+		}
+
+		console.debug(`Prefetching '${highResPath}'`);
+		if (highResPath) {
+			var img = new Image();
+			img.src = highResPath;
+		}
+	});
 }
