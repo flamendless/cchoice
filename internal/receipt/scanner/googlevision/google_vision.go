@@ -144,14 +144,14 @@ func (g *GoogleVisionScanner) extractStructuredData(fullAnnotation *visionpb.Tex
 					avgX := (vertices[0].X + vertices[1].X + vertices[2].X + vertices[3].X) / 4
 					avgY := (vertices[0].Y + vertices[1].Y + vertices[2].Y + vertices[3].Y) / 4
 
-					var wordText string
+					var wordTextSB strings.Builder
 					for _, symbol := range word.Symbols {
-						wordText += symbol.Text
+						wordTextSB.WriteString(symbol.Text)
 					}
 
 					if word.Confidence >= minConfidence {
 						words = append(words, WordInfo{
-							Text:       wordText,
+							Text:       wordTextSB.String(),
 							Confidence: word.Confidence,
 							X:          float32(avgX),
 							Y:          float32(avgY),
@@ -379,13 +379,14 @@ func parseLineItemsWithStructuredData(lines []string, data *scanner.ReceiptData,
 
 	var tableRows []Row
 	for _, row := range structuredData.Rows {
-		rowText := ""
+		var rowTextSB strings.Builder
 		for _, word := range row.Words {
-			rowText += strings.ToUpper(word.Text) + " "
+			rowTextSB.WriteString(strings.ToUpper(word.Text))
+			rowTextSB.WriteString(" ")
 		}
 
 		for i := startIdx; i <= endIdx && i < len(lines); i++ {
-			if strings.Contains(rowText, strings.ToUpper(strings.TrimSpace(lines[i]))) {
+			if strings.Contains(rowTextSB.String(), strings.ToUpper(strings.TrimSpace(lines[i]))) {
 				tableRows = append(tableRows, row)
 				break
 			}
