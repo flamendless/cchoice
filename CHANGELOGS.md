@@ -2,6 +2,19 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.9"></a>
+## [release-v1.1.9] - 2026-02-17
+### Bugfix
+- Add to cart count
+
+### Docs
+- Release v1.1.8
+
+### Web
+- Animate cart on count update
+- Add AddToCart in promo product
+
+
 <a name="release-v1.1.8"></a>
 ## [release-v1.1.8] - 2026-02-14
 ### Docs
@@ -754,7 +767,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.8...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.9...HEAD
+[release-v1.1.9]: https://github.com/flamendless/cchoice/compare/release-v1.1.8...release-v1.1.9
 [release-v1.1.8]: https://github.com/flamendless/cchoice/compare/release-v1.1.7...release-v1.1.8
 [release-v1.1.7]: https://github.com/flamendless/cchoice/compare/release-v1.1.6...release-v1.1.7
 [release-v1.1.6]: https://github.com/flamendless/cchoice/compare/release-v1.1.5...release-v1.1.6
