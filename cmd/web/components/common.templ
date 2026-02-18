@@ -84,13 +84,12 @@ templ HeadMeta() {
 
 		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/metrics.js")) }></script>
 		@templ.JSONScript("url-prefix", utils.URL(""))
-
 		<script>
 			(function(){
 				if (!globalThis._G) {
 					globalThis._G = {};
 				}
-				const urlPrefix = JSON.parse(document.getElementById('url-prefix').textContent);
+				const urlPrefix = JSON.parse(document.getElementById("url-prefix").textContent);
 				Object.defineProperty(globalThis._G, "URL_PREFIX", {
 					value: urlPrefix,
 					writable: false,
