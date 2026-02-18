@@ -143,8 +143,11 @@ func (ejr *EmailJobRunner) QueueEmailJob(ctx context.Context, params EmailJobPar
 		return errors.Join(errs.ErrJobsCreateFailed, err)
 	}
 
-	if err := jobs.Create(ctx, ejr.queue, JobSendEmail, payloadBytes); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	if _, err := jobs.Create(ctx, ejr.queue, JobSendEmail, goqite.Message{Body: payloadBytes}); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
 		return errors.Join(errs.ErrJobsCreateFailed, err)
 	}
 
