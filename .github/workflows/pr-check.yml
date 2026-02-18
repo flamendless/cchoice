@@ -38,7 +38,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: harupy/find-trailing-whitespace@master
+      - name: Check for trailing whitespace
+        run: |
+          if git diff --name-only HEAD | xargs grep -E '[[:space:]]+$' 2>/dev/null; then
+            echo "::error::Found trailing whitespace in changed files"
+            exit 1
+          fi
 
   security:
     name: Security Scan
@@ -55,9 +60,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Check commit messages
         run: |
-          COMMITS=$(git log --format=%s ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+          BASE=${{ github.event.pull_request.base.sha }}
+          HEAD=${{ github.event.pull_request.head.sha }}
+          if [ "$BASE" = "$HEAD" ]; then
+            COMMITS=$(git log --format=%s -1 HEAD)
+          else
+            COMMITS=$(git log --format=%s ${BASE}..${HEAD})
+          fi
           if echo "$COMMITS" | grep -vE '^(Feature|Maintenance|Deps|Toolings|Script|CICD|Config|Docs|Performance|Server|Web|Bugfix)(\(.+\))?: ' > /dev/null; then
             echo "::error::Commit messages must follow conventional commits format (e.g., 'Feature: message', 'Bugfix: message')"
             echo "Invalid commits:"
@@ -72,9 +85,7 @@ jobs:
     if: needs.changes.outputs.go == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: golang/vulncheck-action@v1
-        with:
-          packages: ./...
+      - uses: golang/govulncheck-action@v1
 
   gensql:
     name: Generate SQL
@@ -117,8 +128,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: stable
-      - run: go install github.com/magefile/mage@latest
-      - run: mage build
+      - run: go build
 
   lint:
     name: Lint
