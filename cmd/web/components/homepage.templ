@@ -72,6 +72,7 @@ templ HomePageBody(data models.HomePageData) {
 		@LoadImageSrc()
 		@LoadModalImage()
 		@PrefetchProductImage()
+		@PrefetchSaleProductImages()
 	</body>
 }
 
@@ -155,6 +156,17 @@ script PrefetchProductImage() {
 		}
 
 		console.debug(`Prefetching '${highResPath}'`);
+		if (highResPath) {
+			var img = new Image();
+			img.src = highResPath;
+		}
+	});
+}
+
+script PrefetchSaleProductImages() {
+	var saleProducts = document.querySelectorAll('[data-product-on-sale="true"]');
+	saleProducts.forEach(function(el) {
+		var highResPath = el.dataset.productThumbnailPath;
 		if (highResPath) {
 			var img = new Image();
 			img.src = highResPath;

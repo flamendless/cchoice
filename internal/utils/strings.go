@@ -58,14 +58,18 @@ func LabelToID(module enums.Module, label string) string {
 }
 
 func GenString(length int) string {
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    b := make([]byte, length)
-    _, err := rand.Read(b)
-    if err != nil {
-        return ""
-    }
-    for i := range b {
-        b[i] = charset[int(b[i])%len(charset)]
-    }
-    return string(b)
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	b := make([]byte, length)
+	_, err := rand.Read(b)
+	if err != nil {
+		return ""
+	}
+	for i := range b {
+		b[i] = charset[int(b[i])%len(charset)]
+	}
+	return string(b)
+}
+
+func IsProductOnSale(discountPercentage string) bool {
+	return discountPercentage != ""
 }
