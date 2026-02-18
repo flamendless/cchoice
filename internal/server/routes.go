@@ -74,7 +74,7 @@ func validateImagePath(path string, allowedPrefixes []string) (string, error) {
 		return "", errs.ErrPathInvalidExt
 	}
 
-	if len(cleanPath) > 512 {
+	if len(cleanPath) > constants.MaxImagePathLength {
 		return "", errs.ErrPathTooLong
 	}
 
@@ -91,7 +91,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// r.Use(middleware.NoCache)
 	r.Use(middleware.Compress(5))
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedOrigins:   conf.Conf().AllowedOrigins(),
 		AllowedMethods:   []string{http.MethodGet, http.MethodPost},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
 		AllowCredentials: true,
@@ -454,13 +454,12 @@ func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	if _, err := w.Write(jsonResp); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
 		)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
 	}
 }
 
@@ -610,9 +609,10 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	)
 	if err != nil || len(products) == 0 {
-		logs.LogCtx(ctx).Info(
+		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("query", searchQuery),
+			zap.Error(err),
 		)
 		return
 	}
