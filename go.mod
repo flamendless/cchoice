@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/vision/v2 v2.9.6
 	github.com/Rhymond/go-money v1.0.15
 	github.com/VictoriaMetrics/fastcache v1.13.2
-	github.com/a-h/templ v0.3.977
+	github.com/a-h/templ v0.3.960
 	github.com/alexedwards/scs/v2 v2.9.0
 	github.com/cohesivestack/valgo v0.7.1
 	github.com/davidbyttow/govips/v2 v2.16.0
