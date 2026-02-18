@@ -5,6 +5,7 @@ import (
 	"cchoice/internal/conf"
 	"cchoice/internal/utils"
 	"fmt"
+	"strconv"
 )
 
 var fetchMult = 0.4
@@ -32,12 +33,13 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 							class="w-20 max-w-20 h-20 sm:w-24 sm:max-w-24 sm:h-24 cursor-zoom-in"
 							title="show high-quality image"
 							alt={ product.Name + " thumbnail" }
-							loading="lazy"
+							loading={ func() string { if utils.IsProductOnSale(product.DiscountPercentage) { return "eager" }; return "lazy" }() }
 							data-product-id={ product.ProductID }
 							data-product-thumbnail-path={ product.CDNURL1280 }
 							data-product-name={ product.Name }
 							data-product-brand={ product.BrandName }
 							data-product-price={ product.PriceDisplay }
+							data-product-on-sale={ strconv.FormatBool(utils.IsProductOnSale(product.DiscountPercentage)) }
 						_="
 							on click
 								async call metrics_event('product_click', #selected-product-id.value)
