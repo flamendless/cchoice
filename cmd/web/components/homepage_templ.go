@@ -237,45 +237,71 @@ func LoadModalImage() templ.ComponentScript {
 
 func PrefetchProductImage() templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_PrefetchProductImage_bf8b`,
-		Function: `function __templ_PrefetchProductImage_bf8b(){document.addEventListener("mouseover", function(event) {
-		var target = event.target;
-		if (!target) return;
+		Name: `__templ_PrefetchProductImage_447d`,
+		Function: `function __templ_PrefetchProductImage_447d(){const prefetched = new Set();
 
-		var highResPath = target.dataset.productThumbnailPath;
-		if (!highResPath) {
-			var parent = target.closest("[data-product-thumbnail-path]");
-			if (parent) {
-				highResPath = parent.dataset.productThumbnailPath;
-			}
-		}
+	function prefetch(path) {
+		if (!path) return;
+		if (prefetched.has(path)) return;
 
-		console.debug(` + "`" + `Prefetching '${highResPath}'` + "`" + `);
-		if (highResPath) {
-			var img = new Image();
-			img.src = highResPath;
-		}
-	});
+		prefetched.add(path);
+
+		const link = document.createElement("link");
+		link.rel = "preload";
+		link.as = "image";
+		link.href = path;
+		document.head.appendChild(link);
+	}
+
+	function attachListeners() {
+		const products = document.querySelectorAll("[data-product-thumbnail-path]");
+		products.forEach((el) => {
+			if (el.dataset.prefetchBound === "true") return;
+			if (el.dataset.productOnSale === "true") return;
+			el.dataset.prefetchBound = "true";
+			el.addEventListener("mouseenter", () => {
+				const highResPath = el.dataset.productThumbnailPath;
+				prefetch(highResPath);
+			});
+		});
+	}
+
+	attachListeners();
+
+	document.body.addEventListener("htmx:afterSwap", attachListeners);
 }`,
-		Call:       templ.SafeScript(`__templ_PrefetchProductImage_bf8b`),
-		CallInline: templ.SafeScriptInline(`__templ_PrefetchProductImage_bf8b`),
+		Call:       templ.SafeScript(`__templ_PrefetchProductImage_447d`),
+		CallInline: templ.SafeScriptInline(`__templ_PrefetchProductImage_447d`),
 	}
 }
 
 func PrefetchSaleProductImages() templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_PrefetchSaleProductImages_13c5`,
-		Function: `function __templ_PrefetchSaleProductImages_13c5(){var saleProducts = document.querySelectorAll('[data-product-on-sale="true"]');
-	saleProducts.forEach(function(el) {
-		var highResPath = el.dataset.productThumbnailPath;
-		if (highResPath) {
-			var img = new Image();
-			img.src = highResPath;
-		}
+		Name: `__templ_PrefetchSaleProductImages_3dc0`,
+		Function: `function __templ_PrefetchSaleProductImages_3dc0(){const prefetched = new Set();
+
+	function runPrefetch(root) {
+		const products = root.querySelectorAll('[data-product-on-sale="true"]');
+		products.forEach(el => {
+			const href = el.dataset.productThumbnailPath;
+			if (!href || prefetched.has(href)) return;
+			prefetched.add(href);
+
+			const link = document.createElement("link");
+			link.rel = "prefetch";
+			link.as = "image";
+			link.href = href;
+			document.head.appendChild(link);
+		});
+	}
+
+	runPrefetch(document);
+	document.body.addEventListener("htmx:afterSwap", function(evt) {
+		runPrefetch(evt.target);
 	});
 }`,
-		Call:       templ.SafeScript(`__templ_PrefetchSaleProductImages_13c5`),
-		CallInline: templ.SafeScriptInline(`__templ_PrefetchSaleProductImages_13c5`),
+		Call:       templ.SafeScript(`__templ_PrefetchSaleProductImages_3dc0`),
+		CallInline: templ.SafeScriptInline(`__templ_PrefetchSaleProductImages_3dc0`),
 	}
 }
 
