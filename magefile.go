@@ -84,6 +84,8 @@ func run(c Command) error {
 	if c.Out != "" {
 		cmd.Env = append(os.Environ(), "OUT="+c.Out)
 	}
+
+	fmt.Println("Running: ", cmd.Args)
 	return cmd.Run()
 }
 
