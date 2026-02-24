@@ -293,4 +293,5 @@ type TblStaffAttendance struct {
 	TimeOut   sql.NullString
 	CreatedAt string
 	UpdatedAt string
+	Location  sql.NullString
 }

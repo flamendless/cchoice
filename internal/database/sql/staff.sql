@@ -75,6 +75,7 @@ SELECT
     for_date,
     time_in,
     time_out,
+    location,
     created_at,
     updated_at
 FROM tbl_staff_attendances
@@ -90,6 +91,7 @@ SELECT
     sa.for_date,
     sa.time_in,
     sa.time_out,
+    sa.location,
     sa.created_at,
     sa.updated_at,
     s.first_name,
@@ -130,16 +132,18 @@ INSERT INTO tbl_staff_attendances (
     for_date,
     time_in,
     time_out,
+    location,
     created_at,
     updated_at
 ) VALUES (
-    ?, ?, ?, ?, datetime('now'), datetime('now')
+    ?, ?, ?, ?, ?, datetime('now'), datetime('now')
 ) RETURNING id;
 
 -- name: UpdateStaffAttendanceTimeIn :one
 UPDATE tbl_staff_attendances
 SET
     time_in = ?,
+    location = ?,
     updated_at = datetime('now')
 WHERE
     staff_id = ?
@@ -150,6 +154,16 @@ RETURNING id;
 UPDATE tbl_staff_attendances
 SET
     time_out = ?,
+    updated_at = datetime('now')
+WHERE
+    staff_id = ?
+    AND for_date = ?
+RETURNING id;
+
+-- name: UpdateStaffAttendanceLocation :one
+UPDATE tbl_staff_attendances
+SET
+    location = ?,
     updated_at = datetime('now')
 WHERE
     staff_id = ?

@@ -134,6 +134,7 @@ type AdminStaffProfile struct {
 	CanTimeIn        bool
 	CanTimeOut       bool
 	MyAttendance     *AdminStaffAttendance
+	InShop           *bool
 }
 
 type AdminStaffAttendance struct {
@@ -147,6 +148,7 @@ type AdminStaffAttendance struct {
 	TimeOutStatus    enums.TimeOutStatus
 	Duration         string
 	DurationColor    string
+	InShop           bool
 }
 
 type AdminSuperuserPage struct {
