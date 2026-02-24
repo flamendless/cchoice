@@ -44,7 +44,21 @@ templ Footer() {
 			</div>
 		<div class="self-end">
 			<p class="px-2 font-light text-xs text-wrap">
-				By using this website, you agree to our Terms and Conditions and Privacy Policy
+				By using this website, you agree to our
+				<a
+					class="text-cchoice underline underline-offset-2"
+					href={ utils.URL("/terms") }
+				>
+					Terms and Conditions
+				</a>
+				and
+				<a
+					class="text-cchoice underline underline-offset-2"
+					href={ utils.URL("/privacy") }
+				>
+					Privacy Policy
+				</a>
+				.
 			</p>
 		</div>
 		</div>
