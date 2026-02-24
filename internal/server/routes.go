@@ -184,6 +184,8 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 
 	//INFO: (Brandon) Maintenance page for undefined routes
 	r.Get("/product/{id}", s.maintenancePageHandler)
+	r.Get("/terms", s.termsHandler)
+	r.Get("/privacy", s.privacyHandler)
 	r.NotFound(s.maintenancePageHandler)
 }
 
@@ -712,6 +714,28 @@ func (s *Server) maintenancePageHandler(w http.ResponseWriter, r *http.Request) 
 			zap.String("method", r.Method),
 			zap.Error(err),
 		)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Server) termsHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Terms Handler]"
+	ctx := r.Context()
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := components.TermsPage().Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Server) privacyHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Privacy Handler]"
+	ctx := r.Context()
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := components.PrivacyPage().Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
