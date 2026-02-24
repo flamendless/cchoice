@@ -4,6 +4,7 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
+	"cchoice/internal/enums"
 	"cchoice/internal/utils"
 )
 
@@ -116,4 +117,42 @@ func ToSearchResultProduct[T queries.GetProductsBySearchQueryRow](
 		CDNURL1280:                  getCDNURL(constants.ToPath1280(r.ThumbnailPath)),
 		PriceDisplay:                price.Display(),
 	}
+}
+
+type AdminStaffProfile struct {
+	FullName         string
+	Birthdate        string
+	DateHired        string
+	Position         string
+	ScheduledTimeIn  string
+	ScheduledTimeOut string
+	SelectedDate     string
+	CurrentDate      string
+	CurrentTime      string
+	HasTimeIn        bool
+	HasTimeOut       bool
+	CanTimeIn        bool
+	CanTimeOut       bool
+	MyAttendance     *AdminStaffAttendance
+}
+
+type AdminStaffAttendance struct {
+	StaffID          int64
+	FullName         string
+	TimeIn           string
+	TimeOut          string
+	ScheduledTimeIn  string
+	ScheduledTimeOut string
+	TimeInStatus     enums.TimeInStatus
+	TimeOutStatus    enums.TimeOutStatus
+	Duration         string
+	DurationColor    string
+}
+
+type AdminSuperuserPage struct {
+	FullName     string
+	CurrentDate  string
+	CurrentTime  string
+	SelectedDate string
+	Attendances  []AdminStaffAttendance
 }
