@@ -73,3 +73,13 @@ func GenString(length int) string {
 func IsProductOnSale(discountPercentage string) bool {
 	return discountPercentage != ""
 }
+
+func BuildFullName(firstName, middleName, lastName string) string {
+	var parts []string
+	parts = append(parts, firstName)
+	if middleName != "" {
+		parts = append(parts, middleName)
+	}
+	parts = append(parts, lastName)
+	return strings.Join(parts, " ")
+}

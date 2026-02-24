@@ -178,6 +178,7 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 	AddShippingHandlers(s, r)
 	AddPaymentHandlers(s, r)
 	RegisterPaymentWebhooks(s, r)
+	AddAdminHandlers(s, r)
 
 	//INFO: (Brandon) - unused routes
 	r.Post("/checkouts", s.checkoutsHandler)
@@ -512,6 +513,10 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 		{
 			Label: "Home",
 			URL:   utils.URL("/"),
+		},
+		{
+			Label: "Admin",
+			URL:   utils.URL("/admin"),
 		},
 		{
 			Label:    "About Us",

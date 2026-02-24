@@ -264,3 +264,33 @@ type TblSetting struct {
 	Name  string
 	Value string
 }
+
+type TblStaff struct {
+	ID              int64
+	FirstName       string
+	MiddleName      sql.NullString
+	LastName        string
+	Birthdate       string
+	Sex             string
+	DateHired       string
+	TimeInSchedule  sql.NullString
+	TimeOutSchedule sql.NullString
+	Position        string
+	UserType        string
+	Email           string
+	MobileNo        string
+	Password        string
+	CreatedAt       string
+	UpdatedAt       string
+	DeletedAt       string
+}
+
+type TblStaffAttendance struct {
+	ID        int64
+	StaffID   int64
+	ForDate   string
+	TimeIn    sql.NullString
+	TimeOut   sql.NullString
+	CreatedAt string
+	UpdatedAt string
+}
