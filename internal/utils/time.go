@@ -1,0 +1,35 @@
+package utils
+
+import (
+	"fmt"
+	"time"
+
+	"cchoice/internal/constants"
+)
+
+func TimeToMinutes(s string) (int, bool) {
+	if s == "" {
+		return 0, false
+	}
+	layouts := []string{
+		constants.DateTimeLayoutISO,
+		constants.TimeLayoutHHMMSS,
+		constants.TimeLayoutHHMM,
+	}
+	for _, layout := range layouts {
+		t, err := time.Parse(layout, s)
+		if err == nil {
+			return t.Hour()*60 + t.Minute(), true
+		}
+	}
+	return 0, false
+}
+
+func FormatDurationFromMinutes(m int) string {
+	if m < 0 {
+		return "-"
+	}
+	h := m / 60
+	min := m % 60
+	return fmt.Sprintf("%dh %dm", h, min)
+}
