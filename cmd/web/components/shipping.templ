@@ -211,7 +211,7 @@ templ infieldLabelSelect(id string, name string, label string, required bool, di
 			name={ name }
 			class="border rounded-lg p-3 pt-6 w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 			required={ required }
-			disabled={ disabled }
+			disabled?={ disabled }
 		>
 			<option value=""> </option>
 			{ children... }

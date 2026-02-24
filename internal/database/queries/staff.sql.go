@@ -76,18 +76,20 @@ INSERT INTO tbl_staff_attendances (
     for_date,
     time_in,
     time_out,
+    location,
     created_at,
     updated_at
 ) VALUES (
-    ?, ?, ?, ?, datetime('now'), datetime('now')
+    ?, ?, ?, ?, ?, datetime('now'), datetime('now')
 ) RETURNING id
 `
 
 type CreateStaffAttendanceParams struct {
-	StaffID int64
-	ForDate string
-	TimeIn  sql.NullString
-	TimeOut sql.NullString
+	StaffID  int64
+	ForDate  string
+	TimeIn   sql.NullString
+	TimeOut  sql.NullString
+	Location sql.NullString
 }
 
 func (q *Queries) CreateStaffAttendance(ctx context.Context, arg CreateStaffAttendanceParams) (int64, error) {
@@ -96,6 +98,7 @@ func (q *Queries) CreateStaffAttendance(ctx context.Context, arg CreateStaffAtte
 		arg.ForDate,
 		arg.TimeIn,
 		arg.TimeOut,
+		arg.Location,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -189,6 +192,7 @@ SELECT
     for_date,
     time_in,
     time_out,
+    location,
     created_at,
     updated_at
 FROM tbl_staff_attendances
@@ -203,15 +207,27 @@ type GetStaffAttendanceByDateParams struct {
 	ForDate string
 }
 
-func (q *Queries) GetStaffAttendanceByDate(ctx context.Context, arg GetStaffAttendanceByDateParams) (TblStaffAttendance, error) {
+type GetStaffAttendanceByDateRow struct {
+	ID        int64
+	StaffID   int64
+	ForDate   string
+	TimeIn    sql.NullString
+	TimeOut   sql.NullString
+	Location  sql.NullString
+	CreatedAt string
+	UpdatedAt string
+}
+
+func (q *Queries) GetStaffAttendanceByDate(ctx context.Context, arg GetStaffAttendanceByDateParams) (GetStaffAttendanceByDateRow, error) {
 	row := q.db.QueryRowContext(ctx, getStaffAttendanceByDate, arg.StaffID, arg.ForDate)
-	var i TblStaffAttendance
+	var i GetStaffAttendanceByDateRow
 	err := row.Scan(
 		&i.ID,
 		&i.StaffID,
 		&i.ForDate,
 		&i.TimeIn,
 		&i.TimeOut,
+		&i.Location,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -225,6 +241,7 @@ SELECT
     sa.for_date,
     sa.time_in,
     sa.time_out,
+    sa.location,
     sa.created_at,
     sa.updated_at,
     s.first_name,
@@ -244,6 +261,7 @@ type GetStaffAttendanceByStaffIDAndDateRangeRow struct {
 	ForDate    string
 	TimeIn     sql.NullString
 	TimeOut    sql.NullString
+	Location   sql.NullString
 	CreatedAt  string
 	UpdatedAt  string
 	FirstName  string
@@ -266,6 +284,7 @@ func (q *Queries) GetStaffAttendanceByStaffIDAndDateRange(ctx context.Context, f
 			&i.ForDate,
 			&i.TimeIn,
 			&i.TimeOut,
+			&i.Location,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.FirstName,
@@ -421,10 +440,35 @@ func (q *Queries) GetStaffByID(ctx context.Context, id int64) (GetStaffByIDRow, 
 	return i, err
 }
 
+const updateStaffAttendanceLocation = `-- name: UpdateStaffAttendanceLocation :one
+UPDATE tbl_staff_attendances
+SET
+    location = ?,
+    updated_at = datetime('now')
+WHERE
+    staff_id = ?
+    AND for_date = ?
+RETURNING id
+`
+
+type UpdateStaffAttendanceLocationParams struct {
+	Location sql.NullString
+	StaffID  int64
+	ForDate  string
+}
+
+func (q *Queries) UpdateStaffAttendanceLocation(ctx context.Context, arg UpdateStaffAttendanceLocationParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, updateStaffAttendanceLocation, arg.Location, arg.StaffID, arg.ForDate)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
 const updateStaffAttendanceTimeIn = `-- name: UpdateStaffAttendanceTimeIn :one
 UPDATE tbl_staff_attendances
 SET
     time_in = ?,
+    location = ?,
     updated_at = datetime('now')
 WHERE
     staff_id = ?
@@ -433,13 +477,19 @@ RETURNING id
 `
 
 type UpdateStaffAttendanceTimeInParams struct {
-	TimeIn  sql.NullString
-	StaffID int64
-	ForDate string
+	TimeIn   sql.NullString
+	Location sql.NullString
+	StaffID  int64
+	ForDate  string
 }
 
 func (q *Queries) UpdateStaffAttendanceTimeIn(ctx context.Context, arg UpdateStaffAttendanceTimeInParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, updateStaffAttendanceTimeIn, arg.TimeIn, arg.StaffID, arg.ForDate)
+	row := q.db.QueryRowContext(ctx, updateStaffAttendanceTimeIn,
+		arg.TimeIn,
+		arg.Location,
+		arg.StaffID,
+		arg.ForDate,
+	)
 	var id int64
 	err := row.Scan(&id)
 	return id, err
