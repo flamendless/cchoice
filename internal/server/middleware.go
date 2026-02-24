@@ -35,7 +35,7 @@ func SecurityHeadersMiddleware(next http.Handler) http.Handler {
 
 		permissions := "accelerometer=(), " +
 			"camera=(), " +
-			"geolocation=(), " +
+			"geolocation=(self), " +
 			"gyroscope=(), " +
 			"magnetometer=(), " +
 			"microphone=(), " +

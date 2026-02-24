@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/goccy/go-json"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -56,6 +57,13 @@ type Settings struct {
 	URLFacebook     string
 	URLTikTok       string
 	ShowPromoBanner bool
+	ShopLocation    ShopLocation
+}
+
+type ShopLocation struct {
+	Lat          float64 `json:"lat"`
+	Lng          float64 `json:"lng"`
+	RadiusMeters int     `json:"radius_meters"`
 }
 
 type MailerooConfig struct {
@@ -200,6 +208,12 @@ func (c *appConfig) SetSettings(settings map[string]string) {
 	spb := settings["show_promo_banner"]
 	if spb == "true" || spb == "1" {
 		c.Settings.ShowPromoBanner = true
+	}
+	if raw := settings["shop_location"]; raw != "" {
+		var sl ShopLocation
+		if err := json.Unmarshal([]byte(raw), &sl); err == nil {
+			c.Settings.ShopLocation = sl
+		}
 	}
 }
 

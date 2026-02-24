@@ -1,12 +1,15 @@
 package server
 
 import (
+	"context"
 	"database/sql"
 	"net/http"
+	"strconv"
 	"time"
 
 	"cchoice/cmd/web/components"
 	"cchoice/cmd/web/models"
+	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
@@ -16,19 +19,22 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/goccy/go-json"
 	"go.uber.org/zap"
 )
 
 const (
-	SessionStaffID   = "staff_id"
-	maxStaffListSize = 1000
+	SessionStaffID     = "staff_id"
+	SessionLocationLat = "location_lat"
+	SessionLocationLng = "location_lng"
+	maxStaffListSize   = 1000
 )
 
 type attendanceStatusResult struct {
-	timeInStatus   enums.TimeInStatus
-	timeOutStatus  enums.TimeOutStatus
-	duration       string
-	durationColor  string
+	timeInStatus  enums.TimeInStatus
+	timeOutStatus enums.TimeOutStatus
+	duration      string
+	durationColor string
 }
 
 func computeAttendanceStatus(actualIn, actualOut, schedIn, schedOut string) attendanceStatusResult {
@@ -87,7 +93,39 @@ func parseAttendanceDate(date string) string {
 	return date
 }
 
-func buildAdminStaffAttendance(staff queries.GetAllStaffsRow, att queries.GetStaffAttendanceByStaffIDAndDateRangeRow) models.AdminStaffAttendance {
+// attendanceLocationJSON is the shape of location stored in tbl_staff_attendances.location.
+type attendanceLocationJSON struct {
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
+}
+
+func parseAttendanceLocation(locationJSON sql.NullString) (lat, lng float64, ok bool) {
+	if !locationJSON.Valid || locationJSON.String == "" {
+		return 0, 0, false
+	}
+	var loc attendanceLocationJSON
+	if err := json.Unmarshal([]byte(locationJSON.String), &loc); err != nil {
+		return 0, 0, false
+	}
+	return loc.Lat, loc.Lng, true
+}
+
+func sessionLocationJSON(ctx context.Context, get func(context.Context, string) interface{}) sql.NullString {
+	latVal := get(ctx, SessionLocationLat)
+	lngVal := get(ctx, SessionLocationLng)
+	if latVal == nil || lngVal == nil {
+		return sql.NullString{}
+	}
+	lat, ok1 := latVal.(float64)
+	lng, ok2 := lngVal.(float64)
+	if !ok1 || !ok2 {
+		return sql.NullString{}
+	}
+	b, _ := json.Marshal(attendanceLocationJSON{Lat: lat, Lng: lng})
+	return sql.NullString{String: string(b), Valid: true}
+}
+
+func buildAdminStaffAttendance(staff queries.GetAllStaffsRow, att queries.GetStaffAttendanceByStaffIDAndDateRangeRow, shop conf.ShopLocation) models.AdminStaffAttendance {
 	schedIn, schedOut := "", ""
 	if staff.TimeInSchedule.Valid {
 		schedIn = staff.TimeInSchedule.String
@@ -96,6 +134,10 @@ func buildAdminStaffAttendance(staff queries.GetAllStaffsRow, att queries.GetSta
 		schedOut = staff.TimeOutSchedule.String
 	}
 	c := computeAttendanceStatus(att.TimeIn.String, att.TimeOut.String, schedIn, schedOut)
+	inShop := false
+	if lat, lng, ok := parseAttendanceLocation(att.Location); ok && shop.RadiusMeters > 0 {
+		inShop = utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
+	}
 	return models.AdminStaffAttendance{
 		StaffID:          att.StaffID,
 		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
@@ -107,10 +149,11 @@ func buildAdminStaffAttendance(staff queries.GetAllStaffsRow, att queries.GetSta
 		TimeOutStatus:    c.timeOutStatus,
 		Duration:         c.duration,
 		DurationColor:    c.durationColor,
+		InShop:           inShop,
 	}
 }
 
-func buildStaffDayAttendance(staff queries.GetStaffByIDRow, att queries.TblStaffAttendance) models.AdminStaffAttendance {
+func buildStaffDayAttendance(staff queries.GetStaffByIDRow, att queries.GetStaffAttendanceByDateRow) models.AdminStaffAttendance {
 	schedIn, schedOut := "", ""
 	if staff.TimeInSchedule.Valid {
 		schedIn = staff.TimeInSchedule.String
@@ -141,6 +184,7 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth).Get("/admin/staff/attendance", s.adminStaffAttendanceHandler)
 	r.With(s.requireStaffAuth).Post("/admin/staff/time-in", s.adminStaffTimeInHandler)
 	r.With(s.requireStaffAuth).Post("/admin/staff/time-out", s.adminStaffTimeOutHandler)
+	r.With(s.requireStaffAuth).Post("/admin/staff/attendance/location", s.adminStaffAttendanceLocationHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser", s.adminSuperuserPageHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/attendance", s.adminSuperuserAttendanceHandler)
 }
@@ -237,6 +281,15 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	s.sessionManager.Put(ctx, SessionStaffID, staff.ID)
 
+	if latStr, lngStr := r.PostFormValue("location_lat"), r.PostFormValue("location_lng"); latStr != "" && lngStr != "" {
+		if lat, errLat := strconv.ParseFloat(latStr, 64); errLat == nil {
+			if lng, errLng := strconv.ParseFloat(lngStr, 64); errLng == nil {
+				s.sessionManager.Put(ctx, SessionLocationLat, lat)
+				s.sessionManager.Put(ctx, SessionLocationLng, lng)
+			}
+		}
+	}
+
 	switch enums.ParseStaffUserTypeToEnum(staff.UserType) {
 	case enums.STAFF_USER_TYPE_SUPERUSER:
 		http.Redirect(w, r, utils.URL("/admin/superuser"), http.StatusSeeOther)
@@ -291,6 +344,24 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		myAttendance = &rec
 	}
 
+	shop := conf.Conf().Settings.ShopLocation
+	var inShop *bool
+	if shop.RadiusMeters > 0 {
+		if err == nil {
+			if lat, lng, ok := parseAttendanceLocation(attendance.Location); ok {
+				b := utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
+				inShop = &b
+			}
+		}
+		if inShop == nil {
+			locJSON := sessionLocationJSON(ctx, func(c context.Context, k string) interface{} { return s.sessionManager.Get(c, k) })
+			if lat, lng, ok := parseAttendanceLocation(locJSON); ok {
+				b := utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
+				inShop = &b
+			}
+		}
+	}
+
 	scheduledTimeIn := ""
 	if staff.TimeInSchedule.Valid {
 		scheduledTimeIn = staff.TimeInSchedule.String
@@ -315,6 +386,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		CanTimeIn:        !hasTimeIn,
 		CanTimeOut:       hasTimeIn && !hasTimeOut,
 		MyAttendance:     myAttendance,
+		InShop:           inShop,
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -379,17 +451,20 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if existing.TimeIn.Valid {
+	locationFromSession := sessionLocationJSON(ctx, func(c context.Context, k string) interface{} { return s.sessionManager.Get(c, k) })
+
+	if err == nil && existing.TimeIn.Valid {
 		http.Error(w, "Time in already recorded for today", http.StatusBadRequest)
 		return
 	}
 
 	if err == sql.ErrNoRows {
 		_, err = s.dbRW.GetQueries().CreateStaffAttendance(ctx, queries.CreateStaffAttendanceParams{
-			StaffID: staffID,
-			ForDate: today,
-			TimeIn:  sql.NullString{String: now, Valid: true},
-			TimeOut: sql.NullString{},
+			StaffID:  staffID,
+			ForDate:  today,
+			TimeIn:   sql.NullString{String: now, Valid: true},
+			TimeOut:  sql.NullString{},
+			Location: locationFromSession,
 		})
 		if err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -398,9 +473,10 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 		}
 	} else {
 		_, err = s.dbRW.GetQueries().UpdateStaffAttendanceTimeIn(ctx, queries.UpdateStaffAttendanceTimeInParams{
-			TimeIn:  sql.NullString{String: now, Valid: true},
-			StaffID: staffID,
-			ForDate: today,
+			TimeIn:   sql.NullString{String: now, Valid: true},
+			Location: locationFromSession,
+			StaffID:  staffID,
+			ForDate:  today,
 		})
 		if err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -496,13 +572,14 @@ func (s *Server) adminSuperuserPageHandler(w http.ResponseWriter, r *http.Reques
 		staffMap[staff.ID] = staff
 	}
 
+	shop := conf.Conf().Settings.ShopLocation
 	attendanceData := make([]models.AdminStaffAttendance, 0, len(attendances))
 	for _, att := range attendances {
 		staff, ok := staffMap[att.StaffID]
 		if !ok {
 			continue
 		}
-		attendanceData = append(attendanceData, buildAdminStaffAttendance(staff, att))
+		attendanceData = append(attendanceData, buildAdminStaffAttendance(staff, att, shop))
 	}
 
 	pageData := models.AdminSuperuserPage{
@@ -547,13 +624,14 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 		staffMap[staff.ID] = staff
 	}
 
+	shop := conf.Conf().Settings.ShopLocation
 	attendanceData := make([]models.AdminStaffAttendance, 0, len(attendances))
 	for _, att := range attendances {
 		staff, ok := staffMap[att.StaffID]
 		if !ok {
 			continue
 		}
-		attendanceData = append(attendanceData, buildAdminStaffAttendance(staff, att))
+		attendanceData = append(attendanceData, buildAdminStaffAttendance(staff, att, shop))
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -562,4 +640,89 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
+}
+
+func (s *Server) adminStaffAttendanceLocationHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff Attendance Location Handler]"
+	ctx := r.Context()
+
+	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
+	if staffID == 0 {
+		http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+		return
+	}
+
+	var date, latStr, lngStr string
+	if r.Header.Get("Content-Type") == "application/json" {
+		var body struct {
+			Date string  `json:"date"`
+			Lat  float64 `json:"lat"`
+			Lng  float64 `json:"lng"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+		date, latStr, lngStr = body.Date, strconv.FormatFloat(body.Lat, 'f', -1, 64), strconv.FormatFloat(body.Lng, 'f', -1, 64)
+	} else {
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "Invalid form", http.StatusBadRequest)
+			return
+		}
+		date = r.PostFormValue("date")
+		latStr = r.PostFormValue("lat")
+		lngStr = r.PostFormValue("lng")
+	}
+
+	date = parseAttendanceDate(date)
+	if latStr == "" || lngStr == "" {
+		http.Error(w, "lat and lng required", http.StatusBadRequest)
+		return
+	}
+	lat, errLat := strconv.ParseFloat(latStr, 64)
+	lng, errLng := strconv.ParseFloat(lngStr, 64)
+	if errLat != nil || errLng != nil {
+		http.Error(w, "Invalid lat or lng", http.StatusBadRequest)
+		return
+	}
+
+	locJSON, _ := json.Marshal(attendanceLocationJSON{Lat: lat, Lng: lng})
+	location := sql.NullString{String: string(locJSON), Valid: true}
+
+	_, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
+		StaffID: staffID,
+		ForDate: date,
+	})
+	if err != nil && err != sql.ErrNoRows {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	if err == sql.ErrNoRows {
+		_, err = s.dbRW.GetQueries().CreateStaffAttendance(ctx, queries.CreateStaffAttendanceParams{
+			StaffID:  staffID,
+			ForDate:  date,
+			TimeIn:   sql.NullString{},
+			TimeOut:  sql.NullString{},
+			Location: location,
+		})
+		if err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		_, err = s.dbRW.GetQueries().UpdateStaffAttendanceLocation(ctx, queries.UpdateStaffAttendanceLocationParams{
+			Location: location,
+			StaffID:  staffID,
+			ForDate:  date,
+		})
+		if err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

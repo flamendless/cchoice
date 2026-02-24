@@ -647,20 +647,17 @@ func infieldLabelSelect(id string, name string, label string, required bool, dis
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" disabled=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var36 string
-		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(disabled)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 214, Col: 22}
+		if disabled {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, " disabled")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\"><option value=\"\"></option>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "><option value=\"\"></option>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -668,20 +665,20 @@ func infieldLabelSelect(id string, name string, label string, required bool, dis
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</select> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</select> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var37 string
-		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(label)
+		var templ_7745c5c3_Var36 string
+		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 222, Col: 10}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</label></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</label></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -705,12 +702,12 @@ func ShippingAddressSelect() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var38 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var38 == nil {
-			templ_7745c5c3_Var38 = templ.NopComponent
+		templ_7745c5c3_Var37 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var37 == nil {
+			templ_7745c5c3_Var37 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<div id=\"delivery-fee-loading-template\" class=\"hidden\"><h1>Delivery Fee</h1><h1 class=\"text-right flex items-center gap-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<div id=\"delivery-fee-loading-template\" class=\"hidden\"><h1>Delivery Fee</h1><h1 class=\"text-right flex items-center gap-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -718,7 +715,7 @@ func ShippingAddressSelect() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<span>Calculating...</span></h1></div><div id=\"delivery-eta-loading-template\" class=\"hidden\"><h1>Estimated Delivery Time</h1><h1 class=\"text-right flex items-center gap-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "<span>Calculating...</span></h1></div><div id=\"delivery-eta-loading-template\" class=\"hidden\"><h1>Estimated Delivery Time</h1><h1 class=\"text-right flex items-center gap-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -726,20 +723,20 @@ func ShippingAddressSelect() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "<span>Calculating...</span></h1></div><div class=\"flex flex-col gap-2 w-full max-w-lg\" id=\"shipping-form\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<span>Calculating...</span></h1></div><div class=\"flex flex-col gap-2 w-full max-w-lg\" id=\"shipping-form\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var39 string
-		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/shipping/quotation"))
+		var templ_7745c5c3_Var38 string
+		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/shipping/quotation"))
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shipping.templ`, Line: 245, Col: 44}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "\" hx-trigger=\"post\" hx-swap=\"none\" _=\"\n\t\t\ton change from .required-field\n\t\t\t\tif #city.value !== '' and #province.value !== '' and #barangay.value !== ''\n\t\t\t\t\tlog 'Province, city, and barangay completed, calculating shipping...'\n\t\t\t\t\ttrigger post on #shipping-form\n\t\t\t\tend\n\t\t\tend\n\n\t\t\ton change from <input/> or change from <select/>\n\t\t\t\tcall saveShippingFormState()\n\t\t\tend\n\n\t\t\ton htmx:beforeRequest\n\t\t\t\tif event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/shipping/quotation'\n\t\t\t\t\tput #delivery-fee-row into deliveryRow\n\t\t\t\t\tput #delivery-fee-loading-template into feeLoadingTemplate\n\t\t\t\t\tif deliveryRow is not null and feeLoadingTemplate is not null\n\t\t\t\t\t\tset deliveryRow.innerHTML to feeLoadingTemplate.innerHTML\n\t\t\t\t\tend\n\n\t\t\t\t\tput #delivery-eta-row into etaRow\n\t\t\t\t\tput #delivery-eta-loading-template into etaLoadingTemplate\n\t\t\t\t\tif etaRow is not null and etaLoadingTemplate is not null\n\t\t\t\t\t\tset etaRow.innerHTML to etaLoadingTemplate.innerHTML\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\tend\n\n\t\t\ton htmx:afterRequest\n\t\t\t\tif event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/shipping/quotation'\n\t\t\t\t\ttrigger get on #cart-summary-content\n\t\t\t\t\t-- Save shipping form values to sessionStorage for page refresh\n\t\t\t\t\tcall saveShippingFormState()\n\t\t\t\tend\n\t\t\tend\n\n\t\t\ton load\n\t\t\t\t-- Restore shipping form values from sessionStorage on page load\n\t\t\t\tcall restoreShippingFormState()\n\t\t\tend\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "\" hx-trigger=\"post\" hx-swap=\"none\" _=\"\n\t\t\ton change from .required-field\n\t\t\t\tif #city.value !== '' and #province.value !== '' and #barangay.value !== ''\n\t\t\t\t\tlog 'Province, city, and barangay completed, calculating shipping...'\n\t\t\t\t\ttrigger post on #shipping-form\n\t\t\t\tend\n\t\t\tend\n\n\t\t\ton change from <input/> or change from <select/>\n\t\t\t\tcall saveShippingFormState()\n\t\t\tend\n\n\t\t\ton htmx:beforeRequest\n\t\t\t\tif event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/shipping/quotation'\n\t\t\t\t\tput #delivery-fee-row into deliveryRow\n\t\t\t\t\tput #delivery-fee-loading-template into feeLoadingTemplate\n\t\t\t\t\tif deliveryRow is not null and feeLoadingTemplate is not null\n\t\t\t\t\t\tset deliveryRow.innerHTML to feeLoadingTemplate.innerHTML\n\t\t\t\t\tend\n\n\t\t\t\t\tput #delivery-eta-row into etaRow\n\t\t\t\t\tput #delivery-eta-loading-template into etaLoadingTemplate\n\t\t\t\t\tif etaRow is not null and etaLoadingTemplate is not null\n\t\t\t\t\t\tset etaRow.innerHTML to etaLoadingTemplate.innerHTML\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\tend\n\n\t\t\ton htmx:afterRequest\n\t\t\t\tif event.detail.requestConfig.verb is 'post' and event.detail.requestConfig.path contains '/shipping/quotation'\n\t\t\t\t\ttrigger get on #cart-summary-content\n\t\t\t\t\t-- Save shipping form values to sessionStorage for page refresh\n\t\t\t\t\tcall saveShippingFormState()\n\t\t\t\tend\n\t\t\tend\n\n\t\t\ton load\n\t\t\t\t-- Restore shipping form values from sessionStorage on page load\n\t\t\t\tcall restoreShippingFormState()\n\t\t\tend\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -759,7 +756,7 @@ func ShippingAddressSelect() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<div class=\"relative\"><input type=\"text\" name=\"address_line2\" class=\"border rounded-lg p-3 pt-6 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" placeholder=\" \" onblur=\"this.value = this.value.trim()\"> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Address Line 2 (Optional)</label></div><div class=\"flex flex-row gap-1\"><div class=\"relative w-1/2\"><input type=\"text\" name=\"postal\" class=\"border rounded-lg px-3 py-2 pt-6 w-full h-14 peer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" placeholder=\" \" required pattern=\"^[0-9]{4}$\" onblur=\"this.value = this.value.trim()\"> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Postal Code</label> <small class=\"\n\t\t\t\t\t\ttext-red-500 text-xs block invisible h-0 mt-1\n\t\t\t\t\t\tpeer-invalid:visible peer-invalid:h-auto\n\t\t\t\t\t\">Please enter a valid postal code (4 digits only)</small></div><div class=\"relative w-1/2\"><select id=\"country\" name=\"country\" class=\"border rounded-lg px-3 py-2 pt-6 w-full h-14 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" required disabled><option value=\"PH\" selected>Philippines</option></select> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Country</label></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<div class=\"relative\"><input type=\"text\" name=\"address_line2\" class=\"border rounded-lg p-3 pt-6 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" placeholder=\" \" onblur=\"this.value = this.value.trim()\"> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Address Line 2 (Optional)</label></div><div class=\"flex flex-row gap-1\"><div class=\"relative w-1/2\"><input type=\"text\" name=\"postal\" class=\"border rounded-lg px-3 py-2 pt-6 w-full h-14 peer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" placeholder=\" \" required pattern=\"^[0-9]{4}$\" onblur=\"this.value = this.value.trim()\"> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Postal Code</label> <small class=\"\n\t\t\t\t\t\ttext-red-500 text-xs block invisible h-0 mt-1\n\t\t\t\t\t\tpeer-invalid:visible peer-invalid:h-auto\n\t\t\t\t\t\">Please enter a valid postal code (4 digits only)</small></div><div class=\"relative w-1/2\"><select id=\"country\" name=\"country\" class=\"border rounded-lg px-3 py-2 pt-6 w-full h-14 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" required disabled><option value=\"PH\" selected>Philippines</option></select> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Country</label></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -775,7 +772,7 @@ func ShippingAddressSelect() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</div><script type=\"text/javascript\">\n\t\tfunction saveShippingFormState() {\n\t\t\tconst form = document.getElementById('shipping-form');\n\t\t\tconst formData = {\n\t\t\t\temail: form.querySelector('[name=\"email\"]')?.value || '',\n\t\t\t\tfullname: form.querySelector('[name=\"fullname\"]')?.value || '',\n\t\t\t\tmobile_no: form.querySelector('[name=\"mobile_no\"]')?.value || '',\n\t\t\t\taddress_line1: form.querySelector('[name=\"address_line1\"]')?.value || '',\n\t\t\t\taddress_line2: form.querySelector('[name=\"address_line2\"]')?.value || '',\n\t\t\t\tpostal: form.querySelector('[name=\"postal\"]')?.value || '',\n\t\t\t\tprovince: document.getElementById('province')?.value || '',\n\t\t\t\tcity: document.getElementById('city')?.value || '',\n\t\t\t\tbarangay: document.getElementById('barangay')?.value || '',\n\t\t\t\tprovinceText: document.getElementById('province')?.selectedOptions[0]?.text || '',\n\t\t\t\tcityDisabled: document.getElementById('city')?.disabled || false,\n\t\t\t\tbarangayDisabled: document.getElementById('barangay')?.disabled || false\n\t\t\t};\n\t\t\tconsole.log('Saving shipping form state:', formData);\n\t\t\tsessionStorage.setItem('shippingFormState', JSON.stringify(formData));\n\t\t}\n\n\t\tfunction restoreShippingFormState() {\n\t\t\tconst saved = sessionStorage.getItem('shippingFormState');\n\t\t\tconsole.log('Restoring shipping form state:', saved);\n\t\t\tif (!saved)\n\t\t\t\treturn\n\n\t\t\ttry {\n\t\t\t\tconst formData = JSON.parse(saved);\n\t\t\t\tconst form = document.getElementById('shipping-form');\n\t\t\t\tconst provinceSelect = document.getElementById('province');\n\t\t\t\tconst citySelect = document.getElementById('city');\n\t\t\t\tconst barangaySelect = document.getElementById('barangay');\n\t\t\t\tconsole.log('Restoring shipping form state:', formData);\n\n\t\t\t\tif (formData.email) {\n\t\t\t\t\tconst emailInput = form.querySelector('[name=\"email\"]');\n\t\t\t\t\tif (emailInput) emailInput.value = formData.email;\n\t\t\t\t}\n\t\t\t\tif (formData.fullname) {\n\t\t\t\t\tconst fullnameInput = form.querySelector('[name=\"fullname\"]');\n\t\t\t\t\tif (fullnameInput) fullnameInput.value = formData.fullname;\n\t\t\t\t}\n\t\t\t\tif (formData.mobile_no) {\n\t\t\t\t\tconst mobileInput = form.querySelector('[name=\"mobile_no\"]');\n\t\t\t\t\tif (mobileInput) mobileInput.value = formData.mobile_no;\n\t\t\t\t}\n\t\t\t\tif (formData.address_line1) {\n\t\t\t\t\tconst address1Input = form.querySelector('[name=\"address_line1\"]');\n\t\t\t\t\tif (address1Input) address1Input.value = formData.address_line1;\n\t\t\t\t}\n\t\t\t\tif (formData.address_line2) {\n\t\t\t\t\tconst address2Input = form.querySelector('[name=\"address_line2\"]');\n\t\t\t\t\tif (address2Input) address2Input.value = formData.address_line2;\n\t\t\t\t}\n\t\t\t\tif (formData.postal) {\n\t\t\t\t\tconst postalInput = form.querySelector('[name=\"postal\"]');\n\t\t\t\t\tif (postalInput) postalInput.value = formData.postal;\n\t\t\t\t}\n\n\t\t\t\t// Wait for province options to load\n\t\t\t\tif (provinceSelect && formData.province) {\n\t\t\t\t\tconst checkAndRestore = () => {\n\t\t\t\t\t\tif (provinceSelect.options.length > 1) {\n\t\t\t\t\t\t\tprovinceSelect.value = formData.province;\n\n\t\t\t\t\t\t\t// Check if NCR\n\t\t\t\t\t\t\tif (formData.provinceText && formData.provinceText.includes('National Capital Region')) {\n\t\t\t\t\t\t\t\t// Restore NCR state\n\t\t\t\t\t\t\t\tcitySelect.innerHTML = '<option value=\"' + formData.city + '\" selected>' + formData.city + '</option>';\n\t\t\t\t\t\t\t\tcitySelect.disabled = formData.cityDisabled;\n\t\t\t\t\t\t\t\tbarangaySelect.innerHTML = '<option value=\"' + formData.barangay + '\" selected>' + formData.barangay + '</option>';\n\t\t\t\t\t\t\t\tbarangaySelect.disabled = formData.barangayDisabled;\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\t// For other provinces, trigger the change to load cities\n\t\t\t\t\t\t\t\tprovinceSelect.dispatchEvent(new Event('change', { bubbles: true }));\n\n\t\t\t\t\t\t\t\t// Wait for cities to load, then restore\n\t\t\t\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\t\t\t\tif (citySelect && formData.city) {\n\t\t\t\t\t\t\t\t\t\tcitySelect.value = formData.city;\n\t\t\t\t\t\t\t\t\t\tcitySelect.dispatchEvent(new Event('change', { bubbles: true }));\n\n\t\t\t\t\t\t\t\t\t\t// Wait for barangays to load\n\t\t\t\t\t\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\t\t\t\t\t\tif (barangaySelect && formData.barangay) {\n\t\t\t\t\t\t\t\t\t\t\t\tbarangaySelect.value = formData.barangay;\n\t\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t}, 300);\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}, 300);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t// Options not loaded yet, wait a bit\n\t\t\t\t\t\t\tsetTimeout(checkAndRestore, 100);\n\t\t\t\t\t\t}\n\t\t\t\t\t};\n\t\t\t\t\tcheckAndRestore();\n\t\t\t\t}\n\t\t\t} catch (e) {\n\t\t\t\tconsole.error('Failed to restore shipping form state:', e);\n\t\t\t}\n\t\t}\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</div><script type=\"text/javascript\">\n\t\tfunction saveShippingFormState() {\n\t\t\tconst form = document.getElementById('shipping-form');\n\t\t\tconst formData = {\n\t\t\t\temail: form.querySelector('[name=\"email\"]')?.value || '',\n\t\t\t\tfullname: form.querySelector('[name=\"fullname\"]')?.value || '',\n\t\t\t\tmobile_no: form.querySelector('[name=\"mobile_no\"]')?.value || '',\n\t\t\t\taddress_line1: form.querySelector('[name=\"address_line1\"]')?.value || '',\n\t\t\t\taddress_line2: form.querySelector('[name=\"address_line2\"]')?.value || '',\n\t\t\t\tpostal: form.querySelector('[name=\"postal\"]')?.value || '',\n\t\t\t\tprovince: document.getElementById('province')?.value || '',\n\t\t\t\tcity: document.getElementById('city')?.value || '',\n\t\t\t\tbarangay: document.getElementById('barangay')?.value || '',\n\t\t\t\tprovinceText: document.getElementById('province')?.selectedOptions[0]?.text || '',\n\t\t\t\tcityDisabled: document.getElementById('city')?.disabled || false,\n\t\t\t\tbarangayDisabled: document.getElementById('barangay')?.disabled || false\n\t\t\t};\n\t\t\tconsole.log('Saving shipping form state:', formData);\n\t\t\tsessionStorage.setItem('shippingFormState', JSON.stringify(formData));\n\t\t}\n\n\t\tfunction restoreShippingFormState() {\n\t\t\tconst saved = sessionStorage.getItem('shippingFormState');\n\t\t\tconsole.log('Restoring shipping form state:', saved);\n\t\t\tif (!saved)\n\t\t\t\treturn\n\n\t\t\ttry {\n\t\t\t\tconst formData = JSON.parse(saved);\n\t\t\t\tconst form = document.getElementById('shipping-form');\n\t\t\t\tconst provinceSelect = document.getElementById('province');\n\t\t\t\tconst citySelect = document.getElementById('city');\n\t\t\t\tconst barangaySelect = document.getElementById('barangay');\n\t\t\t\tconsole.log('Restoring shipping form state:', formData);\n\n\t\t\t\tif (formData.email) {\n\t\t\t\t\tconst emailInput = form.querySelector('[name=\"email\"]');\n\t\t\t\t\tif (emailInput) emailInput.value = formData.email;\n\t\t\t\t}\n\t\t\t\tif (formData.fullname) {\n\t\t\t\t\tconst fullnameInput = form.querySelector('[name=\"fullname\"]');\n\t\t\t\t\tif (fullnameInput) fullnameInput.value = formData.fullname;\n\t\t\t\t}\n\t\t\t\tif (formData.mobile_no) {\n\t\t\t\t\tconst mobileInput = form.querySelector('[name=\"mobile_no\"]');\n\t\t\t\t\tif (mobileInput) mobileInput.value = formData.mobile_no;\n\t\t\t\t}\n\t\t\t\tif (formData.address_line1) {\n\t\t\t\t\tconst address1Input = form.querySelector('[name=\"address_line1\"]');\n\t\t\t\t\tif (address1Input) address1Input.value = formData.address_line1;\n\t\t\t\t}\n\t\t\t\tif (formData.address_line2) {\n\t\t\t\t\tconst address2Input = form.querySelector('[name=\"address_line2\"]');\n\t\t\t\t\tif (address2Input) address2Input.value = formData.address_line2;\n\t\t\t\t}\n\t\t\t\tif (formData.postal) {\n\t\t\t\t\tconst postalInput = form.querySelector('[name=\"postal\"]');\n\t\t\t\t\tif (postalInput) postalInput.value = formData.postal;\n\t\t\t\t}\n\n\t\t\t\t// Wait for province options to load\n\t\t\t\tif (provinceSelect && formData.province) {\n\t\t\t\t\tconst checkAndRestore = () => {\n\t\t\t\t\t\tif (provinceSelect.options.length > 1) {\n\t\t\t\t\t\t\tprovinceSelect.value = formData.province;\n\n\t\t\t\t\t\t\t// Check if NCR\n\t\t\t\t\t\t\tif (formData.provinceText && formData.provinceText.includes('National Capital Region')) {\n\t\t\t\t\t\t\t\t// Restore NCR state\n\t\t\t\t\t\t\t\tcitySelect.innerHTML = '<option value=\"' + formData.city + '\" selected>' + formData.city + '</option>';\n\t\t\t\t\t\t\t\tcitySelect.disabled = formData.cityDisabled;\n\t\t\t\t\t\t\t\tbarangaySelect.innerHTML = '<option value=\"' + formData.barangay + '\" selected>' + formData.barangay + '</option>';\n\t\t\t\t\t\t\t\tbarangaySelect.disabled = formData.barangayDisabled;\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\t// For other provinces, trigger the change to load cities\n\t\t\t\t\t\t\t\tprovinceSelect.dispatchEvent(new Event('change', { bubbles: true }));\n\n\t\t\t\t\t\t\t\t// Wait for cities to load, then restore\n\t\t\t\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\t\t\t\tif (citySelect && formData.city) {\n\t\t\t\t\t\t\t\t\t\tcitySelect.value = formData.city;\n\t\t\t\t\t\t\t\t\t\tcitySelect.dispatchEvent(new Event('change', { bubbles: true }));\n\n\t\t\t\t\t\t\t\t\t\t// Wait for barangays to load\n\t\t\t\t\t\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\t\t\t\t\t\tif (barangaySelect && formData.barangay) {\n\t\t\t\t\t\t\t\t\t\t\t\tbarangaySelect.value = formData.barangay;\n\t\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t}, 300);\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}, 300);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t// Options not loaded yet, wait a bit\n\t\t\t\t\t\t\tsetTimeout(checkAndRestore, 100);\n\t\t\t\t\t\t}\n\t\t\t\t\t};\n\t\t\t\t\tcheckAndRestore();\n\t\t\t\t}\n\t\t\t} catch (e) {\n\t\t\t\tconsole.error('Failed to restore shipping form state:', e);\n\t\t\t}\n\t\t}\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
