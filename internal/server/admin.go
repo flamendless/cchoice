@@ -93,7 +93,6 @@ func parseAttendanceDate(date string) string {
 	return date
 }
 
-// attendanceLocationJSON is the shape of location stored in tbl_staff_attendances.location.
 type attendanceLocationJSON struct {
 	Lat float64 `json:"lat"`
 	Lng float64 `json:"lng"`

@@ -87,7 +87,7 @@ func AttendanceToolbar(title string, selectedDate string, dateSelectorID string,
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark transition-colors\">Refresh</button></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"refresh-location-btn px-4 py-2 w-28 bg-cchoice text-white rounded-md hover:bg-cchoice_dark transition-colors inline-flex items-center justify-center gap-2\"><span class=\"refresh-btn-text\">Refresh</span> <span class=\"refresh-btn-spinner inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin\" aria-hidden=\"true\" style=\"display: none;\"></span></button></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -135,7 +135,7 @@ func StaffAttendanceSingleTable(record *models.AdminStaffAttendance) templ.Compo
 					var templ_7745c5c3_Var7 string
 					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(record.TimeIn)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 55, Col: 65}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 56, Col: 65}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
@@ -153,7 +153,7 @@ func StaffAttendanceSingleTable(record *models.AdminStaffAttendance) templ.Compo
 					var templ_7745c5c3_Var8 string
 					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(record.TimeIn)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 57, Col: 64}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 58, Col: 64}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 					if templ_7745c5c3_Err != nil {
@@ -171,7 +171,7 @@ func StaffAttendanceSingleTable(record *models.AdminStaffAttendance) templ.Compo
 					var templ_7745c5c3_Var9 string
 					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(record.TimeIn)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 59, Col: 63}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 60, Col: 63}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 					if templ_7745c5c3_Err != nil {
@@ -185,7 +185,7 @@ func StaffAttendanceSingleTable(record *models.AdminStaffAttendance) templ.Compo
 					var templ_7745c5c3_Var10 string
 					templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(record.TimeIn)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 61, Col: 24}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 62, Col: 24}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 					if templ_7745c5c3_Err != nil {
@@ -211,7 +211,7 @@ func StaffAttendanceSingleTable(record *models.AdminStaffAttendance) templ.Compo
 					var templ_7745c5c3_Var11 string
 					templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(record.TimeOut)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 70, Col: 64}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 71, Col: 64}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 					if templ_7745c5c3_Err != nil {
@@ -229,7 +229,7 @@ func StaffAttendanceSingleTable(record *models.AdminStaffAttendance) templ.Compo
 					var templ_7745c5c3_Var12 string
 					templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(record.TimeOut)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 72, Col: 65}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 73, Col: 65}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 					if templ_7745c5c3_Err != nil {
@@ -247,7 +247,7 @@ func StaffAttendanceSingleTable(record *models.AdminStaffAttendance) templ.Compo
 					var templ_7745c5c3_Var13 string
 					templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(record.TimeOut)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 74, Col: 66}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 75, Col: 66}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 					if templ_7745c5c3_Err != nil {
@@ -261,7 +261,7 @@ func StaffAttendanceSingleTable(record *models.AdminStaffAttendance) templ.Compo
 					var templ_7745c5c3_Var14 string
 					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(record.TimeOut)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 76, Col: 25}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 77, Col: 25}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 					if templ_7745c5c3_Err != nil {
@@ -287,7 +287,7 @@ func StaffAttendanceSingleTable(record *models.AdminStaffAttendance) templ.Compo
 					var templ_7745c5c3_Var15 string
 					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(record.Duration)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 85, Col: 67}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 86, Col: 67}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 					if templ_7745c5c3_Err != nil {
@@ -305,7 +305,7 @@ func StaffAttendanceSingleTable(record *models.AdminStaffAttendance) templ.Compo
 					var templ_7745c5c3_Var16 string
 					templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(record.Duration)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 87, Col: 65}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 88, Col: 65}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 					if templ_7745c5c3_Err != nil {
@@ -319,7 +319,7 @@ func StaffAttendanceSingleTable(record *models.AdminStaffAttendance) templ.Compo
 					var templ_7745c5c3_Var17 string
 					templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(record.Duration)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 89, Col: 26}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 90, Col: 26}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 					if templ_7745c5c3_Err != nil {
@@ -377,7 +377,7 @@ func AttendanceSectionForStaff(
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(fetchURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 114, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 115, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -390,7 +390,7 @@ func AttendanceSectionForStaff(
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(targetID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 115, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 116, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -403,7 +403,7 @@ func AttendanceSectionForStaff(
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(dateSelectorID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 116, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 117, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -416,7 +416,7 @@ func AttendanceSectionForStaff(
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(refreshButtonID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 117, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 118, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
@@ -429,7 +429,7 @@ func AttendanceSectionForStaff(
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/staff/attendance/location"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 118, Col: 67}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 119, Col: 67}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
@@ -442,7 +442,7 @@ func AttendanceSectionForStaff(
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(fetchURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 119, Col: 19}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 120, Col: 19}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
@@ -455,7 +455,7 @@ func AttendanceSectionForStaff(
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("load, change from:#%s", dateSelectorID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 120, Col: 67}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 121, Col: 67}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
@@ -468,7 +468,7 @@ func AttendanceSectionForStaff(
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs("#" + dateSelectorID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 121, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 122, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
@@ -481,7 +481,7 @@ func AttendanceSectionForStaff(
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs("#" + targetID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 122, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 123, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
@@ -502,7 +502,7 @@ func AttendanceSectionForStaff(
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(targetID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 126, Col: 20}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 127, Col: 20}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {
@@ -516,7 +516,7 @@ func AttendanceSectionForStaff(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</div><script>\n\t\t\t(function() {\n\t\t\t\tvar section = document.getElementById(\"staff-attendance-section\");\n\t\t\t\tif (!section) return;\n\t\t\t\tvar fetchUrl = section.getAttribute(\"data-fetch-url\");\n\t\t\t\tvar targetId = section.getAttribute(\"data-target-id\");\n\t\t\t\tvar dateSelectorId = section.getAttribute(\"data-date-selector-id\");\n\t\t\t\tvar refreshBtnId = section.getAttribute(\"data-refresh-btn-id\");\n\t\t\t\tvar locationUrl = section.getAttribute(\"data-location-url\");\n\t\t\t\tvar btn = document.getElementById(refreshBtnId);\n\t\t\t\tvar dateInput = document.getElementById(dateSelectorId);\n\t\t\t\tif (!btn || !dateInput) return;\n\t\t\t\tbtn.addEventListener(\"click\", function() {\n\t\t\t\t\tif (!navigator.geolocation) {\n\t\t\t\t\t\tif (window.htmx) {\n\t\t\t\t\t\t\thtmx.ajax(\"GET\", fetchUrl + \"?date=\" + encodeURIComponent(dateInput.value), { target: \"#\" + targetId, swap: \"innerHTML\" });\n\t\t\t\t\t\t}\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\tnavigator.geolocation.getCurrentPosition(\n\t\t\t\t\t\tfunction(pos) {\n\t\t\t\t\t\t\tvar body = \"date=\" + encodeURIComponent(dateInput.value) + \"&lat=\" + encodeURIComponent(pos.coords.latitude) + \"&lng=\" + encodeURIComponent(pos.coords.longitude);\n\t\t\t\t\t\t\tfetch(locationUrl, {\n\t\t\t\t\t\t\t\tmethod: \"POST\",\n\t\t\t\t\t\t\t\theaders: { \"Content-Type\": \"application/x-www-form-urlencoded\" },\n\t\t\t\t\t\t\t\tbody: body,\n\t\t\t\t\t\t\t\tcredentials: \"same-origin\"\n\t\t\t\t\t\t\t})\n\t\t\t\t\t\t\t\t.then(function() {\n\t\t\t\t\t\t\t\t\tif (window.htmx) {\n\t\t\t\t\t\t\t\t\t\thtmx.ajax(\"GET\", fetchUrl + \"?date=\" + encodeURIComponent(dateInput.value), { target: \"#\" + targetId, swap: \"innerHTML\" });\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t})\n\t\t\t\t\t\t\t\t.catch(function() {\n\t\t\t\t\t\t\t\t\tif (window.htmx) {\n\t\t\t\t\t\t\t\t\t\thtmx.ajax(\"GET\", fetchUrl + \"?date=\" + encodeURIComponent(dateInput.value), { target: \"#\" + targetId, swap: \"innerHTML\" });\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t},\n\t\t\t\t\t\tfunction() {\n\t\t\t\t\t\t\tif (window.htmx) {\n\t\t\t\t\t\t\t\thtmx.ajax(\"GET\", fetchUrl + \"?date=\" + encodeURIComponent(dateInput.value), { target: \"#\" + targetId, swap: \"innerHTML\" });\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t},\n\t\t\t\t\t\t{ timeout: 5000 }\n\t\t\t\t\t);\n\t\t\t\t});\n\t\t\t})();\n\t\t</script></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</div><script>\n\t\t\t(function() {\n\t\t\t\tvar section = document.getElementById(\"staff-attendance-section\");\n\t\t\t\tif (!section) return;\n\t\t\t\tvar fetchUrl = section.getAttribute(\"data-fetch-url\");\n\t\t\t\tvar targetId = section.getAttribute(\"data-target-id\");\n\t\t\t\tvar dateSelectorId = section.getAttribute(\"data-date-selector-id\");\n\t\t\t\tvar refreshBtnId = section.getAttribute(\"data-refresh-btn-id\");\n\t\t\t\tvar locationUrl = section.getAttribute(\"data-location-url\");\n\t\t\t\tvar btn = document.getElementById(refreshBtnId);\n\t\t\t\tvar dateInput = document.getElementById(dateSelectorId);\n\t\t\t\tif (!btn || !dateInput) return;\n\t\t\t\tvar btnText = btn.querySelector(\".refresh-btn-text\");\n\t\t\t\tvar btnSpinner = btn.querySelector(\".refresh-btn-spinner\");\n\t\t\t\tfunction showSpinner() {\n\t\t\t\t\tbtn.disabled = true;\n\t\t\t\t\tif (btnText) btnText.style.display = \"none\";\n\t\t\t\t\tif (btnSpinner) btnSpinner.style.display = \"inline-block\";\n\t\t\t\t}\n\t\t\t\tfunction restoreBtn() {\n\t\t\t\t\tbtn.disabled = false;\n\t\t\t\t\tif (btnText) btnText.style.display = \"\";\n\t\t\t\t\tif (btnSpinner) btnSpinner.style.display = \"none\";\n\t\t\t\t}\n\t\t\t\tbtn.addEventListener(\"click\", function() {\n\t\t\t\t\tif (!navigator.geolocation) {\n\t\t\t\t\t\tif (window.htmx) {\n\t\t\t\t\t\t\thtmx.ajax(\"GET\", fetchUrl + \"?date=\" + encodeURIComponent(dateInput.value), { target: \"#\" + targetId, swap: \"innerHTML\" });\n\t\t\t\t\t\t}\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\tshowSpinner();\n\t\t\t\t\tnavigator.geolocation.getCurrentPosition(\n\t\t\t\t\t\tfunction(pos) {\n\t\t\t\t\t\t\tvar body = \"date=\" + encodeURIComponent(dateInput.value) + \"&lat=\" + encodeURIComponent(pos.coords.latitude) + \"&lng=\" + encodeURIComponent(pos.coords.longitude);\n\t\t\t\t\t\t\tfetch(locationUrl, {\n\t\t\t\t\t\t\t\tmethod: \"POST\",\n\t\t\t\t\t\t\t\theaders: { \"Content-Type\": \"application/x-www-form-urlencoded\" },\n\t\t\t\t\t\t\t\tbody: body,\n\t\t\t\t\t\t\t\tcredentials: \"same-origin\"\n\t\t\t\t\t\t\t})\n\t\t\t\t\t\t\t\t.then(function(resp) {\n\t\t\t\t\t\t\t\t\tif (resp.ok) {\n\t\t\t\t\t\t\t\t\t\twindow.location.reload();\n\t\t\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\t\t\trestoreBtn();\n\t\t\t\t\t\t\t\t\t\tif (window.htmx) {\n\t\t\t\t\t\t\t\t\t\t\thtmx.ajax(\"GET\", fetchUrl + \"?date=\" + encodeURIComponent(dateInput.value), { target: \"#\" + targetId, swap: \"innerHTML\" });\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t})\n\t\t\t\t\t\t\t\t.catch(function() {\n\t\t\t\t\t\t\t\t\trestoreBtn();\n\t\t\t\t\t\t\t\t\tif (window.htmx) {\n\t\t\t\t\t\t\t\t\t\thtmx.ajax(\"GET\", fetchUrl + \"?date=\" + encodeURIComponent(dateInput.value), { target: \"#\" + targetId, swap: \"innerHTML\" });\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t},\n\t\t\t\t\t\tfunction() {\n\t\t\t\t\t\t\trestoreBtn();\n\t\t\t\t\t\t\tif (window.htmx) {\n\t\t\t\t\t\t\t\thtmx.ajax(\"GET\", fetchUrl + \"?date=\" + encodeURIComponent(dateInput.value), { target: \"#\" + targetId, swap: \"innerHTML\" });\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t},\n\t\t\t\t\t\t{ timeout: 5000 }\n\t\t\t\t\t);\n\t\t\t\t});\n\t\t\t})();\n\t\t</script></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -552,7 +552,7 @@ func AttendanceSectionForSuperuser(title string, selectedDate string, fetchURL s
 		var templ_7745c5c3_Var30 string
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(fetchURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 184, Col: 19}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 205, Col: 19}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
@@ -565,7 +565,7 @@ func AttendanceSectionForSuperuser(title string, selectedDate string, fetchURL s
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("load, change from:#%s, click from:#%s", dateSelectorID, refreshButtonID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 185, Col: 100}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 206, Col: 100}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
@@ -578,7 +578,7 @@ func AttendanceSectionForSuperuser(title string, selectedDate string, fetchURL s
 		var templ_7745c5c3_Var32 string
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs("#" + dateSelectorID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 186, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 207, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 		if templ_7745c5c3_Err != nil {
@@ -591,7 +591,7 @@ func AttendanceSectionForSuperuser(title string, selectedDate string, fetchURL s
 		var templ_7745c5c3_Var33 string
 		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs("#" + targetID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 187, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 208, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 		if templ_7745c5c3_Err != nil {
@@ -612,7 +612,7 @@ func AttendanceSectionForSuperuser(title string, selectedDate string, fetchURL s
 		var templ_7745c5c3_Var34 string
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(targetID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 191, Col: 20}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 212, Col: 20}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
@@ -686,7 +686,7 @@ func AdminLoginPage(loginError string) templ.Component {
 			var templ_7745c5c3_Var36 string
 			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(loginError)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 218, Col: 18}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 239, Col: 18}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 			if templ_7745c5c3_Err != nil {
@@ -704,7 +704,7 @@ func AdminLoginPage(loginError string) templ.Component {
 		var templ_7745c5c3_Var37 templ.SafeURL
 		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/login"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 221, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 242, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 		if templ_7745c5c3_Err != nil {
@@ -758,7 +758,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var39 string
 		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(profile.FullName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 315, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 336, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 		if templ_7745c5c3_Err != nil {
@@ -771,7 +771,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var40 string
 		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(profile.CurrentDate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 319, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 340, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 		if templ_7745c5c3_Err != nil {
@@ -784,7 +784,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var41 string
 		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(profile.CurrentTime)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 322, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 343, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 		if templ_7745c5c3_Err != nil {
@@ -797,7 +797,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var42 string
 		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(profile.FullName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 328, Col: 88}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 349, Col: 88}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 		if templ_7745c5c3_Err != nil {
@@ -810,7 +810,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var43 string
 		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Birthdate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 329, Col: 94}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 350, Col: 94}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 		if templ_7745c5c3_Err != nil {
@@ -823,7 +823,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var44 string
 		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(profile.DateHired)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 330, Col: 95}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 351, Col: 95}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 		if templ_7745c5c3_Err != nil {
@@ -836,7 +836,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var45 string
 		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Position)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 331, Col: 92}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 352, Col: 92}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 		if templ_7745c5c3_Err != nil {
@@ -854,7 +854,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 			var templ_7745c5c3_Var46 string
 			templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.JoinStringErrs(profile.ScheduledTimeIn)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 335, Col: 33}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 356, Col: 33}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var46))
 			if templ_7745c5c3_Err != nil {
@@ -873,7 +873,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 			var templ_7745c5c3_Var47 string
 			templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinStringErrs(profile.ScheduledTimeOut)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 341, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 362, Col: 34}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
 			if templ_7745c5c3_Err != nil {
@@ -901,7 +901,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 				}
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "<p class=\"text-gray-500\">Location unknown</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "<p class=\"text-gray-500\">Location unknown</p><p class=\"text-sm text-gray-600 mt-1\">Make sure you enable location services and refresh the page.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -935,7 +935,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var50 string
 		templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/staff/time-in"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 364, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 386, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 		if templ_7745c5c3_Err != nil {
@@ -980,7 +980,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var53 string
 		templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/staff/time-out"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 376, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 398, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
 		if templ_7745c5c3_Err != nil {
@@ -1018,7 +1018,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var54 templ.SafeURL
 		templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/logout"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 395, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 417, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
 		if templ_7745c5c3_Err != nil {
@@ -1072,7 +1072,7 @@ func AdminSuperuserPage(pageData models.AdminSuperuserPage) templ.Component {
 		var templ_7745c5c3_Var56 string
 		templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.JoinStringErrs(pageData.FullName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 446, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 468, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var56))
 		if templ_7745c5c3_Err != nil {
@@ -1085,7 +1085,7 @@ func AdminSuperuserPage(pageData models.AdminSuperuserPage) templ.Component {
 		var templ_7745c5c3_Var57 string
 		templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.JoinStringErrs(pageData.CurrentDate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 450, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 472, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var57))
 		if templ_7745c5c3_Err != nil {
@@ -1098,7 +1098,7 @@ func AdminSuperuserPage(pageData models.AdminSuperuserPage) templ.Component {
 		var templ_7745c5c3_Var58 string
 		templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.JoinStringErrs(pageData.CurrentTime)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 453, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 475, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var58))
 		if templ_7745c5c3_Err != nil {
@@ -1127,7 +1127,7 @@ func AdminSuperuserPage(pageData models.AdminSuperuserPage) templ.Component {
 		var templ_7745c5c3_Var59 templ.SafeURL
 		templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/logout"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 467, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 489, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var59))
 		if templ_7745c5c3_Err != nil {
@@ -1180,7 +1180,7 @@ func AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) te
 				var templ_7745c5c3_Var61 string
 				templ_7745c5c3_Var61, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(att.StaffID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 536, Col: 33}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 558, Col: 33}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var61))
 				if templ_7745c5c3_Err != nil {
@@ -1193,7 +1193,7 @@ func AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) te
 				var templ_7745c5c3_Var62 string
 				templ_7745c5c3_Var62, templ_7745c5c3_Err = templ.JoinStringErrs(att.FullName)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 539, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 561, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var62))
 				if templ_7745c5c3_Err != nil {
@@ -1227,7 +1227,7 @@ func AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) te
 						var templ_7745c5c3_Var63 string
 						templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.JoinStringErrs(att.TimeIn)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 551, Col: 63}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 573, Col: 63}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var63))
 						if templ_7745c5c3_Err != nil {
@@ -1245,7 +1245,7 @@ func AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) te
 						var templ_7745c5c3_Var64 string
 						templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.JoinStringErrs(att.TimeIn)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 553, Col: 62}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 575, Col: 62}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var64))
 						if templ_7745c5c3_Err != nil {
@@ -1263,7 +1263,7 @@ func AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) te
 						var templ_7745c5c3_Var65 string
 						templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.JoinStringErrs(att.TimeIn)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 555, Col: 61}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 577, Col: 61}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var65))
 						if templ_7745c5c3_Err != nil {
@@ -1277,7 +1277,7 @@ func AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) te
 						var templ_7745c5c3_Var66 string
 						templ_7745c5c3_Var66, templ_7745c5c3_Err = templ.JoinStringErrs(att.TimeIn)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 557, Col: 22}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 579, Col: 22}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var66))
 						if templ_7745c5c3_Err != nil {
@@ -1303,7 +1303,7 @@ func AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) te
 						var templ_7745c5c3_Var67 string
 						templ_7745c5c3_Var67, templ_7745c5c3_Err = templ.JoinStringErrs(att.TimeOut)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 566, Col: 62}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 588, Col: 62}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var67))
 						if templ_7745c5c3_Err != nil {
@@ -1321,7 +1321,7 @@ func AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) te
 						var templ_7745c5c3_Var68 string
 						templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.JoinStringErrs(att.TimeOut)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 568, Col: 63}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 590, Col: 63}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var68))
 						if templ_7745c5c3_Err != nil {
@@ -1339,7 +1339,7 @@ func AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) te
 						var templ_7745c5c3_Var69 string
 						templ_7745c5c3_Var69, templ_7745c5c3_Err = templ.JoinStringErrs(att.TimeOut)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 570, Col: 64}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 592, Col: 64}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var69))
 						if templ_7745c5c3_Err != nil {
@@ -1353,7 +1353,7 @@ func AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) te
 						var templ_7745c5c3_Var70 string
 						templ_7745c5c3_Var70, templ_7745c5c3_Err = templ.JoinStringErrs(att.TimeOut)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 572, Col: 23}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 594, Col: 23}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var70))
 						if templ_7745c5c3_Err != nil {
@@ -1379,7 +1379,7 @@ func AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) te
 						var templ_7745c5c3_Var71 string
 						templ_7745c5c3_Var71, templ_7745c5c3_Err = templ.JoinStringErrs(att.Duration)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 581, Col: 65}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 603, Col: 65}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var71))
 						if templ_7745c5c3_Err != nil {
@@ -1397,7 +1397,7 @@ func AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) te
 						var templ_7745c5c3_Var72 string
 						templ_7745c5c3_Var72, templ_7745c5c3_Err = templ.JoinStringErrs(att.Duration)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 583, Col: 63}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 605, Col: 63}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var72))
 						if templ_7745c5c3_Err != nil {
@@ -1411,7 +1411,7 @@ func AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) te
 						var templ_7745c5c3_Var73 string
 						templ_7745c5c3_Var73, templ_7745c5c3_Err = templ.JoinStringErrs(att.Duration)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 585, Col: 24}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin.templ`, Line: 607, Col: 24}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var73))
 						if templ_7745c5c3_Err != nil {
