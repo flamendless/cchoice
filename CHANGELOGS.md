@@ -2,6 +2,14 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.11"></a>
+## [release-v1.1.11] - 2026-02-24
+
+### Feature
+- Location based time in/out enablement
+- Admin page for time tracking
+
+
 <a name="release-v1.1.10"></a>
 ## [release-v1.1.10] - 2026-02-24
 ### CICD
@@ -800,7 +808,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.10...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.11...HEAD
+[release-v1.1.11]: https://github.com/flamendless/cchoice/compare/release-v1.1.10...release-v1.1.11
 [release-v1.1.10]: https://github.com/flamendless/cchoice/compare/release-v1.1.9...release-v1.1.10
 [release-v1.1.9]: https://github.com/flamendless/cchoice/compare/release-v1.1.8...release-v1.1.9
 [release-v1.1.8]: https://github.com/flamendless/cchoice/compare/release-v1.1.7...release-v1.1.8
