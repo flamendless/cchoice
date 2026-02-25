@@ -20,9 +20,10 @@ templ AttendanceToolbar(title string, selectedDate string, dateSelectorID string
 			<button
 				type="button"
 				id={ refreshButtonID }
-				class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark transition-colors"
+				class="refresh-location-btn px-4 py-2 w-28 bg-cchoice text-white rounded-md hover:bg-cchoice_dark transition-colors inline-flex items-center justify-center gap-2"
 			>
-				Refresh
+				<span class="refresh-btn-text">Refresh</span>
+				<span class="refresh-btn-spinner inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true" style="display: none;"></span>
 			</button>
 		</div>
 	</div>
@@ -138,6 +139,18 @@ templ AttendanceSectionForStaff(
 				var btn = document.getElementById(refreshBtnId);
 				var dateInput = document.getElementById(dateSelectorId);
 				if (!btn || !dateInput) return;
+				var btnText = btn.querySelector(".refresh-btn-text");
+				var btnSpinner = btn.querySelector(".refresh-btn-spinner");
+				function showSpinner() {
+					btn.disabled = true;
+					if (btnText) btnText.style.display = "none";
+					if (btnSpinner) btnSpinner.style.display = "inline-block";
+				}
+				function restoreBtn() {
+					btn.disabled = false;
+					if (btnText) btnText.style.display = "";
+					if (btnSpinner) btnSpinner.style.display = "none";
+				}
 				btn.addEventListener("click", function() {
 					if (!navigator.geolocation) {
 						if (window.htmx) {
@@ -145,6 +158,7 @@ templ AttendanceSectionForStaff(
 						}
 						return;
 					}
+					showSpinner();
 					navigator.geolocation.getCurrentPosition(
 						function(pos) {
 							var body = "date=" + encodeURIComponent(dateInput.value) + "&lat=" + encodeURIComponent(pos.coords.latitude) + "&lng=" + encodeURIComponent(pos.coords.longitude);
@@ -154,18 +168,25 @@ templ AttendanceSectionForStaff(
 								body: body,
 								credentials: "same-origin"
 							})
-								.then(function() {
-									if (window.htmx) {
-										htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
+								.then(function(resp) {
+									if (resp.ok) {
+										window.location.reload();
+									} else {
+										restoreBtn();
+										if (window.htmx) {
+											htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
+										}
 									}
 								})
 								.catch(function() {
+									restoreBtn();
 									if (window.htmx) {
 										htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
 									}
 								});
 						},
 						function() {
+							restoreBtn();
 							if (window.htmx) {
 								htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
 							}
@@ -353,6 +374,7 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 							}
 						} else {
 							<p class="text-gray-500">Location unknown</p>
+							<p class="text-sm text-gray-600 mt-1">Make sure you enable location services and refresh the page.</p>
 						}
 					</div>
 
