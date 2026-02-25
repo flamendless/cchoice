@@ -386,6 +386,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		CanTimeOut:       hasTimeIn && !hasTimeOut,
 		MyAttendance:     myAttendance,
 		InShop:           inShop,
+		UserType:         enums.ParseStaffUserTypeToEnum(staff.UserType),
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -675,7 +676,12 @@ func (s *Server) adminStaffAttendanceLocationHandler(w http.ResponseWriter, r *h
 
 	date = parseAttendanceDate(date)
 	if latStr == "" || lngStr == "" {
-		http.Error(w, "lat and lng required", http.StatusBadRequest)
+		staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
+		if err != nil || staff.UserType != enums.STAFF_USER_TYPE_SUPERUSER.String() {
+			http.Error(w, "lat and lng required", http.StatusBadRequest)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 	lat, errLat := strconv.ParseFloat(latStr, 64)

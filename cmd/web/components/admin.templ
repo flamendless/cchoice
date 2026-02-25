@@ -107,6 +107,7 @@ templ AttendanceSectionForStaff(
 	dateSelectorID string,
 	refreshButtonID string,
 	record *models.AdminStaffAttendance,
+	userType enums.StaffUserType,
 ) {
 	{{ fetchURL := utils.URL("/admin/staff/attendance") }}
 	<div
@@ -117,6 +118,7 @@ templ AttendanceSectionForStaff(
 		data-date-selector-id={ dateSelectorID }
 		data-refresh-btn-id={ refreshButtonID }
 		data-location-url={ utils.URL("/admin/staff/attendance/location") }
+		data-user-type={ userType.String() }
 		hx-get={ fetchURL }
 		hx-trigger={ fmt.Sprintf("load, change from:#%s", dateSelectorID) }
 		hx-include={ "#" + dateSelectorID }
@@ -127,75 +129,7 @@ templ AttendanceSectionForStaff(
 		<div id={ targetID }>
 			@StaffAttendanceSingleTable(record)
 		</div>
-		<script>
-			(function() {
-				var section = document.getElementById("staff-attendance-section");
-				if (!section) return;
-				var fetchUrl = section.getAttribute("data-fetch-url");
-				var targetId = section.getAttribute("data-target-id");
-				var dateSelectorId = section.getAttribute("data-date-selector-id");
-				var refreshBtnId = section.getAttribute("data-refresh-btn-id");
-				var locationUrl = section.getAttribute("data-location-url");
-				var btn = document.getElementById(refreshBtnId);
-				var dateInput = document.getElementById(dateSelectorId);
-				if (!btn || !dateInput) return;
-				var btnText = btn.querySelector(".refresh-btn-text");
-				var btnSpinner = btn.querySelector(".refresh-btn-spinner");
-				function showSpinner() {
-					btn.disabled = true;
-					if (btnText) btnText.style.display = "none";
-					if (btnSpinner) btnSpinner.style.display = "inline-block";
-				}
-				function restoreBtn() {
-					btn.disabled = false;
-					if (btnText) btnText.style.display = "";
-					if (btnSpinner) btnSpinner.style.display = "none";
-				}
-				btn.addEventListener("click", function() {
-					if (!navigator.geolocation) {
-						if (window.htmx) {
-							htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
-						}
-						return;
-					}
-					showSpinner();
-					navigator.geolocation.getCurrentPosition(
-						function(pos) {
-							var body = "date=" + encodeURIComponent(dateInput.value) + "&lat=" + encodeURIComponent(pos.coords.latitude) + "&lng=" + encodeURIComponent(pos.coords.longitude);
-							fetch(locationUrl, {
-								method: "POST",
-								headers: { "Content-Type": "application/x-www-form-urlencoded" },
-								body: body,
-								credentials: "same-origin"
-							})
-								.then(function(resp) {
-									if (resp.ok) {
-										window.location.reload();
-									} else {
-										restoreBtn();
-										if (window.htmx) {
-											htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
-										}
-									}
-								})
-								.catch(function() {
-									restoreBtn();
-									if (window.htmx) {
-										htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
-									}
-								});
-						},
-						function() {
-							restoreBtn();
-							if (window.htmx) {
-								htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
-							}
-						},
-						{ timeout: 5000 }
-					);
-				});
-			})();
-		</script>
+		@ScriptStaffAttendanceRefresh()
 	</div>
 }
 
@@ -285,35 +219,7 @@ templ AdminLoginPage(loginError string) {
 						Log In
 					</button>
 				</form>
-				<script>
-					(function() {
-						var form = document.getElementById("admin-login-form");
-						if (!form) return;
-						form.addEventListener("submit", function(e) {
-							var latInput = document.getElementById("location_lat");
-							var lngInput = document.getElementById("location_lng");
-							if (!latInput || !lngInput || (latInput.value && lngInput.value)) {
-								return;
-							}
-							e.preventDefault();
-							if (!navigator.geolocation) {
-								form.submit();
-								return;
-							}
-							navigator.geolocation.getCurrentPosition(
-								function(pos) {
-									latInput.value = String(pos.coords.latitude);
-									lngInput.value = String(pos.coords.longitude);
-									form.submit();
-								},
-								function() {
-									form.submit();
-								},
-								{ timeout: 5000 }
-							);
-						});
-					})();
-				</script>
+				@ScriptAdminLogin()
 			</div>
 		</body>
 	</html>
@@ -364,19 +270,21 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 						}
 					</div>
 
-					<div class="mb-4 p-3 rounded-lg border" id="staff-location-status">
-						if profile.InShop != nil {
-							if *profile.InShop {
-								<p class="text-green-700 font-medium">In shop</p>
+					if profile.UserType != enums.STAFF_USER_TYPE_SUPERUSER {
+						<div class="mb-4 p-3 rounded-lg border" id="staff-location-status">
+							if profile.InShop != nil {
+								if *profile.InShop {
+									<p class="text-green-700 font-medium">In shop</p>
+								} else {
+									<p class="text-red-700 font-medium">Out of shop</p>
+									<p class="text-sm text-gray-600 mt-1">Make sure you enable location services and refresh the page.</p>
+								}
 							} else {
-								<p class="text-red-700 font-medium">Out of shop</p>
+								<p class="text-gray-500">Location unknown</p>
 								<p class="text-sm text-gray-600 mt-1">Make sure you enable location services and refresh the page.</p>
 							}
-						} else {
-							<p class="text-gray-500">Location unknown</p>
-							<p class="text-sm text-gray-600 mt-1">Make sure you enable location services and refresh the page.</p>
-						}
-					</div>
+						</div>
+					}
 
 					<div class="space-y-4">
 						<div>
@@ -412,6 +320,7 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 						"staff-date-selector",
 						"staff-refresh-btn",
 						profile.MyAttendance,
+						profile.UserType,
 					)
 
 					<form action={ utils.URL("/admin/logout") } method="POST" class="mt-6">
@@ -425,28 +334,7 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 				</div>
 			</div>
 
-			<script>
-				function updateClock() {
-					const now = new Date();
-					const options = {
-						weekday: 'long',
-						year: 'numeric',
-						month: 'long',
-						day: 'numeric'
-					};
-					const dateStr = now.toLocaleDateString('en-US', options);
-					const timeStr = now.toLocaleTimeString('en-US', {
-						hour: '2-digit',
-						minute: '2-digit',
-						second: '2-digit',
-						hour12: true
-					});
-					document.getElementById('clock').textContent = timeStr;
-					document.getElementById('current-date').textContent = dateStr;
-				}
-				setInterval(updateClock, 1000);
-				updateClock();
-			</script>
+			@ScriptClock()
 		</body>
 	</html>
 }
@@ -497,28 +385,7 @@ templ AdminSuperuserPage(pageData models.AdminSuperuserPage) {
 				</div>
 			</div>
 
-			<script>
-				function updateClock() {
-					const now = new Date();
-					const options = {
-						weekday: 'long',
-						year: 'numeric',
-						month: 'long',
-						day: 'numeric'
-					};
-					const dateStr = now.toLocaleDateString('en-US', options);
-					const timeStr = now.toLocaleTimeString('en-US', {
-						hour: '2-digit',
-						minute: '2-digit',
-						second: '2-digit',
-						hour12: true
-					});
-					document.getElementById('clock').textContent = timeStr;
-					document.getElementById('current-date').textContent = dateStr;
-				}
-				setInterval(updateClock, 1000);
-				updateClock();
-			</script>
+			@ScriptClock()
 		</body>
 	</html>
 }
@@ -616,4 +483,144 @@ templ AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) {
 			</table>
 		</div>
 	}
+}
+
+templ ScriptAdminLogin() {
+	<script>
+		(function() {
+			var form = document.getElementById("admin-login-form");
+			if (!form) return;
+			form.addEventListener("submit", function(e) {
+				var latInput = document.getElementById("location_lat");
+				var lngInput = document.getElementById("location_lng");
+				if (!latInput || !lngInput || (latInput.value && lngInput.value)) {
+					return;
+				}
+				e.preventDefault();
+				if (!navigator.geolocation) {
+					form.submit();
+					return;
+				}
+				navigator.geolocation.getCurrentPosition(
+					function(pos) {
+						latInput.value = String(pos.coords.latitude);
+						lngInput.value = String(pos.coords.longitude);
+						form.submit();
+					},
+					function() {
+						form.submit();
+					},
+					{ timeout: 5000 }
+				);
+			});
+		})();
+	</script>
+}
+
+templ ScriptStaffAttendanceRefresh() {
+	<script>
+		(function() {
+			var section = document.getElementById("staff-attendance-section");
+			if (!section) return;
+			var fetchUrl = section.getAttribute("data-fetch-url");
+			var targetId = section.getAttribute("data-target-id");
+			var dateSelectorId = section.getAttribute("data-date-selector-id");
+			var refreshBtnId = section.getAttribute("data-refresh-btn-id");
+			var locationUrl = section.getAttribute("data-location-url");
+			var userType = section.getAttribute("data-user-type") || "";
+			var requireLocation = userType !== "SUPERUSER";
+			var btn = document.getElementById(refreshBtnId);
+			var dateInput = document.getElementById(dateSelectorId);
+			if (!btn || !dateInput) return;
+			var btnText = btn.querySelector(".refresh-btn-text");
+			var btnSpinner = btn.querySelector(".refresh-btn-spinner");
+			function showSpinner() {
+				btn.disabled = true;
+				if (btnText) btnText.style.display = "none";
+				if (btnSpinner) btnSpinner.style.display = "inline-block";
+			}
+			function restoreBtn() {
+				btn.disabled = false;
+				if (btnText) btnText.style.display = "";
+				if (btnSpinner) btnSpinner.style.display = "none";
+			}
+			function refetchTable() {
+				if (window.htmx) {
+					htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
+				}
+			}
+			btn.addEventListener("click", function() {
+				if (!requireLocation) {
+					showSpinner();
+					refetchTable();
+					restoreBtn();
+					return;
+				}
+				if (!navigator.geolocation) {
+					refetchTable();
+					return;
+				}
+				showSpinner();
+				navigator.geolocation.getCurrentPosition(
+					function(pos) {
+						var body = "date=" + encodeURIComponent(dateInput.value) + "&lat=" + encodeURIComponent(pos.coords.latitude) + "&lng=" + encodeURIComponent(pos.coords.longitude);
+						fetch(locationUrl, {
+							method: "POST",
+							headers: { "Content-Type": "application/x-www-form-urlencoded" },
+							body: body,
+							credentials: "same-origin"
+						})
+							.then(function(resp) {
+								if (resp.ok) {
+									window.location.reload();
+								} else {
+									restoreBtn();
+									if (window.htmx) {
+										htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
+									}
+								}
+							})
+							.catch(function() {
+								restoreBtn();
+								if (window.htmx) {
+									htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
+								}
+							});
+					},
+					function() {
+						restoreBtn();
+						if (window.htmx) {
+							htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
+						}
+					},
+					{ timeout: 5000 }
+				);
+			});
+		})();
+	</script>
+}
+
+templ ScriptClock() {
+	<script>
+		function updateClock() {
+			const now = new Date();
+			const options = {
+				weekday: "long",
+				year: "numeric",
+				month: "long",
+				day: "numeric"
+			};
+			const dateStr = now.toLocaleDateString("en-US", options);
+			const timeStr = now.toLocaleTimeString("en-US", {
+				hour: "2-digit",
+				minute: "2-digit",
+				second: "2-digit",
+				hour12: true
+			});
+			document.getElementById("clock").textContent = timeStr;
+			document.getElementById("current-date").textContent = dateStr;
+		}
+		setInterval(updateClock, 1000);
+		updateClock();
+	</script>
 }
