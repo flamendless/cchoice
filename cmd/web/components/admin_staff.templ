@@ -1,0 +1,328 @@
+package components
+
+import "fmt"
+
+import "cchoice/cmd/web/models"
+import "cchoice/internal/enums"
+import "cchoice/internal/utils"
+
+templ StaffAttendanceSingleTable(record *models.AdminStaffAttendance) {
+	if record == nil {
+		<p class="text-gray-500 text-center py-4">No attendance record for this date</p>
+	} else {
+		<div class="overflow-x-auto">
+			<table class="min-w-full divide-y divide-gray-200">
+				<thead class="bg-gray-50">
+					<tr>
+						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+							Time In
+						</th>
+						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+							Time Out
+						</th>
+						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+							Duration
+						</th>
+					</tr>
+				</thead>
+				<tbody class="bg-white divide-y divide-gray-200">
+					<tr>
+						<td class="px-6 py-4 whitespace-nowrap text-sm">
+							if record.TimeIn != "" {
+								if record.TimeInStatus == enums.TIME_IN_STATUS_EARLIER {
+									<span class="text-green-600 font-medium">{ record.TimeIn }</span>
+								} else if record.TimeInStatus == enums.TIME_IN_STATUS_ON_TIME {
+									<span class="text-blue-600 font-medium">{ record.TimeIn }</span>
+								} else if record.TimeInStatus == enums.TIME_IN_STATUS_LATE {
+									<span class="text-red-600 font-medium">{ record.TimeIn }</span>
+								} else {
+									{ record.TimeIn }
+								}
+							} else {
+								<span class="text-gray-400">-</span>
+							}
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm">
+							if record.TimeOut != "" {
+								if record.TimeOutStatus == enums.TIME_OUT_STATUS_UNDERTIME {
+									<span class="text-red-600 font-medium">{ record.TimeOut }</span>
+								} else if record.TimeOutStatus == enums.TIME_OUT_STATUS_ON_TIME {
+									<span class="text-blue-600 font-medium">{ record.TimeOut }</span>
+								} else if record.TimeOutStatus == enums.TIME_OUT_STATUS_OVERTIME {
+									<span class="text-green-600 font-medium">{ record.TimeOut }</span>
+								} else {
+									{ record.TimeOut }
+								}
+							} else {
+								<span class="text-gray-400">-</span>
+							}
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm">
+							if record.Duration != "" && record.Duration != "-" {
+								if record.DurationColor == "green" {
+									<span class="text-green-600 font-medium">{ record.Duration }</span>
+								} else if record.DurationColor == "red" {
+									<span class="text-red-600 font-medium">{ record.Duration }</span>
+								} else {
+									{ record.Duration }
+								}
+							} else {
+								<span class="text-gray-400">-</span>
+							}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	}
+}
+
+templ AttendanceSectionForStaff(
+	title string,
+	selectedDate string,
+	targetID string,
+	dateSelectorID string,
+	refreshButtonID string,
+	record *models.AdminStaffAttendance,
+	userType enums.StaffUserType,
+) {
+	{{ fetchURL := utils.URL("/admin/staff/attendance") }}
+	<div
+		class="bg-white rounded-lg shadow-md p-6 mb-6"
+		id="staff-attendance-section"
+		data-fetch-url={ fetchURL }
+		data-target-id={ targetID }
+		data-date-selector-id={ dateSelectorID }
+		data-refresh-btn-id={ refreshButtonID }
+		data-location-url={ utils.URL("/admin/staff/attendance/location") }
+		data-user-type={ userType.String() }
+		hx-get={ fetchURL }
+		hx-trigger={ fmt.Sprintf("load, change from:#%s", dateSelectorID) }
+		hx-include={ "#" + dateSelectorID }
+		hx-target={ "#" + targetID }
+		hx-swap="innerHTML"
+	>
+		@AttendanceToolbar(title, selectedDate, dateSelectorID, refreshButtonID)
+		<div id={ targetID }>
+			@StaffAttendanceSingleTable(record)
+		</div>
+		@ScriptStaffAttendanceRefresh()
+	</div>
+}
+
+func getButtonClass(enabled bool) string {
+	if enabled {
+		return "w-full py-3 px-4 rounded-md font-medium text-white transition-colors bg-cchoice hover:bg-cchoice_dark cursor-pointer"
+	}
+	return "w-full py-3 px-4 rounded-md font-medium text-white transition-colors bg-gray-400 cursor-not-allowed"
+}
+
+templ StaffDetail(label string, value string) {
+	<p class="text-gray-600"><span class="font-medium">{ label }:</span> { value }</p>
+}
+
+templ AdminStaffPage(profile models.AdminStaffProfile) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@HeadMeta()
+			@TabTitle("[STAFF] C-Choice Admin")
+			<style>
+				.refresh-btn-content .refresh-btn-spinner { display: none; }
+				.refresh-btn-content.htmx-request .refresh-btn-spinner { display: inline-block; }
+				.refresh-btn-content.htmx-request .refresh-btn-text { display: none; }
+			</style>
+		</head>
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-row"
+			_="on load call metrics_event('admin_page_visit', 'staff')"
+		>
+			<div class="flex-grow flex flex-col items-center justify-center p-4">
+				<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+					C-Choice Staff Admin Portal
+				</h1>
+				<div class="w-full max-w-4xl p-6 bg-white rounded-lg shadow-md">
+					<p class="text-lg text-gray-700 mb-4">
+						Hello, { profile.FullName }
+					</p>
+					<div class="text-center mb-6">
+						<h1 id="current-date" class="text-3xl font-bold text-cchoice">
+							{ profile.CurrentDate }
+						</h1>
+						<p class="text-xl text-gray-600" id="clock">
+							{ profile.CurrentTime }
+						</p>
+					</div>
+
+					<div class="mb-6 p-4 bg-gray-50 rounded-lg">
+						<h2 class="text-lg font-semibold text-gray-800 mb-2">Profile</h2>
+						@StaffDetail("Name", profile.FullName)
+						@StaffDetail("Birthdate", profile.Birthdate)
+						@StaffDetail("Date Hired", profile.DateHired)
+						@StaffDetail("Position", profile.Position)
+						@StaffDetail("Email", profile.Email)
+						@StaffDetail("Mobile No", profile.MobileNo)
+						@StaffDetail("Scheduled Time In", profile.ScheduledTimeIn)
+						@StaffDetail("Scheduled Time Out", profile.ScheduledTimeOut)
+					</div>
+
+					if profile.UserType != enums.STAFF_USER_TYPE_SUPERUSER {
+						<div class="mb-4 p-3 rounded-lg border" id="staff-location-status">
+							if profile.InShop != nil {
+								if *profile.InShop {
+									<p class="text-green-700 font-medium">In shop</p>
+								} else {
+									<p class="text-red-700 font-medium">Out of shop</p>
+									if profile.LocationDisplay != "" {
+										<p class="text-sm text-gray-600 mt-1">Your location: { profile.LocationDisplay }</p>
+									}
+									<p class="text-sm text-gray-600 mt-1">Make sure you enable location services and refresh the page.</p>
+								}
+							} else {
+								<p class="text-gray-500">Location unknown</p>
+								if profile.LocationDisplay != "" {
+									<p class="text-sm text-gray-600 mt-1">Your location: { profile.LocationDisplay }</p>
+								}
+								<p class="text-sm text-gray-600 mt-1">Make sure you enable location services and refresh the page.</p>
+							}
+						</div>
+					}
+
+					<div class="space-y-4">
+						<div>
+							<button
+								type="button"
+								class={ getButtonClass(profile.CanTimeIn) }
+								hx-post={ utils.URL("/admin/staff/time-in") }
+								hx-trigger="click"
+								hx-swap="none"
+								disabled?={profile.CanTimeIn}
+							>
+								Time In
+							</button>
+						</div>
+						<div>
+							<button
+								type="button"
+								class={ getButtonClass(profile.CanTimeOut) }
+								hx-post={ utils.URL("/admin/staff/time-out") }
+								hx-trigger="click"
+								hx-swap="none"
+								disabled?={profile.CanTimeOut}
+							>
+								Time Out
+							</button>
+						</div>
+					</div>
+
+					@AttendanceSectionForStaff(
+						"My Attendance",
+						profile.SelectedDate,
+						"staff-attendance-table",
+						"staff-date-selector",
+						"staff-refresh-btn",
+						profile.MyAttendance,
+						profile.UserType,
+					)
+
+					<form action={ utils.URL("/admin/logout") } method="POST" class="mt-6">
+						<button
+							type="submit"
+							class="w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice"
+						>
+							Log Out
+						</button>
+					</form>
+				</div>
+			</div>
+
+			@ScriptClock()
+		</body>
+	</html>
+}
+
+templ ScriptStaffAttendanceRefresh() {
+	<script>
+		(function() {
+			var section = document.getElementById("staff-attendance-section");
+			if (!section) return;
+			var fetchUrl = section.getAttribute("data-fetch-url");
+			var targetId = section.getAttribute("data-target-id");
+			var dateSelectorId = section.getAttribute("data-date-selector-id");
+			var refreshBtnId = section.getAttribute("data-refresh-btn-id");
+			var locationUrl = section.getAttribute("data-location-url");
+			var userType = section.getAttribute("data-user-type") || "";
+			var requireLocation = userType !== "SUPERUSER";
+			var btn = document.getElementById(refreshBtnId);
+			var dateInput = document.getElementById(dateSelectorId);
+			if (!btn || !dateInput) return;
+			var indicator = btn.querySelector(".refresh-btn-content");
+			function showSpinner() {
+				btn.disabled = true;
+				if (indicator) indicator.classList.add("htmx-request");
+			}
+			function restoreBtn() {
+				btn.disabled = false;
+				if (indicator) indicator.classList.remove("htmx-request");
+			}
+			function refetchTable() {
+				if (window.htmx) {
+					htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
+				}
+			}
+			btn.addEventListener("click", function() {
+				if (!requireLocation) {
+					showSpinner();
+					function onSwapDone(ev) {
+						if (ev.detail.target.id === targetId) {
+							restoreBtn();
+							document.removeEventListener("htmx:afterSwap", onSwapDone);
+						}
+					}
+					document.addEventListener("htmx:afterSwap", onSwapDone);
+					refetchTable();
+					return;
+				}
+				if (!navigator.geolocation) {
+					refetchTable();
+					return;
+				}
+				showSpinner();
+				navigator.geolocation.getCurrentPosition(
+					function(pos) {
+						var body = "date=" + encodeURIComponent(dateInput.value) + "&lat=" + encodeURIComponent(pos.coords.latitude) + "&lng=" + encodeURIComponent(pos.coords.longitude);
+						fetch(locationUrl, {
+							method: "POST",
+							headers: { "Content-Type": "application/x-www-form-urlencoded" },
+							body: body,
+							credentials: "same-origin"
+						})
+							.then(function(resp) {
+								if (resp.ok) {
+									window.location.reload();
+								} else {
+									restoreBtn();
+									if (window.htmx) {
+										htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
+									}
+								}
+							})
+							.catch(function() {
+								restoreBtn();
+								if (window.htmx) {
+									htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
+								}
+							});
+					},
+					function() {
+						restoreBtn();
+						if (window.htmx) {
+							htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
+						}
+					},
+					{ timeout: 5000 }
+				);
+			});
+		})();
+	</script>
+}

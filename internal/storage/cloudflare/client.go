@@ -43,10 +43,10 @@ type Config struct {
 }
 
 type CloudflareResponse struct {
-	Success  bool                   `json:"success"`
-	Errors   []CloudflareError      `json:"errors"`
-	Messages []string               `json:"messages"`
-	Result   map[string]interface{} `json:"result"`
+	Success  bool              `json:"success"`
+	Errors   []CloudflareError `json:"errors"`
+	Messages []string          `json:"messages"`
+	Result   map[string]any    `json:"result"`
 }
 
 type CloudflareError struct {
