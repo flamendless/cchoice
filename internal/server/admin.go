@@ -24,10 +24,11 @@ import (
 )
 
 const (
-	SessionStaffID     = "staff_id"
-	SessionLocationLat = "location_lat"
-	SessionLocationLng = "location_lng"
-	maxStaffListSize   = 1000
+	SessionStaffID        = "staff_id"
+	SessionStaffAccessID  = "staff_access_id"
+	SessionLocationLat    = "location_lat"
+	SessionLocationLng    = "location_lng"
+	maxStaffListSize      = 1000
 )
 
 type attendanceStatusResult struct {
@@ -289,6 +290,20 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	s.sessionManager.Put(ctx, SessionStaffID, staff.ID)
 
+	userAgent := sql.NullString{}
+	if ua := r.UserAgent(); ua != "" {
+		userAgent = sql.NullString{String: ua, Valid: true}
+	}
+	accessID, err := s.dbRW.GetQueries().CreateStaffAccess(ctx, queries.CreateStaffAccessParams{
+		StaffID:   staff.ID,
+		UserAgent: userAgent,
+	})
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	} else {
+		s.sessionManager.Put(ctx, SessionStaffAccessID, accessID)
+	}
+
 	if latStr, lngStr := r.PostFormValue("location_lat"), r.PostFormValue("location_lng"); latStr != "" && lngStr != "" {
 		if lat, errLat := strconv.ParseFloat(latStr, 64); errLat == nil {
 			if lng, errLng := strconv.ParseFloat(lngStr, 64); errLng == nil {
@@ -312,6 +327,14 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) adminLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Logout Handler]"
 	ctx := r.Context()
+
+	accessID := s.sessionManager.GetInt64(ctx, SessionStaffAccessID)
+	if accessID != 0 {
+		_, err := s.dbRW.GetQueries().UpdateStaffAccessLogout(ctx, accessID)
+		if err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_access_id", accessID), zap.Error(err))
+		}
+	}
 
 	if err := s.sessionManager.Destroy(ctx); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
