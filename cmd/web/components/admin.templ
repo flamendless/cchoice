@@ -22,8 +22,10 @@ templ AttendanceToolbar(title string, selectedDate string, dateSelectorID string
 				id={ refreshButtonID }
 				class="refresh-location-btn px-4 py-2 w-28 bg-cchoice text-white rounded-md hover:bg-cchoice_dark transition-colors inline-flex items-center justify-center gap-2"
 			>
-				<span class="refresh-btn-text">Refresh</span>
-				<span class="refresh-btn-spinner inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true" style="display: none;"></span>
+				<span id={ refreshButtonID + "-content" } class="refresh-btn-content inline-flex items-center gap-2">
+					<span class="refresh-btn-spinner w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" aria-hidden="true"></span>
+					<span class="refresh-btn-text">Refresh</span>
+				</span>
 			</button>
 		</div>
 	</div>
@@ -141,6 +143,7 @@ templ AttendanceSectionForSuperuser(title string, selectedDate string, fetchURL 
 		hx-include={ "#" + dateSelectorID }
 		hx-target={ "#" + targetID }
 		hx-swap="innerHTML"
+		hx-indicator={ fmt.Sprintf("#%s-content", refreshButtonID) }
 	>
 		@AttendanceToolbar(title, selectedDate, dateSelectorID, refreshButtonID)
 		<div id={ targetID }>
@@ -162,6 +165,11 @@ templ AdminLoginPage(loginError string) {
 		<head>
 			@HeadMeta()
 			@TabTitle("[ADMIN] C-Choice Construction Supplies")
+			<style>
+				#login-btn-content #login-spinner { display: none; }
+				#login-btn-content.htmx-request #login-spinner { display: inline-block; }
+				#login-btn-content.htmx-request .login-btn-text { display: none; }
+			</style>
 		</head>
 		<body class="bg-cchoicesoft min-h-screen flex items-center justify-center">
 			<div class="w-full max-w-lg p-8 bg-white rounded-lg shadow-md">
@@ -173,7 +181,15 @@ templ AdminLoginPage(loginError string) {
 						{ loginError }
 					</div>
 				}
-				<form action={ utils.URL("/admin/login") } method="POST" class="space-y-4" id="admin-login-form">
+				<form
+					action={ utils.URL("/admin/login") }
+					method="POST"
+					class="space-y-4"
+					id="admin-login-form"
+					hx-post={ utils.URL("/admin/login") }
+					hx-trigger="submit"
+					hx-indicator="#login-btn-content"
+				>
 					<div>
 						<label for="email" class="block text-sm font-medium text-gray-700">
 							Email
@@ -214,9 +230,12 @@ templ AdminLoginPage(loginError string) {
 					<input type="hidden" name="location_lng" id="location_lng" value="" />
 					<button
 						type="submit"
-						class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice"
+						class="w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice"
 					>
-						Log In
+						<span id="login-btn-content" class="inline-flex items-center gap-2">
+							<span id="login-spinner" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" aria-hidden="true"></span>
+							<span class="login-btn-text">Log In</span>
+						</span>
 					</button>
 				</form>
 				@ScriptAdminLogin()
@@ -231,6 +250,11 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 		<head>
 			@HeadMeta()
 			@TabTitle("[STAFF] C-Choice Admin")
+			<style>
+				.refresh-btn-content .refresh-btn-spinner { display: none; }
+				.refresh-btn-content.htmx-request .refresh-btn-spinner { display: inline-block; }
+				.refresh-btn-content.htmx-request .refresh-btn-text { display: none; }
+			</style>
 		</head>
 		<body class="bg-cchoicesoft min-h-screen flex flex-row">
 			<div class="flex-grow flex flex-col items-center justify-center p-4">
@@ -256,18 +280,10 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 						<p class="text-gray-600"><span class="font-medium">Birthdate:</span> { profile.Birthdate }</p>
 						<p class="text-gray-600"><span class="font-medium">Date Hired:</span> { profile.DateHired }</p>
 						<p class="text-gray-600"><span class="font-medium">Position:</span> { profile.Position }</p>
-						if profile.ScheduledTimeIn != "" {
-							<p class="text-gray-600">
-								<span class="font-medium">Scheduled Time In:</span>
-								{ profile.ScheduledTimeIn }
-							</p>
-						}
-						if profile.ScheduledTimeOut != "" {
-							<p class="text-gray-600">
-								<span class="font-medium">Scheduled Time Out:</span>
-								{ profile.ScheduledTimeOut }
-							</p>
-						}
+						<p class="text-gray-600"><span class="font-medium">Email:</span> { profile.Email }</p>
+						<p class="text-gray-600"><span class="font-medium">Mobile No:</span> { profile.MobileNo }</p>
+						<p class="text-gray-600"><span class="font-medium">Scheduled Time In:</span> { profile.ScheduledTimeIn }</p>
+						<p class="text-gray-600"><span class="font-medium">Scheduled Time Out:</span> { profile.ScheduledTimeOut }</p>
 					</div>
 
 					if profile.UserType != enums.STAFF_USER_TYPE_SUPERUSER {
@@ -345,6 +361,11 @@ templ AdminSuperuserPage(pageData models.AdminSuperuserPage) {
 		<head>
 			@HeadMeta()
 			@TabTitle("[SUPERUSER] C-Choice Admin")
+			<style>
+				.refresh-btn-content .refresh-btn-spinner { display: none; }
+				.refresh-btn-content.htmx-request .refresh-btn-spinner { display: inline-block; }
+				.refresh-btn-content.htmx-request .refresh-btn-text { display: none; }
+			</style>
 		</head>
 		<body class="bg-cchoicesoft min-h-screen flex flex-col">
 			<div class="flex-grow p-4">
@@ -498,17 +519,17 @@ templ ScriptAdminLogin() {
 				}
 				e.preventDefault();
 				if (!navigator.geolocation) {
-					form.submit();
+					form.requestSubmit();
 					return;
 				}
 				navigator.geolocation.getCurrentPosition(
 					function(pos) {
 						latInput.value = String(pos.coords.latitude);
 						lngInput.value = String(pos.coords.longitude);
-						form.submit();
+						form.requestSubmit();
 					},
 					function() {
-						form.submit();
+						form.requestSubmit();
 					},
 					{ timeout: 5000 }
 				);
@@ -532,17 +553,14 @@ templ ScriptStaffAttendanceRefresh() {
 			var btn = document.getElementById(refreshBtnId);
 			var dateInput = document.getElementById(dateSelectorId);
 			if (!btn || !dateInput) return;
-			var btnText = btn.querySelector(".refresh-btn-text");
-			var btnSpinner = btn.querySelector(".refresh-btn-spinner");
+			var indicator = btn.querySelector(".refresh-btn-content");
 			function showSpinner() {
 				btn.disabled = true;
-				if (btnText) btnText.style.display = "none";
-				if (btnSpinner) btnSpinner.style.display = "inline-block";
+				if (indicator) indicator.classList.add("htmx-request");
 			}
 			function restoreBtn() {
 				btn.disabled = false;
-				if (btnText) btnText.style.display = "";
-				if (btnSpinner) btnSpinner.style.display = "none";
+				if (indicator) indicator.classList.remove("htmx-request");
 			}
 			function refetchTable() {
 				if (window.htmx) {
@@ -552,8 +570,14 @@ templ ScriptStaffAttendanceRefresh() {
 			btn.addEventListener("click", function() {
 				if (!requireLocation) {
 					showSpinner();
+					function onSwapDone(ev) {
+						if (ev.detail.target.id === targetId) {
+							restoreBtn();
+							document.removeEventListener("htmx:afterSwap", onSwapDone);
+						}
+					}
+					document.addEventListener("htmx:afterSwap", onSwapDone);
 					refetchTable();
-					restoreBtn();
 					return;
 				}
 				if (!navigator.geolocation) {

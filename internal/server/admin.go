@@ -242,10 +242,19 @@ func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Login Handler]"
 	ctx := r.Context()
+	htmx := r.Header.Get("HX-Request") == "true"
+	redirect := func(url string) {
+		if htmx {
+			w.Header().Set("HX-Redirect", url)
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		http.Redirect(w, r, url, http.StatusSeeOther)
+	}
 
 	if err := r.ParseForm(); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Redirect(w, r, utils.URL("/admin?error=invalid_format"), http.StatusSeeOther)
+		redirect(utils.URL("/admin?error=invalid_format"))
 		return
 	}
 
@@ -253,19 +262,19 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	password := r.PostFormValue("password")
 
 	if !constants.EmailRegex.MatchString(email) {
-		http.Redirect(w, r, utils.URL("/admin?error=invalid_format"), http.StatusSeeOther)
+		redirect(utils.URL("/admin?error=invalid_format"))
 		return
 	}
 
 	if !constants.PasswordRegex.MatchString(password) {
-		http.Redirect(w, r, utils.URL("/admin?error=invalid_format"), http.StatusSeeOther)
+		redirect(utils.URL("/admin?error=invalid_format"))
 		return
 	}
 
 	staff, err := s.dbRO.GetQueries().GetStaffByEmail(ctx, email)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			http.Redirect(w, r, utils.URL("/admin?error=invalid_credentials"), http.StatusSeeOther)
+			redirect(utils.URL("/admin?error=invalid_credentials"))
 			return
 		}
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -274,7 +283,7 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(staff.Password), []byte(password)); err != nil {
-		http.Redirect(w, r, utils.URL("/admin?error=invalid_credentials"), http.StatusSeeOther)
+		redirect(utils.URL("/admin?error=invalid_credentials"))
 		return
 	}
 
@@ -291,12 +300,12 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch enums.ParseStaffUserTypeToEnum(staff.UserType) {
 	case enums.STAFF_USER_TYPE_SUPERUSER:
-		http.Redirect(w, r, utils.URL("/admin/superuser"), http.StatusSeeOther)
+		redirect(utils.URL("/admin/superuser"))
 	case enums.STAFF_USER_TYPE_STAFF:
-		http.Redirect(w, r, utils.URL("/admin/staff"), http.StatusSeeOther)
+		redirect(utils.URL("/admin/staff"))
 	default:
 		logs.Log().Warn(logtag, zap.String("got unhandled", staff.UserType))
-		http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+		redirect(utils.URL("/admin"))
 	}
 }
 
@@ -375,6 +384,8 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		Birthdate:        staff.Birthdate,
 		DateHired:        staff.DateHired,
 		Position:         staff.Position,
+		Email:            staff.Email,
+		MobileNo:         staff.MobileNo,
 		ScheduledTimeIn:  scheduledTimeIn,
 		ScheduledTimeOut: scheduledTimeOut,
 		SelectedDate:     today,
