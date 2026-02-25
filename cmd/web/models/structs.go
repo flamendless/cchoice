@@ -135,6 +135,7 @@ type AdminStaffProfile struct {
 	CanTimeOut       bool
 	MyAttendance     *AdminStaffAttendance
 	InShop           *bool
+	UserType         enums.StaffUserType
 }
 
 type AdminStaffAttendance struct {
