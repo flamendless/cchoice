@@ -124,6 +124,8 @@ type AdminStaffProfile struct {
 	Birthdate        string
 	DateHired        string
 	Position         string
+	Email            string
+	MobileNo         string
 	ScheduledTimeIn  string
 	ScheduledTimeOut string
 	SelectedDate     string
