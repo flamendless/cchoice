@@ -17,6 +17,7 @@ type Goqite struct {
 	Body     []byte
 	Timeout  string
 	Received int64
+	Priority int64
 }
 
 type TblBrand struct {
