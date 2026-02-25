@@ -208,6 +208,6 @@ func (f *fileInfo) Size() int64        { return f.size }
 func (f *fileInfo) Mode() os.FileMode  { return 0644 }
 func (f *fileInfo) ModTime() time.Time { return f.modTime }
 func (f *fileInfo) IsDir() bool        { return f.isDir }
-func (f *fileInfo) Sys() interface{}   { return nil }
+func (f *fileInfo) Sys() any           { return nil }
 
 var _ storage.IFileSystem = (*LinodeFS)(nil)

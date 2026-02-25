@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -24,11 +25,11 @@ import (
 )
 
 const (
-	SessionStaffID        = "staff_id"
-	SessionStaffAccessID  = "staff_access_id"
-	SessionLocationLat    = "location_lat"
-	SessionLocationLng    = "location_lng"
-	maxStaffListSize      = 1000
+	SessionStaffID       = "staff_id"
+	SessionStaffAccessID = "staff_access_id"
+	SessionLocationLat   = "location_lat"
+	SessionLocationLng   = "location_lng"
+	maxStaffListSize     = 1000
 )
 
 type attendanceStatusResult struct {
@@ -110,7 +111,7 @@ func parseAttendanceLocation(locationJSON sql.NullString) (lat, lng float64, ok 
 	return loc.Lat, loc.Lng, true
 }
 
-func sessionLocationJSON(ctx context.Context, get func(context.Context, string) interface{}) sql.NullString {
+func sessionLocationJSON(ctx context.Context, get func(context.Context, string) any) sql.NullString {
 	latVal := get(ctx, SessionLocationLat)
 	lngVal := get(ctx, SessionLocationLng)
 	if latVal == nil || lngVal == nil {
@@ -385,7 +386,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if inShop == nil {
-			locJSON := sessionLocationJSON(ctx, func(c context.Context, k string) interface{} { return s.sessionManager.Get(c, k) })
+			locJSON := sessionLocationJSON(ctx, func(c context.Context, k string) any { return s.sessionManager.Get(c, k) })
 			if lat, lng, ok := parseAttendanceLocation(locJSON); ok {
 				b := utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
 				inShop = &b
@@ -400,6 +401,13 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	scheduledTimeOut := ""
 	if staff.TimeOutSchedule.Valid {
 		scheduledTimeOut = staff.TimeOutSchedule.String
+	}
+
+	locationDisplay := ""
+	if locJSON := sessionLocationJSON(ctx, func(c context.Context, k string) any { return s.sessionManager.Get(c, k) }); locJSON.Valid {
+		if lat, lng, ok := parseAttendanceLocation(locJSON); ok {
+			locationDisplay = fmt.Sprintf("%.4f, %.4f", lat, lng)
+		}
 	}
 
 	profile := models.AdminStaffProfile{
@@ -420,6 +428,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		CanTimeOut:       hasTimeIn && !hasTimeOut,
 		MyAttendance:     myAttendance,
 		InShop:           inShop,
+		LocationDisplay:  locationDisplay,
 		UserType:         enums.ParseStaffUserTypeToEnum(staff.UserType),
 	}
 
@@ -485,7 +494,7 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	locationFromSession := sessionLocationJSON(ctx, func(c context.Context, k string) interface{} { return s.sessionManager.Get(c, k) })
+	locationFromSession := sessionLocationJSON(ctx, func(c context.Context, k string) any { return s.sessionManager.Get(c, k) })
 
 	if err == nil && existing.TimeIn.Valid {
 		http.Error(w, "Time in already recorded for today", http.StatusBadRequest)
