@@ -285,6 +285,16 @@ type TblStaff struct {
 	DeletedAt       string
 }
 
+type TblStaffAccess struct {
+	ID        int64
+	StaffID   int64
+	LoginAt   string
+	LogoutAt  sql.NullString
+	UserAgent sql.NullString
+	CreatedAt string
+	UpdatedAt string
+}
+
 type TblStaffAttendance struct {
 	ID        int64
 	StaffID   int64

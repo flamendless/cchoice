@@ -782,6 +782,9 @@ func Prof(pkg, profType string) error {
 }
 
 func Dev() error {
+	if err := checkMigrations(); err != nil {
+		return err
+	}
 	if err := GenAll(); err != nil {
 		return err
 	}
