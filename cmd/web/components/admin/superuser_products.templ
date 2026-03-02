@@ -1,0 +1,374 @@
+package components
+
+import "fmt"
+
+import "cchoice/cmd/web/models"
+import "cchoice/internal/constants"
+import "cchoice/cmd/web/components/common"
+
+templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("[SUPERUSER] Products - C-Choice Admin")
+			<style>
+				.form-section {
+					display: none;
+			 }
+				.form-section.active {
+					display: block;
+			 }
+			</style>
+		</head>
+		<body class="bg-cchoicesoft min-h-screen flex flex-col" _="on load call metrics_event('admin_superuser_products_page_visit', '')">
+			<div class="flex-grow p-4">
+				<div class="max-w-4xl mx-auto">
+					<div class="text-center mb-6">
+						<img src={ constants.PathSVGLogoOnly } alt="C-Choice Logo" class="w-16 h-16 mx-auto mb-4" />
+					</div>
+					<div class="mb-6">
+						<a
+							href={ formData.CancelURL }
+							class="inline-flex items-center text-cchoice hover:text-cchoice_dark transition-colors"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+							</svg>
+							Back to Home
+						</a>
+					</div>
+
+					<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+						Add New Product
+					</h1>
+
+					<form
+						action={ formData.FormAction }
+						method="POST"
+						enctype="multipart/form-data"
+						class="bg-white rounded-lg shadow-md p-6 space-y-6"
+					>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<div>
+								<label for="brand" class="block text-sm font-medium text-gray-700 mb-1">
+									Brand <span class="text-red-500">*</span>
+								</label>
+								<select
+									id="brand"
+									name="brand_id"
+									required
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+								>
+									<option value="">Select a brand</option>
+									for _, brand := range formData.Brands {
+										<option value={ fmt.Sprint(brand.ID) }>{ brand.Name }</option>
+									}
+								</select>
+							</div>
+
+							<div>
+								<label for="category" class="block text-sm font-medium text-gray-700 mb-1">
+									Category <span class="text-red-500">*</span>
+								</label>
+								<select
+									id="category"
+									name="category"
+									required
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+								>
+									<option value="">Select a category</option>
+									for _, cat := range formData.Categories {
+										<option value={ cat.Category }>{ cat.Category }</option>
+									}
+								</select>
+							</div>
+
+							<div>
+								<label for="subcategory" class="block text-sm font-medium text-gray-700 mb-1">
+									Subcategory
+								</label>
+								<select
+									id="subcategory"
+									name="subcategory"
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+								>
+									<option value="">Select subcategory</option>
+									<option value="__new__">+ Add New Subcategory</option>
+								</select>
+							</div>
+
+							<div id="new_subcategory_container" class="hidden">
+								<label for="new_subcategory" class="block text-sm font-medium text-gray-700 mb-1">
+									New Subcategory
+								</label>
+								<input
+									type="text"
+									id="new_subcategory"
+									name="new_subcategory"
+									pattern="[a-zA-Z0-9\s\-_]+"
+									minlength="2"
+									maxlength="100"
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+								/>
+							</div>
+
+							<div class="md:col-span-2">
+								<label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+									Product Name <span class="text-red-500">*</span>
+								</label>
+								<input
+									type="text"
+									id="name"
+									name="name"
+									required
+									minlength="2"
+									maxlength="255"
+									pattern="[a-zA-Z0-9\s\-_.,]+"
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+								/>
+							</div>
+
+							<div>
+								<label for="serial" class="block text-sm font-medium text-gray-700 mb-1">
+									Serial Number <span class="text-red-500">*</span>
+								</label>
+								<input
+									type="text"
+									id="serial"
+									name="serial"
+									required
+									minlength="1"
+									maxlength="100"
+									pattern="[a-zA-Z0-9\-_]+"
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+								/>
+							</div>
+
+							<div>
+								<label for="price" class="block text-sm font-medium text-gray-700 mb-1">
+									Unit Price (with VAT) <span class="text-red-500">*</span>
+								</label>
+								<div class="relative">
+									<span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₱</span>
+									<input
+										type="number"
+										id="price"
+										name="price"
+										required
+										min="0.01"
+										step="0.01"
+										max="999999999.99"
+										class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									/>
+								</div>
+								<p class="text-xs text-gray-500 mt-1">
+									Price includes { formData.VATPercentage }% VAT
+								</p>
+							</div>
+
+							<div class="md:col-span-2">
+								<label for="description" class="block text-sm font-medium text-gray-700 mb-1">
+									Description
+								</label>
+								<textarea
+									id="description"
+									name="description"
+									rows="4"
+									maxlength="2000"
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+								></textarea>
+							</div>
+						</div>
+
+						<div class="border-t pt-6">
+							<h2 class="text-lg font-semibold text-gray-800 mb-4">Product Specifications</h2>
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+								<div>
+									<label for="spec_colours" class="block text-sm font-medium text-gray-700 mb-1">
+										Colours
+									</label>
+									<input
+										type="text"
+										id="spec_colours"
+										name="spec_colours"
+										maxlength="500"
+										placeholder="e.g., Red, Blue, Green"
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									/>
+								</div>
+
+								<div>
+									<label for="spec_sizes" class="block text-sm font-medium text-gray-700 mb-1">
+										Sizes
+									</label>
+									<input
+										type="text"
+										id="spec_sizes"
+										name="spec_sizes"
+										maxlength="500"
+										placeholder="e.g., S, M, L, XL"
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									/>
+								</div>
+
+								<div>
+									<label for="spec_segmentation" class="block text-sm font-medium text-gray-700 mb-1">
+										Segmentation
+									</label>
+									<input
+										type="text"
+										id="spec_segmentation"
+										name="spec_segmentation"
+										maxlength="255"
+										placeholder="e.g., Industrial, Commercial, Residential"
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									/>
+								</div>
+
+								<div>
+									<label for="spec_part_number" class="block text-sm font-medium text-gray-700 mb-1">
+										Part Number
+									</label>
+									<input
+										type="text"
+										id="spec_part_number"
+										name="spec_part_number"
+										maxlength="100"
+										pattern="[a-zA-Z0-9\-_]+"
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									/>
+								</div>
+
+								<div>
+									<label for="spec_power" class="block text-sm font-medium text-gray-700 mb-1">
+										Power
+									</label>
+									<input
+										type="text"
+										id="spec_power"
+										name="spec_power"
+										maxlength="100"
+										placeholder="e.g., 500W, 1.5HP"
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									/>
+								</div>
+
+								<div>
+									<label for="spec_capacity" class="block text-sm font-medium text-gray-700 mb-1">
+										Capacity
+									</label>
+									<input
+										type="text"
+										id="spec_capacity"
+										name="spec_capacity"
+										maxlength="100"
+										placeholder="e.g., 20L, 100kg"
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									/>
+								</div>
+
+								<div class="md:col-span-2">
+									<label for="spec_scope_of_supply" class="block text-sm font-medium text-gray-700 mb-1">
+										Scope of Supply
+									</label>
+									<textarea
+										id="spec_scope_of_supply"
+										name="spec_scope_of_supply"
+										rows="3"
+										maxlength="1000"
+										placeholder="List items included in the package"
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									></textarea>
+								</div>
+							</div>
+						</div>
+
+						<div class="border-t pt-6">
+							<h2 class="text-lg font-semibold text-gray-800 mb-4">Product Images</h2>
+							<div>
+								<label for="product_image" class="block text-sm font-medium text-gray-700 mb-1">
+									Product Image
+								</label>
+								<input
+									type="file"
+									id="product_image"
+									name="product_image"
+									accept="image/jpeg,image/png,image/webp,image/gif"
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+								/>
+								<p class="text-xs text-gray-500 mt-1">
+									Allowed formats: JPEG, PNG, WebP, GIF. Max size: 10MB.
+								</p>
+							</div>
+						</div>
+
+						<div class="flex justify-end gap-4 pt-4 border-t">
+							<a
+								href={ formData.CancelURL }
+								class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+							>
+								Cancel
+							</a>
+							<button
+								type="submit"
+								class="px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice"
+							>
+								Create Product
+							</button>
+						</div>
+					</form>
+
+					<script id="categories_data" type="application/json">
+						{
+							for _, cat := range formData.Categories {
+								"{ cat.Category }": [
+									for _, subcat := range cat.Subcategories {
+										"{ subcat }",
+									}
+								],
+							}
+						}
+					</script>
+
+					<script>
+						document.getElementById('category').addEventListener('change', function() {
+							var subcatSelect = document.getElementById('subcategory');
+							var selectedCat = this.value;
+
+							subcatSelect.innerHTML = '<option value="">Select subcategory</option><option value="__new__">+ Add New Subcategory</option>';
+
+							if (selectedCat) {
+								var dataElem = document.getElementById('categories_data');
+								var categoriesData = JSON.parse(dataElem.textContent);
+								var subcats = categoriesData[selectedCat] || [];
+								for (var i = 0; i < subcats.length; i++) {
+									var opt = document.createElement('option');
+									opt.value = subcats[i];
+									opt.textContent = subcats[i];
+									subcatSelect.appendChild(opt);
+								}
+							}
+						});
+
+						document.getElementById('subcategory').addEventListener('change', function() {
+							var newSubcatContainer = document.getElementById('new_subcategory_container');
+							if (this.value === '__new__') {
+								newSubcatContainer.classList.remove('hidden');
+								document.getElementById('new_subcategory').focus();
+							} else {
+								newSubcatContainer.classList.add('hidden');
+							}
+						});
+
+						document.getElementById('new_subcategory').addEventListener('input', function() {
+							if (this.value.trim() !== '') {
+								document.getElementById('subcategory').value = '__new__';
+							}
+						});
+					</script>
+				</div>
+			</div>
+		</body>
+	</html>
+}

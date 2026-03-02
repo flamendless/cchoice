@@ -8,13 +8,14 @@ import (
 	"strconv"
 	"time"
 
-	"cchoice/cmd/web/components"
+	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
+	"cchoice/internal/requests"
 	"cchoice/internal/utils"
 
 	"golang.org/x/crypto/bcrypt"
@@ -126,17 +127,6 @@ func sessionLocationJSON(ctx context.Context, get func(context.Context, string) 
 	return sql.NullString{String: string(b), Valid: true}
 }
 
-func extractTime(datetimeStr string) string {
-	if datetimeStr == "" {
-		return ""
-	}
-	t, err := time.Parse("2006-01-02 15:04:05", datetimeStr)
-	if err != nil {
-		return datetimeStr
-	}
-	return t.Format("15:04:05")
-}
-
 func buildAdminStaffAttendance(staff queries.GetAllStaffsRow, att queries.GetStaffAttendanceByStaffIDAndDateRangeRow, shop conf.ShopLocation) models.Attendance {
 	schedIn, schedOut := "", ""
 	if staff.TimeInSchedule.Valid {
@@ -145,7 +135,7 @@ func buildAdminStaffAttendance(staff queries.GetAllStaffsRow, att queries.GetSta
 	if staff.TimeOutSchedule.Valid {
 		schedOut = staff.TimeOutSchedule.String
 	}
-	timeIn, timeOut := extractTime(att.TimeIn.String), extractTime(att.TimeOut.String)
+	timeIn, timeOut := utils.ExtractTime(att.TimeIn.String), utils.ExtractTime(att.TimeOut.String)
 	c := computeAttendanceStatus(timeIn, timeOut, schedIn, schedOut)
 	inShop := false
 	if lat, lng, ok := parseAttendanceLocation(att.Location); ok && shop.RadiusMeters > 0 {
@@ -175,7 +165,7 @@ func buildStaffDayAttendance(staff queries.GetStaffByIDRow, att queries.GetStaff
 	if staff.TimeOutSchedule.Valid {
 		schedOut = staff.TimeOutSchedule.String
 	}
-	timeIn, timeOut := extractTime(att.TimeIn.String), extractTime(att.TimeOut.String)
+	timeIn, timeOut := utils.ExtractTime(att.TimeIn.String), utils.ExtractTime(att.TimeOut.String)
 	c := computeAttendanceStatus(timeIn, timeOut, schedIn, schedOut)
 	return models.Attendance{
 		StaffID:          staff.ID,
@@ -201,8 +191,10 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth).Post("/admin/staff/time-in", s.adminStaffTimeInHandler)
 	r.With(s.requireStaffAuth).Post("/admin/staff/time-out", s.adminStaffTimeOutHandler)
 	r.With(s.requireStaffAuth).Post("/admin/staff/attendance/location", s.adminStaffAttendanceLocationHandler)
-	r.With(s.requireSuperuserAuth).Get("/admin/superuser", s.adminSuperuserPageHandler)
-	r.With(s.requireSuperuserAuth).Get("/admin/superuser/attendance", s.adminSuperuserAttendanceHandler)
+	r.With(s.requireSuperuserAuth).Get("/admin/superuser", s.adminSuperuserHomeHandler)
+	r.With(s.requireSuperuserAuth).Get("/admin/superuser/attendance", s.adminSuperuserAttendancePageHandler)
+	r.With(s.requireSuperuserAuth).Get("/admin/superuser/attendance/table", s.adminSuperuserAttendanceHandler)
+	r.With(s.requireSuperuserAuth).Get("/admin/superuser/products", s.adminSuperuserProductsHandler)
 }
 
 func (s *Server) requireStaffAuth(next http.Handler) http.Handler {
@@ -246,7 +238,7 @@ func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := components.AdminLoginPage(loginError).Render(ctx, w); err != nil {
+	if err := compadmin.AdminLoginPage(loginError).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),
@@ -409,14 +401,8 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	scheduledTimeIn := ""
-	if staff.TimeInSchedule.Valid {
-		scheduledTimeIn = staff.TimeInSchedule.String
-	}
-	scheduledTimeOut := ""
-	if staff.TimeOutSchedule.Valid {
-		scheduledTimeOut = staff.TimeOutSchedule.String
-	}
+	scheduledTimeIn := staff.TimeInSchedule.String
+	scheduledTimeOut := staff.TimeOutSchedule.String
 
 	locationDisplay := ""
 	if locJSON := sessionLocationJSON(ctx, func(c context.Context, k string) any { return s.sessionManager.Get(c, k) }); locJSON.Valid {
@@ -458,7 +444,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := components.AdminStaffPage(profile).Render(ctx, w); err != nil {
+	if err := compadmin.AdminStaffPage(profile).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),
@@ -494,7 +480,7 @@ func (s *Server) adminStaffAttendanceHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := components.StaffAttendanceSingleTable(record).Render(ctx, w); err != nil {
+	if err := compadmin.StaffAttendanceSingleTable(record).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -608,8 +594,8 @@ func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request
 	http.Redirect(w, r, utils.URL("/admin/staff"), http.StatusSeeOther)
 }
 
-func (s *Server) adminSuperuserPageHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Admin Superuser Page Handler]"
+func (s *Server) adminSuperuserHomeHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Home Handler]"
 	ctx := r.Context()
 
 	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
@@ -621,45 +607,8 @@ func (s *Server) adminSuperuserPageHandler(w http.ResponseWriter, r *http.Reques
 	}
 	currentUserFullName := utils.BuildFullName(currentStaff.FirstName, currentStaff.MiddleName.String, currentStaff.LastName)
 
-	today := time.Now().Format(constants.DateLayoutISO)
-
-	attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByStaffIDAndDateRange(ctx, today)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		attendances = []queries.GetStaffAttendanceByStaffIDAndDateRangeRow{}
-	}
-
-	staffs, err := s.dbRO.GetQueries().GetAllStaffs(ctx, maxStaffListSize)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		staffs = []queries.GetAllStaffsRow{}
-	}
-
-	staffMap := make(map[int64]queries.GetAllStaffsRow)
-	for _, staff := range staffs {
-		staffMap[staff.ID] = staff
-	}
-
-	shop := conf.Conf().Settings.ShopLocation
-	attendanceData := make([]models.Attendance, 0, len(attendances))
-	for _, att := range attendances {
-		staff, ok := staffMap[att.StaffID]
-		if !ok {
-			continue
-		}
-		attendanceData = append(attendanceData, buildAdminStaffAttendance(staff, att, shop))
-	}
-
-	pageData := models.AdminSuperuserPage{
-		FullName:     currentUserFullName,
-		CurrentDate:  time.Now().Format(constants.DateLayoutDisplay),
-		CurrentTime:  time.Now().Format(constants.TimeLayoutDisplay),
-		SelectedDate: today,
-		Attendances:  attendanceData,
-	}
-
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := components.AdminSuperuserPage(pageData).Render(ctx, w); err != nil {
+	if err := compadmin.AdminSuperuserHomePage(currentUserFullName).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),
@@ -703,10 +652,114 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := components.AdminSuperuserAttendanceTable(attendanceData).Render(ctx, w); err != nil {
+	if err := compadmin.AdminSuperuserAttendanceTable(attendanceData).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
+	}
+}
+
+func (s *Server) adminSuperuserAttendancePageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Attendance Page Handler]"
+	ctx := r.Context()
+
+	date := parseAttendanceDate(r.URL.Query().Get("date"))
+
+	attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByStaffIDAndDateRange(ctx, date)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		attendances = []queries.GetStaffAttendanceByStaffIDAndDateRangeRow{}
+	}
+
+	staffs, err := s.dbRO.GetQueries().GetAllStaffs(ctx, maxStaffListSize)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		staffs = []queries.GetAllStaffsRow{}
+	}
+
+	staffMap := make(map[int64]queries.GetAllStaffsRow)
+	for _, staff := range staffs {
+		staffMap[staff.ID] = staff
+	}
+
+	shop := conf.Conf().Settings.ShopLocation
+	attendanceData := make([]models.Attendance, 0, len(attendances))
+	for _, att := range attendances {
+		staff, ok := staffMap[att.StaffID]
+		if !ok {
+			continue
+		}
+		attendanceData = append(attendanceData, buildAdminStaffAttendance(staff, att, shop))
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := compadmin.AdminSuperuserAttendancePage("Staff Attendance", date, attendanceData).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Server) adminSuperuserProductsHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Products Handler]"
+	ctx := r.Context()
+
+	brandsRes, err := requests.GetBrandsForAdmin(
+		ctx,
+		s.cache,
+		&s.SF,
+		s.dbRO,
+		requests.GenerateAdminBrandsCacheKey(),
+	)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		brandsRes = []queries.GetBrandsForSidePanelRow{}
+	}
+
+	brands := make([]models.AdminBrand, 0, len(brandsRes))
+	for _, b := range brandsRes {
+		brands = append(brands, models.AdminBrand{
+			ID:   b.ID,
+			Name: b.Name,
+		})
+	}
+
+	categoriesRes, err := requests.GetCategoriesForAdmin(
+		ctx,
+		s.cache,
+		&s.SF,
+		s.dbRO,
+		requests.GenerateAdminCategoriesCacheKey(),
+	)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		categoriesRes = map[string][]string{}
+	}
+
+	categories := make([]models.AdminCategory, 0, len(categoriesRes))
+	for cat, subcats := range categoriesRes {
+		categories = append(categories, models.AdminCategory{
+			Category:      cat,
+			Subcategories: subcats,
+		})
+	}
+
+	formData := models.AdminProductForm{
+		Brands:        brands,
+		Categories:    categories,
+		FormAction:    utils.URL("/admin/superuser/products"),
+		CancelURL:     utils.URL("/admin/superuser"),
+		VATPercentage: conf.Conf().Settings.VATPercentage,
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := compadmin.AdminSuperuserProductsPage(formData).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("path", r.URL.Path),
+			zap.Error(err),
+		)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 

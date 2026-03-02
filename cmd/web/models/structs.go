@@ -164,3 +164,40 @@ type AdminSuperuserPage struct {
 	SelectedDate string
 	Attendances  []Attendance
 }
+
+type AdminBrand struct {
+	ID   int64
+	Name string
+}
+
+type AdminCategory struct {
+	ID            int64
+	Category      string
+	Subcategories []string
+}
+
+type AdminSubcategory struct {
+	ID          int64
+	Category    string
+	Subcategory string
+}
+
+type AdminProductForm struct {
+	Brands         []AdminBrand
+	Categories     []AdminCategory
+	CategoriesJSON string
+	Subcategories  []AdminSubcategory
+	VATPercentage  string
+	FormAction     string
+	CancelURL      string
+}
+
+type AdminProductSpecsForm struct {
+	Colours       string
+	Sizes         string
+	Segmentation  string
+	PartNumber    string
+	Power         string
+	Capacity      string
+	ScopeOfSupply string
+}

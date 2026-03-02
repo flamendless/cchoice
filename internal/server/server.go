@@ -150,6 +150,7 @@ func NewServer() *ServerInstance {
 			"url_tiktok",
 			"show_promo_banner",
 			"shop_location",
+			"vat_percentage",
 		},
 	)
 	if err != nil {

@@ -1,0 +1,205 @@
+package shop
+
+import "cchoice/cmd/web/models"
+import "cchoice/cmd/web/components/common"
+import "cchoice/cmd/web/components/header"
+import "cchoice/cmd/web/components/footer"
+
+templ HomePage(data models.HomePageData) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("Home")
+		</head>
+		@HomePageBody(data)
+	</html>
+}
+
+templ HomePageBody(data models.HomePageData) {
+	<body class="m-0 p-0 overflow-x-hidden custom-scrollbar">
+		@common.ErrorBanner()
+		@SaleBanner(data.RandomSaleProduct)
+		@header.Header()
+		@MobileSidebar()
+
+		<style>
+			#desktop-sidebar {
+				position: sticky;
+				top: 0;
+				left: 0;
+				z-index: 40;
+				min-width: 15%;
+				max-width: 15%;
+				width: 15%;
+				margin-left: 0.125rem;
+				padding-right: 1.5rem;
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+				overflow: auto;
+			}
+			#main-content {
+				display: flex;
+				align-items: flex-start;
+				width: 100%;
+				border-left: 2px solid #F6b08A;
+			}
+			@media (max-width: 1023px) {
+				#desktop-sidebar {
+					display: none !important;
+				}
+				#main-content {
+					width: 100% !important;
+					border-left: none !important;
+				}
+			}
+		</style>
+
+		<div class="flex flex-col">
+			<div class="flex items-start">
+				<div id="desktop-sidebar">
+					@BrandsSidePanel()
+					@CategoriesSidePanel()
+				</div>
+				<div id="main-content" name="right-panel">
+					<div class="w-full">
+						@AllCategorySections()
+						@PostHomeContentSections(data)
+					</div>
+				</div>
+			</div>
+		</div>
+
+		@footer.Footer()
+		@LoadImageSrc()
+		@LoadModalImage()
+		@PrefetchProductImage()
+		@PrefetchSaleProductImages()
+	</body>
+}
+
+templ MobileSidebar() {
+	<div
+		id="mobile-sidebar-overlay"
+		class="hidden fixed inset-0 bg-black/50 z-[9998] lg:hidden"
+		_="on click
+			add .hidden to #mobile-sidebar
+			add .hidden to me
+		"
+	></div>
+	<div
+		id="mobile-sidebar"
+		class="
+			hidden fixed top-0 left-0 h-full w-[75%] max-w-[300px]
+			bg-white z-[9999] overflow-y-auto
+			shadow-xl pt-4 pb-16
+			lg:hidden
+		"
+	>
+		<div class="flex justify-end px-4 mb-4">
+			<button
+				type="button"
+				class="p-2 rounded-lg hover:bg-cchoicesoft"
+				aria-label="Close menu"
+				_="on click
+					add .hidden to #mobile-sidebar
+					add .hidden to #mobile-sidebar-overlay
+				"
+			>
+				<svg class="w-6 h-6 text-cchoice" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+				</svg>
+			</button>
+		</div>
+		<div class="px-2">
+			@BrandsSidePanel()
+			@CategoriesSidePanel()
+		</div>
+	</div>
+}
+
+script LoadImageSrc() {
+	document.body.addEventListener("htmx:afterRequest", function(event) {
+		const target = event.detail.elt;
+		if (target.tagName === "IMG" && event.detail.successful) {
+			const base64Data = event.detail.xhr.responseText;
+			if (base64Data) {
+				target.src = base64Data;
+			}
+		}
+	});
+}
+
+script LoadModalImage() {
+	document.addEventListener("get", function(event) {
+		const target = event.target;
+		if (!target || target.id !== "modal_image_viewer_image")
+			return
+
+		const pathInput = document.getElementById("selected-product-thumbnail-path");
+		if (!pathInput || !pathInput.value)
+			return
+
+		target.src = pathInput.value;
+	}, true);
+}
+
+script PrefetchProductImage() {
+	const prefetched = new Set();
+
+	function prefetch(path) {
+		if (!path) return;
+		if (prefetched.has(path)) return;
+
+		prefetched.add(path);
+
+		const link = document.createElement("link");
+		link.rel = "preload";
+		link.as = "image";
+		link.href = path;
+		document.head.appendChild(link);
+	}
+
+	function attachListeners() {
+		const products = document.querySelectorAll("[data-product-thumbnail-path]");
+		products.forEach((el) => {
+			if (el.dataset.prefetchBound === "true") return;
+			if (el.dataset.productOnSale === "true") return;
+			el.dataset.prefetchBound = "true";
+			el.addEventListener("mouseenter", () => {
+				const highResPath = el.dataset.productThumbnailPath;
+				prefetch(highResPath);
+			});
+		});
+	}
+
+	attachListeners();
+
+	document.body.addEventListener("htmx:afterSwap", attachListeners);
+}
+
+script PrefetchSaleProductImages() {
+	const prefetched = new Set();
+
+	function runPrefetch(root) {
+		const products = root.querySelectorAll('[data-product-on-sale="true"]');
+		products.forEach(el => {
+			const href = el.dataset.productThumbnailPath;
+			if (!href || prefetched.has(href)) return;
+			prefetched.add(href);
+
+			const link = document.createElement("link");
+			link.rel = "prefetch";
+			link.as = "image";
+			link.href = href;
+			document.head.appendChild(link);
+		});
+	}
+
+	runPrefetch(document);
+	document.body.addEventListener("htmx:afterSwap", function(evt) {
+		runPrefetch(evt.target);
+	});
+}
+

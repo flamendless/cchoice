@@ -9,6 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import "cchoice/internal/changelogs"
+import "cchoice/cmd/web/components/common"
 
 func ChangeLogs(logs []changelogs.ChangeLog, limit int) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -35,11 +36,11 @@ func ChangeLogs(logs []changelogs.ChangeLog, limit int) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = HeadMeta().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = common.HeadMeta().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TabTitle("[CHANGELOGS] C-Choice Construction Supplies").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = common.TabTitle("[CHANGELOGS] C-Choice Construction Supplies").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -50,7 +51,7 @@ func ChangeLogs(logs []changelogs.ChangeLog, limit int) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(limit)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/changelogs.templ`, Line: 29, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/changelogs.templ`, Line: 30, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -68,7 +69,7 @@ func ChangeLogs(logs []changelogs.ChangeLog, limit int) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(log.Anchor)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/changelogs.templ`, Line: 35, Col: 28}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/changelogs.templ`, Line: 36, Col: 28}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -81,7 +82,7 @@ func ChangeLogs(logs []changelogs.ChangeLog, limit int) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(log.Version)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/changelogs.templ`, Line: 39, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/changelogs.templ`, Line: 40, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -99,7 +100,7 @@ func ChangeLogs(logs []changelogs.ChangeLog, limit int) templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(log.Date)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/changelogs.templ`, Line: 43, Col: 20}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/changelogs.templ`, Line: 44, Col: 20}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -122,7 +123,7 @@ func ChangeLogs(logs []changelogs.ChangeLog, limit int) templ.Component {
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(section.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/changelogs.templ`, Line: 54, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/changelogs.templ`, Line: 55, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -140,7 +141,7 @@ func ChangeLogs(logs []changelogs.ChangeLog, limit int) templ.Component {
 					var templ_7745c5c3_Var7 string
 					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(item.Text)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/changelogs.templ`, Line: 60, Col: 25}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/changelogs.templ`, Line: 61, Col: 25}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {

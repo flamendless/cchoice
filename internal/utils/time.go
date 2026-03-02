@@ -47,3 +47,14 @@ func FormatDurationFromMinutes(m int) string {
 	min := m % 60
 	return fmt.Sprintf("%dh %dm", h, min)
 }
+
+func ExtractTime(datetimeStr string) string {
+	if datetimeStr == "" {
+		return ""
+	}
+	t, err := time.Parse("2006-01-02 15:04:05", datetimeStr)
+	if err != nil {
+		return datetimeStr
+	}
+	return t.Format("15:04:05")
+}

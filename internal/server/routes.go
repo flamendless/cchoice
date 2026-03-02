@@ -9,6 +9,10 @@ import (
 	"strings"
 
 	"cchoice/cmd/web/components"
+	compfooter "cchoice/cmd/web/components/footer"
+	compheader "cchoice/cmd/web/components/header"
+	compsearch "cchoice/cmd/web/components/search"
+	compshop "cchoice/cmd/web/components/shop"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
@@ -390,7 +394,7 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 		RandomSaleProduct: randomSaleProduct,
 	}
 
-	if err := components.HomePage(homePageData).Render(ctx, w); err != nil {
+	if err := compshop.HomePage(homePageData).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),
@@ -495,7 +499,7 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	if err := components.HeaderRow1Texts(texts).Render(ctx, w); err != nil {
+	if err := compheader.HeaderRow1Texts(texts).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
@@ -566,7 +570,7 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	if err := components.FooterRow1Texts(texts).Render(ctx, w); err != nil {
+	if err := compfooter.FooterRow1Texts(texts).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
@@ -586,7 +590,7 @@ func (s *Server) storeHandler(w http.ResponseWriter, r *http.Request) {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}
 
-	if err := components.GMapsAndWaze(
+	if err := compshop.GMapsAndWaze(
 		cfg.Settings.URLGMap,
 		cfg.Settings.URLWaze,
 	).Render(ctx, w); err != nil {
@@ -640,7 +644,7 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, product := range productResults {
-		if err := components.SearchResultProductCard(product).Render(ctx, w); err != nil {
+		if err := compsearch.SearchResultProductCard(product).Render(ctx, w); err != nil {
 			logs.LogCtx(ctx).Error(
 				logtag,
 				zap.Error(err),
@@ -649,7 +653,7 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if err := components.SearchMore(searchQuery).Render(ctx, w); err != nil {
+	if err := compsearch.SearchMore(searchQuery).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),

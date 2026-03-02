@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	"cchoice/cmd/web/components"
+	comppayment "cchoice/cmd/web/components/payment"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
@@ -66,7 +66,7 @@ func (s *Server) paymentsCancelHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if err := components.CancelPaymentPage(components.CancelPaymentPageBody(paymentRef)).Render(ctx, w); err != nil {
+	if err := comppayment.CancelPaymentPage(comppayment.CancelPaymentPageBody(paymentRef)).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
@@ -187,7 +187,7 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if err := components.SuccessPaymentPage(components.SuccessPaymentPageBody(result.OrderNumber)).Render(ctx, w); err != nil {
+	if err := comppayment.SuccessPaymentPage(comppayment.SuccessPaymentPageBody(result.OrderNumber)).Render(ctx, w); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

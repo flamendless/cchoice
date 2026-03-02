@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"cchoice/cmd/web/components"
+	compshop "cchoice/cmd/web/components/shop"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
@@ -45,7 +45,7 @@ func (s *Server) categoriesSidePanelHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err := components.CategoriesSidePanelList(categories).Render(ctx, w); err != nil {
+	if err := compshop.CategoriesSidePanelList(categories).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
@@ -91,7 +91,7 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := components.CategorySection(page, res).Render(ctx, w); err != nil {
+	if err := compshop.CategorySection(page, res).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
@@ -174,7 +174,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		Products:    models.ToCategorySectionProducts(s.encoder, s.GetCDNURL, productsWithValidImages),
 	}
 
-	if err := components.CategorySectionProducts(categorySectionProducts).Render(ctx, w); err != nil {
+	if err := compshop.CategorySectionProducts(categorySectionProducts).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),

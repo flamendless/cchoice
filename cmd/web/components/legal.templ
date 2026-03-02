@@ -1,6 +1,7 @@
 package components
 
 import "cchoice/internal/utils"
+import "cchoice/cmd/web/components/common"
 
 const lastUpdatedAt = "Last updated: January 2025"
 
@@ -15,8 +16,8 @@ templ TermsPage() {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
-			@HeadMeta()
-			@TabTitle("Terms and Conditions")
+			@common.HeadMeta()
+			@common.TabTitle("Terms and Conditions")
 		</head>
 		<body class="m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-black-100 my-16">
 			<div class="flex-1 py-8 px-4">
@@ -75,8 +76,8 @@ templ PrivacyPage() {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
-			@HeadMeta()
-			@TabTitle("Privacy Policy")
+			@common.HeadMeta()
+			@common.TabTitle("Privacy Policy")
 		</head>
 		<body class="m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-black-100 my-16">
 			<div class="flex-1 py-8 px-4">

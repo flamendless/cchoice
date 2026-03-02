@@ -10,7 +10,9 @@ import (
 	"strings"
 	"sync"
 
-	"cchoice/cmd/web/components"
+	compcart "cchoice/cmd/web/components/cart"
+	comppayment "cchoice/cmd/web/components/payment"
+	compcommon "cchoice/cmd/web/components/common"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/cart"
 	"cchoice/internal/constants"
@@ -119,10 +121,10 @@ func (s *Server) calculateCartSummary(ctx context.Context) (cartSummaryData, err
 func (s *Server) generateCartSummaryComponent(ctx context.Context) templ.Component {
 	summaryData, err := s.calculateCartSummary(ctx)
 	if err != nil {
-		return components.CartSummaryContentEmpty()
+		return compcart.CartSummaryContentEmpty()
 	}
 
-	return components.CartSummaryContent(
+	return compcart.CartSummaryContent(
 		summaryData.Subtotal,
 		summaryData.TotalDiscount,
 		summaryData.TotalWeight,
@@ -138,7 +140,7 @@ func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
 
 	checkoutlineProductIDs, ok := s.sessionManager.Get(ctx, skCheckoutLineProductIDs).([]string)
 	if len(checkoutlineProductIDs) == 0 {
-		if err := components.CartPage(components.CartPageBodyEmpty()).Render(ctx, w); err != nil {
+		if err := compcart.CartPage(compcart.CartPageBodyEmpty()).Render(ctx, w); err != nil {
 			logs.LogCtx(ctx).Error(
 				logtag,
 				zap.Error(err),
@@ -155,7 +157,7 @@ func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
 			zap.String("token", token),
 			zap.Error(errs.ErrSessionCheckoutLineProductIDs),
 		)
-		if err := components.CartPage(components.CartPageBodyEmpty()).Render(ctx, w); err != nil {
+		if err := compcart.CartPage(compcart.CartPageBodyEmpty()).Render(ctx, w); err != nil {
 			logs.LogCtx(ctx).Error(
 				logtag,
 				zap.Error(err),
@@ -178,7 +180,7 @@ func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
 			zap.String("token", token),
 			zap.Error(err),
 		)
-		if err := components.CartPage(components.CartPageBodyEmpty()).Render(ctx, w); err != nil {
+		if err := compcart.CartPage(compcart.CartPageBodyEmpty()).Render(ctx, w); err != nil {
 			logs.LogCtx(ctx).Error(
 				logtag,
 				zap.Error(err),
@@ -189,7 +191,7 @@ func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	summaryContent := s.generateCartSummaryComponent(ctx)
-	if err := components.CartPage(components.CartPageBody(summaryContent)).Render(ctx, w); err != nil {
+	if err := compcart.CartPage(compcart.CartPageBody(summaryContent)).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
@@ -212,7 +214,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 			zap.Error(err),
 			zap.Error(errs.ErrCartMissingCheckoutLines),
 		)
-		if err := components.CartPage(components.CartPageBodyEmpty()).Render(ctx, w); err != nil {
+		if err := compcart.CartPage(compcart.CartPageBodyEmpty()).Render(ctx, w); err != nil {
 			logs.LogCtx(ctx).Error(
 				logtag,
 				zap.Error(err),
@@ -317,7 +319,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 			cl.WeightDisplay = fmt.Sprintf("%.2f kg", weightKg)
 		}
 
-		if err := components.CartCheckoutLineItem(cl).Render(ctx, w); err != nil {
+		if err := compcart.CartCheckoutLineItem(cl).Render(ctx, w); err != nil {
 			logs.LogCtx(ctx).Error(
 				logtag,
 				zap.Error(err),
@@ -481,13 +483,13 @@ func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var renderErrs error
-		renderErrs = errors.Join(renderErrs, components.CartSummaryRow("Subtotal", summaryData.Subtotal, "text-gray-500").Render(ctx, w))
-		renderErrs = errors.Join(renderErrs, components.CartSummaryRow("Total Discount", summaryData.TotalDiscount, "text-red-500").Render(ctx, w))
-		renderErrs = errors.Join(renderErrs, components.CartSummaryRow("Total Weight", summaryData.TotalWeight, "text-gray-500").Render(ctx, w))
-		renderErrs = errors.Join(renderErrs, components.CartSummaryRowWithID("delivery-fee-row", "Delivery Fee", summaryData.DeliveryFee, "text-gray-500").Render(ctx, w))
-		renderErrs = errors.Join(renderErrs, components.CartSummaryRowWithID("delivery-eta-row", "Estimated Delivery Time", summaryData.DeliveryETA, "text-gray-500").Render(ctx, w))
-		renderErrs = errors.Join(renderErrs, components.HR().Render(ctx, w))
-		renderErrs = errors.Join(renderErrs, components.CartSummaryRow("Total", summaryData.Total).Render(ctx, w))
+		renderErrs = errors.Join(renderErrs, compcart.CartSummaryRow("Subtotal", summaryData.Subtotal, "text-gray-500").Render(ctx, w))
+		renderErrs = errors.Join(renderErrs, compcart.CartSummaryRow("Total Discount", summaryData.TotalDiscount, "text-red-500").Render(ctx, w))
+		renderErrs = errors.Join(renderErrs, compcart.CartSummaryRow("Total Weight", summaryData.TotalWeight, "text-gray-500").Render(ctx, w))
+		renderErrs = errors.Join(renderErrs, compcart.CartSummaryRowWithID("delivery-fee-row", "Delivery Fee", summaryData.DeliveryFee, "text-gray-500").Render(ctx, w))
+		renderErrs = errors.Join(renderErrs, compcart.CartSummaryRowWithID("delivery-eta-row", "Estimated Delivery Time", summaryData.DeliveryETA, "text-gray-500").Render(ctx, w))
+		renderErrs = errors.Join(renderErrs, compcommon.HR().Render(ctx, w))
+		renderErrs = errors.Join(renderErrs, compcart.CartSummaryRow("Total", summaryData.Total).Render(ctx, w))
 
 		if renderErrs != nil {
 			logs.LogCtx(ctx).Error(
@@ -870,7 +872,7 @@ func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Reque
 	})
 
 	for _, pm := range paymentMethods {
-		if err := components.CartPaymentMethod(pm).Render(ctx, w); err != nil {
+		if err := comppayment.CartPaymentMethod(pm).Render(ctx, w); err != nil {
 			logs.LogCtx(ctx).Error(
 				logtag,
 				zap.Error(err),

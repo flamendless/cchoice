@@ -1,0 +1,49 @@
+package payment
+
+import "cchoice/cmd/web/models"
+
+templ CartPaymentItem(paymentMethod models.AvailablePaymentMethod) {
+	<img
+		class="w-12 h-12 object-contain mb-1"
+		title={ "image of " + paymentMethod.Value.String() }
+		src={ paymentMethod.ImageURL }
+		alt={ paymentMethod.Value.String() + " thumbnail" }
+	/>
+	<h1 class="text-center text-xs">{ paymentMethod.Value.GetDisplayText() }</h1>
+}
+
+templ CartPaymentMethod(paymentMethod models.AvailablePaymentMethod) {
+	<div class="flex flex-row flex-wrap gap-4">
+		<label>
+			<input
+				type="radio"
+				class="hidden peer"
+				aria-label="Select payment method"
+				name="checked_payment_method"
+				value={ paymentMethod.Value.String() }
+				disabled?={ !paymentMethod.Enabled }
+			/>
+			if paymentMethod.Enabled {
+				<div
+					class="
+						flex flex-col w-22 h-22 items-center justify-center p-2 border-2 border-gray-300
+						rounded-lg cursor-pointer transition-colors hover:border-cchoice hover:bg-cchoice/10
+						peer-checked:border-cchoice peer-checked:bg-cchoice/20
+					"
+				>
+					@CartPaymentItem(paymentMethod)
+				</div>
+			} else {
+				<div
+					class="
+						flex flex-col w-22 h-22 items-center justify-center p-4 rounded-lg
+						border-2 border-gray-200 cursor-not-allowed opacity-50
+						filter grayscale brightness-75
+					"
+				>
+					@CartPaymentItem(paymentMethod)
+				</div>
+			}
+		</label>
+	</div>
+}

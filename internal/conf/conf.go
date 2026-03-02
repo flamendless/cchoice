@@ -58,6 +58,7 @@ type Settings struct {
 	URLTikTok       string
 	ShowPromoBanner bool
 	ShopLocation    ShopLocation
+	VATPercentage   string
 }
 
 type ShopLocation struct {
@@ -205,16 +206,24 @@ func (c *appConfig) SetSettings(settings map[string]string) {
 	c.Settings.URLWaze = settings["url_waze"]
 	c.Settings.URLFacebook = settings["url_facebook"]
 	c.Settings.URLTikTok = settings["url_tiktok"]
+
 	spb := settings["show_promo_banner"]
 	if spb == "true" || spb == "1" {
 		c.Settings.ShowPromoBanner = true
 	}
+
 	if raw := settings["shop_location"]; raw != "" {
 		var sl ShopLocation
 		if err := json.Unmarshal([]byte(raw), &sl); err == nil {
 			c.Settings.ShopLocation = sl
 		}
 	}
+
+	vat := settings["vat_percentage"]
+	if vat == "" {
+		panic(errs.ErrSettingsRequired)
+	}
+	c.Settings.VATPercentage = vat
 }
 
 func (c *appConfig) IsLocal() bool {

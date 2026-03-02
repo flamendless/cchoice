@@ -1,7 +1,7 @@
 package server
 
 import (
-	"cchoice/cmd/web/components"
+	comporder "cchoice/cmd/web/components/order"
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/logs"
@@ -24,7 +24,7 @@ func (s *Server) ordersTrackPageHandler(w http.ResponseWriter, r *http.Request) 
 
 	orderNo := r.URL.Query().Get("order_no")
 	if orderNo == "" {
-		if err := components.OrderTrackerPage(components.OrderTrackerPageBody(orderNo, "", email, mobileNo)).Render(ctx, w); err != nil {
+		if err := comporder.OrderTrackerPage(comporder.OrderTrackerPageBody(orderNo, "", email, mobileNo)).Render(ctx, w); err != nil {
 			logs.Log().Error(logtag, zap.String("order_no", orderNo), zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -35,7 +35,7 @@ func (s *Server) ordersTrackPageHandler(w http.ResponseWriter, r *http.Request) 
 
 	order, err := s.dbRO.GetQueries().GetOrderByOrderNumber(ctx, orderNo)
 	if err != nil {
-		if err := components.OrderTrackerPage(components.OrderTrackerPageBodyError(orderNo, email, mobileNo)).Render(ctx, w); err != nil {
+		if err := comporder.OrderTrackerPage(comporder.OrderTrackerPageBodyError(orderNo, email, mobileNo)).Render(ctx, w); err != nil {
 			logs.Log().Error(logtag, zap.String("order_no", orderNo), zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -43,7 +43,7 @@ func (s *Server) ordersTrackPageHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if err := components.OrderTrackerPage(components.OrderTrackerPageBody(orderNo, order.ShippingEta.String, email, mobileNo)).Render(ctx, w); err != nil {
+	if err := comporder.OrderTrackerPage(comporder.OrderTrackerPageBody(orderNo, order.ShippingEta.String, email, mobileNo)).Render(ctx, w); err != nil {
 		logs.Log().Error(logtag, zap.String("order_no", orderNo), zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

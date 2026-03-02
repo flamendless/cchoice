@@ -1,0 +1,84 @@
+package search
+
+import "cchoice/cmd/web/models"
+import "cchoice/internal/utils"
+
+templ SearchResults() {
+	<div
+		id="search-results"
+		class="
+			absolute flex flex-col w-full max-w-full hidden
+			transform scale-y-100 origin-top transition-transform duration-200
+			left-0 top-full bg-white shadow-xl border-cchoice_border z-10
+		"
+	>
+		<ul></ul>
+	</div>
+}
+
+templ SearchResultsMobile() {
+	<div
+		id="search-mobile-results"
+		class="
+			absolute flex flex-col w-full max-w-full hidden
+			transform scale-y-100 origin-top transition-transform duration-200
+			left-0 top-full bg-white shadow-xl border-cchoice_border z-10
+		"
+	>
+		<ul></ul>
+	</div>
+}
+
+templ SearchMore(query string) {
+	<li class="flex items-center justify-center">
+		<a
+			href={ templ.SafeURL(utils.URL("/search?query=" + query)) }
+			class="
+				text-center w-full border-t-2 border-cchoice_border p-2
+				hover:bg-cchoice hover:text-white transition-colors
+			"
+		>
+			See All Results
+		</a>
+	</li>
+}
+
+templ SearchResultProductCard(product models.SearchResultProduct) {
+	<li>
+		<div
+			class="group flex flex-row items-center py-2 bg-white hover:bg-cchoicesoft transition-colors cursor-pointer"
+			data-product-id={ product.ProductID }
+			data-product-thumbnail-path={ product.CDNURL1280 }
+			data-product-name={ product.Name }
+			data-product-brand={ product.BrandName }
+			data-product-price={ product.PriceDisplay }
+		_="
+			on click
+				async call metrics_event('search_result_click', #selected-product-id.value)
+				set #selected-product-id.value to my @data-product-id
+				set #selected-product-thumbnail-path.value to my @data-product-thumbnail-path
+				set #selected-product-name.value to my @data-product-name
+				set #selected-product-brand.value to my @data-product-brand
+				set #selected-product-price.value to my @data-product-price
+				log 'selected product-id: ' + #selected-product-id.value
+				log 'selected thumbnail image path: ' + #selected-product-thumbnail-path.value
+				trigger get on #modal_image_viewer_image
+				trigger openModal on #modal_image_viewer
+			end
+			"
+		>
+			<img
+				class="w-16 max-w-16 h-16 mx-4"
+				src={ product.CDNURL }
+				title={ product.Name }
+				alt={ product.Name + " thumbnail" }
+			/>
+			<p
+				title={ product.Name }
+				class="text-base font-normal text-ellipsis text-wrap overflow-hidden cursor-pointer"
+			>
+				{ product.Name }
+			</p>
+		</div>
+	</li>
+}

@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	"cchoice/cmd/web/components"
+	compshop "cchoice/cmd/web/components/shop"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
 
@@ -31,7 +31,7 @@ func (s *Server) brandsSidePanelHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if err := components.BrandsSidePanelList(brands).Render(r.Context(), w); err != nil {
+	if err := compshop.BrandsSidePanelList(brands).Render(r.Context(), w); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
