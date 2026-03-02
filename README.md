@@ -3,6 +3,7 @@
 - `git clone --recurse-submodules --shallow-submodules -j8 <repo url>`
 - `go mod download`
 - `go mod tidy`
+- `go install tool`
 - `go install github.com/magefile/mage@latest`
 - `mage deps`
 - `mage setup`

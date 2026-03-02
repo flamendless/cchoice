@@ -14,6 +14,7 @@ SELECT
     email,
     mobile_no,
     password,
+    require_in_shop,
     created_at,
     updated_at
 FROM tbl_staffs
@@ -38,6 +39,7 @@ SELECT
     email,
     mobile_no,
     password,
+    require_in_shop,
     created_at,
     updated_at
 FROM tbl_staffs
@@ -61,6 +63,7 @@ SELECT
     user_type,
     email,
     mobile_no,
+    require_in_shop,
     created_at,
     updated_at
 FROM tbl_staffs
@@ -119,11 +122,12 @@ INSERT INTO tbl_staffs (
     email,
     mobile_no,
     password,
+    require_in_shop,
     created_at,
     updated_at,
     deleted_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), '1970-01-01 00:00:00+00:00'
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), '1970-01-01 00:00:00+00:00'
 ) RETURNING id;
 
 -- name: CreateStaffAttendance :one
