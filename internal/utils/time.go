@@ -7,6 +7,20 @@ import (
 	"cchoice/internal/constants"
 )
 
+var phLocation *time.Location
+
+func init() {
+	var err error
+	phLocation, err = time.LoadLocation("Asia/Manila")
+	if err != nil {
+		phLocation = time.FixedZone("PHT", 8*60*60)
+	}
+}
+
+func NowPH() time.Time {
+	return time.Now().In(phLocation)
+}
+
 func TimeToMinutes(s string) (int, bool) {
 	if s == "" {
 		return 0, false
