@@ -6,7 +6,7 @@ import "cchoice/cmd/web/models"
 import "cchoice/internal/enums"
 import "cchoice/internal/utils"
 
-templ AttendanceSectionForSuperuser(title string, selectedDate string, fetchURL string, targetID string, dateSelectorID string, refreshButtonID string, attendances []models.AdminStaffAttendance) {
+templ AttendanceSectionForSuperuser(title string, selectedDate string, fetchURL string, targetID string, dateSelectorID string, refreshButtonID string, attendances []models.Attendance) {
 	<div
 		class="bg-white rounded-lg shadow-md p-6 mb-6"
 		hx-get={ fetchURL }
@@ -82,7 +82,7 @@ templ AdminSuperuserPage(pageData models.AdminSuperuserPage) {
 	</html>
 }
 
-templ AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) {
+templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 	if len(attendances) == 0 {
 		<p class="text-gray-500 text-center py-4">No attendance records for this date</p>
 	} else {
