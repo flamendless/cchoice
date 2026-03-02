@@ -89,6 +89,9 @@ var cmdCreateStaff = &cobra.Command{
 			panic("must be alphanumeric [a-z A-Z 0-9 - _ . ? # @]")
 		}
 
+		requireInShopInput := prompt(reader, "Require in shop for time in/out (Y/N): ", true)
+		requireInShop := strings.ToUpper(requireInShopInput) == "Y"
+
 		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to hash password: %v\n", err)
@@ -113,6 +116,7 @@ var cmdCreateStaff = &cobra.Command{
 			Email:           email,
 			MobileNo:        mobileNo,
 			Password:        string(hash),
+			RequireInShop:   requireInShop,
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to create staff: %v\n", err)
@@ -133,6 +137,7 @@ var cmdCreateStaff = &cobra.Command{
 			zap.Stringer("usertype", userType),
 			zap.String("email", email),
 			zap.String("mobile number", mobileNo),
+			zap.Bool("require in shop", requireInShop),
 		)
 	},
 }

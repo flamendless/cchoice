@@ -410,6 +410,15 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	canTimeIn := !hasTimeIn
+	canTimeOut := hasTimeIn && !hasTimeOut
+	if staff.RequireInShop {
+		if inShop == nil || !*inShop {
+			canTimeIn = false
+			canTimeOut = false
+		}
+	}
+
 	profile := models.AdminStaffProfile{
 		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
 		Birthdate:        staff.Birthdate,
@@ -424,8 +433,9 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		CurrentTime:      time.Now().Format(constants.TimeLayoutDisplay),
 		HasTimeIn:        hasTimeIn,
 		HasTimeOut:       hasTimeOut,
-		CanTimeIn:        !hasTimeIn,
-		CanTimeOut:       hasTimeIn && !hasTimeOut,
+		CanTimeIn:        canTimeIn,
+		CanTimeOut:       canTimeOut,
+		RequireInShop:    staff.RequireInShop,
 		MyAttendance:     myAttendance,
 		InShop:           inShop,
 		LocationDisplay:  locationDisplay,

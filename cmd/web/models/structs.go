@@ -135,6 +135,7 @@ type AdminStaffProfile struct {
 	HasTimeOut       bool
 	CanTimeIn        bool
 	CanTimeOut       bool
+	RequireInShop    bool
 	MyAttendance     *AdminStaffAttendance
 	InShop           *bool
 	LocationDisplay  string
