@@ -187,6 +187,7 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.Post("/admin/login", s.adminLoginHandler)
 	r.With(s.requireStaffAuth).Post("/admin/logout", s.adminLogoutHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff", s.adminStaffPageHandler)
+	r.With(s.requireStaffAuth).Get("/admin/profile", s.adminStaffProfileHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/attendance", s.adminStaffAttendanceHandler)
 	r.With(s.requireStaffAuth).Post("/admin/staff/time-in", s.adminStaffTimeInHandler)
 	r.With(s.requireStaffAuth).Post("/admin/staff/time-out", s.adminStaffTimeOutHandler)
@@ -237,7 +238,6 @@ func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 		loginError = "Invalid email or password format."
 	}
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := compadmin.AdminLoginPage(loginError).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -302,7 +302,7 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if ua := r.UserAgent(); ua != "" {
 		userAgent = sql.NullString{String: ua, Valid: true}
 	}
-	accessID, err := s.dbRW.GetQueries().CreateStaffAccess(ctx, queries.CreateStaffAccessParams{
+	accessID, err := s.dbRW.GetQueries().CreateStaffAccess(context.Background(), queries.CreateStaffAccessParams{
 		StaffID:   staff.ID,
 		UserAgent: userAgent,
 	})
@@ -349,6 +349,42 @@ func (s *Server) adminLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+}
+
+func (s *Server) adminStaffProfileHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff Profile Handler]"
+	ctx := r.Context()
+
+	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
+	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+		return
+	}
+
+	profile := models.AdminStaffProfile{
+		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
+		Birthdate:        staff.Birthdate,
+		DateHired:        staff.DateHired,
+		Position:         staff.Position,
+		Email:            staff.Email,
+		MobileNo:         staff.MobileNo,
+		ScheduledTimeIn:  staff.TimeInSchedule.String,
+		ScheduledTimeOut: staff.TimeOutSchedule.String,
+		RequireInShop:    staff.RequireInShop,
+		UserType:         enums.ParseStaffUserTypeToEnum(staff.UserType),
+	}
+
+	if err := compadmin.AdminHeader(&profile).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("path", r.URL.Path),
+			zap.Error(err),
+		)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -443,7 +479,6 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		UserType:         enums.ParseStaffUserTypeToEnum(staff.UserType),
 	}
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := compadmin.AdminStaffPage(profile).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -479,7 +514,6 @@ func (s *Server) adminStaffAttendanceHandler(w http.ResponseWriter, r *http.Requ
 		record = &rec
 	}
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := compadmin.StaffAttendanceSingleTable(record).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -607,7 +641,6 @@ func (s *Server) adminSuperuserHomeHandler(w http.ResponseWriter, r *http.Reques
 	}
 	currentUserFullName := utils.BuildFullName(currentStaff.FirstName, currentStaff.MiddleName.String, currentStaff.LastName)
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := compadmin.AdminSuperuserHomePage(currentUserFullName).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -651,7 +684,6 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 		attendanceData = append(attendanceData, buildAdminStaffAttendance(staff, att, shop))
 	}
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := compadmin.AdminSuperuserAttendanceTable(attendanceData).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -662,38 +694,9 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 func (s *Server) adminSuperuserAttendancePageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Superuser Attendance Page Handler]"
 	ctx := r.Context()
-
 	date := parseAttendanceDate(r.URL.Query().Get("date"))
 
-	attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByStaffIDAndDateRange(ctx, date)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		attendances = []queries.GetStaffAttendanceByStaffIDAndDateRangeRow{}
-	}
-
-	staffs, err := s.dbRO.GetQueries().GetAllStaffs(ctx, maxStaffListSize)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		staffs = []queries.GetAllStaffsRow{}
-	}
-
-	staffMap := make(map[int64]queries.GetAllStaffsRow)
-	for _, staff := range staffs {
-		staffMap[staff.ID] = staff
-	}
-
-	shop := conf.Conf().Settings.ShopLocation
-	attendanceData := make([]models.Attendance, 0, len(attendances))
-	for _, att := range attendances {
-		staff, ok := staffMap[att.StaffID]
-		if !ok {
-			continue
-		}
-		attendanceData = append(attendanceData, buildAdminStaffAttendance(staff, att, shop))
-	}
-
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := compadmin.AdminSuperuserAttendancePage("Staff Attendance", date, attendanceData).Render(ctx, w); err != nil {
+	if err := compadmin.AdminSuperuserAttendancePage("Staff Attendance", date).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -752,7 +755,6 @@ func (s *Server) adminSuperuserProductsHandler(w http.ResponseWriter, r *http.Re
 		VATPercentage: conf.Conf().Settings.VATPercentage,
 	}
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := compadmin.AdminSuperuserProductsPage(formData).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
