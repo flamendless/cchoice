@@ -126,7 +126,18 @@ func sessionLocationJSON(ctx context.Context, get func(context.Context, string) 
 	return sql.NullString{String: string(b), Valid: true}
 }
 
-func buildAdminStaffAttendance(staff queries.GetAllStaffsRow, att queries.GetStaffAttendanceByStaffIDAndDateRangeRow, shop conf.ShopLocation) models.AdminStaffAttendance {
+func extractTime(datetimeStr string) string {
+	if datetimeStr == "" {
+		return ""
+	}
+	t, err := time.Parse("2006-01-02 15:04:05", datetimeStr)
+	if err != nil {
+		return datetimeStr
+	}
+	return t.Format("15:04:05")
+}
+
+func buildAdminStaffAttendance(staff queries.GetAllStaffsRow, att queries.GetStaffAttendanceByStaffIDAndDateRangeRow, shop conf.ShopLocation) models.Attendance {
 	schedIn, schedOut := "", ""
 	if staff.TimeInSchedule.Valid {
 		schedIn = staff.TimeInSchedule.String
@@ -134,16 +145,18 @@ func buildAdminStaffAttendance(staff queries.GetAllStaffsRow, att queries.GetSta
 	if staff.TimeOutSchedule.Valid {
 		schedOut = staff.TimeOutSchedule.String
 	}
-	c := computeAttendanceStatus(att.TimeIn.String, att.TimeOut.String, schedIn, schedOut)
+	timeIn, timeOut := extractTime(att.TimeIn.String), extractTime(att.TimeOut.String)
+	c := computeAttendanceStatus(timeIn, timeOut, schedIn, schedOut)
 	inShop := false
 	if lat, lng, ok := parseAttendanceLocation(att.Location); ok && shop.RadiusMeters > 0 {
 		inShop = utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
 	}
-	return models.AdminStaffAttendance{
+	return models.Attendance{
 		StaffID:          att.StaffID,
 		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
-		TimeIn:           att.TimeIn.String,
-		TimeOut:          att.TimeOut.String,
+		Date:             att.ForDate,
+		TimeIn:           timeIn,
+		TimeOut:          timeOut,
 		ScheduledTimeIn:  schedIn,
 		ScheduledTimeOut: schedOut,
 		TimeInStatus:     c.timeInStatus,
@@ -154,7 +167,7 @@ func buildAdminStaffAttendance(staff queries.GetAllStaffsRow, att queries.GetSta
 	}
 }
 
-func buildStaffDayAttendance(staff queries.GetStaffByIDRow, att queries.GetStaffAttendanceByDateRow) models.AdminStaffAttendance {
+func buildStaffDayAttendance(staff queries.GetStaffByIDRow, att queries.GetStaffAttendanceByDateRow) models.Attendance {
 	schedIn, schedOut := "", ""
 	if staff.TimeInSchedule.Valid {
 		schedIn = staff.TimeInSchedule.String
@@ -162,12 +175,14 @@ func buildStaffDayAttendance(staff queries.GetStaffByIDRow, att queries.GetStaff
 	if staff.TimeOutSchedule.Valid {
 		schedOut = staff.TimeOutSchedule.String
 	}
-	c := computeAttendanceStatus(att.TimeIn.String, att.TimeOut.String, schedIn, schedOut)
-	return models.AdminStaffAttendance{
+	timeIn, timeOut := extractTime(att.TimeIn.String), extractTime(att.TimeOut.String)
+	c := computeAttendanceStatus(timeIn, timeOut, schedIn, schedOut)
+	return models.Attendance{
 		StaffID:          staff.ID,
 		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
-		TimeIn:           att.TimeIn.String,
-		TimeOut:          att.TimeOut.String,
+		Date:             att.ForDate,
+		TimeIn:           timeIn,
+		TimeOut:          timeOut,
 		ScheduledTimeIn:  schedIn,
 		ScheduledTimeOut: schedOut,
 		TimeInStatus:     c.timeInStatus,
@@ -362,7 +377,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		ForDate: today,
 	})
 	var hasTimeIn, hasTimeOut bool
-	var myAttendance *models.AdminStaffAttendance
+	var myAttendance *models.Attendance
 	if err != nil {
 		if err != sql.ErrNoRows {
 			logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
@@ -472,7 +487,7 @@ func (s *Server) adminStaffAttendanceHandler(w http.ResponseWriter, r *http.Requ
 		StaffID: staffID,
 		ForDate: date,
 	})
-	var record *models.AdminStaffAttendance
+	var record *models.Attendance
 	if err == nil {
 		rec := buildStaffDayAttendance(staff, attendance)
 		record = &rec
@@ -626,7 +641,7 @@ func (s *Server) adminSuperuserPageHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	shop := conf.Conf().Settings.ShopLocation
-	attendanceData := make([]models.AdminStaffAttendance, 0, len(attendances))
+	attendanceData := make([]models.Attendance, 0, len(attendances))
 	for _, att := range attendances {
 		staff, ok := staffMap[att.StaffID]
 		if !ok {
@@ -678,7 +693,7 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 	}
 
 	shop := conf.Conf().Settings.ShopLocation
-	attendanceData := make([]models.AdminStaffAttendance, 0, len(attendances))
+	attendanceData := make([]models.Attendance, 0, len(attendances))
 	for _, att := range attendances {
 		staff, ok := staffMap[att.StaffID]
 		if !ok {

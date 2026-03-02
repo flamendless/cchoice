@@ -6,7 +6,7 @@ import "cchoice/cmd/web/models"
 import "cchoice/internal/enums"
 import "cchoice/internal/utils"
 
-templ StaffAttendanceSingleTable(record *models.AdminStaffAttendance) {
+templ StaffAttendanceSingleTable(record *models.Attendance) {
 	if record == nil {
 		<p class="text-gray-500 text-center py-4">No attendance record for this date</p>
 	} else {
@@ -83,7 +83,7 @@ templ AttendanceSectionForStaff(
 	targetID string,
 	dateSelectorID string,
 	refreshButtonID string,
-	record *models.AdminStaffAttendance,
+	record *models.Attendance,
 	userType enums.StaffUserType,
 ) {
 	{{ fetchURL := utils.URL("/admin/staff/attendance") }}
@@ -164,6 +164,11 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 						@StaffDetail("Mobile No", profile.MobileNo)
 						@StaffDetail("Scheduled Time In", profile.ScheduledTimeIn)
 						@StaffDetail("Scheduled Time Out", profile.ScheduledTimeOut)
+						if profile.RequireInShop {
+							@StaffDetail("Require in shop time in/out", "true")
+						} else {
+							@StaffDetail("Require in shop time in/out", "false")
+						}
 					</div>
 
 					if profile.UserType != enums.STAFF_USER_TYPE_SUPERUSER {
@@ -196,7 +201,7 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 								hx-post={ utils.URL("/admin/staff/time-in") }
 								hx-trigger="click"
 								hx-swap="none"
-								disabled?={profile.CanTimeIn}
+								disabled?={!profile.CanTimeIn}
 							>
 								Time In
 							</button>
@@ -208,7 +213,7 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 								hx-post={ utils.URL("/admin/staff/time-out") }
 								hx-trigger="click"
 								hx-swap="none"
-								disabled?={profile.CanTimeOut}
+								disabled?={!profile.CanTimeOut}
 							>
 								Time Out
 							</button>

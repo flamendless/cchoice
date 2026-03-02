@@ -14,7 +14,7 @@ import "cchoice/cmd/web/models"
 import "cchoice/internal/enums"
 import "cchoice/internal/utils"
 
-func StaffAttendanceSingleTable(record *models.AdminStaffAttendance) templ.Component {
+func StaffAttendanceSingleTable(record *models.Attendance) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -266,7 +266,7 @@ func AttendanceSectionForStaff(
 	targetID string,
 	dateSelectorID string,
 	refreshButtonID string,
-	record *models.AdminStaffAttendance,
+	record *models.Attendance,
 	userType enums.StaffUserType,
 ) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -635,6 +635,17 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		if profile.RequireInShop {
+			templ_7745c5c3_Err = StaffDetail("Require in shop time in/out", "true").Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = StaffDetail("Require in shop time in/out", "false").Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -663,7 +674,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 						var templ_7745c5c3_Var32 string
 						templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(profile.LocationDisplay)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin_staff.templ`, Line: 177, Col: 88}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin_staff.templ`, Line: 182, Col: 88}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 						if templ_7745c5c3_Err != nil {
@@ -692,7 +703,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 					var templ_7745c5c3_Var33 string
 					templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(profile.LocationDisplay)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin_staff.templ`, Line: 184, Col: 87}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin_staff.templ`, Line: 189, Col: 87}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 					if templ_7745c5c3_Err != nil {
@@ -742,7 +753,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var36 string
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/staff/time-in"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin_staff.templ`, Line: 196, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin_staff.templ`, Line: 201, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 		if templ_7745c5c3_Err != nil {
@@ -752,7 +763,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if profile.CanTimeIn {
+		if !profile.CanTimeIn {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, " disabled")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -787,7 +798,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var39 string
 		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/staff/time-out"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin_staff.templ`, Line: 208, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin_staff.templ`, Line: 213, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 		if templ_7745c5c3_Err != nil {
@@ -797,7 +808,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if profile.CanTimeOut {
+		if !profile.CanTimeOut {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, " disabled")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -826,7 +837,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var40 templ.SafeURL
 		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/logout"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin_staff.templ`, Line: 228, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/admin_staff.templ`, Line: 233, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 		if templ_7745c5c3_Err != nil {

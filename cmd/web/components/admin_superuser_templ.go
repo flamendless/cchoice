@@ -14,7 +14,7 @@ import "cchoice/cmd/web/models"
 import "cchoice/internal/enums"
 import "cchoice/internal/utils"
 
-func AttendanceSectionForSuperuser(title string, selectedDate string, fetchURL string, targetID string, dateSelectorID string, refreshButtonID string, attendances []models.AdminStaffAttendance) templ.Component {
+func AttendanceSectionForSuperuser(title string, selectedDate string, fetchURL string, targetID string, dateSelectorID string, refreshButtonID string, attendances []models.Attendance) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -254,7 +254,7 @@ func AdminSuperuserPage(pageData models.AdminSuperuserPage) templ.Component {
 	})
 }
 
-func AdminSuperuserAttendanceTable(attendances []models.AdminStaffAttendance) templ.Component {
+func AdminSuperuserAttendanceTable(attendances []models.Attendance) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {

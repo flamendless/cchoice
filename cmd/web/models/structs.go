@@ -136,15 +136,16 @@ type AdminStaffProfile struct {
 	CanTimeIn        bool
 	CanTimeOut       bool
 	RequireInShop    bool
-	MyAttendance     *AdminStaffAttendance
+	MyAttendance     *Attendance
 	InShop           *bool
 	LocationDisplay  string
 	UserType         enums.StaffUserType
 }
 
-type AdminStaffAttendance struct {
+type Attendance struct {
 	StaffID          int64
 	FullName         string
+	Date             string
 	TimeIn           string
 	TimeOut          string
 	ScheduledTimeIn  string
@@ -161,5 +162,5 @@ type AdminSuperuserPage struct {
 	CurrentDate  string
 	CurrentTime  string
 	SelectedDate string
-	Attendances  []AdminStaffAttendance
+	Attendances  []Attendance
 }
