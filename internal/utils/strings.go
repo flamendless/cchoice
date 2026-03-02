@@ -83,3 +83,10 @@ func BuildFullName(firstName, middleName, lastName string) string {
 	parts = append(parts, lastName)
 	return strings.Join(parts, " ")
 }
+
+func BoolToString(b bool) string {
+	if b {
+		return "true"
+	}
+	return "false"
+}

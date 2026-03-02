@@ -2,8 +2,45 @@ package components
 
 import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
+import "cchoice/cmd/web/models"
+import "cchoice/internal/enums"
 
-templ AttendanceToolbar(title string, selectedDate string, dateSelectorID string, refreshButtonID string) {
+templ AdminHeader(profile *models.AdminStaffProfile) {
+	if profile == nil {
+		<div
+			hx-get={ utils.URL("/admin/profile") }
+			hx-trigger="load once"
+			hx-swap="outerHTML"
+		>
+			//AdminHeader
+		</div>
+	} else {
+		<p class="text-lg text-gray-700 mb-4">
+			Hello, { profile.FullName }
+		</p>
+		<div class="text-center mb-6">
+			<h1 id="current-date" class="text-3xl font-bold text-cchoice">
+				{ profile.CurrentDate }
+			</h1>
+			<p class="text-xl text-gray-600" id="clock">
+				{ profile.CurrentTime }
+			</p>
+		</div>
+	}
+}
+
+templ AttendanceToolbar(title string, selectedDate string, userType enums.StaffUserType) {
+	{{
+		var dateSelectorID string
+		var refreshButtonID string
+		if userType == enums.STAFF_USER_TYPE_SUPERUSER {
+			dateSelectorID = "date-selector"
+			refreshButtonID = "refresh-btn"
+		} else {
+			dateSelectorID = "staff-date-selector"
+			refreshButtonID = "staff-refresh-btn"
+		}
+	}}
 	<div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
 		<h2 class="text-xl font-semibold text-gray-800">{ title }</h2>
 		<div class="flex gap-2">
