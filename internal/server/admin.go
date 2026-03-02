@@ -506,8 +506,8 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 	ctx := r.Context()
 
 	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	today := time.Now().Format(constants.DateLayoutISO)
-	now := time.Now().Format(constants.DateTimeLayoutISO)
+	today := utils.NowPH().Format(constants.DateLayoutISO)
+	now := utils.NowPH().Format(constants.DateTimeLayoutISO)
 
 	existing, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
 		StaffID: staffID,
@@ -566,8 +566,8 @@ func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request
 	ctx := r.Context()
 
 	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	today := time.Now().Format(constants.DateLayoutISO)
-	now := time.Now().Format(constants.DateTimeLayoutISO)
+	today := utils.NowPH().Format(constants.DateLayoutISO)
+	now := utils.NowPH().Format(constants.DateTimeLayoutISO)
 
 	existing, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
 		StaffID: staffID,
