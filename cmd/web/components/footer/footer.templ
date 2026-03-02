@@ -1,0 +1,66 @@
+package footer
+
+import "cchoice/cmd/web/models"
+import "cchoice/internal/utils"
+
+templ FooterRow1Texts(texts []models.FooterRowText) {
+	<div
+		id="footer-row1-texts"
+		class="flex flex-row flex-wrap text-xs"
+	>
+		for i, hrt := range texts {
+			<a
+				href={ templ.SafeURL(hrt.URL) }
+				class="
+					font-light mx-1 text-nowrap cursor-pointer
+					hover:underline hover:bg-cchoicesoft transition-colors
+				"
+			>
+				{ hrt.Label }
+			</a>
+			if i < len(texts)-1 {
+				<p class="font-normal mx-1">
+					|
+				</p>
+			}
+		}
+	</div>
+}
+
+templ Footer() {
+	<footer class="fixed left-0 bottom-0 py-2 px-1.5 w-full max-w-full z-999 bg-white overflow-hidden">
+		<hr class="border-2 border-cchoice_border my-0.5"/>
+		<div class="w-full max-w-full flex flex-col lg:flex-row">
+			<div
+				id="footer-row1"
+				class="flex flex-row grow"
+				hx-trigger="load once"
+				hx-get={ utils.URL("/settings/footer-texts") }
+				hx-select="#footer-row1-texts"
+				hx-target="#footer-row1-texts"
+				hx-swap="outerHTML"
+			>
+				@FooterRow1Texts(nil)
+			</div>
+		<div class="self-end">
+			<p class="px-2 font-light text-xs text-wrap">
+				By using this website, you agree to our
+				<a
+					class="text-cchoice underline underline-offset-2"
+					href={ utils.URL("/terms") }
+				>
+					Terms and Conditions
+				</a>
+				and
+				<a
+					class="text-cchoice underline underline-offset-2"
+					href={ utils.URL("/privacy") }
+				>
+					Privacy Policy
+				</a>
+				.
+			</p>
+		</div>
+		</div>
+	</footer>
+}

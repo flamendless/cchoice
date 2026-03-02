@@ -2,7 +2,7 @@ package server
 
 import (
 	"cchoice/cmd/parse_map/models"
-	"cchoice/cmd/web/components"
+	compcart "cchoice/cmd/web/components/cart"
 	"cchoice/internal/cart"
 	"cchoice/internal/errs"
 	"cchoice/internal/geocoding"
@@ -113,7 +113,7 @@ func (s *Server) shippingAddressHandler(w http.ResponseWriter, r *http.Request) 
 
 	models.SortMap(maps)
 	for _, m := range maps {
-		if err := components.MapOption(m.Name, m.Name).Render(ctx, w); err != nil {
+		if err := compcart.MapOption(m.Name, m.Name).Render(ctx, w); err != nil {
 			logs.LogCtx(ctx).Error(
 				logtag,
 				zap.Error(err),
@@ -253,7 +253,7 @@ func (s *Server) shippingQuotationHandler(w http.ResponseWriter, r *http.Request
 	s.sessionManager.Put(ctx, skShippingQuotation, quotation)
 	s.sessionManager.Put(ctx, skShippingRequest, shippingRequest)
 
-	if err := components.CartSummaryRowWithID("delivery-fee-row", "Delivery Fee", utils.NewMoney(int64(quotation.Fee*100), quotation.Currency).Display(), "text-gray-500").Render(ctx, w); err != nil {
+	if err := compcart.CartSummaryRowWithID("delivery-fee-row", "Delivery Fee", utils.NewMoney(int64(quotation.Fee*100), quotation.Currency).Display(), "text-gray-500").Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),

@@ -1,0 +1,346 @@
+package common
+
+import "fmt"
+import "cchoice/internal/constants"
+import "cchoice/internal/conf"
+import "cchoice/internal/utils"
+import "cchoice/cmd/web/components/svg"
+
+const DISCOUNT_RIBBON = true
+
+var (
+	onceHeadLinks = templ.NewOnceHandle()
+	faviconsizes = []string{
+		"114x114",
+		"128x128",
+		"152x152",
+		"167x167",
+		"180x180",
+		"192x192",
+	}
+)
+
+templ TabTitle(page string) {
+	if conf.Conf().IsLocal() {
+		<title>{ fmt.Sprintf("[DEV] %s | C-Choice Construction Supply", page) }</title>
+	} else {
+		<title>{ fmt.Sprintf("%s | C-Choice Construction Supply", page) }</title>
+	}
+}
+
+templ HR() {
+	<hr class="border-2 border-cchoice_border mx-1 my-0.5"/>
+}
+
+templ HeadMeta() {
+	<base href="/"/>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+	<meta name="description" content="Your Partner in Progress"/>
+	<meta name="google" content="nositelinkssearchbox"/>
+	<meta name="robots" content="noarchive, noimageindex"/>
+	<meta name="keywords" content="cchoice, c-choice, construction, power tools"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<!--<link rel="dns-prefetch" href="https://images1.cchoice.com"/>-->
+	<link rel="preload" href={ constants.PathSVGLogoWithCompleteText } as="image" type="image/svg+xml"/>
+	<link
+		rel="preload"
+		href={ constants.PathEmptyImageCDN }
+		as="image"
+		type="image/png"
+	/>
+	<link
+		rel="preload"
+		href={ constants.PathStoreImageCDN }
+		as="image"
+	/>
+	<!--
+		TODO: (Brandon) - preload product images here
+		<link rel="preload" href={ utils.URL("/static/images/product_images/bosch/") } as="image" type="image/png"/>
+	-->
+	<meta property="og:title" content="C-Choice Construction Supplies"/>
+	<meta
+		property="og:description"
+		content="Your Partner in Progress"
+	/>
+	<meta property="og:type" content="website"/>
+	<!--<meta property="og:url" content="https://www.cchoice.com/"/>-->
+	<meta property="og:image" content="https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-192x192/public"/>
+	<meta
+		property="og:image:secure_url"
+		content={ utils.URL("/static/images/favicons/192x192.png") }
+	/>
+	<meta name="twitter:card" content="summary"/>
+	<meta charset="UTF-8"/>
+
+	@onceHeadLinks.Once() {
+		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ utils.URL("/static/images/favicons/favicon.ico") }/>
+
+		for _, size := range faviconsizes {
+			<link rel="icon" type="image/png" sizes={ size } href={ fmt.Sprintf("https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-%s/public", size) }/>
+		}
+
+		<link href={ utils.URL("/static/css/tailwind.css") } rel="stylesheet"/>
+		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/htmx.min.js")) }></script>
+		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/hyperscript.min.js")) }></script>
+
+		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/metrics.js")) }></script>
+		@templ.JSONScript("url-prefix", utils.URL(""))
+		<script>
+			(function(){
+				if (!globalThis._G) {
+					globalThis._G = {};
+				}
+				const urlPrefix = JSON.parse(document.getElementById("url-prefix").textContent);
+				Object.defineProperty(globalThis._G, "URL_PREFIX", {
+					value: urlPrefix,
+					writable: false,
+					configurable: false
+				});
+				Object.defineProperty(globalThis._G, "VERSION", {
+					value: async function() {
+						try {
+							const resp = await fetch(urlPrefix + "/version", { cache: "no-store" });
+							if (!resp.ok) { return ""; }
+							return await resp.text();
+						} catch (_) {
+							return "";
+						}
+					},
+					writable: false,
+					configurable: false
+				});
+			})();
+		</script>
+	}
+}
+
+templ IconActionButton(
+	label string,
+	href string,
+	children ...templ.Component,
+) {
+	<div class="my-2 flex flex-col place-center">
+		<button
+			aria-label={ label }
+			title={ label }
+			class="
+				relative inline-block
+				group py-2 stroke-cchoice rounded-full
+				cursor-pointer hover:bg-cchoice_border
+				text-nowrap items-center flex flex-col text-xs text-cchoice
+				hover:text-white
+			"
+			_={ "on click go to url '" + utils.URL(href) + "'" }
+		>
+			for _, child := range children {
+				@child
+			}
+			<!-- <span class="hidden md:block">{ label }</span> -->
+			<!-- <span>{ label }</span> -->
+		</button>
+	</div>
+}
+
+templ IconAction(
+	label string,
+	href string,
+	children ...templ.Component,
+) {
+	<div
+		class="
+			my-2 flex flex-col place-center
+			relative inline-block
+			group py-2 stroke-cchoice rounded-full w-16
+			cursor-pointer hover:bg-cchoice_border
+			text-nowrap items-center flex flex-col text-xs text-cchoice
+			hover:text-white
+		"
+		_={ "on click go to url '" + utils.URL(href) + "'" }
+	>
+		for _, child := range children {
+			@child
+		}
+	</div>
+}
+
+templ ContinueShopping() {
+	<a
+		href={ templ.SafeURL(utils.URL("/")) }
+		class="
+			flex justify-center items-center relative inline-block px-6 py-3
+			bg-cchoice font-medium rounded-lg text-white cursor-pointer
+			transition-colors rounded-full hover:bg-cchoicesoft
+		"
+		title="Continue shopping"
+		alt="Continue shopping button"
+	>
+		Continue Shopping
+	</a>
+}
+
+templ GMapsLink(url string) {
+	<a
+		href={url}
+		target="_blank"
+		rel="noopener noreferrer"
+		aria-label="Open in Google Maps"
+		title="Open in Google Maps"
+		class="
+			inline-flex items-center gap-2
+			p-2 rounded-md
+			text-emerald-600 hover:text-emerald-700
+			hover:bg-emerald-50
+			transition
+		"
+	>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			fill="currentColor"
+			class="w-6 h-6"
+		>
+			<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/>
+		</svg>
+		<span class="text-sm font-medium">Google Maps</span>
+	</a>
+}
+
+templ WazeLink(url string) {
+	<a
+		href={url}
+		target="_blank"
+		rel="noopener noreferrer"
+		aria-label="Open in Waze"
+		title="Open in Waze"
+		class="
+			inline-flex items-center gap-2
+			p-2 rounded-md
+			text-sky-600 hover:text-sky-700
+			hover:bg-sky-50
+			transition
+		"
+	>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			fill="currentColor"
+			class="w-6 h-6"
+		>
+			<path d="M12 2C6.48 2 2 6.03 2 11c0 3.04 1.74 5.73 4.4 7.4L6 22l4.07-2.03c.63.1 1.27.15 1.93.15 5.52 0 10-4.03 10-9s-4.48-9-10-9zm-3 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+		</svg>
+		<span class="text-sm font-medium">Waze</span>
+	</a>
+}
+
+
+templ DiscountRibbon(percentage string) {
+	if DISCOUNT_RIBBON && percentage != "" {
+		<div
+			class="
+				absolute w-full bottom-0
+				mb-1 bg-white/50
+				text-cchoice text-sm font-bold tracking-wide
+				text-center
+			"
+		>
+			-{ percentage }
+		</div>
+	}
+}
+
+//INFO: (Brandon) - when adding this component, make sure to add the
+//                  relevant '<input type="hidden" id="id" value="" name="product_id"/>' as well
+templ AddToCart() {
+	<button
+		id="btn-add-to-cart"
+		class="
+			flex justify-center items-center relative inline-block w-12 h-12
+			bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors
+			group rounded-full hover:bg-cchoicesoft
+		"
+		title="add to cart"
+		alt="add to cart button"
+		hx-post={ utils.URL("/carts/lines") }
+		hx-include="#selected-product-id"
+		hx-swap="none"
+		_="
+			on click
+				async call metrics_event('add_to_cart', #selected-product-id.value)
+				log 'Added to cart: ' + #selected-product-id.value
+				halt
+			end
+			on htmx:afterRequest
+				trigger get on #cart-count-desktop
+				trigger get on #cart-count-mobile
+				if #cart-icon-desktop
+					add .cart-icon-animate to #cart-icon-desktop
+					wait 400ms
+					remove .cart-icon-animate from #cart-icon-desktop
+				end
+				if #cart-icon-mobile
+					add .cart-icon-animate to #cart-icon-mobile
+					wait 400ms
+					remove .cart-icon-animate from #cart-icon-mobile
+				end
+			end
+		"
+	>
+		@svg.Cart("", "stroke-white group-hover:stroke-cchoice_border w-full h-full p-2")
+		<span
+			class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow"
+		>
+			+1
+		</span>
+	</button>
+	<input
+		type="hidden"
+		id="selected-product-id"
+		name="product_id"
+		value=""
+	/>
+}
+
+templ AddToCartPromoProduct() {
+	<button
+		id="btn-add-to-cart"
+		class="
+			flex justify-center items-center relative inline-block w-12 h-12
+			bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors
+			group rounded-full hover:bg-cchoicesoft
+		"
+		title="add to cart"
+		alt="add to cart button"
+		hx-post={ utils.URL("/carts/lines") }
+		hx-include="#promo-product-id"
+		hx-swap="none"
+		_="
+			on click
+				async call metrics_event('add_to_cart', #promo-product-id.value)
+				log 'Added to cart: ' + #promo-product-id.value
+				halt
+			end
+			on htmx:afterRequest
+				trigger get on #cart-count-desktop
+				trigger get on #cart-count-mobile
+				if #cart-icon-desktop
+					add .cart-icon-animate to #cart-icon-desktop
+					wait 400ms
+					remove .cart-icon-animate from #cart-icon-desktop
+				end
+				if #cart-icon-mobile
+					add .cart-icon-animate to #cart-icon-mobile
+					wait 400ms
+					remove .cart-icon-animate from #cart-icon-mobile
+				end
+			end
+		"
+	>
+		@svgCart("", "stroke-white group-hover:stroke-cchoice_border w-full h-full p-2")
+		<span
+			class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow"
+		>
+			+1
+		</span>
+	</button>
+}
+
