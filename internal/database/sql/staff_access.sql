@@ -2,7 +2,7 @@
 INSERT INTO tbl_staff_accesses (
     staff_id,
     login_at,
-    user_agent,
+    useragent_id,
     created_at,
     updated_at
 ) VALUES (
@@ -21,3 +21,16 @@ SET
 WHERE
     id = ?
 RETURNING id;
+
+-- name: GetStaffAccessByID :one
+SELECT
+    id,
+    staff_id,
+    login_at,
+    logout_at,
+    useragent_id,
+    created_at,
+    updated_at
+FROM tbl_staff_accesses
+WHERE id = ?
+LIMIT 1;

@@ -8,10 +8,6 @@ import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
 
 templ StaffAttendanceSingleTable(record *models.Attendance) {
-	if record == nil {
-		<p class="text-gray-500 text-center py-4">No attendance record for this date</p>
-		return
-	}
 	<div class="overflow-x-auto">
 		<table class="min-w-full divide-y divide-gray-200">
 			<thead class="bg-gray-50">
@@ -101,7 +97,11 @@ templ AttendanceSectionForStaff(
 	>
 		@AttendanceToolbar(title, selectedDate, enums.STAFF_USER_TYPE_STAFF)
 		<div id="staff-attendance-table">
-			@StaffAttendanceSingleTable(record)
+			if record != nil {
+				@StaffAttendanceSingleTable(record)
+			} else {
+				<p class="text-gray-500 text-center py-4">No attendance record for this date</p>
+			}
 		</div>
 		@ScriptStaffAttendanceRefresh()
 	</div>

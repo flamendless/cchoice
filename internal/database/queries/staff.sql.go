@@ -80,19 +80,21 @@ INSERT INTO tbl_staff_attendances (
     time_in,
     time_out,
     location,
+    useragent_id,
     created_at,
     updated_at
 ) VALUES (
-    ?, ?, ?, ?, ?, datetime('now'), datetime('now')
+    ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
 ) RETURNING id
 `
 
 type CreateStaffAttendanceParams struct {
-	StaffID  int64
-	ForDate  string
-	TimeIn   sql.NullString
-	TimeOut  sql.NullString
-	Location sql.NullString
+	StaffID     int64
+	ForDate     string
+	TimeIn      sql.NullString
+	TimeOut     sql.NullString
+	Location    sql.NullString
+	UseragentID sql.NullInt64
 }
 
 func (q *Queries) CreateStaffAttendance(ctx context.Context, arg CreateStaffAttendanceParams) (int64, error) {
@@ -102,6 +104,7 @@ func (q *Queries) CreateStaffAttendance(ctx context.Context, arg CreateStaffAtte
 		arg.TimeIn,
 		arg.TimeOut,
 		arg.Location,
+		arg.UseragentID,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -199,6 +202,7 @@ SELECT
     time_in,
     time_out,
     location,
+    useragent_id,
     created_at,
     updated_at
 FROM tbl_staff_attendances
@@ -214,14 +218,15 @@ type GetStaffAttendanceByDateParams struct {
 }
 
 type GetStaffAttendanceByDateRow struct {
-	ID        int64
-	StaffID   int64
-	ForDate   string
-	TimeIn    sql.NullString
-	TimeOut   sql.NullString
-	Location  sql.NullString
-	CreatedAt string
-	UpdatedAt string
+	ID          int64
+	StaffID     int64
+	ForDate     string
+	TimeIn      sql.NullString
+	TimeOut     sql.NullString
+	Location    sql.NullString
+	UseragentID sql.NullInt64
+	CreatedAt   string
+	UpdatedAt   string
 }
 
 func (q *Queries) GetStaffAttendanceByDate(ctx context.Context, arg GetStaffAttendanceByDateParams) (GetStaffAttendanceByDateRow, error) {
@@ -234,6 +239,7 @@ func (q *Queries) GetStaffAttendanceByDate(ctx context.Context, arg GetStaffAtte
 		&i.TimeIn,
 		&i.TimeOut,
 		&i.Location,
+		&i.UseragentID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -248,13 +254,19 @@ SELECT
     sa.time_in,
     sa.time_out,
     sa.location,
+    sa.useragent_id,
     sa.created_at,
     sa.updated_at,
     s.first_name,
     s.middle_name,
-    s.last_name
+    s.last_name,
+    ua.browser,
+    ua.browser_version,
+    ua.os,
+    ua.device
 FROM tbl_staff_attendances sa
 INNER JOIN tbl_staffs s ON s.id = sa.staff_id
+LEFT JOIN tbl_useragents ua ON ua.id = sa.useragent_id
 WHERE
     sa.for_date = ?
     AND s.deleted_at = '1970-01-01 00:00:00+00:00'
@@ -262,17 +274,22 @@ ORDER BY s.last_name ASC, s.first_name ASC
 `
 
 type GetStaffAttendanceByStaffIDAndDateRangeRow struct {
-	ID         int64
-	StaffID    int64
-	ForDate    string
-	TimeIn     sql.NullString
-	TimeOut    sql.NullString
-	Location   sql.NullString
-	CreatedAt  string
-	UpdatedAt  string
-	FirstName  string
-	MiddleName sql.NullString
-	LastName   string
+	ID             int64
+	StaffID        int64
+	ForDate        string
+	TimeIn         sql.NullString
+	TimeOut        sql.NullString
+	Location       sql.NullString
+	UseragentID    sql.NullInt64
+	CreatedAt      string
+	UpdatedAt      string
+	FirstName      string
+	MiddleName     sql.NullString
+	LastName       string
+	Browser        sql.NullString
+	BrowserVersion sql.NullString
+	Os             sql.NullString
+	Device         sql.NullString
 }
 
 func (q *Queries) GetStaffAttendanceByStaffIDAndDateRange(ctx context.Context, forDate string) ([]GetStaffAttendanceByStaffIDAndDateRangeRow, error) {
@@ -291,11 +308,16 @@ func (q *Queries) GetStaffAttendanceByStaffIDAndDateRange(ctx context.Context, f
 			&i.TimeIn,
 			&i.TimeOut,
 			&i.Location,
+			&i.UseragentID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.FirstName,
 			&i.MiddleName,
 			&i.LastName,
+			&i.Browser,
+			&i.BrowserVersion,
+			&i.Os,
+			&i.Device,
 		); err != nil {
 			return nil, err
 		}
@@ -481,6 +503,7 @@ UPDATE tbl_staff_attendances
 SET
     time_in = ?,
     location = ?,
+    useragent_id = ?,
     updated_at = datetime('now')
 WHERE
     staff_id = ?
@@ -489,16 +512,18 @@ RETURNING id
 `
 
 type UpdateStaffAttendanceTimeInParams struct {
-	TimeIn   sql.NullString
-	Location sql.NullString
-	StaffID  int64
-	ForDate  string
+	TimeIn      sql.NullString
+	Location    sql.NullString
+	UseragentID sql.NullInt64
+	StaffID     int64
+	ForDate     string
 }
 
 func (q *Queries) UpdateStaffAttendanceTimeIn(ctx context.Context, arg UpdateStaffAttendanceTimeInParams) (int64, error) {
 	row := q.db.QueryRowContext(ctx, updateStaffAttendanceTimeIn,
 		arg.TimeIn,
 		arg.Location,
+		arg.UseragentID,
 		arg.StaffID,
 		arg.ForDate,
 	)
@@ -511,6 +536,7 @@ const updateStaffAttendanceTimeOut = `-- name: UpdateStaffAttendanceTimeOut :one
 UPDATE tbl_staff_attendances
 SET
     time_out = ?,
+    useragent_id = ?,
     updated_at = datetime('now')
 WHERE
     staff_id = ?
@@ -519,13 +545,19 @@ RETURNING id
 `
 
 type UpdateStaffAttendanceTimeOutParams struct {
-	TimeOut sql.NullString
-	StaffID int64
-	ForDate string
+	TimeOut     sql.NullString
+	UseragentID sql.NullInt64
+	StaffID     int64
+	ForDate     string
 }
 
 func (q *Queries) UpdateStaffAttendanceTimeOut(ctx context.Context, arg UpdateStaffAttendanceTimeOutParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, updateStaffAttendanceTimeOut, arg.TimeOut, arg.StaffID, arg.ForDate)
+	row := q.db.QueryRowContext(ctx, updateStaffAttendanceTimeOut,
+		arg.TimeOut,
+		arg.UseragentID,
+		arg.StaffID,
+		arg.ForDate,
+	)
 	var id int64
 	err := row.Scan(&id)
 	return id, err

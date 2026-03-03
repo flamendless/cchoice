@@ -6,6 +6,7 @@ import (
 
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/types"
 
 	"errors"
 	"fmt"
@@ -57,14 +58,8 @@ type Settings struct {
 	URLFacebook     string
 	URLTikTok       string
 	ShowPromoBanner bool
-	ShopLocation    ShopLocation
+	ShopLocation    types.Location
 	VATPercentage   string
-}
-
-type ShopLocation struct {
-	Lat          float64 `json:"lat"`
-	Lng          float64 `json:"lng"`
-	RadiusMeters int     `json:"radius_meters"`
 }
 
 type MailerooConfig struct {
@@ -213,7 +208,7 @@ func (c *appConfig) SetSettings(settings map[string]string) {
 	}
 
 	if raw := settings["shop_location"]; raw != "" {
-		var sl ShopLocation
+		var sl types.Location
 		if err := json.Unmarshal([]byte(raw), &sl); err == nil {
 			c.Settings.ShopLocation = sl
 		}

@@ -79,6 +79,7 @@ SELECT
     time_in,
     time_out,
     location,
+    useragent_id,
     created_at,
     updated_at
 FROM tbl_staff_attendances
@@ -95,13 +96,19 @@ SELECT
     sa.time_in,
     sa.time_out,
     sa.location,
+    sa.useragent_id,
     sa.created_at,
     sa.updated_at,
     s.first_name,
     s.middle_name,
-    s.last_name
+    s.last_name,
+    ua.browser,
+    ua.browser_version,
+    ua.os,
+    ua.device
 FROM tbl_staff_attendances sa
 INNER JOIN tbl_staffs s ON s.id = sa.staff_id
+LEFT JOIN tbl_useragents ua ON ua.id = sa.useragent_id
 WHERE
     sa.for_date = ?
     AND s.deleted_at = '1970-01-01 00:00:00+00:00'
@@ -137,10 +144,11 @@ INSERT INTO tbl_staff_attendances (
     time_in,
     time_out,
     location,
+    useragent_id,
     created_at,
     updated_at
 ) VALUES (
-    ?, ?, ?, ?, ?, datetime('now'), datetime('now')
+    ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
 ) RETURNING id;
 
 -- name: UpdateStaffAttendanceTimeIn :one
@@ -148,6 +156,7 @@ UPDATE tbl_staff_attendances
 SET
     time_in = ?,
     location = ?,
+    useragent_id = ?,
     updated_at = datetime('now')
 WHERE
     staff_id = ?
@@ -158,6 +167,7 @@ RETURNING id;
 UPDATE tbl_staff_attendances
 SET
     time_out = ?,
+    useragent_id = ?,
     updated_at = datetime('now')
 WHERE
     staff_id = ?

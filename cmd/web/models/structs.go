@@ -155,6 +155,8 @@ type Attendance struct {
 	Duration         string
 	DurationColor    string
 	InShop           bool
+	Location         string
+	DeviceInfo       string
 }
 
 type AdminSuperuserPage struct {

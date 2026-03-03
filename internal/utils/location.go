@@ -1,6 +1,11 @@
 package utils
 
-import "math"
+import (
+	"cchoice/internal/types"
+	"encoding/json"
+	"fmt"
+	"math"
+)
 
 func HaversineDistanceMeters(lat1, lng1, lat2, lng2 float64) float64 {
 	const earthRadiusM = 6371000
@@ -19,4 +24,15 @@ func IsWithinRadius(lat1, lng1, lat2, lng2 float64, radiusMeters int) bool {
 		return false
 	}
 	return HaversineDistanceMeters(lat1, lng1, lat2, lng2) <= float64(radiusMeters)
+}
+
+func FormatLocation(location string) string {
+	if location == "" {
+		return ""
+	}
+	var sl types.Location
+	if err := json.Unmarshal([]byte(location), &sl); err != nil {
+		return location
+	}
+	return fmt.Sprintf("(%f,%f)", sl.Lat, sl.Lng)
 }
