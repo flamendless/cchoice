@@ -139,6 +139,7 @@ type AdminStaffProfile struct {
 	MyAttendance     *Attendance
 	InShop           *bool
 	LocationDisplay  string
+	DistanceMeters   float64
 	UserType         enums.StaffUserType
 }
 

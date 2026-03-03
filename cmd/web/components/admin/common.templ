@@ -178,7 +178,7 @@ templ ScriptAdminLogin() {
 					function() {
 						form.requestSubmit();
 					},
-					{ timeout: 5000 }
+					{ enableHighAccuracy: true, timeout: 15000 }
 				);
 			});
 		})();
