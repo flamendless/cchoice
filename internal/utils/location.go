@@ -2,6 +2,7 @@ package utils
 
 import (
 	"cchoice/internal/types"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -35,4 +36,15 @@ func FormatLocation(location string) string {
 		return location
 	}
 	return fmt.Sprintf("(%f,%f)", sl.Lat, sl.Lng)
+}
+
+func ParseLocation(locationJSON sql.NullString) (lat, lng float64, ok bool) {
+	if !locationJSON.Valid || locationJSON.String == "" {
+		return 0, 0, false
+	}
+	var loc types.Location
+	if err := json.Unmarshal([]byte(locationJSON.String), &loc); err != nil {
+		return 0, 0, false
+	}
+	return loc.Lat, loc.Lng, true
 }
