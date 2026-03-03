@@ -146,7 +146,7 @@ type AdminStaffProfile struct {
 }
 
 type Attendance struct {
-	StaffID          int64
+	StaffID          string
 	FullName         string
 	Date             string
 	TimeIn           string
