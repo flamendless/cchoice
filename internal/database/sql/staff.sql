@@ -7,8 +7,8 @@ SELECT
     birthdate,
     sex,
     date_hired,
-	time_in_schedule,
-	time_out_schedule,
+    time_in_schedule,
+    time_out_schedule,
     position,
     user_type,
     email,
@@ -32,8 +32,8 @@ SELECT
     birthdate,
     sex,
     date_hired,
-	time_in_schedule,
-	time_out_schedule,
+    time_in_schedule,
+    time_out_schedule,
     position,
     user_type,
     email,
@@ -57,8 +57,8 @@ SELECT
     birthdate,
     sex,
     date_hired,
-	time_in_schedule,
-	time_out_schedule,
+    time_in_schedule,
+    time_out_schedule,
     position,
     user_type,
     email,
@@ -79,7 +79,8 @@ SELECT
     time_in,
     time_out,
     location,
-    useragent_id,
+    in_useragent_id,
+    out_useragent_id,
     created_at,
     updated_at
 FROM tbl_staff_attendances
@@ -96,19 +97,25 @@ SELECT
     sa.time_in,
     sa.time_out,
     sa.location,
-    sa.useragent_id,
+    sa.in_useragent_id,
+    sa.out_useragent_id,
     sa.created_at,
     sa.updated_at,
     s.first_name,
     s.middle_name,
     s.last_name,
-    ua.browser,
-    ua.browser_version,
-    ua.os,
-    ua.device
+    in_ua.browser as in_browser,
+    in_ua.browser_version as in_browser_version,
+    in_ua.os as in_os,
+    in_ua.device as in_device,
+    out_ua.browser as out_browser,
+    out_ua.browser_version as out_browser_version,
+    out_ua.os as out_os,
+    out_ua.device as out_device
 FROM tbl_staff_attendances sa
 INNER JOIN tbl_staffs s ON s.id = sa.staff_id
-LEFT JOIN tbl_useragents ua ON ua.id = sa.useragent_id
+LEFT JOIN tbl_useragents in_ua ON in_ua.id = sa.in_useragent_id
+LEFT JOIN tbl_useragents out_ua ON out_ua.id = sa.out_useragent_id
 WHERE
     sa.for_date = ?
     AND s.deleted_at = '1970-01-01 00:00:00+00:00'
@@ -144,11 +151,12 @@ INSERT INTO tbl_staff_attendances (
     time_in,
     time_out,
     location,
-    useragent_id,
+    in_useragent_id,
+    out_useragent_id,
     created_at,
     updated_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
+    ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
 ) RETURNING id;
 
 -- name: UpdateStaffAttendanceTimeIn :one
@@ -156,7 +164,7 @@ UPDATE tbl_staff_attendances
 SET
     time_in = ?,
     location = ?,
-    useragent_id = ?,
+    in_useragent_id = ?,
     updated_at = datetime('now')
 WHERE
     staff_id = ?
@@ -167,7 +175,7 @@ RETURNING id;
 UPDATE tbl_staff_attendances
 SET
     time_out = ?,
-    useragent_id = ?,
+    out_useragent_id = ?,
     updated_at = datetime('now')
 WHERE
     staff_id = ?

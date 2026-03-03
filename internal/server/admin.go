@@ -130,13 +130,21 @@ func buildAdminStaffAttendance(
 		inShop = utils.IsWithinRadius(lat, lng, shopLocation.Lat, shopLocation.Lng, shopLocation.RadiusMeters)
 	}
 
-	deviceInfo := ""
-	if att.Browser.Valid {
-		deviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
-			Browser:        att.Browser.String,
-			BrowserVersion: att.BrowserVersion.String,
-			OS:             att.Os.String,
-			Device:         att.Device.String,
+	var inDeviceInfo, outDeviceInfo string
+	if att.InBrowser.Valid {
+		inDeviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
+			Browser:        att.InBrowser.String,
+			BrowserVersion: att.InBrowserVersion.String,
+			OS:             att.InOs.String,
+			Device:         att.InDevice.String,
+		})
+	}
+	if att.OutBrowser.Valid {
+		outDeviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
+			Browser:        att.OutBrowser.String,
+			BrowserVersion: att.OutBrowserVersion.String,
+			OS:             att.OutOs.String,
+			Device:         att.OutDevice.String,
 		})
 	}
 
@@ -154,7 +162,8 @@ func buildAdminStaffAttendance(
 		DurationColor:    c.durationColor,
 		InShop:           inShop,
 		Location:         att.Location.String,
-		DeviceInfo:       deviceInfo,
+		InDeviceInfo:     inDeviceInfo,
+		OutDeviceInfo:    outDeviceInfo,
 	}
 }
 
@@ -293,4 +302,3 @@ func (s *Server) adminLogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
 }
-

@@ -90,7 +90,8 @@ templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 					@attendanceTableHead("Time Out")
 					@attendanceTableHead("Duration")
 					@attendanceTableHead("Location")
-					@attendanceTableHead("Device")
+					@attendanceTableHead("Time In Device")
+					@attendanceTableHead("Time Out Device")
 				</tr>
 			</thead>
 			<tbody class="bg-white divide-y divide-gray-200">
@@ -153,18 +154,13 @@ templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 							}
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-							if att.Location != "" {
-								<span title={ att.Location }>{ utils.FormatLocation(att.Location) }</span>
-							} else {
-								<span class="text-gray-400">-</span>
-							}
+							<span title={ att.Location }>{ utils.FormatLocation(att.Location) }</span>
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-							if att.DeviceInfo != "" {
-								<span title={ att.DeviceInfo }>{ att.DeviceInfo }</span>
-							} else {
-								<span class="text-gray-400">-</span>
-							}
+							<span title={ att.InDeviceInfo }>{ att.InDeviceInfo }</span>
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+							<span title={ att.OutDeviceInfo }>{ att.OutDeviceInfo }</span>
 						</td>
 					</tr>
 				}
