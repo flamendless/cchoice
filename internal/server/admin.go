@@ -10,6 +10,7 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/types"
@@ -110,6 +111,7 @@ func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentS
 }
 
 func buildAdminStaffAttendance(
+	encoder encode.IEncode,
 	staff queries.GetAllStaffsRow,
 	att queries.GetStaffAttendanceByStaffIDAndDateRangeRow,
 	shopLocation types.Location,
@@ -139,7 +141,7 @@ func buildAdminStaffAttendance(
 	}
 
 	return models.Attendance{
-		StaffID:          att.StaffID,
+		StaffID:          encoder.Encode(att.StaffID),
 		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
 		Date:             att.ForDate,
 		TimeIn:           timeIn,

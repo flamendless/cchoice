@@ -67,7 +67,10 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 		if !ok {
 			continue
 		}
-		attendanceData = append(attendanceData, buildAdminStaffAttendance(staff, att, shop))
+		attendanceData = append(
+			attendanceData,
+			buildAdminStaffAttendance(s.encoder, staff, att, shop),
+		)
 	}
 
 	if err := compadmin.AdminSuperuserAttendanceTable(attendanceData).Render(ctx, w); err != nil {

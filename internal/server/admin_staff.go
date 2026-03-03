@@ -12,6 +12,7 @@ import (
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/services"
@@ -22,7 +23,11 @@ import (
 	"go.uber.org/zap"
 )
 
-func buildStaffDayAttendance(staff queries.GetStaffByIDRow, att queries.GetStaffAttendanceByDateRow) models.Attendance {
+func buildStaffDayAttendance(
+	encoder encode.IEncode,
+	staff queries.GetStaffByIDRow,
+	att queries.GetStaffAttendanceByDateRow,
+) models.Attendance {
 	schedIn, schedOut := "", ""
 	if staff.TimeInSchedule.Valid {
 		schedIn = staff.TimeInSchedule.String
@@ -33,7 +38,7 @@ func buildStaffDayAttendance(staff queries.GetStaffByIDRow, att queries.GetStaff
 	timeIn, timeOut := utils.ExtractTime(att.TimeIn.String), utils.ExtractTime(att.TimeOut.String)
 	c := computeAttendanceStatus(timeIn, timeOut, schedIn, schedOut)
 	return models.Attendance{
-		StaffID:          staff.ID,
+		StaffID:          encoder.Encode(att.StaffID),
 		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
 		Date:             att.ForDate,
 		TimeIn:           timeIn,
@@ -109,7 +114,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		hasTimeIn = attendance.TimeIn.Valid
 		hasTimeOut = attendance.TimeOut.Valid
-		rec := buildStaffDayAttendance(staff, attendance)
+		rec := buildStaffDayAttendance(s.encoder, staff, attendance)
 		myAttendance = &rec
 	}
 
@@ -209,7 +214,7 @@ func (s *Server) adminStaffAttendanceHandler(w http.ResponseWriter, r *http.Requ
 	})
 	var record *models.Attendance
 	if err == nil {
-		rec := buildStaffDayAttendance(staff, attendance)
+		rec := buildStaffDayAttendance(s.encoder, staff, attendance)
 		record = &rec
 	}
 
