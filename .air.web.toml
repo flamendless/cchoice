@@ -8,9 +8,14 @@ tmp_dir = "tmp"
 [build]
   args_bin = [""]
   bin = ""
-  cmd = "mage genall && mage buildweb"
-  delay = 100
-  exclude_dir = ["cmd/web/static/images/", "cmd/web/static/thumbnails/", "cmd/web/static/svg/", "internal/"]
+  cmd = "mage buildweb"
+  delay = 300
+  exclude_dir = [
+    "cmd/web/static/images/",
+    "cmd/web/static/thumbnails/",
+    "cmd/web/static/svg/",
+    "internal/"
+  ]
   exclude_file = []
   exclude_regex = [".*_templ.go", ".*.sql.go"]
   exclude_unchanged = false
@@ -19,7 +24,7 @@ tmp_dir = "tmp"
   include_dir = ["cmd/web"]
   include_ext = ["templ", "html", "css", "js"]
   include_file = []
-  kill_delay = "0s"
+  kill_delay = "500ms"
   log = "build-errors.log"
   poll = false
   poll_interval = 0
@@ -27,7 +32,7 @@ tmp_dir = "tmp"
   pre_cmd = []
   rerun = false
   rerun_delay = 500
-  send_interrupt = false
+  send_interrupt = true
   stop_on_error = true
 
 [color]

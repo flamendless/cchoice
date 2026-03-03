@@ -5,18 +5,24 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./tmp/main"
-  cmd = "mage genAll && mage build"
-  delay = 100
-  exclude_dir = ["internal/database/queries", "cmd/web/static/images/", "cmd/web/static/thumbnails/", "cmd/web/static/svg/", "cmd/goose/"]
+  cmd = "mage build"
+  delay = 300
+  exclude_dir = [
+    "internal/database/queries",
+    "cmd/web/static/images/",
+    "cmd/web/static/thumbnails/",
+    "cmd/web/static/svg/",
+    "cmd/goose/"
+  ]
   exclude_file = ["internal/conf/version_gen.go"]
   exclude_regex = ["_test.go", ".sql.go", ".*_templ.go", "_string.go"]
-  exclude_unchanged = false
+  exclude_unchanged = true
   follow_symlink = false
   full_bin = ""
   include_dir = ["cmd/web", "internal"]
   include_ext = ["tpl", "tmpl", "templ", "html", "js", "css", "go"]
   include_file = []
-  kill_delay = "0s"
+  kill_delay = "500ms"
   log = "build-errors.log"
   poll = false
   poll_interval = 0
@@ -24,7 +30,7 @@ tmp_dir = "tmp"
   pre_cmd = []
   rerun = false
   rerun_delay = 500
-  send_interrupt = false
+  send_interrupt = true
   stop_on_error = true
 
 [color]

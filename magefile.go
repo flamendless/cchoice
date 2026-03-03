@@ -200,6 +200,9 @@ func Build() error {
 }
 
 func BuildWeb() error {
+	if err := GenAll(); err != nil {
+		return err
+	}
 	return run(Command{
 		Type: CmdGoBuild,
 		Out:  filepath.Join(tmpDir, "web"),
