@@ -2,6 +2,7 @@ package server
 
 import (
 	"cchoice/internal/conf"
+	"cchoice/internal/enums"
 	"cchoice/internal/metrics"
 	"cchoice/internal/utils"
 	"crypto/subtle"
@@ -114,3 +115,31 @@ func PrometheusMiddleware(next http.Handler) http.Handler {
 		}
 	})
 }
+
+func (s *Server) requireStaffAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		staffID := s.sessionManager.GetInt64(r.Context(), SessionStaffID)
+		if staffID == 0 {
+			http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (s *Server) requireSuperuserAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		staff, staffID, err := s.getCurrentStaff(r.Context())
+		if staffID == 0 {
+			http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+			return
+		}
+
+		if err != nil || staff.UserType != enums.STAFF_USER_TYPE_SUPERUSER.String() {
+			http.Redirect(w, r, utils.URL("/admin/staff"), http.StatusSeeOther)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
