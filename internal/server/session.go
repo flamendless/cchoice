@@ -4,7 +4,12 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"context"
+	"database/sql"
+	"encoding/json"
 	"slices"
+	"strconv"
+
+	"cchoice/internal/types"
 
 	"github.com/alexedwards/scs/v2"
 )
@@ -14,6 +19,8 @@ const (
 	skShippingQuotation      = "shipping_quotation"
 	skShippingRequest        = "shipping_request"
 	skCheckedItems           = "checked_items"
+	skLocationLat            = "location_lat"
+	skLocationLng            = "location_lng"
 )
 
 func AddToCheckoutLineProductIDs(
@@ -91,4 +98,32 @@ func ToggleCheckedItem(ctx context.Context, sm *scs.SessionManager, itemID strin
 	checkedItems = append(checkedItems, itemID)
 	sm.Put(ctx, skCheckedItems, checkedItems)
 	return checkedItems
+}
+
+func GetLocation(ctx context.Context, sm *scs.SessionManager) sql.NullString {
+	latVal := sm.Get(ctx, skLocationLat)
+	lngVal := sm.Get(ctx, skLocationLng)
+	if latVal == nil || lngVal == nil {
+		return sql.NullString{}
+	}
+	lat, ok1 := latVal.(float64)
+	lng, ok2 := lngVal.(float64)
+	if !ok1 || !ok2 {
+		return sql.NullString{}
+	}
+	b, _ := json.Marshal(types.Location{Lat: lat, Lng: lng})
+	return sql.NullString{String: string(b), Valid: true}
+}
+
+func SetLocation(
+	ctx context.Context,
+	sm *scs.SessionManager,
+	lat, lng string,
+) {
+	if nLat, errLat := strconv.ParseFloat(lat, 64); errLat == nil {
+		if nLng, errLng := strconv.ParseFloat(lng, 64); errLng == nil {
+			sm.Put(ctx, skLocationLat, nLat)
+			sm.Put(ctx, skLocationLng, nLng)
+		}
+	}
 }

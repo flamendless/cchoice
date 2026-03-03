@@ -30,8 +30,6 @@ import (
 const (
 	SessionStaffID       = "staff_id"
 	SessionStaffAccessID = "staff_access_id"
-	SessionLocationLat   = "location_lat"
-	SessionLocationLng   = "location_lng"
 	maxStaffListSize     = 1000
 )
 
@@ -88,47 +86,6 @@ func computeAttendanceStatus(actualIn, actualOut, schedIn, schedOut string) atte
 	return out
 }
 
-func parseAttendanceDate(date string) string {
-	if date == "" {
-		return time.Now().Format(constants.DateLayoutISO)
-	}
-	if _, err := time.Parse(constants.DateLayoutISO, date); err != nil {
-		return time.Now().Format(constants.DateLayoutISO)
-	}
-	return date
-}
-
-type attendanceLocationJSON struct {
-	Lat float64 `json:"lat"`
-	Lng float64 `json:"lng"`
-}
-
-func parseAttendanceLocation(locationJSON sql.NullString) (lat, lng float64, ok bool) {
-	if !locationJSON.Valid || locationJSON.String == "" {
-		return 0, 0, false
-	}
-	var loc attendanceLocationJSON
-	if err := json.Unmarshal([]byte(locationJSON.String), &loc); err != nil {
-		return 0, 0, false
-	}
-	return loc.Lat, loc.Lng, true
-}
-
-func sessionLocationJSON(ctx context.Context, get func(context.Context, string) any) sql.NullString {
-	latVal := get(ctx, SessionLocationLat)
-	lngVal := get(ctx, SessionLocationLng)
-	if latVal == nil || lngVal == nil {
-		return sql.NullString{}
-	}
-	lat, ok1 := latVal.(float64)
-	lng, ok2 := lngVal.(float64)
-	if !ok1 || !ok2 {
-		return sql.NullString{}
-	}
-	b, _ := json.Marshal(attendanceLocationJSON{Lat: lat, Lng: lng})
-	return sql.NullString{String: string(b), Valid: true}
-}
-
 func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentStr string) sql.NullInt64 {
 	if userAgentStr == "" {
 		return sql.NullInt64{}
@@ -167,7 +124,7 @@ func buildAdminStaffAttendance(
 	timeIn, timeOut := utils.ExtractTime(att.TimeIn.String), utils.ExtractTime(att.TimeOut.String)
 	c := computeAttendanceStatus(timeIn, timeOut, schedIn, schedOut)
 	inShop := false
-	if lat, lng, ok := parseAttendanceLocation(att.Location); ok && shopLocation.RadiusMeters > 0 {
+	if lat, lng, ok := utils.ParseLocation(att.Location); ok && shopLocation.RadiusMeters > 0 {
 		inShop = utils.IsWithinRadius(lat, lng, shopLocation.Lat, shopLocation.Lng, shopLocation.RadiusMeters)
 	}
 
@@ -355,12 +312,7 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if latStr, lngStr := r.PostFormValue("location_lat"), r.PostFormValue("location_lng"); latStr != "" && lngStr != "" {
-		if lat, errLat := strconv.ParseFloat(latStr, 64); errLat == nil {
-			if lng, errLng := strconv.ParseFloat(lngStr, 64); errLng == nil {
-				s.sessionManager.Put(ctx, SessionLocationLat, lat)
-				s.sessionManager.Put(ctx, SessionLocationLng, lng)
-			}
-		}
+		SetLocation(ctx, s.sessionManager, latStr, lngStr)
 	}
 
 	switch enums.ParseStaffUserTypeToEnum(staff.UserType) {
@@ -465,14 +417,14 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	var inShop *bool
 	if shop.RadiusMeters > 0 {
 		if err == nil {
-			if lat, lng, ok := parseAttendanceLocation(attendance.Location); ok {
+			if lat, lng, ok := utils.ParseLocation(attendance.Location); ok {
 				b := utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
 				inShop = &b
 			}
 		}
 		if inShop == nil {
-			locJSON := sessionLocationJSON(ctx, func(c context.Context, k string) any { return s.sessionManager.Get(c, k) })
-			if lat, lng, ok := parseAttendanceLocation(locJSON); ok {
+			locJSON := GetLocation(ctx, s.sessionManager)
+			if lat, lng, ok := utils.ParseLocation(locJSON); ok {
 				b := utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
 				inShop = &b
 			}
@@ -483,8 +435,8 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	scheduledTimeOut := staff.TimeOutSchedule.String
 
 	locationDisplay := ""
-	if locJSON := sessionLocationJSON(ctx, func(c context.Context, k string) any { return s.sessionManager.Get(c, k) }); locJSON.Valid {
-		if lat, lng, ok := parseAttendanceLocation(locJSON); ok {
+	if locJSON := GetLocation(ctx, s.sessionManager); locJSON.Valid {
+		if lat, lng, ok := utils.ParseLocation(locJSON); ok {
 			locationDisplay = fmt.Sprintf("%.4f, %.4f", lat, lng)
 		}
 	}
@@ -544,7 +496,7 @@ func (s *Server) adminStaffAttendanceHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	date := parseAttendanceDate(r.URL.Query().Get("date"))
+	date := utils.ParseAttendanceDate(r.URL.Query().Get("date"))
 
 	attendance, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
 		StaffID: staffID,
@@ -581,7 +533,7 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	locationFromSession := sessionLocationJSON(ctx, func(c context.Context, k string) any { return s.sessionManager.Get(c, k) })
+	locationFromSession := GetLocation(ctx, s.sessionManager)
 
 	userAgentStr := r.UserAgent()
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, userAgentStr)
@@ -706,7 +658,7 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 	const logtag = "[Admin Superuser Attendance Handler]"
 	ctx := r.Context()
 
-	date := parseAttendanceDate(r.URL.Query().Get("date"))
+	date := utils.ParseAttendanceDate(r.URL.Query().Get("date"))
 
 	attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByStaffIDAndDateRange(ctx, date)
 	if err != nil {
@@ -745,7 +697,7 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 func (s *Server) adminSuperuserAttendancePageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Superuser Attendance Page Handler]"
 	ctx := r.Context()
-	date := parseAttendanceDate(r.URL.Query().Get("date"))
+	date := utils.ParseAttendanceDate(r.URL.Query().Get("date"))
 
 	if err := compadmin.AdminSuperuserAttendancePage("Staff Attendance", date).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
@@ -848,7 +800,7 @@ func (s *Server) adminStaffAttendanceLocationHandler(w http.ResponseWriter, r *h
 		lngStr = r.PostFormValue("lng")
 	}
 
-	date = parseAttendanceDate(date)
+	date = utils.ParseAttendanceDate(date)
 	if latStr == "" || lngStr == "" {
 		staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
 		if err != nil || staff.UserType != enums.STAFF_USER_TYPE_SUPERUSER.String() {
@@ -865,7 +817,7 @@ func (s *Server) adminStaffAttendanceLocationHandler(w http.ResponseWriter, r *h
 		return
 	}
 
-	locJSON, _ := json.Marshal(attendanceLocationJSON{Lat: lat, Lng: lng})
+	locJSON, _ := json.Marshal(types.Location{Lat: lat, Lng: lng})
 	location := sql.NullString{String: string(locJSON), Valid: true}
 
 	_, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{

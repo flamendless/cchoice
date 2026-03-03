@@ -58,3 +58,13 @@ func ExtractTime(datetimeStr string) string {
 	}
 	return t.Format("15:04:05")
 }
+
+func ParseAttendanceDate(date string) string {
+	if date == "" {
+		return time.Now().Format(constants.DateLayoutISO)
+	}
+	if _, err := time.Parse(constants.DateLayoutISO, date); err != nil {
+		return time.Now().Format(constants.DateLayoutISO)
+	}
+	return date
+}
