@@ -155,25 +155,7 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 					</div>
 
 					if profile.UserType != enums.STAFF_USER_TYPE_SUPERUSER {
-						<div class="mb-4 p-3 rounded-lg border" id="staff-location-status">
-							if profile.InShop != nil {
-								if *profile.InShop {
-									<p class="text-green-700 font-medium">In shop</p>
-								} else {
-									<p class="text-red-700 font-medium">Out of shop</p>
-									if profile.LocationDisplay != "" {
-										<p class="text-sm text-gray-600 mt-1">Your location: { profile.LocationDisplay }</p>
-									}
-									<p class="text-sm text-gray-600 mt-1">Distance to shop: { fmt.Sprintf("%.0f", profile.DistanceMeters) }m</p>
-									<p class="text-sm text-gray-600 mt-1">Make sure you enable location services and refresh the page.</p>
-								}
-							} else {
-								<p class="text-gray-500">Location unknown</p>
-								<p class="text-sm text-gray-600 mt-1">Your location: { profile.LocationDisplay }</p>
-								<p class="text-sm text-gray-600 mt-1">Distance to shop: { fmt.Sprintf("%.0f", profile.DistanceMeters) }m</p>
-								<p class="text-sm text-gray-600 mt-1">Make sure you enable location services and refresh the page.</p>
-							}
-						</div>
+						@StaffLocationStatus(profile)
 					}
 
 					<div class="space-y-4">
@@ -224,6 +206,55 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 			@ScriptClock()
 		</body>
 	</html>
+}
+
+templ StaffLocationStatus(profile models.AdminStaffProfile) {
+	<div
+		class="mb-4 p-3 rounded-lg border"
+		id="staff-location-status"
+		hx-post={ utils.URL("/admin/staff/attendance/location") }
+		hx-trigger="location-ready"
+		hx-swap="outerHTML"
+	>
+		if profile.InShop != nil {
+			if *profile.InShop {
+				<p class="text-green-700 font-medium">In shop</p>
+			} else {
+				<p class="text-red-700 font-medium">Out of shop</p>
+			}
+		} else {
+			<p class="text-gray-500">Location unknown</p>
+		}
+		<p class="text-sm text-gray-600 mt-1">Your location: { profile.LocationDisplay }</p>
+		<p class="text-sm text-gray-600 mt-1">Distance to shop: { fmt.Sprintf("%.0f", profile.DistanceMeters) }m</p>
+		<p class="text-sm text-gray-600 mt-1">
+			Make sure you enable location services.
+		</p>
+	</div>
+
+	<script>
+		(function () {
+			if (!navigator.geolocation) return;
+
+			navigator.geolocation.getCurrentPosition(
+				function (pos) {
+					var el = document.getElementById("staff-location-status");
+					if (!el) return;
+
+					el.setAttribute("hx-vals", JSON.stringify({
+						lat: pos.coords.latitude,
+						lng: pos.coords.longitude
+					}));
+
+					htmx.trigger(el, "location-ready");
+				},
+				function () {
+					console.warn("Unable to retrieve location");
+				},
+				{ enableHighAccuracy: true, timeout: 15000 }
+			);
+		})();
+	</script>
 }
 
 templ ScriptStaffAttendanceRefresh() {
@@ -309,12 +340,6 @@ templ ScriptStaffAttendanceRefresh() {
 					{ enableHighAccuracy: true, timeout: 15000 }
 				);
 			});
-
-			if (requireLocation && navigator.geolocation) {
-				setTimeout(function() {
-					btn.click();
-				}, 500);
-			}
 		})();
 	</script>
 }

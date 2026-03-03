@@ -6,11 +6,11 @@ require (
 	cloud.google.com/go/vision v1.2.0
 	cloud.google.com/go/vision/v2 v2.9.6
 	github.com/Rhymond/go-money v1.0.15
-	github.com/VictoriaMetrics/fastcache v1.13.2
-	github.com/a-h/templ v0.3.960
+	github.com/VictoriaMetrics/fastcache v1.13.3
+	github.com/a-h/templ v0.3.1001
 	github.com/alexedwards/scs/v2 v2.9.0
 	github.com/cohesivestack/valgo v0.7.1
-	github.com/davidbyttow/govips/v2 v2.16.0
+	github.com/davidbyttow/govips/v2 v2.17.0
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-chi/cors v1.2.2
@@ -22,18 +22,19 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/maileroo/maileroo-go-sdk v1.0.0
 	github.com/mattn/go-sqlite3 v1.14.34
+	github.com/medama-io/go-useragent v1.2.3
 	github.com/minio/minio-go/v7 v7.0.98
 	github.com/prometheus/client_golang v1.23.2
 	github.com/spf13/cobra v1.10.2
 	github.com/sqids/sqids-go v0.4.1
 	github.com/stretchr/testify v1.11.1
-	github.com/xuri/excelize/v2 v2.10.0
+	github.com/xuri/excelize/v2 v2.10.1
 	go.uber.org/zap v1.27.1
 	golang.org/x/crypto v0.48.0
-	golang.org/x/net v0.50.0
+	golang.org/x/net v0.51.0
 	golang.org/x/sync v0.19.0
 	golang.org/x/text v0.34.0
-	google.golang.org/api v0.267.0
+	google.golang.org/api v0.269.0
 	maragu.dev/goqite v0.4.0
 )
 
@@ -116,7 +117,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mdempsky/unconvert v0.0.0-20250216222326-4a038b3d31f5 // indirect
-	github.com/medama-io/go-useragent v1.2.3 // indirect
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/minio/crc64nvme v1.1.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
@@ -139,7 +139,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.67.5 // indirect
-	github.com/prometheus/procfs v0.19.2 // indirect
+	github.com/prometheus/procfs v0.20.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/richardlehane/mscfb v1.0.6 // indirect
 	github.com/richardlehane/msoleps v1.0.6 // indirect
@@ -170,11 +170,11 @@ require (
 	github.com/xuri/nfp v0.0.2-0.20250530014748-2ddeb826f9a9 // indirect
 	go.augendre.info/fatcontext v0.8.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.65.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.65.0 // indirect
-	go.opentelemetry.io/otel v1.40.0 // indirect
-	go.opentelemetry.io/otel/metric v1.40.0 // indirect
-	go.opentelemetry.io/otel/trace v1.40.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.66.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.66.0 // indirect
+	go.opentelemetry.io/otel v1.41.0 // indirect
+	go.opentelemetry.io/otel/metric v1.41.0 // indirect
+	go.opentelemetry.io/otel/trace v1.41.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
@@ -192,9 +192,9 @@ require (
 	golang.org/x/tools v0.41.0 // indirect
 	golang.org/x/tools/go/packages/packagestest v0.1.1-deprecated // indirect
 	golang.org/x/vuln v1.1.4 // indirect
-	google.golang.org/genproto v0.0.0-20260217215200-42d3e9bedb6d // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260217215200-42d3e9bedb6d // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260217215200-42d3e9bedb6d // indirect
+	google.golang.org/genproto v0.0.0-20260226221140-a57be14db171 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260226221140-a57be14db171 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260226221140-a57be14db171 // indirect
 	google.golang.org/grpc v1.79.1 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
@@ -209,6 +209,66 @@ require (
 )
 
 tool (
+	cchoice
+	cchoice/cmd
+	cchoice/cmd/genversion
+	cchoice/cmd/parse_map/enums
+	cchoice/cmd/parse_map/models
+	cchoice/cmd/parse_products/models
+	cchoice/cmd/parse_products/templates
+	cchoice/cmd/web/components
+	cchoice/cmd/web/components/admin
+	cchoice/cmd/web/components/cart
+	cchoice/cmd/web/components/common
+	cchoice/cmd/web/components/footer
+	cchoice/cmd/web/components/header
+	cchoice/cmd/web/components/order
+	cchoice/cmd/web/components/payment
+	cchoice/cmd/web/components/search
+	cchoice/cmd/web/components/shop
+	cchoice/cmd/web/components/svg
+	cchoice/cmd/web/models
+	cchoice/cmd/web/static
+	cchoice/internal/cart
+	cchoice/internal/changelogs
+	cchoice/internal/conf
+	cchoice/internal/constants
+	cchoice/internal/database
+	cchoice/internal/database/queries
+	cchoice/internal/database/sql
+	cchoice/internal/encode
+	cchoice/internal/encode/b64
+	cchoice/internal/encode/sqids
+	cchoice/internal/enums
+	cchoice/internal/errs
+	cchoice/internal/geocoding
+	cchoice/internal/geocoding/googlemaps
+	cchoice/internal/httputil
+	cchoice/internal/images
+	cchoice/internal/jobs
+	cchoice/internal/logs
+	cchoice/internal/mail
+	cchoice/internal/mail/maileroo
+	cchoice/internal/metrics
+	cchoice/internal/orders
+	cchoice/internal/payments
+	cchoice/internal/payments/paymongo
+	cchoice/internal/receipt
+	cchoice/internal/receipt/scanner
+	cchoice/internal/receipt/scanner/googlevision
+	cchoice/internal/receipt/writer
+	cchoice/internal/receipt/writer/csv
+	cchoice/internal/requests
+	cchoice/internal/server
+	cchoice/internal/shipping
+	cchoice/internal/shipping/cchoice
+	cchoice/internal/shipping/lalamove
+	cchoice/internal/storage
+	cchoice/internal/storage/cloudflare
+	cchoice/internal/storage/linode
+	cchoice/internal/storage/local
+	cchoice/internal/types
+	cchoice/internal/utils
 	github.com/a-h/templ/cmd/templ
 	github.com/air-verse/air
 	github.com/alexkohler/prealloc

@@ -140,6 +140,8 @@ type AdminStaffProfile struct {
 	InShop           *bool
 	LocationDisplay  string
 	DistanceMeters   float64
+	Lat              float64
+	Lng              float64
 	UserType         enums.StaffUserType
 }
 
