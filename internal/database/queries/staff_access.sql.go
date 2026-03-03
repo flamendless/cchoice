@@ -14,7 +14,7 @@ const createStaffAccess = `-- name: CreateStaffAccess :one
 INSERT INTO tbl_staff_accesses (
     staff_id,
     login_at,
-    user_agent,
+    useragent_id,
     created_at,
     updated_at
 ) VALUES (
@@ -27,15 +27,54 @@ INSERT INTO tbl_staff_accesses (
 `
 
 type CreateStaffAccessParams struct {
-	StaffID   int64
-	UserAgent sql.NullString
+	StaffID     int64
+	UseragentID sql.NullInt64
 }
 
 func (q *Queries) CreateStaffAccess(ctx context.Context, arg CreateStaffAccessParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, createStaffAccess, arg.StaffID, arg.UserAgent)
+	row := q.db.QueryRowContext(ctx, createStaffAccess, arg.StaffID, arg.UseragentID)
 	var id int64
 	err := row.Scan(&id)
 	return id, err
+}
+
+const getStaffAccessByID = `-- name: GetStaffAccessByID :one
+SELECT
+    id,
+    staff_id,
+    login_at,
+    logout_at,
+    useragent_id,
+    created_at,
+    updated_at
+FROM tbl_staff_accesses
+WHERE id = ?
+LIMIT 1
+`
+
+type GetStaffAccessByIDRow struct {
+	ID          int64
+	StaffID     int64
+	LoginAt     string
+	LogoutAt    sql.NullString
+	UseragentID sql.NullInt64
+	CreatedAt   string
+	UpdatedAt   string
+}
+
+func (q *Queries) GetStaffAccessByID(ctx context.Context, id int64) (GetStaffAccessByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getStaffAccessByID, id)
+	var i GetStaffAccessByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.StaffID,
+		&i.LoginAt,
+		&i.LogoutAt,
+		&i.UseragentID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
 
 const updateStaffAccessLogout = `-- name: UpdateStaffAccessLogout :one

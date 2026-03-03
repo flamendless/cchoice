@@ -288,22 +288,34 @@ type TblStaff struct {
 }
 
 type TblStaffAccess struct {
-	ID        int64
-	StaffID   int64
-	LoginAt   string
-	LogoutAt  sql.NullString
-	UserAgent sql.NullString
-	CreatedAt string
-	UpdatedAt string
+	ID          int64
+	StaffID     int64
+	LoginAt     string
+	LogoutAt    sql.NullString
+	CreatedAt   string
+	UpdatedAt   string
+	UseragentID sql.NullInt64
 }
 
 type TblStaffAttendance struct {
-	ID        int64
-	StaffID   int64
-	ForDate   string
-	TimeIn    sql.NullString
-	TimeOut   sql.NullString
-	CreatedAt string
-	UpdatedAt string
-	Location  sql.NullString
+	ID          int64
+	StaffID     int64
+	ForDate     string
+	TimeIn      sql.NullString
+	TimeOut     sql.NullString
+	CreatedAt   string
+	UpdatedAt   string
+	Location    sql.NullString
+	UseragentID sql.NullInt64
+}
+
+type TblUseragent struct {
+	ID             int64
+	UserAgent      string
+	Browser        string
+	BrowserVersion string
+	Os             string
+	Device         string
+	CreatedAt      string
+	UpdatedAt      string
 }

@@ -12,10 +12,12 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
+	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
+	"cchoice/internal/types"
 	"cchoice/internal/utils"
 
 	"golang.org/x/crypto/bcrypt"
@@ -127,7 +129,34 @@ func sessionLocationJSON(ctx context.Context, get func(context.Context, string) 
 	return sql.NullString{String: string(b), Valid: true}
 }
 
-func buildAdminStaffAttendance(staff queries.GetAllStaffsRow, att queries.GetStaffAttendanceByStaffIDAndDateRangeRow, shop conf.ShopLocation) models.Attendance {
+func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentStr string) sql.NullInt64 {
+	if userAgentStr == "" {
+		return sql.NullInt64{}
+	}
+
+	uaInfo := utils.ParseUserAgent(userAgentStr)
+	if uaInfo.Browser == "" {
+		return sql.NullInt64{}
+	}
+
+	id, err := db.GetQueries().UpsertUserAgent(ctx, queries.UpsertUserAgentParams{
+		UserAgent:      userAgentStr,
+		Browser:        uaInfo.Browser,
+		BrowserVersion: uaInfo.BrowserVersion,
+		Os:             uaInfo.OS,
+		Device:         uaInfo.Device,
+	})
+	if err != nil {
+		return sql.NullInt64{}
+	}
+	return sql.NullInt64{Int64: id, Valid: true}
+}
+
+func buildAdminStaffAttendance(
+	staff queries.GetAllStaffsRow,
+	att queries.GetStaffAttendanceByStaffIDAndDateRangeRow,
+	shopLocation types.Location,
+) models.Attendance {
 	schedIn, schedOut := "", ""
 	if staff.TimeInSchedule.Valid {
 		schedIn = staff.TimeInSchedule.String
@@ -138,9 +167,20 @@ func buildAdminStaffAttendance(staff queries.GetAllStaffsRow, att queries.GetSta
 	timeIn, timeOut := utils.ExtractTime(att.TimeIn.String), utils.ExtractTime(att.TimeOut.String)
 	c := computeAttendanceStatus(timeIn, timeOut, schedIn, schedOut)
 	inShop := false
-	if lat, lng, ok := parseAttendanceLocation(att.Location); ok && shop.RadiusMeters > 0 {
-		inShop = utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
+	if lat, lng, ok := parseAttendanceLocation(att.Location); ok && shopLocation.RadiusMeters > 0 {
+		inShop = utils.IsWithinRadius(lat, lng, shopLocation.Lat, shopLocation.Lng, shopLocation.RadiusMeters)
 	}
+
+	deviceInfo := ""
+	if att.Browser.Valid {
+		deviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
+			Browser:        att.Browser.String,
+			BrowserVersion: att.BrowserVersion.String,
+			OS:             att.Os.String,
+			Device:         att.Device.String,
+		})
+	}
+
 	return models.Attendance{
 		StaffID:          att.StaffID,
 		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
@@ -154,6 +194,8 @@ func buildAdminStaffAttendance(staff queries.GetAllStaffsRow, att queries.GetSta
 		Duration:         c.duration,
 		DurationColor:    c.durationColor,
 		InShop:           inShop,
+		Location:         att.Location.String,
+		DeviceInfo:       deviceInfo,
 	}
 }
 
@@ -298,13 +340,13 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	s.sessionManager.Put(ctx, SessionStaffID, staff.ID)
 
-	userAgent := sql.NullString{}
+	useragentID := sql.NullInt64{}
 	if ua := r.UserAgent(); ua != "" {
-		userAgent = sql.NullString{String: ua, Valid: true}
+		useragentID = getOrCreateUserAgentID(context.Background(), s.dbRW, ua)
 	}
 	accessID, err := s.dbRW.GetQueries().CreateStaffAccess(context.Background(), queries.CreateStaffAccessParams{
-		StaffID:   staff.ID,
-		UserAgent: userAgent,
+		StaffID:     staff.ID,
+		UseragentID: useragentID,
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -541,6 +583,9 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 
 	locationFromSession := sessionLocationJSON(ctx, func(c context.Context, k string) any { return s.sessionManager.Get(c, k) })
 
+	userAgentStr := r.UserAgent()
+	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, userAgentStr)
+
 	if err == nil && existing.TimeIn.Valid {
 		http.Error(w, "Time in already recorded for today", http.StatusBadRequest)
 		return
@@ -548,11 +593,12 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 
 	if err == sql.ErrNoRows {
 		_, err = s.dbRW.GetQueries().CreateStaffAttendance(ctx, queries.CreateStaffAttendanceParams{
-			StaffID:  staffID,
-			ForDate:  today,
-			TimeIn:   sql.NullString{String: now, Valid: true},
-			TimeOut:  sql.NullString{},
-			Location: locationFromSession,
+			StaffID:     staffID,
+			ForDate:     today,
+			TimeIn:      sql.NullString{String: now, Valid: true},
+			TimeOut:     sql.NullString{},
+			Location:    locationFromSession,
+			UseragentID: useragentID,
 		})
 		if err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -561,10 +607,11 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 		}
 	} else {
 		_, err = s.dbRW.GetQueries().UpdateStaffAttendanceTimeIn(ctx, queries.UpdateStaffAttendanceTimeInParams{
-			TimeIn:   sql.NullString{String: now, Valid: true},
-			Location: locationFromSession,
-			StaffID:  staffID,
-			ForDate:  today,
+			TimeIn:      sql.NullString{String: now, Valid: true},
+			Location:    locationFromSession,
+			UseragentID: useragentID,
+			StaffID:     staffID,
+			ForDate:     today,
 		})
 		if err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -609,10 +656,14 @@ func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	userAgentStr := r.UserAgent()
+	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, userAgentStr)
+
 	_, err = s.dbRW.GetQueries().UpdateStaffAttendanceTimeOut(ctx, queries.UpdateStaffAttendanceTimeOutParams{
-		TimeOut: sql.NullString{String: now, Valid: true},
-		StaffID: staffID,
-		ForDate: today,
+		TimeOut:     sql.NullString{String: now, Valid: true},
+		UseragentID: useragentID,
+		StaffID:     staffID,
+		ForDate:     today,
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
