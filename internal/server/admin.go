@@ -438,6 +438,8 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	if locJSON := GetLocation(ctx, s.sessionManager); locJSON.Valid {
 		if lat, lng, ok := utils.ParseLocation(locJSON); ok {
 			locationDisplay = fmt.Sprintf("%.4f, %.4f", lat, lng)
+		} else {
+			locationDisplay = locJSON.String
 		}
 	}
 

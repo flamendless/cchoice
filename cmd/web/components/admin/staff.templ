@@ -168,9 +168,7 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 								}
 							} else {
 								<p class="text-gray-500">Location unknown</p>
-								if profile.LocationDisplay != "" {
-									<p class="text-sm text-gray-600 mt-1">Your location: { profile.LocationDisplay }</p>
-								}
+								<p class="text-sm text-gray-600 mt-1">Your location: { profile.LocationDisplay }</p>
 								<p class="text-sm text-gray-600 mt-1">Make sure you enable location services and refresh the page.</p>
 							}
 						</div>
@@ -273,6 +271,7 @@ templ ScriptStaffAttendanceRefresh() {
 					return;
 				}
 				showSpinner();
+
 				navigator.geolocation.getCurrentPosition(
 					function(pos) {
 						var body = "date=" + encodeURIComponent(dateInput.value) + "&lat=" + encodeURIComponent(pos.coords.latitude) + "&lng=" + encodeURIComponent(pos.coords.longitude);
