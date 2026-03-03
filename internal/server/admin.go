@@ -435,9 +435,13 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	scheduledTimeOut := staff.TimeOutSchedule.String
 
 	locationDisplay := ""
+	distanceMeters := 0.0
 	if locJSON := GetLocation(ctx, s.sessionManager); locJSON.Valid {
 		if lat, lng, ok := utils.ParseLocation(locJSON); ok {
 			locationDisplay = fmt.Sprintf("%.4f, %.4f", lat, lng)
+			if shop.Lat != 0 && shop.Lng != 0 {
+				distanceMeters = utils.HaversineDistanceMeters(lat, lng, shop.Lat, shop.Lng)
+			}
 		} else {
 			locationDisplay = locJSON.String
 		}
@@ -472,6 +476,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		MyAttendance:     myAttendance,
 		InShop:           inShop,
 		LocationDisplay:  locationDisplay,
+		DistanceMeters:   distanceMeters,
 		UserType:         enums.ParseStaffUserTypeToEnum(staff.UserType),
 	}
 

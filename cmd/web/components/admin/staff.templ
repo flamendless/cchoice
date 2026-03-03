@@ -164,11 +164,13 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 									if profile.LocationDisplay != "" {
 										<p class="text-sm text-gray-600 mt-1">Your location: { profile.LocationDisplay }</p>
 									}
+									<p class="text-sm text-gray-600 mt-1">Distance to shop: { fmt.Sprintf("%.0f", profile.DistanceMeters) }m</p>
 									<p class="text-sm text-gray-600 mt-1">Make sure you enable location services and refresh the page.</p>
 								}
 							} else {
 								<p class="text-gray-500">Location unknown</p>
 								<p class="text-sm text-gray-600 mt-1">Your location: { profile.LocationDisplay }</p>
+								<p class="text-sm text-gray-600 mt-1">Distance to shop: { fmt.Sprintf("%.0f", profile.DistanceMeters) }m</p>
 								<p class="text-sm text-gray-600 mt-1">Make sure you enable location services and refresh the page.</p>
 							}
 						</div>
@@ -304,9 +306,15 @@ templ ScriptStaffAttendanceRefresh() {
 							htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
 						}
 					},
-					{ timeout: 5000 }
+					{ enableHighAccuracy: true, timeout: 15000 }
 				);
 			});
+
+			if (requireLocation && navigator.geolocation) {
+				setTimeout(function() {
+					btn.click();
+				}, 500);
+			}
 		})();
 	</script>
 }
