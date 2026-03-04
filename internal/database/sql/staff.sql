@@ -78,7 +78,8 @@ SELECT
     for_date,
     time_in,
     time_out,
-    location,
+    in_location,
+    out_location,
     in_useragent_id,
     out_useragent_id,
     created_at,
@@ -96,7 +97,8 @@ SELECT
     sa.for_date,
     sa.time_in,
     sa.time_out,
-    sa.location,
+    sa.in_location,
+    sa.out_location,
     sa.in_useragent_id,
     sa.out_useragent_id,
     sa.created_at,
@@ -129,8 +131,8 @@ INSERT INTO tbl_staffs (
     birthdate,
     sex,
     date_hired,
-	time_in_schedule,
-	time_out_schedule,
+    time_in_schedule,
+    time_out_schedule,
     position,
     user_type,
     email,
@@ -150,20 +152,21 @@ INSERT INTO tbl_staff_attendances (
     for_date,
     time_in,
     time_out,
-    location,
+    in_location,
+    out_location,
     in_useragent_id,
     out_useragent_id,
     created_at,
     updated_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
+    ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
 ) RETURNING id;
 
 -- name: UpdateStaffAttendanceTimeIn :one
 UPDATE tbl_staff_attendances
 SET
     time_in = ?,
-    location = ?,
+    in_location = ?,
     in_useragent_id = ?,
     updated_at = datetime('now')
 WHERE
@@ -185,7 +188,7 @@ RETURNING id;
 -- name: UpdateStaffAttendanceLocation :one
 UPDATE tbl_staff_attendances
 SET
-    location = ?,
+    out_location = ?,
     updated_at = datetime('now')
 WHERE
     staff_id = ?

@@ -119,12 +119,16 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	shop := conf.Conf().Settings.ShopLocation
-	var inShop *bool
+	var inShop, outShop *bool
 	if shop.RadiusMeters > 0 {
 		if err == nil {
-			if lat, lng, ok := utils.ParseLocation(attendance.Location); ok {
+			if lat, lng, ok := utils.ParseLocation(attendance.InLocation); ok {
 				b := utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
 				inShop = &b
+			}
+			if lat, lng, ok := utils.ParseLocation(attendance.OutLocation); ok {
+				b := utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
+				outShop = &b
 			}
 		}
 		if inShop == nil {
@@ -132,6 +136,13 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 			if lat, lng, ok := utils.ParseLocation(locJSON); ok {
 				b := utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
 				inShop = &b
+			}
+		}
+		if outShop == nil {
+			locJSON := GetLocation(ctx, s.sessionManager)
+			if lat, lng, ok := utils.ParseLocation(locJSON); ok {
+				b := utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
+				outShop = &b
 			}
 		}
 	}
@@ -154,12 +165,13 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 
 	canTimeIn := !hasTimeIn
 	canTimeOut := hasTimeIn && !hasTimeOut
-	if staff.RequireInShop {
-		if inShop == nil || !*inShop {
-			canTimeIn = false
-			canTimeOut = false
-		}
-	}
+	//INFO: (flam) - allow for now
+	// if staff.RequireInShop {
+	// 	if inShop == nil || !*inShop {
+	// 		canTimeIn = false
+	// 		canTimeOut = false
+	// 	}
+	// }
 
 	profile := models.AdminStaffProfile{
 		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
@@ -180,6 +192,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		RequireInShop:    staff.RequireInShop,
 		MyAttendance:     myAttendance,
 		InShop:           inShop,
+		OutShop:          outShop,
 		LocationDisplay:  locationDisplay,
 		DistanceMeters:   distanceMeters,
 		UserType:         enums.ParseStaffUserTypeToEnum(staff.UserType),
