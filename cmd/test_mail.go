@@ -62,7 +62,7 @@ var cmdTestMail = &cobra.Command{
 			dbRO := database.New(database.DB_MODE_RO)
 			settings, err := requests.GetSettingsData(
 				ctx,
-				fastcache.New(constants.CACHE_MAX_BYTES),
+				fastcache.New(constants.CacheMaxBytes),
 				&singleflight.Group{},
 				dbRO,
 				[]byte("test_mail_settings"),

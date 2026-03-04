@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"cchoice/internal/constants"
 	"cchoice/internal/types"
 	"database/sql"
 	"encoding/json"
@@ -9,7 +10,6 @@ import (
 )
 
 func HaversineDistanceMeters(lat1, lng1, lat2, lng2 float64) float64 {
-	const earthRadiusM = 6371000
 	lat1Rad := lat1 * math.Pi / 180
 	lat2Rad := lat2 * math.Pi / 180
 	deltaLat := (lat2 - lat1) * math.Pi / 180
@@ -17,7 +17,7 @@ func HaversineDistanceMeters(lat1, lng1, lat2, lng2 float64) float64 {
 	a := math.Sin(deltaLat/2)*math.Sin(deltaLat/2) +
 		math.Cos(lat1Rad)*math.Cos(lat2Rad)*math.Sin(deltaLng/2)*math.Sin(deltaLng/2)
 	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
-	return earthRadiusM * c
+	return constants.EarthRadiusMeters * c
 }
 
 func IsWithinRadius(lat1, lng1, lat2, lng2 float64, radiusMeters int) bool {
