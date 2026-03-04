@@ -138,6 +138,7 @@ type AdminStaffProfile struct {
 	RequireInShop    bool
 	MyAttendance     *Attendance
 	InShop           *bool
+	OutShop          *bool
 	LocationDisplay  string
 	DistanceMeters   float64
 	Lat              float64
@@ -158,7 +159,9 @@ type Attendance struct {
 	Duration         string
 	DurationColor    string
 	InShop           bool
-	Location         string
+	OutShop          bool
+	InLocation       string
+	OutLocation      string
 	InDeviceInfo     string
 	OutDeviceInfo    string
 }

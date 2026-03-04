@@ -125,9 +125,13 @@ func buildAdminStaffAttendance(
 	}
 	timeIn, timeOut := utils.ExtractTime(att.TimeIn.String), utils.ExtractTime(att.TimeOut.String)
 	c := computeAttendanceStatus(timeIn, timeOut, schedIn, schedOut)
-	inShop := false
-	if lat, lng, ok := utils.ParseLocation(att.Location); ok && shopLocation.RadiusMeters > 0 {
+
+	var inShop, outShop bool
+	if lat, lng, ok := utils.ParseLocation(att.InLocation); ok && shopLocation.RadiusMeters > 0 {
 		inShop = utils.IsWithinRadius(lat, lng, shopLocation.Lat, shopLocation.Lng, shopLocation.RadiusMeters)
+	}
+	if lat, lng, ok := utils.ParseLocation(att.OutLocation); ok && shopLocation.RadiusMeters > 0 {
+		outShop = utils.IsWithinRadius(lat, lng, shopLocation.Lat, shopLocation.Lng, shopLocation.RadiusMeters)
 	}
 
 	var inDeviceInfo, outDeviceInfo string
@@ -161,7 +165,9 @@ func buildAdminStaffAttendance(
 		Duration:         c.duration,
 		DurationColor:    c.durationColor,
 		InShop:           inShop,
-		Location:         att.Location.String,
+		OutShop:          outShop,
+		InLocation:       att.InLocation.String,
+		OutLocation:      att.OutLocation.String,
 		InDeviceInfo:     inDeviceInfo,
 		OutDeviceInfo:    outDeviceInfo,
 	}

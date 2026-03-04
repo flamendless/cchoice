@@ -305,9 +305,10 @@ type TblStaffAttendance struct {
 	TimeOut        sql.NullString
 	CreatedAt      string
 	UpdatedAt      string
-	Location       sql.NullString
+	InLocation     sql.NullString
 	InUseragentID  sql.NullInt64
 	OutUseragentID sql.NullInt64
+	OutLocation    sql.NullString
 }
 
 type TblUseragent struct {

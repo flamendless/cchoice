@@ -85,11 +85,13 @@ templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 				<tr>
 					@attendanceTableHead("Staff ID")
 					@attendanceTableHead("Full Name")
-					@attendanceTableHead("In/Out of Shop")
 					@attendanceTableHead("Time In")
 					@attendanceTableHead("Time Out")
 					@attendanceTableHead("Duration")
-					@attendanceTableHead("Location")
+					@attendanceTableHead("Time In of Shop")
+					@attendanceTableHead("Time Out of Shop")
+					@attendanceTableHead("Time In Location")
+					@attendanceTableHead("Time Out Location")
 					@attendanceTableHead("Time In Device")
 					@attendanceTableHead("Time Out Device")
 				</tr>
@@ -102,13 +104,6 @@ templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 							{ att.FullName }
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm">
-							if att.InShop {
-								<span class="text-green-600 font-medium" title="In office">In</span>
-							} else {
-								<span class="text-red-600 font-medium" title="Out of office">Out</span>
-							}
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm">
 							if att.TimeIn != "" {
@@ -153,8 +148,25 @@ templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 								<span class="text-gray-400">-</span>
 							}
 						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm">
+							if att.InShop {
+								<span class="text-green-600 font-medium" title="In office">In</span>
+							} else {
+								<span class="text-red-600 font-medium" title="Out of office">Out</span>
+							}
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm">
+							if att.OutShop {
+								<span class="text-green-600 font-medium" title="In office">In</span>
+							} else {
+								<span class="text-red-600 font-medium" title="Out of office">Out</span>
+							}
+						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-							<span title={ att.Location }>{ utils.FormatLocation(att.Location) }</span>
+							<span title={ att.InLocation }>{ utils.FormatLocation(att.InLocation) }</span>
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+							<span title={ att.OutLocation }>{ utils.FormatLocation(att.OutLocation) }</span>
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 							<span title={ att.InDeviceInfo }>{ att.InDeviceInfo }</span>

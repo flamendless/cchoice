@@ -18,8 +18,8 @@ INSERT INTO tbl_staffs (
     birthdate,
     sex,
     date_hired,
-	time_in_schedule,
-	time_out_schedule,
+    time_in_schedule,
+    time_out_schedule,
     position,
     user_type,
     email,
@@ -79,13 +79,14 @@ INSERT INTO tbl_staff_attendances (
     for_date,
     time_in,
     time_out,
-    location,
+    in_location,
+    out_location,
     in_useragent_id,
     out_useragent_id,
     created_at,
     updated_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
+    ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
 ) RETURNING id
 `
 
@@ -94,7 +95,8 @@ type CreateStaffAttendanceParams struct {
 	ForDate        string
 	TimeIn         sql.NullString
 	TimeOut        sql.NullString
-	Location       sql.NullString
+	InLocation     sql.NullString
+	OutLocation    sql.NullString
 	InUseragentID  sql.NullInt64
 	OutUseragentID sql.NullInt64
 }
@@ -105,7 +107,8 @@ func (q *Queries) CreateStaffAttendance(ctx context.Context, arg CreateStaffAtte
 		arg.ForDate,
 		arg.TimeIn,
 		arg.TimeOut,
-		arg.Location,
+		arg.InLocation,
+		arg.OutLocation,
 		arg.InUseragentID,
 		arg.OutUseragentID,
 	)
@@ -204,7 +207,8 @@ SELECT
     for_date,
     time_in,
     time_out,
-    location,
+    in_location,
+    out_location,
     in_useragent_id,
     out_useragent_id,
     created_at,
@@ -227,7 +231,8 @@ type GetStaffAttendanceByDateRow struct {
 	ForDate        string
 	TimeIn         sql.NullString
 	TimeOut        sql.NullString
-	Location       sql.NullString
+	InLocation     sql.NullString
+	OutLocation    sql.NullString
 	InUseragentID  sql.NullInt64
 	OutUseragentID sql.NullInt64
 	CreatedAt      string
@@ -243,7 +248,8 @@ func (q *Queries) GetStaffAttendanceByDate(ctx context.Context, arg GetStaffAtte
 		&i.ForDate,
 		&i.TimeIn,
 		&i.TimeOut,
-		&i.Location,
+		&i.InLocation,
+		&i.OutLocation,
 		&i.InUseragentID,
 		&i.OutUseragentID,
 		&i.CreatedAt,
@@ -259,7 +265,8 @@ SELECT
     sa.for_date,
     sa.time_in,
     sa.time_out,
-    sa.location,
+    sa.in_location,
+    sa.out_location,
     sa.in_useragent_id,
     sa.out_useragent_id,
     sa.created_at,
@@ -291,7 +298,8 @@ type GetStaffAttendanceByStaffIDAndDateRangeRow struct {
 	ForDate           string
 	TimeIn            sql.NullString
 	TimeOut           sql.NullString
-	Location          sql.NullString
+	InLocation        sql.NullString
+	OutLocation       sql.NullString
 	InUseragentID     sql.NullInt64
 	OutUseragentID    sql.NullInt64
 	CreatedAt         string
@@ -324,7 +332,8 @@ func (q *Queries) GetStaffAttendanceByStaffIDAndDateRange(ctx context.Context, f
 			&i.ForDate,
 			&i.TimeIn,
 			&i.TimeOut,
-			&i.Location,
+			&i.InLocation,
+			&i.OutLocation,
 			&i.InUseragentID,
 			&i.OutUseragentID,
 			&i.CreatedAt,
@@ -499,7 +508,7 @@ func (q *Queries) GetStaffByID(ctx context.Context, id int64) (GetStaffByIDRow, 
 const updateStaffAttendanceLocation = `-- name: UpdateStaffAttendanceLocation :one
 UPDATE tbl_staff_attendances
 SET
-    location = ?,
+    out_location = ?,
     updated_at = datetime('now')
 WHERE
     staff_id = ?
@@ -508,13 +517,13 @@ RETURNING id
 `
 
 type UpdateStaffAttendanceLocationParams struct {
-	Location sql.NullString
-	StaffID  int64
-	ForDate  string
+	OutLocation sql.NullString
+	StaffID     int64
+	ForDate     string
 }
 
 func (q *Queries) UpdateStaffAttendanceLocation(ctx context.Context, arg UpdateStaffAttendanceLocationParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, updateStaffAttendanceLocation, arg.Location, arg.StaffID, arg.ForDate)
+	row := q.db.QueryRowContext(ctx, updateStaffAttendanceLocation, arg.OutLocation, arg.StaffID, arg.ForDate)
 	var id int64
 	err := row.Scan(&id)
 	return id, err
@@ -524,7 +533,7 @@ const updateStaffAttendanceTimeIn = `-- name: UpdateStaffAttendanceTimeIn :one
 UPDATE tbl_staff_attendances
 SET
     time_in = ?,
-    location = ?,
+    in_location = ?,
     in_useragent_id = ?,
     updated_at = datetime('now')
 WHERE
@@ -535,7 +544,7 @@ RETURNING id
 
 type UpdateStaffAttendanceTimeInParams struct {
 	TimeIn        sql.NullString
-	Location      sql.NullString
+	InLocation    sql.NullString
 	InUseragentID sql.NullInt64
 	StaffID       int64
 	ForDate       string
@@ -544,7 +553,7 @@ type UpdateStaffAttendanceTimeInParams struct {
 func (q *Queries) UpdateStaffAttendanceTimeIn(ctx context.Context, arg UpdateStaffAttendanceTimeInParams) (int64, error) {
 	row := q.db.QueryRowContext(ctx, updateStaffAttendanceTimeIn,
 		arg.TimeIn,
-		arg.Location,
+		arg.InLocation,
 		arg.InUseragentID,
 		arg.StaffID,
 		arg.ForDate,

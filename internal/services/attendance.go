@@ -46,7 +46,7 @@ func (s *AttendanceService) TimeIn(
 				ForDate:       date,
 				TimeIn:        sql.NullString{String: now, Valid: true},
 				TimeOut:       sql.NullString{},
-				Location:      location,
+				InLocation:    location,
 				InUseragentID: useragentID,
 			})
 		return err
@@ -55,7 +55,7 @@ func (s *AttendanceService) TimeIn(
 	_, err = s.dbRW.GetQueries().UpdateStaffAttendanceTimeIn(ctx,
 		queries.UpdateStaffAttendanceTimeInParams{
 			TimeIn:        sql.NullString{String: now, Valid: true},
-			Location:      location,
+			InLocation:    location,
 			InUseragentID: useragentID,
 			StaffID:       staffID,
 			ForDate:       date,
@@ -116,19 +116,19 @@ func (s *AttendanceService) UpsertLocation(
 
 	if err == sql.ErrNoRows {
 		_, err = s.dbRW.GetQueries().CreateStaffAttendance(ctx, queries.CreateStaffAttendanceParams{
-			StaffID:  staffID,
-			ForDate:  date,
-			TimeIn:   sql.NullString{},
-			TimeOut:  sql.NullString{},
-			Location: location,
+			StaffID:     staffID,
+			ForDate:     date,
+			TimeIn:      sql.NullString{},
+			TimeOut:     sql.NullString{},
+			OutLocation: location,
 		})
 		return err
 	}
 
 	_, err = s.dbRW.GetQueries().UpdateStaffAttendanceLocation(ctx, queries.UpdateStaffAttendanceLocationParams{
-		Location: location,
-		StaffID:  staffID,
-		ForDate:  date,
+		OutLocation: location,
+		StaffID:     staffID,
+		ForDate:     date,
 	})
 
 	return err
