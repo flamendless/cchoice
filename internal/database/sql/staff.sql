@@ -194,3 +194,17 @@ WHERE
     staff_id = ?
     AND for_date = ?
 RETURNING id;
+
+-- name: CreateStaffTimeOff :one
+INSERT INTO tbl_staff_time_offs (
+	type,
+	start_date,
+	end_date,
+	description,
+    staff_id,
+	useragent_id,
+    created_at,
+    updated_at
+) VALUES (
+    ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
+) RETURNING id;

@@ -3,9 +3,11 @@ package services
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/enums"
 )
 
 type AttendanceService struct {
@@ -96,6 +98,29 @@ func (s *AttendanceService) TimeOut(
 			ForDate:        date,
 		})
 
+	return err
+}
+
+func (s *AttendanceService) TimeOff(
+	ctx context.Context,
+	staffID int64,
+	timeOffType enums.TimeOff,
+	description string,
+	startDate time.Time,
+	endDate time.Time,
+	useragentID sql.NullInt64,
+) error {
+	_, err := s.dbRW.GetQueries().CreateStaffTimeOff(
+		ctx,
+		queries.CreateStaffTimeOffParams{
+			Type:        timeOffType.String(),
+			StartDate:   startDate,
+			EndDate:     endDate,
+			Description: description,
+			StaffID:     staffID,
+			UseragentID: useragentID,
+		},
+	)
 	return err
 }
 
