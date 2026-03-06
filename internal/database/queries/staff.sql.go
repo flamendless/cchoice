@@ -8,6 +8,7 @@ package queries
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const createStaff = `-- name: CreateStaff :one
@@ -111,6 +112,44 @@ func (q *Queries) CreateStaffAttendance(ctx context.Context, arg CreateStaffAtte
 		arg.OutLocation,
 		arg.InUseragentID,
 		arg.OutUseragentID,
+	)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const createStaffTimeOff = `-- name: CreateStaffTimeOff :one
+INSERT INTO tbl_staff_time_offs (
+	type,
+	start_date,
+	end_date,
+	description,
+    staff_id,
+	useragent_id,
+    created_at,
+    updated_at
+) VALUES (
+    ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
+) RETURNING id
+`
+
+type CreateStaffTimeOffParams struct {
+	Type        string
+	StartDate   time.Time
+	EndDate     time.Time
+	Description string
+	StaffID     int64
+	UseragentID sql.NullInt64
+}
+
+func (q *Queries) CreateStaffTimeOff(ctx context.Context, arg CreateStaffTimeOffParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createStaffTimeOff,
+		arg.Type,
+		arg.StartDate,
+		arg.EndDate,
+		arg.Description,
+		arg.StaffID,
+		arg.UseragentID,
 	)
 	var id int64
 	err := row.Scan(&id)

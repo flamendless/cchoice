@@ -311,6 +311,21 @@ type TblStaffAttendance struct {
 	OutLocation    sql.NullString
 }
 
+type TblStaffTimeOff struct {
+	ID          int64
+	Type        string
+	StartDate   time.Time
+	EndDate     time.Time
+	StaffID     int64
+	UseragentID sql.NullInt64
+	Description string
+	Approved    sql.NullBool
+	ApprovedBy  sql.NullInt64
+	ApprovedAt  sql.NullTime
+	CreatedAt   string
+	UpdatedAt   string
+}
+
 type TblUseragent struct {
 	ID             int64
 	UserAgent      string

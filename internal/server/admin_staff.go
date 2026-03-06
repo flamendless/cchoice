@@ -271,6 +271,52 @@ func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 }
 
+func (s *Server) adminStaffTimeOffHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
+	q := r.URL.Query()
+	timeOffType := enums.ParseTimeOffToEnum(q.Get("type"))
+	if timeOffType == enums.TIME_OFF_UNDEFINED {
+		http.Error(w, "Invalid time off type", http.StatusBadRequest)
+		return
+	}
+	description := q.Get("description")
+	if description == "" {
+		http.Error(w, "Description is required", http.StatusBadRequest)
+		return
+	}
+	startDate, err := time.Parse(constants.DateLayoutISO, q.Get("startDate"))
+	if err != nil {
+		http.Error(w, "Unable to time off", http.StatusBadRequest)
+		return
+	}
+	endDate, err := time.Parse(constants.DateLayoutISO, q.Get("endDate"))
+	if err != nil {
+		http.Error(w, "Unable to time off", http.StatusBadRequest)
+		return
+	}
+	if endDate.Before(startDate) {
+		http.Error(w, "end date must not be before start date", http.StatusBadRequest)
+		return
+	}
+	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
+	svc := services.NewAttendanceService(s.dbRO, s.dbRW)
+	if err := svc.TimeOff(
+		ctx,
+		staffID,
+		timeOffType,
+		description,
+		startDate,
+		endDate,
+		useragentID,
+	); err != nil {
+		http.Error(w, "Unable to time off", http.StatusBadRequest)
+		return
+	}
+	w.Header().Set("HX-Redirect", utils.URL("/admin/staff"))
+	w.WriteHeader(http.StatusOK)
+}
+
 func (s *Server) adminStaffAttendanceLocationHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Attendance Location Handler]"
 
