@@ -197,8 +197,6 @@ type AdminProductForm struct {
 	CategoriesJSON string
 	Subcategories  []AdminSubcategory
 	VATPercentage  string
-	FormAction     string
-	CancelURL      string
 }
 
 type AdminProductSpecsForm struct {

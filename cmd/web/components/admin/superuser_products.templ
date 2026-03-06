@@ -5,6 +5,7 @@ import "fmt"
 import "cchoice/cmd/web/models"
 import "cchoice/internal/constants"
 import "cchoice/cmd/web/components/common"
+import "cchoice/internal/utils"
 
 templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
 	<!DOCTYPE html>
@@ -28,23 +29,16 @@ templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
 						<img src={ constants.PathSVGLogoOnly } alt="C-Choice Logo" class="w-16 h-16 mx-auto mb-4" />
 					</div>
 					<div class="mb-6">
-						<a
-							href={ formData.CancelURL }
-							class="inline-flex items-center text-cchoice hover:text-cchoice_dark transition-colors"
-						>
-							<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-							</svg>
-							Back to Home
-						</a>
+						@BackToHome(utils.URL("/admin/superuser"))
 					</div>
+					@AdminHeader(nil)
 
 					<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
 						Add New Product
 					</h1>
 
 					<form
-						action={ formData.FormAction }
+						action={ utils.URL("/admin/superuser/products") }
 						method="POST"
 						enctype="multipart/form-data"
 						class="bg-white rounded-lg shadow-md p-6 space-y-6"
@@ -305,7 +299,7 @@ templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
 
 						<div class="flex justify-end gap-4 pt-4 border-t">
 							<a
-								href={ formData.CancelURL }
+								href={ utils.URL("/admin/superuser") }
 								class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
 							>
 								Cancel

@@ -84,13 +84,13 @@ templ AttendanceSectionForStaff(
 	<div
 		class="bg-white rounded-lg shadow-md p-6 mb-6"
 		id="staff-attendance-section"
-		data-fetch-url={ utils.URL("/admin/staff/attendance") }
+		data-fetch-url={ utils.URL("/admin/staff/attendance/table") }
 		data-target-id="staff-attendance-table"
 		data-date-selector-id="staff-date-selector"
 		data-refresh-btn-id="staff-refresh-btn"
 		data-location-url={ utils.URL("/admin/staff/attendance/location") }
 		data-user-type={ userType.String() }
-		hx-get={ utils.URL("/admin/staff/attendance") }
+		hx-get={ utils.URL("/admin/staff/attendance/table") }
 		hx-trigger={ fmt.Sprintf("load, change from:#%s", "staff-date-selector") }
 		hx-include="#staff-date-selector"
 		hx-target="#staff-attendance-table"
@@ -140,6 +140,9 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 					C-Choice Staff Admin Portal
 				</h1>
 				<div class="w-full max-w-4xl p-6 bg-white rounded-lg shadow-md">
+					<div class="mb-6">
+						@BackToHome(utils.URL("/admin/staff"))
+					</div>
 					@AdminHeader(&profile)
 
 					<div class="mb-6 p-4 bg-gray-50 rounded-lg">

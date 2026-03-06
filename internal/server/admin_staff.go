@@ -52,6 +52,29 @@ func buildStaffDayAttendance(
 	}
 }
 
+func (s *Server) adminStaffHomeHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff Home Handler]"
+	ctx := r.Context()
+
+	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
+	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staffID), zap.Error(err))
+		http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+		return
+	}
+	currentUserFullName := utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName)
+
+	if err := compadmin.AdminStaffHomePage(currentUserFullName).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("path", r.URL.Path),
+			zap.Error(err),
+		)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func (s *Server) adminStaffProfileHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Profile Handler]"
 	ctx := r.Context()
@@ -209,7 +232,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) adminStaffAttendanceHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) adminStaffAttendanceTableHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Attendance Handler]"
 	ctx := r.Context()
 
