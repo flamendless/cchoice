@@ -9,7 +9,6 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
-	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
 )
@@ -61,8 +60,6 @@ func (s *Server) adminSuperuserProductsHandler(w http.ResponseWriter, r *http.Re
 	formData := models.AdminProductForm{
 		Brands:        brands,
 		Categories:    categories,
-		FormAction:    utils.URL("/admin/superuser/products"),
-		CancelURL:     utils.URL("/admin/superuser"),
 		VATPercentage: conf.Conf().Settings.VATPercentage,
 	}
 
