@@ -208,3 +208,14 @@ type AdminProductSpecsForm struct {
 	Capacity      string
 	ScopeOfSupply string
 }
+
+type StaffTimeOff struct {
+	ID          string
+	Type        enums.TimeOff
+	StartDate   string
+	EndDate     string
+	Description string
+	Approved    bool
+	ApprovedBy  string
+	ApprovedAt  string
+}

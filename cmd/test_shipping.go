@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/errs"
 	"cchoice/internal/geocoding/googlemaps"
@@ -201,7 +202,7 @@ func testLalamoveService(ctx context.Context) {
 					Description: "Test package",
 				},
 				ServiceType: shipping.SERVICE_TYPE_MOTORCYCLE,
-				ScheduledAt: time.Now().UTC().Add(1 * time.Hour).Format("2006-01-02T15:04:05Z"),
+				ScheduledAt: time.Now().UTC().Add(1 * time.Hour).Format(constants.DateTimeLayoutTZISO),
 			}
 
 			quotation, err := ss.GetQuotation(req)
