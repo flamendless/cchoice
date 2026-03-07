@@ -35,7 +35,7 @@ func buildStaffDayAttendance(
 	if staff.TimeOutSchedule.Valid {
 		schedOut = staff.TimeOutSchedule.String
 	}
-	timeIn, timeOut := utils.ExtractTime(att.TimeIn.String), utils.ExtractTime(att.TimeOut.String)
+	timeIn, timeOut := utils.ExtractTimeToPH(att.TimeIn.String), utils.ExtractTimeToPH(att.TimeOut.String)
 	c := computeAttendanceStatus(timeIn, timeOut, schedIn, schedOut)
 	return models.Attendance{
 		StaffID:          encoder.Encode(att.StaffID),
@@ -264,7 +264,7 @@ func (s *Server) adminStaffAttendanceTableHandler(w http.ResponseWriter, r *http
 func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	now := utils.NowPH().Format(constants.DateTimeLayoutISO)
+	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
@@ -281,7 +281,7 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	now := utils.NowPH().Format(constants.DateTimeLayoutISO)
+	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
 	svc := services.NewAttendanceService(s.dbRO, s.dbRW)
@@ -378,7 +378,7 @@ func (s *Server) adminStaffTimeOffTableHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	staffTimeOffs := make([]models.StaffTimeOff, len(timeOffs))
+	staffTimeOffs := make([]models.StaffTimeOff, 0, len(timeOffs))
 	for _, to := range timeOffs {
 		var approvedBy string
 		var approvedAt string
@@ -402,7 +402,7 @@ func (s *Server) adminStaffTimeOffTableHandler(w http.ResponseWriter, r *http.Re
 		staffTimeOffs = append(staffTimeOffs, models.StaffTimeOff{
 			ID:          s.encoder.Encode(to.ID),
 			Type:        enums.ParseTimeOffToEnum(to.Type),
-			CreatedAt:   to.CreatedAt,
+			CreatedAt:   utils.ConvertToPH(to.CreatedAt),
 			StartDate:   to.StartDate.Format(constants.DateLayoutISO),
 			EndDate:     to.EndDate.Format(constants.DateLayoutISO),
 			Description: to.Description,

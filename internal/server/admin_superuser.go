@@ -149,7 +149,7 @@ func (s *Server) adminSuperuserTimeOffTableHandler(w http.ResponseWriter, r *htt
 			StaffID:     s.encoder.Encode(to.StaffID),
 			FullName:    fullName,
 			Type:        enums.ParseTimeOffToEnum(to.Type),
-			CreatedAt:   to.CreatedAt,
+			CreatedAt:   utils.ConvertToPH(to.CreatedAt),
 			StartDate:   to.StartDate.Format(constants.DateLayoutISO),
 			EndDate:     to.EndDate.Format(constants.DateLayoutISO),
 			Description: to.Description,
