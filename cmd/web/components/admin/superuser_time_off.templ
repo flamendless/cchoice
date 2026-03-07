@@ -1,0 +1,131 @@
+package components
+
+import "fmt"
+
+import "cchoice/cmd/web/models"
+import "cchoice/internal/constants"
+import "cchoice/internal/utils"
+import "cchoice/cmd/web/components/common"
+
+templ AdminSuperuserTimeOffPage(title string) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("[SUPERUSER] Time Off - C-Choice Admin")
+		</head>
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-col"
+			_="on load call metrics_event('admin_superuser_time_off_page_visit', '')"
+		>
+			<div class="flex-grow p-4">
+				<div class="max-w-6xl mx-auto">
+					<div class="text-center mb-6">
+						<img src={ constants.PathSVGLogoOnly } alt="C-Choice Logo" class="w-16 h-16 mx-auto mb-4" />
+					</div>
+					<div class="mb-6">
+						@BackToHome(utils.URL("/admin/superuser"))
+					</div>
+					@AdminHeader(nil)
+
+					<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+						Staff Time Off
+					</h1>
+
+					@TimeOffSectionSuperuserPage()
+				</div>
+			</div>
+
+			@ScriptClock()
+		</body>
+	</html>
+}
+
+templ TimeOffSectionSuperuserPage() {
+	<div
+		class="bg-white rounded-lg shadow-md p-6"
+		hx-get={ utils.URL("/admin/superuser/time-off/table") }
+		hx-trigger="load"
+		hx-target="#time-off-table"
+		hx-swap="innerHTML"
+	>
+		<div id="time-off-table">
+			<p class="text-gray-500 text-center py-4">Loading...</p>
+		</div>
+	</div>
+}
+
+templ AdminSuperuserTimeOffTable(timeOffs []models.StaffTimeOff) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-50">
+				<tr>
+					@TableHead("Staff Name")
+					@TableHead("Type")
+					@TableHead("Filed Date")
+					@TableHead("Start Date")
+					@TableHead("End Date")
+					@TableHead("Description")
+					@TableHead("Approved")
+					@TableHead("Approved By")
+					@TableHead("Approved At")
+					@TableHead("Actions")
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				for _, to := range timeOffs {
+					<tr id={ fmt.Sprintf("time-off-row-%s", to.ID) }>
+						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+							{ to.FullName }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm">
+							{ to.Type.ToHuman() }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+							{ to.CreatedAt }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+							{ to.StartDate }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+							{ to.EndDate }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+							{ to.Description }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm">
+							if to.Approved {
+								<span class="text-green-600 font-medium">Yes</span>
+							} else {
+								<span class="text-red-600 font-medium">No</span>
+							}
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+							{ to.ApprovedBy }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+							{ to.ApprovedAt }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm">
+							if !to.Approved {
+								<button
+									class="text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-xs font-medium"
+									hx-patch={ utils.URL(fmt.Sprintf("/admin/superuser/time-off/%s/approve", to.ID)) }
+								>
+									Approve
+								</button>
+							} else {
+								<button
+									class="text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-xs font-medium"
+									hx-patch={ utils.URL(fmt.Sprintf("/admin/superuser/time-off/%s/cancel", to.ID)) }
+								>
+									Cancel
+								</button>
+							}
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}

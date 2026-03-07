@@ -197,12 +197,12 @@ RETURNING id;
 
 -- name: CreateStaffTimeOff :one
 INSERT INTO tbl_staff_time_offs (
-	type,
-	start_date,
-	end_date,
-	description,
+    type,
+    start_date,
+    end_date,
+    description,
     staff_id,
-	useragent_id,
+    useragent_id,
     created_at,
     updated_at
 ) VALUES (
@@ -228,3 +228,47 @@ FROM tbl_staff_time_offs sto
 LEFT JOIN tbl_staffs approver ON approver.id = sto.approved_by
 WHERE sto.staff_id = ?
 ORDER BY sto.created_at DESC;
+
+-- name: GetAllStaffTimeOffs :many
+SELECT
+    sto.id,
+    sto.type,
+    sto.start_date,
+    sto.end_date,
+    sto.description,
+    sto.approved,
+    sto.approved_by,
+    sto.approved_at,
+    sto.created_at,
+    sto.updated_at,
+    sto.staff_id,
+    staff.first_name as staff_first_name,
+    staff.middle_name as staff_middle_name,
+    staff.last_name as staff_last_name,
+    approver.first_name as approver_first_name,
+    approver.middle_name as approver_middle_name,
+    approver.last_name as approver_last_name
+FROM tbl_staff_time_offs sto
+INNER JOIN tbl_staffs staff ON staff.id = sto.staff_id
+LEFT JOIN tbl_staffs approver ON approver.id = sto.approved_by
+ORDER BY sto.created_at DESC;
+
+-- name: ApproveStaffTimeOff :one
+UPDATE tbl_staff_time_offs
+SET
+    approved = true,
+    approved_by = ?,
+    approved_at = datetime('now'),
+    updated_at = datetime('now')
+WHERE id = ? AND approved = false
+RETURNING id;
+
+-- name: CancelStaffTimeOff :one
+UPDATE tbl_staff_time_offs
+SET
+    approved = false,
+    approved_by = NULL,
+    approved_at = NULL,
+    updated_at = datetime('now')
+WHERE id = ? AND approved = true
+RETURNING id;

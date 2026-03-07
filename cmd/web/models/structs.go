@@ -211,10 +211,13 @@ type AdminProductSpecsForm struct {
 
 type StaffTimeOff struct {
 	ID          string
+	StaffID     string
+	FullName    string
 	Type        enums.TimeOff
 	StartDate   string
 	EndDate     string
 	Description string
+	CreatedAt   string
 	Approved    bool
 	ApprovedBy  string
 	ApprovedAt  string
