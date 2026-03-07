@@ -402,6 +402,7 @@ func (s *Server) adminStaffTimeOffTableHandler(w http.ResponseWriter, r *http.Re
 		staffTimeOffs = append(staffTimeOffs, models.StaffTimeOff{
 			ID:          s.encoder.Encode(to.ID),
 			Type:        enums.ParseTimeOffToEnum(to.Type),
+			CreatedAt:   to.CreatedAt,
 			StartDate:   to.StartDate.Format(constants.DateLayoutISO),
 			EndDate:     to.EndDate.Format(constants.DateLayoutISO),
 			Description: to.Description,

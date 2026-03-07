@@ -109,6 +109,7 @@ templ StaffTimeOffsTable(timeOffs []models.StaffTimeOff) {
 				<thead class="bg-gray-50">
 					<tr>
 						@TableHead("Type")
+						@TableHead("Filed Date")
 						@TableHead("Start Date")
 						@TableHead("End Date")
 						@TableHead("Description")
@@ -122,6 +123,9 @@ templ StaffTimeOffsTable(timeOffs []models.StaffTimeOff) {
 						<tr class={ getTimeOffRowClass(to.Approved) }>
 							<td class="px-6 py-4 whitespace-nowrap text-sm">
 								{ to.Type.ToHuman() }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm">
+								{ to.CreatedAt }
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap text-sm">
 								{ to.StartDate }

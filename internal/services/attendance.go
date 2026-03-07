@@ -158,3 +158,24 @@ func (s *AttendanceService) UpsertLocation(
 
 	return err
 }
+
+func (s *AttendanceService) ApproveTimeOff(
+	ctx context.Context,
+	timeOffID int64,
+	approvedBy int64,
+) error {
+	_, err := s.dbRW.GetQueries().ApproveStaffTimeOff(ctx, queries.ApproveStaffTimeOffParams{
+		ApprovedBy: sql.NullInt64{Int64: approvedBy, Valid: true},
+		ID:         timeOffID,
+	})
+	return err
+}
+
+func (s *AttendanceService) CancelTimeOff(
+	ctx context.Context,
+	timeOffID int64,
+	approvedBy int64,
+) error {
+	_, err := s.dbRW.GetQueries().CancelStaffTimeOff(ctx, timeOffID)
+	return err
+}

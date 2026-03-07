@@ -11,6 +11,46 @@ import (
 	"time"
 )
 
+const approveStaffTimeOff = `-- name: ApproveStaffTimeOff :one
+UPDATE tbl_staff_time_offs
+SET
+    approved = true,
+    approved_by = ?,
+    approved_at = datetime('now'),
+    updated_at = datetime('now')
+WHERE id = ? AND approved = false
+RETURNING id
+`
+
+type ApproveStaffTimeOffParams struct {
+	ApprovedBy sql.NullInt64
+	ID         int64
+}
+
+func (q *Queries) ApproveStaffTimeOff(ctx context.Context, arg ApproveStaffTimeOffParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, approveStaffTimeOff, arg.ApprovedBy, arg.ID)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const cancelStaffTimeOff = `-- name: CancelStaffTimeOff :one
+UPDATE tbl_staff_time_offs
+SET
+    approved = false,
+    approved_by = NULL,
+    approved_at = NULL,
+    updated_at = datetime('now')
+WHERE id = ? AND approved = true
+RETURNING id
+`
+
+func (q *Queries) CancelStaffTimeOff(ctx context.Context, id int64) (int64, error) {
+	row := q.db.QueryRowContext(ctx, cancelStaffTimeOff, id)
+	err := row.Scan(&id)
+	return id, err
+}
+
 const createStaff = `-- name: CreateStaff :one
 INSERT INTO tbl_staffs (
     first_name,
@@ -120,12 +160,12 @@ func (q *Queries) CreateStaffAttendance(ctx context.Context, arg CreateStaffAtte
 
 const createStaffTimeOff = `-- name: CreateStaffTimeOff :one
 INSERT INTO tbl_staff_time_offs (
-	type,
-	start_date,
-	end_date,
-	description,
+    type,
+    start_date,
+    end_date,
+    description,
     staff_id,
-	useragent_id,
+    useragent_id,
     created_at,
     updated_at
 ) VALUES (
@@ -154,6 +194,92 @@ func (q *Queries) CreateStaffTimeOff(ctx context.Context, arg CreateStaffTimeOff
 	var id int64
 	err := row.Scan(&id)
 	return id, err
+}
+
+const getAllStaffTimeOffs = `-- name: GetAllStaffTimeOffs :many
+SELECT
+    sto.id,
+    sto.type,
+    sto.start_date,
+    sto.end_date,
+    sto.description,
+    sto.approved,
+    sto.approved_by,
+    sto.approved_at,
+    sto.created_at,
+    sto.updated_at,
+    sto.staff_id,
+    staff.first_name as staff_first_name,
+    staff.middle_name as staff_middle_name,
+    staff.last_name as staff_last_name,
+    approver.first_name as approver_first_name,
+    approver.middle_name as approver_middle_name,
+    approver.last_name as approver_last_name
+FROM tbl_staff_time_offs sto
+INNER JOIN tbl_staffs staff ON staff.id = sto.staff_id
+LEFT JOIN tbl_staffs approver ON approver.id = sto.approved_by
+ORDER BY sto.created_at DESC
+`
+
+type GetAllStaffTimeOffsRow struct {
+	ID                 int64
+	Type               string
+	StartDate          time.Time
+	EndDate            time.Time
+	Description        string
+	Approved           sql.NullBool
+	ApprovedBy         sql.NullInt64
+	ApprovedAt         sql.NullTime
+	CreatedAt          string
+	UpdatedAt          string
+	StaffID            int64
+	StaffFirstName     string
+	StaffMiddleName    sql.NullString
+	StaffLastName      string
+	ApproverFirstName  sql.NullString
+	ApproverMiddleName sql.NullString
+	ApproverLastName   sql.NullString
+}
+
+func (q *Queries) GetAllStaffTimeOffs(ctx context.Context) ([]GetAllStaffTimeOffsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllStaffTimeOffs)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllStaffTimeOffsRow
+	for rows.Next() {
+		var i GetAllStaffTimeOffsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Type,
+			&i.StartDate,
+			&i.EndDate,
+			&i.Description,
+			&i.Approved,
+			&i.ApprovedBy,
+			&i.ApprovedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.StaffID,
+			&i.StaffFirstName,
+			&i.StaffMiddleName,
+			&i.StaffLastName,
+			&i.ApproverFirstName,
+			&i.ApproverMiddleName,
+			&i.ApproverLastName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getAllStaffs = `-- name: GetAllStaffs :many
