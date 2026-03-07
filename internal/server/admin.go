@@ -123,7 +123,7 @@ func buildAdminStaffAttendance(
 	if staff.TimeOutSchedule.Valid {
 		schedOut = staff.TimeOutSchedule.String
 	}
-	timeIn, timeOut := utils.ExtractTime(att.TimeIn.String), utils.ExtractTime(att.TimeOut.String)
+	timeIn, timeOut := utils.ExtractTimeToPH(att.TimeIn.String), utils.ExtractTimeToPH(att.TimeOut.String)
 	c := computeAttendanceStatus(timeIn, timeOut, schedIn, schedOut)
 
 	var inShop, outShop bool

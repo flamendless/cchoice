@@ -21,6 +21,17 @@ func NowPH() time.Time {
 	return time.Now().In(phLocation)
 }
 
+func ConvertToPH(datetimeStr string) string {
+	if datetimeStr == "" {
+		return ""
+	}
+	t, err := time.Parse(constants.DateTimeLayoutISO, datetimeStr)
+	if err != nil {
+		return datetimeStr
+	}
+	return t.In(phLocation).Format(constants.DateTimeLayoutISO)
+}
+
 func TimeToMinutes(s string) (int, bool) {
 	if s == "" {
 		return 0, false
@@ -48,7 +59,7 @@ func FormatDurationFromMinutes(m int) string {
 	return fmt.Sprintf("%dh %dm", h, min)
 }
 
-func ExtractTime(datetimeStr string) string {
+func ExtractTimeToPH(datetimeStr string) string {
 	if datetimeStr == "" {
 		return ""
 	}
@@ -56,7 +67,7 @@ func ExtractTime(datetimeStr string) string {
 	if err != nil {
 		return datetimeStr
 	}
-	return t.Format(constants.TimeLayoutHHMMSS)
+	return t.In(phLocation).Format(constants.TimeLayoutHHMMSS)
 }
 
 func ParseAttendanceDate(date string) string {
