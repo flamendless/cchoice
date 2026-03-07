@@ -544,6 +544,80 @@ func (q *Queries) GetStaffByID(ctx context.Context, id int64) (GetStaffByIDRow, 
 	return i, err
 }
 
+const getStaffTimeOffsByStaffID = `-- name: GetStaffTimeOffsByStaffID :many
+SELECT
+    sto.id,
+    sto.type,
+    sto.start_date,
+    sto.end_date,
+    sto.description,
+    sto.approved,
+    sto.approved_by,
+    sto.approved_at,
+    sto.created_at,
+    sto.updated_at,
+    approver.first_name as approver_first_name,
+    approver.middle_name as approver_middle_name,
+    approver.last_name as approver_last_name
+FROM tbl_staff_time_offs sto
+LEFT JOIN tbl_staffs approver ON approver.id = sto.approved_by
+WHERE sto.staff_id = ?
+ORDER BY sto.created_at DESC
+`
+
+type GetStaffTimeOffsByStaffIDRow struct {
+	ID                 int64
+	Type               string
+	StartDate          time.Time
+	EndDate            time.Time
+	Description        string
+	Approved           sql.NullBool
+	ApprovedBy         sql.NullInt64
+	ApprovedAt         sql.NullTime
+	CreatedAt          string
+	UpdatedAt          string
+	ApproverFirstName  sql.NullString
+	ApproverMiddleName sql.NullString
+	ApproverLastName   sql.NullString
+}
+
+func (q *Queries) GetStaffTimeOffsByStaffID(ctx context.Context, staffID int64) ([]GetStaffTimeOffsByStaffIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getStaffTimeOffsByStaffID, staffID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetStaffTimeOffsByStaffIDRow
+	for rows.Next() {
+		var i GetStaffTimeOffsByStaffIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Type,
+			&i.StartDate,
+			&i.EndDate,
+			&i.Description,
+			&i.Approved,
+			&i.ApprovedBy,
+			&i.ApprovedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ApproverFirstName,
+			&i.ApproverMiddleName,
+			&i.ApproverLastName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateStaffAttendanceLocation = `-- name: UpdateStaffAttendanceLocation :one
 UPDATE tbl_staff_attendances
 SET

@@ -208,3 +208,23 @@ INSERT INTO tbl_staff_time_offs (
 ) VALUES (
     ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
 ) RETURNING id;
+
+-- name: GetStaffTimeOffsByStaffID :many
+SELECT
+    sto.id,
+    sto.type,
+    sto.start_date,
+    sto.end_date,
+    sto.description,
+    sto.approved,
+    sto.approved_by,
+    sto.approved_at,
+    sto.created_at,
+    sto.updated_at,
+    approver.first_name as approver_first_name,
+    approver.middle_name as approver_middle_name,
+    approver.last_name as approver_last_name
+FROM tbl_staff_time_offs sto
+LEFT JOIN tbl_staffs approver ON approver.id = sto.approved_by
+WHERE sto.staff_id = ?
+ORDER BY sto.created_at DESC;

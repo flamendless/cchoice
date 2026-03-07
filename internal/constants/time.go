@@ -9,6 +9,7 @@ var (
 const (
 	DateLayoutISO     = "2006-01-02"
 	DateTimeLayoutISO = "2006-01-02 15:04:05"
+	DateTimeLayoutTZISO = "2006-01-02T15:04:05Z"
 	DateLayoutDisplay = "Monday, January 2, 2006"
 	TimeLayoutHHMM    = "15:04"
 	TimeLayoutHHMMSS  = "15:04:05"

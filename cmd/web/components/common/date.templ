@@ -10,3 +10,14 @@ templ DateSelector(id string, value string, required bool) {
 		class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
 	/>
 }
+
+templ DateSelectorEx(id string, value string, required bool) {
+	<input
+		type="date"
+		id={ id }
+		name={ id }
+		value={ value }
+		required?={ required }
+		class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+	/>
+}

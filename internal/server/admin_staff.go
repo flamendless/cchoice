@@ -274,7 +274,7 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Unable to time in", http.StatusBadRequest)
 		return
 	}
-	w.Header().Set("HX-Redirect", utils.URL("/admin/staff"))
+	w.Header().Set("HX-Redirect", utils.URL("/admin/staff/attendance"))
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -290,32 +290,52 @@ func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Unable to time out", http.StatusBadRequest)
 		return
 	}
-	w.Header().Set("HX-Redirect", utils.URL("/admin/staff"))
+	w.Header().Set("HX-Redirect", utils.URL("/admin/staff/attendance"))
 	w.WriteHeader(http.StatusOK)
 }
 
+func (s *Server) adminStaffTimeOffPageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff Request Time Off Page Handler]"
+	ctx := r.Context()
+	if err := compadmin.AdminStaffRequestTimeOffPage().Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("path", r.URL.Path),
+			zap.Error(err),
+		)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+}
+
 func (s *Server) adminStaffTimeOffHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff Time Off Handler]"
 	ctx := r.Context()
 	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	q := r.URL.Query()
-	timeOffType := enums.ParseTimeOffToEnum(q.Get("type"))
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	timeOffType := enums.ParseTimeOffToEnum(r.PostFormValue("type"))
 	if timeOffType == enums.TIME_OFF_UNDEFINED {
 		http.Error(w, "Invalid time off type", http.StatusBadRequest)
 		return
 	}
-	description := q.Get("description")
+	description := r.PostFormValue("description")
 	if description == "" {
 		http.Error(w, "Description is required", http.StatusBadRequest)
 		return
 	}
-	startDate, err := time.Parse(constants.DateLayoutISO, q.Get("startDate"))
+	startDate, err := time.Parse(constants.DateLayoutISO, r.PostFormValue("start-date"))
 	if err != nil {
-		http.Error(w, "Unable to time off", http.StatusBadRequest)
+		http.Error(w, "Invalid start date", http.StatusBadRequest)
 		return
 	}
-	endDate, err := time.Parse(constants.DateLayoutISO, q.Get("endDate"))
+	endDate, err := time.Parse(constants.DateLayoutISO, r.PostFormValue("end-date"))
 	if err != nil {
-		http.Error(w, "Unable to time off", http.StatusBadRequest)
+		http.Error(w, "Invalid end date", http.StatusBadRequest)
 		return
 	}
 	if endDate.Before(startDate) {
@@ -333,11 +353,69 @@ func (s *Server) adminStaffTimeOffHandler(w http.ResponseWriter, r *http.Request
 		endDate,
 		useragentID,
 	); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, "Unable to time off", http.StatusBadRequest)
 		return
 	}
-	w.Header().Set("HX-Redirect", utils.URL("/admin/staff"))
+	w.Header().Set("HX-Redirect", utils.URL("/admin/staff/time-off"))
 	w.WriteHeader(http.StatusOK)
+}
+
+func (s *Server) adminStaffTimeOffTableHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff Time Off Table Handler]"
+	ctx := r.Context()
+
+	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
+	if staffID == 0 {
+		http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+		return
+	}
+
+	timeOffs, err := s.dbRO.GetQueries().GetStaffTimeOffsByStaffID(ctx, staffID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	staffTimeOffs := make([]models.StaffTimeOff, len(timeOffs))
+	for _, to := range timeOffs {
+		var approvedBy string
+		var approvedAt string
+
+		if to.ApprovedBy.Valid && to.ApproverFirstName.Valid {
+			approvedBy = utils.BuildFullName(
+				to.ApproverFirstName.String,
+				to.ApproverMiddleName.String,
+				to.ApproverLastName.String,
+			)
+		} else {
+			approvedBy = "-"
+		}
+
+		if to.ApprovedAt.Valid {
+			approvedAt = to.ApprovedAt.Time.Format(constants.DateTimeLayoutISO)
+		} else {
+			approvedAt = "-"
+		}
+
+		staffTimeOffs = append(staffTimeOffs, models.StaffTimeOff{
+			ID:          s.encoder.Encode(to.ID),
+			Type:        enums.ParseTimeOffToEnum(to.Type),
+			StartDate:   to.StartDate.Format(constants.DateLayoutISO),
+			EndDate:     to.EndDate.Format(constants.DateLayoutISO),
+			Description: to.Description,
+			Approved:    to.Approved.Bool,
+			ApprovedBy:  approvedBy,
+			ApprovedAt:  approvedAt,
+		})
+	}
+
+	if err := compadmin.StaffTimeOffsTable(staffTimeOffs).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (s *Server) adminStaffAttendanceLocationHandler(w http.ResponseWriter, r *http.Request) {

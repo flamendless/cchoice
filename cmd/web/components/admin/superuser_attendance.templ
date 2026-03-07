@@ -64,28 +64,22 @@ templ AttendanceSectionSuperuserPage(title string, selectedDate string) {
 	</div>
 }
 
-templ attendanceTableHead(value string) {
-	<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-		{ value }
-	</th>
-}
-
 templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 	<div class="overflow-x-auto">
 		<table class="min-w-full divide-y divide-gray-200">
 			<thead class="bg-gray-50">
 				<tr>
-					@attendanceTableHead("Staff ID")
-					@attendanceTableHead("Full Name")
-					@attendanceTableHead("Time In")
-					@attendanceTableHead("Time Out")
-					@attendanceTableHead("Duration")
-					@attendanceTableHead("Time In of Shop")
-					@attendanceTableHead("Time Out of Shop")
-					@attendanceTableHead("Time In Location")
-					@attendanceTableHead("Time Out Location")
-					@attendanceTableHead("Time In Device")
-					@attendanceTableHead("Time Out Device")
+					@TableHead("Staff ID")
+					@TableHead("Full Name")
+					@TableHead("Time In")
+					@TableHead("Time Out")
+					@TableHead("Duration")
+					@TableHead("Time In of Shop")
+					@TableHead("Time Out of Shop")
+					@TableHead("Time In Location")
+					@TableHead("Time Out Location")
+					@TableHead("Time In Device")
+					@TableHead("Time Out Device")
 				</tr>
 			</thead>
 			<tbody class="bg-white divide-y divide-gray-200">

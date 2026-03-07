@@ -52,11 +52,11 @@ func ExtractTime(datetimeStr string) string {
 	if datetimeStr == "" {
 		return ""
 	}
-	t, err := time.Parse("2006-01-02 15:04:05", datetimeStr)
+	t, err := time.Parse(constants.DateTimeLayoutISO, datetimeStr)
 	if err != nil {
 		return datetimeStr
 	}
-	return t.Format("15:04:05")
+	return t.Format(constants.TimeLayoutHHMMSS)
 }
 
 func ParseAttendanceDate(date string) string {

@@ -36,3 +36,16 @@ func MustParseTimeOffToEnum(to string) TimeOff {
 	}
 	return res
 }
+
+func (t TimeOff) ToHuman() string {
+	switch t {
+	case TIME_OFF_VL:
+		return "Vacation Leave"
+	case TIME_OFF_SL:
+		return "Sick Leave"
+	case TIME_OFF_ABSENT:
+		return "Absent"
+	default:
+		return "undefined"
+	}
+}
