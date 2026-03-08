@@ -2,8 +2,56 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.12"></a>
+## [release-v1.1.12] - 2026-03-08
+### Docs
+- Update issue templates
+- Release v1.1.11
+
+### Feature
+- WIP export attendance
+- Implement lunch break tracking
+- WIP time off
+- Display location separately as a component
+- Add location and useragent
+- WIP products admin page
+
+### Maintenance
+- Organize utils
+- Cleanup and simplifications
+- Update goqite table
+
+### Script
+- Update magefile and air configs
+
+### Server
+- Be consistent with time storing
+- Separate time in/out status
+- Update haversine distance
+- Separate useragent for time in and time out
+- Update shop radius
+- Use PH time
+- Fix time in/out bugs
+- Add required in shop
+- Record staff access
+
+### Web
+- Add superuser time off
+- Add staff time off
+- Add staff portal
+- Display staff id as encoded
+- Display haversine distance
+- Update location display
+- Display location
+- Add spinning animation to buttons
+- Do not require location service for superusers
+- Add indicator for refresh
+
+
 <a name="release-v1.1.11"></a>
 ## [release-v1.1.11] - 2026-02-24
+### Docs
+- Release v1.1.10
 
 ### Feature
 - Location based time in/out enablement
@@ -808,7 +856,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.11...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.12...HEAD
+[release-v1.1.12]: https://github.com/flamendless/cchoice/compare/release-v1.1.11...release-v1.1.12
 [release-v1.1.11]: https://github.com/flamendless/cchoice/compare/release-v1.1.10...release-v1.1.11
 [release-v1.1.10]: https://github.com/flamendless/cchoice/compare/release-v1.1.9...release-v1.1.10
 [release-v1.1.9]: https://github.com/flamendless/cchoice/compare/release-v1.1.8...release-v1.1.9
