@@ -140,6 +140,9 @@ func MustInit() storage.IObjectStorage {
 
 	ctx := context.Background()
 	if err := client.HeadBucket(ctx); err != nil {
+		if cfg.IsWeb() {
+			return nil
+		}
 		panic(errors.Join(errs.ErrCloudflareVerifyAccess, err))
 	}
 

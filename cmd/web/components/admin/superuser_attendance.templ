@@ -71,6 +71,7 @@ templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 				<tr>
 					@TableHead("Staff ID")
 					@TableHead("Full Name")
+
 					@TableHead("Time In")
 					@TableHead("Time Out")
 					@TableHead("Duration")
@@ -80,6 +81,16 @@ templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 					@TableHead("Time Out Location")
 					@TableHead("Time In Device")
 					@TableHead("Time Out Device")
+
+					@TableHead("Lunch Break In")
+					@TableHead("Lunch Break Out")
+					@TableHead("Lunch Break Duration")
+					@TableHead("Lunch Break In of Shop")
+					@TableHead("Lunch Break Out of Shop")
+					@TableHead("Lunch Break In Location")
+					@TableHead("Lunch Break Out Location")
+					@TableHead("Lunch Break In Device")
+					@TableHead("Lunch Break Out Device")
 				</tr>
 			</thead>
 			<tbody class="bg-white divide-y divide-gray-200">
@@ -91,75 +102,25 @@ templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 							{ att.FullName }
 						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm">
-							if att.TimeIn != "" {
-								if att.TimeInStatus == enums.TIME_IN_STATUS_EARLIER {
-									<span class="text-green-600 font-medium">{ att.TimeIn }</span>
-								} else if att.TimeInStatus == enums.TIME_IN_STATUS_ON_TIME {
-									<span class="text-blue-600 font-medium">{ att.TimeIn }</span>
-								} else if att.TimeInStatus == enums.TIME_IN_STATUS_LATE {
-									<span class="text-red-600 font-medium">{ att.TimeIn }</span>
-								} else {
-									{ att.TimeIn }
-								}
-							} else {
-								<span class="text-gray-400">-</span>
-							}
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm">
-							if att.TimeOut != "" {
-								if att.TimeOutStatus == enums.TIME_OUT_STATUS_UNDERTIME {
-									<span class="text-red-600 font-medium">{ att.TimeOut }</span>
-								} else if att.TimeOutStatus == enums.TIME_OUT_STATUS_ON_TIME {
-									<span class="text-blue-600 font-medium">{ att.TimeOut }</span>
-								} else if att.TimeOutStatus == enums.TIME_OUT_STATUS_OVERTIME {
-									<span class="text-green-600 font-medium">{ att.TimeOut }</span>
-								} else {
-									{ att.TimeOut }
-								}
-							} else {
-								<span class="text-gray-400">-</span>
-							}
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm">
-							if att.Duration != "" && att.Duration != "-" {
-								if att.DurationColor == "green" {
-									<span class="text-green-600 font-medium">{ att.Duration }</span>
-								} else if att.DurationColor == "red" {
-									<span class="text-red-600 font-medium">{ att.Duration }</span>
-								} else {
-									{ att.Duration }
-								}
-							} else {
-								<span class="text-gray-400">-</span>
-							}
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm">
-							if att.InShop {
-								<span class="text-green-600 font-medium" title="In office">In</span>
-							} else {
-								<span class="text-red-600 font-medium" title="Out of office">Out</span>
-							}
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm">
-							if att.OutShop {
-								<span class="text-green-600 font-medium" title="In office">In</span>
-							} else {
-								<span class="text-red-600 font-medium" title="Out of office">Out</span>
-							}
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-							<span title={ att.InLocation }>{ utils.FormatLocation(att.InLocation) }</span>
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-							<span title={ att.OutLocation }>{ utils.FormatLocation(att.OutLocation) }</span>
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-							<span title={ att.InDeviceInfo }>{ att.InDeviceInfo }</span>
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-							<span title={ att.OutDeviceInfo }>{ att.OutDeviceInfo }</span>
-						</td>
+						@In(att.Attendance.In, att.Attendance.InStatus)
+						@Out(att.Attendance.Out, att.Attendance.OutStatus)
+						@Duration(att.Attendance.Duration, att.Attendance.DurationColor)
+						@LocStatus(att.Attendance.InShop)
+						@LocStatus(att.Attendance.OutShop)
+						@LatLong(att.Attendance.InLocation)
+						@LatLong(att.Attendance.OutLocation)
+						@Device(att.Attendance.InDeviceInfo)
+						@Device(att.Attendance.OutDeviceInfo)
+
+						@In(att.LunchBreak.In, att.LunchBreak.InStatus)
+						@Out(att.LunchBreak.Out, att.LunchBreak.OutStatus)
+						@Duration(att.LunchBreak.Duration, att.LunchBreak.DurationColor)
+						@LocStatus(att.LunchBreak.InShop)
+						@LocStatus(att.LunchBreak.OutShop)
+						@LatLong(att.LunchBreak.InLocation)
+						@LatLong(att.LunchBreak.OutLocation)
+						@Device(att.LunchBreak.InDeviceInfo)
+						@Device(att.LunchBreak.OutDeviceInfo)
 					</tr>
 				}
 			</tbody>

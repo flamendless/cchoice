@@ -41,7 +41,7 @@ func (s *Server) getCurrentStaff(ctx context.Context) (queries.GetStaffByIDRow, 
 	return staff, staffID, err
 }
 
-func computeAttendanceStatus(actualIn, actualOut, schedIn, schedOut string) attendanceStatusResult {
+func computeInOutStatus(actualIn, actualOut, schedIn, schedOut string) attendanceStatusResult {
 	out := attendanceStatusResult{duration: "-"}
 	actualInM, inOk := utils.TimeToMinutes(actualIn)
 	actualOutM, outOk := utils.TimeToMinutes(actualOut)
@@ -124,7 +124,9 @@ func buildAdminStaffAttendance(
 		schedOut = staff.TimeOutSchedule.String
 	}
 	timeIn, timeOut := utils.ExtractTimeToPH(att.TimeIn.String), utils.ExtractTimeToPH(att.TimeOut.String)
-	c := computeAttendanceStatus(timeIn, timeOut, schedIn, schedOut)
+	lunchbreakIn, lunchbreakOut := utils.ExtractTimeToPH(att.LunchBreakIn.String), utils.ExtractTimeToPH(att.LunchBreakOut.String)
+	c := computeInOutStatus(timeIn, timeOut, schedIn, schedOut)
+	lunchbreak := computeInOutStatus(lunchbreakIn, lunchbreakOut, "12:00", "13:00")
 
 	var inShop, outShop bool
 	if lat, lng, ok := utils.ParseLocation(att.InLocation); ok && shopLocation.RadiusMeters > 0 {
@@ -134,7 +136,15 @@ func buildAdminStaffAttendance(
 		outShop = utils.IsWithinRadius(lat, lng, shopLocation.Lat, shopLocation.Lng, shopLocation.RadiusMeters)
 	}
 
-	var inDeviceInfo, outDeviceInfo string
+	var lbInShop, lbOutShop bool
+	if lat, lng, ok := utils.ParseLocation(att.LunchBreakInLocation); ok && shopLocation.RadiusMeters > 0 {
+		lbInShop = utils.IsWithinRadius(lat, lng, shopLocation.Lat, shopLocation.Lng, shopLocation.RadiusMeters)
+	}
+	if lat, lng, ok := utils.ParseLocation(att.LunchBreakOutLocation); ok && shopLocation.RadiusMeters > 0 {
+		lbOutShop = utils.IsWithinRadius(lat, lng, shopLocation.Lat, shopLocation.Lng, shopLocation.RadiusMeters)
+	}
+
+	var inDeviceInfo, outDeviceInfo, lbInDeviceInfo, lbOutDeviceInfo string
 	if att.InBrowser.Valid {
 		inDeviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
 			Browser:        att.InBrowser.String,
@@ -151,25 +161,59 @@ func buildAdminStaffAttendance(
 			Device:         att.OutDevice.String,
 		})
 	}
+	if att.LunchBreakInBrowser.Valid {
+		lbInDeviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
+			Browser:        att.LunchBreakInBrowser.String,
+			BrowserVersion: att.LunchBreakInBrowserVersion.String,
+			OS:             att.LunchBreakInOs.String,
+			Device:         att.LunchBreakInDevice.String,
+		})
+	}
+	if att.LunchBreakOutBrowser.Valid {
+		lbOutDeviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
+			Browser:        att.LunchBreakOutBrowser.String,
+			BrowserVersion: att.LunchBreakOutBrowserVersion.String,
+			OS:             att.LunchBreakOutOs.String,
+			Device:         att.LunchBreakOutDevice.String,
+		})
+	}
 
 	return models.Attendance{
 		StaffID:          encoder.Encode(att.StaffID),
 		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
 		Date:             att.ForDate,
-		TimeIn:           timeIn,
-		TimeOut:          timeOut,
 		ScheduledTimeIn:  schedIn,
 		ScheduledTimeOut: schedOut,
-		TimeInStatus:     c.timeInStatus,
-		TimeOutStatus:    c.timeOutStatus,
-		Duration:         c.duration,
-		DurationColor:    c.durationColor,
-		InShop:           inShop,
-		OutShop:          outShop,
-		InLocation:       att.InLocation.String,
-		OutLocation:      att.OutLocation.String,
-		InDeviceInfo:     inDeviceInfo,
-		OutDeviceInfo:    outDeviceInfo,
+
+		Attendance: models.AttendanceStat{
+			In:            timeIn,
+			Out:           timeOut,
+			InStatus:      c.timeInStatus,
+			OutStatus:     c.timeOutStatus,
+			Duration:      c.duration,
+			DurationColor: c.durationColor,
+			InShop:        inShop,
+			OutShop:       outShop,
+			InLocation:    att.InLocation.String,
+			OutLocation:   att.OutLocation.String,
+			InDeviceInfo:  inDeviceInfo,
+			OutDeviceInfo: outDeviceInfo,
+		},
+
+		LunchBreak: models.AttendanceStat{
+			In:            lunchbreakIn,
+			Out:           lunchbreakOut,
+			InStatus:      lunchbreak.timeInStatus,
+			OutStatus:     lunchbreak.timeOutStatus,
+			Duration:      lunchbreak.duration,
+			DurationColor: lunchbreak.durationColor,
+			InShop:        lbInShop,
+			OutShop:       lbOutShop,
+			InLocation:    att.LunchBreakInLocation.String,
+			OutLocation:   att.LunchBreakOutLocation.String,
+			InDeviceInfo:  lbInDeviceInfo,
+			OutDeviceInfo: lbOutDeviceInfo,
+		},
 	}
 }
 
@@ -183,6 +227,8 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth).Get("/admin/staff/attendance/table", s.adminStaffAttendanceTableHandler)
 	r.With(s.requireStaffAuth).Post("/admin/staff/time-in", s.adminStaffTimeInHandler)
 	r.With(s.requireStaffAuth).Post("/admin/staff/time-out", s.adminStaffTimeOutHandler)
+	r.With(s.requireStaffAuth).Post("/admin/staff/lunch-break-in", s.adminStaffLunchBreakInHandler)
+	r.With(s.requireStaffAuth).Post("/admin/staff/lunch-break-out", s.adminStaffLunchBreakOutHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/time-off", s.adminStaffTimeOffPageHandler)
 	r.With(s.requireStaffAuth).Post("/admin/staff/time-off", s.adminStaffTimeOffHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/time-off/table", s.adminStaffTimeOffTableHandler)

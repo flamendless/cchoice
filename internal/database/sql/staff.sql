@@ -82,6 +82,12 @@ SELECT
     out_location,
     in_useragent_id,
     out_useragent_id,
+    lunch_break_in,
+    lunch_break_out,
+    lunch_break_in_location,
+    lunch_break_out_location,
+    lunch_break_in_useragent_id,
+    lunch_break_out_useragent_id,
     created_at,
     updated_at
 FROM tbl_staff_attendances
@@ -101,6 +107,12 @@ SELECT
     sa.out_location,
     sa.in_useragent_id,
     sa.out_useragent_id,
+    sa.lunch_break_in,
+    sa.lunch_break_out,
+    sa.lunch_break_in_location,
+    sa.lunch_break_out_location,
+    sa.lunch_break_in_useragent_id,
+    sa.lunch_break_out_useragent_id,
     sa.created_at,
     sa.updated_at,
     s.first_name,
@@ -113,11 +125,21 @@ SELECT
     out_ua.browser as out_browser,
     out_ua.browser_version as out_browser_version,
     out_ua.os as out_os,
-    out_ua.device as out_device
+    out_ua.device as out_device,
+    lunch_break_in_ua.browser as lunch_break_in_browser,
+    lunch_break_in_ua.browser_version as lunch_break_in_browser_version,
+    lunch_break_in_ua.os as lunch_break_in_os,
+    lunch_break_in_ua.device as lunch_break_in_device,
+    lunch_break_out_ua.browser as lunch_break_out_browser,
+    lunch_break_out_ua.browser_version as lunch_break_out_browser_version,
+    lunch_break_out_ua.os as lunch_break_out_os,
+    lunch_break_out_ua.device as lunch_break_out_device
 FROM tbl_staff_attendances sa
 INNER JOIN tbl_staffs s ON s.id = sa.staff_id
 LEFT JOIN tbl_useragents in_ua ON in_ua.id = sa.in_useragent_id
 LEFT JOIN tbl_useragents out_ua ON out_ua.id = sa.out_useragent_id
+LEFT JOIN tbl_useragents lunch_break_in_ua ON lunch_break_in_ua.id = sa.lunch_break_in_useragent_id
+LEFT JOIN tbl_useragents lunch_break_out_ua ON lunch_break_out_ua.id = sa.lunch_break_out_useragent_id
 WHERE
     sa.for_date = ?
     AND s.deleted_at = '1970-01-01 00:00:00+00:00'
@@ -271,4 +293,28 @@ SET
     approved_at = NULL,
     updated_at = datetime('now')
 WHERE id = ? AND approved = true
+RETURNING id;
+
+-- name: UpdateStaffAttendanceLunchBreakIn :one
+UPDATE tbl_staff_attendances
+SET
+    lunch_break_in = ?,
+    lunch_break_in_location = ?,
+    lunch_break_in_useragent_id = ?,
+    updated_at = datetime('now')
+WHERE
+    staff_id = ?
+    AND for_date = ?
+RETURNING id;
+
+-- name: UpdateStaffAttendanceLunchBreakOut :one
+UPDATE tbl_staff_attendances
+SET
+    lunch_break_out = ?,
+    lunch_break_out_location = ?,
+    lunch_break_out_useragent_id = ?,
+    updated_at = datetime('now')
+WHERE
+    staff_id = ?
+    AND for_date = ?
 RETURNING id;

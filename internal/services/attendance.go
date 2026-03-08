@@ -101,6 +101,56 @@ func (s *AttendanceService) TimeOut(
 	return err
 }
 
+func (s *AttendanceService) LunchBreakIn(
+	ctx context.Context,
+	staffID int64,
+	date string,
+	now string,
+	location sql.NullString,
+	useragentID sql.NullInt64,
+) error {
+	_, err := s.dbRW.GetQueries().UpdateStaffAttendanceLunchBreakIn(ctx, queries.UpdateStaffAttendanceLunchBreakInParams{
+		LunchBreakIn:            sql.NullString{String: now, Valid: true},
+		LunchBreakInLocation:    location,
+		LunchBreakInUseragentID: useragentID,
+		StaffID:                 staffID,
+		ForDate:                 date,
+	})
+	return err
+}
+
+func (s *AttendanceService) LunchBreakOut(
+	ctx context.Context,
+	staffID int64,
+	date string,
+	now string,
+	location sql.NullString,
+	useragentID sql.NullInt64,
+) error {
+	existing, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
+		StaffID: staffID,
+		ForDate: date,
+	})
+	if err != nil {
+		return err
+	}
+	if !existing.LunchBreakIn.Valid {
+		return sql.ErrNoRows
+	}
+	if existing.LunchBreakOut.Valid {
+		return sql.ErrTxDone
+	}
+
+	_, err = s.dbRW.GetQueries().UpdateStaffAttendanceLunchBreakOut(ctx, queries.UpdateStaffAttendanceLunchBreakOutParams{
+		LunchBreakOut:            sql.NullString{String: now, Valid: true},
+		LunchBreakOutLocation:    location,
+		LunchBreakOutUseragentID: useragentID,
+		StaffID:                  staffID,
+		ForDate:                  date,
+	})
+	return err
+}
+
 func (s *AttendanceService) TimeOff(
 	ctx context.Context,
 	staffID int64,

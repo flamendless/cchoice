@@ -376,6 +376,12 @@ SELECT
     out_location,
     in_useragent_id,
     out_useragent_id,
+    lunch_break_in,
+    lunch_break_out,
+    lunch_break_in_location,
+    lunch_break_out_location,
+    lunch_break_in_useragent_id,
+    lunch_break_out_useragent_id,
     created_at,
     updated_at
 FROM tbl_staff_attendances
@@ -391,17 +397,23 @@ type GetStaffAttendanceByDateParams struct {
 }
 
 type GetStaffAttendanceByDateRow struct {
-	ID             int64
-	StaffID        int64
-	ForDate        string
-	TimeIn         sql.NullString
-	TimeOut        sql.NullString
-	InLocation     sql.NullString
-	OutLocation    sql.NullString
-	InUseragentID  sql.NullInt64
-	OutUseragentID sql.NullInt64
-	CreatedAt      string
-	UpdatedAt      string
+	ID                       int64
+	StaffID                  int64
+	ForDate                  string
+	TimeIn                   sql.NullString
+	TimeOut                  sql.NullString
+	InLocation               sql.NullString
+	OutLocation              sql.NullString
+	InUseragentID            sql.NullInt64
+	OutUseragentID           sql.NullInt64
+	LunchBreakIn             sql.NullString
+	LunchBreakOut            sql.NullString
+	LunchBreakInLocation     sql.NullString
+	LunchBreakOutLocation    sql.NullString
+	LunchBreakInUseragentID  sql.NullInt64
+	LunchBreakOutUseragentID sql.NullInt64
+	CreatedAt                string
+	UpdatedAt                string
 }
 
 func (q *Queries) GetStaffAttendanceByDate(ctx context.Context, arg GetStaffAttendanceByDateParams) (GetStaffAttendanceByDateRow, error) {
@@ -417,6 +429,12 @@ func (q *Queries) GetStaffAttendanceByDate(ctx context.Context, arg GetStaffAtte
 		&i.OutLocation,
 		&i.InUseragentID,
 		&i.OutUseragentID,
+		&i.LunchBreakIn,
+		&i.LunchBreakOut,
+		&i.LunchBreakInLocation,
+		&i.LunchBreakOutLocation,
+		&i.LunchBreakInUseragentID,
+		&i.LunchBreakOutUseragentID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -434,6 +452,12 @@ SELECT
     sa.out_location,
     sa.in_useragent_id,
     sa.out_useragent_id,
+    sa.lunch_break_in,
+    sa.lunch_break_out,
+    sa.lunch_break_in_location,
+    sa.lunch_break_out_location,
+    sa.lunch_break_in_useragent_id,
+    sa.lunch_break_out_useragent_id,
     sa.created_at,
     sa.updated_at,
     s.first_name,
@@ -446,11 +470,21 @@ SELECT
     out_ua.browser as out_browser,
     out_ua.browser_version as out_browser_version,
     out_ua.os as out_os,
-    out_ua.device as out_device
+    out_ua.device as out_device,
+    lunch_break_in_ua.browser as lunch_break_in_browser,
+    lunch_break_in_ua.browser_version as lunch_break_in_browser_version,
+    lunch_break_in_ua.os as lunch_break_in_os,
+    lunch_break_in_ua.device as lunch_break_in_device,
+    lunch_break_out_ua.browser as lunch_break_out_browser,
+    lunch_break_out_ua.browser_version as lunch_break_out_browser_version,
+    lunch_break_out_ua.os as lunch_break_out_os,
+    lunch_break_out_ua.device as lunch_break_out_device
 FROM tbl_staff_attendances sa
 INNER JOIN tbl_staffs s ON s.id = sa.staff_id
 LEFT JOIN tbl_useragents in_ua ON in_ua.id = sa.in_useragent_id
 LEFT JOIN tbl_useragents out_ua ON out_ua.id = sa.out_useragent_id
+LEFT JOIN tbl_useragents lunch_break_in_ua ON lunch_break_in_ua.id = sa.lunch_break_in_useragent_id
+LEFT JOIN tbl_useragents lunch_break_out_ua ON lunch_break_out_ua.id = sa.lunch_break_out_useragent_id
 WHERE
     sa.for_date = ?
     AND s.deleted_at = '1970-01-01 00:00:00+00:00'
@@ -458,28 +492,42 @@ ORDER BY s.last_name ASC, s.first_name ASC
 `
 
 type GetStaffAttendanceByStaffIDAndDateRangeRow struct {
-	ID                int64
-	StaffID           int64
-	ForDate           string
-	TimeIn            sql.NullString
-	TimeOut           sql.NullString
-	InLocation        sql.NullString
-	OutLocation       sql.NullString
-	InUseragentID     sql.NullInt64
-	OutUseragentID    sql.NullInt64
-	CreatedAt         string
-	UpdatedAt         string
-	FirstName         string
-	MiddleName        sql.NullString
-	LastName          string
-	InBrowser         sql.NullString
-	InBrowserVersion  sql.NullString
-	InOs              sql.NullString
-	InDevice          sql.NullString
-	OutBrowser        sql.NullString
-	OutBrowserVersion sql.NullString
-	OutOs             sql.NullString
-	OutDevice         sql.NullString
+	ID                          int64
+	StaffID                     int64
+	ForDate                     string
+	TimeIn                      sql.NullString
+	TimeOut                     sql.NullString
+	InLocation                  sql.NullString
+	OutLocation                 sql.NullString
+	InUseragentID               sql.NullInt64
+	OutUseragentID              sql.NullInt64
+	LunchBreakIn                sql.NullString
+	LunchBreakOut               sql.NullString
+	LunchBreakInLocation        sql.NullString
+	LunchBreakOutLocation       sql.NullString
+	LunchBreakInUseragentID     sql.NullInt64
+	LunchBreakOutUseragentID    sql.NullInt64
+	CreatedAt                   string
+	UpdatedAt                   string
+	FirstName                   string
+	MiddleName                  sql.NullString
+	LastName                    string
+	InBrowser                   sql.NullString
+	InBrowserVersion            sql.NullString
+	InOs                        sql.NullString
+	InDevice                    sql.NullString
+	OutBrowser                  sql.NullString
+	OutBrowserVersion           sql.NullString
+	OutOs                       sql.NullString
+	OutDevice                   sql.NullString
+	LunchBreakInBrowser         sql.NullString
+	LunchBreakInBrowserVersion  sql.NullString
+	LunchBreakInOs              sql.NullString
+	LunchBreakInDevice          sql.NullString
+	LunchBreakOutBrowser        sql.NullString
+	LunchBreakOutBrowserVersion sql.NullString
+	LunchBreakOutOs             sql.NullString
+	LunchBreakOutDevice         sql.NullString
 }
 
 func (q *Queries) GetStaffAttendanceByStaffIDAndDateRange(ctx context.Context, forDate string) ([]GetStaffAttendanceByStaffIDAndDateRangeRow, error) {
@@ -501,6 +549,12 @@ func (q *Queries) GetStaffAttendanceByStaffIDAndDateRange(ctx context.Context, f
 			&i.OutLocation,
 			&i.InUseragentID,
 			&i.OutUseragentID,
+			&i.LunchBreakIn,
+			&i.LunchBreakOut,
+			&i.LunchBreakInLocation,
+			&i.LunchBreakOutLocation,
+			&i.LunchBreakInUseragentID,
+			&i.LunchBreakOutUseragentID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.FirstName,
@@ -514,6 +568,14 @@ func (q *Queries) GetStaffAttendanceByStaffIDAndDateRange(ctx context.Context, f
 			&i.OutBrowserVersion,
 			&i.OutOs,
 			&i.OutDevice,
+			&i.LunchBreakInBrowser,
+			&i.LunchBreakInBrowserVersion,
+			&i.LunchBreakInOs,
+			&i.LunchBreakInDevice,
+			&i.LunchBreakOutBrowser,
+			&i.LunchBreakOutBrowserVersion,
+			&i.LunchBreakOutOs,
+			&i.LunchBreakOutDevice,
 		); err != nil {
 			return nil, err
 		}
@@ -763,6 +825,74 @@ type UpdateStaffAttendanceLocationParams struct {
 
 func (q *Queries) UpdateStaffAttendanceLocation(ctx context.Context, arg UpdateStaffAttendanceLocationParams) (int64, error) {
 	row := q.db.QueryRowContext(ctx, updateStaffAttendanceLocation, arg.OutLocation, arg.StaffID, arg.ForDate)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const updateStaffAttendanceLunchBreakIn = `-- name: UpdateStaffAttendanceLunchBreakIn :one
+UPDATE tbl_staff_attendances
+SET
+    lunch_break_in = ?,
+    lunch_break_in_location = ?,
+    lunch_break_in_useragent_id = ?,
+    updated_at = datetime('now')
+WHERE
+    staff_id = ?
+    AND for_date = ?
+RETURNING id
+`
+
+type UpdateStaffAttendanceLunchBreakInParams struct {
+	LunchBreakIn            sql.NullString
+	LunchBreakInLocation    sql.NullString
+	LunchBreakInUseragentID sql.NullInt64
+	StaffID                 int64
+	ForDate                 string
+}
+
+func (q *Queries) UpdateStaffAttendanceLunchBreakIn(ctx context.Context, arg UpdateStaffAttendanceLunchBreakInParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, updateStaffAttendanceLunchBreakIn,
+		arg.LunchBreakIn,
+		arg.LunchBreakInLocation,
+		arg.LunchBreakInUseragentID,
+		arg.StaffID,
+		arg.ForDate,
+	)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const updateStaffAttendanceLunchBreakOut = `-- name: UpdateStaffAttendanceLunchBreakOut :one
+UPDATE tbl_staff_attendances
+SET
+    lunch_break_out = ?,
+    lunch_break_out_location = ?,
+    lunch_break_out_useragent_id = ?,
+    updated_at = datetime('now')
+WHERE
+    staff_id = ?
+    AND for_date = ?
+RETURNING id
+`
+
+type UpdateStaffAttendanceLunchBreakOutParams struct {
+	LunchBreakOut            sql.NullString
+	LunchBreakOutLocation    sql.NullString
+	LunchBreakOutUseragentID sql.NullInt64
+	StaffID                  int64
+	ForDate                  string
+}
+
+func (q *Queries) UpdateStaffAttendanceLunchBreakOut(ctx context.Context, arg UpdateStaffAttendanceLunchBreakOutParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, updateStaffAttendanceLunchBreakOut,
+		arg.LunchBreakOut,
+		arg.LunchBreakOutLocation,
+		arg.LunchBreakOutUseragentID,
+		arg.StaffID,
+		arg.ForDate,
+	)
 	var id int64
 	err := row.Scan(&id)
 	return id, err
