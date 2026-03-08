@@ -78,7 +78,7 @@ func AdminSuperuserAttendancePage(title string, selectedDate string) templ.Compo
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">Staff Attendance</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">Employee Attendance</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

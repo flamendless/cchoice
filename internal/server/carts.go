@@ -336,20 +336,14 @@ func (s *Server) addProductToCartHandler(w http.ResponseWriter, r *http.Request)
 	token := s.sessionManager.Token(ctx)
 
 	if err := r.ParseForm(); err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Error(err),
-		)
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	productID := r.Form.Get("product_id")
 	if productID == "" {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Error(errs.ErrInvalidParams),
-		)
+		logs.LogCtx(ctx).Error(logtag, zap.Error(errs.ErrInvalidParams))
 		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
