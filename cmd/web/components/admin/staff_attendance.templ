@@ -12,62 +12,23 @@ templ StaffAttendanceSingleTable(record *models.Attendance) {
 		<table class="min-w-full divide-y divide-gray-200">
 			<thead class="bg-gray-50">
 				<tr>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-						Time In
-					</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-						Time Out
-					</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-						Duration
-					</th>
+					@TableHead("Time In")
+					@TableHead("Time Out")
+					@TableHead("Duration")
+					@TableHead("Lunch Break In")
+					@TableHead("Lunch Break Out")
+					@TableHead("Duration")
 				</tr>
 			</thead>
 			<tbody class="bg-white divide-y divide-gray-200">
 				<tr>
-					<td class="px-6 py-4 whitespace-nowrap text-sm">
-						if record.TimeIn != "" {
-							if record.TimeInStatus == enums.TIME_IN_STATUS_EARLIER {
-								<span class="text-green-600 font-medium">{ record.TimeIn }</span>
-							} else if record.TimeInStatus == enums.TIME_IN_STATUS_ON_TIME {
-								<span class="text-blue-600 font-medium">{ record.TimeIn }</span>
-							} else if record.TimeInStatus == enums.TIME_IN_STATUS_LATE {
-								<span class="text-red-600 font-medium">{ record.TimeIn }</span>
-							} else {
-								{ record.TimeIn }
-							}
-						} else {
-							<span class="text-gray-400">-</span>
-						}
-					</td>
-					<td class="px-6 py-4 whitespace-nowrap text-sm">
-						if record.TimeOut != "" {
-							if record.TimeOutStatus == enums.TIME_OUT_STATUS_UNDERTIME {
-								<span class="text-red-600 font-medium">{ record.TimeOut }</span>
-							} else if record.TimeOutStatus == enums.TIME_OUT_STATUS_ON_TIME {
-								<span class="text-blue-600 font-medium">{ record.TimeOut }</span>
-							} else if record.TimeOutStatus == enums.TIME_OUT_STATUS_OVERTIME {
-								<span class="text-green-600 font-medium">{ record.TimeOut }</span>
-							} else {
-								{ record.TimeOut }
-							}
-						} else {
-							<span class="text-gray-400">-</span>
-						}
-					</td>
-					<td class="px-6 py-4 whitespace-nowrap text-sm">
-						if record.Duration != "" && record.Duration != "-" {
-							if record.DurationColor == "green" {
-								<span class="text-green-600 font-medium">{ record.Duration }</span>
-							} else if record.DurationColor == "red" {
-								<span class="text-red-600 font-medium">{ record.Duration }</span>
-							} else {
-								{ record.Duration }
-							}
-						} else {
-							<span class="text-gray-400">-</span>
-						}
-					</td>
+					@In(record.Attendance.In, record.Attendance.InStatus)
+					@Out(record.Attendance.Out, record.Attendance.OutStatus)
+					@Duration(record.Attendance.Duration, record.Attendance.DurationColor)
+
+					@In(record.LunchBreak.In, record.Attendance.InStatus)
+					@Out(record.LunchBreak.Out, record.Attendance.OutStatus)
+					@Duration(record.LunchBreak.Duration, record.Attendance.DurationColor)
 				</tr>
 			</tbody>
 		</table>
@@ -155,6 +116,8 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 						@StaffDetail("Mobile No", profile.MobileNo)
 						@StaffDetail("Scheduled Time In", profile.ScheduledTimeIn)
 						@StaffDetail("Scheduled Time Out", profile.ScheduledTimeOut)
+						@StaffDetail("Lunch break", "1 Hour")
+						@StaffDetail("Paid breaktime", "30 minutes")
 						@StaffDetail("Required in shop time in/out", utils.BoolToString(profile.RequireInShop))
 					</div>
 
@@ -163,7 +126,7 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 					}
 
 					<div class="space-y-4">
-						<div>
+						<div class="flex flex-row gap-4">
 							<button
 								type="button"
 								class={ getButtonClass(profile.CanTimeIn) }
@@ -174,8 +137,6 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 							>
 								Time In
 							</button>
-						</div>
-						<div>
 							<button
 								type="button"
 								class={ getButtonClass(profile.CanTimeOut) }
@@ -185,6 +146,29 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 								disabled?={!profile.CanTimeOut}
 							>
 								Time Out
+							</button>
+						</div>
+
+						<div class="flex flex-row gap-4">
+							<button
+								type="button"
+								class={ getButtonClass(profile.CanLunchBreakIn) }
+								hx-post={ utils.URL("/admin/staff/lunch-break-in") }
+								hx-trigger="click"
+								hx-swap="none"
+								disabled?={!profile.CanLunchBreakIn}
+							>
+								Lunch Break In
+							</button>
+							<button
+								type="button"
+								class={ getButtonClass(profile.CanLunchBreakOut) }
+								hx-post={ utils.URL("/admin/staff/lunch-break-out") }
+								hx-trigger="click"
+								hx-swap="none"
+								disabled?={!profile.CanLunchBreakOut}
+							>
+								Lunch Break Out
 							</button>
 						</div>
 					</div>

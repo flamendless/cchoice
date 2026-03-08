@@ -222,3 +222,78 @@ templ TableHead(value string) {
 	</th>
 }
 
+templ In(value string, status enums.TimeInStatus) {
+	<td class="px-6 py-4 whitespace-nowrap text-sm">
+		if value != "" {
+			switch status {
+			case enums.TIME_IN_STATUS_EARLIER:
+				<span class="text-green-600 font-medium">{ value }</span>
+			case enums.TIME_IN_STATUS_ON_TIME:
+				<span class="text-blue-600 font-medium">{ value }</span>
+			case enums.TIME_IN_STATUS_LATE:
+				<span class="text-red-600 font-medium">{ value }</span>
+			default:
+				{ value }
+			}
+		} else {
+			<span class="text-gray-400">-</span>
+		}
+	</td>
+}
+
+templ Out(value string, status enums.TimeOutStatus) {
+	<td class="px-6 py-4 whitespace-nowrap text-sm">
+		if value != "" {
+			switch status {
+			case enums.TIME_OUT_STATUS_UNDERTIME:
+				<span class="text-green-600 font-medium">{ value }</span>
+			case enums.TIME_OUT_STATUS_ON_TIME:
+				<span class="text-blue-600 font-medium">{ value }</span>
+			case enums.TIME_OUT_STATUS_OVERTIME:
+				<span class="text-red-600 font-medium">{ value }</span>
+			default:
+				{ value }
+			}
+		} else {
+			<span class="text-gray-400">-</span>
+		}
+	</td>
+}
+
+templ Duration(duration string, color string) {
+	<td class="px-6 py-4 whitespace-nowrap text-sm">
+		if duration != "" && duration != "-" {
+			if color == "green" {
+				<span class="text-green-600 font-medium">{ duration }</span>
+			} else if color == "red" {
+				<span class="text-red-600 font-medium">{ duration }</span>
+			} else {
+				{ duration }
+			}
+		} else {
+			<span class="text-gray-400">-</span>
+		}
+	</td>
+}
+
+templ LocStatus(cond bool) {
+	<td class="px-6 py-4 whitespace-nowrap text-sm">
+		if cond {
+			<span class="text-green-600 font-medium" title="In office">In</span>
+		} else {
+			<span class="text-red-600 font-medium" title="Out of office">Out</span>
+		}
+	</td>
+}
+
+templ LatLong(loc string) {
+	<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+		<span title={ loc }>{ utils.FormatLocation(loc) }</span>
+	</td>
+}
+
+templ Device(deviceInfo string) {
+	<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+		<span title={ deviceInfo }>{ deviceInfo }</span>
+	</td>
+}

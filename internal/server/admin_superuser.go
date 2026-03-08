@@ -46,7 +46,6 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 	ctx := r.Context()
 
 	date := utils.ParseAttendanceDate(r.URL.Query().Get("date"))
-
 	attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByStaffIDAndDateRange(ctx, date)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))

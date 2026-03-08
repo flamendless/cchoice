@@ -135,6 +135,8 @@ type AdminStaffProfile struct {
 	HasTimeOut       bool
 	CanTimeIn        bool
 	CanTimeOut       bool
+	CanLunchBreakIn  bool
+	CanLunchBreakOut bool
 	RequireInShop    bool
 	MyAttendance     *Attendance
 	InShop           *bool
@@ -146,24 +148,29 @@ type AdminStaffProfile struct {
 	UserType         enums.StaffUserType
 }
 
+type AttendanceStat struct {
+	In            string
+	Out           string
+	InStatus      enums.TimeInStatus
+	OutStatus     enums.TimeOutStatus
+	Duration      string
+	DurationColor string
+	InShop        bool
+	OutShop       bool
+	InLocation    string
+	OutLocation   string
+	InDeviceInfo  string
+	OutDeviceInfo string
+}
+
 type Attendance struct {
 	StaffID          string
 	FullName         string
 	Date             string
-	TimeIn           string
-	TimeOut          string
 	ScheduledTimeIn  string
 	ScheduledTimeOut string
-	TimeInStatus     enums.TimeInStatus
-	TimeOutStatus    enums.TimeOutStatus
-	Duration         string
-	DurationColor    string
-	InShop           bool
-	OutShop          bool
-	InLocation       string
-	OutLocation      string
-	InDeviceInfo     string
-	OutDeviceInfo    string
+	Attendance       AttendanceStat
+	LunchBreak       AttendanceStat
 }
 
 type AdminSuperuserPage struct {

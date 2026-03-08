@@ -20,6 +20,7 @@ import (
 	"cchoice/internal/utils"
 
 	"github.com/goccy/go-json"
+	"github.com/gookit/goutil/dump"
 	"go.uber.org/zap"
 )
 
@@ -35,20 +36,34 @@ func buildStaffDayAttendance(
 	if staff.TimeOutSchedule.Valid {
 		schedOut = staff.TimeOutSchedule.String
 	}
+
 	timeIn, timeOut := utils.ExtractTimeToPH(att.TimeIn.String), utils.ExtractTimeToPH(att.TimeOut.String)
-	c := computeAttendanceStatus(timeIn, timeOut, schedIn, schedOut)
+	lunchbreakIn, lunchBreakOut := utils.ExtractTimeToPH(att.LunchBreakIn.String), utils.ExtractTimeToPH(att.LunchBreakOut.String)
+	c := computeInOutStatus(timeIn, timeOut, schedIn, schedOut)
+	lunchbreak := computeInOutStatus(lunchbreakIn, lunchBreakOut, "12:00", "13:00")
+
 	return models.Attendance{
 		StaffID:          encoder.Encode(att.StaffID),
 		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
 		Date:             att.ForDate,
-		TimeIn:           timeIn,
-		TimeOut:          timeOut,
 		ScheduledTimeIn:  schedIn,
 		ScheduledTimeOut: schedOut,
-		TimeInStatus:     c.timeInStatus,
-		TimeOutStatus:    c.timeOutStatus,
-		Duration:         c.duration,
-		DurationColor:    c.durationColor,
+		Attendance: models.AttendanceStat{
+			In:            timeIn,
+			Out:           timeOut,
+			InStatus:      c.timeInStatus,
+			OutStatus:     c.timeOutStatus,
+			Duration:      c.duration,
+			DurationColor: c.durationColor,
+		},
+		LunchBreak: models.AttendanceStat{
+			In:            lunchbreakIn,
+			Out:           lunchBreakOut,
+			InStatus:      lunchbreak.timeInStatus,
+			OutStatus:     lunchbreak.timeOutStatus,
+			Duration:      lunchbreak.duration,
+			DurationColor: lunchbreak.durationColor,
+		},
 	}
 }
 
@@ -127,6 +142,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		ForDate: today,
 	})
 	var hasTimeIn, hasTimeOut bool
+	var hasLunchBreakIn, hasLunchBreakOut bool
 	var myAttendance *models.Attendance
 	if err != nil {
 		if err != sql.ErrNoRows {
@@ -137,6 +153,8 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		hasTimeIn = attendance.TimeIn.Valid
 		hasTimeOut = attendance.TimeOut.Valid
+		hasLunchBreakIn = attendance.LunchBreakIn.Valid
+		hasLunchBreakOut = attendance.LunchBreakOut.Valid
 		rec := buildStaffDayAttendance(s.encoder, staff, attendance)
 		myAttendance = &rec
 	}
@@ -188,7 +206,10 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 
 	canTimeIn := !hasTimeIn
 	canTimeOut := hasTimeIn && !hasTimeOut
-	//INFO: (flam) - allow for now
+	canLunchBreakIn := hasTimeIn && !hasLunchBreakIn
+	canLunchBreakOut := !hasTimeOut && hasLunchBreakIn && !hasLunchBreakOut
+
+	//INFO: (flam) - allow all for now
 	// if staff.RequireInShop {
 	// 	if inShop == nil || !*inShop {
 	// 		canTimeIn = false
@@ -212,6 +233,8 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		HasTimeOut:       hasTimeOut,
 		CanTimeIn:        canTimeIn,
 		CanTimeOut:       canTimeOut,
+		CanLunchBreakIn:  canLunchBreakIn,
+		CanLunchBreakOut: canLunchBreakOut,
 		RequireInShop:    staff.RequireInShop,
 		MyAttendance:     myAttendance,
 		InShop:           inShop,
@@ -288,6 +311,55 @@ func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request
 	err := svc.TimeOut(ctx, staffID, date, now, useragentID)
 	if err != nil {
 		http.Error(w, "Unable to time out", http.StatusBadRequest)
+		return
+	}
+	w.Header().Set("HX-Redirect", utils.URL("/admin/staff/attendance"))
+	w.WriteHeader(http.StatusOK)
+}
+
+func (s *Server) adminStaffLunchBreakInHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff Lunch Break In Handler]"
+	ctx := r.Context()
+	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
+	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
+	date := utils.NowPH().Format(constants.DateLayoutISO)
+	location := GetLocation(ctx, s.sessionManager)
+	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
+	svc := services.NewAttendanceService(s.dbRO, s.dbRW)
+	err := svc.LunchBreakIn(ctx, staffID, date, now, location, useragentID)
+	dump.Println(111, now, date, location, r.UserAgent(), useragentID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+			zap.Int64("staff_id", staffID),
+			zap.String("date", date),
+		)
+		http.Error(w, "Unable to lunchbreak in", http.StatusBadRequest)
+		return
+	}
+	w.Header().Set("HX-Redirect", utils.URL("/admin/staff/attendance"))
+	w.WriteHeader(http.StatusOK)
+}
+
+func (s *Server) adminStaffLunchBreakOutHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff Lunch Break Out Handler]"
+	ctx := r.Context()
+	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
+	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
+	date := utils.NowPH().Format(constants.DateLayoutISO)
+	location := GetLocation(ctx, s.sessionManager)
+	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
+	svc := services.NewAttendanceService(s.dbRO, s.dbRW)
+	err := svc.LunchBreakOut(ctx, staffID, date, now, location, useragentID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+			zap.Int64("staff_id", staffID),
+			zap.String("date", date),
+		)
+		http.Error(w, "Unable to lunchbreak out", http.StatusBadRequest)
 		return
 	}
 	w.Header().Set("HX-Redirect", utils.URL("/admin/staff/attendance"))
