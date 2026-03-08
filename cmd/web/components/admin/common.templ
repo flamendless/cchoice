@@ -4,6 +4,7 @@ import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/models"
 import "cchoice/internal/enums"
+import "fmt"
 
 templ AdminHeader(profile *models.AdminStaffProfile) {
 	if profile == nil {
@@ -31,20 +32,29 @@ templ AdminHeader(profile *models.AdminStaffProfile) {
 
 templ AttendanceToolbar(title string, selectedDate string, userType enums.StaffUserType) {
 	{{
-		var dateSelectorID string
+		var dateSelectorID, dateSelectorIDEnd string
 		var refreshButtonID string
-		if userType == enums.STAFF_USER_TYPE_SUPERUSER {
-			dateSelectorID = "date-selector"
-			refreshButtonID = "refresh-btn"
-		} else {
+		var exportButtonID string
+		if userType == enums.STAFF_USER_TYPE_STAFF {
 			dateSelectorID = "staff-date-selector"
 			refreshButtonID = "staff-refresh-btn"
+		} else {
+			dateSelectorID = "date-selector"
+			dateSelectorIDEnd = "date-selector-end"
+			refreshButtonID = "refresh-btn"
+			exportButtonID = "export-csv-btn"
 		}
 	}}
+
 	<div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
 		<h2 class="text-xl font-semibold text-gray-800">{ title }</h2>
 		<div class="flex gap-2">
-			@common.DateSelector(dateSelectorID, selectedDate, false)
+			if userType == enums.STAFF_USER_TYPE_STAFF {
+				@common.DateSelector(dateSelectorID, selectedDate, false)
+			} else if userType == enums.STAFF_USER_TYPE_SUPERUSER {
+				@common.DateSelectorNamed(dateSelectorID, "Start Date", selectedDate, false)
+				@common.DateSelectorNamed(dateSelectorIDEnd, "End Date", selectedDate, false)
+			}
 			<button
 				type="button"
 				id={ refreshButtonID }
@@ -55,6 +65,17 @@ templ AttendanceToolbar(title string, selectedDate string, userType enums.StaffU
 					<span class="refresh-btn-text">Refresh</span>
 				</span>
 			</button>
+			if userType == enums.STAFF_USER_TYPE_SUPERUSER {
+				<button
+					type="button"
+					id={ exportButtonID }
+					hx-post={ utils.URL("/admin/superuser/attendance/report") }
+					hx-include={ fmt.Sprintf("#%s,#%s", dateSelectorID, dateSelectorIDEnd) }
+					class="px-4 py-2 w-28 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors inline-flex items-center justify-center gap-2"
+				>
+					Export CSV
+				</button>
+			}
 		</div>
 	</div>
 }

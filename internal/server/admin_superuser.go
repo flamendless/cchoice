@@ -1,7 +1,13 @@
 package server
 
 import (
+	"database/sql"
+	"encoding/csv"
+	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 
@@ -93,6 +99,178 @@ func (s *Server) adminSuperuserAttendancePageHandler(w http.ResponseWriter, r *h
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Attendance Report Handler]"
+	ctx := r.Context()
+
+	if err := r.ParseForm(); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	startDate := r.FormValue("date-selector")
+	endDate := r.FormValue("date-selector-end")
+	if startDate == "" || endDate == "" {
+		http.Error(w, "Missing start date or end date", http.StatusBadRequest)
+		return
+	}
+
+	attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByDateRange(ctx, queries.GetStaffAttendanceByDateRangeParams{
+		StartDate: startDate,
+		EndDate:   endDate,
+	})
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, "Failed to fetch attendance data", http.StatusInternalServerError)
+		return
+	}
+
+	reportName := fmt.Sprintf("attendance_%s_%s_%s.csv", startDate, endDate, utils.GenString(8))
+	tmpFile, err := os.CreateTemp("./tmp", reportName)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, "Failed to create temp file", http.StatusInternalServerError)
+		return
+	}
+	defer func() {
+		if err := tmpFile.Close(); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		}
+	}()
+
+	writer := csv.NewWriter(tmpFile)
+	defer writer.Flush()
+
+	if err := writer.Write([]string{"Report name: "+reportName}); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := writer.Write([]string{fmt.Sprintf("Start date: %s | End date: %s", startDate, endDate)}); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := writer.Write([]string{
+		"date",
+		"name of staff",
+		"time in",
+		"time out",
+		"duration",
+		"in location and useragent",
+		"out location and useragent",
+		"lunch break in",
+		"lunch break out",
+		"lunch break duration",
+		"lunch break in location and useragent",
+		"lunch break out location and useragent",
+	}); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for _, att := range attendances {
+		staffName := utils.BuildFullName(att.FirstName, att.MiddleName.String, att.LastName)
+		dateStr := att.ForDate
+
+		timeIn := utils.ExtractTimeToPH(att.TimeIn.String)
+		timeOut := utils.ExtractTimeToPH(att.TimeOut.String)
+
+		var duration string
+		if att.TimeIn.Valid && att.TimeOut.Valid {
+			inTime, err := time.Parse(constants.TimeLayoutHHMM, timeIn)
+			if err == nil {
+				outTime, err := time.Parse(constants.TimeLayoutHHMM, timeOut)
+				if err == nil {
+					duration = outTime.Sub(inTime).String()
+				}
+			}
+		}
+
+		inLocUA := formatLocationAndUseragent(att.InLocation.String, att.InBrowser, att.InBrowserVersion, att.InOs, att.InDevice)
+		outLocUA := formatLocationAndUseragent(att.OutLocation.String, att.OutBrowser, att.OutBrowserVersion, att.OutOs, att.OutDevice)
+
+		lbIn := utils.ExtractTimeToPH(att.LunchBreakIn.String)
+		lbOut := utils.ExtractTimeToPH(att.LunchBreakOut.String)
+
+		var lbDuration string
+		if att.LunchBreakIn.Valid && att.LunchBreakOut.Valid {
+			inTime, err := time.Parse(constants.TimeLayoutHHMM, lbIn)
+			if err == nil {
+				outTime, err := time.Parse(constants.TimeLayoutHHMM, lbOut)
+				if err == nil {
+					lbDuration = outTime.Sub(inTime).String()
+				}
+			}
+		}
+
+		lbInLocUA := formatLocationAndUseragent(att.LunchBreakInLocation.String, att.LunchBreakInBrowser, att.LunchBreakInBrowserVersion, att.LunchBreakInOs, att.LunchBreakInDevice)
+		lbOutLocUA := formatLocationAndUseragent(att.LunchBreakOutLocation.String, att.LunchBreakOutBrowser, att.LunchBreakOutBrowserVersion, att.LunchBreakOutOs, att.LunchBreakOutDevice)
+
+		if err := writer.Write([]string{
+			dateStr,
+			staffName,
+			timeIn,
+			timeOut,
+			duration,
+			inLocUA,
+			outLocUA,
+			lbIn,
+			lbOut,
+			lbDuration,
+			lbInLocUA,
+			lbOutLocUA,
+		}); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+
+	if err := writer.Error(); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, "Failed to write CSV", http.StatusInternalServerError)
+		return
+	}
+	if _, err := tmpFile.Seek(0, io.SeekStart); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, "Failed to write CSV", http.StatusInternalServerError)
+		return
+	}
+	if _, err := io.Copy(w, tmpFile); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, "Failed to write CSV", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("HX-Redirect", utils.URL("/admin/superuser/attendance/report/download?filename="+reportName))
+}
+
+func (s *Server) adminSuperuserAttendanceReportDownloadHandler(w http.ResponseWriter, r *http.Request) {
+	reportPath := r.URL.Query().Get("filename")
+	w.Header().Set("Content-Type", "text/csv")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", reportPath))
+	http.ServeFile(w, r, reportPath)
+}
+
+func formatLocationAndUseragent(location string, browser, browserVersion, os, device sql.NullString) string {
+	var result string
+	if location != "" {
+		result = location
+	}
+	if browser.Valid && browser.String != "" {
+		if result != "" {
+			result += " - "
+		}
+		result += fmt.Sprintf("%s/%s/%s", browser.String, os.String, device.String)
+	}
+	if result == "" {
+		return "-"
+	}
+	return result
 }
 
 func (s *Server) adminSuperuserTimeOffPageHandler(w http.ResponseWriter, r *http.Request) {
