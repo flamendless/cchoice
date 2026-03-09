@@ -247,11 +247,11 @@ func AdminSuperuserAttendanceTable(attendances []models.Attendance) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TableHead("Lunch Break In").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TableHead("Lunch Break Start").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TableHead("Lunch Break Out").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TableHead("Lunch Break End").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -259,27 +259,27 @@ func AdminSuperuserAttendanceTable(attendances []models.Attendance) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TableHead("Lunch Break In of Shop").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TableHead("Lunch Break Start of Shop").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TableHead("Lunch Break Out of Shop").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TableHead("Lunch Break End of Shop").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TableHead("Lunch Break In Location").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TableHead("Lunch Break Start Location").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TableHead("Lunch Break Out Location").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TableHead("Lunch Break End Location").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TableHead("Lunch Break In Device").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TableHead("Lunch Break Start Device").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TableHead("Lunch Break Out Device").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TableHead("Lunch Break End Device").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

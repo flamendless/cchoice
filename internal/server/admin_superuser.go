@@ -162,11 +162,11 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		"duration",
 		"in location and useragent",
 		"out location and useragent",
-		"lunch break in",
-		"lunch break out",
+		"lunch break start",
+		"lunch break end",
 		"lunch break duration",
-		"lunch break in location and useragent",
-		"lunch break out location and useragent",
+		"lunch break start location and useragent",
+		"lunch break end location and useragent",
 	}); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)

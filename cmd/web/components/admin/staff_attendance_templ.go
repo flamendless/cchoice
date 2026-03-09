@@ -52,11 +52,11 @@ func StaffAttendanceSingleTable(record *models.Attendance) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TableHead("Lunch Break In").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TableHead("Lunch Break Start").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TableHead("Lunch Break Out").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TableHead("Lunch Break End").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -534,7 +534,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, ">Lunch Break In</button> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, ">Start Lunch Break</button> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -579,7 +579,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, ">Lunch Break Out</button></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, ">End Lunch Break</button></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
