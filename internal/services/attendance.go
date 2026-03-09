@@ -71,6 +71,7 @@ func (s *AttendanceService) TimeOut(
 	staffID int64,
 	date string,
 	now string,
+	location sql.NullString,
 	useragentID sql.NullInt64,
 ) error {
 	existing, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx,
@@ -93,6 +94,7 @@ func (s *AttendanceService) TimeOut(
 	_, err = s.dbRW.GetQueries().UpdateStaffAttendanceTimeOut(ctx,
 		queries.UpdateStaffAttendanceTimeOutParams{
 			TimeOut:        sql.NullString{String: now, Valid: true},
+			OutLocation:    location,
 			OutUseragentID: useragentID,
 			StaffID:        staffID,
 			ForDate:        date,

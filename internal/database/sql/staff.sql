@@ -249,6 +249,7 @@ RETURNING id;
 UPDATE tbl_staff_attendances
 SET
     time_out = ?,
+    out_location = ?,
     out_useragent_id = ?,
     updated_at = datetime('now')
 WHERE

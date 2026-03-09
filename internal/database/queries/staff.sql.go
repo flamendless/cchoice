@@ -1090,6 +1090,7 @@ const updateStaffAttendanceTimeOut = `-- name: UpdateStaffAttendanceTimeOut :one
 UPDATE tbl_staff_attendances
 SET
     time_out = ?,
+    out_location = ?,
     out_useragent_id = ?,
     updated_at = datetime('now')
 WHERE
@@ -1100,6 +1101,7 @@ RETURNING id
 
 type UpdateStaffAttendanceTimeOutParams struct {
 	TimeOut        sql.NullString
+	OutLocation    sql.NullString
 	OutUseragentID sql.NullInt64
 	StaffID        int64
 	ForDate        string
@@ -1108,6 +1110,7 @@ type UpdateStaffAttendanceTimeOutParams struct {
 func (q *Queries) UpdateStaffAttendanceTimeOut(ctx context.Context, arg UpdateStaffAttendanceTimeOutParams) (int64, error) {
 	row := q.db.QueryRowContext(ctx, updateStaffAttendanceTimeOut,
 		arg.TimeOut,
+		arg.OutLocation,
 		arg.OutUseragentID,
 		arg.StaffID,
 		arg.ForDate,
