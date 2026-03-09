@@ -15,8 +15,8 @@ templ StaffAttendanceSingleTable(record *models.Attendance) {
 					@TableHead("Time In")
 					@TableHead("Time Out")
 					@TableHead("Duration")
-					@TableHead("Lunch Break In")
-					@TableHead("Lunch Break Out")
+					@TableHead("Lunch Break Start")
+					@TableHead("Lunch Break End")
 					@TableHead("Duration")
 				</tr>
 			</thead>
@@ -158,7 +158,7 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 								hx-swap="none"
 								disabled?={!profile.CanLunchBreakIn}
 							>
-								Lunch Break In
+								Start Lunch Break
 							</button>
 							<button
 								type="button"
@@ -168,7 +168,7 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 								hx-swap="none"
 								disabled?={!profile.CanLunchBreakOut}
 							>
-								Lunch Break Out
+								End Lunch Break
 							</button>
 						</div>
 					</div>
