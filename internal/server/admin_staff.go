@@ -22,6 +22,7 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/gookit/goutil/dump"
 	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func buildStaffDayAttendance(
@@ -114,7 +115,10 @@ func (s *Server) adminStaffProfileHandler(w http.ResponseWriter, r *http.Request
 		UserType:         enums.ParseStaffUserTypeToEnum(staff.UserType),
 	}
 
-	if err := compadmin.AdminHeader(&profile).Render(ctx, w); err != nil {
+	errorMsg := r.URL.Query().Get("error")
+	successMsg := r.URL.Query().Get("success")
+
+	if err := compadmin.AdminProfilePage(profile, errorMsg, successMsg).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),
@@ -123,6 +127,64 @@ func (s *Server) adminStaffProfileHandler(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
+}
+
+func (s *Server) adminChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Change Password Handler]"
+	ctx := r.Context()
+
+	redirect := func(url string) {
+		w.Header().Set("HX-Redirect", url)
+		w.WriteHeader(http.StatusOK)
+	}
+
+	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
+	if staffID == 0 {
+		redirect(utils.URL("/admin"))
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		redirect(utils.URL("/admin/profile?error=Invalid+form+submission"))
+		return
+	}
+
+	newPassword := r.PostFormValue("new_password")
+	confirmPassword := r.PostFormValue("confirm_password")
+
+	if newPassword == "" || confirmPassword == "" {
+		redirect(utils.URL("/admin/profile?error=Both+password+fields+are+required"))
+		return
+	}
+
+	if !constants.PasswordRegex.MatchString(newPassword) {
+		redirect(utils.URL("/admin/profile?error=Invalid+password+format"))
+		return
+	}
+
+	if newPassword != confirmPassword {
+		redirect(utils.URL("/admin/profile?error=Passwords+do+not+match"))
+		return
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirect(utils.URL("/admin/profile?error=Failed+to+hash+password"))
+		return
+	}
+
+	_, err = s.dbRW.GetQueries().UpdateStaffPassword(ctx, queries.UpdateStaffPasswordParams{
+		Password: string(hash),
+		ID:       staffID,
+	})
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		redirect(utils.URL("/admin/profile?error=Failed+to+update+password"))
+		return
+	}
+
+	redirect(utils.URL("/admin/profile?success=Password+updated+successfully"))
 }
 
 func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {

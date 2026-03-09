@@ -1119,3 +1119,25 @@ func (q *Queries) UpdateStaffAttendanceTimeOut(ctx context.Context, arg UpdateSt
 	err := row.Scan(&id)
 	return id, err
 }
+
+const updateStaffPassword = `-- name: UpdateStaffPassword :one
+UPDATE tbl_staffs
+SET
+    password = ?,
+    updated_at = datetime('now')
+WHERE
+    id = ?
+RETURNING id
+`
+
+type UpdateStaffPasswordParams struct {
+	Password string
+	ID       int64
+}
+
+func (q *Queries) UpdateStaffPassword(ctx context.Context, arg UpdateStaffPasswordParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, updateStaffPassword, arg.Password, arg.ID)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}

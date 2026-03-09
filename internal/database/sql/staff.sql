@@ -368,3 +368,12 @@ WHERE
     staff_id = ?
     AND for_date = ?
 RETURNING id;
+
+-- name: UpdateStaffPassword :one
+UPDATE tbl_staffs
+SET
+    password = ?,
+    updated_at = datetime('now')
+WHERE
+    id = ?
+RETURNING id;
