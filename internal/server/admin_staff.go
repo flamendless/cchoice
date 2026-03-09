@@ -306,9 +306,10 @@ func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request
 	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
 	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
 	date := utils.NowPH().Format(constants.DateLayoutISO)
+	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
 	svc := services.NewAttendanceService(s.dbRO, s.dbRW)
-	err := svc.TimeOut(ctx, staffID, date, now, useragentID)
+	err := svc.TimeOut(ctx, staffID, date, now, location, useragentID)
 	if err != nil {
 		http.Error(w, "Unable to time out", http.StatusBadRequest)
 		return
