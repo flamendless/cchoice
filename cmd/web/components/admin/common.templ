@@ -41,15 +41,27 @@ templ AttendanceToolbar(title string, selectedDate string, userType enums.StaffU
 			}
 
 			if userType == enums.STAFF_USER_TYPE_SUPERUSER {
-				<button
-					type="button"
-					id="export-csv-btn"
-					hx-post={ utils.URL("/admin/superuser/attendance/report") }
-					hx-include="#date-selector,#date-selector-end"
-					class="px-4 py-2 w-28 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors inline-flex items-center justify-center gap-2"
+				<form
+					method="POST"
+					action={ utils.URL("/admin/superuser/attendance/report") }
+					class="inline"
 				>
-					Export CSV
-				</button>
+					<input type="hidden" name="date-selector" id="date-selector-hidden"/>
+					<input type="hidden" name="date-selector-end" id="date-selector-end-hidden"/>
+
+					<button
+						type="submit"
+						class="px-4 py-2 w-28 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors inline-flex items-center justify-center gap-2"
+						_="
+							on click
+								set #date-selector-hidden.value to #date-selector.value
+								set #date-selector-end-hidden.value to #date-selector-end.value
+								call metrics_event('admin_exec', 'export csv')
+						"
+					>
+						Export CSV
+					</button>
+				</form>
 			}
 		</div>
 	</div>

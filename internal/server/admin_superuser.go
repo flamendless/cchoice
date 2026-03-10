@@ -4,9 +4,7 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -139,19 +137,10 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 	}
 
 	reportName := fmt.Sprintf("attendance_%s_%s_%s.csv", startDate, endDate, utils.GenString(8))
-	tmpFile, err := os.CreateTemp("./tmp", reportName)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, "Failed to create temp file", http.StatusInternalServerError)
-		return
-	}
-	defer func() {
-		if err := tmpFile.Close(); err != nil {
-			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		}
-	}()
+	w.Header().Set("Content-Type", "text/csv")
+	w.Header().Set("Content-Disposition", "attachment; filename="+reportName)
 
-	writer := csv.NewWriter(tmpFile)
+	writer := csv.NewWriter(w)
 	defer writer.Flush()
 
 	if err := writer.Write([]string{"Report name: " + reportName}); err != nil {
@@ -184,9 +173,6 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 	}
 
 	for _, att := range attendances {
-		staffName := utils.BuildFullName(att.FirstName, att.MiddleName.String, att.LastName)
-		dateStr := att.ForDate
-
 		timeIn := utils.ExtractTimeToPH(att.TimeIn.String)
 		timeOut := utils.ExtractTimeToPH(att.TimeOut.String)
 
@@ -222,8 +208,8 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		lbOutLocUA := formatLocationAndUseragent(att.LunchBreakOutLocation.String, att.LunchBreakOutBrowser, att.LunchBreakOutBrowserVersion, att.LunchBreakOutOs, att.LunchBreakOutDevice)
 
 		if err := writer.Write([]string{
-			dateStr,
-			staffName,
+			att.ForDate,
+			utils.BuildFullName(att.FirstName, att.MiddleName.String, att.LastName),
 			timeIn,
 			timeOut,
 			duration,
@@ -240,36 +226,30 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		}
 	}
 
+	logs.Log().Info(
+		logtag,
+		zap.String("file", reportName),
+		zap.String("start date", startDate),
+		zap.String("end date", endDate),
+		zap.Int64("staff id", s.sessionManager.GetInt64(ctx, SessionStaffID)),
+	)
+
 	if err := writer.Error(); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, "Failed to write CSV", http.StatusInternalServerError)
 		return
 	}
-	if _, err := tmpFile.Seek(0, io.SeekStart); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, "Failed to write CSV", http.StatusInternalServerError)
-		return
-	}
-	if _, err := io.Copy(w, tmpFile); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, "Failed to write CSV", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("HX-Redirect", utils.URL("/admin/superuser/attendance/report/download?filename="+reportName))
-}
-
-func (s *Server) adminSuperuserAttendanceReportDownloadHandler(w http.ResponseWriter, r *http.Request) {
-	reportPath := r.URL.Query().Get("filename")
-	w.Header().Set("Content-Type", "text/csv")
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", reportPath))
-	http.ServeFile(w, r, reportPath)
 }
 
 func formatLocationAndUseragent(location string, browser, browserVersion, os, device sql.NullString) string {
 	var result string
 	if location != "" {
-		result = location
+		if lat, long, ok := utils.ParseLocation(sql.NullString{
+			String: location,
+			Valid:  true,
+		}); ok {
+			result = fmt.Sprintf("(%f,%f)", lat, long)
+		}
 	}
 	if browser.Valid && browser.String != "" {
 		if result != "" {
