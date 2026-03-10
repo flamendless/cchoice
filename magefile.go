@@ -53,14 +53,17 @@ func run(c Command) error {
 
 	switch c.Type {
 	case CmdGoBuild:
+		//go build [-o output] [build flags] [packages]
 		args := []string{"build"}
-		if len(c.Tags) > 0 {
-			args = append(args, "-tags="+strings.Join(c.Tags, " "))
-		}
 		if c.Out != "" {
 			args = append(args, "-o", c.Out)
 		}
+		args = append(args, "-x")
+		args = append(args, "-v")
 		args = append(args, c.Args...)
+		if len(c.Tags) > 0 {
+			args = append(args, "-tags="+strings.Join(c.Tags, " "))
+		}
 		cmd = exec.Command("go", args...)
 
 	case CmdGoRun:
@@ -220,10 +223,24 @@ func serve(
 	if err := GenAll(); err != nil {
 		return err
 	}
-	openBrowser("http://localhost:7331/cchoice")
 
-	templCmd := exec.Command("go", "tool", "templ", "generate",
-		"--watch", "--proxy=http://localhost:2626", "--open-browser=false")
+	if app == "admin" {
+		openBrowser("http://localhost:7331/cchoice/admin")
+		app = "web"
+	} else {
+		openBrowser("http://localhost:7331/cchoice")
+	}
+
+	templCmd := exec.Command(
+		"go",
+		"tool",
+		"templ",
+		"generate",
+		"--watch",
+		"--proxy=http://localhost:2626",
+		"--open-browser=false",
+		"--path=cmd/web/components",
+	)
 	if err := runBackground(templCmd); err != nil {
 		return err
 	}
@@ -240,6 +257,10 @@ func Serve() error {
 
 func ServeWeb() error {
 	return serve(".air.web.toml", "web")
+}
+
+func ServeAdmin() error {
+	return serve(".air.admin.toml", "admin")
 }
 
 func BuildGoose() error {

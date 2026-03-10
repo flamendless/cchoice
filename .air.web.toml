@@ -11,10 +11,11 @@ tmp_dir = "tmp"
   cmd = "mage buildweb"
   delay = 300
   exclude_dir = [
-    "cmd/web/static/images/",
-    "cmd/web/static/thumbnails/",
-    "cmd/web/static/svg/",
-    "internal/"
+    "cmd/web/static/images",
+    "cmd/web/static/thumbnails",
+    "cmd/web/static/svg",
+    "cmd/goose",
+    "internal"
   ]
   exclude_file = []
   exclude_regex = [".*_templ.go", ".*.sql.go"]

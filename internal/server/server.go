@@ -160,6 +160,7 @@ func NewServer() *ServerInstance {
 	cfg.SetSettings(settings)
 
 	var addr string
+	//TODO: (Brandon) - makes sense to create enums for these
 	switch cfg.AppEnv {
 	case "local", "web":
 		addr = fmt.Sprintf("%s:%d", newServer.address, newServer.port)
