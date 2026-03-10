@@ -107,14 +107,7 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 					@AdminHeader(&profile)
 
 					<div class="mb-6 p-4 bg-gray-50 rounded-lg">
-						<h2 class="text-lg font-semibold text-gray-800 mb-2">Profile</h2>
-						@StaffDetail("Name", profile.FullName)
-						@StaffDetail("Position", profile.Position)
-						@StaffDetail("Scheduled Time In", profile.ScheduledTimeIn)
-						@StaffDetail("Scheduled Time Out", profile.ScheduledTimeOut)
-						@StaffDetail("Lunch break", "1 Hour")
-						@StaffDetail("Paid breaktime", "30 minutes")
-						@StaffDetail("Required in shop time in/out", utils.BoolToString(profile.RequireInShop))
+						@AdminProfileHeader(profile)
 					</div>
 
 					if profile.UserType != enums.STAFF_USER_TYPE_SUPERUSER {

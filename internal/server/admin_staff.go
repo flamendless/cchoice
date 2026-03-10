@@ -129,6 +129,41 @@ func (s *Server) adminStaffProfileHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
+func (s *Server) adminStaffProfileHeaderHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff Profile Header Handler]"
+	ctx := r.Context()
+
+	staff, staffID, err := s.getCurrentStaff(r.Context())
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+		return
+	}
+
+	profile := models.AdminStaffProfile{
+		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
+		Birthdate:        staff.Birthdate,
+		DateHired:        staff.DateHired,
+		Position:         staff.Position,
+		Email:            staff.Email,
+		MobileNo:         staff.MobileNo,
+		ScheduledTimeIn:  staff.TimeInSchedule.String,
+		ScheduledTimeOut: staff.TimeOutSchedule.String,
+		RequireInShop:    staff.RequireInShop,
+		UserType:         enums.ParseStaffUserTypeToEnum(staff.UserType),
+	}
+
+	if err := compadmin.AdminProfileHeader(profile).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("path", r.URL.Path),
+			zap.Error(err),
+		)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+}
+
 func (s *Server) adminChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Change Password Handler]"
 	ctx := r.Context()

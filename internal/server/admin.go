@@ -223,6 +223,7 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth).Post("/admin/logout", s.adminLogoutHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff", s.adminStaffHomeHandler)
 	r.With(s.requireStaffAuth).Get("/admin/profile", s.adminStaffProfileHandler)
+	r.With(s.requireStaffAuth).Get("/admin/profile-header", s.adminStaffProfileHeaderHandler)
 	r.With(s.requireStaffAuth).Post("/admin/change-password", s.adminChangePasswordHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/attendance", s.adminStaffPageHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/attendance/table", s.adminStaffAttendanceTableHandler)

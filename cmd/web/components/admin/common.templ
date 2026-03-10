@@ -9,11 +9,11 @@ import "fmt"
 templ AdminHeader(profile *models.AdminStaffProfile) {
 	if profile == nil {
 		<div
-			hx-get={ utils.URL("/admin/profile") }
+			hx-get={ utils.URL("/admin/profile-header") }
 			hx-trigger="load once"
 			hx-swap="outerHTML"
 		>
-			//AdminHeader
+			//AdminHeader(non-nil profile)
 		</div>
 	} else {
 		<p class="text-lg text-gray-700 mb-4">
