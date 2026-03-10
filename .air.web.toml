@@ -18,7 +18,7 @@ tmp_dir = "tmp"
     "internal"
   ]
   exclude_file = []
-  exclude_regex = [".*_templ.go", ".*.sql.go"]
+  exclude_regex = [".*_templ.go", ".*.sql.go", ".*_test.go"]
   exclude_unchanged = false
   follow_symlink = false
   full_bin = "APP_ENV='web' ./tmp/web"

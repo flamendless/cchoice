@@ -58,8 +58,8 @@ func run(c Command) error {
 		if c.Out != "" {
 			args = append(args, "-o", c.Out)
 		}
-		args = append(args, "-x")
-		args = append(args, "-v")
+		// args = append(args, "-x")
+		// args = append(args, "-v")
 		args = append(args, c.Args...)
 		if len(c.Tags) > 0 {
 			args = append(args, "-tags="+strings.Join(c.Tags, " "))
@@ -101,6 +101,7 @@ func init() {
 func runBackground(cmd *exec.Cmd) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	fmt.Println("Running (bg): ", cmd.Args)
 	if err := cmd.Start(); err != nil {
 		return err
 	}
