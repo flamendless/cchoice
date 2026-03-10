@@ -12,7 +12,10 @@ templ AdminStaffHomePage(fullName string) {
 			@common.TabTitle("[STAFF] C-Choice Admin")
 		</head>
 
-		<body class="bg-cchoicesoft min-h-screen flex flex-col" _="on load call metrics_event('admin_superuser_home_page_visit', '')">
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-col"
+			_="on load call metrics_event('admin_visit', 'staff home')"
+		>
 			<div class="flex-grow p-4">
 				<div class="max-w-6xl mx-auto">
 					<div class="text-center mb-8 mt-4">

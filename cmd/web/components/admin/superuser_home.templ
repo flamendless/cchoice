@@ -12,7 +12,10 @@ templ AdminSuperuserHomePage(fullName string) {
 			@common.TabTitle("[SUPERUSER] C-Choice Admin")
 		</head>
 
-		<body class="bg-cchoicesoft min-h-screen flex flex-col" _="on load call metrics_event('admin_superuser_home_page_visit', '')">
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-col"
+			_="on load call metrics_event('admin_visit', 'superuser home')"
+		>
 			<div class="flex-grow p-4">
 				<div class="max-w-6xl mx-auto">
 					<div class="text-center mb-8 mt-4">

@@ -22,7 +22,10 @@ templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
 			 }
 			</style>
 		</head>
-		<body class="bg-cchoicesoft min-h-screen flex flex-col" _="on load call metrics_event('admin_superuser_products_page_visit', '')">
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-col"
+			_="on load call metrics_event('admin_visit', 'products')"
+		>
 			<div class="flex-grow p-4">
 				<div class="max-w-4xl mx-auto">
 					<div class="text-center mb-6">

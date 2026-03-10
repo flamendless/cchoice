@@ -17,7 +17,7 @@ templ AdminSuperuserAttendancePage(title string, selectedDate string) {
 		</head>
 		<body
 			class="bg-cchoicesoft min-h-screen flex flex-col"
-			_="on load call metrics_event('admin_superuser_attendance_page_visit', '')"
+			_="on load call metrics_event('admin_visit', 'attendance')"
 		>
 			<div class="flex-grow p-4">
 				<div class="max-w-6xl mx-auto">
