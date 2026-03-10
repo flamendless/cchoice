@@ -391,7 +391,7 @@ func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.
 		return
 	}
 
-	date := utils.ParseAttendanceDate(r.URL.Query().Get("date"))
+	date := utils.ParseAttendanceDate(r.URL.Query().Get("date-selector"))
 	attendance, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
 		StaffID: staffID,
 		ForDate: date,

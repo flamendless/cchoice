@@ -113,7 +113,7 @@ func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentS
 func buildAdminStaffAttendance(
 	encoder encode.IEncode,
 	staff queries.GetAllStaffsRow,
-	att queries.GetStaffAttendanceByStaffIDAndDateRangeRow,
+	att queries.GetStaffAttendanceByDateRangeRow,
 	shopLocation types.Location,
 ) models.Attendance {
 	schedIn, schedOut := "", ""

@@ -4,7 +4,6 @@ import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/models"
 import "cchoice/internal/enums"
-import "fmt"
 
 templ AdminHeader(profile *models.AdminStaffProfile) {
 	if profile == nil {
@@ -31,46 +30,22 @@ templ AdminHeader(profile *models.AdminStaffProfile) {
 }
 
 templ AttendanceToolbar(title string, selectedDate string, userType enums.StaffUserType) {
-	{{
-		var dateSelectorID, dateSelectorIDEnd string
-		var refreshButtonID string
-		var exportButtonID string
-		if userType == enums.STAFF_USER_TYPE_STAFF {
-			dateSelectorID = "staff-date-selector"
-			refreshButtonID = "staff-refresh-btn"
-		} else {
-			dateSelectorID = "date-selector"
-			dateSelectorIDEnd = "date-selector-end"
-			refreshButtonID = "refresh-btn"
-			exportButtonID = "export-csv-btn"
-		}
-	}}
-
 	<div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
 		<h2 class="text-xl font-semibold text-gray-800">{ title }</h2>
 		<div class="flex gap-2">
 			if userType == enums.STAFF_USER_TYPE_STAFF {
-				@common.DateSelector(dateSelectorID, selectedDate, false)
+				@common.DateSelectorNamed("date-selector", "Date", selectedDate, false)
 			} else if userType == enums.STAFF_USER_TYPE_SUPERUSER {
-				@common.DateSelectorNamed(dateSelectorID, "Start Date", selectedDate, false)
-				@common.DateSelectorNamed(dateSelectorIDEnd, "End Date", selectedDate, false)
+				@common.DateSelectorNamed("date-selector", "Start Date", selectedDate, false)
+				@common.DateSelectorNamed("date-selector-end", "End Date", selectedDate, false)
 			}
-			<button
-				type="button"
-				id={ refreshButtonID }
-				class="refresh-location-btn px-4 py-2 w-28 bg-cchoice text-white rounded-md hover:bg-cchoice_dark transition-colors inline-flex items-center justify-center gap-2"
-			>
-				<span id={ refreshButtonID + "-content" } class="refresh-btn-content inline-flex items-center gap-2">
-					<span class="refresh-btn-spinner w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" aria-hidden="true"></span>
-					<span class="refresh-btn-text">Refresh</span>
-				</span>
-			</button>
+
 			if userType == enums.STAFF_USER_TYPE_SUPERUSER {
 				<button
 					type="button"
-					id={ exportButtonID }
+					id="export-csv-btn"
 					hx-post={ utils.URL("/admin/superuser/attendance/report") }
-					hx-include={ fmt.Sprintf("#%s,#%s", dateSelectorID, dateSelectorIDEnd) }
+					hx-include="#date-selector,#date-selector-end"
 					class="px-4 py-2 w-28 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors inline-flex items-center justify-center gap-2"
 				>
 					Export CSV
