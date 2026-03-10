@@ -25,9 +25,41 @@ templ StaffAttendanceSingleTable(record *models.Attendance) {
 					@In(record.Attendance.In, record.Attendance.InStatus)
 					@Out(record.Attendance.Out, record.Attendance.OutStatus)
 					@Duration(record.Attendance.Duration, record.Attendance.DurationColor)
-
 					@In(record.LunchBreak.In, record.Attendance.InStatus)
 					@Out(record.LunchBreak.Out, record.Attendance.OutStatus)
+					@Duration(record.LunchBreak.Duration, record.Attendance.DurationColor)
+				</tr>
+			</tbody>
+		</table>
+	</div>
+}
+
+templ StaffAttendanceRows(record *models.Attendance) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<tbody class="bg-white divide-y divide-gray-200">
+				<tr>
+					@TableHead("Time In")
+					@In(record.Attendance.In, record.Attendance.InStatus)
+				</tr>
+				<tr>
+					@TableHead("Time Out")
+					@Out(record.Attendance.Out, record.Attendance.OutStatus)
+				</tr>
+				<tr>
+					@TableHead("Duration")
+					@Duration(record.Attendance.Duration, record.Attendance.DurationColor)
+				</tr>
+				<tr>
+					@TableHead("Lunch Break Start")
+					@In(record.LunchBreak.In, record.Attendance.InStatus)
+				</tr>
+				<tr>
+					@TableHead("Lunch Break End")
+					@Out(record.LunchBreak.Out, record.Attendance.OutStatus)
+				</tr>
+				<tr>
+					@TableHead("Duration")
 					@Duration(record.LunchBreak.Duration, record.Attendance.DurationColor)
 				</tr>
 			</tbody>
@@ -44,13 +76,13 @@ templ AttendanceSectionForStaff(
 	<div
 		class="bg-white rounded-lg shadow-md p-6 mb-6"
 		id="staff-attendance-section"
-		data-fetch-url={ utils.URL("/admin/staff/attendance/table") }
+		data-fetch-url={ utils.URL("/admin/staff/attendance/rows") }
 		data-target-id="staff-attendance-table"
 		data-date-selector-id="staff-date-selector"
 		data-refresh-btn-id="staff-refresh-btn"
 		data-location-url={ utils.URL("/admin/staff/attendance/location") }
 		data-user-type={ userType.String() }
-		hx-get={ utils.URL("/admin/staff/attendance/table") }
+		hx-get={ utils.URL("/admin/staff/attendance/rows") }
 		hx-trigger={ fmt.Sprintf("load, change from:#%s", "staff-date-selector") }
 		hx-include="#staff-date-selector"
 		hx-target="#staff-attendance-table"
@@ -59,7 +91,8 @@ templ AttendanceSectionForStaff(
 		@AttendanceToolbar(title, selectedDate, enums.STAFF_USER_TYPE_STAFF)
 		<div id="staff-attendance-table">
 			if record != nil {
-				@StaffAttendanceSingleTable(record)
+				<!-- @StaffAttendanceSingleTable(record) -->
+				@StaffAttendanceRows(record)
 			} else {
 				<p class="text-gray-500 text-center py-4">No attendance record for this date</p>
 			}
@@ -91,7 +124,6 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 				.refresh-btn-content.htmx-request .refresh-btn-text { display: none; }
 			</style>
 		</head>
-
 		<body
 			class="bg-cchoicesoft min-h-screen flex flex-row"
 			_="on load call metrics_event('admin_page_visit_attendance', 'staff')"
@@ -105,15 +137,12 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 						@BackToHome(utils.URL("/admin/staff"))
 					</div>
 					@AdminHeader(&profile)
-
 					<div class="mb-6 p-4 bg-gray-50 rounded-lg">
 						@AdminProfileHeader(profile)
 					</div>
-
 					if profile.UserType != enums.STAFF_USER_TYPE_SUPERUSER {
 						@StaffLocationStatus(profile)
 					}
-
 					<div class="space-y-4">
 						<div class="flex flex-row gap-4">
 							<button
@@ -122,7 +151,7 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 								hx-post={ utils.URL("/admin/staff/time-in") }
 								hx-trigger="click"
 								hx-swap="none"
-								disabled?={!profile.CanTimeIn}
+								disabled?={ !profile.CanTimeIn }
 							>
 								Time In
 							</button>
@@ -132,43 +161,40 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 								hx-post={ utils.URL("/admin/staff/time-out") }
 								hx-trigger="click"
 								hx-swap="none"
-								disabled?={!profile.CanTimeOut}
+								disabled?={ !profile.CanTimeOut }
 							>
 								Time Out
 							</button>
 						</div>
-
 						<div class="flex flex-row gap-4">
 							<button
 								type="button"
 								class={ getButtonClass(profile.CanLunchBreakIn) }
-								hx-post={ utils.URL("/admin/staff/lunch-break-in") }
+								hx-post={ utils.URL("/admin/staff/lunch-break-start") }
 								hx-trigger="click"
 								hx-swap="none"
-								disabled?={!profile.CanLunchBreakIn}
+								disabled?={ !profile.CanLunchBreakIn }
 							>
 								Start Lunch Break
 							</button>
 							<button
 								type="button"
 								class={ getButtonClass(profile.CanLunchBreakOut) }
-								hx-post={ utils.URL("/admin/staff/lunch-break-out") }
+								hx-post={ utils.URL("/admin/staff/lunch-break-end") }
 								hx-trigger="click"
 								hx-swap="none"
-								disabled?={!profile.CanLunchBreakOut}
+								disabled?={ !profile.CanLunchBreakOut }
 							>
 								End Lunch Break
 							</button>
 						</div>
 					</div>
-
 					@AttendanceSectionForStaff(
 						"My Attendance",
 						profile.SelectedDate,
 						profile.MyAttendance,
 						profile.UserType,
 					)
-
 					<form action={ utils.URL("/admin/logout") } method="POST" class="mt-6">
 						<button
 							type="submit"
@@ -179,7 +205,6 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 					</form>
 				</div>
 			</div>
-
 			@ScriptClock()
 		</body>
 	</html>
@@ -208,7 +233,6 @@ templ StaffLocationStatus(profile models.AdminStaffProfile) {
 			Make sure you enable location services.
 		</p>
 	</div>
-
 	<script>
 		(function () {
 			if (!navigator.geolocation) return;

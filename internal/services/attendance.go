@@ -56,11 +56,11 @@ func (s *AttendanceService) TimeIn(
 
 	_, err = s.dbRW.GetQueries().UpdateStaffAttendanceTimeIn(ctx,
 		queries.UpdateStaffAttendanceTimeInParams{
+			StaffID:       staffID,
+			ForDate:       date,
 			TimeIn:        sql.NullString{String: now, Valid: true},
 			InLocation:    location,
 			InUseragentID: useragentID,
-			StaffID:       staffID,
-			ForDate:       date,
 		})
 
 	return err
