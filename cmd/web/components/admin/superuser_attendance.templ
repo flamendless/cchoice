@@ -14,11 +14,6 @@ templ AdminSuperuserAttendancePage(title string, selectedDate string) {
 		<head>
 			@common.HeadMeta()
 			@common.TabTitle("[SUPERUSER] Attendance - C-Choice Admin")
-			<style>
-				.refresh-btn-content .refresh-btn-spinner { display: none; }
-				.refresh-btn-content.htmx-request .refresh-btn-spinner { display: inline-block; }
-				.refresh-btn-content.htmx-request .refresh-btn-text { display: none; }
-			</style>
 		</head>
 		<body
 			class="bg-cchoicesoft min-h-screen flex flex-col"
@@ -52,7 +47,7 @@ templ AttendanceSectionSuperuserPage(title string, selectedDate string) {
 		class="bg-white rounded-lg shadow-md p-6"
 		hx-get={ utils.URL("/admin/superuser/attendance/table") }
 		hx-trigger={ fmt.Sprintf("load, change from:#%s, click from:#%s", "date-selector", "refresh-btn") }
-		hx-include="#date-selector"
+		hx-include="#date-selector,#date-selector-end"
 		hx-target="#attendance-table"
 		hx-swap="innerHTML"
 		hx-indicator={ fmt.Sprintf("#%s-content", "refresh-btn") }
@@ -69,6 +64,9 @@ templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 		<table class="min-w-full divide-y divide-gray-200">
 			<thead class="bg-gray-50">
 				<tr>
+					if len(attendances) > 1 {
+						@TableHead("Date")
+					}
 					@TableHead("Staff ID")
 					@TableHead("Full Name")
 
@@ -96,6 +94,11 @@ templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 			<tbody class="bg-white divide-y divide-gray-200">
 				for _, att := range attendances {
 					<tr>
+						if len(attendances) > 1 {
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+								{ att.Date }
+							</td>
+						}
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 							{ att.StaffID }
 						</td>

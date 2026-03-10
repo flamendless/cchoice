@@ -51,11 +51,21 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 	const logtag = "[Admin Superuser Attendance Handler]"
 	ctx := r.Context()
 
-	date := utils.ParseAttendanceDate(r.URL.Query().Get("date"))
-	attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByStaffIDAndDateRange(ctx, date)
+	startDateParam := r.URL.Query().Get("date-selector")
+	startDate := utils.ParseAttendanceDate(startDateParam)
+
+	endDateParam := r.URL.Query().Get("date-selector-end")
+	if endDateParam == "" {
+		endDateParam = startDateParam
+	}
+
+	attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByDateRange(ctx, queries.GetStaffAttendanceByDateRangeParams{
+		StartDate: startDate,
+		EndDate:   utils.ParseAttendanceDate(endDateParam),
+	})
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		attendances = []queries.GetStaffAttendanceByStaffIDAndDateRangeRow{}
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("start date", startDateParam), zap.String("end date", endDateParam))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
 
 	staffs, err := s.dbRO.GetQueries().GetAllStaffs(ctx, maxStaffListSize)
@@ -144,7 +154,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 	writer := csv.NewWriter(tmpFile)
 	defer writer.Flush()
 
-	if err := writer.Write([]string{"Report name: "+reportName}); err != nil {
+	if err := writer.Write([]string{"Report name: " + reportName}); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

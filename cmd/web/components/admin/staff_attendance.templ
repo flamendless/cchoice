@@ -76,15 +76,9 @@ templ AttendanceSectionForStaff(
 	<div
 		class="bg-white rounded-lg shadow-md p-6 mb-6"
 		id="staff-attendance-section"
-		data-fetch-url={ utils.URL("/admin/staff/attendance/rows") }
-		data-target-id="staff-attendance-table"
-		data-date-selector-id="staff-date-selector"
-		data-refresh-btn-id="staff-refresh-btn"
-		data-location-url={ utils.URL("/admin/staff/attendance/location") }
-		data-user-type={ userType.String() }
 		hx-get={ utils.URL("/admin/staff/attendance/rows") }
-		hx-trigger={ fmt.Sprintf("load, change from:#%s", "staff-date-selector") }
-		hx-include="#staff-date-selector"
+		hx-trigger={ fmt.Sprintf("load, change from:#%s", "date-selector") }
+		hx-include="#date-selector"
 		hx-target="#staff-attendance-table"
 		hx-swap="innerHTML"
 	>
@@ -97,7 +91,6 @@ templ AttendanceSectionForStaff(
 				<p class="text-gray-500 text-center py-4">No attendance record for this date</p>
 			}
 		</div>
-		@ScriptStaffAttendanceRefresh()
 	</div>
 }
 
@@ -118,11 +111,6 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 		<head>
 			@common.HeadMeta()
 			@common.TabTitle("[STAFF] C-Choice Admin")
-			<style>
-				.refresh-btn-content .refresh-btn-spinner { display: none; }
-				.refresh-btn-content.htmx-request .refresh-btn-spinner { display: inline-block; }
-				.refresh-btn-content.htmx-request .refresh-btn-text { display: none; }
-			</style>
 		</head>
 		<body
 			class="bg-cchoicesoft min-h-screen flex flex-row"
@@ -254,93 +242,6 @@ templ StaffLocationStatus(profile models.AdminStaffProfile) {
 				},
 				{ enableHighAccuracy: true, timeout: 15000 }
 			);
-		})();
-	</script>
-}
-
-templ ScriptStaffAttendanceRefresh() {
-	<script>
-		(function() {
-			var section = document.getElementById("staff-attendance-section");
-			if (!section) return;
-			var fetchUrl = section.getAttribute("data-fetch-url");
-			var targetId = section.getAttribute("data-target-id");
-			var dateSelectorId = section.getAttribute("data-date-selector-id");
-			var refreshBtnId = section.getAttribute("data-refresh-btn-id");
-			var locationUrl = section.getAttribute("data-location-url");
-			var userType = section.getAttribute("data-user-type") || "";
-			var requireLocation = userType !== "SUPERUSER";
-			var btn = document.getElementById(refreshBtnId);
-			var dateInput = document.getElementById(dateSelectorId);
-			if (!btn || !dateInput) return;
-			var indicator = btn.querySelector(".refresh-btn-content");
-			function showSpinner() {
-				btn.disabled = true;
-				if (indicator) indicator.classList.add("htmx-request");
-			}
-			function restoreBtn() {
-				btn.disabled = false;
-				if (indicator) indicator.classList.remove("htmx-request");
-			}
-			function refetchTable() {
-				if (window.htmx) {
-					htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
-				}
-			}
-			btn.addEventListener("click", function() {
-				if (!requireLocation) {
-					showSpinner();
-					function onSwapDone(ev) {
-						if (ev.detail.target.id === targetId) {
-							restoreBtn();
-							document.removeEventListener("htmx:afterSwap", onSwapDone);
-						}
-					}
-					document.addEventListener("htmx:afterSwap", onSwapDone);
-					refetchTable();
-					return;
-				}
-				if (!navigator.geolocation) {
-					refetchTable();
-					return;
-				}
-				showSpinner();
-
-				navigator.geolocation.getCurrentPosition(
-					function(pos) {
-						var body = "date=" + encodeURIComponent(dateInput.value) + "&lat=" + encodeURIComponent(pos.coords.latitude) + "&lng=" + encodeURIComponent(pos.coords.longitude);
-						fetch(locationUrl, {
-							method: "POST",
-							headers: { "Content-Type": "application/x-www-form-urlencoded" },
-							body: body,
-							credentials: "same-origin"
-						})
-							.then(function(resp) {
-								if (resp.ok) {
-									window.location.reload();
-								} else {
-									restoreBtn();
-									if (window.htmx) {
-										htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
-									}
-								}
-							})
-							.catch(function() {
-								restoreBtn();
-								if (window.htmx) {
-									htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
-								}
-							});
-					},
-					function() {
-						restoreBtn();
-						if (window.htmx) {
-							htmx.ajax("GET", fetchUrl + "?date=" + encodeURIComponent(dateInput.value), { target: "#" + targetId, swap: "innerHTML" });
-						}
-					},
-					{ enableHighAccuracy: true, timeout: 15000 }
-				);
-			});
 		})();
 	</script>
 }
