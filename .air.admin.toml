@@ -2,25 +2,27 @@ root = "."
 testdata_dir = "testdata"
 tmp_dir = "tmp"
 
+[env]
+  APP_ENV = "web"
+
 [build]
-  args_bin = []
-  bin = "./tmp/main"
-  cmd = "mage build"
+  args_bin = [""]
+  bin = ""
+  cmd = "mage buildweb"
   delay = 300
   exclude_dir = [
-    "internal/database/queries",
     "cmd/web/static/images",
     "cmd/web/static/thumbnails",
     "cmd/web/static/svg",
-    "cmd/goose"
+    "cmd/goose",
   ]
-  exclude_file = ["internal/conf/version_gen.go"]
-  exclude_regex = ["_test.go", ".sql.go", ".*_templ.go", "_string.go"]
-  exclude_unchanged = true
+  exclude_file = []
+  exclude_regex = [".*_templ.go", ".*.sql.go"]
+  exclude_unchanged = false
   follow_symlink = false
-  full_bin = ""
-  include_dir = ["cmd/web", "internal"]
-  include_ext = ["tpl", "tmpl", "templ", "html", "js", "css", "go"]
+  full_bin = "APP_ENV='web' ./tmp/web"
+  include_dir = ["cmd/web/components/admin"]
+  include_ext = ["templ", "html", "css", "js"]
   include_file = []
   kill_delay = "500ms"
   log = "build-errors.log"
