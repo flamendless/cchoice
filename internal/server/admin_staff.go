@@ -20,7 +20,6 @@ import (
 	"cchoice/internal/utils"
 
 	"github.com/goccy/go-json"
-	"github.com/gookit/goutil/dump"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -353,7 +352,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) adminStaffAttendanceTableHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Admin Staff Attendance Handler]"
+	const logtag = "[Admin Staff Attendance Table Handler]"
 	ctx := r.Context()
 
 	staff, staffID, err := s.getCurrentStaff(r.Context())
@@ -375,6 +374,35 @@ func (s *Server) adminStaffAttendanceTableHandler(w http.ResponseWriter, r *http
 	}
 
 	if err := compadmin.StaffAttendanceSingleTable(record).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff Attendance Rows Handler]"
+	ctx := r.Context()
+
+	staff, staffID, err := s.getCurrentStaff(r.Context())
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+		return
+	}
+
+	date := utils.ParseAttendanceDate(r.URL.Query().Get("date"))
+	attendance, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
+		StaffID: staffID,
+		ForDate: date,
+	})
+	var record *models.Attendance
+	if err == nil {
+		rec := buildStaffDayAttendance(s.encoder, staff, attendance)
+		record = &rec
+	}
+
+	if err := compadmin.StaffAttendanceRows(record).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -416,7 +444,7 @@ func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (s *Server) adminStaffLunchBreakInHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Admin Staff Lunch Break In Handler]"
+	const logtag = "[Admin Staff Lunch Break Start Handler]"
 	ctx := r.Context()
 	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
 	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
@@ -425,7 +453,6 @@ func (s *Server) adminStaffLunchBreakInHandler(w http.ResponseWriter, r *http.Re
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
 	svc := services.NewAttendanceService(s.dbRO, s.dbRW)
 	err := svc.LunchBreakIn(ctx, staffID, date, now, location, useragentID)
-	dump.Println(111, now, date, location, r.UserAgent(), useragentID)
 	if err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -441,7 +468,7 @@ func (s *Server) adminStaffLunchBreakInHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (s *Server) adminStaffLunchBreakOutHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Admin Staff Lunch Break Out Handler]"
+	const logtag = "[Admin Staff Lunch Break End Handler]"
 	ctx := r.Context()
 	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
 	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
