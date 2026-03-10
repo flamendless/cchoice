@@ -33,49 +33,7 @@ templ AdminProfilePage(profile models.AdminStaffProfile, errorMsg string, succes
 							}
 						</div>
 
-						<h1 class="text-2xl font-bold text-cchoice mb-6">My Profile</h1>
-
-						<div class="mb-8 p-4 bg-gray-50 rounded-lg">
-							<h2 class="text-lg font-semibold text-gray-800 mb-4">Personal Information</h2>
-							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<div>
-									<p class="text-sm text-gray-500">Full Name</p>
-									<p class="font-medium text-gray-900">{ profile.FullName }</p>
-								</div>
-								<div>
-									<p class="text-sm text-gray-500">Email</p>
-									<p class="font-medium text-gray-900">{ profile.Email }</p>
-								</div>
-								<div>
-									<p class="text-sm text-gray-500">Mobile No</p>
-									<p class="font-medium text-gray-900">{ profile.MobileNo }</p>
-								</div>
-								<div>
-									<p class="text-sm text-gray-500">Birthdate</p>
-									<p class="font-medium text-gray-900">{ profile.Birthdate }</p>
-								</div>
-								<div>
-									<p class="text-sm text-gray-500">Date Hired</p>
-									<p class="font-medium text-gray-900">{ profile.DateHired }</p>
-								</div>
-								<div>
-									<p class="text-sm text-gray-500">Position</p>
-									<p class="font-medium text-gray-900">{ profile.Position }</p>
-								</div>
-								<div>
-									<p class="text-sm text-gray-500">Scheduled Time In</p>
-									<p class="font-medium text-gray-900">{ profile.ScheduledTimeIn }</p>
-								</div>
-								<div>
-									<p class="text-sm text-gray-500">Scheduled Time Out</p>
-									<p class="font-medium text-gray-900">{ profile.ScheduledTimeOut }</p>
-								</div>
-								<div>
-									<p class="text-sm text-gray-500">User Type</p>
-									<p class="font-medium text-gray-900">{ profile.UserType.String() }</p>
-								</div>
-							</div>
-						</div>
+						@AdminProfileHeader(profile)
 
 						<div class="p-4 bg-gray-50 rounded-lg">
 							<h2 class="text-lg font-semibold text-gray-800 mb-4">Change Password</h2>
@@ -162,4 +120,30 @@ templ AdminProfilePage(profile models.AdminStaffProfile, errorMsg string, succes
 			</div>
 		</body>
 	</html>
+}
+
+templ profileText(label string, value string) {
+	<div>
+		<p class="text-sm text-gray-500">{ label }</p>
+		<p class="font-medium text-gray-900">{ value }</p>
+	</div>
+}
+
+templ AdminProfileHeader(profile models.AdminStaffProfile) {
+	<h1 class="text-2xl font-bold text-cchoice mb-6">My Profile</h1>
+	<div class="mb-8 p-4 bg-gray-50 rounded-lg">
+		<h2 class="text-lg font-semibold text-gray-800 mb-4">Personal Information</h2>
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+			@profileText("Full Name", profile.FullName)
+			@profileText("E-Mail", profile.Email)
+			@profileText("Mobile No.", profile.MobileNo)
+			@profileText("Birthdate", profile.Birthdate)
+			@profileText("Date Hired", profile.DateHired)
+			@profileText("Position", profile.Position)
+			@profileText("Scheduled Time In", profile.ScheduledTimeIn)
+			@profileText("Scheduled Time Out", profile.ScheduledTimeOut)
+			@profileText("User Type", profile.UserType.String())
+			@profileText("Required In Shop", utils.BoolToString(profile.RequireInShop))
+		</div>
+	</div>
 }
