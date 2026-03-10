@@ -2,6 +2,26 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.13"></a>
+## [release-v1.1.13] - 2026-03-10
+### Bugfix
+- Time out location now stored
+
+### Docs
+- Release v1.1.12
+
+### Feature
+- Admin profile page
+
+### Script
+- Optimize start time by specifying templ path
+
+### Web
+- Display staff attendance record in inverted table
+- Separate profile header
+- Rename lunch break in/out -> start/end
+
+
 <a name="release-v1.1.12"></a>
 ## [release-v1.1.12] - 2026-03-08
 ### Docs
@@ -856,7 +876,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.12...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.13...HEAD
+[release-v1.1.13]: https://github.com/flamendless/cchoice/compare/release-v1.1.12...release-v1.1.13
 [release-v1.1.12]: https://github.com/flamendless/cchoice/compare/release-v1.1.11...release-v1.1.12
 [release-v1.1.11]: https://github.com/flamendless/cchoice/compare/release-v1.1.10...release-v1.1.11
 [release-v1.1.10]: https://github.com/flamendless/cchoice/compare/release-v1.1.9...release-v1.1.10
