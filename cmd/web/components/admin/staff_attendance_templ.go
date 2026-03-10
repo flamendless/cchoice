@@ -383,7 +383,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-row\" _=\"on load call metrics_event('admin_page_visit_attendance', 'staff')\"><div class=\"flex-grow flex flex-col items-center justify-center p-4\"><h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">C-Choice Staff Admin Portal</h1><div class=\"w-full max-w-4xl p-6 bg-white rounded-lg shadow-md\"><div class=\"mb-6\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-row\" _=\"on load call metrics_event('admin_visit', 'staff')\"><div class=\"flex-grow flex flex-col items-center justify-center p-4\"><h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">C-Choice Staff Admin Portal</h1><div class=\"w-full max-w-4xl p-6 bg-white rounded-lg shadow-md\"><div class=\"mb-6\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

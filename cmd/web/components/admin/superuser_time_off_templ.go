@@ -48,7 +48,7 @@ func AdminSuperuserTimeOffPage(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"on load call metrics_event('admin_superuser_time_off_page_visit', '')\"><div class=\"flex-grow p-4\"><div class=\"max-w-6xl mx-auto\"><div class=\"text-center mb-6\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"on load call metrics_event('admin_visit', 'time off')\"><div class=\"flex-grow p-4\"><div class=\"max-w-6xl mx-auto\"><div class=\"text-center mb-6\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

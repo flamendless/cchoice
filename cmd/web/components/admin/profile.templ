@@ -20,7 +20,7 @@ templ AdminProfilePage(profile models.AdminStaffProfile, errorMsg string, succes
 
 		<body
 			class="bg-cchoicesoft min-h-screen flex flex-col"
-			_="on load call metrics_event('admin_profile_page_visit', '')"
+			_="on load call metrics_event('admin_visit', 'profile')"
 		>
 			<div class="flex-grow p-4">
 				<div class="max-w-2xl mx-auto">
@@ -48,13 +48,12 @@ templ AdminProfilePage(profile models.AdminStaffProfile, errorMsg string, succes
 								</div>
 							}
 							<form
-								action={ utils.URL("/admin/change-password") }
-								method="POST"
 								class="space-y-4"
 								id="change-password-form"
 								hx-post={ utils.URL("/admin/change-password") }
 								hx-trigger="submit"
 								hx-indicator="#change-password-btn-content"
+								_="on submit call metrics_event('admin_exec', 'change password')"
 							>
 								<div>
 									<label for="new_password" class="block text-sm font-medium text-gray-700">
