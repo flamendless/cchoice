@@ -240,7 +240,6 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/attendance", s.adminSuperuserAttendancePageHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/attendance/table", s.adminSuperuserAttendanceHandler)
 	r.With(s.requireSuperuserAuth).Post("/admin/superuser/attendance/report", s.adminSuperuserAttendanceReportHandler)
-	r.With(s.requireSuperuserAuth).Get("/admin/superuser/attendance/report/download", s.adminSuperuserAttendanceReportDownloadHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/time-off", s.adminSuperuserTimeOffPageHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/time-off/table", s.adminSuperuserTimeOffTableHandler)
 	r.With(s.requireSuperuserAuth).Patch("/admin/superuser/time-off/{id}/approve", s.adminSuperuserTimeOffApproveHandler)
