@@ -236,8 +236,8 @@ func (c *appConfig) IsWeb() bool {
 func (c *appConfig) AllowedOrigins() []string {
 	if c.IsProd() {
 		return []string{
-			"https://cchoice.com",
-			"https://www.cchoice.com",
+			"https://cchoice.shop",
+			"https://www.cchoice.shop",
 			"https://flamendless.xyz/cchoice",
 			"https://www.flamendless.xyz/cchoice",
 		}
