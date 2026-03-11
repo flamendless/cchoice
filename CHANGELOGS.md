@@ -2,13 +2,27 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.14"></a>
+## [release-v1.1.14] - 2026-03-11
+### Bugfix
+- Path in templ generate not working
+
+### Maintenance
+- Update allowed origins
+
+### Web
+- Update metrics to trigger once
+- Unify success and error messages to banners
+- Update export csv to stream
+- Rename metrics events for admin
+- Update metrics events for admin
+- Update date selectors
+
+
 <a name="release-v1.1.13"></a>
 ## [release-v1.1.13] - 2026-03-10
 ### Bugfix
 - Time out location now stored
-
-### Docs
-- Release v1.1.12
 
 ### Feature
 - Admin profile page
@@ -26,7 +40,6 @@
 ## [release-v1.1.12] - 2026-03-08
 ### Docs
 - Update issue templates
-- Release v1.1.11
 
 ### Feature
 - WIP export attendance
@@ -70,9 +83,6 @@
 
 <a name="release-v1.1.11"></a>
 ## [release-v1.1.11] - 2026-02-24
-### Docs
-- Release v1.1.10
-
 ### Feature
 - Location based time in/out enablement
 - Admin page for time tracking
@@ -116,9 +126,6 @@
 ### Bugfix
 - Add to cart count
 
-### Docs
-- Release v1.1.8
-
 ### Web
 - Animate cart on count update
 - Add AddToCart in promo product
@@ -126,18 +133,12 @@
 
 <a name="release-v1.1.8"></a>
 ## [release-v1.1.8] - 2026-02-14
-### Docs
-- Release v1.1.7
-
 ### Web
 - Add metrics to promo product click and checked payment method
 
 
 <a name="release-v1.1.7"></a>
 ## [release-v1.1.7] - 2026-02-12
-### Docs
-- Release v1.1.6
-
 ### Server
 - Fix random promo product not really being randomized
 
@@ -153,9 +154,6 @@
 
 <a name="release-v1.1.5"></a>
 ## [release-v1.1.5] - 2026-02-12
-### Docs
-- Release v1.1.4
-
 ### Script
 - Add checkMigrations
 
@@ -165,9 +163,6 @@
 
 <a name="release-v1.1.4"></a>
 ## [release-v1.1.4] - 2026-02-12
-### Docs
-- Release v1.1.3
-
 ### Server
 - Add random promo product metrics
 - Add random promo product
@@ -181,9 +176,6 @@
 
 <a name="release-v1.1.3"></a>
 ## [release-v1.1.3] - 2026-02-05
-### Docs
-- Release v1.1.2
-
 ### Web
 - Add COR seal
 
@@ -192,7 +184,6 @@
 ## [release-v1.1.2] - 2026-02-02
 ### Docs
 - Add list.md for tracking script execution
-- Release v1.1.1
 
 ### Server
 - Update sale
@@ -201,18 +192,12 @@
 
 <a name="release-v1.1.1"></a>
 ## [release-v1.1.1] - 2026-01-26
-### Docs
-- Release v1.1.0
-
 ### Server
 - Update checkout to use discounts
 
 
 <a name="release-v1.1.0"></a>
 ## [release-v1.1.0] - 2026-01-26
-### Docs
-- Release v1.0.11
-
 ### Server
 - Update sale discount style
 - Implement CSV input for creating product sales
@@ -221,9 +206,6 @@
 
 <a name="release-v1.0.11"></a>
 ## [release-v1.0.11] - 2026-01-15
-### Docs
-- Release v1.0.10
-
 ### Server
 - Set cache age for js files
 - Address lighthouse reports
@@ -233,9 +215,6 @@
 
 <a name="release-v1.0.10"></a>
 ## [release-v1.0.10] - 2025-12-31
-### Docs
-- Release v1.0.9
-
 ### Server
 - Implement basic event metrics
 
@@ -262,10 +241,6 @@
 ### CICD
 - Change email step for dev
 
-### Docs
-- Release v1.0.8
-
-
 <a name="release-v1.0.8"></a>
 ## [release-v1.0.8] - 2025-12-29
 ### CICD
@@ -273,26 +248,14 @@
 - Remove CC
 - Test release notes email
 
-### Docs
-- Release v1.0.8
-- Release v1.0.8
-- Release v1.0.7
-
-
 <a name="release-v1.0.7"></a>
 ## [release-v1.0.7] - 2025-12-29
-### Docs
-- Release v1.0.6
-
 ### Web
 - On search click, display the modal
 
 
 <a name="release-v1.0.6"></a>
 ## [release-v1.0.6] - 2025-12-29
-### Docs
-- Release v1.0.5
-
 ### Script
 - Add svgs in migrate images to cloudflare script
 
@@ -305,9 +268,6 @@
 
 <a name="release-v1.0.5"></a>
 ## [release-v1.0.5] - 2025-12-25
-### Docs
-- Dev v0.1.1
-
 ### Script
 - Update dev
 
@@ -324,12 +284,6 @@
 ## [dev-v0.1.1] - 2025-12-25
 ### Bugfix
 - Use git rev-list to correctly get latest tag
-
-### Docs
-- Release v1.0.4
-- Release v1.0.3
-- Release v1.0.2
-- Release v1.0.2
 
 ### Script
 - Fix serveweb
@@ -353,10 +307,6 @@
 ### Bugfix
 - Use git rev-list to correctly get latest tag
 
-### Docs
-- Release v1.0.3
-- Release v1.0.2
-
 ### Server
 - Implement changelogs parsing
 - Allow cloudflare in CSP
@@ -367,27 +317,18 @@
 
 <a name="release-v1.0.3"></a>
 ## [release-v1.0.3] - 2025-12-17
-### Docs
-- Release v1.0.1
-
 ### Server
 - Allow cloudflare in CSP
 
 
 <a name="release-v1.0.2"></a>
 ## [release-v1.0.2] - 2025-12-17
-### Docs
-- Release v1.0.1
-
 ### Web
 - More responsive fixes and more brand logs
 
 
 <a name="release-v1.0.1"></a>
 ## [release-v1.0.1] - 2025-12-16
-### Docs
-- Release v1.0.0
-
 ### Server
 - Fix searchbar
 - WIP fixing searchbar
@@ -876,7 +817,8 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.13...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.14...HEAD
+[release-v1.1.14]: https://github.com/flamendless/cchoice/compare/release-v1.1.13...release-v1.1.14
 [release-v1.1.13]: https://github.com/flamendless/cchoice/compare/release-v1.1.12...release-v1.1.13
 [release-v1.1.12]: https://github.com/flamendless/cchoice/compare/release-v1.1.11...release-v1.1.12
 [release-v1.1.11]: https://github.com/flamendless/cchoice/compare/release-v1.1.10...release-v1.1.11
