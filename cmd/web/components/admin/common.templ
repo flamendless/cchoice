@@ -81,7 +81,7 @@ templ AdminLoginPage() {
 		</head>
 		<body
 			class="bg-cchoicesoft min-h-screen flex items-center justify-center"
-			_="on load call metrics_event('admin_visit', 'login')"
+			_="init call metrics_event('admin_visit', 'login')"
 		>
 			@common.ErrorBanner()
 			@common.SuccessBanner()

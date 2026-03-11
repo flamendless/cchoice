@@ -48,7 +48,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t.form-section {\n\t\t\t\t\tdisplay: none;\n\t\t\t }\n\t\t\t\t.form-section.active {\n\t\t\t\t\tdisplay: block;\n\t\t\t }\n\t\t\t</style></head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"on load call metrics_event('admin_visit', 'products')\"><div class=\"flex-grow p-4\"><div class=\"max-w-4xl mx-auto\"><div class=\"text-center mb-6\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t.form-section {\n\t\t\t\t\tdisplay: none;\n\t\t\t }\n\t\t\t\t.form-section.active {\n\t\t\t\t\tdisplay: block;\n\t\t\t }\n\t\t\t</style></head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'products')\"><div class=\"flex-grow p-4\"><div class=\"max-w-4xl mx-auto\"><div class=\"text-center mb-6\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

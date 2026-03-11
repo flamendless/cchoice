@@ -11,7 +11,7 @@ templ SuccessBanner() {
 			<div class="fixed inset-0 flex items-start justify-center z-[9999] my-4">
 				<div
 					class="
-						flex flex-row justify-between items-center w-[90%] max-md
+						flex flex-row justify-between items-center w-[90%] max-w-md
 						border rounded-lg bg-green-500 text-white p-4 shadow-lg
 					"
 				>
@@ -20,12 +20,10 @@ templ SuccessBanner() {
 						id="success_banner_closer"
 						class="mr-6 ml-4 mt-2 mb-2"
 						hidden
-						hx-trigger="click"
-						hx-target="#success_banner"
-						hx-swap="innerHTML"
 						alt="close success button"
 						aria-label="Close"
 						title="Close"
+						_="on click hide #success_banner"
 					>
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
 							<path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>

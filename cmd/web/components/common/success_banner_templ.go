@@ -50,7 +50,7 @@ func SuccessBanner() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"fixed inset-0 flex items-start justify-center z-[9999] my-4\"><div class=\"flex flex-row justify-between items-center w-[90%] max-md border rounded-lg bg-green-500 text-white p-4 shadow-lg\"><p id=\"success_banner_text\" class=\"grow self-center\"></p><button id=\"success_banner_closer\" class=\"mr-6 ml-4 mt-2 mb-2\" hidden hx-trigger=\"click\" hx-target=\"#success_banner\" hx-swap=\"innerHTML\" alt=\"close success button\" aria-label=\"Close\" title=\"Close\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-6\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z\"></path></svg></button></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"fixed inset-0 flex items-start justify-center z-[9999] my-4\"><div class=\"flex flex-row justify-between items-center w-[90%] max-w-md border rounded-lg bg-green-500 text-white p-4 shadow-lg\"><p id=\"success_banner_text\" class=\"grow self-center\"></p><button id=\"success_banner_closer\" class=\"mr-6 ml-4 mt-2 mb-2\" hidden hx-trigger=\"click\" hx-target=\"#success_banner\" hx-swap=\"innerHTML\" alt=\"close success button\" aria-label=\"Close\" title=\"Close\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-6\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z\"></path></svg></button></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -79,7 +79,7 @@ func SuccessBanner() templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(templ.URL(utils.URL("/static/js/error_handler.js")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/success_banner.templ`, Line: 38, Col: 91}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/common/success_banner.templ`, Line: 38, Col: 91}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
