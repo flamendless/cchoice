@@ -30,7 +30,7 @@ func (s *Server) adminSuperuserHomeHandler(w http.ResponseWriter, r *http.Reques
 	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staffID), zap.Error(err))
-		http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+		redirectHXLogin(w, r)
 		return
 	}
 	currentUserFullName := utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName)
@@ -340,7 +340,7 @@ func (s *Server) adminSuperuserTimeOffApproveHandler(w http.ResponseWriter, r *h
 	_, err := s.dbRO.GetQueries().GetStaffByID(ctx, currentStaffID)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", currentStaffID), zap.Error(err))
-		http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+		redirectHXLogin(w, r)
 		return
 	}
 
@@ -363,8 +363,7 @@ func (s *Server) adminSuperuserTimeOffApproveHandler(w http.ResponseWriter, r *h
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("HX-Refresh", "true")
-	w.WriteHeader(http.StatusOK)
+	redirectHX(w, utils.URLWithSuccess("/admin/superuser/time-off", "Time off request approved"))
 }
 
 func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *http.Request) {
@@ -374,7 +373,7 @@ func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *ht
 	_, err := s.dbRO.GetQueries().GetStaffByID(ctx, currentStaffID)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", currentStaffID), zap.Error(err))
-		http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+		redirectHXLogin(w, r)
 		return
 	}
 
@@ -397,6 +396,5 @@ func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *ht
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("HX-Refresh", "true")
-	w.WriteHeader(http.StatusOK)
+	redirectHX(w, utils.URLWithSuccess("/admin/superuser/time-off", "Time off request cancelled"))
 }

@@ -377,3 +377,17 @@ SET
 WHERE
     id = ?
 RETURNING id;
+
+-- name: UpdateStaffProfile :one
+UPDATE tbl_staffs
+SET
+    first_name = ?,
+    middle_name = ?,
+    last_name = ?,
+    mobile_no = ?,
+    birthdate = ?,
+    date_hired = ?,
+    updated_at = datetime('now')
+WHERE
+    id = ?
+RETURNING id;

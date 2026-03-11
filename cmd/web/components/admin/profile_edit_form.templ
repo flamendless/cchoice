@@ -1,0 +1,126 @@
+package components
+
+import "cchoice/internal/utils"
+import "cchoice/cmd/web/models"
+
+templ AdminProfileEditForm(profile models.AdminStaffProfile) {
+	<div class="mb-8 p-4 bg-gray-50 rounded-lg" id="personal-info-section">
+		<div class="flex justify-between items-center mb-4">
+			<h2 class="text-lg font-semibold text-gray-800">Personal Information</h2>
+			<div class="flex gap-2">
+				<button
+					type="submit"
+					form="profile-edit-form"
+					class="px-3 py-1.5 text-sm bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-cchoice"
+					_="on click call metrics_event('admin_exec', 'save edit profile')"
+				>
+					Save Changes
+				</button>
+				<button
+					type="button"
+					class="px-3 py-1.5 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+					hx-get={ utils.URL("/admin/profile") }
+					hx-target="body"
+					hx-swap="outerHTML"
+				>
+					Cancel
+				</button>
+			</div>
+		</div>
+		<form
+			id="profile-edit-form"
+			hx-patch={ utils.URL("/admin/profile") }
+			hx-target="body"
+			hx-swap="outerHTML"
+			class="grid grid-cols-1 md:grid-cols-2 gap-4"
+		>
+			<div>
+				<label for="first_name" class="block text-sm font-medium text-gray-700">
+					First Name <span class="text-red-500">*</span>
+				</label>
+				<input
+					type="text"
+					id="first_name"
+					name="first_name"
+					value={ profile.FirstName }
+					required
+					minlength="1"
+					maxlength="50"
+					pattern="[a-zA-Z\s\-]+"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+			<div>
+				<label for="middle_name" class="block text-sm font-medium text-gray-700">
+					Middle Name
+				</label>
+				<input
+					type="text"
+					id="middle_name"
+					name="middle_name"
+					value={ profile.MiddleName }
+					maxlength="50"
+					pattern="[a-zA-Z\s\-]+"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+			<div>
+				<label for="last_name" class="block text-sm font-medium text-gray-700">
+					Last Name <span class="text-red-500">*</span>
+				</label>
+				<input
+					type="text"
+					id="last_name"
+					name="last_name"
+					value={ profile.LastName }
+					required
+					minlength="1"
+					maxlength="50"
+					pattern="[a-zA-Z\s\-]+"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+			<div>
+				<label for="mobile_no" class="block text-sm font-medium text-gray-700">
+					Mobile Number <span class="text-red-500">*</span>
+				</label>
+				<input
+					type="tel"
+					id="mobile_no"
+					name="mobile_no"
+					value={ profile.MobileNo }
+					required
+					pattern="[0-9]{11}"
+					placeholder="e.g., 09123456789"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+			<div>
+				<label for="birthdate" class="block text-sm font-medium text-gray-700">
+					Birthdate <span class="text-red-500">*</span>
+				</label>
+				<input
+					type="date"
+					id="birthdate"
+					name="birthdate"
+					value={ profile.Birthdate }
+					required
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+			<div>
+				<label for="date_hired" class="block text-sm font-medium text-gray-700">
+					Date Hired <span class="text-red-500">*</span>
+				</label>
+				<input
+					type="date"
+					id="date_hired"
+					name="date_hired"
+					value={ profile.DateHired }
+					required
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+		</form>
+	</div>
+}

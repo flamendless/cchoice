@@ -67,7 +67,7 @@ templ AttendanceToolbar(title string, selectedDate string, userType enums.StaffU
 	</div>
 }
 
-templ AdminLoginPage(loginError string) {
+templ AdminLoginPage() {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
@@ -83,15 +83,12 @@ templ AdminLoginPage(loginError string) {
 			class="bg-cchoicesoft min-h-screen flex items-center justify-center"
 			_="on load call metrics_event('admin_visit', 'login')"
 		>
+			@common.ErrorBanner()
+			@common.SuccessBanner()
 			<div class="w-full max-w-lg p-8 bg-white rounded-lg shadow-md">
 				<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
 					C-Choice Admin Portal
 				</h1>
-				if loginError != "" {
-					<div class="mb-4 p-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm" role="alert">
-						{ loginError }
-					</div>
-				}
 				<form
 					action={ utils.URL("/admin/login") }
 					method="POST"

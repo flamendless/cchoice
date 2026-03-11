@@ -10,10 +10,10 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "cchoice/internal/utils"
 
-var errorBannerHandlerOnce = templ.NewOnceHandle()
-var onceErrorHandler = templ.NewOnceHandle()
+var successBannerHandlerOnce = templ.NewOnceHandle()
+var onceSuccessHandler = templ.NewOnceHandle()
 
-func ErrorBanner() templ.Component {
+func SuccessBanner() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -34,7 +34,7 @@ func ErrorBanner() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"error_banner\" hidden>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"success_banner\" hidden>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -50,13 +50,13 @@ func ErrorBanner() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"fixed inset-0 flex items-start justify-center z-[9999] my-4\"><div class=\"flex flex-row justify-between items-center w-[90%] max-w-md border rounded-lg bg-red-500 text-white p-4 shadow-lg\"><p id=\"error_banner_text\" class=\"grow self-center\"></p><button id=\"error_banner_closer\" class=\"mr-6 ml-4 mt-2 mb-2\" hidden hx-trigger=\"click\" hx-target=\"#error_banner\" hx-swap=\"innerHTML\" alt=\"close error button\" aria-label=\"Close\" title=\"Close\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-6\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z\"></path></svg></button></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"fixed inset-0 flex items-start justify-center z-[9999] my-4\"><div class=\"flex flex-row justify-between items-center w-[90%] max-md border rounded-lg bg-green-500 text-white p-4 shadow-lg\"><p id=\"success_banner_text\" class=\"grow self-center\"></p><button id=\"success_banner_closer\" class=\"mr-6 ml-4 mt-2 mb-2\" hidden hx-trigger=\"click\" hx-target=\"#success_banner\" hx-swap=\"innerHTML\" alt=\"close success button\" aria-label=\"Close\" title=\"Close\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"size-6\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z\"></path></svg></button></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = errorBannerHandlerOnce.Once().Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = successBannerHandlerOnce.Once().Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -79,7 +79,7 @@ func ErrorBanner() templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(templ.URL(utils.URL("/static/js/error_handler.js")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/error_banner.templ`, Line: 38, Col: 91}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/success_banner.templ`, Line: 38, Col: 91}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -91,7 +91,7 @@ func ErrorBanner() templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = onceErrorHandler.Once().Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = onceSuccessHandler.Once().Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

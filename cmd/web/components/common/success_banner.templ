@@ -2,28 +2,28 @@ package common
 
 import "cchoice/internal/utils"
 
-var errorBannerHandlerOnce = templ.NewOnceHandle()
-var onceErrorHandler = templ.NewOnceHandle()
+var successBannerHandlerOnce = templ.NewOnceHandle()
+var onceSuccessHandler = templ.NewOnceHandle()
 
-templ ErrorBanner() {
-	<div id="error_banner" hidden>
-		@errorBannerHandlerOnce.Once() {
+templ SuccessBanner() {
+	<div id="success_banner" hidden>
+		@successBannerHandlerOnce.Once() {
 			<div class="fixed inset-0 flex items-start justify-center z-[9999] my-4">
 				<div
 					class="
-						flex flex-row justify-between items-center w-[90%] max-w-md
-						border rounded-lg bg-red-500 text-white p-4 shadow-lg
+						flex flex-row justify-between items-center w-[90%] max-md
+						border rounded-lg bg-green-500 text-white p-4 shadow-lg
 					"
 				>
-					<p id="error_banner_text" class="grow self-center"></p>
+					<p id="success_banner_text" class="grow self-center"></p>
 					<button
-						id="error_banner_closer"
+						id="success_banner_closer"
 						class="mr-6 ml-4 mt-2 mb-2"
 						hidden
 						hx-trigger="click"
-						hx-target="#error_banner"
+						hx-target="#success_banner"
 						hx-swap="innerHTML"
-						alt="close error button"
+						alt="close success button"
 						aria-label="Close"
 						title="Close"
 					>
@@ -34,7 +34,7 @@ templ ErrorBanner() {
 				</div>
 			</div>
 		}
-		@onceErrorHandler.Once() {
+		@onceSuccessHandler.Once() {
 			<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/error_handler.js")) }>
 			</script>
 		}

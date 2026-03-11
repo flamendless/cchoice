@@ -224,6 +224,8 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth).Get("/admin/staff", s.adminStaffHomeHandler)
 	r.With(s.requireStaffAuth).Get("/admin/profile", s.adminStaffProfileHandler)
 	r.With(s.requireStaffAuth).Get("/admin/profile-header", s.adminStaffProfileHeaderHandler)
+	r.With(s.requireStaffAuth).Get("/admin/profile/edit", s.adminProfileEditFormHandler)
+	r.With(s.requireStaffAuth).Patch("/admin/profile", s.adminProfileUpdateHandler)
 	r.With(s.requireStaffAuth).Post("/admin/change-password", s.adminChangePasswordHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/attendance", s.adminStaffPageHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/attendance/table", s.adminStaffAttendanceTableHandler)
@@ -251,15 +253,7 @@ func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Login Page Handler]"
 	ctx := r.Context()
 
-	loginError := ""
-	switch r.URL.Query().Get("error") {
-	case "invalid_credentials":
-		loginError = "Invalid email or password."
-	case "invalid_format":
-		loginError = "Invalid email or password format."
-	}
-
-	if err := compadmin.AdminLoginPage(loginError).Render(ctx, w); err != nil {
+	if err := compadmin.AdminLoginPage().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),
@@ -272,19 +266,10 @@ func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Login Handler]"
 	ctx := r.Context()
-	htmx := r.Header.Get("HX-Request") == "true"
-	redirect := func(url string) {
-		if htmx {
-			w.Header().Set("HX-Redirect", url)
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		http.Redirect(w, r, url, http.StatusSeeOther)
-	}
 
 	if err := r.ParseForm(); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirect(utils.URL("/admin?error=invalid_format"))
+		redirectHX(w, utils.URLWithError("/admin", "Invalid form submission"))
 		return
 	}
 
@@ -292,19 +277,19 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	password := r.PostFormValue("password")
 
 	if !constants.EmailRegex.MatchString(email) {
-		redirect(utils.URL("/admin?error=invalid_format"))
+		redirectHX(w, utils.URLWithError("/admin", "Invalid email or password format"))
 		return
 	}
 
 	if !constants.PasswordRegex.MatchString(password) {
-		redirect(utils.URL("/admin?error=invalid_format"))
+		redirectHX(w, utils.URLWithError("/admin", "Invalid email or password format"))
 		return
 	}
 
 	staff, err := s.dbRO.GetQueries().GetStaffByEmail(ctx, email)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			redirect(utils.URL("/admin?error=invalid_credentials"))
+			redirectHX(w, utils.URLWithError("/admin", "Invalid email or password"))
 			return
 		}
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -313,7 +298,7 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(staff.Password), []byte(password)); err != nil {
-		redirect(utils.URL("/admin?error=invalid_credentials"))
+		redirectHX(w, utils.URLWithError("/admin", "Invalid email or password"))
 		return
 	}
 
@@ -339,12 +324,12 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch enums.ParseStaffUserTypeToEnum(staff.UserType) {
 	case enums.STAFF_USER_TYPE_SUPERUSER:
-		redirect(utils.URL("/admin/superuser"))
+		redirectHX(w, utils.URL("/admin/superuser"))
 	case enums.STAFF_USER_TYPE_STAFF:
-		redirect(utils.URL("/admin/staff"))
+		redirectHX(w, utils.URL("/admin/staff"))
 	default:
 		logs.Log().Warn(logtag, zap.String("got unhandled", staff.UserType))
-		redirect(utils.URL("/admin"))
+		redirectHX(w, utils.URL("/admin"))
 	}
 }
 
@@ -364,5 +349,5 @@ func (s *Server) adminLogoutHandler(w http.ResponseWriter, r *http.Request) {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}
 
-	http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+	redirectHXLogin(w, r)
 }
