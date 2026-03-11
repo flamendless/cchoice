@@ -1141,3 +1141,43 @@ func (q *Queries) UpdateStaffPassword(ctx context.Context, arg UpdateStaffPasswo
 	err := row.Scan(&id)
 	return id, err
 }
+
+const updateStaffProfile = `-- name: UpdateStaffProfile :one
+UPDATE tbl_staffs
+SET
+    first_name = ?,
+    middle_name = ?,
+    last_name = ?,
+    mobile_no = ?,
+    birthdate = ?,
+    date_hired = ?,
+    updated_at = datetime('now')
+WHERE
+    id = ?
+RETURNING id
+`
+
+type UpdateStaffProfileParams struct {
+	FirstName  string
+	MiddleName sql.NullString
+	LastName   string
+	MobileNo   string
+	Birthdate  string
+	DateHired  string
+	ID         int64
+}
+
+func (q *Queries) UpdateStaffProfile(ctx context.Context, arg UpdateStaffProfileParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, updateStaffProfile,
+		arg.FirstName,
+		arg.MiddleName,
+		arg.LastName,
+		arg.MobileNo,
+		arg.Birthdate,
+		arg.DateHired,
+		arg.ID,
+	)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}

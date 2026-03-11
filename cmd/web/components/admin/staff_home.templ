@@ -16,6 +16,8 @@ templ AdminStaffHomePage(fullName string) {
 			class="bg-cchoicesoft min-h-screen flex flex-col"
 			_="on load call metrics_event('admin_visit', 'staff home')"
 		>
+			@common.ErrorBanner()
+			@common.SuccessBanner()
 			<div class="flex-grow p-4">
 				<div class="max-w-6xl mx-auto">
 					<div class="text-center mb-8 mt-4">

@@ -18,6 +18,8 @@ templ AdminSuperuserTimeOffPage(title string) {
 			class="bg-cchoicesoft min-h-screen flex flex-col"
 			_="on load call metrics_event('admin_visit', 'time off')"
 		>
+			@common.ErrorBanner()
+			@common.SuccessBanner()
 			<div class="flex-grow p-4">
 				<div class="max-w-6xl mx-auto">
 					<div class="text-center mb-6">
@@ -26,7 +28,6 @@ templ AdminSuperuserTimeOffPage(title string) {
 					<div class="mb-6">
 						@BackToHome(utils.URL("/admin/superuser"))
 					</div>
-					@AdminHeader(nil)
 
 					<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
 						Staff Time Off

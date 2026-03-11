@@ -12,6 +12,14 @@ func URL(path string) string {
 	return "/cchoice" + path
 }
 
+func URLWithSuccess(url string, message string) string {
+	return URL(fmt.Sprintf("%s?success=%s", url, message))
+}
+
+func URLWithError(url string, message string) string {
+	return URL(fmt.Sprintf("%s?error=%s", url, message))
+}
+
 func MatchPath(path string, target string) bool {
 	if conf.Conf().IsLocal() || conf.Conf().IsWeb() {
 		return path == ("/cchoice" + target)
