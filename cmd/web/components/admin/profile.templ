@@ -19,7 +19,7 @@ templ AdminProfilePage(profile models.AdminStaffProfile) {
 		</head>
 		<body
 			class="bg-cchoicesoft min-h-screen flex flex-col"
-			_="on load call metrics_event('admin_visit', 'profile')"
+			_="init call metrics_event('admin_visit', 'profile')"
 		>
 			@common.ErrorBanner()
 			@common.SuccessBanner()

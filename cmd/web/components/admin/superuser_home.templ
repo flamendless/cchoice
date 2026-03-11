@@ -14,7 +14,7 @@ templ AdminSuperuserHomePage(fullName string) {
 
 		<body
 			class="bg-cchoicesoft min-h-screen flex flex-col"
-			_="on load call metrics_event('admin_visit', 'superuser home')"
+			_="init call metrics_event('admin_visit', 'superuser home')"
 		>
 			@common.ErrorBanner()
 			@common.SuccessBanner()

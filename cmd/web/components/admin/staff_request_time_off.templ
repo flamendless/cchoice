@@ -16,7 +16,7 @@ templ AdminStaffRequestTimeOffPage() {
 
 		<body
 			class="bg-cchoicesoft min-h-screen flex flex-row"
-			_="on load call metrics_event('admin_visit', 'request time off')"
+			_="init call metrics_event('admin_visit', 'request time off')"
 		>
 			@common.ErrorBanner()
 			@common.SuccessBanner()

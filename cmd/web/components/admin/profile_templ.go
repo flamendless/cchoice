@@ -46,7 +46,7 @@ func AdminProfilePage(profile models.AdminStaffProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t#change-password-btn-content #change-password-spinner { display: none; }\n\t\t\t\t#change-password-btn-content.htmx-request #change-password-spinner { display: inline-block; }\n\t\t\t\t#change-password-btn-content.htmx-request .change-password-btn-text { display: none; }\n\t\t\t</style></head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"on load call metrics_event('admin_visit', 'profile')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t#change-password-btn-content #change-password-spinner { display: none; }\n\t\t\t\t#change-password-btn-content.htmx-request #change-password-spinner { display: inline-block; }\n\t\t\t\t#change-password-btn-content.htmx-request .change-password-btn-text { display: none; }\n\t\t\t</style></head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'profile')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
