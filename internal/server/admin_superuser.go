@@ -57,11 +57,19 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 	if endDateParam == "" {
 		endDateParam = startDateParam
 	}
+	endDate := utils.ParseAttendanceDate(endDateParam)
 
-	attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByDateRange(ctx, queries.GetStaffAttendanceByDateRangeParams{
-		StartDate: startDate,
-		EndDate:   utils.ParseAttendanceDate(endDateParam),
-	})
+	staffID := encode.INVALID
+	if staffIDParam := r.FormValue("staff-id"); staffIDParam != "" {
+		staffID = s.encoder.Decode(staffIDParam)
+		if staffID == encode.INVALID {
+			logs.Log().Warn(logtag, zap.String("staff id", staffIDParam), zap.Error(errs.ErrDecode))
+		}
+	}
+
+	//TODO: (Brandon) services should be in the Server struct as well
+	attendanceService := services.NewAttendanceService(s.dbRO, s.dbRW)
+	attendances, err := attendanceService.GetAttendance(ctx, staffID, startDate, endDate)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("start date", startDateParam), zap.String("end date", endDateParam))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -142,8 +150,8 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		format = "csv"
 	}
 
-	reportService := services.NewReportService(s.dbRO)
-	attendances, err := reportService.GetAttendanceReport(ctx, staffID, startDate, endDate)
+	attendanceService := services.NewAttendanceService(s.dbRO, s.dbRW)
+	attendances, err := attendanceService.GetAttendance(ctx, staffID, startDate, endDate)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
@@ -165,6 +173,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		zap.Int64("staff id", s.sessionManager.GetInt64(ctx, SessionStaffID)),
 	)
 
+	reportService := services.NewReportService(s.dbRO)
 	switch format {
 	case "csv":
 		w.Header().Set("Content-Type", "text/csv")

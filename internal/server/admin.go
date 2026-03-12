@@ -13,6 +13,7 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
+	"cchoice/internal/staff"
 	"cchoice/internal/types"
 	"cchoice/internal/utils"
 
@@ -113,7 +114,7 @@ func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentS
 func buildAdminStaffAttendance(
 	encoder encode.IEncode,
 	staff queries.GetAllStaffsRow,
-	att queries.GetStaffAttendanceByDateRangeRow,
+	att staff.StaffRow,
 	shopLocation types.Location,
 ) models.Attendance {
 	schedIn, schedOut := "", ""

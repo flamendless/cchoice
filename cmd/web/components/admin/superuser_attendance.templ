@@ -37,8 +37,6 @@ templ AdminSuperuserAttendancePage(title string, selectedDate string) {
 					@AttendanceSectionSuperuserPage(title, selectedDate)
 				</div>
 			</div>
-
-			@ScriptClock()
 		</body>
 	</html>
 }
@@ -47,11 +45,13 @@ templ AttendanceSectionSuperuserPage(title string, selectedDate string) {
 	<div
 		class="bg-white rounded-lg shadow-md p-6"
 		hx-get={ utils.URL("/admin/superuser/attendance/table") }
-		hx-trigger={ fmt.Sprintf("load, change from:#%s, click from:#%s", "date-selector", "refresh-btn") }
-		hx-include="#date-selector,#date-selector-end"
+		hx-trigger={ fmt.Sprintf(
+			"load, change from:#%s, change from:#%s, change from:#%s",
+			"date-selector", "date-selector-end", "staff-id",
+		) }
+		hx-include="#date-selector,#date-selector-end,#staff-id"
 		hx-target="#attendance-table"
 		hx-swap="innerHTML"
-		hx-indicator={ fmt.Sprintf("#%s-content", "refresh-btn") }
 	>
 		@AttendanceToolbar(selectedDate, enums.STAFF_USER_TYPE_SUPERUSER)
 		<div id="attendance-table">

@@ -3,9 +3,8 @@ package services
 import (
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
-	"cchoice/internal/database/queries"
-	"cchoice/internal/encode"
 	"cchoice/internal/logs"
+	"cchoice/internal/staff"
 	"cchoice/internal/utils"
 	"context"
 	"database/sql"
@@ -17,45 +16,6 @@ import (
 	"go.uber.org/zap"
 )
 
-type StaffRow struct {
-	ID                          int64
-	StaffID                     int64
-	ForDate                     string
-	TimeIn                      sql.NullString
-	TimeOut                     sql.NullString
-	InLocation                  sql.NullString
-	OutLocation                 sql.NullString
-	InUseragentID               sql.NullInt64
-	OutUseragentID              sql.NullInt64
-	LunchBreakIn                sql.NullString
-	LunchBreakOut               sql.NullString
-	LunchBreakInLocation        sql.NullString
-	LunchBreakOutLocation       sql.NullString
-	LunchBreakInUseragentID     sql.NullInt64
-	LunchBreakOutUseragentID    sql.NullInt64
-	CreatedAt                   string
-	UpdatedAt                   string
-	FirstName                   string
-	MiddleName                  sql.NullString
-	LastName                    string
-	InBrowser                   sql.NullString
-	InBrowserVersion            sql.NullString
-	InOs                        sql.NullString
-	InDevice                    sql.NullString
-	OutBrowser                  sql.NullString
-	OutBrowserVersion           sql.NullString
-	OutOs                       sql.NullString
-	OutDevice                   sql.NullString
-	LunchBreakInBrowser         sql.NullString
-	LunchBreakInBrowserVersion  sql.NullString
-	LunchBreakInOs              sql.NullString
-	LunchBreakInDevice          sql.NullString
-	LunchBreakOutBrowser        sql.NullString
-	LunchBreakOutBrowserVersion sql.NullString
-	LunchBreakOutOs             sql.NullString
-	LunchBreakOutDevice         sql.NullString
-}
-
 type ReportService struct {
 	dbRO database.Service
 }
@@ -64,48 +24,10 @@ func NewReportService(dbRO database.Service) *ReportService {
 	return &ReportService{dbRO: dbRO}
 }
 
-func (s *ReportService) GetAttendanceReport(
-	ctx context.Context,
-	staffID int64,
-	startDate string,
-	endDate string,
-) ([]StaffRow, error) {
-	var data []StaffRow
-	if staffID != encode.INVALID {
-		attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByDateRangeAndStaffID(ctx, queries.GetStaffAttendanceByDateRangeAndStaffIDParams{
-			StaffID:   staffID,
-			StartDate: startDate,
-			EndDate:   endDate,
-		})
-		if err != nil {
-			return data, err
-		}
-
-		data = make([]StaffRow, 0, len(attendances))
-		for _, att := range attendances {
-			data = append(data, StaffRow(att))
-		}
-	} else {
-		attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByDateRange(ctx, queries.GetStaffAttendanceByDateRangeParams{
-			StartDate: startDate,
-			EndDate:   endDate,
-		})
-		if err != nil {
-			return data, err
-		}
-
-		data = make([]StaffRow, 0, len(attendances))
-		for _, att := range attendances {
-			data = append(data, StaffRow(att))
-		}
-	}
-	return data, nil
-}
-
 func (s *ReportService) StreamReportCSV(
 	ctx context.Context,
 	writer *csv.Writer,
-	data []StaffRow,
+	data []staff.StaffRow,
 	filename string,
 	startDate string,
 	endDate string,
@@ -221,7 +143,7 @@ func formatLocationAndUseragent(location string, browser, browserVersion, os, de
 func (s *ReportService) StreamReportXLSX(
 	ctx context.Context,
 	file *excelize.File,
-	data []StaffRow,
+	data []staff.StaffRow,
 	filename string,
 	startDate string,
 	endDate string,
