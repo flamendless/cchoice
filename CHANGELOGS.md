@@ -2,6 +2,18 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.15"></a>
+## [release-v1.1.15] - 2026-03-12
+### Docs
+- Release v1.1.14
+
+### Feature
+- XLSX report
+
+### Web
+- Add staff filter
+
+
 <a name="release-v1.1.14"></a>
 ## [release-v1.1.14] - 2026-03-11
 ### Bugfix
