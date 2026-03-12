@@ -60,10 +60,10 @@ func run(c Command) error {
 		}
 		// args = append(args, "-x")
 		// args = append(args, "-v")
-		args = append(args, c.Args...)
 		if len(c.Tags) > 0 {
-			args = append(args, "-tags="+strings.Join(c.Tags, " "))
+			args = append(args, "-tags="+strings.Join(c.Tags, ","))
 		}
+		args = append(args, c.Args...)
 		cmd = exec.Command("go", args...)
 
 	case CmdGoRun:
