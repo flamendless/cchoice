@@ -900,7 +900,7 @@ func StaffDropdown() templ.Component {
 			templ_7745c5c3_Var39 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<div class=\"flex flex-col items-center\"><label for=\"staffs\" class=\"block text-sm font-medium text-gray-700\">Staffs</label> <select id=\"staff-id\" name=\"staffs\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<div class=\"flex flex-col items-center\"><label for=\"staff-id\" class=\"block text-sm font-medium text-gray-700\">Staffs</label> <select id=\"staff-id\" name=\"staff-id\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

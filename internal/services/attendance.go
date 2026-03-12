@@ -7,7 +7,9 @@ import (
 
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/encode"
 	"cchoice/internal/enums"
+	"cchoice/internal/staff"
 )
 
 type AttendanceService struct {
@@ -231,3 +233,42 @@ func (s *AttendanceService) CancelTimeOff(
 	_, err := s.dbRW.GetQueries().CancelStaffTimeOff(ctx, timeOffID)
 	return err
 }
+
+func (s *AttendanceService) GetAttendance(
+	ctx context.Context,
+	staffID int64,
+	startDate string,
+	endDate string,
+) ([]staff.StaffRow, error) {
+	var data []staff.StaffRow
+	if staffID != encode.INVALID {
+		attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByDateRangeAndStaffID(ctx, queries.GetStaffAttendanceByDateRangeAndStaffIDParams{
+			StaffID:   staffID,
+			StartDate: startDate,
+			EndDate:   endDate,
+		})
+		if err != nil {
+			return data, err
+		}
+
+		data = make([]staff.StaffRow, 0, len(attendances))
+		for _, att := range attendances {
+			data = append(data, staff.StaffRow(att))
+		}
+	} else {
+		attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByDateRange(ctx, queries.GetStaffAttendanceByDateRangeParams{
+			StartDate: startDate,
+			EndDate:   endDate,
+		})
+		if err != nil {
+			return data, err
+		}
+
+		data = make([]staff.StaffRow, 0, len(attendances))
+		for _, att := range attendances {
+			data = append(data, staff.StaffRow(att))
+		}
+	}
+	return data, nil
+}
+
