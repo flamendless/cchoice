@@ -29,10 +29,9 @@ templ AdminHeader(profile *models.AdminStaffProfile) {
 	}
 }
 
-templ AttendanceToolbar(title string, selectedDate string, userType enums.StaffUserType) {
-	<div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
-		<h2 class="text-xl font-semibold text-gray-800">{ title }</h2>
-		<div class="flex gap-2">
+templ AttendanceToolbar(selectedDate string, userType enums.StaffUserType) {
+	<div class="flex flex-col sm:flex-row sm:flex-wrap justify-between items-start sm:items-center gap-4 mb-4">
+		<div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
 			if userType == enums.STAFF_USER_TYPE_STAFF {
 				@common.DateSelectorNamed("date-selector", "Date", selectedDate, false)
 			} else if userType == enums.STAFF_USER_TYPE_SUPERUSER {
@@ -40,33 +39,57 @@ templ AttendanceToolbar(title string, selectedDate string, userType enums.StaffU
 				@common.DateSelectorNamed("date-selector", "Start Date", selectedDate, false)
 				@common.DateSelectorNamed("date-selector-end", "End Date", selectedDate, false)
 			}
-
-			if userType == enums.STAFF_USER_TYPE_SUPERUSER {
+		</div>
+		if userType == enums.STAFF_USER_TYPE_SUPERUSER {
+			<div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
 				<form
 					method="POST"
-					action={ utils.URL("/admin/superuser/attendance/report") }
-					class="inline"
+					action={ utils.URL("/admin/superuser/attendance/report?format=csv") }
+					class="w-full sm:w-auto"
 				>
-					<input type="hidden" name="staff-id" id="staff-id-hidden"/>
-					<input type="hidden" name="date-selector" id="date-selector-hidden"/>
-					<input type="hidden" name="date-selector-end" id="date-selector-end-hidden"/>
-
+					<input type="hidden" name="staff-id" class="staff-id-hidden"/>
+					<input type="hidden" name="date-selector" class="date-selector-hidden"/>
+					<input type="hidden" name="date-selector-end" class="date-selector-end-hidden"/>
 					<button
 						type="submit"
-						class="px-4 py-2 w-28 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors inline-flex items-center justify-center gap-2"
+						class="w-full sm:w-28 px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark transition-colors inline-flex items-center justify-center gap-2"
 						_="
 							on click
-								set #staff-id-hidden.value to #staff-id.value
-								set #date-selector-hidden.value to #date-selector.value
-								set #date-selector-end-hidden.value to #date-selector-end.value
+								set .staff-id-hidden.value to #staff-id.value
+								set .date-selector-hidden.value to #date-selector.value
+								set .date-selector-end-hidden.value to #date-selector-end.value
 								call metrics_event('admin_exec', 'export csv')
+							end
 						"
 					>
 						Export CSV
 					</button>
 				</form>
-			}
-		</div>
+				<form
+					method="POST"
+					action={ utils.URL("/admin/superuser/attendance/report?format=xlsx") }
+					class="w-full sm:w-auto"
+				>
+					<input type="hidden" name="staff-id" class="staff-id-hidden"/>
+					<input type="hidden" name="date-selector" class="date-selector-hidden"/>
+					<input type="hidden" name="date-selector-end" class="date-selector-end-hidden"/>
+					<button
+						type="submit"
+						class="w-full sm:w-28 px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark transition-colors inline-flex items-center justify-center gap-2"
+						_="
+							on click
+								set .staff-id-hidden.value to #staff-id.value
+								set .date-selector-hidden.value to #date-selector.value
+								set .date-selector-end-hidden.value to #date-selector-end.value
+								call metrics_event('admin_exec', 'export xlsx')
+							end
+						"
+					>
+						Export XLSX
+					</button>
+				</form>
+			</div>
+		}
 	</div>
 }
 
@@ -137,8 +160,8 @@ templ AdminLoginPage() {
 							</button>
 						</div>
 					</div>
-					<input type="hidden" name="location_lat" id="location_lat" value="" />
-					<input type="hidden" name="location_lng" id="location_lng" value="" />
+					<input type="hidden" name="location_lat" id="location_lat" value=""/>
+					<input type="hidden" name="location_lng" id="location_lng" value=""/>
 					<button
 						type="submit"
 						class="w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice"
@@ -218,7 +241,7 @@ templ BackToHome(url string) {
 		class="inline-flex items-center text-cchoice hover:text-cchoice_dark transition-colors"
 	>
 		<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-			<path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+			<path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
 		</svg>
 		Back to Home
 	</a>
@@ -234,14 +257,14 @@ templ In(value string, status enums.TimeInStatus) {
 	<td class="px-6 py-4 whitespace-nowrap text-sm">
 		if value != "" {
 			switch status {
-			case enums.TIME_IN_STATUS_EARLIER:
-				<span class="text-green-600 font-medium">{ value }</span>
-			case enums.TIME_IN_STATUS_ON_TIME:
-				<span class="text-blue-600 font-medium">{ value }</span>
-			case enums.TIME_IN_STATUS_LATE:
-				<span class="text-red-600 font-medium">{ value }</span>
-			default:
-				{ value }
+				case enums.TIME_IN_STATUS_EARLIER:
+					<span class="text-green-600 font-medium">{ value }</span>
+				case enums.TIME_IN_STATUS_ON_TIME:
+					<span class="text-blue-600 font-medium">{ value }</span>
+				case enums.TIME_IN_STATUS_LATE:
+					<span class="text-red-600 font-medium">{ value }</span>
+				default:
+					{ value }
 			}
 		} else {
 			<span class="text-gray-400">-</span>
@@ -253,14 +276,14 @@ templ Out(value string, status enums.TimeOutStatus) {
 	<td class="px-6 py-4 whitespace-nowrap text-sm">
 		if value != "" {
 			switch status {
-			case enums.TIME_OUT_STATUS_UNDERTIME:
-				<span class="text-green-600 font-medium">{ value }</span>
-			case enums.TIME_OUT_STATUS_ON_TIME:
-				<span class="text-blue-600 font-medium">{ value }</span>
-			case enums.TIME_OUT_STATUS_OVERTIME:
-				<span class="text-red-600 font-medium">{ value }</span>
-			default:
-				{ value }
+				case enums.TIME_OUT_STATUS_UNDERTIME:
+					<span class="text-green-600 font-medium">{ value }</span>
+				case enums.TIME_OUT_STATUS_ON_TIME:
+					<span class="text-blue-600 font-medium">{ value }</span>
+				case enums.TIME_OUT_STATUS_OVERTIME:
+					<span class="text-red-600 font-medium">{ value }</span>
+				default:
+					{ value }
 			}
 		} else {
 			<span class="text-gray-400">-</span>
@@ -314,7 +337,8 @@ templ StaffDropdown() {
 			Staffs
 		</label>
 		<select
-			id="staff-id" name="staffs"
+			id="staff-id"
+			name="staffs"
 			class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
 			hx-get={ utils.URL("/admin/staff/list") }
 			hx-trigger="load"

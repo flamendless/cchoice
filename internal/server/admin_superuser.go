@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/xuri/excelize/v2"
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
@@ -134,6 +135,13 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		}
 	}
 
+	format := r.URL.Query().Get("format")
+
+	//TODO: (Brandon) Create enums OUTPUT_FORMAT for csv, xlsx, etc values
+	if format == "" {
+		format = "csv"
+	}
+
 	reportService := services.NewReportService(s.dbRO)
 	attendances, err := reportService.GetAttendanceReport(ctx, staffID, startDate, endDate)
 	if err != nil {
@@ -146,12 +154,8 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		return
 	}
 
-	reportName := fmt.Sprintf("attendance_%s_%s_%s.csv", startDate, endDate, utils.GenString(8))
-	w.Header().Set("Content-Type", "text/csv")
+	reportName := fmt.Sprintf("attendance_%s_%s_%s.%s", startDate, endDate, utils.GenString(8), format)
 	w.Header().Set("Content-Disposition", "attachment; filename="+reportName)
-
-	writer := csv.NewWriter(w)
-	defer writer.Flush()
 
 	logs.Log().Info(
 		logtag,
@@ -161,23 +165,53 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		zap.Int64("staff id", s.sessionManager.GetInt64(ctx, SessionStaffID)),
 	)
 
-	if err := reportService.StreamReport(
-		ctx,
-		writer,
-		attendances,
-		reportName,
-		startDate,
-		endDate,
-	); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
-		return
-	}
+	switch format {
+	case "csv":
+		w.Header().Set("Content-Type", "text/csv")
+		writer := csv.NewWriter(w)
+		defer writer.Flush()
 
-	if err := writer.Error(); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
-		return
+		if err := reportService.StreamReportCSV(
+			ctx,
+			writer,
+			attendances,
+			reportName,
+			startDate,
+			endDate,
+		); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
+			return
+		}
+
+		if err := writer.Error(); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
+			return
+		}
+	case "xlsx":
+		w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+		file := excelize.NewFile()
+		defer file.Close()
+
+		if err := reportService.StreamReportXLSX(
+			ctx,
+			file,
+			attendances,
+			reportName,
+			startDate,
+			endDate,
+		); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
+			return
+		}
+
+		if err := file.Write(w); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
+			return
+		}
 	}
 }
 

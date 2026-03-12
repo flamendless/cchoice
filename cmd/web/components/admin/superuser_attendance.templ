@@ -53,7 +53,7 @@ templ AttendanceSectionSuperuserPage(title string, selectedDate string) {
 		hx-swap="innerHTML"
 		hx-indicator={ fmt.Sprintf("#%s-content", "refresh-btn") }
 	>
-		@AttendanceToolbar(title, selectedDate, enums.STAFF_USER_TYPE_SUPERUSER)
+		@AttendanceToolbar(selectedDate, enums.STAFF_USER_TYPE_SUPERUSER)
 		<div id="attendance-table">
 			//AdminSuperuserAttendanceTable
 		</div>

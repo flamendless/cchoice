@@ -82,7 +82,7 @@ templ AttendanceSectionForStaff(
 		hx-target="#staff-attendance-table"
 		hx-swap="innerHTML"
 	>
-		@AttendanceToolbar(title, selectedDate, enums.STAFF_USER_TYPE_STAFF)
+		@AttendanceToolbar(selectedDate, enums.STAFF_USER_TYPE_STAFF)
 		<div id="staff-attendance-table">
 			if record != nil {
 				<!-- @StaffAttendanceSingleTable(record) -->
