@@ -757,8 +757,6 @@ func (s *Server) adminStaffAttendanceLocationHandler(w http.ResponseWriter, r *h
 		lngStr = r.PostFormValue("lng")
 	}
 
-	date = utils.ParseAttendanceDate(date)
-
 	if latStr == "" || lngStr == "" {
 		http.Error(w, "lat and lng required", http.StatusBadRequest)
 		return
@@ -774,8 +772,10 @@ func (s *Server) adminStaffAttendanceLocationHandler(w http.ResponseWriter, r *h
 	locationJSON, _ := json.Marshal(types.Location{Lat: lat, Lng: lng})
 	location := sql.NullString{String: string(locationJSON), Valid: true}
 
-	attendanceService := services.NewAttendanceService(s.dbRO, s.dbRW)
-	_ = attendanceService.UpsertLocation(ctx, staffID, date, location)
+	_ = date
+	// date = utils.ParseAttendanceDate(date)
+	// attendanceService := services.NewAttendanceService(s.dbRO, s.dbRW)
+	// _ = attendanceService.UpsertLocation(ctx, staffID, date, location)
 
 	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
 	if err != nil {
