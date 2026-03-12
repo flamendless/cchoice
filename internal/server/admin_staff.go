@@ -177,7 +177,7 @@ func (s *Server) adminChangePasswordHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err := r.ParseForm(); err != nil {
-		redirectHX(w, utils.URLWithError("/admin/profile", "Invalid form submission"))
+		redirectHX(w, r, utils.URLWithError("/admin/profile", "Invalid form submission"))
 		return
 	}
 
@@ -185,24 +185,24 @@ func (s *Server) adminChangePasswordHandler(w http.ResponseWriter, r *http.Reque
 	confirmPassword := r.PostFormValue("confirm_password")
 
 	if newPassword == "" || confirmPassword == "" {
-		redirectHX(w, utils.URLWithError("/admin/profile", "Both password fields are required"))
+		redirectHX(w, r, utils.URLWithError("/admin/profile", "Both password fields are required"))
 		return
 	}
 
 	if !constants.PasswordRegex.MatchString(newPassword) {
-		redirectHX(w, utils.URLWithError("/admin/profile", "Invalid password format"))
+		redirectHX(w, r, utils.URLWithError("/admin/profile", "Invalid password format"))
 		return
 	}
 
 	if newPassword != confirmPassword {
-		redirectHX(w, utils.URLWithError("/admin/profile", "Passwords do not match"))
+		redirectHX(w, r, utils.URLWithError("/admin/profile", "Passwords do not match"))
 		return
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, utils.URLWithError("/admin/profile", "Failed to hash password"))
+		redirectHX(w, r, utils.URLWithError("/admin/profile", "Failed to hash password"))
 		return
 	}
 
@@ -212,11 +212,11 @@ func (s *Server) adminChangePasswordHandler(w http.ResponseWriter, r *http.Reque
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
-		redirectHX(w, utils.URLWithError("/admin/profile", "Failed to update password"))
+		redirectHX(w, r, utils.URLWithError("/admin/profile", "Failed to update password"))
 		return
 	}
 
-	redirectHX(w, utils.URLWithSuccess("/admin/profile", "Password updated successfully"))
+	redirectHX(w, r, utils.URLWithSuccess("/admin/profile", "Password updated successfully"))
 }
 
 func (s *Server) adminProfileEditFormHandler(w http.ResponseWriter, r *http.Request) {
@@ -265,7 +265,7 @@ func (s *Server) adminProfileUpdateHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	if err := r.ParseForm(); err != nil {
-		redirectHX(w, utils.URLWithError("/admin/profile", "Invalid form submission"))
+		redirectHX(w, r, utils.URLWithError("/admin/profile", "Invalid form submission"))
 		return
 	}
 
@@ -277,7 +277,7 @@ func (s *Server) adminProfileUpdateHandler(w http.ResponseWriter, r *http.Reques
 	dateHired := r.PostFormValue("date_hired")
 
 	if firstName == "" || lastName == "" || mobileNo == "" || birthdate == "" || dateHired == "" {
-		redirectHX(w, utils.URLWithError("/admin/profile", "All required fields must be filled"))
+		redirectHX(w, r, utils.URLWithError("/admin/profile", "All required fields must be filled"))
 		return
 	}
 
@@ -294,11 +294,46 @@ func (s *Server) adminProfileUpdateHandler(w http.ResponseWriter, r *http.Reques
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
-		redirectHX(w, utils.URLWithError("/admin/profile", "Failed to update profile"))
+		redirectHX(w, r, utils.URLWithError("/admin/profile", "Failed to update profile"))
 		return
 	}
 
-	redirectHX(w, utils.URLWithSuccess("/admin/profile", "Profile updated successfully"))
+	redirectHX(w, r, utils.URLWithSuccess("/admin/profile", "Profile updated successfully"))
+}
+
+func (s *Server) adminStaffListHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff List Handler]"
+	ctx := r.Context()
+
+	staff, staffID, err := s.getCurrentStaff(r.Context())
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		redirectHXLogin(w, r)
+		return
+	}
+
+	var list []models.Staff
+	switch enums.ParseStaffUserTypeToEnum(staff.UserType) {
+	case enums.STAFF_USER_TYPE_STAFF:
+		list = append(list, models.Staff{
+			ID:       s.encoder.Encode(staffID),
+			FullName: utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
+		})
+	case enums.STAFF_USER_TYPE_SUPERUSER:
+		staffs, err := s.dbRO.GetQueries().GetAllStaffs(ctx, 100)
+		if err != nil {
+			logs.Log().Error(logtag, zap.Int64("staff id", staffID), zap.Error(err))
+		}
+		for _, staff := range staffs {
+			list = append(list, models.Staff{
+				ID:       s.encoder.Encode(staff.ID),
+				FullName: utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
+			})
+		}
+	}
+	if err := compadmin.StaffOptions(list).Render(ctx, w); err != nil {
+		logs.Log().Error(logtag, zap.Int64("staff id", staffID), zap.Error(err))
+	}
 }
 
 func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -323,7 +358,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err != sql.ErrNoRows {
 			logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-			redirectHX(w, utils.URLWithError("/admin/staff", "Error encountered"))
+			redirectHX(w, r, utils.URLWithError("/admin/staff", "Error encountered"))
 			return
 		}
 	} else {
@@ -502,7 +537,7 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Unable to time in", http.StatusBadRequest)
 		return
 	}
-	redirectHX(w, utils.URLWithSuccess("/admin/staff/attendance", "Time in recorded successfully"))
+	redirectHX(w, r, utils.URLWithSuccess("/admin/staff/attendance", "Time in recorded successfully"))
 }
 
 func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request) {
@@ -518,7 +553,7 @@ func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Unable to time out", http.StatusBadRequest)
 		return
 	}
-	redirectHX(w, utils.URLWithSuccess("/admin/staff/attendance", "Time out recorded successfully"))
+	redirectHX(w, r, utils.URLWithSuccess("/admin/staff/attendance", "Time out recorded successfully"))
 }
 
 func (s *Server) adminStaffLunchBreakInHandler(w http.ResponseWriter, r *http.Request) {
@@ -541,7 +576,7 @@ func (s *Server) adminStaffLunchBreakInHandler(w http.ResponseWriter, r *http.Re
 		http.Error(w, "Unable to lunchbreak in", http.StatusBadRequest)
 		return
 	}
-	redirectHX(w, utils.URLWithSuccess("/admin/staff/attendance", "Lunch break start recorded successfully"))
+	redirectHX(w, r, utils.URLWithSuccess("/admin/staff/attendance", "Lunch break start recorded successfully"))
 }
 
 func (s *Server) adminStaffLunchBreakOutHandler(w http.ResponseWriter, r *http.Request) {
@@ -564,7 +599,7 @@ func (s *Server) adminStaffLunchBreakOutHandler(w http.ResponseWriter, r *http.R
 		http.Error(w, "Unable to lunchbreak out", http.StatusBadRequest)
 		return
 	}
-	redirectHX(w, utils.URLWithSuccess("/admin/staff/attendance", "Lunch break end recorded successfully"))
+	redirectHX(w, r, utils.URLWithSuccess("/admin/staff/attendance", "Lunch break end recorded successfully"))
 }
 
 func (s *Server) adminStaffTimeOffPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -630,7 +665,7 @@ func (s *Server) adminStaffTimeOffHandler(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Unable to time off", http.StatusBadRequest)
 		return
 	}
-	redirectHX(w, utils.URLWithSuccess("/admin/staff/time-off", "Time off request submitted"))
+	redirectHX(w, r, utils.URLWithSuccess("/admin/staff/time-off", "Time off request submitted"))
 }
 
 func (s *Server) adminStaffTimeOffTableHandler(w http.ResponseWriter, r *http.Request) {

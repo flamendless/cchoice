@@ -3,6 +3,7 @@ package utils
 import (
 	"cchoice/internal/conf"
 	"fmt"
+	"net/url"
 )
 
 func URL(path string) string {
@@ -12,12 +13,14 @@ func URL(path string) string {
 	return "/cchoice" + path
 }
 
-func URLWithSuccess(url string, message string) string {
-	return URL(fmt.Sprintf("%s?success=%s", url, message))
+func URLWithSuccess(path string, message string) string {
+	message = url.QueryEscape(message)
+	return URL(fmt.Sprintf("%s?success=%s", path, message))
 }
 
-func URLWithError(url string, message string) string {
-	return URL(fmt.Sprintf("%s?error=%s", url, message))
+func URLWithError(path string, message string) string {
+	message = url.QueryEscape(message)
+	return URL(fmt.Sprintf("%s?error=%s", path, message))
 }
 
 func MatchPath(path string, target string) bool {

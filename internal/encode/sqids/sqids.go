@@ -55,7 +55,7 @@ func (sqids Sqids) Decode(id string) int64 {
 			zap.Error(errs.ErrDecode),
 			zap.String("id", id),
 		)
-		return -1
+		return encode.INVALID
 	}
 	return int64(ids[0])
 }

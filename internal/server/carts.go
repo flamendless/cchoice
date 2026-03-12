@@ -11,12 +11,13 @@ import (
 	"sync"
 
 	compcart "cchoice/cmd/web/components/cart"
-	comppayment "cchoice/cmd/web/components/payment"
 	compcommon "cchoice/cmd/web/components/common"
+	comppayment "cchoice/cmd/web/components/payment"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/cart"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/encode"
 	"cchoice/internal/errs"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
@@ -174,7 +175,7 @@ func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
 		token,
 		checkoutlineProductIDs,
 	)
-	if err != nil || checkoutID == -1 {
+	if err != nil || checkoutID == encode.INVALID {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("token", token),
