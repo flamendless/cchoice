@@ -232,3 +232,8 @@ type StaffTimeOff struct {
 	ApprovedBy  string
 	ApprovedAt  string
 }
+
+type Staff struct {
+	ID       string
+	FullName string
+}

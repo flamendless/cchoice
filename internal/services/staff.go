@@ -10,15 +10,15 @@ import (
 )
 
 type StaffService struct {
-	db database.Service
+	dbRO database.Service
 }
 
-func NewStaffService(db database.Service) *StaffService {
-	return &StaffService{db: db}
+func NewStaffService(dbRO database.Service) *StaffService {
+	return &StaffService{dbRO: dbRO}
 }
 
 func (s *StaffService) GetByID(ctx context.Context, staffID int64) (models.AdminStaffProfile, error) {
-	staff, err := s.db.GetQueries().GetStaffByID(ctx, staffID)
+	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
 	if err != nil {
 		return models.AdminStaffProfile{}, err
 	}

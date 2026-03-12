@@ -227,6 +227,7 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth).Get("/admin/profile/edit", s.adminProfileEditFormHandler)
 	r.With(s.requireStaffAuth).Patch("/admin/profile", s.adminProfileUpdateHandler)
 	r.With(s.requireStaffAuth).Post("/admin/change-password", s.adminChangePasswordHandler)
+	r.With(s.requireStaffAuth).Get("/admin/staff/list", s.adminStaffListHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/attendance", s.adminStaffPageHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/attendance/table", s.adminStaffAttendanceTableHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/attendance/rows", s.adminStaffAttendanceRowsHandler)
@@ -269,7 +270,7 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := r.ParseForm(); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, utils.URLWithError("/admin", "Invalid form submission"))
+		redirectHX(w, r, utils.URLWithError("/admin", "Invalid form submission"))
 		return
 	}
 
@@ -277,19 +278,19 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	password := r.PostFormValue("password")
 
 	if !constants.EmailRegex.MatchString(email) {
-		redirectHX(w, utils.URLWithError("/admin", "Invalid email or password format"))
+		redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password format"))
 		return
 	}
 
 	if !constants.PasswordRegex.MatchString(password) {
-		redirectHX(w, utils.URLWithError("/admin", "Invalid email or password format"))
+		redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password format"))
 		return
 	}
 
 	staff, err := s.dbRO.GetQueries().GetStaffByEmail(ctx, email)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			redirectHX(w, utils.URLWithError("/admin", "Invalid email or password"))
+			redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password"))
 			return
 		}
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -298,7 +299,7 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(staff.Password), []byte(password)); err != nil {
-		redirectHX(w, utils.URLWithError("/admin", "Invalid email or password"))
+		redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password"))
 		return
 	}
 
@@ -324,12 +325,12 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch enums.ParseStaffUserTypeToEnum(staff.UserType) {
 	case enums.STAFF_USER_TYPE_SUPERUSER:
-		redirectHX(w, utils.URL("/admin/superuser"))
+		redirectHX(w, r, utils.URL("/admin/superuser"))
 	case enums.STAFF_USER_TYPE_STAFF:
-		redirectHX(w, utils.URL("/admin/staff"))
+		redirectHX(w, r, utils.URL("/admin/staff"))
 	default:
 		logs.Log().Warn(logtag, zap.String("got unhandled", staff.UserType))
-		redirectHX(w, utils.URL("/admin"))
+		redirectHX(w, r, utils.URL("/admin"))
 	}
 }
 

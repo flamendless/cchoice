@@ -1,11 +1,9 @@
 package server
 
 import (
-	"database/sql"
 	"encoding/csv"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 
@@ -14,7 +12,9 @@ import (
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/encode"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
@@ -102,7 +102,7 @@ func (s *Server) adminSuperuserAttendancePageHandler(w http.ResponseWriter, r *h
 	ctx := r.Context()
 	date := utils.ParseAttendanceDate(r.URL.Query().Get("date"))
 
-	if err := compadmin.AdminSuperuserAttendancePage("Staff Attendance", date).Render(ctx, w); err != nil {
+	if err := compadmin.AdminSuperuserAttendancePage("Employee Attendance", date).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -115,24 +115,34 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 
 	if err := r.ParseForm(); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
 		return
 	}
 
 	startDate := r.FormValue("date-selector")
 	endDate := r.FormValue("date-selector-end")
 	if startDate == "" || endDate == "" {
-		http.Error(w, "Missing start date or end date", http.StatusBadRequest)
+		redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", "missing start date or end date"))
 		return
 	}
 
-	attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByDateRange(ctx, queries.GetStaffAttendanceByDateRangeParams{
-		StartDate: startDate,
-		EndDate:   endDate,
-	})
+	staffID := encode.INVALID
+	if staffIDStr := r.FormValue("staff-id"); staffIDStr != "" {
+		staffID = s.encoder.Decode(staffIDStr)
+		if staffID == encode.INVALID {
+			logs.Log().Warn(logtag, zap.String("staff id", staffIDStr), zap.Error(errs.ErrDecode))
+		}
+	}
+
+	reportService := services.NewReportService(s.dbRO)
+	attendances, err := reportService.GetAttendanceReport(ctx, staffID, startDate, endDate)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, "Failed to fetch attendance data", http.StatusInternalServerError)
+		redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
+		return
+	}
+	if len(attendances) == 0 {
+		redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", "No attendance data found. Skipping report generation."))
 		return
 	}
 
@@ -143,89 +153,6 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 	writer := csv.NewWriter(w)
 	defer writer.Flush()
 
-	if err := writer.Write([]string{"Report name: " + reportName}); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if err := writer.Write([]string{fmt.Sprintf("Start date: %s | End date: %s", startDate, endDate)}); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if err := writer.Write([]string{
-		"date",
-		"name of staff",
-		"time in",
-		"time out",
-		"duration",
-		"in location and useragent",
-		"out location and useragent",
-		"lunch break start",
-		"lunch break end",
-		"lunch break duration",
-		"lunch break start location and useragent",
-		"lunch break end location and useragent",
-	}); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	for _, att := range attendances {
-		timeIn := utils.ExtractTimeToPH(att.TimeIn.String)
-		timeOut := utils.ExtractTimeToPH(att.TimeOut.String)
-
-		var duration string
-		if att.TimeIn.Valid && att.TimeOut.Valid {
-			inTime, err := time.Parse(constants.TimeLayoutHHMM, timeIn)
-			if err == nil {
-				outTime, err := time.Parse(constants.TimeLayoutHHMM, timeOut)
-				if err == nil {
-					duration = outTime.Sub(inTime).String()
-				}
-			}
-		}
-
-		inLocUA := formatLocationAndUseragent(att.InLocation.String, att.InBrowser, att.InBrowserVersion, att.InOs, att.InDevice)
-		outLocUA := formatLocationAndUseragent(att.OutLocation.String, att.OutBrowser, att.OutBrowserVersion, att.OutOs, att.OutDevice)
-
-		lbIn := utils.ExtractTimeToPH(att.LunchBreakIn.String)
-		lbOut := utils.ExtractTimeToPH(att.LunchBreakOut.String)
-
-		var lbDuration string
-		if att.LunchBreakIn.Valid && att.LunchBreakOut.Valid {
-			inTime, err := time.Parse(constants.TimeLayoutHHMM, lbIn)
-			if err == nil {
-				outTime, err := time.Parse(constants.TimeLayoutHHMM, lbOut)
-				if err == nil {
-					lbDuration = outTime.Sub(inTime).String()
-				}
-			}
-		}
-
-		lbInLocUA := formatLocationAndUseragent(att.LunchBreakInLocation.String, att.LunchBreakInBrowser, att.LunchBreakInBrowserVersion, att.LunchBreakInOs, att.LunchBreakInDevice)
-		lbOutLocUA := formatLocationAndUseragent(att.LunchBreakOutLocation.String, att.LunchBreakOutBrowser, att.LunchBreakOutBrowserVersion, att.LunchBreakOutOs, att.LunchBreakOutDevice)
-
-		if err := writer.Write([]string{
-			att.ForDate,
-			utils.BuildFullName(att.FirstName, att.MiddleName.String, att.LastName),
-			timeIn,
-			timeOut,
-			duration,
-			inLocUA,
-			outLocUA,
-			lbIn,
-			lbOut,
-			lbDuration,
-			lbInLocUA,
-			lbOutLocUA,
-		}); err != nil {
-			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}
-
 	logs.Log().Info(
 		logtag,
 		zap.String("file", reportName),
@@ -234,33 +161,24 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		zap.Int64("staff id", s.sessionManager.GetInt64(ctx, SessionStaffID)),
 	)
 
-	if err := writer.Error(); err != nil {
+	if err := reportService.StreamReport(
+		ctx,
+		writer,
+		attendances,
+		reportName,
+		startDate,
+		endDate,
+	); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, "Failed to write CSV", http.StatusInternalServerError)
+		redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
 		return
 	}
-}
 
-func formatLocationAndUseragent(location string, browser, browserVersion, os, device sql.NullString) string {
-	var result string
-	if location != "" {
-		if lat, long, ok := utils.ParseLocation(sql.NullString{
-			String: location,
-			Valid:  true,
-		}); ok {
-			result = fmt.Sprintf("(%f,%f)", lat, long)
-		}
+	if err := writer.Error(); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
+		return
 	}
-	if browser.Valid && browser.String != "" {
-		if result != "" {
-			result += " - "
-		}
-		result += fmt.Sprintf("%s/%s/%s", browser.String, os.String, device.String)
-	}
-	if result == "" {
-		return "-"
-	}
-	return result
 }
 
 func (s *Server) adminSuperuserTimeOffPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -346,7 +264,7 @@ func (s *Server) adminSuperuserTimeOffApproveHandler(w http.ResponseWriter, r *h
 
 	timeOffIDStr := chi.URLParam(r, "id")
 	decodedTimeOffID := s.encoder.Decode(timeOffIDStr)
-	if decodedTimeOffID == -1 {
+	if decodedTimeOffID == encode.INVALID {
 		logs.LogCtx(ctx).Error(logtag, zap.String("time_off_id", timeOffIDStr))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -363,7 +281,7 @@ func (s *Server) adminSuperuserTimeOffApproveHandler(w http.ResponseWriter, r *h
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	redirectHX(w, utils.URLWithSuccess("/admin/superuser/time-off", "Time off request approved"))
+	redirectHX(w, r, utils.URLWithSuccess("/admin/superuser/time-off", "Time off request approved"))
 }
 
 func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *http.Request) {
@@ -379,7 +297,7 @@ func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *ht
 
 	timeOffIDStr := chi.URLParam(r, "id")
 	decodedTimeOffID := s.encoder.Decode(timeOffIDStr)
-	if decodedTimeOffID == -1 {
+	if decodedTimeOffID == encode.INVALID {
 		logs.LogCtx(ctx).Error(logtag, zap.String("time_off_id", timeOffIDStr))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -396,5 +314,5 @@ func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *ht
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	redirectHX(w, utils.URLWithSuccess("/admin/superuser/time-off", "Time off request cancelled"))
+	redirectHX(w, r, utils.URLWithSuccess("/admin/superuser/time-off", "Time off request cancelled"))
 }

@@ -301,7 +301,7 @@ SELECT
     created_at,
     updated_at
 FROM tbl_staffs
-WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+WHERE deleted_at = '1970-01-01 00:00:00+00:00' AND user_type = 'STAFF'
 ORDER BY last_name ASC, first_name ASC
 LIMIT ?
 `
@@ -487,7 +487,7 @@ LEFT JOIN tbl_useragents lunch_break_in_ua ON lunch_break_in_ua.id = sa.lunch_br
 LEFT JOIN tbl_useragents lunch_break_out_ua ON lunch_break_out_ua.id = sa.lunch_break_out_useragent_id
 WHERE
     sa.for_date >= ?1
-	AND sa.for_date <= ?2
+    AND sa.for_date <= ?2
 ORDER BY sa.for_date ASC, s.last_name ASC, s.first_name ASC
 `
 
@@ -544,6 +544,162 @@ func (q *Queries) GetStaffAttendanceByDateRange(ctx context.Context, arg GetStaf
 	var items []GetStaffAttendanceByDateRangeRow
 	for rows.Next() {
 		var i GetStaffAttendanceByDateRangeRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.StaffID,
+			&i.ForDate,
+			&i.TimeIn,
+			&i.TimeOut,
+			&i.InLocation,
+			&i.OutLocation,
+			&i.InUseragentID,
+			&i.OutUseragentID,
+			&i.LunchBreakIn,
+			&i.LunchBreakOut,
+			&i.LunchBreakInLocation,
+			&i.LunchBreakOutLocation,
+			&i.LunchBreakInUseragentID,
+			&i.LunchBreakOutUseragentID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
+			&i.InBrowser,
+			&i.InBrowserVersion,
+			&i.InOs,
+			&i.InDevice,
+			&i.OutBrowser,
+			&i.OutBrowserVersion,
+			&i.OutOs,
+			&i.OutDevice,
+			&i.LunchBreakInBrowser,
+			&i.LunchBreakInBrowserVersion,
+			&i.LunchBreakInOs,
+			&i.LunchBreakInDevice,
+			&i.LunchBreakOutBrowser,
+			&i.LunchBreakOutBrowserVersion,
+			&i.LunchBreakOutOs,
+			&i.LunchBreakOutDevice,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getStaffAttendanceByDateRangeAndStaffID = `-- name: GetStaffAttendanceByDateRangeAndStaffID :many
+SELECT
+    sa.id,
+    sa.staff_id,
+    sa.for_date,
+    sa.time_in,
+    sa.time_out,
+    sa.in_location,
+    sa.out_location,
+    sa.in_useragent_id,
+    sa.out_useragent_id,
+    sa.lunch_break_in,
+    sa.lunch_break_out,
+    sa.lunch_break_in_location,
+    sa.lunch_break_out_location,
+    sa.lunch_break_in_useragent_id,
+    sa.lunch_break_out_useragent_id,
+    sa.created_at,
+    sa.updated_at,
+    s.first_name,
+    s.middle_name,
+    s.last_name,
+    in_ua.browser as in_browser,
+    in_ua.browser_version as in_browser_version,
+    in_ua.os as in_os,
+    in_ua.device as in_device,
+    out_ua.browser as out_browser,
+    out_ua.browser_version as out_browser_version,
+    out_ua.os as out_os,
+    out_ua.device as out_device,
+    lunch_break_in_ua.browser as lunch_break_in_browser,
+    lunch_break_in_ua.browser_version as lunch_break_in_browser_version,
+    lunch_break_in_ua.os as lunch_break_in_os,
+    lunch_break_in_ua.device as lunch_break_in_device,
+    lunch_break_out_ua.browser as lunch_break_out_browser,
+    lunch_break_out_ua.browser_version as lunch_break_out_browser_version,
+    lunch_break_out_ua.os as lunch_break_out_os,
+    lunch_break_out_ua.device as lunch_break_out_device
+FROM tbl_staff_attendances sa
+INNER JOIN tbl_staffs s ON s.id = sa.staff_id
+LEFT JOIN tbl_useragents in_ua ON in_ua.id = sa.in_useragent_id
+LEFT JOIN tbl_useragents out_ua ON out_ua.id = sa.out_useragent_id
+LEFT JOIN tbl_useragents lunch_break_in_ua ON lunch_break_in_ua.id = sa.lunch_break_in_useragent_id
+LEFT JOIN tbl_useragents lunch_break_out_ua ON lunch_break_out_ua.id = sa.lunch_break_out_useragent_id
+WHERE
+    sa.staff_id = ?1
+    AND sa.for_date >= ?2
+    AND sa.for_date <= ?3
+ORDER BY sa.for_date ASC, s.last_name ASC, s.first_name ASC
+`
+
+type GetStaffAttendanceByDateRangeAndStaffIDParams struct {
+	StaffID   int64
+	StartDate string
+	EndDate   string
+}
+
+type GetStaffAttendanceByDateRangeAndStaffIDRow struct {
+	ID                          int64
+	StaffID                     int64
+	ForDate                     string
+	TimeIn                      sql.NullString
+	TimeOut                     sql.NullString
+	InLocation                  sql.NullString
+	OutLocation                 sql.NullString
+	InUseragentID               sql.NullInt64
+	OutUseragentID              sql.NullInt64
+	LunchBreakIn                sql.NullString
+	LunchBreakOut               sql.NullString
+	LunchBreakInLocation        sql.NullString
+	LunchBreakOutLocation       sql.NullString
+	LunchBreakInUseragentID     sql.NullInt64
+	LunchBreakOutUseragentID    sql.NullInt64
+	CreatedAt                   string
+	UpdatedAt                   string
+	FirstName                   string
+	MiddleName                  sql.NullString
+	LastName                    string
+	InBrowser                   sql.NullString
+	InBrowserVersion            sql.NullString
+	InOs                        sql.NullString
+	InDevice                    sql.NullString
+	OutBrowser                  sql.NullString
+	OutBrowserVersion           sql.NullString
+	OutOs                       sql.NullString
+	OutDevice                   sql.NullString
+	LunchBreakInBrowser         sql.NullString
+	LunchBreakInBrowserVersion  sql.NullString
+	LunchBreakInOs              sql.NullString
+	LunchBreakInDevice          sql.NullString
+	LunchBreakOutBrowser        sql.NullString
+	LunchBreakOutBrowserVersion sql.NullString
+	LunchBreakOutOs             sql.NullString
+	LunchBreakOutDevice         sql.NullString
+}
+
+func (q *Queries) GetStaffAttendanceByDateRangeAndStaffID(ctx context.Context, arg GetStaffAttendanceByDateRangeAndStaffIDParams) ([]GetStaffAttendanceByDateRangeAndStaffIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getStaffAttendanceByDateRangeAndStaffID, arg.StaffID, arg.StartDate, arg.EndDate)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetStaffAttendanceByDateRangeAndStaffIDRow
+	for rows.Next() {
+		var i GetStaffAttendanceByDateRangeAndStaffIDRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.StaffID,

@@ -5,11 +5,22 @@ import (
 	"net/http"
 )
 
-func redirectHX(w http.ResponseWriter, url string) {
-	w.Header().Set("HX-Redirect", url)
-	w.WriteHeader(http.StatusOK)
+func isHTMX(r *http.Request) bool {
+	return r.Header.Get("HX-Request") == "true"
+}
+
+func redirectHX(w http.ResponseWriter, r *http.Request, url string) {
+	if isHTMX(r) {
+		w.Header().Set("HX-Redirect", url)
+	} else {
+		http.Redirect(w, r, url, http.StatusSeeOther)
+	}
 }
 
 func redirectHXLogin(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+	if isHTMX(r) {
+		w.Header().Set("HX-Redirect", utils.URL("/admin"))
+	} else {
+		http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+	}
 }
