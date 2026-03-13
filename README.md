@@ -1,6 +1,7 @@
 # Setup
 
 - `git clone --recurse-submodules --shallow-submodules -j8 <repo url>`
+- `cd cchoice`
 - `go mod download`
 - `go mod tidy`
 - `go install tool`
@@ -21,6 +22,7 @@ See `.env.sample`
 
 # Running
 
+Users should set their own `BROWSER` env var in their shell. Example: `export BROWSER=chrome`
 - run `mage serve`
 - or `mage serveweb` for faster iteration for frontend changes only
 

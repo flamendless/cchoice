@@ -299,7 +299,7 @@ func BuildGoose() error {
 }
 
 func Setup() error {
-	const pathPreCommitHook = "./git/hooks/pre-commit"
+	const pathPreCommitHook = "./.git/hooks/pre-commit"
 	if _, err := os.Stat(pathPreCommitHook); os.IsNotExist(err) {
 		if err := run(Command{Type: CmdExec, Cmd: "cp", Args: []string{"./scripts/pre-commit-unit-test.sh", pathPreCommitHook}}); err != nil {
 			return err
