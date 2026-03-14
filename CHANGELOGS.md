@@ -2,6 +2,26 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.16"></a>
+## [release-v1.1.16] - 2026-03-14
+### Bugfix
+- Remove upsert location
+
+### Docs
+- Update guide and fix typo
+- Release v1.1.15
+
+### Script
+- Optimize gen* by checking for changes
+- Fixed go build flag ordering and tag formatting
+
+### Server
+- Report - add total days and late data
+
+### Web
+- Update table when a filter is changed
+
+
 <a name="release-v1.1.15"></a>
 ## [release-v1.1.15] - 2026-03-12
 ### Docs
