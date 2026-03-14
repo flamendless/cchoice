@@ -569,10 +569,27 @@ func DepsMac() error {
 }
 
 func GenSQL() error {
+	hasChanges, err := hasExtChanges("*.sql")
+	if err != nil {
+		return fmt.Errorf("failed to check for sql file changes: %w", err)
+	}
+	if !hasChanges {
+		fmt.Println("No changes in sql files detected. Skipping tests.")
+		return nil
+	}
 	return run(Command{Type: CmdExec, Cmd: "go", Args: []string{"tool", "sqlc", "generate"}})
 }
 
 func GenTempl() error {
+	hasChanges, err := hasExtChanges("*.templ")
+	if err != nil {
+		return fmt.Errorf("failed to check for templ file changes: %w", err)
+	}
+	if !hasChanges {
+		fmt.Println("No changes in templ files detected. Skipping tests.")
+		return nil
+	}
+
 	if err := run(Command{
 		Type: CmdExec,
 		Cmd:  "./tailwindcss",
@@ -661,30 +678,17 @@ func SC() error {
 	return nil
 }
 
-func hasGoFileChanges() (bool, error) {
-	cmd := exec.Command("git", "diff", "--name-only", "HEAD", "--", "*.go")
+func hasExtChanges(ext string) (bool, error) {
+	cmd := exec.Command("git", "diff", "--name-only", "HEAD", "--", ext)
 	output, err := cmd.Output()
 	if err != nil {
-		cmd = exec.Command("git", "diff", "--name-only", "--cached", "--", "*.go")
+		cmd = exec.Command("git", "diff", "--name-only", "--cached", "--", ext)
 		output, err = cmd.Output()
 		if err != nil {
 			return true, nil
 		}
 	}
 	return strings.TrimSpace(string(output)) != "", nil
-}
-
-func hasPackageChanges(packages []string) (bool, error) {
-	for _, pkg := range packages {
-		changed, err := hasPackageChanged(pkg)
-		if err != nil {
-			return false, err
-		}
-		if changed {
-			return true, nil
-		}
-	}
-	return false, nil
 }
 
 func hasPackageChanged(pkg string) (bool, error) {
@@ -704,7 +708,7 @@ func hasPackageChanged(pkg string) (bool, error) {
 }
 
 func TestAll() error {
-	hasChanges, err := hasGoFileChanges()
+	hasChanges, err := hasExtChanges("*.go")
 	if err != nil {
 		return fmt.Errorf("failed to check for Go file changes: %w", err)
 	}
