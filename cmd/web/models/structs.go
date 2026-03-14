@@ -6,6 +6,7 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/utils"
+	"time"
 )
 
 type HeaderRowText struct {
@@ -158,6 +159,7 @@ type AttendanceStat struct {
 	OutStatus     enums.TimeOutStatus
 	Duration      string
 	DurationColor string
+	InLate        time.Duration
 	InShop        bool
 	OutShop       bool
 	InLocation    string

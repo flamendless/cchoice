@@ -597,7 +597,13 @@ func GenTempl() error {
 	}); err != nil {
 		return err
 	}
-	return run(Command{Type: CmdExec, Cmd: "go", Args: []string{"tool", "templ", "generate", "templ", "-v"}})
+	return run(Command{Type: CmdExec, Cmd: "go", Args: []string{
+		"tool",
+		"templ",
+		"generate",
+		"--path=cmd/web/components",
+		"-v",
+	}})
 }
 
 func GenAll() error {

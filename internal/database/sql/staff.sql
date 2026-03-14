@@ -38,7 +38,6 @@ SELECT
     user_type,
     email,
     mobile_no,
-    password,
     require_in_shop,
     created_at,
     updated_at

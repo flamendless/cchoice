@@ -3,6 +3,7 @@ package services
 import (
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
+	"cchoice/internal/encode"
 	"cchoice/internal/logs"
 	"cchoice/internal/staff"
 	"cchoice/internal/utils"
@@ -17,17 +18,25 @@ import (
 )
 
 type ReportService struct {
-	dbRO database.Service
+	encoder encode.IEncode
+	dbRO    database.Service
 }
 
-func NewReportService(dbRO database.Service) *ReportService {
-	return &ReportService{dbRO: dbRO}
+func NewReportService(
+	encoder encode.IEncode,
+	dbRO database.Service,
+) *ReportService {
+	return &ReportService{
+		encoder: encoder,
+		dbRO:    dbRO,
+	}
 }
 
 func (s *ReportService) StreamReportCSV(
 	ctx context.Context,
 	writer *csv.Writer,
 	data []staff.StaffRow,
+	staffID int64,
 	filename string,
 	startDate string,
 	endDate string,
@@ -41,6 +50,33 @@ func (s *ReportService) StreamReportCSV(
 	if err := writer.Write([]string{"End date: " + endDate}); err != nil {
 		return err
 	}
+
+	if staffID != encode.INVALID {
+		totalDays, err := utils.GetTotalDaysBetweenDates(startDate, endDate)
+		if err != nil {
+			return err
+		}
+		if err := writer.Write([]string{fmt.Sprintf("Total days (present/total): %d/%d", len(data), totalDays)}); err != nil {
+			return err
+		}
+
+		attendanceService := NewAttendanceService(s.encoder, s.dbRO, nil)
+		staffDB, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
+		if err != nil {
+			return err
+		}
+
+		var totalMinutesLate float64
+		for _, d := range data {
+			c := attendanceService.ComputeData(staff.StaffRowBase(staffDB), d)
+			totalMinutesLate += c.Attendance.InLate.Minutes()
+		}
+
+		if err := writer.Write([]string{fmt.Sprintf("Total minutes late: %.2f", totalMinutesLate)}); err != nil {
+			return err
+		}
+	}
+
 	if err := writer.Write([]string{
 		"date",
 		"name of staff",
@@ -121,49 +157,68 @@ func (s *ReportService) StreamReportCSV(
 	return nil
 }
 
-func formatLocationAndUseragent(location string, browser, browserVersion, os, device sql.NullString) string {
-	var result string
-	if location != "" {
-		if lat, long, ok := utils.ParseLocation(sql.NullString{
-			String: location,
-			Valid:  true,
-		}); ok {
-			result = fmt.Sprintf("(%f,%f)", lat, long)
-		}
-	}
-	if browser.Valid && browser.String != "" {
-		if result != "" {
-			result += " - "
-		}
-		result += fmt.Sprintf("%s/%s/%s", browser.String, os.String, device.String)
-	}
-	return result
-}
-
 func (s *ReportService) StreamReportXLSX(
 	ctx context.Context,
 	file *excelize.File,
 	data []staff.StaffRow,
+	staffID int64,
 	filename string,
 	startDate string,
 	endDate string,
 ) error {
+	const sheet = "Sheet1"
 	row := 1
 
-	if err := file.SetCellValue("Sheet1", fmt.Sprintf("A%d", row), "Report name: "+filename); err != nil {
+	if err := file.SetCellValue(sheet, fmt.Sprintf("A%d", row), "Report name: "+filename); err != nil {
 		return err
 	}
 	row++
 
-	if err := file.SetCellValue("Sheet1", fmt.Sprintf("A%d", row), "Start date: "+startDate); err != nil {
+	if err := file.SetCellValue(sheet, fmt.Sprintf("A%d", row), "Start date: "+startDate); err != nil {
 		return err
 	}
 	row++
 
-	if err := file.SetCellValue("Sheet1", fmt.Sprintf("A%d", row), "End date: "+endDate); err != nil {
+	if err := file.SetCellValue(sheet, fmt.Sprintf("A%d", row), "End date: "+endDate); err != nil {
 		return err
 	}
 	row++
+
+	if staffID != encode.INVALID {
+		totalDays, err := utils.GetTotalDaysBetweenDates(startDate, endDate)
+		if err != nil {
+			return err
+		}
+		if err := file.SetCellValue(
+			sheet,
+			fmt.Sprintf("A%d", row),
+			fmt.Sprintf("Total days (present/total): %d/%d", len(data), totalDays),
+		); err != nil {
+			return err
+		}
+		row++
+
+		attendanceService := NewAttendanceService(s.encoder, s.dbRO, nil)
+		staffDB, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
+		if err != nil {
+			return err
+		}
+
+		var totalMinutesLate float64
+		for _, d := range data {
+			c := attendanceService.ComputeData(staff.StaffRowBase(staffDB), d)
+			totalMinutesLate += c.Attendance.InLate.Minutes()
+		}
+
+		if err := file.SetCellValue(
+			sheet,
+			fmt.Sprintf("A%d", row),
+			fmt.Sprintf("Total minutes late: %.2f", totalMinutesLate),
+		); err != nil {
+			return err
+		}
+		row++
+	}
 
 	headers := []string{
 		"date",
@@ -262,4 +317,26 @@ func (s *ReportService) StreamReportXLSX(
 	}
 
 	return nil
+}
+
+func formatLocationAndUseragent(
+	location string,
+	browser, browserVersion, os, device sql.NullString,
+) string {
+	var result string
+	if location != "" {
+		if lat, long, ok := utils.ParseLocation(sql.NullString{
+			String: location,
+			Valid:  true,
+		}); ok {
+			result = fmt.Sprintf("(%f,%f)", lat, long)
+		}
+	}
+	if browser.Valid && browser.String != "" {
+		if result != "" {
+			result += " - "
+		}
+		result += fmt.Sprintf("%s/%s/%s", browser.String, os.String, device.String)
+	}
+	return result
 }

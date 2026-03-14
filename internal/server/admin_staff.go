@@ -12,10 +12,10 @@ import (
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
-	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/services"
+	staffmodels "cchoice/internal/staff"
 	"cchoice/internal/types"
 	"cchoice/internal/utils"
 
@@ -23,49 +23,6 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )
-
-func buildStaffDayAttendance(
-	encoder encode.IEncode,
-	staff queries.GetStaffByIDRow,
-	att queries.GetStaffAttendanceByDateRow,
-) models.Attendance {
-	schedIn, schedOut := "", ""
-	if staff.TimeInSchedule.Valid {
-		schedIn = staff.TimeInSchedule.String
-	}
-	if staff.TimeOutSchedule.Valid {
-		schedOut = staff.TimeOutSchedule.String
-	}
-
-	timeIn, timeOut := utils.ExtractTimeToPH(att.TimeIn.String), utils.ExtractTimeToPH(att.TimeOut.String)
-	lunchbreakIn, lunchBreakOut := utils.ExtractTimeToPH(att.LunchBreakIn.String), utils.ExtractTimeToPH(att.LunchBreakOut.String)
-	c := computeInOutStatus(timeIn, timeOut, schedIn, schedOut)
-	lunchbreak := computeInOutStatus(lunchbreakIn, lunchBreakOut, "12:00", "13:00")
-
-	return models.Attendance{
-		StaffID:          encoder.Encode(att.StaffID),
-		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
-		Date:             att.ForDate,
-		ScheduledTimeIn:  schedIn,
-		ScheduledTimeOut: schedOut,
-		Attendance: models.AttendanceStat{
-			In:            timeIn,
-			Out:           timeOut,
-			InStatus:      c.timeInStatus,
-			OutStatus:     c.timeOutStatus,
-			Duration:      c.duration,
-			DurationColor: c.durationColor,
-		},
-		LunchBreak: models.AttendanceStat{
-			In:            lunchbreakIn,
-			Out:           lunchBreakOut,
-			InStatus:      lunchbreak.timeInStatus,
-			OutStatus:     lunchbreak.timeOutStatus,
-			Duration:      lunchbreak.duration,
-			DurationColor: lunchbreak.durationColor,
-		},
-	}
-}
 
 func (s *Server) adminStaffHomeHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Home Handler]"
@@ -366,7 +323,30 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		hasTimeOut = attendance.TimeOut.Valid
 		hasLunchBreakIn = attendance.LunchBreakIn.Valid
 		hasLunchBreakOut = attendance.LunchBreakOut.Valid
-		rec := buildStaffDayAttendance(s.encoder, staff, attendance)
+
+		attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, nil)
+		rec := attendanceService.ComputeData(
+			staffmodels.StaffRowBase(staff),
+			staffmodels.StaffRow{
+				ID:                          staffID,
+				StaffID:                     staffID,
+				ForDate:                     attendance.ForDate,
+				TimeIn:                      attendance.TimeIn,
+				TimeOut:                     attendance.TimeOut,
+				InLocation:                  attendance.InLocation,
+				OutLocation:                 attendance.OutLocation,
+				InUseragentID:               attendance.InUseragentID,
+				OutUseragentID:              attendance.OutUseragentID,
+				LunchBreakIn:                attendance.LunchBreakIn,
+				LunchBreakOut:               attendance.LunchBreakOut,
+				LunchBreakInLocation:        attendance.LunchBreakInLocation,
+				LunchBreakOutLocation:       attendance.LunchBreakOutLocation,
+				LunchBreakInUseragentID:     attendance.LunchBreakInUseragentID,
+				LunchBreakOutUseragentID:    attendance.LunchBreakOutUseragentID,
+				CreatedAt:                   attendance.CreatedAt,
+				UpdatedAt:                   attendance.UpdatedAt,
+			},
+		)
 		myAttendance = &rec
 	}
 
@@ -484,7 +464,29 @@ func (s *Server) adminStaffAttendanceTableHandler(w http.ResponseWriter, r *http
 	})
 	var record *models.Attendance
 	if err == nil {
-		rec := buildStaffDayAttendance(s.encoder, staff, attendance)
+		attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, nil)
+		rec := attendanceService.ComputeData(
+			staffmodels.StaffRowBase(staff),
+			staffmodels.StaffRow{
+				ID:                          staffID,
+				StaffID:                     staffID,
+				ForDate:                     attendance.ForDate,
+				TimeIn:                      attendance.TimeIn,
+				TimeOut:                     attendance.TimeOut,
+				InLocation:                  attendance.InLocation,
+				OutLocation:                 attendance.OutLocation,
+				InUseragentID:               attendance.InUseragentID,
+				OutUseragentID:              attendance.OutUseragentID,
+				LunchBreakIn:                attendance.LunchBreakIn,
+				LunchBreakOut:               attendance.LunchBreakOut,
+				LunchBreakInLocation:        attendance.LunchBreakInLocation,
+				LunchBreakOutLocation:       attendance.LunchBreakOutLocation,
+				LunchBreakInUseragentID:     attendance.LunchBreakInUseragentID,
+				LunchBreakOutUseragentID:    attendance.LunchBreakOutUseragentID,
+				CreatedAt:                   attendance.CreatedAt,
+				UpdatedAt:                   attendance.UpdatedAt,
+			},
+		)
 		record = &rec
 	}
 
@@ -513,7 +515,29 @@ func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.
 	})
 	var record *models.Attendance
 	if err == nil {
-		rec := buildStaffDayAttendance(s.encoder, staff, attendance)
+		attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, nil)
+		rec := attendanceService.ComputeData(
+			staffmodels.StaffRowBase(staff),
+			staffmodels.StaffRow{
+				ID:                          staffID,
+				StaffID:                     staffID,
+				ForDate:                     attendance.ForDate,
+				TimeIn:                      attendance.TimeIn,
+				TimeOut:                     attendance.TimeOut,
+				InLocation:                  attendance.InLocation,
+				OutLocation:                 attendance.OutLocation,
+				InUseragentID:               attendance.InUseragentID,
+				OutUseragentID:              attendance.OutUseragentID,
+				LunchBreakIn:                attendance.LunchBreakIn,
+				LunchBreakOut:               attendance.LunchBreakOut,
+				LunchBreakInLocation:        attendance.LunchBreakInLocation,
+				LunchBreakOutLocation:       attendance.LunchBreakOutLocation,
+				LunchBreakInUseragentID:     attendance.LunchBreakInUseragentID,
+				LunchBreakOutUseragentID:    attendance.LunchBreakOutUseragentID,
+				CreatedAt:                   attendance.CreatedAt,
+				UpdatedAt:                   attendance.UpdatedAt,
+			},
+		)
 		record = &rec
 	}
 
@@ -531,7 +555,7 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
-	svc := services.NewAttendanceService(s.dbRO, s.dbRW)
+	svc := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
 	err := svc.TimeIn(ctx, staffID, date, now, location, useragentID)
 	if err != nil {
 		http.Error(w, "Unable to time in", http.StatusBadRequest)
@@ -547,7 +571,7 @@ func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
-	svc := services.NewAttendanceService(s.dbRO, s.dbRW)
+	svc := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
 	err := svc.TimeOut(ctx, staffID, date, now, location, useragentID)
 	if err != nil {
 		http.Error(w, "Unable to time out", http.StatusBadRequest)
@@ -564,7 +588,7 @@ func (s *Server) adminStaffLunchBreakInHandler(w http.ResponseWriter, r *http.Re
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
-	svc := services.NewAttendanceService(s.dbRO, s.dbRW)
+	svc := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
 	err := svc.LunchBreakIn(ctx, staffID, date, now, location, useragentID)
 	if err != nil {
 		logs.LogCtx(ctx).Error(
@@ -587,7 +611,7 @@ func (s *Server) adminStaffLunchBreakOutHandler(w http.ResponseWriter, r *http.R
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
-	svc := services.NewAttendanceService(s.dbRO, s.dbRW)
+	svc := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
 	err := svc.LunchBreakOut(ctx, staffID, date, now, location, useragentID)
 	if err != nil {
 		logs.LogCtx(ctx).Error(
@@ -651,7 +675,7 @@ func (s *Server) adminStaffTimeOffHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
-	svc := services.NewAttendanceService(s.dbRO, s.dbRW)
+	svc := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
 	if err := svc.TimeOff(
 		ctx,
 		staffID,
@@ -774,7 +798,7 @@ func (s *Server) adminStaffAttendanceLocationHandler(w http.ResponseWriter, r *h
 
 	_ = date
 	// date = utils.ParseAttendanceDate(date)
-	// attendanceService := services.NewAttendanceService(s.dbRO, s.dbRW)
+	// attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
 	// _ = attendanceService.UpsertLocation(ctx, staffID, date, location)
 
 	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)

@@ -2,6 +2,25 @@ package staff
 
 import "database/sql"
 
+type StaffRowBase struct {
+	ID              int64
+	FirstName       string
+	MiddleName      sql.NullString
+	LastName        string
+	Birthdate       string
+	Sex             string
+	DateHired       string
+	TimeInSchedule  sql.NullString
+	TimeOutSchedule sql.NullString
+	Position        string
+	UserType        string
+	Email           string
+	MobileNo        string
+	RequireInShop   bool
+	CreatedAt       string
+	UpdatedAt       string
+}
+
 type StaffRow struct {
 	ID                          int64
 	StaffID                     int64
