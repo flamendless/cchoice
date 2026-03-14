@@ -5,20 +5,46 @@ import (
 	"database/sql"
 	"time"
 
+	"cchoice/cmd/web/models"
+	"cchoice/internal/conf"
+	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
+	"cchoice/internal/logs"
 	"cchoice/internal/staff"
+	"cchoice/internal/types"
+	"cchoice/internal/utils"
+
+	"go.uber.org/zap"
 )
 
 type AttendanceService struct {
-	dbRO database.Service
-	dbRW database.Service
+	encoder      encode.IEncode
+	dbRO         database.Service
+	dbRW         database.Service
+	shopLocation types.Location
 }
 
-func NewAttendanceService(ro, rw database.Service) *AttendanceService {
-	return &AttendanceService{dbRO: ro, dbRW: rw}
+type attendanceStatusResult struct {
+	inStatus      enums.TimeInStatus
+	outStatus     enums.TimeOutStatus
+	duration      string
+	durationColor string
+	inLate        time.Duration
+}
+
+func NewAttendanceService(
+	encoder encode.IEncode,
+	ro, rw database.Service,
+) *AttendanceService {
+	return &AttendanceService{
+		encoder:      encoder,
+		dbRO:         ro,
+		dbRW:         rw,
+		shopLocation: conf.Conf().Settings.ShopLocation,
+	}
 }
 
 func (s *AttendanceService) TimeIn(
@@ -272,3 +298,167 @@ func (s *AttendanceService) GetAttendance(
 	return data, nil
 }
 
+func (s *AttendanceService) ComputeData(
+	staff staff.StaffRowBase,
+	att staff.StaffRow,
+) models.Attendance {
+	schedIn, schedOut := "", ""
+	if staff.TimeInSchedule.Valid {
+		schedIn = staff.TimeInSchedule.String
+	}
+	if staff.TimeOutSchedule.Valid {
+		schedOut = staff.TimeOutSchedule.String
+	}
+	timeIn, timeOut := utils.ExtractTimeToPH(att.TimeIn.String), utils.ExtractTimeToPH(att.TimeOut.String)
+	lunchbreakIn, lunchbreakOut := utils.ExtractTimeToPH(att.LunchBreakIn.String), utils.ExtractTimeToPH(att.LunchBreakOut.String)
+	c := computeInOutStatus(timeIn, timeOut, schedIn, schedOut)
+	lunchbreak := computeInOutStatus(lunchbreakIn, lunchbreakOut, "12:00", "13:00")
+
+	var inShop, outShop bool
+	if lat, lng, ok := utils.ParseLocation(att.InLocation); ok && s.shopLocation.RadiusMeters > 0 {
+		inShop = utils.IsWithinRadius(lat, lng, s.shopLocation.Lat, s.shopLocation.Lng, s.shopLocation.RadiusMeters)
+	}
+	if lat, lng, ok := utils.ParseLocation(att.OutLocation); ok && s.shopLocation.RadiusMeters > 0 {
+		outShop = utils.IsWithinRadius(lat, lng, s.shopLocation.Lat, s.shopLocation.Lng, s.shopLocation.RadiusMeters)
+	}
+
+	var lbInShop, lbOutShop bool
+	if lat, lng, ok := utils.ParseLocation(att.LunchBreakInLocation); ok && s.shopLocation.RadiusMeters > 0 {
+		lbInShop = utils.IsWithinRadius(lat, lng, s.shopLocation.Lat, s.shopLocation.Lng, s.shopLocation.RadiusMeters)
+	}
+	if lat, lng, ok := utils.ParseLocation(att.LunchBreakOutLocation); ok && s.shopLocation.RadiusMeters > 0 {
+		lbOutShop = utils.IsWithinRadius(lat, lng, s.shopLocation.Lat, s.shopLocation.Lng, s.shopLocation.RadiusMeters)
+	}
+
+	var inDeviceInfo, outDeviceInfo, lbInDeviceInfo, lbOutDeviceInfo string
+	if att.InBrowser.Valid {
+		inDeviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
+			Browser:        att.InBrowser.String,
+			BrowserVersion: att.InBrowserVersion.String,
+			OS:             att.InOs.String,
+			Device:         att.InDevice.String,
+		})
+	}
+	if att.OutBrowser.Valid {
+		outDeviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
+			Browser:        att.OutBrowser.String,
+			BrowserVersion: att.OutBrowserVersion.String,
+			OS:             att.OutOs.String,
+			Device:         att.OutDevice.String,
+		})
+	}
+	if att.LunchBreakInBrowser.Valid {
+		lbInDeviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
+			Browser:        att.LunchBreakInBrowser.String,
+			BrowserVersion: att.LunchBreakInBrowserVersion.String,
+			OS:             att.LunchBreakInOs.String,
+			Device:         att.LunchBreakInDevice.String,
+		})
+	}
+	if att.LunchBreakOutBrowser.Valid {
+		lbOutDeviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
+			Browser:        att.LunchBreakOutBrowser.String,
+			BrowserVersion: att.LunchBreakOutBrowserVersion.String,
+			OS:             att.LunchBreakOutOs.String,
+			Device:         att.LunchBreakOutDevice.String,
+		})
+	}
+
+	return models.Attendance{
+		StaffID:          s.encoder.Encode(att.StaffID),
+		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
+		Date:             att.ForDate,
+		ScheduledTimeIn:  schedIn,
+		ScheduledTimeOut: schedOut,
+
+		Attendance: models.AttendanceStat{
+			In:            timeIn,
+			Out:           timeOut,
+			InStatus:      c.inStatus,
+			OutStatus:     c.outStatus,
+			Duration:      c.duration,
+			DurationColor: c.durationColor,
+			InLate: c.inLate,
+			InShop:        inShop,
+			OutShop:       outShop,
+			InLocation:    att.InLocation.String,
+			OutLocation:   att.OutLocation.String,
+			InDeviceInfo:  inDeviceInfo,
+			OutDeviceInfo: outDeviceInfo,
+		},
+
+		LunchBreak: models.AttendanceStat{
+			In:            lunchbreakIn,
+			Out:           lunchbreakOut,
+			InStatus:      lunchbreak.inStatus,
+			OutStatus:     lunchbreak.outStatus,
+			Duration:      lunchbreak.duration,
+			DurationColor: lunchbreak.durationColor,
+			InShop:        lbInShop,
+			OutShop:       lbOutShop,
+			InLocation:    att.LunchBreakInLocation.String,
+			OutLocation:   att.LunchBreakOutLocation.String,
+			InDeviceInfo:  lbInDeviceInfo,
+			OutDeviceInfo: lbOutDeviceInfo,
+		},
+	}
+}
+
+func computeInOutStatus(actualIn, actualOut, schedIn, schedOut string) attendanceStatusResult {
+	out := attendanceStatusResult{duration: "-"}
+	actualInM, inOk := utils.TimeToMinutes(actualIn)
+	actualOutM, outOk := utils.TimeToMinutes(actualOut)
+	schedInM, schedInOk := utils.TimeToMinutes(schedIn)
+	schedOutM, schedOutOk := utils.TimeToMinutes(schedOut)
+
+	if inOk && schedInOk {
+		switch {
+		case actualInM < schedInM:
+			out.inStatus = enums.TIME_IN_STATUS_EARLIER
+		case actualInM == schedInM:
+			out.inStatus = enums.TIME_IN_STATUS_ON_TIME
+		default:
+			out.inStatus = enums.TIME_IN_STATUS_LATE
+
+			timeSchedIn, err := time.Parse(constants.TimeLayoutHHMM, schedIn)
+			if err != nil {
+				logs.Log().Warn("computeInOutStatus", zap.String("sched in", schedIn), zap.Error(err))
+			}
+			timeActualIn, err := time.Parse(constants.TimeLayoutHHMMSS, actualIn)
+			if err != nil {
+				logs.Log().Warn("computeInOutStatus", zap.String("actual in", actualIn), zap.Error(err))
+			}
+			out.inLate = timeActualIn.Sub(timeSchedIn)
+		}
+	}
+
+	if outOk && schedOutOk {
+		switch {
+		case actualOutM < schedOutM:
+			out.outStatus = enums.TIME_OUT_STATUS_UNDERTIME
+		case actualOutM == schedOutM:
+			out.outStatus = enums.TIME_OUT_STATUS_ON_TIME
+		default:
+			out.outStatus = enums.TIME_OUT_STATUS_OVERTIME
+		}
+	}
+
+	if inOk && outOk {
+		diff := actualOutM - actualInM
+		if diff >= 0 {
+			out.duration = utils.FormatDurationFromMinutes(diff)
+		}
+		if schedInOk && schedOutOk {
+			schedDuration := schedOutM - schedInM
+			if schedDuration >= 0 && diff >= 0 {
+				if diff >= schedDuration {
+					out.durationColor = "green"
+				} else {
+					out.durationColor = "red"
+				}
+			}
+		}
+	}
+
+	return out
+}

@@ -986,7 +986,6 @@ SELECT
     user_type,
     email,
     mobile_no,
-    password,
     require_in_shop,
     created_at,
     updated_at
@@ -1011,7 +1010,6 @@ type GetStaffByIDRow struct {
 	UserType        string
 	Email           string
 	MobileNo        string
-	Password        string
 	RequireInShop   bool
 	CreatedAt       string
 	UpdatedAt       string
@@ -1034,7 +1032,6 @@ func (q *Queries) GetStaffByID(ctx context.Context, id int64) (GetStaffByIDRow, 
 		&i.UserType,
 		&i.Email,
 		&i.MobileNo,
-		&i.Password,
 		&i.RequireInShop,
 		&i.CreatedAt,
 		&i.UpdatedAt,

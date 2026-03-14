@@ -6,15 +6,11 @@ import (
 	"net/http"
 
 	compadmin "cchoice/cmd/web/components/admin"
-	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
-	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
-	"cchoice/internal/staff"
-	"cchoice/internal/types"
 	"cchoice/internal/utils"
 
 	"golang.org/x/crypto/bcrypt"
@@ -29,63 +25,10 @@ const (
 	maxStaffListSize     = 1000
 )
 
-type attendanceStatusResult struct {
-	timeInStatus  enums.TimeInStatus
-	timeOutStatus enums.TimeOutStatus
-	duration      string
-	durationColor string
-}
-
 func (s *Server) getCurrentStaff(ctx context.Context) (queries.GetStaffByIDRow, int64, error) {
 	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
 	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
 	return staff, staffID, err
-}
-
-func computeInOutStatus(actualIn, actualOut, schedIn, schedOut string) attendanceStatusResult {
-	out := attendanceStatusResult{duration: "-"}
-	actualInM, inOk := utils.TimeToMinutes(actualIn)
-	actualOutM, outOk := utils.TimeToMinutes(actualOut)
-	schedInM, schedInOk := utils.TimeToMinutes(schedIn)
-	schedOutM, schedOutOk := utils.TimeToMinutes(schedOut)
-
-	if inOk && schedInOk {
-		switch {
-		case actualInM < schedInM:
-			out.timeInStatus = enums.TIME_IN_STATUS_EARLIER
-		case actualInM == schedInM:
-			out.timeInStatus = enums.TIME_IN_STATUS_ON_TIME
-		default:
-			out.timeInStatus = enums.TIME_IN_STATUS_LATE
-		}
-	}
-	if outOk && schedOutOk {
-		switch {
-		case actualOutM < schedOutM:
-			out.timeOutStatus = enums.TIME_OUT_STATUS_UNDERTIME
-		case actualOutM == schedOutM:
-			out.timeOutStatus = enums.TIME_OUT_STATUS_ON_TIME
-		default:
-			out.timeOutStatus = enums.TIME_OUT_STATUS_OVERTIME
-		}
-	}
-	if inOk && outOk {
-		diff := actualOutM - actualInM
-		if diff >= 0 {
-			out.duration = utils.FormatDurationFromMinutes(diff)
-		}
-		if schedInOk && schedOutOk {
-			schedDuration := schedOutM - schedInM
-			if schedDuration >= 0 && diff >= 0 {
-				if diff >= schedDuration {
-					out.durationColor = "green"
-				} else {
-					out.durationColor = "red"
-				}
-			}
-		}
-	}
-	return out
 }
 
 func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentStr string) sql.NullInt64 {
@@ -109,113 +52,6 @@ func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentS
 		return sql.NullInt64{}
 	}
 	return sql.NullInt64{Int64: id, Valid: true}
-}
-
-func buildAdminStaffAttendance(
-	encoder encode.IEncode,
-	staff queries.GetAllStaffsRow,
-	att staff.StaffRow,
-	shopLocation types.Location,
-) models.Attendance {
-	schedIn, schedOut := "", ""
-	if staff.TimeInSchedule.Valid {
-		schedIn = staff.TimeInSchedule.String
-	}
-	if staff.TimeOutSchedule.Valid {
-		schedOut = staff.TimeOutSchedule.String
-	}
-	timeIn, timeOut := utils.ExtractTimeToPH(att.TimeIn.String), utils.ExtractTimeToPH(att.TimeOut.String)
-	lunchbreakIn, lunchbreakOut := utils.ExtractTimeToPH(att.LunchBreakIn.String), utils.ExtractTimeToPH(att.LunchBreakOut.String)
-	c := computeInOutStatus(timeIn, timeOut, schedIn, schedOut)
-	lunchbreak := computeInOutStatus(lunchbreakIn, lunchbreakOut, "12:00", "13:00")
-
-	var inShop, outShop bool
-	if lat, lng, ok := utils.ParseLocation(att.InLocation); ok && shopLocation.RadiusMeters > 0 {
-		inShop = utils.IsWithinRadius(lat, lng, shopLocation.Lat, shopLocation.Lng, shopLocation.RadiusMeters)
-	}
-	if lat, lng, ok := utils.ParseLocation(att.OutLocation); ok && shopLocation.RadiusMeters > 0 {
-		outShop = utils.IsWithinRadius(lat, lng, shopLocation.Lat, shopLocation.Lng, shopLocation.RadiusMeters)
-	}
-
-	var lbInShop, lbOutShop bool
-	if lat, lng, ok := utils.ParseLocation(att.LunchBreakInLocation); ok && shopLocation.RadiusMeters > 0 {
-		lbInShop = utils.IsWithinRadius(lat, lng, shopLocation.Lat, shopLocation.Lng, shopLocation.RadiusMeters)
-	}
-	if lat, lng, ok := utils.ParseLocation(att.LunchBreakOutLocation); ok && shopLocation.RadiusMeters > 0 {
-		lbOutShop = utils.IsWithinRadius(lat, lng, shopLocation.Lat, shopLocation.Lng, shopLocation.RadiusMeters)
-	}
-
-	var inDeviceInfo, outDeviceInfo, lbInDeviceInfo, lbOutDeviceInfo string
-	if att.InBrowser.Valid {
-		inDeviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
-			Browser:        att.InBrowser.String,
-			BrowserVersion: att.InBrowserVersion.String,
-			OS:             att.InOs.String,
-			Device:         att.InDevice.String,
-		})
-	}
-	if att.OutBrowser.Valid {
-		outDeviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
-			Browser:        att.OutBrowser.String,
-			BrowserVersion: att.OutBrowserVersion.String,
-			OS:             att.OutOs.String,
-			Device:         att.OutDevice.String,
-		})
-	}
-	if att.LunchBreakInBrowser.Valid {
-		lbInDeviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
-			Browser:        att.LunchBreakInBrowser.String,
-			BrowserVersion: att.LunchBreakInBrowserVersion.String,
-			OS:             att.LunchBreakInOs.String,
-			Device:         att.LunchBreakInDevice.String,
-		})
-	}
-	if att.LunchBreakOutBrowser.Valid {
-		lbOutDeviceInfo = utils.FormatUserAgentDevice(types.UserAgentInfo{
-			Browser:        att.LunchBreakOutBrowser.String,
-			BrowserVersion: att.LunchBreakOutBrowserVersion.String,
-			OS:             att.LunchBreakOutOs.String,
-			Device:         att.LunchBreakOutDevice.String,
-		})
-	}
-
-	return models.Attendance{
-		StaffID:          encoder.Encode(att.StaffID),
-		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
-		Date:             att.ForDate,
-		ScheduledTimeIn:  schedIn,
-		ScheduledTimeOut: schedOut,
-
-		Attendance: models.AttendanceStat{
-			In:            timeIn,
-			Out:           timeOut,
-			InStatus:      c.timeInStatus,
-			OutStatus:     c.timeOutStatus,
-			Duration:      c.duration,
-			DurationColor: c.durationColor,
-			InShop:        inShop,
-			OutShop:       outShop,
-			InLocation:    att.InLocation.String,
-			OutLocation:   att.OutLocation.String,
-			InDeviceInfo:  inDeviceInfo,
-			OutDeviceInfo: outDeviceInfo,
-		},
-
-		LunchBreak: models.AttendanceStat{
-			In:            lunchbreakIn,
-			Out:           lunchbreakOut,
-			InStatus:      lunchbreak.timeInStatus,
-			OutStatus:     lunchbreak.timeOutStatus,
-			Duration:      lunchbreak.duration,
-			DurationColor: lunchbreak.durationColor,
-			InShop:        lbInShop,
-			OutShop:       lbOutShop,
-			InLocation:    att.LunchBreakInLocation.String,
-			OutLocation:   att.LunchBreakOutLocation.String,
-			InDeviceInfo:  lbInDeviceInfo,
-			OutDeviceInfo: lbOutDeviceInfo,
-		},
-	}
 }
 
 func AddAdminHandlers(s *Server, r chi.Router) {

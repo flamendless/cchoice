@@ -79,3 +79,16 @@ func ParseAttendanceDate(date string) string {
 	}
 	return date
 }
+
+func GetTotalDaysBetweenDates(startDate string, endDate string) (int, error) {
+	dtStart, err := time.Parse(constants.DateLayoutISO, startDate)
+	if err != nil {
+		return 0, err
+	}
+	dtEnd, err := time.Parse(constants.DateLayoutISO, endDate)
+	if err != nil {
+		return 0, err
+	}
+	totalDays := (dtEnd.Sub(dtStart).Hours() / 24) + 1
+	return int(totalDays), nil
+}

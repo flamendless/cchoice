@@ -10,7 +10,6 @@ import (
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
-	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
@@ -18,6 +17,7 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/services"
+	staffmodels "cchoice/internal/staff"
 	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
@@ -68,7 +68,7 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 	}
 
 	//TODO: (Brandon) services should be in the Server struct as well
-	attendanceService := services.NewAttendanceService(s.dbRO, s.dbRW)
+	attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
 	attendances, err := attendanceService.GetAttendance(ctx, staffID, startDate, endDate)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("start date", startDateParam), zap.String("end date", endDateParam))
@@ -86,7 +86,6 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 		staffMap[staff.ID] = staff
 	}
 
-	shop := conf.Conf().Settings.ShopLocation
 	attendanceData := make([]models.Attendance, 0, len(attendances))
 	for _, att := range attendances {
 		staff, ok := staffMap[att.StaffID]
@@ -95,7 +94,7 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 		}
 		attendanceData = append(
 			attendanceData,
-			buildAdminStaffAttendance(s.encoder, staff, att, shop),
+			attendanceService.ComputeData(staffmodels.StaffRowBase(staff), att),
 		)
 	}
 
@@ -150,7 +149,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		format = "csv"
 	}
 
-	attendanceService := services.NewAttendanceService(s.dbRO, s.dbRW)
+	attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
 	attendances, err := attendanceService.GetAttendance(ctx, staffID, startDate, endDate)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -173,7 +172,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		zap.Int64("staff id", s.sessionManager.GetInt64(ctx, SessionStaffID)),
 	)
 
-	reportService := services.NewReportService(s.dbRO)
+	reportService := services.NewReportService(s.encoder, s.dbRO)
 	switch format {
 	case "csv":
 		w.Header().Set("Content-Type", "text/csv")
@@ -184,6 +183,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 			ctx,
 			writer,
 			attendances,
+			staffID,
 			reportName,
 			startDate,
 			endDate,
@@ -207,6 +207,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 			ctx,
 			file,
 			attendances,
+			staffID,
 			reportName,
 			startDate,
 			endDate,
@@ -313,7 +314,7 @@ func (s *Server) adminSuperuserTimeOffApproveHandler(w http.ResponseWriter, r *h
 		return
 	}
 
-	attendanceService := services.NewAttendanceService(s.dbRO, s.dbRW)
+	attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
 	if err := attendanceService.ApproveTimeOff(ctx, decodedTimeOffID, currentStaffID); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -346,7 +347,7 @@ func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *ht
 		return
 	}
 
-	attendanceService := services.NewAttendanceService(s.dbRO, s.dbRW)
+	attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
 	if err := attendanceService.CancelTimeOff(ctx, decodedTimeOffID, currentStaffID); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
