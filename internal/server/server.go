@@ -35,7 +35,8 @@ import (
 )
 
 type Services struct {
-	products *services.ProductsService
+	products  *services.ProductsService
+	staffLogs *services.StaffLogsService
 }
 
 type Server struct {
@@ -140,7 +141,8 @@ func NewServer() *ServerInstance {
 	}
 
 	newServer.services = Services{
-		products: services.NewProductsService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		products:  services.NewProductsService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		staffLogs: services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 	}
 
 	ctx := context.Background()

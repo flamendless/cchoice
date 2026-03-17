@@ -317,6 +317,16 @@ type TblStaffAttendance struct {
 	LunchBreakOutUseragentID sql.NullInt64
 }
 
+type TblStaffLog struct {
+	ID          int64
+	StaffID     int64
+	CreatedAt   string
+	Action      string
+	Module      string
+	Result      string
+	UseragentID sql.NullInt64
+}
+
 type TblStaffTimeOff struct {
 	ID          int64
 	Type        string

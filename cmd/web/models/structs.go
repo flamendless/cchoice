@@ -249,3 +249,16 @@ type Staff struct {
 	ID       string
 	FullName string
 }
+
+type StaffLog struct {
+	ID         string
+	StaffID    string
+	FullName   string
+	FirstName  string
+	MiddleName string
+	LastName   string
+	CreatedAt  string
+	Action     string
+	Module     string
+	Result     string
+}

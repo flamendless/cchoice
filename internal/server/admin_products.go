@@ -220,6 +220,18 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		return
 	}
 
+	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
+	if err := s.services.staffLogs.CreateLog(
+		ctx,
+		staffID,
+		"create",
+		"products",
+		"success",
+		nil,
+	); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
+
 	logs.LogCtx(ctx).Info(logtag, zap.Int64("product_id", product.ID), zap.String("name", name))
 	redirectHX(w, r, utils.URLWithSuccess(page, "Product created successfully"))
 }
