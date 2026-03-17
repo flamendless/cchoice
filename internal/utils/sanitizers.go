@@ -17,14 +17,16 @@ func SanitizePrice(price string) (*money.Money, []error) {
 	errsRes := make([]error, 0, 2)
 	currency := money.PHP
 
-	hasPHPTrailing := strings.HasSuffix(price, "PHP")
+	hasPHPTrailing := strings.HasSuffix(price, constants.PHP)
+
 	if hasPHPTrailing {
-		price = strings.TrimSuffix(price, "PHP")
+		price = strings.TrimSuffix(price, constants.PHP)
 	}
 
-	hasPHPLeading := strings.HasPrefix(price, "PHP")
+	hasPHPLeading := strings.HasPrefix(price, constants.PHP)
+
 	if hasPHPLeading {
-		price = strings.TrimPrefix(price, "PHP")
+		price = strings.TrimPrefix(price, constants.PHP)
 	}
 
 	price = strings.TrimSpace(price)

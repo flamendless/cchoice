@@ -6,4 +6,5 @@ const (
 	Singleflight         = "singleflight"
 	Gob                  = "gob"
 	ViberURIPrefix       = "viber://chat?number="
+	PHP                  = "PHP"
 )

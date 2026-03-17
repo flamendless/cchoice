@@ -2,6 +2,7 @@ package googlevision
 
 import (
 	"cchoice/internal/conf"
+	"cchoice/internal/constants"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/receipt"
@@ -225,7 +226,7 @@ func (g *GoogleVisionScanner) parseReceiptWithStructuredData(text string, struct
 
 	data := &scanner.ReceiptData{
 		Items:    []scanner.LineItem{},
-		Currency: "PHP",
+		Currency: constants.PHP,
 	}
 
 	parseMerchant(lines, data)
