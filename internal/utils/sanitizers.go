@@ -89,7 +89,7 @@ func SanitizeCategory(input string) string {
 
 func SanitizeString(s string) string {
 	s = strings.TrimSpace(s)
-	s = constants.MultipleSpacesRegex.ReplaceAllString(s, " ")
+	s = constants.ReMultipleSpaces.ReplaceAllString(s, " ")
 	return strings.TrimSpace(s)
 }
 

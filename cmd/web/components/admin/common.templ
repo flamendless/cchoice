@@ -4,6 +4,7 @@ import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/models"
 import "cchoice/internal/enums"
+import "cchoice/internal/constants"
 
 templ AdminHeader(profile *models.AdminStaffProfile) {
 	if profile == nil {
@@ -112,6 +113,11 @@ templ AdminLoginPage() {
 			@common.ErrorBanner()
 			@common.SuccessBanner()
 			<div class="w-full max-w-lg p-8 bg-white rounded-lg shadow-md">
+				<img
+					src={ constants.PathSVGLogoOnly }
+					alt="C-Choice Logo"
+					class="w-20 h-20 mx-auto mb-4"
+				/>
 				<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
 					C-Choice Admin Portal
 				</h1>
@@ -133,7 +139,7 @@ templ AdminLoginPage() {
 							id="email"
 							name="email"
 							required
-							pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
+							pattern={ constants.PatternEmail }
 							class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
 						/>
 					</div>
@@ -148,7 +154,7 @@ templ AdminLoginPage() {
 								name="password"
 								required
 								maxlength="64"
-								pattern="[a-zA-Z0-9\-_.?#@]+"
+								pattern={ constants.PatternPassword }
 								class="block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
 							/>
 							<button

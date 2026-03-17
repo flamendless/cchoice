@@ -574,7 +574,7 @@ func GenSQL() error {
 		return fmt.Errorf("failed to check for sql file changes: %w", err)
 	}
 	if !hasChanges {
-		fmt.Println("No changes in sql files detected. Skipping tests.")
+		fmt.Println("No changes in sql files detected. Skipping gensql.")
 		return nil
 	}
 	return run(Command{Type: CmdExec, Cmd: "go", Args: []string{"tool", "sqlc", "generate"}})
@@ -586,7 +586,7 @@ func GenTempl() error {
 		return fmt.Errorf("failed to check for templ file changes: %w", err)
 	}
 	if !hasChanges {
-		fmt.Println("No changes in templ files detected. Skipping tests.")
+		fmt.Println("No changes in templ files detected. Skipping gentempl.")
 		return nil
 	}
 

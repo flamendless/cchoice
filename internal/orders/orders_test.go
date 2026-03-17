@@ -51,7 +51,7 @@ func TestGenerateUniqueOrderReferenceNumber(t *testing.T) {
 	t.Run("format matches expected pattern", func(t *testing.T) {
 		ref, err := GenerateUniqueOrderReferenceNumber(ctx)
 		require.NoError(t, err)
-		require.True(t, constants.OrderReferenceRegex.MatchString(ref), "reference %s does not match expected pattern", ref)
+		require.True(t, constants.ReOrderReference.MatchString(ref), "reference %s does not match expected pattern", ref)
 	})
 
 	t.Run("timestamp increases over time", func(t *testing.T) {

@@ -4,6 +4,7 @@ import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/models"
 import "cchoice/internal/enums"
+import "cchoice/internal/constants"
 
 templ AdminProfilePage(profile models.AdminStaffProfile) {
 	<!DOCTYPE html>
@@ -57,7 +58,7 @@ templ AdminProfilePage(profile models.AdminStaffProfile) {
 											required
 											minlength="1"
 											maxlength="64"
-											pattern="[a-zA-Z0-9\-_.?#@]+"
+											pattern={ constants.PatternPassword }
 											class="block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
 										/>
 										<button
@@ -81,7 +82,7 @@ templ AdminProfilePage(profile models.AdminStaffProfile) {
 											required
 											minlength="1"
 											maxlength="64"
-											pattern="[a-zA-Z0-9\-_.?#@]+"
+											pattern={ constants.PatternPassword }
 											class="block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
 										/>
 										<button
