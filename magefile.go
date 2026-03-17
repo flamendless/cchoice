@@ -4,6 +4,8 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -684,6 +686,31 @@ func SC() error {
 	return nil
 }
 
+func HasTrailingWhitespace() bool {
+	gitCmd := exec.Command("git", "diff", "--name-only", "HEAD")
+	var gitOut bytes.Buffer
+	gitCmd.Stdout = &gitOut
+	if err := gitCmd.Run(); err != nil {
+		return true
+	}
+
+	files := strings.Fields(gitOut.String())
+	if len(files) == 0 {
+		return false
+	}
+
+	args := append([]string{"-E", `[[:space:]]+$`}, files...)
+	grepCmd := exec.Command("grep", args...)
+	out, err := grepCmd.CombinedOutput()
+	if err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() == 1 {
+			return err == nil
+		}
+	}
+
+	return string(out) != ""
+}
+
 func hasExtChanges(ext string) (bool, error) {
 	cmd := exec.Command("git", "diff", "--name-only", "HEAD", "--", ext)
 	output, err := cmd.Output()
@@ -714,6 +741,10 @@ func hasPackageChanged(pkg string) (bool, error) {
 }
 
 func TestAll() error {
+	if hasTW := HasTrailingWhitespace(); hasTW {
+		return errors.New("trailing whitespace detected")
+	}
+
 	hasChanges, err := hasExtChanges("*.go")
 	if err != nil {
 		return fmt.Errorf("failed to check for Go file changes: %w", err)
