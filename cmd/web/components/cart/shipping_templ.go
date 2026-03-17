@@ -10,6 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/svg"
+import "cchoice/internal/constants"
 
 func MapOption(value string, name string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -39,7 +40,7 @@ func MapOption(value string, name string) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 7, Col: 22}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 8, Col: 22}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -52,7 +53,7 @@ func MapOption(value string, name string) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 7, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 8, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -94,7 +95,7 @@ func ProvinceSelect() templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/shipping/address?data=provinces"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 17, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 18, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -107,7 +108,7 @@ func ProvinceSelect() templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/shipping/quotation"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 20, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 21, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -149,7 +150,7 @@ func CitySelect() templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/shipping/address?data=cities"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 78, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 79, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -191,7 +192,7 @@ func BarangaySelect() templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/shipping/address?data=barangays"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 114, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 115, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -233,7 +234,7 @@ func input(t string, name string, placeholder string, pattern ...string) templ.C
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(t)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 136, Col: 10}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 137, Col: 10}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -246,7 +247,7 @@ func input(t string, name string, placeholder string, pattern ...string) templ.C
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 137, Col: 13}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 138, Col: 13}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -259,7 +260,7 @@ func input(t string, name string, placeholder string, pattern ...string) templ.C
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(placeholder)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 139, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 140, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -277,7 +278,7 @@ func input(t string, name string, placeholder string, pattern ...string) templ.C
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(pattern[0])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 143, Col: 23}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 144, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -329,7 +330,7 @@ func inputWithClass(t string, name string, placeholder string, class string, pat
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(t)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 150, Col: 10}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 151, Col: 10}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -342,7 +343,7 @@ func inputWithClass(t string, name string, placeholder string, class string, pat
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 151, Col: 13}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 152, Col: 13}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -368,7 +369,7 @@ func inputWithClass(t string, name string, placeholder string, class string, pat
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(placeholder)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 153, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 154, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -386,7 +387,7 @@ func inputWithClass(t string, name string, placeholder string, class string, pat
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(pattern[0])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 157, Col: 23}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 158, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -433,7 +434,7 @@ func warning(text string) templ.Component {
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(text)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 169, Col: 8}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 170, Col: 8}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
@@ -512,7 +513,7 @@ func infieldLabelInput(t string, name string, label string, pattern ...string) t
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(t)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 182, Col: 11}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 183, Col: 11}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
@@ -525,7 +526,7 @@ func infieldLabelInput(t string, name string, label string, pattern ...string) t
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 183, Col: 14}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 184, Col: 14}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {
@@ -543,7 +544,7 @@ func infieldLabelInput(t string, name string, label string, pattern ...string) t
 			var templ_7745c5c3_Var29 string
 			templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(pattern[0])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 189, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 190, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 			if templ_7745c5c3_Err != nil {
@@ -561,7 +562,7 @@ func infieldLabelInput(t string, name string, label string, pattern ...string) t
 		var templ_7745c5c3_Var30 string
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 195, Col: 10}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 196, Col: 10}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
@@ -574,7 +575,7 @@ func infieldLabelInput(t string, name string, label string, pattern ...string) t
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 203, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 204, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
@@ -616,7 +617,7 @@ func infieldLabelSelect(id string, name string, label string, required bool, dis
 		var templ_7745c5c3_Var33 string
 		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 211, Col: 10}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 212, Col: 10}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 		if templ_7745c5c3_Err != nil {
@@ -629,7 +630,7 @@ func infieldLabelSelect(id string, name string, label string, required bool, dis
 		var templ_7745c5c3_Var34 string
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 212, Col: 14}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 213, Col: 14}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
@@ -642,7 +643,7 @@ func infieldLabelSelect(id string, name string, label string, required bool, dis
 		var templ_7745c5c3_Var35 string
 		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(required)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 214, Col: 22}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 215, Col: 22}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 		if templ_7745c5c3_Err != nil {
@@ -673,7 +674,7 @@ func infieldLabelSelect(id string, name string, label string, required bool, dis
 		var templ_7745c5c3_Var36 string
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 223, Col: 10}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 224, Col: 10}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 		if templ_7745c5c3_Err != nil {
@@ -731,7 +732,7 @@ func ShippingAddressSelect() templ.Component {
 		var templ_7745c5c3_Var38 string
 		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/shipping/quotation"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 246, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 247, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 		if templ_7745c5c3_Err != nil {
@@ -757,7 +758,20 @@ func ShippingAddressSelect() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<div class=\"relative\"><input type=\"text\" name=\"address_line2\" class=\"border rounded-lg p-3 pt-6 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" placeholder=\" \" onblur=\"this.value = this.value.trim()\"> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Address Line 2 (Optional)</label></div><div class=\"flex flex-row gap-1\"><div class=\"relative w-1/2\"><input type=\"text\" name=\"postal\" class=\"border rounded-lg px-3 py-2 pt-6 w-full h-14 peer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" placeholder=\" \" required pattern=\"^[0-9]{4}$\" onblur=\"this.value = this.value.trim()\"> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Postal Code</label> <small class=\"text-red-500 text-xs block invisible h-0 mt-1 peer-invalid:visible peer-invalid:h-auto\">Please enter a valid postal code (4 digits only)</small></div><div class=\"relative w-1/2\"><select id=\"country\" name=\"country\" class=\"border rounded-lg px-3 py-2 pt-6 w-full h-14 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" required disabled><option value=\"PH\" selected>Philippines</option></select> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Country</label></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<div class=\"relative\"><input type=\"text\" name=\"address_line2\" class=\"border rounded-lg p-3 pt-6 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" placeholder=\" \" onblur=\"this.value = this.value.trim()\"> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Address Line 2 (Optional)</label></div><div class=\"flex flex-row gap-1\"><div class=\"relative w-1/2\"><input type=\"text\" name=\"postal\" class=\"border rounded-lg px-3 py-2 pt-6 w-full h-14 peer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" placeholder=\" \" required pattern=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var39 string
+		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternPostalCode)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/shipping.templ`, Line: 318, Col: 42}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\" onblur=\"this.value = this.value.trim()\"> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Postal Code</label> <small class=\"text-red-500 text-xs block invisible h-0 mt-1 peer-invalid:visible peer-invalid:h-auto\">Please enter a valid postal code (4 digits only)</small></div><div class=\"relative w-1/2\"><select id=\"country\" name=\"country\" class=\"border rounded-lg px-3 py-2 pt-6 w-full h-14 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent\" required disabled><option value=\"PH\" selected>Philippines</option></select> <label class=\"absolute left-3 top-1 text-xs text-gray-500 font-medium pointer-events-none\">Country</label></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -773,7 +787,7 @@ func ShippingAddressSelect() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</div><script type=\"text/javascript\">\n\t\tfunction saveShippingFormState() {\n\t\t\tconst form = document.getElementById('shipping-form');\n\t\t\tconst formData = {\n\t\t\t\temail: form.querySelector('[name=\"email\"]')?.value || '',\n\t\t\t\tfullname: form.querySelector('[name=\"fullname\"]')?.value || '',\n\t\t\t\tmobile_no: form.querySelector('[name=\"mobile_no\"]')?.value || '',\n\t\t\t\taddress_line1: form.querySelector('[name=\"address_line1\"]')?.value || '',\n\t\t\t\taddress_line2: form.querySelector('[name=\"address_line2\"]')?.value || '',\n\t\t\t\tpostal: form.querySelector('[name=\"postal\"]')?.value || '',\n\t\t\t\tprovince: document.getElementById('province')?.value || '',\n\t\t\t\tcity: document.getElementById('city')?.value || '',\n\t\t\t\tbarangay: document.getElementById('barangay')?.value || '',\n\t\t\t\tprovinceText: document.getElementById('province')?.selectedOptions[0]?.text || '',\n\t\t\t\tcityDisabled: document.getElementById('city')?.disabled || false,\n\t\t\t\tbarangayDisabled: document.getElementById('barangay')?.disabled || false\n\t\t\t};\n\t\t\tconsole.log('Saving shipping form state:', formData);\n\t\t\tsessionStorage.setItem('shippingFormState', JSON.stringify(formData));\n\t\t}\n\n\t\tfunction restoreShippingFormState() {\n\t\t\tconst saved = sessionStorage.getItem('shippingFormState');\n\t\t\tconsole.log('Restoring shipping form state:', saved);\n\t\t\tif (!saved)\n\t\t\t\treturn\n\n\t\t\ttry {\n\t\t\t\tconst formData = JSON.parse(saved);\n\t\t\t\tconst form = document.getElementById('shipping-form');\n\t\t\t\tconst provinceSelect = document.getElementById('province');\n\t\t\t\tconst citySelect = document.getElementById('city');\n\t\t\t\tconst barangaySelect = document.getElementById('barangay');\n\t\t\t\tconsole.log('Restoring shipping form state:', formData);\n\n\t\t\t\tif (formData.email) {\n\t\t\t\t\tconst emailInput = form.querySelector('[name=\"email\"]');\n\t\t\t\t\tif (emailInput) emailInput.value = formData.email;\n\t\t\t\t}\n\t\t\t\tif (formData.fullname) {\n\t\t\t\t\tconst fullnameInput = form.querySelector('[name=\"fullname\"]');\n\t\t\t\t\tif (fullnameInput) fullnameInput.value = formData.fullname;\n\t\t\t\t}\n\t\t\t\tif (formData.mobile_no) {\n\t\t\t\t\tconst mobileInput = form.querySelector('[name=\"mobile_no\"]');\n\t\t\t\t\tif (mobileInput) mobileInput.value = formData.mobile_no;\n\t\t\t\t}\n\t\t\t\tif (formData.address_line1) {\n\t\t\t\t\tconst address1Input = form.querySelector('[name=\"address_line1\"]');\n\t\t\t\t\tif (address1Input) address1Input.value = formData.address_line1;\n\t\t\t\t}\n\t\t\t\tif (formData.address_line2) {\n\t\t\t\t\tconst address2Input = form.querySelector('[name=\"address_line2\"]');\n\t\t\t\t\tif (address2Input) address2Input.value = formData.address_line2;\n\t\t\t\t}\n\t\t\t\tif (formData.postal) {\n\t\t\t\t\tconst postalInput = form.querySelector('[name=\"postal\"]');\n\t\t\t\t\tif (postalInput) postalInput.value = formData.postal;\n\t\t\t\t}\n\n\t\t\t\t// Wait for province options to load\n\t\t\t\tif (provinceSelect && formData.province) {\n\t\t\t\t\tconst checkAndRestore = () => {\n\t\t\t\t\t\tif (provinceSelect.options.length > 1) {\n\t\t\t\t\t\t\tprovinceSelect.value = formData.province;\n\n\t\t\t\t\t\t\t// Check if NCR\n\t\t\t\t\t\t\tif (formData.provinceText && formData.provinceText.includes('National Capital Region')) {\n\t\t\t\t\t\t\t\t// Restore NCR state\n\t\t\t\t\t\t\t\tcitySelect.innerHTML = '<option value=\"' + formData.city + '\" selected>' + formData.city + '</option>';\n\t\t\t\t\t\t\t\tcitySelect.disabled = formData.cityDisabled;\n\t\t\t\t\t\t\t\tbarangaySelect.innerHTML = '<option value=\"' + formData.barangay + '\" selected>' + formData.barangay + '</option>';\n\t\t\t\t\t\t\t\tbarangaySelect.disabled = formData.barangayDisabled;\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\t// For other provinces, trigger the change to load cities\n\t\t\t\t\t\t\t\tprovinceSelect.dispatchEvent(new Event('change', { bubbles: true }));\n\n\t\t\t\t\t\t\t\t// Wait for cities to load, then restore\n\t\t\t\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\t\t\t\tif (citySelect && formData.city) {\n\t\t\t\t\t\t\t\t\t\tcitySelect.value = formData.city;\n\t\t\t\t\t\t\t\t\t\tcitySelect.dispatchEvent(new Event('change', { bubbles: true }));\n\n\t\t\t\t\t\t\t\t\t\t// Wait for barangays to load\n\t\t\t\t\t\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\t\t\t\t\t\tif (barangaySelect && formData.barangay) {\n\t\t\t\t\t\t\t\t\t\t\t\tbarangaySelect.value = formData.barangay;\n\t\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t}, 300);\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}, 300);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t// Options not loaded yet, wait a bit\n\t\t\t\t\t\t\tsetTimeout(checkAndRestore, 100);\n\t\t\t\t\t\t}\n\t\t\t\t\t};\n\t\t\t\t\tcheckAndRestore();\n\t\t\t\t}\n\t\t\t} catch (e) {\n\t\t\t\tconsole.error('Failed to restore shipping form state:', e);\n\t\t\t}\n\t\t}\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</div><script type=\"text/javascript\">\n\t\tfunction saveShippingFormState() {\n\t\t\tconst form = document.getElementById('shipping-form');\n\t\t\tconst formData = {\n\t\t\t\temail: form.querySelector('[name=\"email\"]')?.value || '',\n\t\t\t\tfullname: form.querySelector('[name=\"fullname\"]')?.value || '',\n\t\t\t\tmobile_no: form.querySelector('[name=\"mobile_no\"]')?.value || '',\n\t\t\t\taddress_line1: form.querySelector('[name=\"address_line1\"]')?.value || '',\n\t\t\t\taddress_line2: form.querySelector('[name=\"address_line2\"]')?.value || '',\n\t\t\t\tpostal: form.querySelector('[name=\"postal\"]')?.value || '',\n\t\t\t\tprovince: document.getElementById('province')?.value || '',\n\t\t\t\tcity: document.getElementById('city')?.value || '',\n\t\t\t\tbarangay: document.getElementById('barangay')?.value || '',\n\t\t\t\tprovinceText: document.getElementById('province')?.selectedOptions[0]?.text || '',\n\t\t\t\tcityDisabled: document.getElementById('city')?.disabled || false,\n\t\t\t\tbarangayDisabled: document.getElementById('barangay')?.disabled || false\n\t\t\t};\n\t\t\tconsole.log('Saving shipping form state:', formData);\n\t\t\tsessionStorage.setItem('shippingFormState', JSON.stringify(formData));\n\t\t}\n\n\t\tfunction restoreShippingFormState() {\n\t\t\tconst saved = sessionStorage.getItem('shippingFormState');\n\t\t\tconsole.log('Restoring shipping form state:', saved);\n\t\t\tif (!saved)\n\t\t\t\treturn\n\n\t\t\ttry {\n\t\t\t\tconst formData = JSON.parse(saved);\n\t\t\t\tconst form = document.getElementById('shipping-form');\n\t\t\t\tconst provinceSelect = document.getElementById('province');\n\t\t\t\tconst citySelect = document.getElementById('city');\n\t\t\t\tconst barangaySelect = document.getElementById('barangay');\n\t\t\t\tconsole.log('Restoring shipping form state:', formData);\n\n\t\t\t\tif (formData.email) {\n\t\t\t\t\tconst emailInput = form.querySelector('[name=\"email\"]');\n\t\t\t\t\tif (emailInput) emailInput.value = formData.email;\n\t\t\t\t}\n\t\t\t\tif (formData.fullname) {\n\t\t\t\t\tconst fullnameInput = form.querySelector('[name=\"fullname\"]');\n\t\t\t\t\tif (fullnameInput) fullnameInput.value = formData.fullname;\n\t\t\t\t}\n\t\t\t\tif (formData.mobile_no) {\n\t\t\t\t\tconst mobileInput = form.querySelector('[name=\"mobile_no\"]');\n\t\t\t\t\tif (mobileInput) mobileInput.value = formData.mobile_no;\n\t\t\t\t}\n\t\t\t\tif (formData.address_line1) {\n\t\t\t\t\tconst address1Input = form.querySelector('[name=\"address_line1\"]');\n\t\t\t\t\tif (address1Input) address1Input.value = formData.address_line1;\n\t\t\t\t}\n\t\t\t\tif (formData.address_line2) {\n\t\t\t\t\tconst address2Input = form.querySelector('[name=\"address_line2\"]');\n\t\t\t\t\tif (address2Input) address2Input.value = formData.address_line2;\n\t\t\t\t}\n\t\t\t\tif (formData.postal) {\n\t\t\t\t\tconst postalInput = form.querySelector('[name=\"postal\"]');\n\t\t\t\t\tif (postalInput) postalInput.value = formData.postal;\n\t\t\t\t}\n\n\t\t\t\t// Wait for province options to load\n\t\t\t\tif (provinceSelect && formData.province) {\n\t\t\t\t\tconst checkAndRestore = () => {\n\t\t\t\t\t\tif (provinceSelect.options.length > 1) {\n\t\t\t\t\t\t\tprovinceSelect.value = formData.province;\n\n\t\t\t\t\t\t\t// Check if NCR\n\t\t\t\t\t\t\tif (formData.provinceText && formData.provinceText.includes('National Capital Region')) {\n\t\t\t\t\t\t\t\t// Restore NCR state\n\t\t\t\t\t\t\t\tcitySelect.innerHTML = '<option value=\"' + formData.city + '\" selected>' + formData.city + '</option>';\n\t\t\t\t\t\t\t\tcitySelect.disabled = formData.cityDisabled;\n\t\t\t\t\t\t\t\tbarangaySelect.innerHTML = '<option value=\"' + formData.barangay + '\" selected>' + formData.barangay + '</option>';\n\t\t\t\t\t\t\t\tbarangaySelect.disabled = formData.barangayDisabled;\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\t// For other provinces, trigger the change to load cities\n\t\t\t\t\t\t\t\tprovinceSelect.dispatchEvent(new Event('change', { bubbles: true }));\n\n\t\t\t\t\t\t\t\t// Wait for cities to load, then restore\n\t\t\t\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\t\t\t\tif (citySelect && formData.city) {\n\t\t\t\t\t\t\t\t\t\tcitySelect.value = formData.city;\n\t\t\t\t\t\t\t\t\t\tcitySelect.dispatchEvent(new Event('change', { bubbles: true }));\n\n\t\t\t\t\t\t\t\t\t\t// Wait for barangays to load\n\t\t\t\t\t\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\t\t\t\t\t\tif (barangaySelect && formData.barangay) {\n\t\t\t\t\t\t\t\t\t\t\t\tbarangaySelect.value = formData.barangay;\n\t\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t}, 300);\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}, 300);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t// Options not loaded yet, wait a bit\n\t\t\t\t\t\t\tsetTimeout(checkAndRestore, 100);\n\t\t\t\t\t\t}\n\t\t\t\t\t};\n\t\t\t\t\tcheckAndRestore();\n\t\t\t\t}\n\t\t\t} catch (e) {\n\t\t\t\tconsole.error('Failed to restore shipping form state:', e);\n\t\t\t}\n\t\t}\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

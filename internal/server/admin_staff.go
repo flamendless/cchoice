@@ -146,7 +146,7 @@ func (s *Server) adminChangePasswordHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if !constants.PasswordRegex.MatchString(newPassword) {
+	if !constants.RePassword.MatchString(newPassword) {
 		redirectHX(w, r, utils.URLWithError("/admin/profile", "Invalid password format"))
 		return
 	}

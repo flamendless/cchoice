@@ -70,7 +70,7 @@ var cmdCreateStaff = &cobra.Command{
 		userTypeInput := prompt(reader, "User Type (staff/superuser): ", true)
 		userType := enums.MustParseStaffUserTypeToEnum(strings.ToUpper(userTypeInput))
 		email := prompt(reader, "Email: ", true)
-		if !constants.EmailRegex.MatchString(email) {
+		if !constants.ReEmail.MatchString(email) {
 			panic("must be a valid email")
 		}
 
@@ -85,7 +85,7 @@ var cmdCreateStaff = &cobra.Command{
 		}
 
 		password := prompt(reader, "Password: ", true)
-		if !constants.PasswordRegex.MatchString(password) {
+		if !constants.RePassword.MatchString(password) {
 			panic("must be alphanumeric [a-z A-Z 0-9 - _ . ? # @]")
 		}
 

@@ -114,12 +114,12 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.PostFormValue("email")
 	password := r.PostFormValue("password")
 
-	if !constants.EmailRegex.MatchString(email) {
+	if !constants.ReEmail.MatchString(email) {
 		redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password format"))
 		return
 	}
 
-	if !constants.PasswordRegex.MatchString(password) {
+	if !constants.RePassword.MatchString(password) {
 		redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password format"))
 		return
 	}
