@@ -1381,3 +1381,18 @@ func (q *Queries) UpdateProducts(ctx context.Context, arg UpdateProductsParams) 
 	}
 	return result.LastInsertId()
 }
+
+const validateUniqueSerial = `-- name: ValidateUniqueSerial :one
+SELECT
+	id
+FROM tbl_products
+WHERE tbl_products.serial = ?
+LIMIT 1
+`
+
+func (q *Queries) ValidateUniqueSerial(ctx context.Context, serial string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, validateUniqueSerial, serial)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
