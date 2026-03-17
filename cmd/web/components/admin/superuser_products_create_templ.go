@@ -67,7 +67,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathSVGLogoOnly)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 26, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 26, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -88,7 +88,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/superuser/products/create"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 35, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 35, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -106,7 +106,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(brand.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 54, Col: 46}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 54, Col: 46}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -119,7 +119,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(brand.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 54, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 54, Col: 61}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -142,7 +142,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(cat.Category)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 75, Col: 38}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 75, Col: 38}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -155,7 +155,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(cat.Category)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 75, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 75, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -173,7 +173,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/superuser/products/subcategories"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 88, Col: 70}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 88, Col: 70}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -186,7 +186,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternProductName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 108, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 108, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -199,7 +199,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternSerialNumber)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 124, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 124, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -212,7 +212,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/superuser/products/validate-serial"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 130, Col: 73}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 130, Col: 73}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -225,7 +225,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(formData.VATPercentage)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 158, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 158, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -238,7 +238,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternSerialNumber)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 230, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 230, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -251,7 +251,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		var templ_7745c5c3_Var14 templ.SafeURL
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 299, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 299, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
