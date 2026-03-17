@@ -169,29 +169,34 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		return
 	}
 
-	file, header, err := r.FormFile("product_image")
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Product image is required"))
-		return
-	}
-	defer file.Close()
+	var filename string
+	if conf.Conf().IsWeb() {
+		filename = "do_not_upload_image"
+	} else {
+		file, header, err := r.FormFile("product_image")
+		if err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			redirectHX(w, r, utils.URLWithError(page, "Product image is required"))
+			return
+		}
+		defer file.Close()
 
-	ext := filepath.Ext(header.Filename)
-	uuid := utils.GenString(16)
-	filename := fmt.Sprintf("products/%s_%s%s", uuid, strings.ReplaceAll(name, " ", "_"), ext)
+		ext := filepath.Ext(header.Filename)
+		uuid := utils.GenString(16)
+		filename := fmt.Sprintf("products/%s_%s%s", uuid, strings.ReplaceAll(name, " ", "_"), ext)
 
-	buf := bytes.Buffer{}
-	if _, err := io.Copy(&buf, file); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to read image"))
-		return
-	}
-	contentType := header.Header.Get("Content-Type")
-	if err := s.objectStorage.PutObject(ctx, filename, &buf, contentType); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to upload image"))
-		return
+		buf := bytes.Buffer{}
+		if _, err := io.Copy(&buf, file); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			redirectHX(w, r, utils.URLWithError(page, "Failed to read image"))
+			return
+		}
+		contentType := header.Header.Get("Content-Type")
+		if err := s.objectStorage.PutObject(ctx, filename, &buf, contentType); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			redirectHX(w, r, utils.URLWithError(page, "Failed to upload image"))
+			return
+		}
 	}
 
 	product, err := s.services.products.CreateProduct(ctx, services.CreateProductInput{

@@ -76,6 +76,12 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth).Post("/admin/staff/time-off", s.adminStaffTimeOffHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/time-off/table", s.adminStaffTimeOffTableHandler)
 	r.With(s.requireStaffAuth).Post("/admin/staff/attendance/location", s.adminStaffAttendanceLocationHandler)
+
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_PRODUCT)).Get("/admin/superuser/products/create", s.adminSuperuserProductsCreatePageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_PRODUCT)).Post("/admin/superuser/products/create", s.adminSuperuserProductsCreatePostHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_PRODUCT)).Get("/admin/superuser/products/subcategories", s.adminSuperuserProductsSubcategoriesHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_PRODUCT)).Get("/admin/superuser/products/validate-serial", s.adminSuperuserProductsValidateSerialHandler)
+
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser", s.adminSuperuserHomeHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/attendance", s.adminSuperuserAttendancePageHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/attendance/table", s.adminSuperuserAttendanceHandler)
@@ -84,10 +90,6 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/time-off/table", s.adminSuperuserTimeOffTableHandler)
 	r.With(s.requireSuperuserAuth).Patch("/admin/superuser/time-off/{id}/approve", s.adminSuperuserTimeOffApproveHandler)
 	r.With(s.requireSuperuserAuth).Patch("/admin/superuser/time-off/{id}/cancel", s.adminSuperuserTimeOffCancelHandler)
-	r.With(s.requireSuperuserAuth).Get("/admin/superuser/products/create", s.adminSuperuserProductsCreatePageHandler)
-	r.With(s.requireSuperuserAuth).Post("/admin/superuser/products/create", s.adminSuperuserProductsCreatePostHandler)
-	r.With(s.requireSuperuserAuth).Get("/admin/superuser/products/subcategories", s.adminSuperuserProductsSubcategoriesHandler)
-	r.With(s.requireSuperuserAuth).Get("/admin/superuser/products/validate-serial", s.adminSuperuserProductsValidateSerialHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/products", s.adminSuperuserProductsListPageHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/products/table", s.adminSuperuserProductsListTableHandler)
 	r.With(s.requireSuperuserAuth).Patch("/admin/superuser/products/{id}/status", s.adminSuperuserProductsUpdateStatusHandler)

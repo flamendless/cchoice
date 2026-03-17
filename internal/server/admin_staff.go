@@ -35,9 +35,22 @@ func (s *Server) adminStaffHomeHandler(w http.ResponseWriter, r *http.Request) {
 		redirectHXLogin(w, r)
 		return
 	}
-	currentUserFullName := utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName)
 
-	if err := compadmin.AdminStaffHomePage(currentUserFullName).Render(ctx, w); err != nil {
+	dbRoles, err := s.dbRO.GetQueries().GetStaffRolesByStaffID(ctx, staffID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staffID), zap.Error(err))
+	}
+
+	roles := make([]enums.StaffRole, 0, len(dbRoles))
+	for _, roleStr := range dbRoles {
+		role := enums.ParseStaffRoleToEnum(roleStr)
+		if role.IsValid() {
+			roles = append(roles, role)
+		}
+	}
+
+	currentUserFullName := utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName)
+	if err := compadmin.AdminStaffHomePage(currentUserFullName, roles).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),
@@ -328,23 +341,23 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		rec := attendanceService.ComputeData(
 			staffmodels.StaffRowBase(staff),
 			staffmodels.StaffRow{
-				ID:                          staffID,
-				StaffID:                     staffID,
-				ForDate:                     attendance.ForDate,
-				TimeIn:                      attendance.TimeIn,
-				TimeOut:                     attendance.TimeOut,
-				InLocation:                  attendance.InLocation,
-				OutLocation:                 attendance.OutLocation,
-				InUseragentID:               attendance.InUseragentID,
-				OutUseragentID:              attendance.OutUseragentID,
-				LunchBreakIn:                attendance.LunchBreakIn,
-				LunchBreakOut:               attendance.LunchBreakOut,
-				LunchBreakInLocation:        attendance.LunchBreakInLocation,
-				LunchBreakOutLocation:       attendance.LunchBreakOutLocation,
-				LunchBreakInUseragentID:     attendance.LunchBreakInUseragentID,
-				LunchBreakOutUseragentID:    attendance.LunchBreakOutUseragentID,
-				CreatedAt:                   attendance.CreatedAt,
-				UpdatedAt:                   attendance.UpdatedAt,
+				ID:                       staffID,
+				StaffID:                  staffID,
+				ForDate:                  attendance.ForDate,
+				TimeIn:                   attendance.TimeIn,
+				TimeOut:                  attendance.TimeOut,
+				InLocation:               attendance.InLocation,
+				OutLocation:              attendance.OutLocation,
+				InUseragentID:            attendance.InUseragentID,
+				OutUseragentID:           attendance.OutUseragentID,
+				LunchBreakIn:             attendance.LunchBreakIn,
+				LunchBreakOut:            attendance.LunchBreakOut,
+				LunchBreakInLocation:     attendance.LunchBreakInLocation,
+				LunchBreakOutLocation:    attendance.LunchBreakOutLocation,
+				LunchBreakInUseragentID:  attendance.LunchBreakInUseragentID,
+				LunchBreakOutUseragentID: attendance.LunchBreakOutUseragentID,
+				CreatedAt:                attendance.CreatedAt,
+				UpdatedAt:                attendance.UpdatedAt,
 			},
 		)
 		myAttendance = &rec
@@ -468,23 +481,23 @@ func (s *Server) adminStaffAttendanceTableHandler(w http.ResponseWriter, r *http
 		rec := attendanceService.ComputeData(
 			staffmodels.StaffRowBase(staff),
 			staffmodels.StaffRow{
-				ID:                          staffID,
-				StaffID:                     staffID,
-				ForDate:                     attendance.ForDate,
-				TimeIn:                      attendance.TimeIn,
-				TimeOut:                     attendance.TimeOut,
-				InLocation:                  attendance.InLocation,
-				OutLocation:                 attendance.OutLocation,
-				InUseragentID:               attendance.InUseragentID,
-				OutUseragentID:              attendance.OutUseragentID,
-				LunchBreakIn:                attendance.LunchBreakIn,
-				LunchBreakOut:               attendance.LunchBreakOut,
-				LunchBreakInLocation:        attendance.LunchBreakInLocation,
-				LunchBreakOutLocation:       attendance.LunchBreakOutLocation,
-				LunchBreakInUseragentID:     attendance.LunchBreakInUseragentID,
-				LunchBreakOutUseragentID:    attendance.LunchBreakOutUseragentID,
-				CreatedAt:                   attendance.CreatedAt,
-				UpdatedAt:                   attendance.UpdatedAt,
+				ID:                       staffID,
+				StaffID:                  staffID,
+				ForDate:                  attendance.ForDate,
+				TimeIn:                   attendance.TimeIn,
+				TimeOut:                  attendance.TimeOut,
+				InLocation:               attendance.InLocation,
+				OutLocation:              attendance.OutLocation,
+				InUseragentID:            attendance.InUseragentID,
+				OutUseragentID:           attendance.OutUseragentID,
+				LunchBreakIn:             attendance.LunchBreakIn,
+				LunchBreakOut:            attendance.LunchBreakOut,
+				LunchBreakInLocation:     attendance.LunchBreakInLocation,
+				LunchBreakOutLocation:    attendance.LunchBreakOutLocation,
+				LunchBreakInUseragentID:  attendance.LunchBreakInUseragentID,
+				LunchBreakOutUseragentID: attendance.LunchBreakOutUseragentID,
+				CreatedAt:                attendance.CreatedAt,
+				UpdatedAt:                attendance.UpdatedAt,
 			},
 		)
 		record = &rec
@@ -519,23 +532,23 @@ func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.
 		rec := attendanceService.ComputeData(
 			staffmodels.StaffRowBase(staff),
 			staffmodels.StaffRow{
-				ID:                          staffID,
-				StaffID:                     staffID,
-				ForDate:                     attendance.ForDate,
-				TimeIn:                      attendance.TimeIn,
-				TimeOut:                     attendance.TimeOut,
-				InLocation:                  attendance.InLocation,
-				OutLocation:                 attendance.OutLocation,
-				InUseragentID:               attendance.InUseragentID,
-				OutUseragentID:              attendance.OutUseragentID,
-				LunchBreakIn:                attendance.LunchBreakIn,
-				LunchBreakOut:               attendance.LunchBreakOut,
-				LunchBreakInLocation:        attendance.LunchBreakInLocation,
-				LunchBreakOutLocation:       attendance.LunchBreakOutLocation,
-				LunchBreakInUseragentID:     attendance.LunchBreakInUseragentID,
-				LunchBreakOutUseragentID:    attendance.LunchBreakOutUseragentID,
-				CreatedAt:                   attendance.CreatedAt,
-				UpdatedAt:                   attendance.UpdatedAt,
+				ID:                       staffID,
+				StaffID:                  staffID,
+				ForDate:                  attendance.ForDate,
+				TimeIn:                   attendance.TimeIn,
+				TimeOut:                  attendance.TimeOut,
+				InLocation:               attendance.InLocation,
+				OutLocation:              attendance.OutLocation,
+				InUseragentID:            attendance.InUseragentID,
+				OutUseragentID:           attendance.OutUseragentID,
+				LunchBreakIn:             attendance.LunchBreakIn,
+				LunchBreakOut:            attendance.LunchBreakOut,
+				LunchBreakInLocation:     attendance.LunchBreakInLocation,
+				LunchBreakOutLocation:    attendance.LunchBreakOutLocation,
+				LunchBreakInUseragentID:  attendance.LunchBreakInUseragentID,
+				LunchBreakOutUseragentID: attendance.LunchBreakOutUseragentID,
+				CreatedAt:                attendance.CreatedAt,
+				UpdatedAt:                attendance.UpdatedAt,
 			},
 		)
 		record = &rec
