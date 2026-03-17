@@ -74,9 +74,9 @@ func (s *Server) calculateCartSummary(ctx context.Context) (cartSummaryData, err
 		return cartSummaryData{}, err
 	}
 
-	var subtotal = utils.NewMoney(0, "PHP")
-	deliveryFee := utils.NewMoney(0, "PHP")
-	totalDiscounts := utils.NewMoney(0, "PHP")
+	var subtotal = utils.NewMoney(0, constants.PHP)
+	deliveryFee := utils.NewMoney(0, constants.PHP)
+	totalDiscounts := utils.NewMoney(0, constants.PHP)
 
 	if quotation, ok := s.sessionManager.Get(ctx, skShippingQuotation).(*shipping.ShippingQuotation); ok && quotation != nil {
 		deliveryFee = utils.NewMoney(int64(quotation.Fee*100), quotation.Currency)
@@ -696,12 +696,12 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 
 		if shippingQuotation.Fee != 0 {
 			lineItems = append(lineItems, payments.LineItem{
-				Amount:      int32(shippingQuotation.Fee*100),
+				Amount:      int32(shippingQuotation.Fee * 100),
 				Currency:    money.PHP,
 				Description: "Shipping Fee",
 				// Images:      []string{imageURL}, //TODO: (Brandon)
-				Name:        "Shipping Fee",
-				Quantity:    1,
+				Name:     "Shipping Fee",
+				Quantity: 1,
 			})
 		}
 

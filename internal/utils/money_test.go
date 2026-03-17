@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"cchoice/internal/constants"
 	"database/sql"
 	"testing"
 
@@ -14,8 +15,8 @@ func TestNewMoney(t *testing.T) {
 		price    int64
 		currency string
 	}{
-		{"zero", 0, "PHP"},
-		{"positive", 10000, "PHP"},
+		{"zero", 0, constants.PHP},
+		{"positive", 10000, constants.PHP},
 		{"large", 99999999, "USD"},
 	}
 	for _, tt := range tests {
@@ -34,10 +35,10 @@ func TestNewMoneyFromString(t *testing.T) {
 		currency string
 		wantErr  bool
 	}{
-		{"valid integer", "100", "PHP", false},
-		{"valid decimal", "99.50", "PHP", false},
-		{"invalid", "not-a-number", "PHP", true},
-		{"empty", "", "PHP", true},
+		{"valid integer", "100", constants.PHP, false},
+		{"valid decimal", "99.50", constants.PHP, false},
+		{"invalid", "not-a-number", constants.PHP, true},
+		{"empty", "", constants.PHP, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -67,7 +68,7 @@ func TestGetOrigAndDiscounted(t *testing.T) {
 			name:                   "not on sale",
 			isOnSale:               0,
 			unitPriceWithVat:       10000,
-			unitPriceWithVatCurr:   "PHP",
+			unitPriceWithVatCurr:   constants.PHP,
 			salePriceWithVat:       sql.NullInt64{},
 			salePriceWithVatCurr:   sql.NullString{},
 			wantDiscountPercentage: "",
@@ -76,18 +77,18 @@ func TestGetOrigAndDiscounted(t *testing.T) {
 			name:                   "on sale 50% off",
 			isOnSale:               1,
 			unitPriceWithVat:       10000,
-			unitPriceWithVatCurr:   "PHP",
+			unitPriceWithVatCurr:   constants.PHP,
 			salePriceWithVat:       sql.NullInt64{Int64: 5000, Valid: true},
-			salePriceWithVatCurr:   sql.NullString{String: "PHP", Valid: true},
+			salePriceWithVatCurr:   sql.NullString{String: constants.PHP, Valid: true},
 			wantDiscountPercentage: "50%",
 		},
 		{
 			name:                   "on sale 25% off",
 			isOnSale:               1,
 			unitPriceWithVat:       10000,
-			unitPriceWithVatCurr:   "PHP",
+			unitPriceWithVatCurr:   constants.PHP,
 			salePriceWithVat:       sql.NullInt64{Int64: 7500, Valid: true},
-			salePriceWithVatCurr:   sql.NullString{String: "PHP", Valid: true},
+			salePriceWithVatCurr:   sql.NullString{String: constants.PHP, Valid: true},
 			wantDiscountPercentage: "25%",
 		},
 	}
@@ -124,7 +125,13 @@ func TestGetDiscountAmount(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := GetDiscountAmount(tt.isOnSale, tt.unitPriceWithVat, "PHP", tt.salePriceWithVat, sql.NullString{String: "PHP", Valid: true})
+			m := GetDiscountAmount(
+				tt.isOnSale,
+				tt.unitPriceWithVat,
+				constants.PHP,
+				tt.salePriceWithVat,
+				sql.NullString{String: constants.PHP, Valid: true},
+			)
 			require.NotNil(t, m)
 			assert.Equal(t, tt.wantAmount, m.Amount())
 		})

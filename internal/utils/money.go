@@ -31,7 +31,7 @@ func GetOrigAndDiscounted(
 	isOnSale int64,
 	unitPriceWithVat int64,
 	unitPriceWithVatCurrency string,
-	salePriceWithVat         sql.NullInt64,
+	salePriceWithVat sql.NullInt64,
 	salePriceWithVatCurrency sql.NullString,
 ) (*money.Money, *money.Money, string) {
 	origPrice := NewMoney(unitPriceWithVat, unitPriceWithVatCurrency)
@@ -51,13 +51,13 @@ func GetDiscountAmount(
 	isOnSale int64,
 	unitPriceWithVat int64,
 	unitPriceWithVatCurrency string,
-	salePriceWithVat         sql.NullInt64,
+	salePriceWithVat sql.NullInt64,
 	salePriceWithVatCurrency sql.NullString,
 ) *money.Money {
 	if isOnSale != 1 {
-		return NewMoney(0, "PHP")
+		return NewMoney(0, constants.PHP)
 	}
 
 	discount := unitPriceWithVat - salePriceWithVat.Int64
-	return NewMoney(discount, "PHP")
+	return NewMoney(discount, constants.PHP)
 }

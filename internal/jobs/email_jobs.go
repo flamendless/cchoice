@@ -297,7 +297,7 @@ func (ejr *EmailJobRunner) sendPaymentConfirmationEmail(ctx context.Context, ema
 
 	templateData := mail.TemplateData{
 		"PaymentReference": checkoutPayment.ReferenceNumber,
-		"Amount":           utils.NewMoney(checkoutPayment.TotalAmount, "PHP").Display(),
+		"Amount":           utils.NewMoney(checkoutPayment.TotalAmount, constants.PHP).Display(),
 		"PaymentMethod":    checkoutPayment.PaymentMethodType,
 		"PaidAt":           checkoutPayment.PaidAt.Format("January 2, 2006 3:04 PM"),
 	}

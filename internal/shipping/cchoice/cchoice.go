@@ -2,6 +2,7 @@ package cchoice
 
 import (
 	"cchoice/internal/conf"
+	"cchoice/internal/constants"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/shipping"
@@ -186,7 +187,7 @@ func (s *CChoiceService) GetQuotation(req shipping.ShippingRequest) (*shipping.S
 
 	return &shipping.ShippingQuotation{
 		ID:           s.generateQuotationID(),
-		Currency:     "PHP",
+		Currency:     constants.PHP,
 		ServiceType:  serviceType,
 		Fee:          fee,
 		DistanceKm:   distance,

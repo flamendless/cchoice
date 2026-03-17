@@ -3,6 +3,7 @@ package orders
 import (
 	"cchoice/internal/cart"
 	"cchoice/internal/conf"
+	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
@@ -145,9 +146,9 @@ func CreateOrderFromCheckout(
 		}
 	}
 
-	subtotal := utils.NewMoney(0, "PHP")
-	deliveryFee := utils.NewMoney(0, "PHP")
-	totalDiscounts := utils.NewMoney(0, "PHP")
+	subtotal := utils.NewMoney(0, constants.PHP)
+	deliveryFee := utils.NewMoney(0, constants.PHP)
+	totalDiscounts := utils.NewMoney(0, constants.PHP)
 
 	if params.ShippingQuotation != nil {
 		deliveryFee = utils.NewMoney(int64(params.ShippingQuotation.Fee*100), params.ShippingQuotation.Currency)
@@ -220,7 +221,7 @@ func CreateOrderFromCheckout(
 		ShippingAmount:           deliveryFee.Amount(),
 		DiscountAmount:           totalDiscounts.Amount(),
 		TotalAmount:              total.Amount(),
-		Currency:                 "PHP",
+		Currency:                 constants.PHP,
 		ShippingService:          sql.NullString{Valid: false},
 		ShippingOrderID:          sql.NullString{Valid: false},
 		ShippingTrackingNumber:   sql.NullString{Valid: false},
