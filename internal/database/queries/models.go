@@ -327,6 +327,13 @@ type TblStaffLog struct {
 	UseragentID sql.NullInt64
 }
 
+type TblStaffRole struct {
+	ID        int64
+	StaffID   int64
+	Role      string
+	CreatedAt sql.NullTime
+}
+
 type TblStaffTimeOff struct {
 	ID          int64
 	Type        string

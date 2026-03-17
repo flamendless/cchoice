@@ -5,6 +5,7 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/metrics"
 	"cchoice/internal/utils"
+	"context"
 	"crypto/subtle"
 	"net/http"
 	"strconv"
@@ -143,3 +144,54 @@ func (s *Server) requireSuperuserAuth(next http.Handler) http.Handler {
 	})
 }
 
+func (s *Server) HasRole(ctx context.Context, role enums.StaffRole) bool {
+	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
+	if staffID == 0 {
+		return false
+	}
+
+	staff, _, err := s.getCurrentStaff(ctx)
+	if err != nil {
+		return false
+	}
+
+	if staff.UserType == enums.STAFF_USER_TYPE_SUPERUSER.String() {
+		return true
+	}
+
+	roles, err := s.dbRO.GetQueries().GetStaffRolesByStaffID(ctx, staffID)
+	if err != nil {
+		return false
+	}
+
+	roleStr := role.String()
+	for _, r := range roles {
+		if r == roleStr {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Server) AllowRoles(roles ...enums.StaffRole) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			hasAccess := false
+
+			for _, role := range roles {
+				if s.HasRole(ctx, role) {
+					hasAccess = true
+					break
+				}
+			}
+
+			if !hasAccess {
+				http.Error(w, "Forbidden", http.StatusForbidden)
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
+}
