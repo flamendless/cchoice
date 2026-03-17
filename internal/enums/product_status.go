@@ -8,6 +8,7 @@ const (
 	PRODUCT_STATUS_UNDEFINED ProductStatus = iota
 	PRODUCT_STATUS_ACTIVE
 	PRODUCT_STATUS_DELETED
+	PRODUCT_STATUS_DRAFT
 )
 
 func ParseProductStatusToEnum(e string) ProductStatus {
@@ -16,6 +17,8 @@ func ParseProductStatusToEnum(e string) ProductStatus {
 		return PRODUCT_STATUS_ACTIVE
 	case PRODUCT_STATUS_DELETED.String():
 		return PRODUCT_STATUS_DELETED
+	case PRODUCT_STATUS_DRAFT.String():
+		return PRODUCT_STATUS_DRAFT
 	default:
 		return PRODUCT_STATUS_UNDEFINED
 	}

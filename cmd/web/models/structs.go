@@ -221,6 +221,18 @@ type AdminProductSpecsForm struct {
 	ScopeOfSupply string
 }
 
+type AdminProductListItem struct {
+	ID          string
+	Name        string
+	Serial      string
+	Description string
+	Brand       string
+	Status      enums.ProductStatus
+	ImagePath   string
+	CreatedAt   string
+	UpdatedAt   string
+}
+
 type StaffTimeOff struct {
 	ID          string
 	StaffID     string

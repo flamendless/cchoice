@@ -1,0 +1,118 @@
+package components
+
+import "fmt"
+
+import "cchoice/cmd/web/models"
+import "cchoice/internal/constants"
+
+import "cchoice/internal/utils"
+import "cchoice/cmd/web/components/common"
+import "cchoice/internal/enums"
+
+templ AdminSuperuserProductsListPage(title string) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("[SUPERUSER] Products - C-Choice Admin")
+		</head>
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-col"
+			_="init call metrics_event('admin_visit', 'products list')"
+		>
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-6xl mx-auto">
+					<div class="text-center mb-6">
+						<img src={ constants.PathSVGLogoOnly } alt="C-Choice Logo" class="w-16 h-16 mx-auto mb-4"/>
+					</div>
+					<div class="mb-6">
+						@BackToHome(utils.URL("/admin/superuser"))
+					</div>
+					<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+						Products
+					</h1>
+					@ProductsListSection()
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+templ ProductsListSection() {
+	<div
+		class="bg-white rounded-lg shadow-md p-6"
+		hx-get={ utils.URL("/admin/superuser/products/table") }
+		hx-trigger="load"
+		hx-target="#products-table"
+		hx-swap="innerHTML"
+	>
+		@ProductSearchToolbar(utils.URL("/admin/superuser/products/table"))
+		<div id="products-table">
+			//AdminSuperuserProductsListTable
+		</div>
+	</div>
+}
+
+templ productsListTableRow(val string) {
+	<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+		{ val }
+	</td>
+}
+
+templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-50">
+				<tr>
+					@TableHead("ID")
+					@TableHead("Name")
+					@TableHead("Serial")
+					@TableHead("Description")
+					@TableHead("Brand")
+					@TableHead("Status")
+					@TableHead("Actions")
+					@TableHead("Created At")
+					@TableHead("Updated At")
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				for _, p := range products {
+					<tr id={ fmt.Sprintf("product-row-%s", p.ID) }>
+						@productsListTableRow(p.ID)
+						@productsListTableRow(p.Name)
+						@productsListTableRow(p.Serial)
+						<td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate" title={ p.Description }>
+							{ p.Description }
+						</td>
+						@productsListTableRow(p.Brand)
+						<td class="px-6 py-4 whitespace-nowrap text-sm">
+							@ProductStatus(p.Status)
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm flex flex-col items-center">
+							<a
+								href={ utils.URL("/"+p.ImagePath) }
+								target="_blank"
+								class="text-cchoice hover:text-cchoice_dark underline"
+							>
+								View Image
+							</a>
+							switch p.Status {
+								case enums.PRODUCT_STATUS_ACTIVE:
+									@ProductActionDraft(p.ID)
+								case enums.PRODUCT_STATUS_DRAFT:
+									@ProductActionPublish(p.ID)
+								case enums.PRODUCT_STATUS_DELETED:
+									@ProductActionDraft(p.ID)
+							}
+						</td>
+
+						@productsListTableRow(p.CreatedAt)
+						@productsListTableRow(p.UpdatedAt)
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}

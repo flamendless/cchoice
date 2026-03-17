@@ -27,11 +27,16 @@ import (
 	"cchoice/internal/mail"
 	"cchoice/internal/payments"
 	"cchoice/internal/requests"
+	"cchoice/internal/services"
 	"cchoice/internal/shipping"
 	"cchoice/internal/storage"
 	localstorage "cchoice/internal/storage/local"
 	"cchoice/internal/utils"
 )
+
+type Services struct {
+	products *services.ProductsService
+}
 
 type Server struct {
 	dbRO            database.Service
@@ -48,6 +53,7 @@ type Server struct {
 	encoder         encode.IEncode
 	mailService     mail.IMailService
 	emailJobRunner  *jobs.EmailJobRunner
+	services        Services
 	address         string
 	port            int
 	portFS          int
@@ -131,6 +137,10 @@ func NewServer() *ServerInstance {
 		emailJobRunner:  emailJobRunner,
 		useHTTP2:        cfg.Server.UseHTTP2,
 		useSSL:          cfg.Server.UseSSL,
+	}
+
+	newServer.services = Services{
+		products: services.NewProductsService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 	}
 
 	ctx := context.Background()

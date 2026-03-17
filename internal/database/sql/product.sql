@@ -191,6 +191,31 @@ ORDER BY tbl_products.created_at DESC
 LIMIT ?
 ;
 
+-- name: AdminGetProductsForListing :many
+SELECT
+	tbl_products.id,
+	tbl_products.name,
+	tbl_products.serial,
+	tbl_products.description,
+	tbl_brands.name AS brand_name,
+	tbl_products.status,
+	tbl_products.created_at,
+	tbl_products.updated_at,
+	COALESCE(tbl_product_images.thumbnail, '') AS image_path
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+WHERE
+	(@search IS NULL OR @search = '' OR LOWER(tbl_products.serial) LIKE '%' || LOWER(@search) || '%')
+	AND (@status IS NULL OR @status = '' OR tbl_products.status = @status)
+ORDER BY
+	CASE tbl_products.status
+		WHEN 'DRAFT' THEN 1
+		WHEN 'ACTIVE' THEN 2
+		WHEN 'DELETED' THEN 3
+		ELSE 4
+	END;
+
 
 --TODO: (Brandon) if sqlc releases PR #3498
 --      replace WHERE with `tbl_products_fts MATCH ?`
@@ -244,3 +269,8 @@ LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 WHERE tbl_product_sales.id IS NOT NULL
 ORDER BY RANDOM()
 LIMIT 1;
+
+-- name: UpdateProductsStatus :exec
+UPDATE tbl_products
+SET status = ?, updated_at = datetime('now')
+WHERE id = ?;

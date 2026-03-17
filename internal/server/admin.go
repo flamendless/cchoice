@@ -84,10 +84,13 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/time-off/table", s.adminSuperuserTimeOffTableHandler)
 	r.With(s.requireSuperuserAuth).Patch("/admin/superuser/time-off/{id}/approve", s.adminSuperuserTimeOffApproveHandler)
 	r.With(s.requireSuperuserAuth).Patch("/admin/superuser/time-off/{id}/cancel", s.adminSuperuserTimeOffCancelHandler)
-	r.With(s.requireSuperuserAuth).Get("/admin/superuser/products", s.adminSuperuserProductsHandler)
+	r.With(s.requireSuperuserAuth).Get("/admin/superuser/products/create", s.adminSuperuserProductsCreatePageHandler)
+	r.With(s.requireSuperuserAuth).Post("/admin/superuser/products/create", s.adminSuperuserProductsCreatePostHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/products/subcategories", s.adminSuperuserProductsSubcategoriesHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/products/validate-serial", s.adminSuperuserProductsValidateSerialHandler)
-	r.With(s.requireSuperuserAuth).Post("/admin/superuser/products", s.adminSuperuserProductsPostHandler)
+	r.With(s.requireSuperuserAuth).Get("/admin/superuser/products", s.adminSuperuserProductsListPageHandler)
+	r.With(s.requireSuperuserAuth).Get("/admin/superuser/products/table", s.adminSuperuserProductsListTableHandler)
+	r.With(s.requireSuperuserAuth).Patch("/admin/superuser/products/{id}/status", s.adminSuperuserProductsUpdateStatusHandler)
 }
 
 func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {

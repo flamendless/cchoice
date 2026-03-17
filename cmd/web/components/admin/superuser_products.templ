@@ -32,7 +32,7 @@ templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
 						Add New Product
 					</h1>
 					<form
-						hx-post={ utils.URL("/admin/superuser/products") }
+						hx-post={ utils.URL("/admin/superuser/products/create") }
 						hx-swap="outerHTML"
 						hx-target="body"
 						enctype="multipart/form-data"
