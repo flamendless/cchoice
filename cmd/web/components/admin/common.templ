@@ -363,3 +363,11 @@ templ StaffOptions(staffs []models.Staff) {
 		<option value={ staff.ID }>{ staff.FullName }</option>
 	}
 }
+
+templ SubcategoryOptions(subcategories []string) {
+	<option value="">Select subcategory</option>
+	for _, subcat := range subcategories {
+		<option value={ subcat }>{ subcat }</option>
+	}
+	<!-- <option value="__new__">+ Add New Subcategory</option> -->
+}

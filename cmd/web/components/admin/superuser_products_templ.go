@@ -48,20 +48,32 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t.form-section {\n\t\t\t\t\tdisplay: none;\n\t\t\t }\n\t\t\t\t.form-section.active {\n\t\t\t\t\tdisplay: block;\n\t\t\t }\n\t\t\t</style></head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'products')\"><div class=\"flex-grow p-4\"><div class=\"max-w-4xl mx-auto\"><div class=\"text-center mb-6\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'products')\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = common.ErrorBanner().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = common.SuccessBanner().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"flex-grow p-4\"><div class=\"max-w-4xl mx-auto\"><div class=\"text-center mb-6\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathSVGLogoOnly)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 32, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 26, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" alt=\"C-Choice Logo\" class=\"w-16 h-16 mx-auto mb-4\"></div><div class=\"mb-6\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" alt=\"C-Choice Logo\" class=\"w-16 h-16 mx-auto mb-4\"></div><div class=\"mb-6\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -69,118 +81,170 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">Add New Product</h1><form action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div><h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">Add New Product</h1><form hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var3 templ.SafeURL
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/products"))
+		var templ_7745c5c3_Var3 string
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/superuser/products"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 43, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 35, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" method=\"POST\" enctype=\"multipart/form-data\" class=\"bg-white rounded-lg shadow-md p-6 space-y-6\"><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><div><label for=\"brand\" class=\"block text-sm font-medium text-gray-700 mb-1\">Brand <span class=\"text-red-500\">*</span></label> <select id=\"brand\" name=\"brand_id\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select a brand</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" hx-swap=\"outerHTML\" hx-target=\"body\" enctype=\"multipart/form-data\" class=\"bg-white rounded-lg shadow-md p-6 space-y-6\"><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><div><label for=\"brand\" class=\"block text-sm font-medium text-gray-700 mb-1\">Brand <span class=\"text-red-500\">*</span></label> <select id=\"brand\" name=\"brand_id\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select a brand</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, brand := range formData.Brands {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<option value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(brand.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 61, Col: 46}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 54, Col: 46}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(brand.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 61, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 54, Col: 61}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</option>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</option>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</select></div><div><label for=\"category\" class=\"block text-sm font-medium text-gray-700 mb-1\">Category <span class=\"text-red-500\">*</span></label> <select id=\"category\" name=\"category\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select a category</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</select></div><div><label for=\"category\" class=\"block text-sm font-medium text-gray-700 mb-1\">Category <span class=\"text-red-500\">*</span></label> <select id=\"category\" name=\"category\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"on change\n\t\t\t\t\t\t\t\t\tif my.value\n\t\t\t\t\t\t\t\t\t\ttrigger get on #subcategory\n\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\"><option value=\"\">Select a category</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, cat := range formData.Categories {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<option value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(cat.Category)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 78, Col: 38}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 75, Col: 38}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(cat.Category)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 78, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 75, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</option>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</option>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</select></div><div><label for=\"subcategory\" class=\"block text-sm font-medium text-gray-700 mb-1\">Subcategory</label> <select id=\"subcategory\" name=\"subcategory\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select subcategory</option> <option value=\"__new__\">+ Add New Subcategory</option></select></div><div id=\"new_subcategory_container\" class=\"hidden\"><label for=\"new_subcategory\" class=\"block text-sm font-medium text-gray-700 mb-1\">New Subcategory</label> <input type=\"text\" id=\"new_subcategory\" name=\"new_subcategory\" pattern=\"[a-zA-Z0-9\\s\\-_]+\" minlength=\"2\" maxlength=\"100\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div class=\"md:col-span-2\"><label for=\"name\" class=\"block text-sm font-medium text-gray-700 mb-1\">Product Name <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"name\" name=\"name\" required minlength=\"2\" maxlength=\"255\" pattern=\"[a-zA-Z0-9\\s\\-_.,]+\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"serial\" class=\"block text-sm font-medium text-gray-700 mb-1\">Serial Number <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"serial\" name=\"serial\" required minlength=\"1\" maxlength=\"100\" pattern=\"[a-zA-Z0-9\\-_]+\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"price\" class=\"block text-sm font-medium text-gray-700 mb-1\">Unit Price (with VAT) <span class=\"text-red-500\">*</span></label><div class=\"relative\"><span class=\"absolute left-3 top-1/2 -translate-y-1/2 text-gray-500\">₱</span> <input type=\"number\" id=\"price\" name=\"price\" required min=\"0.01\" step=\"0.01\" max=\"999999999.99\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><p class=\"text-xs text-gray-500 mt-1\">Price includes ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</select></div><div><label for=\"subcategory\" class=\"block text-sm font-medium text-gray-700 mb-1\">Subcategory <span class=\"text-red-500\">*</span></label> <select id=\"subcategory\" name=\"subcategory\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(formData.VATPercentage)
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/superuser/products/subcategories"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 162, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 88, Col: 70}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "% VAT</p></div><div class=\"md:col-span-2\"><label for=\"description\" class=\"block text-sm font-medium text-gray-700 mb-1\">Description</label> <textarea id=\"description\" name=\"description\" rows=\"4\" maxlength=\"2000\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></textarea></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Specifications</h2><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><div><label for=\"spec_colours\" class=\"block text-sm font-medium text-gray-700 mb-1\">Colours</label> <input type=\"text\" id=\"spec_colours\" name=\"spec_colours\" maxlength=\"500\" placeholder=\"e.g., Red, Blue, Green\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_sizes\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sizes</label> <input type=\"text\" id=\"spec_sizes\" name=\"spec_sizes\" maxlength=\"500\" placeholder=\"e.g., S, M, L, XL\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_segmentation\" class=\"block text-sm font-medium text-gray-700 mb-1\">Segmentation</label> <input type=\"text\" id=\"spec_segmentation\" name=\"spec_segmentation\" maxlength=\"255\" placeholder=\"e.g., Industrial, Commercial, Residential\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_part_number\" class=\"block text-sm font-medium text-gray-700 mb-1\">Part Number</label> <input type=\"text\" id=\"spec_part_number\" name=\"spec_part_number\" maxlength=\"100\" pattern=\"[a-zA-Z0-9\\-_]+\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_power\" class=\"block text-sm font-medium text-gray-700 mb-1\">Power</label> <input type=\"text\" id=\"spec_power\" name=\"spec_power\" maxlength=\"100\" placeholder=\"e.g., 500W, 1.5HP\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_capacity\" class=\"block text-sm font-medium text-gray-700 mb-1\">Capacity</label> <input type=\"text\" id=\"spec_capacity\" name=\"spec_capacity\" maxlength=\"100\" placeholder=\"e.g., 20L, 100kg\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div class=\"md:col-span-2\"><label for=\"spec_scope_of_supply\" class=\"block text-sm font-medium text-gray-700 mb-1\">Scope of Supply</label> <textarea id=\"spec_scope_of_supply\" name=\"spec_scope_of_supply\" rows=\"3\" maxlength=\"1000\" placeholder=\"List items included in the package\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></textarea></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Images</h2><div><label for=\"product_image\" class=\"block text-sm font-medium text-gray-700 mb-1\">Product Image</label> <input type=\"file\" id=\"product_image\" name=\"product_image\" accept=\"image/jpeg,image/png,image/webp,image/gif\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><p class=\"text-xs text-gray-500 mt-1\">Allowed formats: JPEG, PNG, WebP, GIF. Max size: 10MB.</p></div></div><div class=\"flex justify-end gap-4 pt-4 border-t\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" hx-trigger=\"get\" hx-include=\"#category\" hx-swap=\"innerHTML\" hx-target=\"this\"><option value=\"\">Select subcategory</option></select></div><div class=\"md:col-span-2\"><label for=\"name\" class=\"block text-sm font-medium text-gray-700 mb-1\">Product Name <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"name\" name=\"name\" required minlength=\"2\" maxlength=\"255\" pattern=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var9 templ.SafeURL
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser"))
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternProductName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 304, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 108, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Create Product</button></div></form><script id=\"categories_data\" type=\"application/json\">\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tfor _, cat := range formData.Categories {\n\t\t\t\t\t\t\t\t\"{ cat.Category }\": [\n\t\t\t\t\t\t\t\t\tfor _, subcat := range cat.Subcategories {\n\t\t\t\t\t\t\t\t\t\t\"{ subcat }\",\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t],\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t</script><script>\n\t\t\t\t\t\tdocument.getElementById('category').addEventListener('change', function() {\n\t\t\t\t\t\t\tvar subcatSelect = document.getElementById('subcategory');\n\t\t\t\t\t\t\tvar selectedCat = this.value;\n\n\t\t\t\t\t\t\tsubcatSelect.innerHTML = '<option value=\"\">Select subcategory</option><option value=\"__new__\">+ Add New Subcategory</option>';\n\n\t\t\t\t\t\t\tif (selectedCat) {\n\t\t\t\t\t\t\t\tvar dataElem = document.getElementById('categories_data');\n\t\t\t\t\t\t\t\tvar categoriesData = JSON.parse(dataElem.textContent);\n\t\t\t\t\t\t\t\tvar subcats = categoriesData[selectedCat] || [];\n\t\t\t\t\t\t\t\tfor (var i = 0; i < subcats.length; i++) {\n\t\t\t\t\t\t\t\t\tvar opt = document.createElement('option');\n\t\t\t\t\t\t\t\t\topt.value = subcats[i];\n\t\t\t\t\t\t\t\t\topt.textContent = subcats[i];\n\t\t\t\t\t\t\t\t\tsubcatSelect.appendChild(opt);\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t});\n\n\t\t\t\t\t\tdocument.getElementById('subcategory').addEventListener('change', function() {\n\t\t\t\t\t\t\tvar newSubcatContainer = document.getElementById('new_subcategory_container');\n\t\t\t\t\t\t\tif (this.value === '__new__') {\n\t\t\t\t\t\t\t\tnewSubcatContainer.classList.remove('hidden');\n\t\t\t\t\t\t\t\tdocument.getElementById('new_subcategory').focus();\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\tnewSubcatContainer.classList.add('hidden');\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t});\n\n\t\t\t\t\t\tdocument.getElementById('new_subcategory').addEventListener('input', function() {\n\t\t\t\t\t\t\tif (this.value.trim() !== '') {\n\t\t\t\t\t\t\t\tdocument.getElementById('subcategory').value = '__new__';\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t});\n\t\t\t\t\t</script></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"serial\" class=\"block text-sm font-medium text-gray-700 mb-1\">Serial Number <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"serial\" name=\"serial\" required minlength=\"1\" maxlength=\"100\" pattern=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var10 string
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternSerialNumber)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 123, Col: 49}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"price\" class=\"block text-sm font-medium text-gray-700 mb-1\">Unit Price (with VAT) <span class=\"text-red-500\">*</span></label><div class=\"relative\"><span class=\"absolute left-3 top-1/2 -translate-y-1/2 text-gray-500\">₱</span> <input type=\"number\" id=\"price\" name=\"price\" required min=\"0.01\" step=\"0.01\" max=\"999999999.99\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><p class=\"text-xs text-gray-500 mt-1\">Price includes ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var11 string
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(formData.VATPercentage)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 145, Col: 48}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "% VAT</p></div><div class=\"md:col-span-2\"><label for=\"description\" class=\"block text-sm font-medium text-gray-700 mb-1\">Description <span class=\"text-red-500\">*</span></label> <textarea id=\"description\" name=\"description\" required rows=\"4\" maxlength=\"2000\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></textarea></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Specifications</h2><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><div><label for=\"spec_colours\" class=\"block text-sm font-medium text-gray-700 mb-1\">Colours <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_colours\" name=\"spec_colours\" required maxlength=\"500\" placeholder=\"e.g., Red, Blue, Green\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_sizes\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sizes <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_sizes\" name=\"spec_sizes\" required maxlength=\"500\" placeholder=\"e.g., S, M, L, XL\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_segmentation\" class=\"block text-sm font-medium text-gray-700 mb-1\">Segmentation <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_segmentation\" name=\"spec_segmentation\" required maxlength=\"255\" placeholder=\"e.g., Industrial, Commercial, Residential\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_part_number\" class=\"block text-sm font-medium text-gray-700 mb-1\">Part Number <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_part_number\" name=\"spec_part_number\" required maxlength=\"100\" pattern=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var12 string
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternSerialNumber)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 217, Col: 48}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_power\" class=\"block text-sm font-medium text-gray-700 mb-1\">Power <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_power\" name=\"spec_power\" required maxlength=\"100\" placeholder=\"e.g., 500W, 1.5HP\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_capacity\" class=\"block text-sm font-medium text-gray-700 mb-1\">Capacity <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_capacity\" name=\"spec_capacity\" required maxlength=\"100\" placeholder=\"e.g., 20L, 100kg\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div class=\"md:col-span-2\"><label for=\"spec_scope_of_supply\" class=\"block text-sm font-medium text-gray-700 mb-1\">Scope of Supply <span class=\"text-red-500\">*</span></label> <textarea id=\"spec_scope_of_supply\" name=\"spec_scope_of_supply\" required rows=\"3\" maxlength=\"1000\" placeholder=\"List items included in the package\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></textarea></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Images</h2><div><label for=\"product_image\" class=\"block text-sm font-medium text-gray-700 mb-1\">Product Image <span class=\"text-red-500\">*</span></label> <input type=\"file\" id=\"product_image\" name=\"product_image\" required accept=\"image/jpeg,image/png,image/webp,image/gif\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><p class=\"text-xs text-gray-500 mt-1\">Allowed formats: JPEG, PNG, WebP, GIF. Max size: 10MB.</p></div></div><div class=\"flex justify-end gap-4 pt-4 border-t\"><a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var13 templ.SafeURL
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products.templ`, Line: 286, Col: 44}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\" _=\"on click call metrics_event('admin_exec', 'create product')\">Create Product</button></div></form></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
