@@ -73,7 +73,7 @@ templ AdminSuperuserHomePage(fullName string) {
 						</a>
 
 						<a
-							href={ utils.URL("/admin/superuser/products") }
+							href={ utils.URL("/admin/superuser/products/create") }
 							class="block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice"
 						>
 							<div class="flex justify-center mb-4">
@@ -81,8 +81,21 @@ templ AdminSuperuserHomePage(fullName string) {
 									<path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
 								</svg>
 							</div>
-							<h2 class="text-xl font-semibold text-gray-800 mb-2">Products</h2>
-							<p class="text-sm text-gray-500">Manage products, specs, and inventory</p>
+							<h2 class="text-xl font-semibold text-gray-800 mb-2">Create Product</h2>
+							<p class="text-sm text-gray-500">Create a product</p>
+						</a>
+
+						<a
+							href={ utils.URL("/admin/superuser/products") }
+							class="block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice"
+						>
+							<div class="flex justify-center mb-4">
+								<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-cchoice" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+								</svg>
+							</div>
+							<h2 class="text-xl font-semibold text-gray-800 mb-2">Manage Products</h2>
+							<p class="text-sm text-gray-500">View and manage all products</p>
 						</a>
 					</div>
 

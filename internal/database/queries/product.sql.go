@@ -11,6 +11,84 @@ import (
 	"time"
 )
 
+const adminGetProductsForListing = `-- name: AdminGetProductsForListing :many
+;
+
+SELECT
+	tbl_products.id,
+	tbl_products.name,
+	tbl_products.serial,
+	tbl_products.description,
+	tbl_brands.name AS brand_name,
+	tbl_products.status,
+	tbl_products.created_at,
+	tbl_products.updated_at,
+	COALESCE(tbl_product_images.thumbnail, '') AS image_path
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+WHERE
+	(?1 IS NULL OR ?1 = '' OR LOWER(tbl_products.serial) LIKE '%' || LOWER(?1) || '%')
+	AND (?2 IS NULL OR ?2 = '' OR tbl_products.status = ?2)
+ORDER BY
+	CASE tbl_products.status
+		WHEN 'DRAFT' THEN 1
+		WHEN 'ACTIVE' THEN 2
+		WHEN 'DELETED' THEN 3
+		ELSE 4
+	END
+`
+
+type AdminGetProductsForListingParams struct {
+	Search interface{}
+	Status interface{}
+}
+
+type AdminGetProductsForListingRow struct {
+	ID          int64
+	Name        string
+	Serial      string
+	Description sql.NullString
+	BrandName   string
+	Status      string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	ImagePath   string
+}
+
+func (q *Queries) AdminGetProductsForListing(ctx context.Context, arg AdminGetProductsForListingParams) ([]AdminGetProductsForListingRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetProductsForListing, arg.Search, arg.Status)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetProductsForListingRow
+	for rows.Next() {
+		var i AdminGetProductsForListingRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Serial,
+			&i.Description,
+			&i.BrandName,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ImagePath,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const checkProductExistsByID = `-- name: CheckProductExistsByID :one
 SELECT 1
 FROM tbl_products
@@ -462,9 +540,6 @@ func (q *Queries) GetProductsByID(ctx context.Context, id int64) (GetProductsByI
 }
 
 const getProductsBySearchQuery = `-- name: GetProductsBySearchQuery :many
-;
-
-
 SELECT
 	tbl_products.id,
 	tbl_products.name,
@@ -1380,6 +1455,22 @@ func (q *Queries) UpdateProducts(ctx context.Context, arg UpdateProductsParams) 
 		return 0, err
 	}
 	return result.LastInsertId()
+}
+
+const updateProductsStatus = `-- name: UpdateProductsStatus :exec
+UPDATE tbl_products
+SET status = ?, updated_at = datetime('now')
+WHERE id = ?
+`
+
+type UpdateProductsStatusParams struct {
+	Status string
+	ID     int64
+}
+
+func (q *Queries) UpdateProductsStatus(ctx context.Context, arg UpdateProductsStatusParams) error {
+	_, err := q.db.ExecContext(ctx, updateProductsStatus, arg.Status, arg.ID)
+	return err
 }
 
 const validateUniqueSerial = `-- name: ValidateUniqueSerial :one

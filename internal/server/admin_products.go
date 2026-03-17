@@ -21,7 +21,6 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
-	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
@@ -77,8 +76,7 @@ func (s *Server) adminSuperuserProductsValidateSerialHandler(w http.ResponseWrit
 		return
 	}
 
-	productsService := services.NewProductsService(s.dbRO)
-	isUnique, err := productsService.ValidateSerial(ctx, serial)
+	isUnique, err := s.services.products.ValidateSerial(ctx, serial)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		if err := compadmin.SerialValidationResult(false).Render(ctx, w); err != nil {
@@ -99,39 +97,40 @@ func (s *Server) adminSuperuserProductsValidateSerialHandler(w http.ResponseWrit
 	}
 }
 
-func (s *Server) adminSuperuserProductsPostHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Superuser Products Post Handler]"
+	const page = "/admin/superuser/products/create"
 	ctx := r.Context()
 
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Failed to parse form"))
+		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
 		return
 	}
 
 	brandIDStr := r.FormValue("brand_id")
 	if brandIDStr == "" {
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Brand is required"))
+		redirectHX(w, r, utils.URLWithError(page, "Brand is required"))
 		return
 	}
 	brandID, err := strconv.ParseInt(brandIDStr, 10, 64)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Invalid brand"))
+		redirectHX(w, r, utils.URLWithError(page, "Invalid brand"))
 		return
 	}
 
 	_, err = s.dbRO.GetQueries().GetBrandsByID(ctx, brandID)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Brand not found"))
+		redirectHX(w, r, utils.URLWithError(page, "Brand not found"))
 		return
 	}
 
 	category := r.FormValue("category")
 	subcategory := r.FormValue("subcategory")
 	if category == "" || subcategory == "" {
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Category and subcategory are required"))
+		redirectHX(w, r, utils.URLWithError(page, "Category and subcategory are required"))
 		return
 	}
 
@@ -141,7 +140,7 @@ func (s *Server) adminSuperuserProductsPostHandler(w http.ResponseWriter, r *htt
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Category not found"))
+		redirectHX(w, r, utils.URLWithError(page, "Category not found"))
 		return
 	}
 
@@ -151,27 +150,26 @@ func (s *Server) adminSuperuserProductsPostHandler(w http.ResponseWriter, r *htt
 	priceStr := r.FormValue("price")
 
 	if name == "" || serial == "" || description == "" || priceStr == "" {
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "All fields are required"))
+		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
 		return
 	}
 
-	productsService := services.NewProductsService(s.dbRO)
-	isUnique, err := productsService.ValidateSerial(ctx, serial)
+	isUnique, err := s.services.products.ValidateSerial(ctx, serial)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Failed to validate serial"))
+		redirectHX(w, r, utils.URLWithError(page, "Failed to validate serial"))
 		return
 	}
 
 	if !isUnique {
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Serial already exists"))
+		redirectHX(w, r, utils.URLWithError(page, "Serial already exists"))
 		return
 	}
 
 	price, err := strconv.ParseFloat(priceStr, 64)
 	if err != nil || price <= 0 {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Invalid price"))
+		redirectHX(w, r, utils.URLWithError(page, "Invalid price"))
 		return
 	}
 
@@ -193,14 +191,14 @@ func (s *Server) adminSuperuserProductsPostHandler(w http.ResponseWriter, r *htt
 
 	if specColours == "" || specSizes == "" || specSegmentation == "" ||
 		specPartNumber == "" || specPower == "" || specCapacity == "" || specScopeOfSupply == "" {
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "All product specs are required"))
+		redirectHX(w, r, utils.URLWithError(page, "All product specs are required"))
 		return
 	}
 
 	file, header, err := r.FormFile("product_image")
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Product image is required"))
+		redirectHX(w, r, utils.URLWithError(page, "Product image is required"))
 		return
 	}
 	defer file.Close()
@@ -212,13 +210,13 @@ func (s *Server) adminSuperuserProductsPostHandler(w http.ResponseWriter, r *htt
 	buf := bytes.Buffer{}
 	if _, err := io.Copy(&buf, file); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Failed to read image"))
+		redirectHX(w, r, utils.URLWithError(page, "Failed to read image"))
 		return
 	}
 	contentType := header.Header.Get("Content-Type")
 	if err := s.objectStorage.PutObject(ctx, filename, &buf, contentType); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Failed to upload image"))
+		redirectHX(w, r, utils.URLWithError(page, "Failed to upload image"))
 		return
 	}
 
@@ -235,7 +233,7 @@ func (s *Server) adminSuperuserProductsPostHandler(w http.ResponseWriter, r *htt
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Failed to create product specs"))
+		redirectHX(w, r, utils.URLWithError(page, "Failed to create product specs"))
 		return
 	}
 
@@ -244,7 +242,7 @@ func (s *Server) adminSuperuserProductsPostHandler(w http.ResponseWriter, r *htt
 		Name:                        name,
 		Description:                 sql.NullString{String: description, Valid: true},
 		BrandID:                     brandID,
-		Status:                      enums.PRODUCT_STATUS_ACTIVE.String(),
+		Status:                      enums.PRODUCT_STATUS_DRAFT.String(),
 		ProductSpecsID:              sql.NullInt64{Int64: specs.ID, Valid: true},
 		UnitPriceWithoutVat:         unitPriceWithoutVat,
 		UnitPriceWithVat:            unitPriceWithVat,
@@ -256,7 +254,7 @@ func (s *Server) adminSuperuserProductsPostHandler(w http.ResponseWriter, r *htt
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Failed to create product"))
+		redirectHX(w, r, utils.URLWithError(page, "Failed to create product"))
 		return
 	}
 
@@ -266,7 +264,7 @@ func (s *Server) adminSuperuserProductsPostHandler(w http.ResponseWriter, r *htt
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Failed to link product to category"))
+		redirectHX(w, r, utils.URLWithError(page, "Failed to link product to category"))
 		return
 	}
 
@@ -280,15 +278,15 @@ func (s *Server) adminSuperuserProductsPostHandler(w http.ResponseWriter, r *htt
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Failed to save product image"))
+		redirectHX(w, r, utils.URLWithError(page, "Failed to save product image"))
 		return
 	}
 
 	logs.LogCtx(ctx).Info(logtag, zap.Int64("product_id", product.ID), zap.String("name", name))
-	redirectHX(w, r, utils.URLWithSuccess("/admin/superuser/products", "Product created successfully"))
+	redirectHX(w, r, utils.URLWithSuccess(page, "Product created successfully"))
 }
 
-func (s *Server) adminSuperuserProductsHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) adminSuperuserProductsCreatePageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Superuser Products Handler]"
 	ctx := r.Context()
 

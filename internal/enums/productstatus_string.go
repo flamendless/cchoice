@@ -11,11 +11,12 @@ func _() {
 	_ = x[PRODUCT_STATUS_UNDEFINED-0]
 	_ = x[PRODUCT_STATUS_ACTIVE-1]
 	_ = x[PRODUCT_STATUS_DELETED-2]
+	_ = x[PRODUCT_STATUS_DRAFT-3]
 }
 
-const _ProductStatus_name = "UNDEFINEDACTIVEDELETED"
+const _ProductStatus_name = "UNDEFINEDACTIVEDELETEDDRAFT"
 
-var _ProductStatus_index = [...]uint8{0, 9, 15, 22}
+var _ProductStatus_index = [...]uint8{0, 9, 15, 22, 27}
 
 func (i ProductStatus) String() string {
 	idx := int(i) - 0
