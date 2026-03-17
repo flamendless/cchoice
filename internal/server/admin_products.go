@@ -21,6 +21,7 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
+	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
@@ -61,6 +62,40 @@ func (s *Server) adminSuperuserProductsSubcategoriesHandler(w http.ResponseWrite
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+}
+
+func (s *Server) adminSuperuserProductsValidateSerialHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Products Validate Serial Handler]"
+	ctx := r.Context()
+
+	serial := r.URL.Query().Get("serial")
+	if serial == "" {
+		if err := compadmin.SerialValidationResult(false).Render(ctx, w); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		}
+		return
+	}
+
+	productsService := services.NewProductsService(s.dbRO)
+	isUnique, err := productsService.ValidateSerial(ctx, serial)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		if err := compadmin.SerialValidationResult(false).Render(ctx, w); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		}
+		return
+	}
+
+	if !isUnique {
+		if err := compadmin.SerialValidationResult(false).Render(ctx, w); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		}
+		return
+	}
+
+	if err := compadmin.SerialValidationResult(true).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}
 }
 
@@ -117,6 +152,19 @@ func (s *Server) adminSuperuserProductsPostHandler(w http.ResponseWriter, r *htt
 
 	if name == "" || serial == "" || description == "" || priceStr == "" {
 		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "All fields are required"))
+		return
+	}
+
+	productsService := services.NewProductsService(s.dbRO)
+	isUnique, err := productsService.ValidateSerial(ctx, serial)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Failed to validate serial"))
+		return
+	}
+
+	if !isUnique {
+		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", "Serial already exists"))
 		return
 	}
 

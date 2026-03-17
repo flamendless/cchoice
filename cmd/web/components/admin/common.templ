@@ -371,3 +371,11 @@ templ SubcategoryOptions(subcategories []string) {
 	}
 	<!-- <option value="__new__">+ Add New Subcategory</option> -->
 }
+
+templ SerialValidationResult(isValid bool) {
+	if isValid {
+		<p class="text-sm text-green-600 mt-1">Serial is unique ✓</p>
+	} else {
+		<p class="text-sm text-red-600 mt-1">Serial already exists</p>
+	}
+}

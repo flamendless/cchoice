@@ -9,6 +9,13 @@ INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 WHERE tbl_products.id = ?
 LIMIT 1;
 
+-- name: ValidateUniqueSerial :one
+SELECT
+	id
+FROM tbl_products
+WHERE tbl_products.serial = ?
+LIMIT 1;
+
 -- name: GetProductByName :one
 SELECT
 	*
