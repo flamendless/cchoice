@@ -2,7 +2,6 @@ package server
 
 import (
 	"bytes"
-	"database/sql"
 	"fmt"
 	"io"
 	"math"
@@ -10,17 +9,16 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/conf"
-	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
-	"cchoice/internal/enums"
+	"cchoice/internal/encode"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
+	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
@@ -108,22 +106,9 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		return
 	}
 
-	brandIDStr := r.FormValue("brand_id")
-	if brandIDStr == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Brand is required"))
-		return
-	}
-	brandID, err := strconv.ParseInt(brandIDStr, 10, 64)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	brandID := s.encoder.Decode(r.FormValue("brand_id"))
+	if brandID == encode.INVALID {
 		redirectHX(w, r, utils.URLWithError(page, "Invalid brand"))
-		return
-	}
-
-	_, err = s.dbRO.GetQueries().GetBrandsByID(ctx, brandID)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Brand not found"))
 		return
 	}
 
@@ -134,21 +119,10 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		return
 	}
 
-	categoryRow, err := s.dbRO.GetQueries().GetProductCategoryByCategoryAndSubcategory(ctx, queries.GetProductCategoryByCategoryAndSubcategoryParams{
-		Category:    sql.NullString{String: category, Valid: true},
-		Subcategory: sql.NullString{String: subcategory, Valid: true},
-	})
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Category not found"))
-		return
-	}
-
 	name := r.FormValue("name")
 	serial := r.FormValue("serial")
 	description := r.FormValue("description")
 	priceStr := r.FormValue("price")
-
 	if name == "" || serial == "" || description == "" || priceStr == "" {
 		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
 		return
@@ -220,65 +194,29 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		return
 	}
 
-	now := time.Now().UTC()
-
-	specs, err := s.dbRW.GetQueries().CreateProductSpecs(ctx, queries.CreateProductSpecsParams{
-		Colours:       sql.NullString{String: specColours, Valid: true},
-		Sizes:         sql.NullString{String: specSizes, Valid: true},
-		Segmentation:  sql.NullString{String: specSegmentation, Valid: true},
-		PartNumber:    sql.NullString{String: specPartNumber, Valid: true},
-		Power:         sql.NullString{String: specPower, Valid: true},
-		Capacity:      sql.NullString{String: specCapacity, Valid: true},
-		ScopeOfSupply: sql.NullString{String: specScopeOfSupply, Valid: true},
-	})
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to create product specs"))
-		return
-	}
-
-	product, err := s.dbRW.GetQueries().CreateProducts(ctx, queries.CreateProductsParams{
-		Serial:                      serial,
-		Name:                        name,
-		Description:                 sql.NullString{String: description, Valid: true},
-		BrandID:                     brandID,
-		Status:                      enums.PRODUCT_STATUS_DRAFT.String(),
-		ProductSpecsID:              sql.NullInt64{Int64: specs.ID, Valid: true},
-		UnitPriceWithoutVat:         unitPriceWithoutVat,
-		UnitPriceWithVat:            unitPriceWithVat,
-		UnitPriceWithoutVatCurrency: constants.PHP,
-		UnitPriceWithVatCurrency:    constants.PHP,
-		CreatedAt:                   now,
-		UpdatedAt:                   now,
-		DeletedAt:                   constants.DtBeginning,
+	product, err := s.services.products.CreateProduct(ctx, services.CreateProductInput{
+		Serial:      serial,
+		Name:        name,
+		Description: description,
+		BrandID:     brandID,
+		Category:    category,
+		Subcategory: subcategory,
+		Specs: services.ProductSpecsInput{
+			Colours:       specColours,
+			Sizes:         specSizes,
+			Segmentation:  specSegmentation,
+			PartNumber:    specPartNumber,
+			Power:         specPower,
+			Capacity:      specCapacity,
+			ScopeOfSupply: specScopeOfSupply,
+		},
+		ImagePath:           filename,
+		UnitPriceWithoutVat: unitPriceWithoutVat,
+		UnitPriceWithVat:    unitPriceWithVat,
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, "Failed to create product"))
-		return
-	}
-
-	_, err = s.dbRW.GetQueries().CreateProductsCategories(ctx, queries.CreateProductsCategoriesParams{
-		ProductID:  product.ID,
-		CategoryID: categoryRow.ID,
-	})
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to link product to category"))
-		return
-	}
-
-	_, err = s.dbRW.GetQueries().CreateProductImage(ctx, queries.CreateProductImageParams{
-		ProductID: product.ID,
-		Path:      filename,
-		Thumbnail: sql.NullString{String: filename, Valid: true},
-		CreatedAt: now,
-		UpdatedAt: now,
-		DeletedAt: constants.DtBeginning,
-	})
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to save product image"))
 		return
 	}
 
@@ -305,7 +243,7 @@ func (s *Server) adminSuperuserProductsCreatePageHandler(w http.ResponseWriter, 
 	brands := make([]models.AdminBrand, 0, len(brandsRes))
 	for _, b := range brandsRes {
 		brands = append(brands, models.AdminBrand{
-			ID:   b.ID,
+			ID:   s.encoder.Encode(b.ID),
 			Name: b.Name,
 		})
 	}

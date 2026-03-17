@@ -187,18 +187,16 @@ type AdminSuperuserPage struct {
 }
 
 type AdminBrand struct {
-	ID   int64
+	ID   string
 	Name string
 }
 
 type AdminCategory struct {
-	ID            int64
 	Category      string
 	Subcategories []string
 }
 
 type AdminSubcategory struct {
-	ID          int64
 	Category    string
 	Subcategory string
 }
