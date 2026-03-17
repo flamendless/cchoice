@@ -452,5 +452,17 @@ func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter
 		return
 	}
 
+	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
+	if err := s.services.staffLogs.CreateLog(
+		ctx,
+		staffID,
+		"update status",
+		"products",
+		"success",
+		nil,
+	); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
+
 	redirectHX(w, r, utils.URLWithSuccess(page, "Product status updated successfully"))
 }
