@@ -55,9 +55,15 @@ templ ProductsListSection() {
 	</div>
 }
 
-templ productsListTableRow(val string) {
-	<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-		{ val }
+templ TableHeader(w string, value string) {
+	<th class={ fmt.Sprintf("px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[%s]", w) }>
+		{ value }
+	</th>
+}
+
+templ TableCell(w string, extraClasses string) {
+	<td class={ fmt.Sprintf("px-6 py-4 whitespace-nowrap text-sm w-[%s] %s", w, extraClasses) }>
+		{ children... }
 	</td>
 }
 
@@ -66,38 +72,65 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 		<table class="min-w-full divide-y divide-gray-200">
 			<thead class="bg-gray-50">
 				<tr>
-					@TableHead("ID")
-					@TableHead("Name")
-					@TableHead("Serial")
-					@TableHead("Description")
-					@TableHead("Brand")
-					@TableHead("Status")
-					@TableHead("Actions")
-					@TableHead("Created At")
-					@TableHead("Updated At")
+					@TableHeader("5%", "ID")
+					@TableHeader("5%", "Name")
+					@TableHeader("5%", "Serial")
+					@TableHeader("10%", "Description")
+					@TableHeader("5%", "Brand")
+					@TableHeader("5%", "Status")
+					@TableHeader("10%", "Actions")
+					@TableHeader("7%", "Created At")
+					@TableHeader("7%", "Updated At")
 				</tr>
 			</thead>
 			<tbody class="bg-white divide-y divide-gray-200">
 				for _, p := range products {
 					<tr id={ fmt.Sprintf("product-row-%s", p.ID) }>
-						@productsListTableRow(p.ID)
-						@productsListTableRow(p.Name)
-						@productsListTableRow(p.Serial)
-						<td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate" title={ p.Description }>
-							{ p.Description }
-						</td>
-						@productsListTableRow(p.Brand)
-						<td class="px-6 py-4 whitespace-nowrap text-sm">
+						@TableCell("5%", "text-gray-900") {
+							{ p.ID }
+						}
+						@TableCell("5%", "text-gray-900") {
+							{ p.Name }
+						}
+						@TableCell("5%", "text-gray-900") {
+							{ p.Serial }
+						}
+						@TableCell("10%", "text-gray-900 max-w-xs truncate") {
+							<span title={ p.Description }>{ p.Description }</span>
+						}
+						@TableCell("5%", "text-gray-900") {
+							{ p.Brand }
+						}
+						@TableCell("5%", "") {
 							@ProductStatus(p.Status)
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm flex flex-col items-center">
-							<a
-								href={ utils.URL("/"+p.ImagePath) }
-								target="_blank"
-								class="text-cchoice hover:text-cchoice_dark underline"
-							>
-								View Image
-							</a>
+						}
+						@TableCell("10%", "") {
+							<div class="flex flex-col items-center gap-2">
+							if p.ImagePath == "" {
+								<a
+									class="
+										inline-block px-3 py-1 text-xs font-medium rounded
+										bg-cchoice/30 text-cchoice_dark/50
+										border border-cchoice/40
+										cursor-not-allowed pointer-events-none
+									"
+								>
+									View Image
+								</a>
+							} else {
+								<a
+									href={ utils.URL("/"+p.ImagePath) }
+									target="_blank"
+									class="
+										inline-block px-3 py-1 text-xs font-medium rounded
+										bg-cchoice text-white
+										hover:bg-cchoice_dark
+										border border-cchoice_dark
+									"
+								>
+									View Image
+								</a>
+							}
 							switch p.Status {
 								case enums.PRODUCT_STATUS_ACTIVE:
 									@ProductActionDraft(p.ID)
@@ -106,10 +139,14 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 								case enums.PRODUCT_STATUS_DELETED:
 									@ProductActionDraft(p.ID)
 							}
-						</td>
-
-						@productsListTableRow(p.CreatedAt)
-						@productsListTableRow(p.UpdatedAt)
+							</div>
+						}
+						@TableCell("7%", "text-gray-900") {
+							{ p.CreatedAt }
+						}
+						@TableCell("7%", "text-gray-900") {
+							{ p.UpdatedAt }
+						}
 					</tr>
 				}
 			</tbody>
