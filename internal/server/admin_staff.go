@@ -2,14 +2,11 @@ package server
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
-	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
@@ -296,6 +293,9 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	var hasTimeIn, hasTimeOut bool
 	var hasLunchBreakIn, hasLunchBreakOut bool
 	var myAttendance *models.Attendance
+	var inShop, outShop *bool
+	var locationDisplay string
+	var distanceMeters float64
 	if err != nil {
 		if err != sql.ErrNoRows {
 			logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
@@ -334,50 +334,15 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		myAttendance = &rec
 	}
 
-	shop := conf.Conf().Settings.ShopLocation
-	var inShop, outShop *bool
-	if shop.RadiusMeters > 0 {
-		if err == nil {
-			if lat, lng, ok := utils.ParseLocation(attendance.InLocation); ok {
-				b := utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
-				inShop = &b
-			}
-			if lat, lng, ok := utils.ParseLocation(attendance.OutLocation); ok {
-				b := utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
-				outShop = &b
-			}
-		}
-		if inShop == nil {
-			locJSON := GetLocation(ctx, s.sessionManager)
-			if lat, lng, ok := utils.ParseLocation(locJSON); ok {
-				b := utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
-				inShop = &b
-			}
-		}
-		if outShop == nil {
-			locJSON := GetLocation(ctx, s.sessionManager)
-			if lat, lng, ok := utils.ParseLocation(locJSON); ok {
-				b := utils.IsWithinRadius(lat, lng, shop.Lat, shop.Lng, shop.RadiusMeters)
-				outShop = &b
-			}
-		}
-	}
+	inShop, outShop = s.services.location.CheckShopRadius(
+		ctx,
+		s.sessionManager,
+		attendance.InLocation,
+		attendance.OutLocation,
+	)
 
 	scheduledTimeIn := staff.TimeInSchedule.String
 	scheduledTimeOut := staff.TimeOutSchedule.String
-
-	locationDisplay := "unable to get location"
-	distanceMeters := 0.0
-	if locJSON := GetLocation(ctx, s.sessionManager); locJSON.Valid {
-		if lat, lng, ok := utils.ParseLocation(locJSON); ok {
-			locationDisplay = fmt.Sprintf("%.4f, %.4f", lat, lng)
-			if shop.Lat != 0 && shop.Lng != 0 {
-				distanceMeters = utils.HaversineDistanceMeters(lat, lng, shop.Lat, shop.Lng)
-			}
-		} else {
-			locationDisplay = locJSON.String
-		}
-	}
 
 	canTimeIn := !hasTimeIn
 	canTimeOut := hasTimeIn && !hasTimeOut
@@ -392,6 +357,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	// 	}
 	// }
 
+	locationDisplay, distanceMeters = s.services.location.ComputeLocationDisplay(ctx, s.sessionManager)
 	profile := models.AdminStaffProfile{
 		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
 		Birthdate:        staff.Birthdate,
@@ -739,52 +705,16 @@ func (s *Server) adminStaffAttendanceLocationHandler(w http.ResponseWriter, r *h
 		return
 	}
 
-	var date, latStr, lngStr string
-	if r.Header.Get("Content-Type") == "application/json" {
-		var body struct {
-			Date string  `json:"date"`
-			Lat  float64 `json:"lat"`
-			Lng  float64 `json:"lng"`
-		}
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			http.Error(w, "Invalid body", http.StatusBadRequest)
-			return
-		}
-		date = body.Date
-		latStr = strconv.FormatFloat(body.Lat, 'f', -1, 64)
-		lngStr = strconv.FormatFloat(body.Lng, 'f', -1, 64)
-	} else {
-		_ = r.ParseForm()
-		date = r.PostFormValue("date")
-		latStr = r.PostFormValue("lat")
-		lngStr = r.PostFormValue("lng")
-	}
-
-	if latStr == "" || lngStr == "" {
-		http.Error(w, "lat and lng required", http.StatusBadRequest)
-		return
-	}
-
-	lat, err1 := strconv.ParseFloat(latStr, 64)
-	lng, err2 := strconv.ParseFloat(lngStr, 64)
-	if err1 != nil || err2 != nil {
-		http.Error(w, "invalid lat/lng", http.StatusBadRequest)
+	lat, lng, err := s.services.location.ComputeLocationFromRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	locationJSON, _ := json.Marshal(types.Location{Lat: lat, Lng: lng})
-	location := sql.NullString{String: string(locationJSON), Valid: true}
+	attendanceLocation := sql.NullString{String: string(locationJSON), Valid: true}
 
-	_ = date
-	// date = utils.ParseAttendanceDate(date)
-	// attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	// _ = attendanceService.UpsertLocation(ctx, staffID, date, location)
-
-	locationResult := services.ComputeLocation(
-		location,
-		GetLocation(ctx, s.sessionManager),
-		conf.Conf().Settings.ShopLocation,
-	)
+	locationResult := s.services.location.ComputeLocation(attendanceLocation, GetLocation(ctx, s.sessionManager))
 
 	profile := models.AdminStaffProfile{
 		FullName:        utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),

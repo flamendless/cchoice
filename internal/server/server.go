@@ -40,6 +40,7 @@ type Services struct {
 	brand        *services.BrandService
 	staff        *services.StaffService
 	staffLog     *services.StaffLogsService
+	location     *services.LocationService
 }
 
 type Server struct {
@@ -149,6 +150,7 @@ func NewServer() *ServerInstance {
 		brand:        services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staff:        services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staffLog:     services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		location:     services.NewLocationService(cfg.Settings.ShopLocation),
 	}
 
 	ctx := context.Background()
