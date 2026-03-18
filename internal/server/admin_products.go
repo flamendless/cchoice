@@ -12,12 +12,14 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/conf"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
+	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
@@ -299,4 +301,89 @@ func (s *Server) adminSuperuserProductsCreatePageHandler(w http.ResponseWriter, 
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func (s *Server) adminSuperuserProductsListPageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Products List Page Handler]"
+	ctx := r.Context()
+
+	if err := compadmin.AdminSuperuserProductsListPage("Products").Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Server) adminSuperuserProductsListTableHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Products List Table Handler]"
+	ctx := r.Context()
+
+	search := r.URL.Query().Get("search")
+	status := r.URL.Query().Get("status")
+
+	productList, err := s.services.product.GetProductsForListingAdmin(ctx, search, status)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		productList = []models.AdminProductListItem{}
+	}
+
+	if err := compadmin.AdminSuperuserProductsListTable(productList).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Products Update Status Handler]"
+	const page = "/admin/superuser/products"
+	ctx := r.Context()
+
+	productIDStr := chi.URLParam(r, "id")
+	if productIDStr == "" {
+		redirectHX(w, r, utils.URLWithError(page, "Invalid product ID"))
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+		return
+	}
+
+	statusStr := r.FormValue("status")
+	if statusStr == "" {
+		redirectHX(w, r, utils.URLWithError(page, "Status is required"))
+		return
+	}
+
+	status := enums.ParseProductStatusToEnum(statusStr)
+	if status == enums.PRODUCT_STATUS_UNDEFINED {
+		redirectHX(w, r, utils.URLWithError(page, "Invalid status"))
+		return
+	}
+
+	if err := s.services.product.UpdateProductStatus(ctx, productIDStr, status); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("product_id", productIDStr),
+			zap.String("status", statusStr),
+			zap.Error(err),
+		)
+		redirectHX(w, r, utils.URLWithError(page, "Failed to update product status"))
+		return
+	}
+
+	if err := s.services.staffLog.CreateLog(
+		ctx,
+		s.sessionManager.GetString(ctx, SessionStaffID),
+		"update status",
+		"products",
+		"success",
+		nil,
+	); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
+
+	redirectHX(w, r, utils.URLWithSuccess(page, "Product status updated successfully"))
 }
