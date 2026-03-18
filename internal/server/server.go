@@ -40,6 +40,7 @@ type Services struct {
 	brand        *services.BrandService
 	staff        *services.StaffService
 	staffLog     *services.StaffLogsService
+	role         *services.RoleService
 	location     *services.LocationService
 }
 
@@ -150,6 +151,7 @@ func NewServer() *ServerInstance {
 		brand:        services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staff:        services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staffLog:     services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		role:         services.NewRoleService(newServer.encoder, newServer.dbRO),
 		location:     services.NewLocationService(cfg.Settings.ShopLocation),
 	}
 

@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	compadmin "cchoice/cmd/web/components/admin"
-	"cchoice/cmd/web/models"
 	"cchoice/internal/logs"
 
 	"go.uber.org/zap"
@@ -28,26 +27,11 @@ func (s *Server) adminSuperuserLogsTableHandler(w http.ResponseWriter, r *http.R
 	const logtag = "[Admin Superuser Logs Table Handler]"
 	ctx := r.Context()
 
-	logsData, err := s.services.staffLog.GetAll(ctx)
+	logsList, err := s.services.staffLog.GetAllAsModel(ctx)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
-	}
-
-	logsList := make([]models.StaffLog, 0, len(logsData))
-	for _, l := range logsData {
-		logsList = append(logsList, models.StaffLog{
-			ID:         s.encoder.Encode(l.ID),
-			StaffID:    s.encoder.Encode(l.StaffID),
-			CreatedAt:  l.CreatedAt,
-			Action:     l.Action,
-			Module:     l.Module,
-			Result:     l.Result,
-			FirstName:  l.FirstName.String,
-			MiddleName: l.MiddleName.String,
-			LastName:   l.LastName.String,
-		})
 	}
 
 	if err := compadmin.AdminSuperuserLogsTable(logsList).Render(ctx, w); err != nil {
