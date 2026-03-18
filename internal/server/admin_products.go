@@ -12,7 +12,6 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/conf"
 	"cchoice/internal/database/queries"
-	"cchoice/internal/encode"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
@@ -104,8 +103,8 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		return
 	}
 
-	brandID := s.encoder.Decode(r.FormValue("brand_id"))
-	if brandID == encode.INVALID {
+	brandID := r.FormValue("brand_id")
+	if brandID == "" {
 		redirectHX(w, r, utils.URLWithError(page, "Invalid brand"))
 		return
 	}
@@ -227,10 +226,9 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		return
 	}
 
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
 	if err := s.services.staffLog.CreateLog(
 		ctx,
-		staffID,
+		s.sessionManager.GetString(ctx, SessionStaffID),
 		"create",
 		"products",
 		"success",

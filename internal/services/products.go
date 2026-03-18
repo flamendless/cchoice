@@ -20,7 +20,7 @@ type ProductSpecsInput struct {
 
 type CreateProductInput struct {
 	Serial, Name, Description string
-	BrandID                   int64
+	BrandID                   string
 	Category, Subcategory     string
 	Specs                     ProductSpecsInput
 	ImagePath                 string
@@ -47,7 +47,8 @@ func NewProductService(
 }
 
 func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductInput) (*queries.TblProduct, error) {
-	_, err := s.dbRO.GetQueries().GetBrandsByID(ctx, input.BrandID)
+	brandID := s.encoder.Decode(input.BrandID)
+	_, err := s.dbRO.GetQueries().GetBrandsByID(ctx, brandID)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +79,7 @@ func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductI
 		Serial:                      input.Serial,
 		Name:                        input.Name,
 		Description:                 sql.NullString{String: input.Description, Valid: true},
-		BrandID:                     input.BrandID,
+		BrandID:                     brandID,
 		Status:                      enums.PRODUCT_STATUS_DRAFT.String(),
 		ProductSpecsID:              sql.NullInt64{Int64: specs.ID, Valid: true},
 		UnitPriceWithoutVat:         input.UnitPriceWithoutVat,

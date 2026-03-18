@@ -36,7 +36,7 @@ func (s *ReportService) StreamReportCSV(
 	ctx context.Context,
 	writer *csv.Writer,
 	data []staff.StaffRow,
-	staffID int64,
+	staffID string,
 	filename string,
 	startDate string,
 	endDate string,
@@ -51,7 +51,8 @@ func (s *ReportService) StreamReportCSV(
 		return err
 	}
 
-	if staffID != encode.INVALID {
+	decodedStaffID := s.encoder.Decode(staffID)
+	if decodedStaffID != encode.INVALID {
 		totalDays, err := utils.GetTotalDaysBetweenDates(startDate, endDate)
 		if err != nil {
 			return err
@@ -61,7 +62,7 @@ func (s *ReportService) StreamReportCSV(
 		}
 
 		attendanceService := NewAttendanceService(s.encoder, s.dbRO, nil)
-		staffDB, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
+		staffDB, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedStaffID)
 		if err != nil {
 			return err
 		}
@@ -161,7 +162,7 @@ func (s *ReportService) StreamReportXLSX(
 	ctx context.Context,
 	file *excelize.File,
 	data []staff.StaffRow,
-	staffID int64,
+	staffID string,
 	filename string,
 	startDate string,
 	endDate string,
@@ -184,7 +185,8 @@ func (s *ReportService) StreamReportXLSX(
 	}
 	row++
 
-	if staffID != encode.INVALID {
+	decodedStaffID := s.encoder.Decode(staffID)
+	if decodedStaffID != encode.INVALID {
 		totalDays, err := utils.GetTotalDaysBetweenDates(startDate, endDate)
 		if err != nil {
 			return err
@@ -199,7 +201,7 @@ func (s *ReportService) StreamReportXLSX(
 		row++
 
 		attendanceService := NewAttendanceService(s.encoder, s.dbRO, nil)
-		staffDB, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
+		staffDB, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedStaffID)
 		if err != nil {
 			return err
 		}

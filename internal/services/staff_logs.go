@@ -29,7 +29,7 @@ func NewStaffLogsService(
 
 func (s *StaffLogsService) CreateLog(
 	ctx context.Context,
-	staffID int64,
+	staffID string,
 	action, module, result string,
 	useragentID *int64,
 ) error {
@@ -38,7 +38,7 @@ func (s *StaffLogsService) CreateLog(
 		useragentIDParam = sql.NullInt64{Int64: *useragentID, Valid: true}
 	}
 	_, err := s.dbRW.GetQueries().CreateStaffLog(ctx, queries.CreateStaffLogParams{
-		StaffID:     staffID,
+		StaffID:     s.encoder.Decode(staffID),
 		Action:      action,
 		Module:      module,
 		Result:      result,

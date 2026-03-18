@@ -27,17 +27,17 @@ func (s *Server) adminStaffHomeHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Home Handler]"
 	ctx := r.Context()
 
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
+	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
+	staff, err := s.services.staff.GetCurrentStaff(ctx, staffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staffID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
 		redirectHXLogin(w, r)
 		return
 	}
 
-	dbRoles, err := s.dbRO.GetQueries().GetStaffRolesByStaffID(ctx, staffID)
+	dbRoles, err := s.dbRO.GetQueries().GetStaffRolesByStaffID(ctx, staff.ID)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staffID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
 	}
 
 	roles := make([]enums.StaffRole, 0, len(dbRoles))
@@ -63,9 +63,9 @@ func (s *Server) adminStaffProfileHandler(w http.ResponseWriter, r *http.Request
 	const logtag = "[Admin Staff Profile Handler]"
 	ctx := r.Context()
 
-	staff, staffID, err := s.getCurrentStaff(r.Context())
+	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 		redirectHXLogin(w, r)
 		return
 	}
@@ -101,9 +101,9 @@ func (s *Server) adminStaffProfileHeaderHandler(w http.ResponseWriter, r *http.R
 	const logtag = "[Admin Staff Profile Header Handler]"
 	ctx := r.Context()
 
-	staff, staffID, err := s.getCurrentStaff(r.Context())
+	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 		redirectHXLogin(w, r)
 		return
 	}
@@ -140,12 +140,6 @@ func (s *Server) adminChangePasswordHandler(w http.ResponseWriter, r *http.Reque
 	const page = "/admin/profile"
 	ctx := r.Context()
 
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	if staffID == 0 {
-		redirectHXLogin(w, r)
-		return
-	}
-
 	if err := r.ParseForm(); err != nil {
 		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
 		return
@@ -169,8 +163,9 @@ func (s *Server) adminChangePasswordHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
 	if err := s.services.staff.UpdatePassword(ctx, staffID, newPassword); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("staff_id", staffID))
 		redirectHX(w, r, utils.URLWithError(page, "Failed to update password"))
 		return
 	}
@@ -182,9 +177,9 @@ func (s *Server) adminProfileEditFormHandler(w http.ResponseWriter, r *http.Requ
 	const logtag = "[Admin Profile Edit Form Handler]"
 	ctx := r.Context()
 
-	staff, staffID, err := s.getCurrentStaff(r.Context())
+	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 		redirectHXLogin(w, r)
 		return
 	}
@@ -205,7 +200,7 @@ func (s *Server) adminProfileEditFormHandler(w http.ResponseWriter, r *http.Requ
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),
-			zap.Int64("staff_id", staffID),
+			zap.Int64("staff_id", staff.ID),
 			zap.Error(err),
 		)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -217,12 +212,6 @@ func (s *Server) adminProfileUpdateHandler(w http.ResponseWriter, r *http.Reques
 	const logtag = "[Admin Profile Update Handler]"
 	const page = "/admin/profile"
 	ctx := r.Context()
-
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	if staffID == 0 {
-		redirectHXLogin(w, r)
-		return
-	}
 
 	if err := r.ParseForm(); err != nil {
 		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
@@ -241,16 +230,17 @@ func (s *Server) adminProfileUpdateHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
 	if err := s.services.staff.UpdateProfile(ctx, services.UpdateProfileParams{
+		ID:         staffID,
 		FirstName:  firstName,
 		MiddleName: middleName,
 		LastName:   lastName,
 		MobileNo:   mobileNo,
 		Birthdate:  birthdate,
 		DateHired:  dateHired,
-		ID:         staffID,
 	}); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("staff_id", staffID))
 		redirectHX(w, r, utils.URLWithError(page, "Failed to update profile"))
 		return
 	}
@@ -262,9 +252,9 @@ func (s *Server) adminStaffListHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff List Handler]"
 	ctx := r.Context()
 
-	staff, staffID, err := s.getCurrentStaff(r.Context())
+	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 		redirectHXLogin(w, r)
 		return
 	}
@@ -273,17 +263,17 @@ func (s *Server) adminStaffListHandler(w http.ResponseWriter, r *http.Request) {
 	switch enums.ParseStaffUserTypeToEnum(staff.UserType) {
 	case enums.STAFF_USER_TYPE_STAFF:
 		list = append(list, models.Staff{
-			ID:       s.encoder.Encode(staffID),
+			ID:       s.encoder.Encode(staff.ID),
 			FullName: utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
 		})
 	case enums.STAFF_USER_TYPE_SUPERUSER:
 		list, err = s.services.staff.GetAll(ctx, 100)
 		if err != nil {
-			logs.Log().Error(logtag, zap.Int64("staff id", staffID), zap.Error(err))
+			logs.Log().Error(logtag, zap.Int64("staff id", staff.ID), zap.Error(err))
 		}
 	}
 	if err := compadmin.StaffOptions(list).Render(ctx, w); err != nil {
-		logs.Log().Error(logtag, zap.Int64("staff id", staffID), zap.Error(err))
+		logs.Log().Error(logtag, zap.Int64("staff id", staff.ID), zap.Error(err))
 	}
 }
 
@@ -291,16 +281,16 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Page Handler]"
 	ctx := r.Context()
 
-	staff, staffID, err := s.getCurrentStaff(r.Context())
+	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 		redirectHXLogin(w, r)
 		return
 	}
 
 	today := time.Now().Format(constants.DateLayoutISO)
 	attendance, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
-		StaffID: staffID,
+		StaffID: staff.ID,
 		ForDate: today,
 	})
 	var hasTimeIn, hasTimeOut bool
@@ -322,8 +312,8 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		rec := attendanceService.ComputeData(
 			staffmodels.StaffRowBase(staff),
 			staffmodels.StaffRow{
-				ID:                       staffID,
-				StaffID:                  staffID,
+				ID:                       staff.ID,
+				StaffID:                  staff.ID,
 				ForDate:                  attendance.ForDate,
 				TimeIn:                   attendance.TimeIn,
 				TimeOut:                  attendance.TimeOut,
@@ -444,16 +434,16 @@ func (s *Server) adminStaffAttendanceTableHandler(w http.ResponseWriter, r *http
 	const logtag = "[Admin Staff Attendance Table Handler]"
 	ctx := r.Context()
 
-	staff, staffID, err := s.getCurrentStaff(r.Context())
+	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 		redirectHXLogin(w, r)
 		return
 	}
 
 	date := utils.ParseAttendanceDate(r.URL.Query().Get("date"))
 	attendance, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
-		StaffID: staffID,
+		StaffID: staff.ID,
 		ForDate: date,
 	})
 	var record *models.Attendance
@@ -462,8 +452,8 @@ func (s *Server) adminStaffAttendanceTableHandler(w http.ResponseWriter, r *http
 		rec := attendanceService.ComputeData(
 			staffmodels.StaffRowBase(staff),
 			staffmodels.StaffRow{
-				ID:                       staffID,
-				StaffID:                  staffID,
+				ID:                       staff.ID,
+				StaffID:                  staff.ID,
 				ForDate:                  attendance.ForDate,
 				TimeIn:                   attendance.TimeIn,
 				TimeOut:                  attendance.TimeOut,
@@ -495,16 +485,16 @@ func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.
 	const logtag = "[Admin Staff Attendance Rows Handler]"
 	ctx := r.Context()
 
-	staff, staffID, err := s.getCurrentStaff(r.Context())
+	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 		redirectHXLogin(w, r)
 		return
 	}
 
 	date := utils.ParseAttendanceDate(r.URL.Query().Get("date-selector"))
 	attendance, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
-		StaffID: staffID,
+		StaffID: staff.ID,
 		ForDate: date,
 	})
 	var record *models.Attendance
@@ -513,8 +503,8 @@ func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.
 		rec := attendanceService.ComputeData(
 			staffmodels.StaffRowBase(staff),
 			staffmodels.StaffRow{
-				ID:                       staffID,
-				StaffID:                  staffID,
+				ID:                       staff.ID,
+				StaffID:                  staff.ID,
 				ForDate:                  attendance.ForDate,
 				TimeIn:                   attendance.TimeIn,
 				TimeOut:                  attendance.TimeOut,
@@ -544,13 +534,12 @@ func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.
 
 func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
 	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
 	svc := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	err := svc.TimeIn(ctx, staffID, date, now, location, useragentID)
+	err := svc.TimeIn(ctx, s.sessionManager.GetString(ctx, SessionStaffID), date, now, location, useragentID)
 	if err != nil {
 		http.Error(w, "Unable to time in", http.StatusBadRequest)
 		return
@@ -560,13 +549,12 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 
 func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
 	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
 	svc := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	err := svc.TimeOut(ctx, staffID, date, now, location, useragentID)
+	err := svc.TimeOut(ctx, s.sessionManager.GetString(ctx, SessionStaffID), date, now, location, useragentID)
 	if err != nil {
 		http.Error(w, "Unable to time out", http.StatusBadRequest)
 		return
@@ -577,7 +565,7 @@ func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request
 func (s *Server) adminStaffLunchBreakInHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Lunch Break Start Handler]"
 	ctx := r.Context()
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
+	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
 	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
@@ -588,7 +576,7 @@ func (s *Server) adminStaffLunchBreakInHandler(w http.ResponseWriter, r *http.Re
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
-			zap.Int64("staff_id", staffID),
+			zap.String("staff_id", staffID),
 			zap.String("date", date),
 		)
 		http.Error(w, "Unable to lunchbreak in", http.StatusBadRequest)
@@ -600,7 +588,7 @@ func (s *Server) adminStaffLunchBreakInHandler(w http.ResponseWriter, r *http.Re
 func (s *Server) adminStaffLunchBreakOutHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Lunch Break End Handler]"
 	ctx := r.Context()
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
+	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
 	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
@@ -611,7 +599,7 @@ func (s *Server) adminStaffLunchBreakOutHandler(w http.ResponseWriter, r *http.R
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
-			zap.Int64("staff_id", staffID),
+			zap.String("staff_id", staffID),
 			zap.String("date", date),
 		)
 		http.Error(w, "Unable to lunchbreak out", http.StatusBadRequest)
@@ -637,8 +625,6 @@ func (s *Server) adminStaffTimeOffPageHandler(w http.ResponseWriter, r *http.Req
 func (s *Server) adminStaffTimeOffHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Time Off Handler]"
 	ctx := r.Context()
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -672,7 +658,7 @@ func (s *Server) adminStaffTimeOffHandler(w http.ResponseWriter, r *http.Request
 	svc := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
 	if err := svc.TimeOff(
 		ctx,
-		staffID,
+		s.sessionManager.GetString(ctx, SessionStaffID),
 		timeOffType,
 		description,
 		startDate,
@@ -690,15 +676,15 @@ func (s *Server) adminStaffTimeOffTableHandler(w http.ResponseWriter, r *http.Re
 	const logtag = "[Admin Staff Time Off Table Handler]"
 	ctx := r.Context()
 
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	if staffID == 0 {
+	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
+	if staffID == "" {
 		redirectHXLogin(w, r)
 		return
 	}
 
-	timeOffs, err := s.dbRO.GetQueries().GetStaffTimeOffsByStaffID(ctx, staffID)
+	timeOffs, err := s.dbRO.GetQueries().GetStaffTimeOffsByStaffID(ctx, s.encoder.Decode(staffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", s.encoder.Decode(staffID)))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -745,11 +731,10 @@ func (s *Server) adminStaffTimeOffTableHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (s *Server) adminStaffAttendanceLocationHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Admin Staff Attendance Location Handler]"
-
 	ctx := r.Context()
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	if staffID == 0 {
+	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
+	staff, err := s.services.staff.GetCurrentStaff(ctx, staffIDStr)
+	if err != nil {
 		redirectHXLogin(w, r)
 		return
 	}
@@ -794,13 +779,6 @@ func (s *Server) adminStaffAttendanceLocationHandler(w http.ResponseWriter, r *h
 	// date = utils.ParseAttendanceDate(date)
 	// attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
 	// _ = attendanceService.UpsertLocation(ctx, staffID, date, location)
-
-	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
-		http.Error(w, "failed to get staff", http.StatusBadRequest)
-		return
-	}
 
 	locationResult := services.ComputeLocation(
 		location,

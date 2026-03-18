@@ -13,9 +13,7 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
-	"cchoice/internal/encode"
 	"cchoice/internal/enums"
-	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/services"
 	staffmodels "cchoice/internal/staff"
@@ -28,10 +26,10 @@ func (s *Server) adminSuperuserHomeHandler(w http.ResponseWriter, r *http.Reques
 	const logtag = "[Admin Superuser Home Handler]"
 	ctx := r.Context()
 
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
+	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
+	staff, err := s.services.staff.GetCurrentStaff(ctx, staffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staffID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
 		redirectHXLogin(w, r)
 		return
 	}
@@ -60,18 +58,10 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 	}
 	endDate := utils.ParseAttendanceDate(endDateParam)
 
-	staffID := encode.INVALID
-	if staffIDParam := r.FormValue("staff-id"); staffIDParam != "" {
-		staffID = s.encoder.Decode(staffIDParam)
-		if staffID == encode.INVALID {
-			logs.Log().Warn(logtag, zap.String("staff id", staffIDParam), zap.Error(errs.ErrDecode))
-		}
-	}
-
 	//TODO: (Brandon) services should be in the Server struct as well
 	//                see how I implemented ProductsService in server
 	attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	attendances, err := attendanceService.GetAttendance(ctx, staffID, startDate, endDate)
+	attendances, err := attendanceService.GetAttendance(ctx, r.FormValue("staff-id"), startDate, endDate)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("start date", startDateParam), zap.String("end date", endDateParam))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -121,45 +111,38 @@ func (s *Server) adminSuperuserAttendancePageHandler(w http.ResponseWriter, r *h
 
 func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Superuser Attendance Report Handler]"
+	const page = "/admin/superuser/attendance"
 	ctx := r.Context()
 
 	if err := r.ParseForm(); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 
 	startDate := r.FormValue("date-selector")
 	endDate := r.FormValue("date-selector-end")
 	if startDate == "" || endDate == "" {
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", "missing start date or end date"))
+		redirectHX(w, r, utils.URLWithError(page, "missing start date or end date"))
 		return
 	}
 
-	staffID := encode.INVALID
-	if staffIDStr := r.FormValue("staff-id"); staffIDStr != "" {
-		staffID = s.encoder.Decode(staffIDStr)
-		if staffID == encode.INVALID {
-			logs.Log().Warn(logtag, zap.String("staff id", staffIDStr), zap.Error(errs.ErrDecode))
-		}
-	}
-
 	format := r.URL.Query().Get("format")
-
 	//TODO: (Brandon) Create enums OUTPUT_FORMAT for csv, xlsx, etc values
 	if format == "" {
 		format = "csv"
 	}
 
+	staffID := r.FormValue("staff-id")
 	attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
 	attendances, err := attendanceService.GetAttendance(ctx, staffID, startDate, endDate)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 	if len(attendances) == 0 {
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", "No attendance data found. Skipping report generation."))
+		redirectHX(w, r, utils.URLWithError(page, "No attendance data found. Skipping report generation."))
 		return
 	}
 
@@ -171,7 +154,8 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		zap.String("file", reportName),
 		zap.String("start date", startDate),
 		zap.String("end date", endDate),
-		zap.Int64("staff id", s.sessionManager.GetInt64(ctx, SessionStaffID)),
+		zap.String("staff id", s.sessionManager.GetString(ctx, SessionStaffID)),
+		zap.String("param staff id", staffID),
 	)
 
 	reportService := services.NewReportService(s.encoder, s.dbRO)
@@ -191,13 +175,13 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 			endDate,
 		); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-			redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
+			redirectHX(w, r, utils.URLWithError(page, err.Error()))
 			return
 		}
 
 		if err := writer.Error(); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-			redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
+			redirectHX(w, r, utils.URLWithError(page, err.Error()))
 			return
 		}
 	case "xlsx":
@@ -215,13 +199,13 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 			endDate,
 		); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-			redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
+			redirectHX(w, r, utils.URLWithError(page, err.Error()))
 			return
 		}
 
 		if err := file.Write(w); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-			redirectHX(w, r, utils.URLWithError("/admin/superuser/attendance", err.Error()))
+			redirectHX(w, r, utils.URLWithError(page, err.Error()))
 			return
 		}
 	}
@@ -300,30 +284,18 @@ func (s *Server) adminSuperuserTimeOffTableHandler(w http.ResponseWriter, r *htt
 func (s *Server) adminSuperuserTimeOffApproveHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Superuser Time Off Approve Handler]"
 	ctx := r.Context()
-	currentStaffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	_, err := s.dbRO.GetQueries().GetStaffByID(ctx, currentStaffID)
+	currentStaffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
+	staff, err := s.services.staff.GetCurrentStaff(ctx, currentStaffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", currentStaffID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
 		redirectHXLogin(w, r)
 		return
 	}
 
-	timeOffIDStr := chi.URLParam(r, "id")
-	decodedTimeOffID := s.encoder.Decode(timeOffIDStr)
-	if decodedTimeOffID == encode.INVALID {
-		logs.LogCtx(ctx).Error(logtag, zap.String("time_off_id", timeOffIDStr))
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
+	timeOffID := chi.URLParam(r, "id")
 	attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	if err := attendanceService.ApproveTimeOff(ctx, decodedTimeOffID, currentStaffID); err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.String("time_off_id", timeOffIDStr),
-			zap.Int64("time_off_id", decodedTimeOffID),
-			zap.Error(err),
-		)
+	if err := attendanceService.ApproveTimeOff(ctx, timeOffID, currentStaffIDStr); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("time_off_id", timeOffID), zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -333,28 +305,20 @@ func (s *Server) adminSuperuserTimeOffApproveHandler(w http.ResponseWriter, r *h
 func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Superuser Time Off Cancel Handler]"
 	ctx := r.Context()
-	currentStaffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	_, err := s.dbRO.GetQueries().GetStaffByID(ctx, currentStaffID)
+	currentStaffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
+	staff, err := s.services.staff.GetCurrentStaff(ctx, currentStaffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", currentStaffID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
 		redirectHXLogin(w, r)
 		return
 	}
 
-	timeOffIDStr := chi.URLParam(r, "id")
-	decodedTimeOffID := s.encoder.Decode(timeOffIDStr)
-	if decodedTimeOffID == encode.INVALID {
-		logs.LogCtx(ctx).Error(logtag, zap.String("time_off_id", timeOffIDStr))
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
+	timeOffID := chi.URLParam(r, "id")
 	attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	if err := attendanceService.CancelTimeOff(ctx, decodedTimeOffID, currentStaffID); err != nil {
+	if err := attendanceService.CancelTimeOff(ctx, timeOffID); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
-			zap.String("time_off_id", timeOffIDStr),
-			zap.Int64("time_off_id", decodedTimeOffID),
+			zap.String("time_off_id", timeOffID),
 			zap.Error(err),
 		)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -452,10 +416,9 @@ func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter
 		return
 	}
 
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
 	if err := s.services.staffLog.CreateLog(
 		ctx,
-		staffID,
+		s.sessionManager.GetString(ctx, SessionStaffID),
 		"update status",
 		"products",
 		"success",
