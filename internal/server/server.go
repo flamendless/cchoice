@@ -35,8 +35,10 @@ import (
 )
 
 type Services struct {
-	products  *services.ProductsService
-	staffLogs *services.StaffLogsService
+	products      *services.ProductsService
+	productImages *services.ProductImagesService
+	brands        *services.BrandsService
+	staffLogs     *services.StaffLogsService
 }
 
 type Server struct {
@@ -141,8 +143,10 @@ func NewServer() *ServerInstance {
 	}
 
 	newServer.services = Services{
-		products:  services.NewProductsService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		staffLogs: services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		products:      services.NewProductsService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		productImages: services.NewProductImagesService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
+		brands:        services.NewBrandsService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		staffLogs:     services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 	}
 
 	ctx := context.Background()
