@@ -2,13 +2,11 @@ package server
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"math"
 	"net/http"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
@@ -181,10 +179,14 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		}
 		defer file.Close()
 
-		ext := filepath.Ext(header.Filename)
-		uuid := utils.GenString(16)
-		filename := fmt.Sprintf("products/%s_%s%s", uuid, strings.ReplaceAll(name, " ", "_"), ext)
+		brandName, err := s.services.brands.GetNameByID(ctx, brandID)
+		if err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			redirectHX(w, r, utils.URLWithError(page, "Brand not found"))
+			return
+		}
 
+		filename = s.services.productImages.GenerateFilename(filepath.Ext(header.Filename), brandName, name)
 		buf := bytes.Buffer{}
 		if _, err := io.Copy(&buf, file); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -192,7 +194,7 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 			return
 		}
 		contentType := header.Header.Get("Content-Type")
-		if err := s.objectStorage.PutObject(ctx, filename, &buf, contentType); err != nil {
+		if err := s.services.productImages.UploadProductImage(ctx, filename, &buf, contentType); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, "Failed to upload image"))
 			return
