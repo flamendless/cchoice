@@ -1,7 +1,6 @@
 package server
 
 import (
-	"database/sql"
 	"encoding/csv"
 	"fmt"
 	"net/http"
@@ -325,107 +324,4 @@ func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *ht
 		return
 	}
 	redirectHX(w, r, utils.URLWithSuccess("/admin/superuser/time-off", "Time off request cancelled"))
-}
-
-func (s *Server) adminSuperuserProductsListPageHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Admin Superuser Products List Page Handler]"
-	ctx := r.Context()
-
-	if err := compadmin.AdminSuperuserProductsListPage("Products").Render(ctx, w); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-func (s *Server) adminSuperuserProductsListTableHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Admin Superuser Products List Table Handler]"
-	ctx := r.Context()
-
-	search := r.URL.Query().Get("search")
-	status := r.URL.Query().Get("status")
-
-	products, err := s.dbRO.GetQueries().AdminGetProductsForListing(ctx, queries.AdminGetProductsForListingParams{
-		Search: sql.NullString{String: search, Valid: search != ""},
-		Status: sql.NullString{String: status, Valid: status != ""},
-	})
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		products = []queries.AdminGetProductsForListingRow{}
-	}
-
-	productList := make([]models.AdminProductListItem, 0, len(products))
-	for _, p := range products {
-		productList = append(productList, models.AdminProductListItem{
-			ID:          s.encoder.Encode(p.ID),
-			Name:        p.Name,
-			Serial:      p.Serial,
-			Description: p.Description.String,
-			Brand:       p.BrandName,
-			Status:      enums.ParseProductStatusToEnum(p.Status),
-			ImagePath:   p.ImagePath,
-			CreatedAt:   p.CreatedAt.Format(constants.DateTimeLayoutISO),
-			UpdatedAt:   p.UpdatedAt.Format(constants.DateTimeLayoutISO),
-		})
-	}
-
-	if err := compadmin.AdminSuperuserProductsListTable(productList).Render(ctx, w); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-}
-
-func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Admin Superuser Products Update Status Handler]"
-	const page = "/admin/superuser/products"
-	ctx := r.Context()
-
-	productIDStr := chi.URLParam(r, "id")
-	if productIDStr == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid product ID"))
-		return
-	}
-
-	if err := r.ParseForm(); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
-		return
-	}
-
-	statusStr := r.FormValue("status")
-	if statusStr == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Status is required"))
-		return
-	}
-
-	status := enums.ParseProductStatusToEnum(statusStr)
-	if status == enums.PRODUCT_STATUS_UNDEFINED {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid status"))
-		return
-	}
-
-	if err := s.services.product.UpdateProductStatus(ctx, productIDStr, status); err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.String("product_id", productIDStr),
-			zap.String("status", statusStr),
-			zap.Error(err),
-		)
-		redirectHX(w, r, utils.URLWithError(page, "Failed to update product status"))
-		return
-	}
-
-	if err := s.services.staffLog.CreateLog(
-		ctx,
-		s.sessionManager.GetString(ctx, SessionStaffID),
-		"update status",
-		"products",
-		"success",
-		nil,
-	); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-	}
-
-	redirectHX(w, r, utils.URLWithSuccess(page, "Product status updated successfully"))
 }

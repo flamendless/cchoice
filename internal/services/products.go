@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"time"
 
+	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
@@ -135,4 +136,31 @@ func (s *ProductService) UpdateProductStatus(ctx context.Context, productID stri
 		Status: status.String(),
 		ID:     decodedProductID,
 	})
+}
+
+func (s *ProductService) GetProductsForListingAdmin(ctx context.Context, search, status string) ([]models.AdminProductListItem, error) {
+	products, err := s.dbRO.GetQueries().AdminGetProductsForListing(ctx, queries.AdminGetProductsForListingParams{
+		Search: sql.NullString{String: search, Valid: search != ""},
+		Status: sql.NullString{String: status, Valid: status != ""},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	productList := make([]models.AdminProductListItem, 0, len(products))
+	for _, p := range products {
+		productList = append(productList, models.AdminProductListItem{
+			ID:          s.encoder.Encode(p.ID),
+			Name:        p.Name,
+			Serial:      p.Serial,
+			Description: p.Description.String,
+			Brand:       p.BrandName,
+			Status:      enums.ParseProductStatusToEnum(p.Status),
+			ImagePath:   p.ImagePath,
+			CreatedAt:   p.CreatedAt.Format(constants.DateTimeLayoutISO),
+			UpdatedAt:   p.UpdatedAt.Format(constants.DateTimeLayoutISO),
+		})
+	}
+
+	return productList, nil
 }
