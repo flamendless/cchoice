@@ -28,25 +28,25 @@ type CreateProductInput struct {
 	UnitPriceWithVat          int64
 }
 
-type ProductsService struct {
+type ProductService struct {
 	dbRO    database.Service
 	dbRW    database.Service
 	encoder encode.IEncode
 }
 
-func NewProductsService(
+func NewProductService(
 	encoder encode.IEncode,
 	dbRO database.Service,
 	dbRW database.Service,
-) *ProductsService {
-	return &ProductsService{
+) *ProductService {
+	return &ProductService{
 		dbRO:    dbRO,
 		dbRW:    dbRW,
 		encoder: encoder,
 	}
 }
 
-func (s *ProductsService) CreateProduct(ctx context.Context, input CreateProductInput) (*queries.TblProduct, error) {
+func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductInput) (*queries.TblProduct, error) {
 	_, err := s.dbRO.GetQueries().GetBrandsByID(ctx, input.BrandID)
 	if err != nil {
 		return nil, err
@@ -116,7 +116,7 @@ func (s *ProductsService) CreateProduct(ctx context.Context, input CreateProduct
 	return &product, nil
 }
 
-func (s *ProductsService) ValidateSerial(ctx context.Context, serial string) (bool, error) {
+func (s *ProductService) ValidateSerial(ctx context.Context, serial string) (bool, error) {
 	_, err := s.dbRO.GetQueries().ValidateUniqueSerial(ctx, serial)
 	if err != nil {
 		return true, nil
@@ -124,7 +124,7 @@ func (s *ProductsService) ValidateSerial(ctx context.Context, serial string) (bo
 	return false, nil
 }
 
-func (s *ProductsService) UpdateProductStatus(ctx context.Context, productID string, status enums.ProductStatus) error {
+func (s *ProductService) UpdateProductStatus(ctx context.Context, productID string, status enums.ProductStatus) error {
 	decodedProductID := s.encoder.Decode(productID)
 	if decodedProductID == encode.INVALID {
 		return errs.ErrDecode

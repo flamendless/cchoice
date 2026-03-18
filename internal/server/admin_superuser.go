@@ -441,7 +441,7 @@ func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter
 		return
 	}
 
-	if err := s.services.products.UpdateProductStatus(ctx, productIDStr, status); err != nil {
+	if err := s.services.product.UpdateProductStatus(ctx, productIDStr, status); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("product_id", productIDStr),
@@ -453,7 +453,7 @@ func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter
 	}
 
 	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	if err := s.services.staffLogs.CreateLog(
+	if err := s.services.staffLog.CreateLog(
 		ctx,
 		staffID,
 		"update status",

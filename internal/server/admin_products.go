@@ -72,7 +72,7 @@ func (s *Server) adminSuperuserProductsValidateSerialHandler(w http.ResponseWrit
 		return
 	}
 
-	isUnique, err := s.services.products.ValidateSerial(ctx, serial)
+	isUnique, err := s.services.product.ValidateSerial(ctx, serial)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		if err := compadmin.SerialValidationResult(false).Render(ctx, w); err != nil {
@@ -126,7 +126,7 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		return
 	}
 
-	isUnique, err := s.services.products.ValidateSerial(ctx, serial)
+	isUnique, err := s.services.product.ValidateSerial(ctx, serial)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, "Failed to validate serial"))
@@ -179,14 +179,14 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		}
 		defer file.Close()
 
-		brandName, err := s.services.brands.GetNameByID(ctx, brandID)
+		brandName, err := s.services.brand.GetNameByID(ctx, brandID)
 		if err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, "Brand not found"))
 			return
 		}
 
-		filename = s.services.productImages.GenerateFilename(filepath.Ext(header.Filename), brandName, name)
+		filename = s.services.productImage.GenerateFilename(filepath.Ext(header.Filename), brandName, name)
 		buf := bytes.Buffer{}
 		if _, err := io.Copy(&buf, file); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -194,14 +194,14 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 			return
 		}
 		contentType := header.Header.Get("Content-Type")
-		if err := s.services.productImages.UploadProductImage(ctx, filename, &buf, contentType); err != nil {
+		if err := s.services.productImage.UploadProductImage(ctx, filename, &buf, contentType); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, "Failed to upload image"))
 			return
 		}
 	}
 
-	product, err := s.services.products.CreateProduct(ctx, services.CreateProductInput{
+	product, err := s.services.product.CreateProduct(ctx, services.CreateProductInput{
 		Serial:      serial,
 		Name:        name,
 		Description: description,
@@ -228,7 +228,7 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 	}
 
 	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	if err := s.services.staffLogs.CreateLog(
+	if err := s.services.staffLog.CreateLog(
 		ctx,
 		staffID,
 		"create",

@@ -21,7 +21,6 @@ import (
 
 	"github.com/goccy/go-json"
 	"go.uber.org/zap"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func (s *Server) adminStaffHomeHandler(w http.ResponseWriter, r *http.Request) {
@@ -138,6 +137,7 @@ func (s *Server) adminStaffProfileHeaderHandler(w http.ResponseWriter, r *http.R
 
 func (s *Server) adminChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Change Password Handler]"
+	const page = "/admin/profile"
 	ctx := r.Context()
 
 	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
@@ -147,7 +147,7 @@ func (s *Server) adminChangePasswordHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err := r.ParseForm(); err != nil {
-		redirectHX(w, r, utils.URLWithError("/admin/profile", "Invalid form submission"))
+		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
 		return
 	}
 
@@ -155,38 +155,27 @@ func (s *Server) adminChangePasswordHandler(w http.ResponseWriter, r *http.Reque
 	confirmPassword := r.PostFormValue("confirm_password")
 
 	if newPassword == "" || confirmPassword == "" {
-		redirectHX(w, r, utils.URLWithError("/admin/profile", "Both password fields are required"))
+		redirectHX(w, r, utils.URLWithError(page, "Both password fields are required"))
 		return
 	}
 
 	if !constants.RePassword.MatchString(newPassword) {
-		redirectHX(w, r, utils.URLWithError("/admin/profile", "Invalid password format"))
+		redirectHX(w, r, utils.URLWithError(page, "Invalid password format"))
 		return
 	}
 
 	if newPassword != confirmPassword {
-		redirectHX(w, r, utils.URLWithError("/admin/profile", "Passwords do not match"))
+		redirectHX(w, r, utils.URLWithError(page, "Passwords do not match"))
 		return
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/profile", "Failed to hash password"))
-		return
-	}
-
-	_, err = s.dbRW.GetQueries().UpdateStaffPassword(ctx, queries.UpdateStaffPasswordParams{
-		Password: string(hash),
-		ID:       staffID,
-	})
-	if err != nil {
+	if err := s.services.staff.UpdatePassword(ctx, staffID, newPassword); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
-		redirectHX(w, r, utils.URLWithError("/admin/profile", "Failed to update password"))
+		redirectHX(w, r, utils.URLWithError(page, "Failed to update password"))
 		return
 	}
 
-	redirectHX(w, r, utils.URLWithSuccess("/admin/profile", "Password updated successfully"))
+	redirectHX(w, r, utils.URLWithSuccess(page, "Password updated successfully"))
 }
 
 func (s *Server) adminProfileEditFormHandler(w http.ResponseWriter, r *http.Request) {
@@ -226,6 +215,7 @@ func (s *Server) adminProfileEditFormHandler(w http.ResponseWriter, r *http.Requ
 
 func (s *Server) adminProfileUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Profile Update Handler]"
+	const page = "/admin/profile"
 	ctx := r.Context()
 
 	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
@@ -235,7 +225,7 @@ func (s *Server) adminProfileUpdateHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	if err := r.ParseForm(); err != nil {
-		redirectHX(w, r, utils.URLWithError("/admin/profile", "Invalid form submission"))
+		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
 		return
 	}
 
@@ -247,28 +237,25 @@ func (s *Server) adminProfileUpdateHandler(w http.ResponseWriter, r *http.Reques
 	dateHired := r.PostFormValue("date_hired")
 
 	if firstName == "" || lastName == "" || mobileNo == "" || birthdate == "" || dateHired == "" {
-		redirectHX(w, r, utils.URLWithError("/admin/profile", "All required fields must be filled"))
+		redirectHX(w, r, utils.URLWithError(page, "All required fields must be filled"))
 		return
 	}
 
-	middleNameNull := sql.NullString{String: middleName, Valid: middleName != ""}
-
-	_, err := s.dbRW.GetQueries().UpdateStaffProfile(ctx, queries.UpdateStaffProfileParams{
+	if err := s.services.staff.UpdateProfile(ctx, services.UpdateProfileParams{
 		FirstName:  firstName,
-		MiddleName: middleNameNull,
+		MiddleName: middleName,
 		LastName:   lastName,
 		MobileNo:   mobileNo,
 		Birthdate:  birthdate,
 		DateHired:  dateHired,
 		ID:         staffID,
-	})
-	if err != nil {
+	}); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staffID))
-		redirectHX(w, r, utils.URLWithError("/admin/profile", "Failed to update profile"))
+		redirectHX(w, r, utils.URLWithError(page, "Failed to update profile"))
 		return
 	}
 
-	redirectHX(w, r, utils.URLWithSuccess("/admin/profile", "Profile updated successfully"))
+	redirectHX(w, r, utils.URLWithSuccess(page, "Profile updated successfully"))
 }
 
 func (s *Server) adminStaffListHandler(w http.ResponseWriter, r *http.Request) {
@@ -290,15 +277,9 @@ func (s *Server) adminStaffListHandler(w http.ResponseWriter, r *http.Request) {
 			FullName: utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
 		})
 	case enums.STAFF_USER_TYPE_SUPERUSER:
-		staffs, err := s.dbRO.GetQueries().GetAllStaffs(ctx, 100)
+		list, err = s.services.staff.GetAll(ctx, 100)
 		if err != nil {
 			logs.Log().Error(logtag, zap.Int64("staff id", staffID), zap.Error(err))
-		}
-		for _, staff := range staffs {
-			list = append(list, models.Staff{
-				ID:       s.encoder.Encode(staff.ID),
-				FullName: utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
-			})
 		}
 	}
 	if err := compadmin.StaffOptions(list).Render(ctx, w); err != nil {
