@@ -21,7 +21,7 @@ type StaffService struct {
 }
 
 type UpdateProfileParams struct {
-	ID         int64
+	ID         string
 	FirstName  string
 	MiddleName string
 	LastName   string
@@ -42,8 +42,9 @@ func NewStaffService(
 	}
 }
 
-func (s *StaffService) GetByID(ctx context.Context, staffID int64) (models.AdminStaffProfile, error) {
-	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
+func (s *StaffService) GetByID(ctx context.Context, staffID string) (models.AdminStaffProfile, error) {
+	decodedID := s.encoder.Decode(staffID)
+	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedID)
 	if err != nil {
 		return models.AdminStaffProfile{}, err
 	}
@@ -62,7 +63,8 @@ func (s *StaffService) GetByID(ctx context.Context, staffID int64) (models.Admin
 	}, nil
 }
 
-func (s *StaffService) UpdatePassword(ctx context.Context, staffID int64, password string) error {
+func (s *StaffService) UpdatePassword(ctx context.Context, staffID string, password string) error {
+	decodedID := s.encoder.Decode(staffID)
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -70,12 +72,13 @@ func (s *StaffService) UpdatePassword(ctx context.Context, staffID int64, passwo
 
 	_, err = s.dbRW.GetQueries().UpdateStaffPassword(ctx, queries.UpdateStaffPasswordParams{
 		Password: string(hash),
-		ID:       staffID,
+		ID:       decodedID,
 	})
 	return err
 }
 
 func (s *StaffService) UpdateProfile(ctx context.Context, params UpdateProfileParams) error {
+	decodedID := s.encoder.Decode(params.ID)
 	middleNameNull := sql.NullString{String: params.MiddleName, Valid: params.MiddleName != ""}
 
 	_, err := s.dbRW.GetQueries().UpdateStaffProfile(ctx, queries.UpdateStaffProfileParams{
@@ -85,7 +88,7 @@ func (s *StaffService) UpdateProfile(ctx context.Context, params UpdateProfilePa
 		MobileNo:   params.MobileNo,
 		Birthdate:  params.Birthdate,
 		DateHired:  params.DateHired,
-		ID:         params.ID,
+		ID:         decodedID,
 	})
 	return err
 }
@@ -104,4 +107,10 @@ func (s *StaffService) GetAll(ctx context.Context, limit int64) ([]models.Staff,
 		})
 	}
 	return list, nil
+}
+
+func (s *StaffService) GetCurrentStaff(ctx context.Context, staffID string) (queries.GetStaffByIDRow, error) {
+	decodedID := s.encoder.Decode(staffID)
+	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedID)
+	return staff, err
 }

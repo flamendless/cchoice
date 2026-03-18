@@ -119,7 +119,7 @@ func PrometheusMiddleware(next http.Handler) http.Handler {
 
 func (s *Server) requireStaffAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		staffID := s.sessionManager.GetInt64(r.Context(), SessionStaffID)
+		staffID := s.encoder.Decode(s.sessionManager.GetString(r.Context(), SessionStaffID))
 		if staffID == 0 {
 			http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
 			return
@@ -130,8 +130,8 @@ func (s *Server) requireStaffAuth(next http.Handler) http.Handler {
 
 func (s *Server) requireSuperuserAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		staff, staffID, err := s.getCurrentStaff(r.Context())
-		if staffID == 0 {
+		staff, err := s.services.staff.GetCurrentStaff(r.Context(), s.sessionManager.GetString(r.Context(), SessionStaffID))
+		if staff.ID == 0 {
 			http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
 			return
 		}
@@ -145,12 +145,17 @@ func (s *Server) requireSuperuserAuth(next http.Handler) http.Handler {
 }
 
 func (s *Server) HasRole(ctx context.Context, role enums.StaffRole) bool {
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
+	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
+	if staffIDStr == "" {
+		return false
+	}
+
+	staffID := s.encoder.Decode(staffIDStr)
 	if staffID == 0 {
 		return false
 	}
 
-	staff, _, err := s.getCurrentStaff(ctx)
+	staff, err := s.services.staff.GetCurrentStaff(ctx, staffIDStr)
 	if err != nil {
 		return false
 	}

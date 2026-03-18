@@ -25,12 +25,6 @@ const (
 	maxStaffListSize     = 1000
 )
 
-func (s *Server) getCurrentStaff(ctx context.Context) (queries.GetStaffByIDRow, int64, error) {
-	staffID := s.sessionManager.GetInt64(ctx, SessionStaffID)
-	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
-	return staff, staffID, err
-}
-
 func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentStr string) sql.NullInt64 {
 	if userAgentStr == "" {
 		return sql.NullInt64{}
@@ -150,7 +144,7 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.sessionManager.Put(ctx, SessionStaffID, staff.ID)
+	s.sessionManager.Put(ctx, SessionStaffID, s.encoder.Encode(staff.ID))
 
 	useragentID := sql.NullInt64{}
 	if ua := r.UserAgent(); ua != "" {

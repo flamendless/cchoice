@@ -49,15 +49,16 @@ func NewAttendanceService(
 
 func (s *AttendanceService) TimeIn(
 	ctx context.Context,
-	staffID int64,
+	staffID string,
 	date string,
 	now string,
 	location sql.NullString,
 	useragentID sql.NullInt64,
 ) error {
+	dbStaffID := s.encoder.Decode(staffID)
 	existing, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx,
 		queries.GetStaffAttendanceByDateParams{
-			StaffID: staffID,
+			StaffID: dbStaffID,
 			ForDate: date,
 		})
 
@@ -72,7 +73,7 @@ func (s *AttendanceService) TimeIn(
 	if err == sql.ErrNoRows {
 		_, err = s.dbRW.GetQueries().CreateStaffAttendance(ctx,
 			queries.CreateStaffAttendanceParams{
-				StaffID:       staffID,
+				StaffID:       dbStaffID,
 				ForDate:       date,
 				TimeIn:        sql.NullString{String: now, Valid: true},
 				TimeOut:       sql.NullString{},
@@ -84,7 +85,7 @@ func (s *AttendanceService) TimeIn(
 
 	_, err = s.dbRW.GetQueries().UpdateStaffAttendanceTimeIn(ctx,
 		queries.UpdateStaffAttendanceTimeInParams{
-			StaffID:       staffID,
+			StaffID:       dbStaffID,
 			ForDate:       date,
 			TimeIn:        sql.NullString{String: now, Valid: true},
 			InLocation:    location,
@@ -96,15 +97,16 @@ func (s *AttendanceService) TimeIn(
 
 func (s *AttendanceService) TimeOut(
 	ctx context.Context,
-	staffID int64,
+	staffID string,
 	date string,
 	now string,
 	location sql.NullString,
 	useragentID sql.NullInt64,
 ) error {
+	dbStaffID := s.encoder.Decode(staffID)
 	existing, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx,
 		queries.GetStaffAttendanceByDateParams{
-			StaffID: staffID,
+			StaffID: dbStaffID,
 			ForDate: date,
 		})
 	if err != nil {
@@ -124,7 +126,7 @@ func (s *AttendanceService) TimeOut(
 			TimeOut:        sql.NullString{String: now, Valid: true},
 			OutLocation:    location,
 			OutUseragentID: useragentID,
-			StaffID:        staffID,
+			StaffID:        dbStaffID,
 			ForDate:        date,
 		})
 
@@ -133,7 +135,7 @@ func (s *AttendanceService) TimeOut(
 
 func (s *AttendanceService) LunchBreakIn(
 	ctx context.Context,
-	staffID int64,
+	staffID string,
 	date string,
 	now string,
 	location sql.NullString,
@@ -143,7 +145,7 @@ func (s *AttendanceService) LunchBreakIn(
 		LunchBreakIn:            sql.NullString{String: now, Valid: true},
 		LunchBreakInLocation:    location,
 		LunchBreakInUseragentID: useragentID,
-		StaffID:                 staffID,
+		StaffID:                 s.encoder.Decode(staffID),
 		ForDate:                 date,
 	})
 	return err
@@ -151,14 +153,15 @@ func (s *AttendanceService) LunchBreakIn(
 
 func (s *AttendanceService) LunchBreakOut(
 	ctx context.Context,
-	staffID int64,
+	staffID string,
 	date string,
 	now string,
 	location sql.NullString,
 	useragentID sql.NullInt64,
 ) error {
+	dbStaffID := s.encoder.Decode(staffID)
 	existing, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
-		StaffID: staffID,
+		StaffID: dbStaffID,
 		ForDate: date,
 	})
 	if err != nil {
@@ -175,7 +178,7 @@ func (s *AttendanceService) LunchBreakOut(
 		LunchBreakOut:            sql.NullString{String: now, Valid: true},
 		LunchBreakOutLocation:    location,
 		LunchBreakOutUseragentID: useragentID,
-		StaffID:                  staffID,
+		StaffID:                  dbStaffID,
 		ForDate:                  date,
 	})
 	return err
@@ -183,7 +186,7 @@ func (s *AttendanceService) LunchBreakOut(
 
 func (s *AttendanceService) TimeOff(
 	ctx context.Context,
-	staffID int64,
+	staffID string,
 	timeOffType enums.TimeOff,
 	description string,
 	startDate time.Time,
@@ -197,7 +200,7 @@ func (s *AttendanceService) TimeOff(
 			StartDate:   startDate,
 			EndDate:     endDate,
 			Description: description,
-			StaffID:     staffID,
+			StaffID:     s.encoder.Decode(staffID),
 			UseragentID: useragentID,
 		},
 	)
@@ -206,12 +209,13 @@ func (s *AttendanceService) TimeOff(
 
 func (s *AttendanceService) UpsertLocation(
 	ctx context.Context,
-	staffID int64,
+	staffID string,
 	date string,
 	location sql.NullString,
 ) error {
+	dbStaffID := s.encoder.Decode(staffID)
 	_, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
-		StaffID: staffID,
+		StaffID: dbStaffID,
 		ForDate: date,
 	})
 
@@ -221,7 +225,7 @@ func (s *AttendanceService) UpsertLocation(
 
 	if err == sql.ErrNoRows {
 		_, err = s.dbRW.GetQueries().CreateStaffAttendance(ctx, queries.CreateStaffAttendanceParams{
-			StaffID:     staffID,
+			StaffID:     dbStaffID,
 			ForDate:     date,
 			TimeIn:      sql.NullString{},
 			TimeOut:     sql.NullString{},
@@ -232,7 +236,7 @@ func (s *AttendanceService) UpsertLocation(
 
 	_, err = s.dbRW.GetQueries().UpdateStaffAttendanceLocation(ctx, queries.UpdateStaffAttendanceLocationParams{
 		OutLocation: location,
-		StaffID:     staffID,
+		StaffID:     dbStaffID,
 		ForDate:     date,
 	})
 
@@ -241,35 +245,32 @@ func (s *AttendanceService) UpsertLocation(
 
 func (s *AttendanceService) ApproveTimeOff(
 	ctx context.Context,
-	timeOffID int64,
-	approvedBy int64,
+	timeOffID string,
+	approvedByID string,
 ) error {
 	_, err := s.dbRW.GetQueries().ApproveStaffTimeOff(ctx, queries.ApproveStaffTimeOffParams{
-		ApprovedBy: sql.NullInt64{Int64: approvedBy, Valid: true},
-		ID:         timeOffID,
+		ApprovedBy: sql.NullInt64{Int64: s.encoder.Decode(approvedByID), Valid: true},
+		ID:         s.encoder.Decode(timeOffID),
 	})
 	return err
 }
 
-func (s *AttendanceService) CancelTimeOff(
-	ctx context.Context,
-	timeOffID int64,
-	approvedBy int64,
-) error {
-	_, err := s.dbRW.GetQueries().CancelStaffTimeOff(ctx, timeOffID)
+func (s *AttendanceService) CancelTimeOff(ctx context.Context, timeOffID string) error {
+	_, err := s.dbRW.GetQueries().CancelStaffTimeOff(ctx, s.encoder.Decode(timeOffID))
 	return err
 }
 
 func (s *AttendanceService) GetAttendance(
 	ctx context.Context,
-	staffID int64,
+	staffID string,
 	startDate string,
 	endDate string,
 ) ([]staff.StaffRow, error) {
+	dbStaffID := s.encoder.Decode(staffID)
 	var data []staff.StaffRow
-	if staffID != encode.INVALID {
+	if dbStaffID != encode.INVALID {
 		attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByDateRangeAndStaffID(ctx, queries.GetStaffAttendanceByDateRangeAndStaffIDParams{
-			StaffID:   staffID,
+			StaffID:   dbStaffID,
 			StartDate: startDate,
 			EndDate:   endDate,
 		})
@@ -378,7 +379,7 @@ func (s *AttendanceService) ComputeData(
 			OutStatus:     c.outStatus,
 			Duration:      c.duration,
 			DurationColor: c.durationColor,
-			InLate: c.inLate,
+			InLate:        c.inLate,
 			InShop:        inShop,
 			OutShop:       outShop,
 			InLocation:    att.InLocation.String,
