@@ -28,7 +28,7 @@ func (s *Server) adminSuperuserLogsTableHandler(w http.ResponseWriter, r *http.R
 	const logtag = "[Admin Superuser Logs Table Handler]"
 	ctx := r.Context()
 
-	logsData, err := s.services.staffLogs.GetAll(ctx)
+	logsData, err := s.services.staffLog.GetAll(ctx)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)

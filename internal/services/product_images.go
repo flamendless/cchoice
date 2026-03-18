@@ -12,20 +12,20 @@ import (
 	"cchoice/internal/utils"
 )
 
-type ProductImagesService struct {
+type ProductImageService struct {
 	objectStorage storage.IObjectStorage
 	encoder       encode.IEncode
 	dbRO          database.Service
 	dbRW          database.Service
 }
 
-func NewProductImagesService(
+func NewProductImageService(
 	objectStorage storage.IObjectStorage,
 	encoder encode.IEncode,
 	dbRO database.Service,
 	dbRW database.Service,
-) *ProductImagesService {
-	return &ProductImagesService{
+) *ProductImageService {
+	return &ProductImageService{
 		objectStorage: objectStorage,
 		encoder:       encoder,
 		dbRO:          dbRO,
@@ -33,7 +33,7 @@ func NewProductImagesService(
 	}
 }
 
-func (s *ProductImagesService) GenerateFilename(
+func (s *ProductImageService) GenerateFilename(
 	ext string,
 	paths ...string,
 ) string {
@@ -42,6 +42,6 @@ func (s *ProductImagesService) GenerateFilename(
 	return fmt.Sprintf("products/%s_%s%s", sanitizedName, uuid, ext)
 }
 
-func (s *ProductImagesService) UploadProductImage(ctx context.Context, filename string, file io.Reader, contentType string) error {
+func (s *ProductImageService) UploadProductImage(ctx context.Context, filename string, file io.Reader, contentType string) error {
 	return s.objectStorage.PutObject(ctx, filename, file, contentType)
 }
