@@ -61,19 +61,30 @@ func (s *ReportService) StreamReportCSV(
 			return err
 		}
 
-		attendanceService := NewAttendanceService(s.encoder, s.dbRO, nil)
 		staffDB, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedStaffID)
 		if err != nil {
 			return err
 		}
-
-		var totalMinutesLate float64
-		for _, d := range data {
-			c := attendanceService.ComputeData(staff.StaffRowBase(staffDB), d)
-			totalMinutesLate += c.Attendance.InLate.Minutes()
+		if err := writer.Write([]string{fmt.Sprintf(
+			"Scheduled working time: %s - %s",
+			staffDB.TimeInSchedule.String,
+			staffDB.TimeOutSchedule.String,
+		)}); err != nil {
+			return err
 		}
 
-		if err := writer.Write([]string{fmt.Sprintf("Total minutes late: %.2f", totalMinutesLate)}); err != nil {
+		attendanceService := NewAttendanceService(s.encoder, s.dbRO, nil)
+		extraStats := attendanceService.GetExtraStats(ctx, staffID, data)
+		if err := writer.Write([]string{fmt.Sprintf("Total undertime count: %d (%.2f minutes)", extraStats.TotalUndertimeCount, extraStats.TotalUndertimeMinutes)}); err != nil {
+			return err
+		}
+		if err := writer.Write([]string{fmt.Sprintf("Total late count: %d (%.2f minutes)", extraStats.TotalLateCount, extraStats.TotalLateMinutes)}); err != nil {
+			return err
+		}
+		if err := writer.Write([]string{fmt.Sprintf("Total early in count: %d", extraStats.TotalEarlyInCount)}); err != nil {
+			return err
+		}
+		if err := writer.Write([]string{fmt.Sprintf("Total overtime count: %d", extraStats.TotalOvertimeCount)}); err != nil {
 			return err
 		}
 	}
@@ -200,22 +211,53 @@ func (s *ReportService) StreamReportXLSX(
 		}
 		row++
 
-		attendanceService := NewAttendanceService(s.encoder, s.dbRO, nil)
 		staffDB, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedStaffID)
 		if err != nil {
 			return err
 		}
-
-		var totalMinutesLate float64
-		for _, d := range data {
-			c := attendanceService.ComputeData(staff.StaffRowBase(staffDB), d)
-			totalMinutesLate += c.Attendance.InLate.Minutes()
-		}
-
 		if err := file.SetCellValue(
 			sheet,
 			fmt.Sprintf("A%d", row),
-			fmt.Sprintf("Total minutes late: %.2f", totalMinutesLate),
+			fmt.Sprintf(
+				"Scheduled working time: %s - %s",
+				staffDB.TimeInSchedule.String,
+				staffDB.TimeOutSchedule.String,
+			),
+		); err != nil {
+			return err
+		}
+		row++
+
+		attendanceService := NewAttendanceService(s.encoder, s.dbRO, nil)
+		extraStats := attendanceService.GetExtraStats(ctx, staffID, data)
+		if err := file.SetCellValue(
+			sheet,
+			fmt.Sprintf("A%d", row),
+			fmt.Sprintf("Total undertime count: %d (%.2f minutes)", extraStats.TotalUndertimeCount, extraStats.TotalUndertimeMinutes),
+		); err != nil {
+			return err
+		}
+		row++
+		if err := file.SetCellValue(
+			sheet,
+			fmt.Sprintf("A%d", row),
+			fmt.Sprintf("Total late count: %d (%.2f minutes)", extraStats.TotalLateCount, extraStats.TotalLateMinutes),
+		); err != nil {
+			return err
+		}
+		row++
+		if err := file.SetCellValue(
+			sheet,
+			fmt.Sprintf("A%d", row),
+			fmt.Sprintf("Total early in count: %d", extraStats.TotalEarlyInCount),
+		); err != nil {
+			return err
+		}
+		row++
+		if err := file.SetCellValue(
+			sheet,
+			fmt.Sprintf("A%d", row),
+			fmt.Sprintf("Total overtime count: %d", extraStats.TotalOvertimeCount),
 		); err != nil {
 			return err
 		}
