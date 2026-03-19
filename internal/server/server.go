@@ -151,7 +151,7 @@ func NewServer() *ServerInstance {
 		brand:        services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staff:        services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staffLog:     services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		role:         services.NewRoleService(newServer.encoder, newServer.dbRO),
+		role:         services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		location:     services.NewLocationService(cfg.Settings.ShopLocation),
 	}
 

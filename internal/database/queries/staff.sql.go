@@ -365,6 +365,94 @@ func (q *Queries) GetAllStaffs(ctx context.Context, limit int64) ([]GetAllStaffs
 	return items, nil
 }
 
+const getAllStaffsForAdmin = `-- name: GetAllStaffsForAdmin :many
+SELECT
+    id,
+    first_name,
+    middle_name,
+    last_name,
+    birthdate,
+    sex,
+    date_hired,
+    time_in_schedule,
+    time_out_schedule,
+    position,
+    user_type,
+    email,
+    mobile_no,
+    require_in_shop,
+    created_at,
+    updated_at
+FROM tbl_staffs
+WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+AND (
+    ?1 IS NULL
+    OR ?1 = ''
+    OR LOWER(first_name || ' ' || COALESCE(middle_name, '') || ' ' || last_name) LIKE '%' || LOWER(?1) || '%'
+    OR LOWER(last_name || ', ' || first_name || ' ' || COALESCE(middle_name, '')) LIKE '%' || LOWER(?1) || '%'
+)
+ORDER BY last_name ASC, first_name ASC
+`
+
+type GetAllStaffsForAdminRow struct {
+	ID              int64
+	FirstName       string
+	MiddleName      sql.NullString
+	LastName        string
+	Birthdate       string
+	Sex             string
+	DateHired       string
+	TimeInSchedule  sql.NullString
+	TimeOutSchedule sql.NullString
+	Position        string
+	UserType        string
+	Email           string
+	MobileNo        string
+	RequireInShop   bool
+	CreatedAt       string
+	UpdatedAt       string
+}
+
+func (q *Queries) GetAllStaffsForAdmin(ctx context.Context, search interface{}) ([]GetAllStaffsForAdminRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllStaffsForAdmin, search)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllStaffsForAdminRow
+	for rows.Next() {
+		var i GetAllStaffsForAdminRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
+			&i.Birthdate,
+			&i.Sex,
+			&i.DateHired,
+			&i.TimeInSchedule,
+			&i.TimeOutSchedule,
+			&i.Position,
+			&i.UserType,
+			&i.Email,
+			&i.MobileNo,
+			&i.RequireInShop,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getStaffAttendanceByDate = `-- name: GetStaffAttendanceByDate :one
 SELECT
     id,
