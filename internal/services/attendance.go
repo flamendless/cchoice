@@ -33,6 +33,8 @@ type attendanceStatusResult struct {
 	duration      string
 	durationColor string
 	inLate        time.Duration
+	undertime     time.Duration
+	earlyIn       time.Duration
 }
 
 func NewAttendanceService(
@@ -380,6 +382,8 @@ func (s *AttendanceService) ComputeData(
 			Duration:      c.duration,
 			DurationColor: c.durationColor,
 			InLate:        c.inLate,
+			Undertime:     c.undertime,
+			EarlyIn:       c.earlyIn,
 			InShop:        inShop,
 			OutShop:       outShop,
 			InLocation:    att.InLocation.String,
@@ -416,6 +420,15 @@ func computeInOutStatus(actualIn, actualOut, schedIn, schedOut string) attendanc
 		switch {
 		case actualInM < schedInM:
 			out.inStatus = enums.TIME_IN_STATUS_EARLIER
+			timeSchedIn, err := time.Parse(constants.TimeLayoutHHMM, schedIn)
+			if err != nil {
+				logs.Log().Warn("computeInOutStatus", zap.String("sched in", schedIn), zap.Error(err))
+			}
+			timeActualIn, err := time.Parse(constants.TimeLayoutHHMMSS, actualIn)
+			if err != nil {
+				logs.Log().Warn("computeInOutStatus", zap.String("actual in", actualIn), zap.Error(err))
+			}
+			out.earlyIn = timeSchedIn.Sub(timeActualIn)
 		case actualInM == schedInM:
 			out.inStatus = enums.TIME_IN_STATUS_ON_TIME
 		default:
@@ -437,6 +450,15 @@ func computeInOutStatus(actualIn, actualOut, schedIn, schedOut string) attendanc
 		switch {
 		case actualOutM < schedOutM:
 			out.outStatus = enums.TIME_OUT_STATUS_UNDERTIME
+			timeSchedOut, err := time.Parse(constants.TimeLayoutHHMM, schedOut)
+			if err != nil {
+				logs.Log().Warn("computeInOutStatus", zap.String("sched out", schedOut), zap.Error(err))
+			}
+			timeActualOut, err := time.Parse(constants.TimeLayoutHHMMSS, actualOut)
+			if err != nil {
+				logs.Log().Warn("computeInOutStatus", zap.String("actual out", actualOut), zap.Error(err))
+			}
+			out.undertime = timeSchedOut.Sub(timeActualOut)
 		case actualOutM == schedOutM:
 			out.outStatus = enums.TIME_OUT_STATUS_ON_TIME
 		default:
@@ -462,4 +484,42 @@ func computeInOutStatus(actualIn, actualOut, schedIn, schedOut string) attendanc
 	}
 
 	return out
+}
+
+type AttendanceExtraStats struct {
+	TotalUndertimeMinutes float64
+	TotalLateMinutes      float64
+	TotalUndertimeCount   int
+	TotalLateCount        int
+	TotalEarlyInCount     int
+	TotalOvertimeCount    int
+}
+
+func (s *AttendanceService) GetExtraStats(ctx context.Context, staffID string, data []staff.StaffRow) AttendanceExtraStats {
+	var res AttendanceExtraStats
+
+	decodedStaffID := s.encoder.Decode(staffID)
+	staffDB, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedStaffID)
+	if err != nil {
+		return res
+	}
+
+	for _, d := range data {
+		c := s.ComputeData(staff.StaffRowBase(staffDB), d)
+		res.TotalLateMinutes += c.Attendance.InLate.Minutes()
+		if c.Attendance.InStatus == enums.TIME_IN_STATUS_LATE {
+			res.TotalLateCount++
+		}
+		if c.Attendance.OutStatus == enums.TIME_OUT_STATUS_UNDERTIME {
+			res.TotalUndertimeCount++
+			res.TotalUndertimeMinutes += c.Attendance.Undertime.Minutes()
+		}
+		if c.Attendance.OutStatus == enums.TIME_OUT_STATUS_OVERTIME {
+			res.TotalOvertimeCount++
+		}
+		if c.Attendance.InStatus == enums.TIME_IN_STATUS_EARLIER {
+			res.TotalEarlyInCount++
+		}
+	}
+	return res
 }

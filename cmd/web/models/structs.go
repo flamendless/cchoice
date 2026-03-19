@@ -160,6 +160,8 @@ type AttendanceStat struct {
 	Duration      string
 	DurationColor string
 	InLate        time.Duration
+	Undertime     time.Duration
+	EarlyIn       time.Duration
 	InShop        bool
 	OutShop       bool
 	InLocation    string
