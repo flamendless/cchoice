@@ -70,6 +70,34 @@ WHERE deleted_at = '1970-01-01 00:00:00+00:00' AND user_type = 'STAFF'
 ORDER BY last_name ASC, first_name ASC
 LIMIT ?;
 
+-- name: GetAllStaffsForAdmin :many
+SELECT
+    id,
+    first_name,
+    middle_name,
+    last_name,
+    birthdate,
+    sex,
+    date_hired,
+    time_in_schedule,
+    time_out_schedule,
+    position,
+    user_type,
+    email,
+    mobile_no,
+    require_in_shop,
+    created_at,
+    updated_at
+FROM tbl_staffs
+WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+AND (
+    @search IS NULL
+    OR @search = ''
+    OR LOWER(first_name || ' ' || COALESCE(middle_name, '') || ' ' || last_name) LIKE '%' || LOWER(@search) || '%'
+    OR LOWER(last_name || ', ' || first_name || ' ' || COALESCE(middle_name, '')) LIKE '%' || LOWER(@search) || '%'
+)
+ORDER BY last_name ASC, first_name ASC;
+
 -- name: GetStaffAttendanceByDate :one
 SELECT
     id,

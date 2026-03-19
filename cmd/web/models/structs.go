@@ -250,6 +250,16 @@ type Staff struct {
 	FullName string
 }
 
+type AdminStaffListItem struct {
+	ID       string
+	FullName string
+	Position string
+	Email    string
+	MobileNo string
+	UserType enums.StaffUserType
+	Roles    []enums.StaffRole
+}
+
 type StaffLog struct {
 	ID         string
 	StaffID    string

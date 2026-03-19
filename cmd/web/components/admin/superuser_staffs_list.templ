@@ -1,0 +1,199 @@
+package components
+
+import (
+	"fmt"
+
+	"cchoice/cmd/web/models"
+	"cchoice/cmd/web/components/common"
+	"cchoice/internal/constants"
+	"cchoice/internal/enums"
+	"cchoice/internal/utils"
+)
+
+templ AdminSuperuserStaffsListPage(title string) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("[SUPERUSER] Employees - C-Choice Admin")
+		</head>
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-col"
+			_="init call metrics_event('admin_visit', 'staffs list')"
+		>
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-7xl mx-auto">
+					<div class="text-center mb-6">
+						<img src={ constants.PathSVGLogoOnly } alt="C-Choice Logo" class="w-16 h-16 mx-auto mb-4"/>
+					</div>
+					<div class="mb-6">
+						@BackToHome(utils.URL("/admin/superuser"))
+					</div>
+					<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+						Employees
+					</h1>
+					@StaffsListSection()
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+templ StaffsListSection() {
+	<div
+		class="bg-white rounded-lg shadow-md p-6"
+		hx-get={ utils.URL("/admin/superuser/staffs/table") }
+		hx-trigger="load"
+		hx-target="#staffs-table"
+		hx-swap="innerHTML"
+	>
+		@StaffSearchToolbar(utils.URL("/admin/superuser/staffs/table"))
+		<div id="staffs-table">
+		</div>
+	</div>
+}
+
+templ StaffSearchToolbar(url string) {
+	<div class="flex flex-col sm:flex-row sm:flex-wrap justify-between items-start sm:items-center gap-4 mb-4">
+		<div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+			<input
+				type="text"
+				name="search"
+				placeholder="Search by name..."
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				hx-get={ url }
+				hx-trigger="change, search delay:300ms"
+				hx-target="#staffs-table"
+				hx-include="[name='search']"
+			/>
+		</div>
+	</div>
+}
+
+templ AdminSuperuserStaffsListTable(staffs []models.AdminStaffListItem) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-50">
+				<tr>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[5%]">
+						ID
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+						Full Name
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
+						Position
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+						Email
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
+						Mobile No
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
+						User Type
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[35%]">
+						Roles
+					</th>
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				for _, staff := range staffs {
+					<tr id={ fmt.Sprintf("staff-row-%s", staff.ID) }>
+						<td class="px-6 py-4 whitespace-nowrap text-sm w-[5%] text-gray-900">
+							{ staff.ID }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm w-[15%] text-gray-900">
+							{ staff.FullName }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm w-[10%] text-gray-900">
+							{ staff.Position }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm w-[15%] text-gray-900">
+							{ staff.Email }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm w-[10%] text-gray-900">
+							{ staff.MobileNo }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm w-[10%] text-gray-900">
+							{ staff.UserType.String() }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm w-[35%]">
+							@StaffRolesCell(staff.ID, staff.UserType, staff.Roles)
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ StaffRolesCell(staffID string, userType enums.StaffUserType, roles []enums.StaffRole) {
+	if userType == enums.STAFF_USER_TYPE_SUPERUSER {
+		<span class="text-gray-400 italic">Full access</span>
+	} else {
+		<div
+			id={ fmt.Sprintf("staff-roles-cells-%s", staffID) }
+			class="flex flex-wrap items-center gap-1"
+		>
+			for _, role := range roles {
+				@StaffRolePill(staffID, role)
+			}
+			<div class="flex flex-col">
+				<button
+					type="button"
+					class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full border border-dashed border-gray-400 text-gray-600 hover:bg-gray-100"
+					hx-get={ utils.URLf("/admin/superuser/staffs/roles?staff_id=%s", staffID) }
+					hx-target={ fmt.Sprintf("#staff-roles-%s", staffID) }
+					hx-trigger="click"
+					hx-swap="outerHTML"
+				>
+					+ add role
+				</button>
+				<div id={ fmt.Sprintf("staff-roles-%s", staffID) }>
+				</div>
+				//StaffRoleDropdown
+			</div>
+		</div>
+	}
+}
+
+templ StaffRolePill(staffID string, role enums.StaffRole) {
+	<span
+		class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+		id={ fmt.Sprintf("staff-role-pill-%s-%s", staffID, role.String()) }
+	>
+		{ role.String() }
+		<button
+			type="button"
+			class="ml-1 text-blue-600 hover:text-blue-800 font-bold"
+			hx-patch={ utils.URLf("/admin/superuser/staffs/%s/role?action=REMOVE&role=%s", staffID, role.String()) }
+			hx-target={ fmt.Sprintf("#staff-role-pill-%s-%s", staffID, role.String()) }
+			hx-swap="outerHTML"
+		>
+			×
+		</button>
+	</span>
+}
+
+templ StaffRoleDropdown(staffID string, roles []enums.StaffRole) {
+	<select
+		id={ fmt.Sprintf("staff-roles-%s", staffID) }
+		name="role"
+		class="mt-1 z-10 w-40 bg-white border border-gray-300 rounded-md shadow-lg focus:outline-none focus:ring-cchoice focus:border-cchoice"
+		hx-patch={ utils.URLf("/admin/superuser/staffs/%s/role?action=ADD", staffID) }
+		hx-include={ fmt.Sprintf("#staff-roles-%s", staffID) }
+		hx-trigger="exec"
+		hx-swap="outerHTML"
+		hx-target={ fmt.Sprintf("#staff-roles-cells-%s", staffID) }
+		_="on change trigger exec on me end"
+	>
+		<option value="">Select role...</option>
+		for _, role := range roles {
+			<option value={ role.String() }>{ role.String() }</option>
+		}
+	</select>
+}

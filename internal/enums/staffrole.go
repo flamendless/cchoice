@@ -30,3 +30,13 @@ func MustParseStaffRoleToEnum(e string) StaffRole {
 func (r StaffRole) IsValid() bool {
 	return r != STAFF_ROLE_UNDEFINED
 }
+
+func GetAllStaffRoles() []StaffRole {
+	return []StaffRole{
+		STAFF_ROLE_CREATE_PRODUCT,
+	}
+}
+
+func RoleExists(role StaffRole) bool {
+	return role.IsValid()
+}

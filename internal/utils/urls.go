@@ -13,6 +13,10 @@ func URL(path string) string {
 	return "/cchoice" + path
 }
 
+func URLf(path string, args ...any) string {
+	return URL(fmt.Sprintf(path, args...))
+}
+
 func URLWithSuccess(path string, message string) string {
 	message = url.QueryEscape(message)
 	return URL(fmt.Sprintf("%s?success=%s", path, message))

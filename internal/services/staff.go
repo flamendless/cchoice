@@ -110,6 +110,10 @@ func (s *StaffService) GetAll(ctx context.Context, limit int64) ([]models.Staff,
 	return list, nil
 }
 
+func (s *StaffService) GetAllForAdmin(ctx context.Context, search string) ([]queries.GetAllStaffsForAdminRow, error) {
+	return s.dbRO.GetQueries().GetAllStaffsForAdmin(ctx, search)
+}
+
 func (s *StaffService) GetCurrentStaff(ctx context.Context, staffID string) (queries.GetStaffByIDRow, error) {
 	decodedID := s.encoder.Decode(staffID)
 	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedID)
