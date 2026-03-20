@@ -15,7 +15,8 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/net/http2"
 	"golang.org/x/sync/singleflight"
-
+	
+	"cchoice/internal/enums"
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
@@ -184,9 +185,9 @@ func NewServer() *ServerInstance {
 	var addr string
 	//TODO: (Brandon) - makes sense to create enums for these
 	switch cfg.AppEnv {
-	case "local", "web":
+	case enums.APP_ENV_LOCAL, enums.APP_ENV_WEB:
 		addr = fmt.Sprintf("%s:%d", newServer.address, newServer.port)
-	case "prod":
+	case enums.APP_ENV_PROD:
 		addr = fmt.Sprintf(":%d", newServer.port)
 	}
 
@@ -229,7 +230,7 @@ func NewServer() *ServerInstance {
 
 	logFields := []zap.Field{
 		zap.String("Address", addr),
-		zap.String("AppEnv", cfg.AppEnv),
+		zap.String("AppEnv", cfg.AppEnv.String()),
 		zap.Bool("Use caching", newServer.cache != nil),
 		zap.Int("Caching max bytes", constants.CacheMaxBytes),
 		zap.Bool("Use session manager", newServer.sessionManager != nil),

@@ -412,7 +412,7 @@ func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 
 	queryAppEnv := r.URL.Query().Get("appenv")
 	if queryAppEnv == "" {
-		queryAppEnv = conf.Conf().AppEnv
+		queryAppEnv = conf.Conf().AppEnv.String()
 	}
 
 	ctx := r.Context()
