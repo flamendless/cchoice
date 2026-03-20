@@ -21,7 +21,7 @@ var once sync.Once
 
 type appConfig struct {
 	Server             ServerConfig
-	AppEnv             string `env:"APP_ENV" env-required:""`
+	AppEnv enums.AppEnv `env:"APP_ENV" env-required:""`
 	DBURL              string `env:"DB_URL" env-required:""`
 	PaymentService     string `env:"PAYMENT_SERVICE" env-required:""`
 	PayMongo           PayMongoConfig
@@ -222,15 +222,15 @@ func (c *appConfig) SetSettings(settings map[string]string) {
 }
 
 func (c *appConfig) IsLocal() bool {
-	return c.AppEnv == "local" || c.AppEnv == "web"
+	return c.AppEnv == enums.APP_ENV_LOCAL || c.AppEnv == enums.APP_ENV_WEB
 }
 
 func (c *appConfig) IsProd() bool {
-	return c.AppEnv == "prod"
+	return c.AppEnv == enums.APP_ENV_PROD
 }
 
 func (c *appConfig) IsWeb() bool {
-	return c.AppEnv == "web"
+	return c.AppEnv == enums.APP_ENV_WEB
 }
 
 func (c *appConfig) AllowedOrigins() []string {
