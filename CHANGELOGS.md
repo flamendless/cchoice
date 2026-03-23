@@ -2,6 +2,41 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.17"></a>
+## [release-v1.1.17] - 2026-03-19
+### Docs
+- Release v1.1.16
+
+### Feature
+- Staff management
+- Role-based endpoints
+- Admin staff logs
+- Products table
+- Product upload
+- WIP product upload
+
+### Maintenance
+- More migration to services
+- More migration to product service
+- Create location service
+- Always pass encoded ID to services
+- More services
+- Create product images and brands services
+- Update templ file
+- Move PHP to constants
+- Unify regexes
+
+### Script
+- Add trailing whitespace check
+
+### Server
+- Move create product to service
+
+### Web
+- Add more data in reports
+- Update styles
+
+
 <a name="release-v1.1.16"></a>
 ## [release-v1.1.16] - 2026-03-14
 ### Bugfix
