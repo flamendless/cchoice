@@ -17,6 +17,7 @@ import (
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/httputil"
 	"cchoice/internal/images"
@@ -411,24 +412,27 @@ func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 	const limit = 8
 
 	queryAppEnv := r.URL.Query().Get("appenv")
+	var parsedAppEnv enums.AppEnv
 	if queryAppEnv == "" {
-		queryAppEnv = conf.Conf().AppEnv
+		parsedAppEnv = conf.Conf().AppEnv
+	} else {
+		parsedAppEnv = enums.ParseAppEnvToEnum(queryAppEnv)
 	}
 
 	ctx := r.Context()
-	cacheKey := []byte("changelogs:" + queryAppEnv)
+	cacheKey := []byte("changelogs:" + parsedAppEnv.String())
 	logsData, err := requests.GetChangeLogs(
 		ctx,
 		s.cache,
 		&s.SF,
 		cacheKey,
-		queryAppEnv,
+		parsedAppEnv,
 		limit,
 	)
 	if err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
-			zap.String("query", queryAppEnv),
+			zap.Stringer("query", parsedAppEnv),
 			zap.Int("limit", limit),
 			zap.Error(err),
 		)
@@ -440,7 +444,7 @@ func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 	if err := components.ChangeLogs(logsData, limit).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
-			zap.String("query", queryAppEnv),
+			zap.Stringer("query", parsedAppEnv),
 			zap.Int("limit", limit),
 			zap.Error(err),
 		)

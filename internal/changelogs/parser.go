@@ -4,15 +4,17 @@ import (
 	"bufio"
 	"io"
 	"strings"
+
+	"cchoice/internal/enums"
 )
 
-func Parse(r io.Reader, appenv string, limit int) ([]ChangeLog, error) {
+func Parse(r io.Reader, appenv enums.AppEnv, limit int) ([]ChangeLog, error) {
 	scanner := bufio.NewScanner(r)
 
 	var (
-		count        int
-		currentLog   *ChangeLog
-		currentSect  *ChangeSection
+		count       int
+		currentLog  *ChangeLog
+		currentSect *ChangeSection
 	)
 	logs := make([]ChangeLog, 0, limit*2)
 
@@ -51,12 +53,12 @@ func Parse(r io.Reader, appenv string, limit int) ([]ChangeLog, error) {
 
 			version, date := parseHeader(line)
 			switch appenv {
-			case "local":
+			case enums.APP_ENV_LOCAL:
 				if !strings.HasPrefix(version, "dev-v") {
 					currentLog = nil
 					continue
 				}
-			case "prod":
+			case enums.APP_ENV_PROD:
 				if !strings.HasPrefix(version, "release-v") {
 					currentLog = nil
 					continue
