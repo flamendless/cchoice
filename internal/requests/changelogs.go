@@ -11,6 +11,7 @@ import (
 
 	"cchoice/internal/changelogs"
 	"cchoice/internal/constants"
+	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/metrics"
 )
@@ -20,7 +21,7 @@ func GetChangeLogs(
 	cache *fastcache.Cache,
 	sf *singleflight.Group,
 	cacheKey []byte,
-	appenv string,
+	appenv enums.AppEnv,
 	limit int,
 ) ([]changelogs.ChangeLog, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {

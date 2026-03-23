@@ -21,6 +21,7 @@ import (
 	"cchoice/internal/database"
 	"cchoice/internal/encode"
 	"cchoice/internal/encode/sqids"
+	"cchoice/internal/enums"
 	"cchoice/internal/geocoding"
 	"cchoice/internal/jobs"
 	"cchoice/internal/logs"
@@ -182,11 +183,10 @@ func NewServer() *ServerInstance {
 	cfg.SetSettings(settings)
 
 	var addr string
-	//TODO: (Brandon) - makes sense to create enums for these
 	switch cfg.AppEnv {
-	case "local", "web":
+	case enums.APP_ENV_LOCAL, enums.APP_ENV_WEB:
 		addr = fmt.Sprintf("%s:%d", newServer.address, newServer.port)
-	case "prod":
+	case enums.APP_ENV_PROD:
 		addr = fmt.Sprintf(":%d", newServer.port)
 	}
 
@@ -229,7 +229,7 @@ func NewServer() *ServerInstance {
 
 	logFields := []zap.Field{
 		zap.String("Address", addr),
-		zap.String("AppEnv", cfg.AppEnv),
+		zap.Stringer("AppEnv", cfg.AppEnv),
 		zap.Bool("Use caching", newServer.cache != nil),
 		zap.Int("Caching max bytes", constants.CacheMaxBytes),
 		zap.Bool("Use session manager", newServer.sessionManager != nil),
