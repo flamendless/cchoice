@@ -43,6 +43,8 @@ type Services struct {
 	staffLog     *services.StaffLogsService
 	role         *services.RoleService
 	location     *services.LocationService
+	attendance   *services.AttendanceService
+	report       *services.ReportService
 }
 
 type Server struct {
@@ -154,6 +156,8 @@ func NewServer() *ServerInstance {
 		staffLog:     services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		role:         services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		location:     services.NewLocationService(cfg.Settings.ShopLocation),
+		attendance:   services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		report:       services.NewReportService(newServer.encoder, newServer.dbRO),
 	}
 
 	ctx := context.Background()

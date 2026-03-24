@@ -258,8 +258,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		hasLunchBreakIn = attendance.LunchBreakIn.Valid
 		hasLunchBreakOut = attendance.LunchBreakOut.Valid
 
-		attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, nil)
-		rec := attendanceService.ComputeData(
+		rec := s.services.attendance.ComputeData(
 			staffmodels.StaffRowBase(staff),
 			staffmodels.StaffRow{
 				ID:                       staff.ID,
@@ -352,8 +351,7 @@ func (s *Server) adminStaffAttendanceTableHandler(w http.ResponseWriter, r *http
 	attendance, err := s.services.staff.GetAttendanceByDate(ctx, staff.ID, date)
 	var record *models.Attendance
 	if err == nil {
-		attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, nil)
-		rec := attendanceService.ComputeData(
+		rec := s.services.attendance.ComputeData(
 			staffmodels.StaffRowBase(staff),
 			staffmodels.StaffRow{
 				ID:                       staff.ID,
@@ -400,8 +398,7 @@ func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.
 	attendance, err := s.services.staff.GetAttendanceByDate(ctx, staff.ID, date)
 	var record *models.Attendance
 	if err == nil {
-		attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, nil)
-		rec := attendanceService.ComputeData(
+		rec := s.services.attendance.ComputeData(
 			staffmodels.StaffRowBase(staff),
 			staffmodels.StaffRow{
 				ID:                       staff.ID,
@@ -439,8 +436,7 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
-	svc := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	err := svc.TimeIn(ctx, s.sessionManager.GetString(ctx, SessionStaffID), date, now, location, useragentID)
+	err := s.services.attendance.TimeIn(ctx, s.sessionManager.GetString(ctx, SessionStaffID), date, now, location, useragentID)
 	if err != nil {
 		http.Error(w, "Unable to time in", http.StatusBadRequest)
 		return
@@ -454,8 +450,7 @@ func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
-	svc := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	err := svc.TimeOut(ctx, s.sessionManager.GetString(ctx, SessionStaffID), date, now, location, useragentID)
+	err := s.services.attendance.TimeOut(ctx, s.sessionManager.GetString(ctx, SessionStaffID), date, now, location, useragentID)
 	if err != nil {
 		http.Error(w, "Unable to time out", http.StatusBadRequest)
 		return
@@ -471,8 +466,7 @@ func (s *Server) adminStaffLunchBreakInHandler(w http.ResponseWriter, r *http.Re
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
-	svc := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	err := svc.LunchBreakIn(ctx, staffID, date, now, location, useragentID)
+	err := s.services.attendance.LunchBreakIn(ctx, staffID, date, now, location, useragentID)
 	if err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -494,8 +488,7 @@ func (s *Server) adminStaffLunchBreakOutHandler(w http.ResponseWriter, r *http.R
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
-	svc := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	err := svc.LunchBreakOut(ctx, staffID, date, now, location, useragentID)
+	err := s.services.attendance.LunchBreakOut(ctx, staffID, date, now, location, useragentID)
 	if err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -556,8 +549,7 @@ func (s *Server) adminStaffTimeOffHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
-	svc := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	if err := svc.TimeOff(
+	if err := s.services.attendance.TimeOff(
 		ctx,
 		s.sessionManager.GetString(ctx, SessionStaffID),
 		timeOffType,
