@@ -35,7 +35,7 @@ func GetProvinces(
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
-		provinces := make([]*models.Map, 0)
+		provinces := make([]*models.Map, 0, 82)
 		for _, region := range models.PhilippinesMap {
 			for _, province := range region.Contents {
 				if province.Level == enums.LEVEL_PROVINCE {
