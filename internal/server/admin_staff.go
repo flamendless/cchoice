@@ -436,8 +436,7 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
-	err := s.services.attendance.TimeIn(ctx, s.sessionManager.GetString(ctx, SessionStaffID), date, now, location, useragentID)
-	if err != nil {
+	if err := s.services.attendance.TimeIn(ctx, s.sessionManager.GetString(ctx, SessionStaffID), date, now, location, useragentID); err != nil {
 		http.Error(w, "Unable to time in", http.StatusBadRequest)
 		return
 	}
@@ -450,8 +449,7 @@ func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
-	err := s.services.attendance.TimeOut(ctx, s.sessionManager.GetString(ctx, SessionStaffID), date, now, location, useragentID)
-	if err != nil {
+	if err := s.services.attendance.TimeOut(ctx, s.sessionManager.GetString(ctx, SessionStaffID), date, now, location, useragentID); err != nil {
 		http.Error(w, "Unable to time out", http.StatusBadRequest)
 		return
 	}
@@ -466,8 +464,7 @@ func (s *Server) adminStaffLunchBreakInHandler(w http.ResponseWriter, r *http.Re
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
-	err := s.services.attendance.LunchBreakIn(ctx, staffID, date, now, location, useragentID)
-	if err != nil {
+	if err := s.services.attendance.LunchBreakIn(ctx, staffID, date, now, location, useragentID); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
@@ -488,8 +485,7 @@ func (s *Server) adminStaffLunchBreakOutHandler(w http.ResponseWriter, r *http.R
 	date := utils.NowPH().Format(constants.DateLayoutISO)
 	location := GetLocation(ctx, s.sessionManager)
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
-	err := s.services.attendance.LunchBreakOut(ctx, staffID, date, now, location, useragentID)
-	if err != nil {
+	if err := s.services.attendance.LunchBreakOut(ctx, staffID, date, now, location, useragentID); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
