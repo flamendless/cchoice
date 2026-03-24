@@ -14,7 +14,6 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
-	"cchoice/internal/services"
 	staffmodels "cchoice/internal/staff"
 	"cchoice/internal/utils"
 
@@ -57,10 +56,7 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 	}
 	endDate := utils.ParseAttendanceDate(endDateParam)
 
-	//TODO: (Brandon) services should be in the Server struct as well
-	//                see how I implemented ProductsService in server
-	attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	attendances, err := attendanceService.GetAttendance(ctx, r.FormValue("staff-id"), startDate, endDate)
+	attendances, err := s.services.attendance.GetAttendance(ctx, r.FormValue("staff-id"), startDate, endDate)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("start date", startDateParam), zap.String("end date", endDateParam))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -85,7 +81,7 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 		}
 		attendanceData = append(
 			attendanceData,
-			attendanceService.ComputeData(staffmodels.StaffRowBase(staff), att),
+			s.services.attendance.ComputeData(staffmodels.StaffRowBase(staff), att),
 		)
 	}
 
@@ -133,8 +129,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 	}
 
 	staffID := r.FormValue("staff-id")
-	attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	attendances, err := attendanceService.GetAttendance(ctx, staffID, startDate, endDate)
+	attendances, err := s.services.attendance.GetAttendance(ctx, staffID, startDate, endDate)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
@@ -157,14 +152,13 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		zap.String("param staff id", staffID),
 	)
 
-	reportService := services.NewReportService(s.encoder, s.dbRO)
 	switch format {
 	case "csv":
 		w.Header().Set("Content-Type", "text/csv")
 		writer := csv.NewWriter(w)
 		defer writer.Flush()
 
-		if err := reportService.StreamReportCSV(
+		if err := s.services.report.StreamReportCSV(
 			ctx,
 			writer,
 			attendances,
@@ -188,7 +182,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		file := excelize.NewFile()
 		defer file.Close()
 
-		if err := reportService.StreamReportXLSX(
+		if err := s.services.report.StreamReportXLSX(
 			ctx,
 			file,
 			attendances,
@@ -292,8 +286,7 @@ func (s *Server) adminSuperuserTimeOffApproveHandler(w http.ResponseWriter, r *h
 	}
 
 	timeOffID := chi.URLParam(r, "id")
-	attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	if err := attendanceService.ApproveTimeOff(ctx, timeOffID, currentStaffIDStr); err != nil {
+	if err := s.services.attendance.ApproveTimeOff(ctx, timeOffID, currentStaffIDStr); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("time_off_id", timeOffID), zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -313,8 +306,7 @@ func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *ht
 	}
 
 	timeOffID := chi.URLParam(r, "id")
-	attendanceService := services.NewAttendanceService(s.encoder, s.dbRO, s.dbRW)
-	if err := attendanceService.CancelTimeOff(ctx, timeOffID); err != nil {
+	if err := s.services.attendance.CancelTimeOff(ctx, timeOffID); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("time_off_id", timeOffID),
