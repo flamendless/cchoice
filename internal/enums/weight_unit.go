@@ -41,3 +41,7 @@ func (w WeightUnit) ToString() string {
 		return ""
 	}
 }
+
+func GetAllWeightUnits() []WeightUnit {
+	return []WeightUnit{WEIGHT_UNIT_KG, WEIGHT_UNIT_G, WEIGHT_UNIT_LB, WEIGHT_UNIT_OZ}
+}

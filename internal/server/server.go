@@ -149,7 +149,7 @@ func NewServer() *ServerInstance {
 	}
 
 	newServer.services = Services{
-		product:      services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		product:      services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW, newServer.GetCDNURL),
 		productImage: services.NewProductImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
 		brand:        services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staff:        services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),

@@ -161,17 +161,18 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 	specPower := r.FormValue("spec_power")
 	specCapacity := r.FormValue("spec_capacity")
 	specScopeOfSupply := r.FormValue("spec_scope_of_supply")
+	specWeight := r.FormValue("spec_weight")
+	specWeightUnit := r.FormValue("spec_weight_unit")
 
 	if specColours == "" || specSizes == "" || specSegmentation == "" ||
-		specPartNumber == "" || specPower == "" || specCapacity == "" || specScopeOfSupply == "" {
+		specPartNumber == "" || specPower == "" || specCapacity == "" || specScopeOfSupply == "" ||
+		specWeight == "" || specWeightUnit == "" {
 		redirectHX(w, r, utils.URLWithError(page, "All product specs are required"))
 		return
 	}
 
 	var filename string
-	if conf.Conf().IsWeb() {
-		filename = "do_not_upload_image"
-	} else {
+	if conf.Conf().IsProd() {
 		file, header, err := r.FormFile("product_image")
 		if err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -217,6 +218,8 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 			Power:         specPower,
 			Capacity:      specCapacity,
 			ScopeOfSupply: specScopeOfSupply,
+			Weight:        specWeight,
+			WeightUnit:    specWeightUnit,
 		},
 		ImagePath:           filename,
 		UnitPriceWithoutVat: unitPriceWithoutVat,

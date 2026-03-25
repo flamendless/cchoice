@@ -23,10 +23,20 @@ SELECT
 	tbl_products.status,
 	tbl_products.created_at,
 	tbl_products.updated_at,
-	COALESCE(tbl_product_images.thumbnail, '') AS image_path
+	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	COALESCE(tbl_product_specs.colours, '') AS colours,
+	COALESCE(tbl_product_specs.sizes, '') AS sizes,
+	COALESCE(tbl_product_specs.segmentation, '') AS segmentation,
+	COALESCE(tbl_product_specs.part_number, '') AS part_number,
+	COALESCE(tbl_product_specs.power, '') AS power,
+	COALESCE(tbl_product_specs.capacity, '') AS capacity,
+	COALESCE(tbl_product_specs.scope_of_supply, '') AS scope_of_supply,
+	COALESCE(tbl_product_specs.weight, 0) AS weight,
+	COALESCE(tbl_product_specs.weight_unit, '') AS weight_unit
 FROM tbl_products
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_specs ON tbl_product_specs.id = tbl_products.product_specs_id
 WHERE
 	(?1 IS NULL OR ?1 = '' OR LOWER(tbl_products.serial) LIKE '%' || LOWER(?1) || '%')
 	AND (?2 IS NULL OR ?2 = '' OR tbl_products.status = ?2)
@@ -45,15 +55,24 @@ type AdminGetProductsForListingParams struct {
 }
 
 type AdminGetProductsForListingRow struct {
-	ID          int64
-	Name        string
-	Serial      string
-	Description sql.NullString
-	BrandName   string
-	Status      string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	ImagePath   string
+	ID            int64
+	Name          string
+	Serial        string
+	Description   sql.NullString
+	BrandName     string
+	Status        string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	ThumbnailPath string
+	Colours       string
+	Sizes         string
+	Segmentation  string
+	PartNumber    string
+	Power         string
+	Capacity      string
+	ScopeOfSupply string
+	Weight        float64
+	WeightUnit    string
 }
 
 func (q *Queries) AdminGetProductsForListing(ctx context.Context, arg AdminGetProductsForListingParams) ([]AdminGetProductsForListingRow, error) {
@@ -74,7 +93,16 @@ func (q *Queries) AdminGetProductsForListing(ctx context.Context, arg AdminGetPr
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.ImagePath,
+			&i.ThumbnailPath,
+			&i.Colours,
+			&i.Sizes,
+			&i.Segmentation,
+			&i.PartNumber,
+			&i.Power,
+			&i.Capacity,
+			&i.ScopeOfSupply,
+			&i.Weight,
+			&i.WeightUnit,
 		); err != nil {
 			return nil, err
 		}

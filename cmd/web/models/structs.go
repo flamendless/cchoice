@@ -219,18 +219,31 @@ type AdminProductSpecsForm struct {
 	Power         string
 	Capacity      string
 	ScopeOfSupply string
+	Weight        string
+	WeightUnit    string
 }
 
 type AdminProductListItem struct {
-	ID          string
-	Name        string
-	Serial      string
-	Description string
-	Brand       string
-	Status      enums.ProductStatus
-	ImagePath   string
-	CreatedAt   string
-	UpdatedAt   string
+	ID            string
+	Name          string
+	Serial        string
+	Description   string
+	Brand         string
+	Status        enums.ProductStatus
+	ThumbnailPath     string
+	CDNURL        string
+	CDNURL1280    string
+	CreatedAt     string
+	UpdatedAt     string
+	Colours       string
+	Sizes         string
+	Segmentation  string
+	PartNumber    string
+	Power         string
+	Capacity      string
+	ScopeOfSupply string
+	Weight        string
+	WeightUnit    string
 }
 
 type StaffTimeOff struct {

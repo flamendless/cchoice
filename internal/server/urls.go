@@ -10,6 +10,10 @@ import (
 var cdnURLCache sync.Map
 
 func (s *Server) GetCDNURL(path string) string {
+	if path == "" {
+		return path
+	}
+
 	if cached, ok := cdnURLCache.Load(path); ok {
 		return cached.(string)
 	}
