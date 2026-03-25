@@ -10,7 +10,7 @@ const (
 	PatternMobileNumber   = `[0-9]{11}`
 	PatternOrderReference = `CCO-[0-9a-zA-Z]+[0-9A-F]{6}`
 	PatternPostalCode     = `[0-9]{4}`
-	PatternSize           = `\d+x\d+`
+	PatternSize           = `/\d+x\d+/`
 	PatternSubcategory    = `[a-zA-Z0-9\s\-_]+`
 	PatternProductName    = `[a-zA-Z0-9\s\-_.,]+`
 	PatternSerialNumber   = `[a-zA-Z0-9\-_]+`
@@ -18,7 +18,7 @@ const (
 )
 
 var (
-	ReSize           = regexp.MustCompile(`^` + PatternSize + `$`)
+	ReSize           = regexp.MustCompile(PatternSize)
 	ReMultipleSpaces = regexp.MustCompile(PatternMultipleSpaces)
 	ReOrderReference = regexp.MustCompile(`^` + PatternOrderReference + `$`)
 	RePassword       = regexp.MustCompile(`^` + PatternPassword + `$`)
