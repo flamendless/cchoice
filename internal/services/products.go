@@ -3,6 +3,8 @@ package services
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"strconv"
 	"time"
 
 	"cchoice/cmd/web/models"
@@ -17,6 +19,8 @@ import (
 type ProductSpecsInput struct {
 	Colours, Sizes, Segmentation, PartNumber string
 	Power, Capacity, ScopeOfSupply           string
+	Weight                                   string
+	WeightUnit                               string
 }
 
 type CreateProductInput struct {
@@ -30,20 +34,23 @@ type CreateProductInput struct {
 }
 
 type ProductService struct {
-	dbRO    database.Service
-	dbRW    database.Service
-	encoder encode.IEncode
+	dbRO      database.Service
+	dbRW      database.Service
+	encoder   encode.IEncode
+	getCDNURL models.CDNURLFunc
 }
 
 func NewProductService(
 	encoder encode.IEncode,
 	dbRO database.Service,
 	dbRW database.Service,
+	cdnURLFunc models.CDNURLFunc,
 ) *ProductService {
 	return &ProductService{
-		dbRO:    dbRO,
-		dbRW:    dbRW,
-		encoder: encoder,
+		dbRO:      dbRO,
+		dbRW:      dbRW,
+		encoder:   encoder,
+		getCDNURL: cdnURLFunc,
 	}
 }
 
@@ -62,6 +69,7 @@ func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductI
 		return nil, err
 	}
 
+	weightVal, weightErr := strconv.ParseFloat(input.Specs.Weight, 64)
 	specs, err := s.dbRW.GetQueries().CreateProductSpecs(ctx, queries.CreateProductSpecsParams{
 		Colours:       sql.NullString{String: input.Specs.Colours, Valid: true},
 		Sizes:         sql.NullString{String: input.Specs.Sizes, Valid: true},
@@ -70,6 +78,8 @@ func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductI
 		Power:         sql.NullString{String: input.Specs.Power, Valid: true},
 		Capacity:      sql.NullString{String: input.Specs.Capacity, Valid: true},
 		ScopeOfSupply: sql.NullString{String: input.Specs.ScopeOfSupply, Valid: true},
+		Weight:        sql.NullFloat64{Float64: weightVal, Valid: weightErr != nil},
+		WeightUnit:    sql.NullString{String: input.Specs.WeightUnit, Valid: true},
 	})
 	if err != nil {
 		return nil, err
@@ -95,24 +105,25 @@ func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductI
 		return nil, err
 	}
 
-	_, err = s.dbRW.GetQueries().CreateProductsCategories(ctx, queries.CreateProductsCategoriesParams{
+	if _, err = s.dbRW.GetQueries().CreateProductsCategories(ctx, queries.CreateProductsCategoriesParams{
 		ProductID:  product.ID,
 		CategoryID: categoryRow.ID,
-	})
-	if err != nil {
+	}); err != nil {
 		return nil, err
 	}
 
-	_, err = s.dbRW.GetQueries().CreateProductImage(ctx, queries.CreateProductImageParams{
-		ProductID: product.ID,
-		Path:      input.ImagePath,
-		Thumbnail: sql.NullString{String: input.ImagePath, Valid: true},
-		CreatedAt: now,
-		UpdatedAt: now,
-		DeletedAt: constants.DtBeginning,
-	})
-	if err != nil {
-		return nil, err
+	if input.ImagePath != "" {
+		//TODO: Implement generation of thumbnail
+		if _, err = s.dbRW.GetQueries().CreateProductImage(ctx, queries.CreateProductImageParams{
+			ProductID: product.ID,
+			Path:      input.ImagePath,
+			Thumbnail: sql.NullString{String: input.ImagePath, Valid: true},
+			CreatedAt: now,
+			UpdatedAt: now,
+			DeletedAt: constants.DtBeginning,
+		}); err != nil {
+			return nil, err
+		}
 	}
 
 	return &product, nil
@@ -138,7 +149,10 @@ func (s *ProductService) UpdateProductStatus(ctx context.Context, productID stri
 	})
 }
 
-func (s *ProductService) GetProductsForListingAdmin(ctx context.Context, search, status string) ([]models.AdminProductListItem, error) {
+func (s *ProductService) GetProductsForListingAdmin(
+	ctx context.Context,
+	search, status string,
+) ([]models.AdminProductListItem, error) {
 	products, err := s.dbRO.GetQueries().AdminGetProductsForListing(ctx, queries.AdminGetProductsForListingParams{
 		Search: sql.NullString{String: search, Valid: search != ""},
 		Status: sql.NullString{String: status, Valid: status != ""},
@@ -149,16 +163,32 @@ func (s *ProductService) GetProductsForListingAdmin(ctx context.Context, search,
 
 	productList := make([]models.AdminProductListItem, 0, len(products))
 	for _, p := range products {
+		var weightStr string
+		if p.Weight > 0 {
+			weightStr = fmt.Sprintf("%.2f %s", p.Weight, p.WeightUnit)
+		}
+
 		productList = append(productList, models.AdminProductListItem{
-			ID:          s.encoder.Encode(p.ID),
-			Name:        p.Name,
-			Serial:      p.Serial,
-			Description: p.Description.String,
-			Brand:       p.BrandName,
-			Status:      enums.ParseProductStatusToEnum(p.Status),
-			ImagePath:   p.ImagePath,
-			CreatedAt:   p.CreatedAt.Format(constants.DateTimeLayoutISO),
-			UpdatedAt:   p.UpdatedAt.Format(constants.DateTimeLayoutISO),
+			ID:            s.encoder.Encode(p.ID),
+			Name:          p.Name,
+			Serial:        p.Serial,
+			Description:   p.Description.String,
+			Brand:         p.BrandName,
+			Status:        enums.ParseProductStatusToEnum(p.Status),
+			ThumbnailPath: p.ThumbnailPath,
+			CDNURL:        s.getCDNURL(p.ThumbnailPath),
+			CDNURL1280:    s.getCDNURL(constants.ToPath1280(p.ThumbnailPath)),
+			CreatedAt:     p.CreatedAt.Format(constants.DateTimeLayoutISO),
+			UpdatedAt:     p.UpdatedAt.Format(constants.DateTimeLayoutISO),
+			Colours:       p.Colours,
+			Sizes:         p.Sizes,
+			Segmentation:  p.Segmentation,
+			PartNumber:    p.PartNumber,
+			Power:         p.Power,
+			Capacity:      p.Capacity,
+			ScopeOfSupply: p.ScopeOfSupply,
+			Weight:        weightStr,
+			WeightUnit:    p.WeightUnit,
 		})
 	}
 

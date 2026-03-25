@@ -245,20 +245,28 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_power\" class=\"block text-sm font-medium text-gray-700 mb-1\">Power <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_power\" name=\"spec_power\" required maxlength=\"100\" placeholder=\"e.g., 500W, 1.5HP\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_capacity\" class=\"block text-sm font-medium text-gray-700 mb-1\">Capacity <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_capacity\" name=\"spec_capacity\" required maxlength=\"100\" placeholder=\"e.g., 20L, 100kg\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div class=\"md:col-span-2\"><label for=\"spec_scope_of_supply\" class=\"block text-sm font-medium text-gray-700 mb-1\">Scope of Supply <span class=\"text-red-500\">*</span></label> <textarea id=\"spec_scope_of_supply\" name=\"spec_scope_of_supply\" required rows=\"3\" maxlength=\"1000\" placeholder=\"List items included in the package\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></textarea></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Image</h2><div><label for=\"product_image\" class=\"block text-sm font-medium text-gray-700 mb-1\">Product Image <span class=\"text-red-500\">*</span></label> <input type=\"file\" id=\"product_image\" name=\"product_image\" accept=\"image/jpeg,image/png,image/webp,image/gif\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" required><p class=\"text-xs text-gray-500 mt-1\">Allowed formats: JPEG, PNG, WebP, GIF. Max size: 10MB.</p></div></div><div class=\"flex justify-end gap-4 pt-4 border-t\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_power\" class=\"block text-sm font-medium text-gray-700 mb-1\">Power <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_power\" name=\"spec_power\" required maxlength=\"100\" placeholder=\"e.g., 500W, 1.5HP\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_capacity\" class=\"block text-sm font-medium text-gray-700 mb-1\">Capacity <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_capacity\" name=\"spec_capacity\" required maxlength=\"100\" placeholder=\"e.g., 20L, 100kg\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_weight\" class=\"block text-sm font-medium text-gray-700 mb-1\">Weight <span class=\"text-red-500\">*</span></label> <input type=\"number\" id=\"spec_weight\" name=\"spec_weight\" required min=\"0.01\" step=\"0.01\" max=\"999999999.99\" placeholder=\"e.g., 10.5\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_weight_unit\" class=\"block text-sm font-medium text-gray-700 mb-1\">Weight Unit <span class=\"text-red-500\">*</span></label>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = WeightUnitDropdown("").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div><div class=\"md:col-span-2\"><label for=\"spec_scope_of_supply\" class=\"block text-sm font-medium text-gray-700 mb-1\">Scope of Supply <span class=\"text-red-500\">*</span></label> <textarea id=\"spec_scope_of_supply\" name=\"spec_scope_of_supply\" required rows=\"3\" maxlength=\"1000\" placeholder=\"List items included in the package\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></textarea></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Image</h2><div><label for=\"product_image\" class=\"block text-sm font-medium text-gray-700 mb-1\">Product Image <span class=\"text-red-500\">*</span></label> <input type=\"file\" id=\"product_image\" name=\"product_image\" accept=\"image/jpeg,image/png,image/webp,image/gif\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" required><p class=\"text-xs text-gray-500 mt-1\">Allowed formats: JPEG, PNG, WebP, GIF. Max size: 10MB.</p></div></div><div class=\"flex justify-end gap-4 pt-4 border-t\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var14 templ.SafeURL
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 312, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 334, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" id=\"submit-btn\" class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice disabled:opacity-50 disabled:cursor-not-allowed\" _=\"on click call metrics_event('admin_exec', 'create product')\"><span id=\"submit-btn-content\" class=\"flex items-center gap-2\"><span class=\"submit-btn-text\">Create Product</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" id=\"submit-btn\" class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice disabled:opacity-50 disabled:cursor-not-allowed\" _=\"on click call metrics_event('admin_exec', 'create product')\"><span id=\"submit-btn-content\" class=\"flex items-center gap-2\"><span class=\"submit-btn-text\">Create Product</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -266,7 +274,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</span></button></div></form></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</span></button></div></form></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

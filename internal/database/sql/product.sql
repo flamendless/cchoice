@@ -201,10 +201,20 @@ SELECT
 	tbl_products.status,
 	tbl_products.created_at,
 	tbl_products.updated_at,
-	COALESCE(tbl_product_images.thumbnail, '') AS image_path
+	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	COALESCE(tbl_product_specs.colours, '') AS colours,
+	COALESCE(tbl_product_specs.sizes, '') AS sizes,
+	COALESCE(tbl_product_specs.segmentation, '') AS segmentation,
+	COALESCE(tbl_product_specs.part_number, '') AS part_number,
+	COALESCE(tbl_product_specs.power, '') AS power,
+	COALESCE(tbl_product_specs.capacity, '') AS capacity,
+	COALESCE(tbl_product_specs.scope_of_supply, '') AS scope_of_supply,
+	COALESCE(tbl_product_specs.weight, 0) AS weight,
+	COALESCE(tbl_product_specs.weight_unit, '') AS weight_unit
 FROM tbl_products
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_specs ON tbl_product_specs.id = tbl_products.product_specs_id
 WHERE
 	(@search IS NULL OR @search = '' OR LOWER(tbl_products.serial) LIKE '%' || LOWER(@search) || '%')
 	AND (@status IS NULL OR @status = '' OR tbl_products.status = @status)
