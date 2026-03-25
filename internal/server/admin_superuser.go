@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/xuri/excelize/v2"
@@ -122,10 +123,10 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		return
 	}
 
-	format := r.URL.Query().Get("format")
-	//TODO: (Brandon) Create enums OUTPUT_FORMAT for csv, xlsx, etc values
-	if format == "" {
-		format = "csv"
+	formatParam := r.URL.Query().Get("format")
+	formatEnum := enums.ParseOutputFormatToEnum(formatParam)
+	if formatEnum == enums.OUTPUT_FORMAT_UNDEFINED {
+		formatEnum = enums.OUTPUT_FORMAT_CSV
 	}
 
 	staffID := r.FormValue("staff-id")
@@ -140,7 +141,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		return
 	}
 
-	reportName := fmt.Sprintf("attendance_%s_%s_%s.%s", startDate, endDate, utils.GenString(8), format)
+	reportName := fmt.Sprintf("attendance_%s_%s_%s.%s", startDate, endDate, utils.GenString(8), strings.ToLower(formatEnum.String()))
 	w.Header().Set("Content-Disposition", "attachment; filename="+reportName)
 
 	logs.Log().Info(
@@ -152,8 +153,8 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		zap.String("param staff id", staffID),
 	)
 
-	switch format {
-	case "csv":
+	switch formatEnum {
+	case enums.OUTPUT_FORMAT_CSV:
 		w.Header().Set("Content-Type", "text/csv")
 		writer := csv.NewWriter(w)
 		defer writer.Flush()
@@ -177,7 +178,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 			redirectHX(w, r, utils.URLWithError(page, err.Error()))
 			return
 		}
-	case "xlsx":
+	case enums.OUTPUT_FORMAT_XLSX:
 		w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 		file := excelize.NewFile()
 		defer file.Close()
