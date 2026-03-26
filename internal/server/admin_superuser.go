@@ -26,15 +26,14 @@ func (s *Server) adminSuperuserHomeHandler(w http.ResponseWriter, r *http.Reques
 	ctx := r.Context()
 
 	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
-	staff, err := s.services.staff.GetCurrentStaff(ctx, staffIDStr)
+	staffProfile, err := s.services.staff.GetCurrentStaff(ctx, staffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staffProfile.ID), zap.Error(err))
 		redirectHXLogin(w, r)
 		return
 	}
-	currentUserFullName := utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName)
 
-	if err := compadmin.AdminSuperuserHomePage(currentUserFullName).Render(ctx, w); err != nil {
+	if err := compadmin.AdminSuperuserHomePage(staffProfile.FullName).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),

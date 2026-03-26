@@ -26,18 +26,17 @@ func (s *Server) adminStaffHomeHandler(w http.ResponseWriter, r *http.Request) {
 	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
 	staff, err := s.services.staff.GetCurrentStaff(ctx, staffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 		redirectHXLogin(w, r)
 		return
 	}
 
 	roles, err := s.services.role.GetByStaffID(ctx, staffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 	}
 
-	currentUserFullName := utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName)
-	if err := compadmin.AdminStaffHomePage(currentUserFullName, roles).Render(ctx, w); err != nil {
+	if err := compadmin.AdminStaffHomePage(staff.FullName, roles).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),
@@ -51,7 +50,7 @@ func (s *Server) adminStaffProfileHandler(w http.ResponseWriter, r *http.Request
 	const logtag = "[Admin Staff Profile Handler]"
 	ctx := r.Context()
 
-	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
+	staff, err := s.services.staff.GetRawStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 		redirectHXLogin(w, r)
@@ -75,7 +74,7 @@ func (s *Server) adminStaffProfileHeaderHandler(w http.ResponseWriter, r *http.R
 	const logtag = "[Admin Staff Profile Header Handler]"
 	ctx := r.Context()
 
-	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
+	staff, err := s.services.staff.GetRawStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 		redirectHXLogin(w, r)
@@ -137,7 +136,7 @@ func (s *Server) adminProfileEditFormHandler(w http.ResponseWriter, r *http.Requ
 	const logtag = "[Admin Profile Edit Form Handler]"
 	ctx := r.Context()
 
-	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
+	staff, err := s.services.staff.GetRawStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 		redirectHXLogin(w, r)
@@ -210,11 +209,11 @@ func (s *Server) adminStaffListHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var list []models.Staff
-	switch enums.ParseStaffUserTypeToEnum(staff.UserType) {
+	switch staff.UserType {
 	case enums.STAFF_USER_TYPE_STAFF:
 		list = append(list, models.Staff{
 			ID:       s.encoder.Encode(staff.ID),
-			FullName: utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
+			FullName: utils.BuildFullName(staff.FirstName, staff.MiddleName, staff.LastName),
 		})
 	case enums.STAFF_USER_TYPE_SUPERUSER:
 		list, err = s.services.staff.GetAll(ctx, 100)
@@ -231,7 +230,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Page Handler]"
 	ctx := r.Context()
 
-	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
+	staff, err := s.services.staff.GetRawStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 		redirectHXLogin(w, r)
@@ -340,7 +339,7 @@ func (s *Server) adminStaffAttendanceTableHandler(w http.ResponseWriter, r *http
 	const logtag = "[Admin Staff Attendance Table Handler]"
 	ctx := r.Context()
 
-	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
+	staff, err := s.services.staff.GetRawStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 		redirectHXLogin(w, r)
@@ -387,7 +386,7 @@ func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.
 	const logtag = "[Admin Staff Attendance Rows Handler]"
 	ctx := r.Context()
 
-	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
+	staff, err := s.services.staff.GetRawStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
 		redirectHXLogin(w, r)
@@ -588,7 +587,7 @@ func (s *Server) adminStaffTimeOffTableHandler(w http.ResponseWriter, r *http.Re
 func (s *Server) adminStaffAttendanceLocationHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
-	staff, err := s.services.staff.GetCurrentStaff(ctx, staffIDStr)
+	staff, err := s.services.staff.GetRawStaff(ctx, staffIDStr)
 	if err != nil {
 		redirectHXLogin(w, r)
 		return

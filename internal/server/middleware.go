@@ -131,12 +131,12 @@ func (s *Server) requireStaffAuth(next http.Handler) http.Handler {
 func (s *Server) requireSuperuserAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		staff, err := s.services.staff.GetCurrentStaff(r.Context(), s.sessionManager.GetString(r.Context(), SessionStaffID))
-		if staff.ID == 0 {
+		if err != nil {
 			http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
 			return
 		}
 
-		if err != nil || staff.UserType != enums.STAFF_USER_TYPE_SUPERUSER.String() {
+		if staff.UserType != enums.STAFF_USER_TYPE_SUPERUSER {
 			http.Redirect(w, r, utils.URL("/admin/staff"), http.StatusSeeOther)
 			return
 		}
@@ -160,7 +160,7 @@ func (s *Server) HasRole(ctx context.Context, role enums.StaffRole) bool {
 		return false
 	}
 
-	if staff.UserType == enums.STAFF_USER_TYPE_SUPERUSER.String() {
+	if staff.UserType == enums.STAFF_USER_TYPE_SUPERUSER {
 		return true
 	}
 
