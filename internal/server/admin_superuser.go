@@ -11,7 +11,6 @@ import (
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
-	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
@@ -203,52 +202,10 @@ func (s *Server) adminSuperuserTimeOffTableHandler(w http.ResponseWriter, r *htt
 	const logtag = "[Admin Superuser Time Off Table Handler]"
 	ctx := r.Context()
 
-	timeOffs, err := s.dbRO.GetQueries().GetAllStaffTimeOffs(ctx)
+	staffTimeOffs, err := s.services.attendance.GetAllStaffTimeOffs(ctx)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		timeOffs = []queries.GetAllStaffTimeOffsRow{}
-	}
-
-	staffTimeOffs := make([]models.StaffTimeOff, 0, len(timeOffs))
-	for _, to := range timeOffs {
-		var approvedBy string
-		var approvedAt string
-
-		if to.ApprovedBy.Valid && to.ApproverFirstName.Valid {
-			approvedBy = utils.BuildFullName(
-				to.ApproverFirstName.String,
-				to.ApproverMiddleName.String,
-				to.ApproverLastName.String,
-			)
-		} else {
-			approvedBy = "-"
-		}
-
-		if to.ApprovedAt.Valid {
-			approvedAt = to.ApprovedAt.Time.Format(constants.DateTimeLayoutISO)
-		} else {
-			approvedAt = "-"
-		}
-
-		fullName := utils.BuildFullName(
-			to.StaffFirstName,
-			to.StaffMiddleName.String,
-			to.StaffLastName,
-		)
-
-		staffTimeOffs = append(staffTimeOffs, models.StaffTimeOff{
-			ID:          s.encoder.Encode(to.ID),
-			StaffID:     s.encoder.Encode(to.StaffID),
-			FullName:    fullName,
-			Type:        enums.ParseTimeOffToEnum(to.Type),
-			CreatedAt:   utils.ConvertToPH(to.CreatedAt),
-			StartDate:   to.StartDate.Format(constants.DateLayoutISO),
-			EndDate:     to.EndDate.Format(constants.DateLayoutISO),
-			Description: to.Description,
-			Approved:    to.Approved.Bool,
-			ApprovedBy:  approvedBy,
-			ApprovedAt:  approvedAt,
-		})
+		staffTimeOffs = []models.StaffTimeOff{}
 	}
 
 	if err := compadmin.AdminSuperuserTimeOffTable(staffTimeOffs).Render(ctx, w); err != nil {
