@@ -172,7 +172,7 @@ func (s *Server) HasRole(ctx context.Context, role enums.StaffRole) bool {
 		return false
 	}
 
-	if staff.UserType == enums.STAFF_USER_TYPE_SUPERUSER.String() {
+	if staff.UserType == enums.STAFF_USER_TYPE_SUPERUSER {
 		return true
 	}
 
