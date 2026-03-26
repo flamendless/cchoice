@@ -39,6 +39,25 @@ type attendanceStatusResult struct {
 	earlyIn       time.Duration
 }
 
+type StaffDayAttendance struct {
+	HasTimeIn        bool
+	HasTimeOut       bool
+	HasLunchBreakIn  bool
+	HasLunchBreakOut bool
+	Computed         *models.Attendance
+	InLocation       sql.NullString
+	OutLocation      sql.NullString
+}
+
+type AttendanceExtraStats struct {
+	TotalUndertimeMinutes float64
+	TotalLateMinutes      float64
+	TotalUndertimeCount   int
+	TotalLateCount        int
+	TotalEarlyInCount     int
+	TotalOvertimeCount    int
+}
+
 func NewAttendanceService(
 	encoder encode.IEncode,
 	ro, rw database.IService,
@@ -349,6 +368,144 @@ func (s *AttendanceService) GetAttendance(
 	return data, nil
 }
 
+func (s *AttendanceService) ComputeAllAttendanceData(
+	ctx context.Context,
+	limit int64,
+	attendances []staff.StaffRow,
+) []models.Attendance {
+	staffs, err := s.dbRO.GetQueries().GetAllStaffs(ctx, limit)
+	if err != nil {
+		logs.LogCtx(ctx).Error("[ComputeAllAttendanceData]", zap.Error(err))
+		staffs = []queries.GetAllStaffsRow{}
+	}
+
+	staffMap := make(map[int64]queries.GetAllStaffsRow)
+	for _, staff := range staffs {
+		staffMap[staff.ID] = staff
+	}
+
+	attendanceData := make([]models.Attendance, 0, len(attendances))
+	for _, att := range attendances {
+		st, ok := staffMap[att.StaffID]
+		if !ok {
+			continue
+		}
+
+		staffBase := staff.StaffRowBase{
+			FirstName:       st.FirstName,
+			MiddleName:      st.MiddleName,
+			LastName:        st.LastName,
+			TimeInSchedule:  st.TimeInSchedule,
+			TimeOutSchedule: st.TimeOutSchedule,
+		}
+
+		attendanceData = append(
+			attendanceData,
+			s.ComputeData(staffBase, att),
+		)
+	}
+	return attendanceData
+}
+
+func (s *AttendanceService) GetAllStaffTimeOffs(ctx context.Context) ([]models.StaffTimeOff, error) {
+	timeOffs, err := s.dbRO.GetQueries().GetAllStaffTimeOffs(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	staffTimeOffs := make([]models.StaffTimeOff, 0, len(timeOffs))
+	for _, to := range timeOffs {
+		var approvedBy string
+		var approvedAt string
+
+		if to.ApprovedBy.Valid && to.ApproverFirstName.Valid {
+			approvedBy = utils.BuildFullName(
+				to.ApproverFirstName.String,
+				to.ApproverMiddleName.String,
+				to.ApproverLastName.String,
+			)
+		} else {
+			approvedBy = "-"
+		}
+
+		if to.ApprovedAt.Valid {
+			approvedAt = to.ApprovedAt.Time.Format(constants.DateTimeLayoutISO)
+		} else {
+			approvedAt = "-"
+		}
+
+		fullName := utils.BuildFullName(
+			to.StaffFirstName,
+			to.StaffMiddleName.String,
+			to.StaffLastName,
+		)
+
+		staffTimeOffs = append(staffTimeOffs, models.StaffTimeOff{
+			ID:          s.encoder.Encode(to.ID),
+			StaffID:     s.encoder.Encode(to.StaffID),
+			FullName:    fullName,
+			Type:        enums.ParseTimeOffToEnum(to.Type),
+			CreatedAt:   utils.ConvertToPH(to.CreatedAt),
+			StartDate:   to.StartDate.Format(constants.DateLayoutISO),
+			EndDate:     to.EndDate.Format(constants.DateLayoutISO),
+			Description: to.Description,
+			Approved:    to.Approved.Bool,
+			ApprovedBy:  approvedBy,
+			ApprovedAt:  approvedAt,
+		})
+	}
+	return staffTimeOffs, nil
+}
+
+func (s *AttendanceService) GetStaffDayAttendance(ctx context.Context, staffID string, date string) (StaffDayAttendance, error) {
+	decodedID := s.encoder.Decode(staffID)
+	staffRow, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedID)
+	if err != nil {
+		return StaffDayAttendance{}, err
+	}
+
+	attendance, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
+		StaffID: decodedID,
+		ForDate: date,
+	})
+	if err != nil {
+		return StaffDayAttendance{}, err
+	}
+
+	rec := s.ComputeData(
+		staff.StaffRowBase(staffRow),
+		staff.StaffRow{
+			ID:                       attendance.ID,
+			StaffID:                  attendance.StaffID,
+			ForDate:                  attendance.ForDate,
+			TimeIn:                   attendance.TimeIn,
+			TimeOut:                  attendance.TimeOut,
+			InLocation:               attendance.InLocation,
+			OutLocation:              attendance.OutLocation,
+			InUseragentID:            attendance.InUseragentID,
+			OutUseragentID:           attendance.OutUseragentID,
+			LunchBreakIn:             attendance.LunchBreakIn,
+			LunchBreakOut:            attendance.LunchBreakOut,
+			LunchBreakInLocation:     attendance.LunchBreakInLocation,
+			LunchBreakOutLocation:    attendance.LunchBreakOutLocation,
+			LunchBreakInUseragentID:  attendance.LunchBreakInUseragentID,
+			LunchBreakOutUseragentID: attendance.LunchBreakOutUseragentID,
+			CreatedAt:                attendance.CreatedAt,
+			UpdatedAt:                attendance.UpdatedAt,
+		},
+	)
+
+	return StaffDayAttendance{
+		HasTimeIn:        attendance.TimeIn.Valid,
+		HasTimeOut:       attendance.TimeOut.Valid,
+		HasLunchBreakIn:  attendance.LunchBreakIn.Valid,
+		HasLunchBreakOut: attendance.LunchBreakOut.Valid,
+		Computed:         &rec,
+		InLocation:       attendance.InLocation,
+		OutLocation:      attendance.OutLocation,
+	}, nil
+}
+
 func (s *AttendanceService) ComputeData(
 	staff staff.StaffRowBase,
 	att staff.StaffRow,
@@ -532,15 +689,6 @@ func computeInOutStatus(actualIn, actualOut, schedIn, schedOut string) attendanc
 	}
 
 	return out
-}
-
-type AttendanceExtraStats struct {
-	TotalUndertimeMinutes float64
-	TotalLateMinutes      float64
-	TotalUndertimeCount   int
-	TotalLateCount        int
-	TotalEarlyInCount     int
-	TotalOvertimeCount    int
 }
 
 func (s *AttendanceService) GetExtraStats(ctx context.Context, staffID string, data []staff.StaffRow) AttendanceExtraStats {
