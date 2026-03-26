@@ -15,7 +15,6 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
-	staffmodels "cchoice/internal/staff"
 	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
@@ -62,28 +61,13 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
 
-	staffs, err := s.dbRO.GetQueries().GetAllStaffs(ctx, maxStaffListSize)
+	staffs, err := s.services.staff.GetAllStaffsRaw(ctx, maxStaffListSize)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		staffs = []queries.GetAllStaffsRow{}
 	}
 
-	staffMap := make(map[int64]queries.GetAllStaffsRow)
-	for _, staff := range staffs {
-		staffMap[staff.ID] = staff
-	}
-
-	attendanceData := make([]models.Attendance, 0, len(attendances))
-	for _, att := range attendances {
-		staff, ok := staffMap[att.StaffID]
-		if !ok {
-			continue
-		}
-		attendanceData = append(
-			attendanceData,
-			s.services.attendance.ComputeData(staffmodels.StaffRowBase(staff), att),
-		)
-	}
+	attendanceData := s.services.attendance.ComputeAllAttendanceData(staffs, attendances)
 
 	if err := compadmin.AdminSuperuserAttendanceTable(attendanceData).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))

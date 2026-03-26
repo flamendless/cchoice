@@ -301,6 +301,38 @@ func (s *AttendanceService) GetAttendance(
 	return data, nil
 }
 
+func (s *AttendanceService) ComputeAllAttendanceData(
+	staffs []queries.GetAllStaffsRow,
+	attendances []staff.StaffRow,
+) []models.Attendance {
+	staffMap := make(map[int64]queries.GetAllStaffsRow)
+	for _, staff := range staffs {
+		staffMap[staff.ID] = staff
+	}
+
+	attendanceData := make([]models.Attendance, 0, len(attendances))
+	for _, att := range attendances {
+		st, ok := staffMap[att.StaffID]
+		if !ok {
+			continue
+		}
+
+		staffBase := staff.StaffRowBase{
+			FirstName:       st.FirstName,
+			MiddleName:      st.MiddleName,
+			LastName:        st.LastName,
+			TimeInSchedule:  st.TimeInSchedule,
+			TimeOutSchedule: st.TimeOutSchedule,
+		}
+
+		attendanceData = append(
+			attendanceData,
+			s.ComputeData(staffBase, att),
+		)
+	}
+	return attendanceData
+}
+
 func (s *AttendanceService) ComputeData(
 	staff staff.StaffRowBase,
 	att staff.StaffRow,
