@@ -131,6 +131,7 @@ func ToSearchResultProduct[T queries.GetProductsBySearchQueryRow](
 }
 
 type AdminStaffProfile struct {
+	ID               string
 	FullName         string
 	FirstName        string
 	MiddleName       string
