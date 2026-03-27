@@ -86,8 +86,8 @@ func ToCategorySectionProducts[T queries.GetProductsByCategoryIDRow](
 		res = append(res, CategorySectionProduct{
 			GetProductsByCategoryIDRow: r,
 			ProductID:                  encoder.Encode(r.ID),
-			CDNURL:                     getCDNURL(r.ThumbnailPath),
-			CDNURL1280:                 getCDNURL(constants.ToPath1280(r.ThumbnailPath)),
+			CDNURL:                     r.CdnUrlThumbnail.String,
+			CDNURL1280:                 r.CdnUrl.String,
 			OrigPriceDisplay:           origPrice.Display(),
 			PriceDisplay:               discountedPrice.Display(),
 			DiscountPercentage:         discountPercentage,
@@ -111,11 +111,21 @@ func ToSearchResultProduct[T queries.GetProductsBySearchQueryRow](
 ) SearchResultProduct {
 	r := queries.GetProductsBySearchQueryRow(data)
 	price := utils.NewMoney(r.UnitPriceWithVat, r.UnitPriceWithVatCurrency)
+
+	cdnURL := r.CdnUrl.String
+	if cdnURL == "" {
+		cdnURL = getCDNURL(r.ThumbnailPath)
+	}
+	cdnURLThumbnail := r.CdnUrlThumbnail.String
+	if cdnURLThumbnail == "" {
+		cdnURLThumbnail = getCDNURL(constants.ToPath1280(r.ThumbnailPath))
+	}
+
 	return SearchResultProduct{
 		GetProductsBySearchQueryRow: r,
 		ProductID:                   encoder.Encode(r.ID),
-		CDNURL:                      getCDNURL(r.ThumbnailPath),
-		CDNURL1280:                  getCDNURL(constants.ToPath1280(r.ThumbnailPath)),
+		CDNURL:                      cdnURL,
+		CDNURL1280:                  cdnURLThumbnail,
 		PriceDisplay:                price.Display(),
 	}
 }
@@ -230,7 +240,7 @@ type AdminProductListItem struct {
 	Description   string
 	Brand         string
 	Status        enums.ProductStatus
-	ThumbnailPath     string
+	ThumbnailPath string
 	CDNURL        string
 	CDNURL1280    string
 	CreatedAt     string

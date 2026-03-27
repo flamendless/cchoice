@@ -16,21 +16,25 @@ INSERT INTO tbl_product_images (
 	product_id,
 	path,
 	thumbnail,
+	cdn_url,
+	cdn_url_thumbnail,
 	created_at,
 	updated_at,
 	deleted_at
 ) VALUES (
-	?, ?, ?, ?, ?, ?
-) RETURNING id, product_id, path, thumbnail, created_at, updated_at, deleted_at
+	?, ?, ?, ?, ?, ?, ?, ?
+) RETURNING id, product_id, path, thumbnail, created_at, updated_at, deleted_at, cdn_url, cdn_url_thumbnail
 `
 
 type CreateProductImageParams struct {
-	ProductID int64
-	Path      string
-	Thumbnail sql.NullString
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
+	ProductID       int64
+	Path            string
+	Thumbnail       sql.NullString
+	CdnUrl          sql.NullString
+	CdnUrlThumbnail sql.NullString
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	DeletedAt       time.Time
 }
 
 func (q *Queries) CreateProductImage(ctx context.Context, arg CreateProductImageParams) (TblProductImage, error) {
@@ -38,6 +42,8 @@ func (q *Queries) CreateProductImage(ctx context.Context, arg CreateProductImage
 		arg.ProductID,
 		arg.Path,
 		arg.Thumbnail,
+		arg.CdnUrl,
+		arg.CdnUrlThumbnail,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.DeletedAt,
@@ -51,12 +57,51 @@ func (q *Queries) CreateProductImage(ctx context.Context, arg CreateProductImage
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.CdnUrl,
+		&i.CdnUrlThumbnail,
 	)
 	return i, err
 }
 
+const getAllProductImages = `-- name: GetAllProductImages :many
+SELECT id, product_id, path, thumbnail, created_at, updated_at, deleted_at, cdn_url, cdn_url_thumbnail FROM tbl_product_images
+`
+
+func (q *Queries) GetAllProductImages(ctx context.Context) ([]TblProductImage, error) {
+	rows, err := q.db.QueryContext(ctx, getAllProductImages)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TblProductImage
+	for rows.Next() {
+		var i TblProductImage
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProductID,
+			&i.Path,
+			&i.Thumbnail,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProductImageByProductID = `-- name: GetProductImageByProductID :one
-SELECT id, product_id, path, thumbnail, created_at, updated_at, deleted_at FROM tbl_product_images
+SELECT id, product_id, path, thumbnail, created_at, updated_at, deleted_at, cdn_url, cdn_url_thumbnail FROM tbl_product_images
 WHERE product_id = ?
 LIMIT 1
 `
@@ -72,6 +117,139 @@ func (q *Queries) GetProductImageByProductID(ctx context.Context, productID int6
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.CdnUrl,
+		&i.CdnUrlThumbnail,
+	)
+	return i, err
+}
+
+const getProductImagesWithEmptyCDNURLs = `-- name: GetProductImagesWithEmptyCDNURLs :many
+SELECT
+	id,
+	product_id,
+	COALESCE(
+		thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path,
+	cdn_url,
+	cdn_url_thumbnail
+FROM tbl_product_images
+WHERE cdn_url = '' OR cdn_url_thumbnail = ''
+`
+
+type GetProductImagesWithEmptyCDNURLsRow struct {
+	ID              int64
+	ProductID       int64
+	ThumbnailPath   string
+	CdnUrl          sql.NullString
+	CdnUrlThumbnail sql.NullString
+}
+
+func (q *Queries) GetProductImagesWithEmptyCDNURLs(ctx context.Context) ([]GetProductImagesWithEmptyCDNURLsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductImagesWithEmptyCDNURLs)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductImagesWithEmptyCDNURLsRow
+	for rows.Next() {
+		var i GetProductImagesWithEmptyCDNURLsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProductID,
+			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getProductImagesWithEmptyCDNURLsForce = `-- name: GetProductImagesWithEmptyCDNURLsForce :many
+SELECT
+	id,
+	product_id,
+	COALESCE(
+		thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path,
+	cdn_url,
+	cdn_url_thumbnail
+FROM tbl_product_images
+`
+
+type GetProductImagesWithEmptyCDNURLsForceRow struct {
+	ID              int64
+	ProductID       int64
+	ThumbnailPath   string
+	CdnUrl          sql.NullString
+	CdnUrlThumbnail sql.NullString
+}
+
+func (q *Queries) GetProductImagesWithEmptyCDNURLsForce(ctx context.Context) ([]GetProductImagesWithEmptyCDNURLsForceRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductImagesWithEmptyCDNURLsForce)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductImagesWithEmptyCDNURLsForceRow
+	for rows.Next() {
+		var i GetProductImagesWithEmptyCDNURLsForceRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProductID,
+			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateProductImageCDNURLs = `-- name: UpdateProductImageCDNURLs :one
+UPDATE tbl_product_images
+SET cdn_url = ?, cdn_url_thumbnail = ?, updated_at = datetime('now')
+WHERE id = ?
+RETURNING id, product_id, path, thumbnail, created_at, updated_at, deleted_at, cdn_url, cdn_url_thumbnail
+`
+
+type UpdateProductImageCDNURLsParams struct {
+	CdnUrl          sql.NullString
+	CdnUrlThumbnail sql.NullString
+	ID              int64
+}
+
+func (q *Queries) UpdateProductImageCDNURLs(ctx context.Context, arg UpdateProductImageCDNURLsParams) (TblProductImage, error) {
+	row := q.db.QueryRowContext(ctx, updateProductImageCDNURLs, arg.CdnUrl, arg.CdnUrlThumbnail, arg.ID)
+	var i TblProductImage
+	err := row.Scan(
+		&i.ID,
+		&i.ProductID,
+		&i.Path,
+		&i.Thumbnail,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.CdnUrl,
+		&i.CdnUrlThumbnail,
 	)
 	return i, err
 }
@@ -80,7 +258,7 @@ const updateProductImageThumbnail = `-- name: UpdateProductImageThumbnail :one
 UPDATE tbl_product_images
 SET thumbnail = ?, updated_at = datetime('now')
 WHERE id = ?
-RETURNING id, product_id, path, thumbnail, created_at, updated_at, deleted_at
+RETURNING id, product_id, path, thumbnail, created_at, updated_at, deleted_at, cdn_url, cdn_url_thumbnail
 `
 
 type UpdateProductImageThumbnailParams struct {
@@ -99,6 +277,8 @@ func (q *Queries) UpdateProductImageThumbnail(ctx context.Context, arg UpdatePro
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.CdnUrl,
+		&i.CdnUrlThumbnail,
 	)
 	return i, err
 }

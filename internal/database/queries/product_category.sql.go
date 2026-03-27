@@ -290,7 +290,9 @@ SELECT
 	COALESCE(
 		tbl_product_images.thumbnail,
 		'static/images/empty_96x96.webp'
-	) AS thumbnail_path
+	) AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
 FROM tbl_products
 INNER JOIN
 	tbl_brands ON tbl_brands.id = tbl_products.brand_id
@@ -326,6 +328,8 @@ type GetProductsByCategoryIDRow struct {
 	DiscountValue            sql.NullInt64
 	BrandName                string
 	ThumbnailPath            string
+	CdnUrl                   sql.NullString
+	CdnUrlThumbnail          sql.NullString
 }
 
 func (q *Queries) GetProductsByCategoryID(ctx context.Context, arg GetProductsByCategoryIDParams) ([]GetProductsByCategoryIDRow, error) {
@@ -350,6 +354,8 @@ func (q *Queries) GetProductsByCategoryID(ctx context.Context, arg GetProductsBy
 			&i.DiscountValue,
 			&i.BrandName,
 			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
 		); err != nil {
 			return nil, err
 		}

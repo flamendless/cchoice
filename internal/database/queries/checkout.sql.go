@@ -288,6 +288,8 @@ SELECT
 		tbl_product_images.thumbnail,
 		'static/images/empty_96x96.webp'
 	) AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail,
 	tbl_product_specs.weight,
 	tbl_product_specs.weight_unit
 FROM tbl_checkout_lines
@@ -319,6 +321,8 @@ type GetCheckoutLinesByCheckoutIDRow struct {
 	DiscountValue            sql.NullInt64
 	BrandName                string
 	ThumbnailPath            string
+	CdnUrl                   sql.NullString
+	CdnUrlThumbnail          sql.NullString
 	Weight                   sql.NullFloat64
 	WeightUnit               sql.NullString
 }
@@ -348,6 +352,8 @@ func (q *Queries) GetCheckoutLinesByCheckoutID(ctx context.Context, checkoutID i
 			&i.DiscountValue,
 			&i.BrandName,
 			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
 			&i.Weight,
 			&i.WeightUnit,
 		); err != nil {
