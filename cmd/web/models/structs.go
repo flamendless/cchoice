@@ -121,6 +121,7 @@ func ToSearchResultProduct[T queries.GetProductsBySearchQueryRow](
 }
 
 type AdminStaffProfile struct {
+	ID               string
 	FullName         string
 	FirstName        string
 	MiddleName       string
@@ -230,7 +231,7 @@ type AdminProductListItem struct {
 	Description   string
 	Brand         string
 	Status        enums.ProductStatus
-	ThumbnailPath     string
+	ThumbnailPath string
 	CDNURL        string
 	CDNURL1280    string
 	CreatedAt     string
