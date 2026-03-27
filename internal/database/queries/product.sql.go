@@ -24,6 +24,8 @@ SELECT
 	tbl_products.created_at,
 	tbl_products.updated_at,
 	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail,
 	COALESCE(tbl_product_specs.colours, '') AS colours,
 	COALESCE(tbl_product_specs.sizes, '') AS sizes,
 	COALESCE(tbl_product_specs.segmentation, '') AS segmentation,
@@ -56,24 +58,26 @@ type AdminGetProductsForListingParams struct {
 }
 
 type AdminGetProductsForListingRow struct {
-	ID            int64
-	Name          string
-	Serial        string
-	Description   sql.NullString
-	BrandName     string
-	Status        string
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	ThumbnailPath string
-	Colours       string
-	Sizes         string
-	Segmentation  string
-	PartNumber    string
-	Power         string
-	Capacity      string
-	ScopeOfSupply string
-	Weight        float64
-	WeightUnit    string
+	ID              int64
+	Name            string
+	Serial          string
+	Description     sql.NullString
+	BrandName       string
+	Status          string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	ThumbnailPath   string
+	CdnUrl          sql.NullString
+	CdnUrlThumbnail sql.NullString
+	Colours         string
+	Sizes           string
+	Segmentation    string
+	PartNumber      string
+	Power           string
+	Capacity        string
+	ScopeOfSupply   string
+	Weight          float64
+	WeightUnit      string
 }
 
 func (q *Queries) AdminGetProductsForListing(ctx context.Context, arg AdminGetProductsForListingParams) ([]AdminGetProductsForListingRow, error) {
@@ -95,6 +99,8 @@ func (q *Queries) AdminGetProductsForListing(ctx context.Context, arg AdminGetPr
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
 			&i.Colours,
 			&i.Sizes,
 			&i.Segmentation,
@@ -479,10 +485,9 @@ func (q *Queries) GetProductsByFilter(ctx context.Context, arg GetProductsByFilt
 
 const getProductsByID = `-- name: GetProductsByID :one
 SELECT
-	tbl_products.id, serial, tbl_products.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, tbl_product_categories.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at,
+	tbl_products.id, serial, tbl_products.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at,
 	tbl_brands.name AS brand_name
 FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
 INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 WHERE tbl_products.id = ?
@@ -505,10 +510,6 @@ type GetProductsByIDRow struct {
 	UpdatedAt                   time.Time
 	DeletedAt                   time.Time
 	ID_2                        int64
-	Category                    sql.NullString
-	Subcategory                 sql.NullString
-	PromotedAtHomepage          sql.NullBool
-	ID_3                        int64
 	Colours                     sql.NullString
 	Sizes                       sql.NullString
 	Segmentation                sql.NullString
@@ -518,7 +519,7 @@ type GetProductsByIDRow struct {
 	ScopeOfSupply               sql.NullString
 	WeightUnit                  sql.NullString
 	Weight                      sql.NullFloat64
-	ID_4                        int64
+	ID_3                        int64
 	Name_2                      string
 	CreatedAt_2                 time.Time
 	UpdatedAt_2                 time.Time
@@ -526,6 +527,7 @@ type GetProductsByIDRow struct {
 	BrandName                   string
 }
 
+// INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
 func (q *Queries) GetProductsByID(ctx context.Context, id int64) (GetProductsByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getProductsByID, id)
 	var i GetProductsByIDRow
@@ -545,10 +547,6 @@ func (q *Queries) GetProductsByID(ctx context.Context, id int64) (GetProductsByI
 		&i.UpdatedAt,
 		&i.DeletedAt,
 		&i.ID_2,
-		&i.Category,
-		&i.Subcategory,
-		&i.PromotedAtHomepage,
-		&i.ID_3,
 		&i.Colours,
 		&i.Sizes,
 		&i.Segmentation,
@@ -558,7 +556,7 @@ func (q *Queries) GetProductsByID(ctx context.Context, id int64) (GetProductsByI
 		&i.ScopeOfSupply,
 		&i.WeightUnit,
 		&i.Weight,
-		&i.ID_4,
+		&i.ID_3,
 		&i.Name_2,
 		&i.CreatedAt_2,
 		&i.UpdatedAt_2,
@@ -581,7 +579,9 @@ SELECT
 	COALESCE(
 		tbl_product_images.thumbnail,
 		'static/images/empty_96x96.webp'
-	) AS thumbnail_path
+	) AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
 FROM tbl_products_fts
 INNER JOIN tbl_products ON tbl_products.id = tbl_products_fts.rowid
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
@@ -603,6 +603,8 @@ type GetProductsBySearchQueryRow struct {
 	UnitPriceWithVatCurrency string
 	BrandName                string
 	ThumbnailPath            string
+	CdnUrl                   sql.NullString
+	CdnUrlThumbnail          sql.NullString
 }
 
 // TODO: (Brandon) if sqlc releases PR #3498
@@ -624,6 +626,8 @@ func (q *Queries) GetProductsBySearchQuery(ctx context.Context, arg GetProductsB
 			&i.UnitPriceWithVatCurrency,
 			&i.BrandName,
 			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
 		); err != nil {
 			return nil, err
 		}
@@ -1384,7 +1388,9 @@ SELECT
 	COALESCE(
 		tbl_product_images.thumbnail,
 		'static/images/empty_96x96.webp'
-	) AS thumbnail_path
+	) AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
 FROM tbl_products
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 LEFT JOIN tbl_product_sales
@@ -1411,6 +1417,8 @@ type GetRandomProductOnSaleRow struct {
 	DiscountValue            sql.NullInt64
 	BrandName                string
 	ThumbnailPath            string
+	CdnUrl                   sql.NullString
+	CdnUrlThumbnail          sql.NullString
 }
 
 func (q *Queries) GetRandomProductOnSale(ctx context.Context) (GetRandomProductOnSaleRow, error) {
@@ -1429,6 +1437,8 @@ func (q *Queries) GetRandomProductOnSale(ctx context.Context) (GetRandomProductO
 		&i.DiscountValue,
 		&i.BrandName,
 		&i.ThumbnailPath,
+		&i.CdnUrl,
+		&i.CdnUrlThumbnail,
 	)
 	return i, err
 }

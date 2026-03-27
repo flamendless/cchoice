@@ -210,13 +210,15 @@ type TblProductCategory struct {
 }
 
 type TblProductImage struct {
-	ID        int64
-	ProductID int64
-	Path      string
-	Thumbnail sql.NullString
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
+	ID              int64
+	ProductID       int64
+	Path            string
+	Thumbnail       sql.NullString
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	DeletedAt       time.Time
+	CdnUrl          sql.NullString
+	CdnUrlThumbnail sql.NullString
 }
 
 type TblProductSale struct {

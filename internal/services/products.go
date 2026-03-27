@@ -113,14 +113,18 @@ func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductI
 	}
 
 	if input.ImagePath != "" {
-		//TODO: Implement generation of thumbnail
+		//TODO: images are not yet available by this time. This should be in the thumbnail job/service
+		cdnURL := s.getCDNURL(input.ImagePath)
+		cdnURLThumbnail := s.getCDNURL(constants.ToPath1280(input.ImagePath))
 		if _, err = s.dbRW.GetQueries().CreateProductImage(ctx, queries.CreateProductImageParams{
-			ProductID: product.ID,
-			Path:      input.ImagePath,
-			Thumbnail: sql.NullString{String: input.ImagePath, Valid: true},
-			CreatedAt: now,
-			UpdatedAt: now,
-			DeletedAt: constants.DtBeginning,
+			ProductID:       product.ID,
+			Path:            input.ImagePath,
+			Thumbnail:       sql.NullString{String: input.ImagePath, Valid: true},
+			CdnUrl:          sql.NullString{String: cdnURL, Valid: cdnURL != ""},
+			CdnUrlThumbnail: sql.NullString{String: cdnURLThumbnail, Valid: cdnURLThumbnail != ""},
+			CreatedAt:       now,
+			UpdatedAt:       now,
+			DeletedAt:       constants.DtBeginning,
 		}); err != nil {
 			return nil, err
 		}
