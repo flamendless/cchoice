@@ -37,6 +37,25 @@ type attendanceStatusResult struct {
 	earlyIn       time.Duration
 }
 
+type StaffDayAttendance struct {
+	HasTimeIn        bool
+	HasTimeOut       bool
+	HasLunchBreakIn  bool
+	HasLunchBreakOut bool
+	Computed         *models.Attendance
+	InLocation       sql.NullString
+	OutLocation      sql.NullString
+}
+
+type AttendanceExtraStats struct {
+	TotalUndertimeMinutes float64
+	TotalLateMinutes      float64
+	TotalUndertimeCount   int
+	TotalLateCount        int
+	TotalEarlyInCount     int
+	TotalOvertimeCount    int
+}
+
 func NewAttendanceService(
 	encoder encode.IEncode,
 	ro, rw database.Service,
@@ -390,16 +409,6 @@ func (s *AttendanceService) GetAllStaffTimeOffs(ctx context.Context) ([]models.S
 	return staffTimeOffs, nil
 }
 
-type StaffDayAttendance struct {
-	HasTimeIn        bool
-	HasTimeOut       bool
-	HasLunchBreakIn  bool
-	HasLunchBreakOut bool
-	Computed         *models.Attendance
-	InLocation       sql.NullString
-	OutLocation      sql.NullString
-}
-
 func (s *AttendanceService) GetStaffDayAttendance(ctx context.Context, staffID string, date string) (StaffDayAttendance, error) {
 	decodedID := s.encoder.Decode(staffID)
 	staffRow, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedID)
@@ -632,15 +641,6 @@ func computeInOutStatus(actualIn, actualOut, schedIn, schedOut string) attendanc
 	}
 
 	return out
-}
-
-type AttendanceExtraStats struct {
-	TotalUndertimeMinutes float64
-	TotalLateMinutes      float64
-	TotalUndertimeCount   int
-	TotalLateCount        int
-	TotalEarlyInCount     int
-	TotalOvertimeCount    int
 }
 
 func (s *AttendanceService) GetExtraStats(ctx context.Context, staffID string, data []staff.StaffRow) AttendanceExtraStats {
