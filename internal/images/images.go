@@ -2,6 +2,7 @@ package images
 
 import (
 	"cchoice/internal/encode/b64"
+	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/metrics"
@@ -15,15 +16,15 @@ import (
 	"go.uber.org/zap"
 )
 
-func ImageToB64(format ImageFormat, data []byte) string {
-	return format.DataURIPrefix() + b64.ToBase64(data)
+func ImageToB64(format enums.ImageFormat, data []byte) string {
+	return enums.ImageFormat(format).DataURIPrefix() + b64.ToBase64(data)
 }
 
 func GetImageDataB64(
 	cache *fastcache.Cache,
 	fs http.FileSystem,
 	finalPath string,
-	ext ImageFormat,
+	ext enums.ImageFormat,
 ) (string, error) {
 	const logtag = "[GetImageDataB64]"
 

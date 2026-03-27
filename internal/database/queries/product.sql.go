@@ -46,7 +46,8 @@ ORDER BY
 		WHEN 'ACTIVE' THEN 2
 		WHEN 'DELETED' THEN 3
 		ELSE 4
-	END
+	END,
+	tbl_products.updated_at DESC
 `
 
 type AdminGetProductsForListingParams struct {
@@ -568,6 +569,9 @@ func (q *Queries) GetProductsByID(ctx context.Context, id int64) (GetProductsByI
 }
 
 const getProductsBySearchQuery = `-- name: GetProductsBySearchQuery :many
+;
+
+
 SELECT
 	tbl_products.id,
 	tbl_products.name,

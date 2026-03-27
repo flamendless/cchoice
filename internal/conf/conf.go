@@ -43,6 +43,11 @@ type appConfig struct {
 	MailerooConfig     MailerooConfig
 	Settings           Settings
 	BasicAuth          BasicAuth
+	Test               Test
+}
+
+type Test struct {
+	LocalUploadImage bool `env:"TEST_LOCAL_UPLOAD_IMAGE" env-default:"0"`
 }
 
 type BasicAuth struct {

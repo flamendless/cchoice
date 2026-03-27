@@ -349,6 +349,18 @@ type TblStaffTimeOff struct {
 	UpdatedAt   string
 }
 
+type TblThumbnailJob struct {
+	ID           int64
+	QueueID      string
+	ProductID    int64
+	Brand        string
+	SourcePath   string
+	Status       string
+	ErrorMessage sql.NullString
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}
+
 type TblUseragent struct {
 	ID             int64
 	UserAgent      string

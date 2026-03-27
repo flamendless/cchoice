@@ -18,6 +18,7 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
+	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
@@ -250,7 +251,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 		g.Go(func() error {
 			var imgData string
 			if !strings.HasSuffix(checkoutLines[i].ThumbnailPath, constants.EmptyImageFilename) {
-				if imgDataB64, err := images.GetImageDataB64(s.cache, s.productImageFS, checkoutLines[i].ThumbnailPath, images.IMAGE_FORMAT_WEBP); err == nil {
+				if imgDataB64, err := images.GetImageDataB64(s.cache, s.productImageFS, checkoutLines[i].ThumbnailPath, enums.IMAGE_FORMAT_WEBP); err == nil {
 					imgData = imgDataB64
 				} else {
 					logs.LogCtx(gctx).Error(

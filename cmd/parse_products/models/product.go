@@ -241,7 +241,7 @@ func (product *Product) GetOrInsertProductSpecsID(ctx context.Context, db databa
 					Valid:   true,
 				},
 				WeightUnit: sql.NullString{
-					String: product.ProductSpecs.WeightUnit.ToString(),
+					String: product.ProductSpecs.WeightUnit.String(),
 					Valid:  true,
 				},
 			},

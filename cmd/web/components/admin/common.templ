@@ -444,7 +444,7 @@ templ ProductActionDraft(productID string) {
 	</button>
 }
 
-templ WeightUnitDropdown(selected string) {
+templ WeightUnitDropdown(selected enums.WeightUnit) {
 	<select
 		id="spec_weight_unit"
 		name="spec_weight_unit"
@@ -452,8 +452,14 @@ templ WeightUnitDropdown(selected string) {
 		class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
 	>
 		<option value="">Select unit</option>
-		for _, wu := range enums.GetAllWeightUnits() {
-			<option value={ wu.ToString() } selected={ selected == wu.ToString() }>{ wu.ToString() }</option>
+		for _, wu := range enums.AllWeightUnits {
+			{{ v := wu.String() }}
+			<option
+				value={ v }
+				selected?={ selected == wu }
+			>
+				{ v }
+			</option>
 		}
 	</select>
 }

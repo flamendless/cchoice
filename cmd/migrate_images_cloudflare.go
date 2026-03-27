@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"cchoice/internal/constants"
+	"cchoice/internal/enums"
 	"cchoice/internal/errs"
-	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/storage/cloudflare"
 	"context"
@@ -243,12 +243,12 @@ func collectImagesCloudflare(
 		}
 
 		ext := strings.ToLower(filepath.Ext(filePath))
-		imgFormat := images.ParseImageFormatExtToEnum(ext)
-		if imgFormat == images.IMAGE_FORMAT_UNDEFINED {
+		imgFormat := enums.ParseImageFormatExtToEnum(ext)
+		if imgFormat == enums.IMAGE_FORMAT_UNDEFINED {
 			return nil
 		}
 
-		if webpOnly && imgFormat != images.IMAGE_FORMAT_WEBP {
+		if webpOnly && imgFormat != enums.IMAGE_FORMAT_WEBP {
 			logs.Log().Debug(
 				"Skipping file",
 				zap.Bool("webp only", webpOnly),
@@ -360,7 +360,7 @@ func processBatchCloudflare(ctx context.Context, client *cloudflare.Client, batc
 		}
 
 		ext := strings.ToLower(filepath.Ext(img.localPath))
-		imgFormat := images.ParseImageFormatExtToEnum(ext)
+		imgFormat := enums.ParseImageFormatExtToEnum(ext)
 		contentType := imgFormat.MIMEType()
 
 		if err := client.PutObjectFromBytes(ctx, img.key, data, contentType); err != nil {

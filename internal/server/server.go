@@ -48,26 +48,28 @@ type Services struct {
 }
 
 type Server struct {
-	dbRO            database.Service
-	dbRW            database.Service
-	SF              singleflight.Group
-	staticFS        http.FileSystem // For static assets (JS, CSS, icons) - always local
-	productImageFS  http.FileSystem // For product images - configurable (local or object storage)
-	cache           *fastcache.Cache
-	sessionManager  *scs.SessionManager
-	paymentGateway  payments.IPaymentGateway
-	shippingService shipping.IShippingService
-	geocoder        geocoding.IGeocoder
-	objectStorage   storage.IObjectStorage
-	encoder         encode.IEncode
-	mailService     mail.IMailService
-	emailJobRunner  *jobs.EmailJobRunner
-	services        Services
-	address         string
-	port            int
-	portFS          int
-	useHTTP2        bool
-	useSSL          bool
+	dbRO               database.Service
+	dbRW               database.Service
+	SF                 singleflight.Group
+	staticFS           http.FileSystem // For static assets (JS, CSS, icons) - always local
+	productImageFS     http.FileSystem // For product images - configurable (local or object storage)
+	cache              *fastcache.Cache
+	sessionManager     *scs.SessionManager
+	paymentGateway     payments.IPaymentGateway
+	shippingService    shipping.IShippingService
+	geocoder           geocoding.IGeocoder
+	objectStorage      storage.IObjectStorage
+	encoder            encode.IEncode
+	mailService        mail.IMailService
+	mailJobRunner      *jobs.EmailJobRunner
+	thumbnailService   jobs.IThumbnailService
+	thumbnailJobRunner *jobs.ThumbnailJobRunner
+	services           Services
+	address            string
+	port               int
+	portFS             int
+	useHTTP2           bool
+	useSSL             bool
 }
 
 func (s *Server) GetProductImageProxyURL(ctx context.Context, thumbnailPath string, size string) (string, error) {
@@ -127,25 +129,32 @@ func NewServer() *ServerInstance {
 		geocoder = mustInitGeocodingService(dbRW)
 	}
 
+	var thumbnailService *services.ThumbnailService
+	var thumbnailJobRunner *jobs.ThumbnailJobRunner
+	thumbnailService = services.NewThumbnailService(objStorage)
+	thumbnailJobRunner = jobs.NewThumbnailJobRunner(dbRW.GetDB(), dbRO, dbRW, thumbnailService)
+
 	newServer := &Server{
-		address:         cfg.Server.Address,
-		port:            cfg.Server.Port,
-		portFS:          cfg.Server.PortFS,
-		dbRO:            dbRO,
-		dbRW:            dbRW,
-		staticFS:        localstorage.New(),
-		productImageFS:  productImageFS,
-		cache:           fastcache.New(constants.CacheMaxBytes),
-		sessionManager:  sessionManager,
-		paymentGateway:  paymentGateway,
-		shippingService: shippingService,
-		objectStorage:   objStorage,
-		geocoder:        geocoder,
-		encoder:         sqids.MustSqids(),
-		mailService:     mailService,
-		emailJobRunner:  emailJobRunner,
-		useHTTP2:        cfg.Server.UseHTTP2,
-		useSSL:          cfg.Server.UseSSL,
+		address:            cfg.Server.Address,
+		port:               cfg.Server.Port,
+		portFS:             cfg.Server.PortFS,
+		dbRO:               dbRO,
+		dbRW:               dbRW,
+		staticFS:           localstorage.New(),
+		productImageFS:     productImageFS,
+		cache:              fastcache.New(constants.CacheMaxBytes),
+		sessionManager:     sessionManager,
+		paymentGateway:     paymentGateway,
+		shippingService:    shippingService,
+		objectStorage:      objStorage,
+		geocoder:           geocoder,
+		encoder:            sqids.MustSqids(),
+		mailService:        mailService,
+		mailJobRunner:      emailJobRunner,
+		thumbnailService:   thumbnailService,
+		thumbnailJobRunner: thumbnailJobRunner,
+		useHTTP2:           cfg.Server.UseHTTP2,
+		useSSL:             cfg.Server.UseSSL,
 	}
 
 	newServer.services = Services{
@@ -243,6 +252,7 @@ func NewServer() *ServerInstance {
 		zap.Duration("Read timeout", readTimeout),
 		zap.Duration("Write timeout", writeTimeout),
 		zap.String("Encoder", newServer.encoder.Name()),
+		zap.Any("Tests", cfg.Test),
 	}
 
 	if newServer.shippingService != nil {

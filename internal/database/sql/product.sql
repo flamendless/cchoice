@@ -224,7 +224,9 @@ ORDER BY
 		WHEN 'ACTIVE' THEN 2
 		WHEN 'DELETED' THEN 3
 		ELSE 4
-	END;
+	END,
+	tbl_products.updated_at DESC
+;
 
 
 --TODO: (Brandon) if sqlc releases PR #3498

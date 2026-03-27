@@ -3,9 +3,10 @@
 package cmd
 
 import (
+	"cchoice/internal/enums"
 	"cchoice/internal/errs"
-	"cchoice/internal/images"
 	"cchoice/internal/logs"
+	"cchoice/internal/types"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -24,16 +25,6 @@ type prepareImageVariantsFlags struct {
 	outpath string
 }
 
-type imageSize struct {
-	width  int
-	height int
-}
-
-var imageSizes = []imageSize{
-	{640, 640},
-	{1280, 1280},
-}
-
 var flagsPrepareImageVariants prepareImageVariantsFlags
 
 func getImageFiles(inpath string) ([]string, error) {
@@ -49,7 +40,7 @@ func getImageFiles(inpath string) ([]string, error) {
 		}
 
 		ext := filepath.Ext(info.Name())
-		if images.IsValidImageExtension(ext) {
+		if enums.IsValidImageExtension(ext) {
 			imageFiles = append(imageFiles, path)
 		} else {
 			logs.Log().Info("Skipping non-image file", zap.String("path", path))
@@ -61,8 +52,8 @@ func getImageFiles(inpath string) ([]string, error) {
 	return imageFiles, err
 }
 
-func processImageForSize(imagePath string, size imageSize, webpPath string, webpExport *vips.ExportParams) error {
-	folderName := fmt.Sprintf("%dx%d", size.width, size.height)
+func processImageForSize(imagePath string, size types.ImageSize, webpPath string, webpExport *vips.ExportParams) error {
+	folderName := fmt.Sprintf("%dx%d", size.Width, size.Height)
 
 	img, err := vips.NewImageFromFile(imagePath)
 	if err != nil {
@@ -70,7 +61,7 @@ func processImageForSize(imagePath string, size imageSize, webpPath string, webp
 	}
 	defer img.Close()
 
-	if err := img.Thumbnail(size.width, size.height, vips.InterestingCentre); err != nil {
+	if err := img.Thumbnail(size.Width, size.Height, vips.InterestingCentre); err != nil {
 		return fmt.Errorf("failed to create thumbnail: %w", err)
 	}
 
@@ -132,8 +123,8 @@ var cmdPrepareImageVariants = &cobra.Command{
 		webpPath := filepath.Join(brandPath, "webp")
 
 		dirs := []string{originalPath, webpPath}
-		for _, size := range imageSizes {
-			folderName := fmt.Sprintf("%dx%d", size.width, size.height)
+		for _, size := range types.ImageSizes {
+			folderName := fmt.Sprintf("%dx%d", size.Width, size.Height)
 			dirs = append(dirs, filepath.Join(webpPath, folderName))
 		}
 
@@ -157,8 +148,8 @@ var cmdPrepareImageVariants = &cobra.Command{
 
 		webpExport := vips.NewDefaultWEBPExportParams()
 
-		for _, size := range imageSizes {
-			folderName := fmt.Sprintf("%dx%d", size.width, size.height)
+		for _, size := range types.ImageSizes {
+			folderName := fmt.Sprintf("%dx%d", size.Width, size.Height)
 			logs.Log().Info("Processing size variant", zap.String("size", folderName))
 
 			for _, imagePath := range imageFiles {

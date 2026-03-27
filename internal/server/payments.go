@@ -29,7 +29,7 @@ func RegisterPaymentWebhooks(s *Server, r chi.Router) {
 		handler := paymongo.NewWebhookHandler(paymongo.WebhookHandlerConfig{
 			DBRO:           s.dbRO,
 			DBRW:           s.dbRW,
-			EmailJobRunner: s.emailJobRunner,
+			EmailJobRunner: s.mailJobRunner,
 		})
 		r.Post("/webhooks/paymongo", handler)
 		return
@@ -179,7 +179,7 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 		ReferenceNumber: paymentRef,
 		DBRO:            s.dbRO,
 		DBRW:            s.dbRW,
-		EmailJobRunner:  s.emailJobRunner,
+		EmailJobRunner:  s.mailJobRunner,
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))

@@ -7,6 +7,7 @@ import "cchoice/internal/constants"
 import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/components/svg"
 import "cchoice/internal/utils"
+import "cchoice/internal/enums"
 
 templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
 	<!DOCTYPE html>
@@ -292,7 +293,7 @@ templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
 									<label for="spec_weight_unit" class="block text-sm font-medium text-gray-700 mb-1">
 										Weight Unit <span class="text-red-500">*</span>
 									</label>
-									@WeightUnitDropdown("")
+									@WeightUnitDropdown(enums.WEIGHT_UNIT_KG)
 								</div>
 								<div class="md:col-span-2">
 									<label for="spec_scope_of_supply" class="block text-sm font-medium text-gray-700 mb-1">

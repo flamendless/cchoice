@@ -192,7 +192,7 @@ func (s *Server) AllowRoles(roles ...enums.StaffRole) func(http.Handler) http.Ha
 			}
 
 			if !hasAccess {
-				http.Error(w, "Forbidden", http.StatusForbidden)
+				redirectHX(w, r, utils.URLWithError("/admin", "Login to access page"))
 				return
 			}
 

@@ -1,8 +1,6 @@
-package images
+package enums
 
 import "strings"
-
-//go:generate go tool stringer -type=ImageFormat -trimprefix=IMAGE_FORMAT_
 
 type ImageFormat int
 

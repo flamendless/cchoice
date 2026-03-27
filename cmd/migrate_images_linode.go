@@ -4,9 +4,9 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
-	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/storage/linode"
+	"cchoice/internal/utils"
 	"context"
 	"errors"
 	"fmt"
@@ -188,12 +188,12 @@ func migrateImages(
 		}
 
 		ext := strings.ToLower(filepath.Ext(filePath))
-		imgFormat := images.ParseImageFormatExtToEnum(ext)
-		if imgFormat == images.IMAGE_FORMAT_UNDEFINED {
+		imgFormat := enums.ParseImageFormatExtToEnum(ext)
+		if imgFormat == enums.IMAGE_FORMAT_UNDEFINED {
 			return nil
 		}
 
-		if isBrandLogos && imgFormat == images.IMAGE_FORMAT_PNG {
+		if isBrandLogos && imgFormat == enums.IMAGE_FORMAT_PNG {
 			logs.Log().Debug(
 				"Skipping PNG file for brand logos (only WebP allowed)",
 				zap.String("file", filePath),
@@ -275,26 +275,6 @@ func migrateImages(
 	return nil
 }
 
-func getContentType(ext string) string {
-	imgFormat := images.ParseImageFormatExtToEnum(ext)
-	if imgFormat != images.IMAGE_FORMAT_UNDEFINED {
-		return imgFormat.MIMEType()
-	}
-	// Non-image content types
-	switch ext {
-	case ".md":
-		return "text/markdown"
-	case ".txt":
-		return "text/plain"
-	case ".html":
-		return "text/html"
-	case ".json":
-		return "application/json"
-	default:
-		return "application/octet-stream"
-	}
-}
-
 func migrateFile(ctx context.Context, client *linode.Client, filePath string, s3Key string) error {
 	info, err := os.Stat(filePath)
 	if err != nil {
@@ -335,7 +315,7 @@ func migrateFile(ctx context.Context, client *linode.Client, filePath string, s3
 	}
 
 	ext := strings.ToLower(filepath.Ext(filePath))
-	contentType := getContentType(ext)
+	contentType := utils.GetContentType(ext)
 
 	if err := client.PutObjectFromBytes(ctx, s3Key, data, contentType); err != nil {
 		return fmt.Errorf("failed to upload file: %w", err)

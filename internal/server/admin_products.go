@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"math"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/jobs"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
 	"cchoice/internal/services"
@@ -171,18 +173,38 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		return
 	}
 
+	result := "success"
+	defer func() {
+		if err := s.services.staffLog.CreateLog(
+			context.Background(),
+			s.sessionManager.GetString(ctx, SessionStaffID),
+			"create",
+			"products",
+			result,
+			nil,
+		); err != nil {
+			logs.Log().Error(logtag, zap.Error(err))
+		}
+	}()
+
 	var filename string
-	if conf.Conf().IsProd() {
+	var brandName string
+	//INFO: Add true || conf.Conf... to test locally.
+	//      true || TestLocalUploadImage = 0 -> test locally the cloudflare upload
+	//      TestLocalUploadImage = 1         -> test locally the local upload
+	if conf.Conf().Test.LocalUploadImage || conf.Conf().IsProd() {
 		file, header, err := r.FormFile("product_image")
 		if err != nil {
+			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, "Product image is required"))
 			return
 		}
 		defer file.Close()
 
-		brandName, err := s.services.brand.GetNameByID(ctx, brandID)
+		brandName, err = s.services.brand.GetNameByID(ctx, brandID)
 		if err != nil {
+			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, "Brand not found"))
 			return
@@ -191,12 +213,21 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		filename = s.services.productImage.GenerateFilename(filepath.Ext(header.Filename), brandName, name)
 		buf := bytes.Buffer{}
 		if _, err := io.Copy(&buf, file); err != nil {
+			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, "Failed to read image"))
 			return
 		}
+
 		contentType := header.Header.Get("Content-Type")
-		if err := s.services.productImage.UploadProductImage(ctx, filename, &buf, contentType); err != nil {
+		if err := s.services.productImage.UploadProductImage(
+			ctx,
+			brandName,
+			filename,
+			&buf,
+			contentType,
+		); err != nil {
+			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, "Failed to upload image"))
 			return
@@ -219,27 +250,29 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 			Capacity:      specCapacity,
 			ScopeOfSupply: specScopeOfSupply,
 			Weight:        specWeight,
-			WeightUnit:    specWeightUnit,
+			WeightUnit:    enums.ParseWeightUnitToEnum(specWeightUnit).ToDB(),
 		},
 		ImagePath:           filename,
 		UnitPriceWithoutVat: unitPriceWithoutVat,
 		UnitPriceWithVat:    unitPriceWithVat,
 	})
 	if err != nil {
+		result = err.Error()
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, "Failed to create product"))
 		return
 	}
 
-	if err := s.services.staffLog.CreateLog(
-		ctx,
-		s.sessionManager.GetString(ctx, SessionStaffID),
-		"create",
-		"products",
-		"success",
-		nil,
-	); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	if filename != "" && s.thumbnailJobRunner != nil {
+		if err := s.thumbnailJobRunner.QueueThumbnailJob(ctx, jobs.ThumbnailJobParams{
+			ProductID:  product.ID,
+			Brand:      brandName,
+			SourcePath: filename,
+			Filename:   filepath.Base(filename),
+		}); err != nil {
+			result = err.Error()
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		}
 	}
 
 	logs.LogCtx(ctx).Info(logtag, zap.Int64("product_id", product.ID), zap.String("name", name))
@@ -366,7 +399,22 @@ func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter
 		return
 	}
 
+	result := "success"
+	defer func() {
+		if err := s.services.staffLog.CreateLog(
+			context.Background(),
+			s.sessionManager.GetString(ctx, SessionStaffID),
+			"update status",
+			"products",
+			result,
+			nil,
+		); err != nil {
+			logs.Log().Error(logtag, zap.Error(err))
+		}
+	}()
+
 	if err := s.services.product.UpdateProductStatus(ctx, productIDStr, status); err != nil {
+		result = err.Error()
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("product_id", productIDStr),
@@ -375,17 +423,6 @@ func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter
 		)
 		redirectHX(w, r, utils.URLWithError(page, "Failed to update product status"))
 		return
-	}
-
-	if err := s.services.staffLog.CreateLog(
-		ctx,
-		s.sessionManager.GetString(ctx, SessionStaffID),
-		"update status",
-		"products",
-		"success",
-		nil,
-	); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}
 
 	redirectHX(w, r, utils.URLWithSuccess(page, "Product status updated successfully"))
