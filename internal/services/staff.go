@@ -49,19 +49,7 @@ func (s *StaffService) GetByID(ctx context.Context, staffID string) (models.Admi
 	if err != nil {
 		return models.AdminStaffProfile{}, err
 	}
-
-	return models.AdminStaffProfile{
-		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
-		Birthdate:        staff.Birthdate,
-		DateHired:        staff.DateHired,
-		Position:         staff.Position,
-		Email:            staff.Email,
-		MobileNo:         staff.MobileNo,
-		ScheduledTimeIn:  staff.TimeInSchedule.String,
-		ScheduledTimeOut: staff.TimeOutSchedule.String,
-		RequireInShop:    staff.RequireInShop,
-		UserType:         enums.ParseStaffUserTypeToEnum(staff.UserType),
-	}, nil
+	return s.BuildProfile(staff), nil
 }
 
 func (s *StaffService) UpdatePassword(ctx context.Context, staffID string, password string) error {
@@ -110,10 +98,6 @@ func (s *StaffService) GetAll(ctx context.Context, limit int64) ([]models.Staff,
 	return list, nil
 }
 
-func (s *StaffService) GetAllStaffsRaw(ctx context.Context, limit int64) ([]queries.GetAllStaffsRow, error) {
-	return s.dbRO.GetQueries().GetAllStaffs(ctx, limit)
-}
-
 func (s *StaffService) GetAllForAdmin(ctx context.Context, search string) ([]queries.GetAllStaffsForAdminRow, error) {
 	return s.dbRO.GetQueries().GetAllStaffsForAdmin(ctx, search)
 }
@@ -127,15 +111,9 @@ func (s *StaffService) GetCurrentStaff(ctx context.Context, staffID string) (mod
 	return s.BuildProfile(staff), nil
 }
 
-func (s *StaffService) GetRawStaff(ctx context.Context, staffID string) (queries.GetStaffByIDRow, error) {
-	decodedID := s.encoder.Decode(staffID)
-	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedID)
-	return staff, err
-}
-
 func (s *StaffService) BuildProfile(staff queries.GetStaffByIDRow) models.AdminStaffProfile {
 	return models.AdminStaffProfile{
-		ID:               staff.ID,
+		ID:               s.encoder.Encode(staff.ID),
 		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
 		FirstName:        staff.FirstName,
 		MiddleName:       staff.MiddleName.String,
@@ -150,13 +128,6 @@ func (s *StaffService) BuildProfile(staff queries.GetStaffByIDRow) models.AdminS
 		RequireInShop:    staff.RequireInShop,
 		UserType:         enums.ParseStaffUserTypeToEnum(staff.UserType),
 	}
-}
-
-func (s *StaffService) GetAttendanceByDate(ctx context.Context, staffID int64, date string) (queries.GetStaffAttendanceByDateRow, error) {
-	return s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
-		StaffID: staffID,
-		ForDate: date,
-	})
 }
 
 func (s *StaffService) GetTimeOffs(ctx context.Context, staffID string) ([]models.StaffTimeOff, error) {

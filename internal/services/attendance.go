@@ -302,9 +302,16 @@ func (s *AttendanceService) GetAttendance(
 }
 
 func (s *AttendanceService) ComputeAllAttendanceData(
-	staffs []queries.GetAllStaffsRow,
+	ctx context.Context,
+	limit int64,
 	attendances []staff.StaffRow,
 ) []models.Attendance {
+	staffs, err := s.dbRO.GetQueries().GetAllStaffs(ctx, limit)
+	if err != nil {
+		logs.LogCtx(ctx).Error("[ComputeAllAttendanceData]", zap.Error(err))
+		staffs = []queries.GetAllStaffsRow{}
+	}
+
 	staffMap := make(map[int64]queries.GetAllStaffsRow)
 	for _, staff := range staffs {
 		staffMap[staff.ID] = staff
@@ -381,6 +388,65 @@ func (s *AttendanceService) GetAllStaffTimeOffs(ctx context.Context) ([]models.S
 		})
 	}
 	return staffTimeOffs, nil
+}
+
+type StaffDayAttendance struct {
+	HasTimeIn        bool
+	HasTimeOut       bool
+	HasLunchBreakIn  bool
+	HasLunchBreakOut bool
+	Computed         *models.Attendance
+	InLocation       sql.NullString
+	OutLocation      sql.NullString
+}
+
+func (s *AttendanceService) GetStaffDayAttendance(ctx context.Context, staffID string, date string) (StaffDayAttendance, error) {
+	decodedID := s.encoder.Decode(staffID)
+	staffRow, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedID)
+	if err != nil {
+		return StaffDayAttendance{}, err
+	}
+
+	attendance, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
+		StaffID: decodedID,
+		ForDate: date,
+	})
+	if err != nil {
+		return StaffDayAttendance{}, err
+	}
+
+	rec := s.ComputeData(
+		staff.StaffRowBase(staffRow),
+		staff.StaffRow{
+			ID:                       attendance.ID,
+			StaffID:                  attendance.StaffID,
+			ForDate:                  attendance.ForDate,
+			TimeIn:                   attendance.TimeIn,
+			TimeOut:                  attendance.TimeOut,
+			InLocation:               attendance.InLocation,
+			OutLocation:              attendance.OutLocation,
+			InUseragentID:            attendance.InUseragentID,
+			OutUseragentID:           attendance.OutUseragentID,
+			LunchBreakIn:             attendance.LunchBreakIn,
+			LunchBreakOut:            attendance.LunchBreakOut,
+			LunchBreakInLocation:     attendance.LunchBreakInLocation,
+			LunchBreakOutLocation:    attendance.LunchBreakOutLocation,
+			LunchBreakInUseragentID:  attendance.LunchBreakInUseragentID,
+			LunchBreakOutUseragentID: attendance.LunchBreakOutUseragentID,
+			CreatedAt:                attendance.CreatedAt,
+			UpdatedAt:                attendance.UpdatedAt,
+		},
+	)
+
+	return StaffDayAttendance{
+		HasTimeIn:        attendance.TimeIn.Valid,
+		HasTimeOut:       attendance.TimeOut.Valid,
+		HasLunchBreakIn:  attendance.LunchBreakIn.Valid,
+		HasLunchBreakOut: attendance.LunchBreakOut.Valid,
+		Computed:         &rec,
+		InLocation:       attendance.InLocation,
+		OutLocation:      attendance.OutLocation,
+	}, nil
 }
 
 func (s *AttendanceService) ComputeData(

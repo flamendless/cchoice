@@ -11,7 +11,6 @@ import (
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
-	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
@@ -26,7 +25,7 @@ func (s *Server) adminSuperuserHomeHandler(w http.ResponseWriter, r *http.Reques
 	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
 	staffProfile, err := s.services.staff.GetCurrentStaff(ctx, staffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staffProfile.ID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.String("staff_id", staffProfile.ID), zap.Error(err))
 		redirectHXLogin(w, r)
 		return
 	}
@@ -60,13 +59,7 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
 
-	staffs, err := s.services.staff.GetAllStaffsRaw(ctx, maxStaffListSize)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		staffs = []queries.GetAllStaffsRow{}
-	}
-
-	attendanceData := s.services.attendance.ComputeAllAttendanceData(staffs, attendances)
+	attendanceData := s.services.attendance.ComputeAllAttendanceData(ctx, maxStaffListSize, attendances)
 
 	if err := compadmin.AdminSuperuserAttendanceTable(attendanceData).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
@@ -221,7 +214,7 @@ func (s *Server) adminSuperuserTimeOffApproveHandler(w http.ResponseWriter, r *h
 	currentStaffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
 	staff, err := s.services.staff.GetCurrentStaff(ctx, currentStaffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.String("staff_id", staff.ID), zap.Error(err))
 		redirectHXLogin(w, r)
 		return
 	}
@@ -241,7 +234,7 @@ func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *ht
 	currentStaffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
 	staff, err := s.services.staff.GetCurrentStaff(ctx, currentStaffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.String("staff_id", staff.ID), zap.Error(err))
 		redirectHXLogin(w, r)
 		return
 	}
