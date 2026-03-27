@@ -328,6 +328,14 @@ templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
 								<p class="text-xs text-gray-500 mt-1">
 									Allowed formats: JPEG, PNG, WebP, GIF. Max size: 10MB.
 								</p>
+								<div id="image-preview-container" class="hidden mt-2 p-2 border border-gray-200 rounded-md bg-gray-50">
+									<img
+										id="product-image-preview"
+										src=""
+										alt="Product image preview"
+										class="max-w-xs max-h-48 object-contain mx-auto"
+									/>
+								</div>
 							</div>
 						</div>
 						<div class="flex justify-end gap-4 pt-4 border-t">
@@ -352,6 +360,7 @@ templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
 					</form>
 				</div>
 			</div>
+			@ScrImageUpload()
 		</body>
 	</html>
 }
