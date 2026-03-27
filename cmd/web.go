@@ -18,6 +18,7 @@ var cmdWeb = &cobra.Command{
 	Short: "Run the web frontend only (no payment/shipping/mail services)",
 	Run: func(cmd *cobra.Command, args []string) {
 		serverInstance := server.NewServer()
+		serverInstance.StartBackgroundJobs()
 		httpServer := serverInstance.HTTPServer
 
 		logs.Log().Info("Serving HTTP (web mode)")

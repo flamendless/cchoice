@@ -54,3 +54,51 @@ func (q *Queries) CreateProductImage(ctx context.Context, arg CreateProductImage
 	)
 	return i, err
 }
+
+const getProductImageByProductID = `-- name: GetProductImageByProductID :one
+SELECT id, product_id, path, thumbnail, created_at, updated_at, deleted_at FROM tbl_product_images
+WHERE product_id = ?
+LIMIT 1
+`
+
+func (q *Queries) GetProductImageByProductID(ctx context.Context, productID int64) (TblProductImage, error) {
+	row := q.db.QueryRowContext(ctx, getProductImageByProductID, productID)
+	var i TblProductImage
+	err := row.Scan(
+		&i.ID,
+		&i.ProductID,
+		&i.Path,
+		&i.Thumbnail,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const updateProductImageThumbnail = `-- name: UpdateProductImageThumbnail :one
+UPDATE tbl_product_images
+SET thumbnail = ?, updated_at = datetime('now')
+WHERE id = ?
+RETURNING id, product_id, path, thumbnail, created_at, updated_at, deleted_at
+`
+
+type UpdateProductImageThumbnailParams struct {
+	Thumbnail sql.NullString
+	ID        int64
+}
+
+func (q *Queries) UpdateProductImageThumbnail(ctx context.Context, arg UpdateProductImageThumbnailParams) (TblProductImage, error) {
+	row := q.db.QueryRowContext(ctx, updateProductImageThumbnail, arg.Thumbnail, arg.ID)
+	var i TblProductImage
+	err := row.Scan(
+		&i.ID,
+		&i.ProductID,
+		&i.Path,
+		&i.Thumbnail,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}

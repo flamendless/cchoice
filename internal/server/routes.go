@@ -35,7 +35,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func buildImageCacheKey(path, thumbnail, size, quality string, ext images.ImageFormat) []byte {
+func buildImageCacheKey(path, thumbnail, size, quality string, ext enums.ImageFormat) []byte {
 	key := fmt.Sprintf(
 		"product_image_%s_t%s_s%s_q%s_%s",
 		path,
@@ -74,8 +74,8 @@ func validateImagePath(path string, allowedPrefixes []string) (string, error) {
 	}
 
 	ext := filepath.Ext(cleanPath)
-	imgFormat := images.ParseImageFormatExtToEnum(ext)
-	if imgFormat == images.IMAGE_FORMAT_UNDEFINED {
+	imgFormat := enums.ParseImageFormatExtToEnum(ext)
+	if imgFormat == enums.IMAGE_FORMAT_UNDEFINED {
 		return "", errs.ErrPathInvalidExt
 	}
 
@@ -212,17 +212,17 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ext := images.IMAGE_FORMAT_PNG
+	ext := enums.IMAGE_FORMAT_PNG
 	thumbnail := r.URL.Query().Get("thumbnail")
 	if thumbnail == "1" {
-		ext = images.IMAGE_FORMAT_WEBP
+		ext = enums.IMAGE_FORMAT_WEBP
 	}
 
 	size := r.URL.Query().Get("size")
 	quality := r.URL.Query().Get("quality")
 	if quality == "best" {
 		size = "640x640"
-		ext = images.IMAGE_FORMAT_WEBP
+		ext = enums.IMAGE_FORMAT_WEBP
 	}
 
 	cacheKey := buildImageCacheKey(cleanPath, thumbnail, size, quality, ext)
@@ -256,7 +256,7 @@ func (s *Server) brandLogoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ext := images.IMAGE_FORMAT_WEBP
+	ext := enums.IMAGE_FORMAT_WEBP
 	cacheKey := buildImageCacheKey(cleanPath, "", "", "", ext)
 	s.serveImage(w, r, cleanPath, ext, cacheKey, logtag)
 }
@@ -288,7 +288,7 @@ func (s *Server) assetImageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ext := images.IMAGE_FORMAT_WEBP
+	ext := enums.IMAGE_FORMAT_WEBP
 	cacheKey := buildImageCacheKey(cleanPath, "", "", "", ext)
 	s.serveImage(w, r, cleanPath, ext, cacheKey, logtag)
 }
@@ -297,7 +297,7 @@ func (s *Server) serveImage(
 	w http.ResponseWriter,
 	r *http.Request,
 	path string,
-	ext images.ImageFormat,
+	ext enums.ImageFormat,
 	cacheKey []byte,
 	logtag string,
 ) {

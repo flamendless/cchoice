@@ -1,4 +1,4 @@
-package images
+package enums
 
 import (
 	"testing"

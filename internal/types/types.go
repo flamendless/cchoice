@@ -13,3 +13,19 @@ type UserAgentInfo struct {
 	Device         string
 }
 
+type ImageSize struct {
+	Width  int
+	Height int
+}
+
+var ImageSizes = []ImageSize{
+	{640, 640},
+	{1280, 1280},
+}
+
+type ThumbnailVariant struct {
+	Size       string
+	Path       string
+	URL        string
+	IsOriginal bool
+}
