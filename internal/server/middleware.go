@@ -144,6 +144,17 @@ func (s *Server) requireSuperuserAuth(next http.Handler) http.Handler {
 	})
 }
 
+func (s *Server) requireCustomerAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		customerID := s.encoder.Decode(s.sessionManager.GetString(r.Context(), SessionCustomerID))
+		if customerID == 0 {
+			http.Redirect(w, r, utils.URL("/customer"), http.StatusSeeOther)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 func (s *Server) HasRole(ctx context.Context, role enums.StaffRole) bool {
 	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
 	if staffIDStr == "" {

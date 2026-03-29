@@ -331,8 +331,7 @@ func HeaderDesktop() templ.Component {
 		templ_7745c5c3_Err = common.IconAction(
 			"Cart",
 			"/carts",
-			svg.Cart("cart-icon-desktop", clsHeaderIconButton),
-			CartCount("cart-count-desktop", 0),
+			svg.Cart("cart-count-desktop", clsHeaderIconButton),
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -341,6 +340,14 @@ func HeaderDesktop() templ.Component {
 			"Track Order",
 			"/orders/track",
 			svg.TrackOrder(clsHeaderIconButton),
+		).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = common.IconAction(
+			"Log In",
+			"/customer",
+			svg.User(clsHeaderIconButton),
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -415,6 +422,14 @@ func HeaderMobile() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = common.IconAction(
+			"Log In",
+			"/customer",
+			svg.User(clsHeaderIconButton),
+		).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<button id=\"btn-hamburger\" type=\"button\" class=\"flex-shrink-0 p-2 rounded-lg hover:bg-cchoicesoft focus:outline-none focus:ring-2 focus:ring-cchoice cursor-pointer\" aria-label=\"Toggle navigation menu\" title=\"Toggle navigation menu\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\ttoggle .hidden on #mobile-sidebar\n\t\t\t\t\t\ttoggle .hidden on #mobile-sidebar-overlay\n\t\t\t\t\tend\n\t\t\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -459,7 +474,7 @@ func Header() templ.Component {
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/settings/header-texts"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 229, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 238, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {

@@ -1,0 +1,587 @@
+package components
+
+import "cchoice/internal/utils"
+import "cchoice/cmd/web/components/common"
+import "cchoice/cmd/web/models"
+import "cchoice/internal/constants"
+
+templ CustomerLoginPage() {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("[LOGIN] C-Choice Customer Portal")
+			<style>
+				#login-btn-content #login-spinner { display: none; }
+				#login-btn-content.htmx-request #login-spinner { display: inline-block; }
+				#login-btn-content.htmx-request .login-btn-text { display: none; }
+			</style>
+		</head>
+		<body
+			class="bg-cchoicesoft min-h-screen flex items-center justify-center"
+			_="init call metrics_event('customer_visit', 'login')"
+		>
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="w-full max-w-lg p-8 bg-white rounded-lg shadow-md">
+				<img
+					src={ constants.PathSVGLogoOnly }
+					alt="C-Choice Logo"
+					class="w-20 h-20 mx-auto mb-4"
+				/>
+				<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+					C-Choice Customer Portal
+				</h1>
+				<form
+					action={ utils.URL("/customer/login") }
+					method="POST"
+					class="space-y-4"
+					id="customer-login-form"
+					hx-post={ utils.URL("/customer/login") }
+					hx-trigger="submit"
+					hx-indicator="#login-btn-content"
+				>
+					<div>
+						<label for="email" class="block text-sm font-medium text-gray-700">
+							Email
+						</label>
+						<input
+							type="email"
+							id="email"
+							name="email"
+							required
+							pattern={ constants.PatternEmail }
+							class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						/>
+					</div>
+					<div>
+						<label for="password" class="block text-sm font-medium text-gray-700">
+							Password
+						</label>
+						<div class="relative mt-1">
+							<input
+								type="password"
+								id="password"
+								name="password"
+								required
+								maxlength="64"
+								pattern={ constants.PatternPassword }
+								class="block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+							/>
+							<button
+								type="button"
+								class="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none"
+								_="on click
+									if #password.type == 'password' then set #password.type to 'text'
+										set my innerText to 'Hide'
+									else
+										set #password.type to 'password'
+										set my innerText to 'Show'
+									end
+								"
+							>
+								Show
+							</button>
+						</div>
+					</div>
+					<button
+						type="submit"
+						class="w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice"
+					>
+						<span id="login-btn-content" class="inline-flex items-center gap-2">
+							<span id="login-spinner" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" aria-hidden="true"></span>
+							<span class="login-btn-text">Log In</span>
+						</span>
+					</button>
+				</form>
+				<div class="mt-4 text-center">
+					<p class="text-sm text-gray-600">
+						Don't have an account?
+						<a href={ utils.URL("/customer/register") } class="text-cchoice hover:text-cchoice_dark font-medium">
+							Register here
+						</a>
+					</p>
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+templ CustomerRegisterPage() {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("[REGISTER] C-Choice Customer Portal")
+		</head>
+		<body
+			class="bg-cchoicesoft min-h-screen flex items-center justify-center"
+			_="init call metrics_event('customer_visit', 'register')"
+		>
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="w-full max-w-2xl p-8 bg-white rounded-lg shadow-md">
+				<img
+					src={ constants.PathSVGLogoOnly }
+					alt="C-Choice Logo"
+					class="w-20 h-20 mx-auto mb-4"
+				/>
+				<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+					C-Choice Customer Registration
+				</h1>
+				<form
+					action={ utils.URL("/customer/register") }
+					method="POST"
+					class="space-y-4"
+					id="customer-register-form"
+					hx-post={ utils.URL("/customer/register") }
+					hx-trigger="submit"
+				>
+					<div>
+						<label for="customer_type" class="block text-sm font-medium text-gray-700">
+							Account Type
+						</label>
+						<select
+							id="customer_type"
+							name="customer_type"
+							required
+							class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+							_="on change
+								if my.value == ''
+									add .hidden to #register-form-fields
+									add .hidden to #register-button-group
+								else
+									remove .hidden from #register-form-fields
+									remove .hidden from #register-button-group
+									if my.value == 'company'
+										remove .hidden from #company-name-group
+									else
+										add .hidden to #company-name-group
+									end
+								end"
+						>
+							<option value="">Select account type</option>
+							<option value="customer">Individual Customer</option>
+							<option value="company">Company</option>
+						</select>
+					</div>
+					<div id="register-form-fields" class="hidden space-y-4">
+						<div id="company-name-group" class="hidden">
+							<label for="company_name" class="block text-sm font-medium text-gray-700">
+								Company Name
+							</label>
+							<input
+								type="text"
+								id="company_name"
+								name="company_name"
+								class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+							/>
+						</div>
+						<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+						<div>
+							<label for="first_name" class="block text-sm font-medium text-gray-700">
+								First Name
+							</label>
+							<input
+								type="text"
+								id="first_name"
+								name="first_name"
+								required
+								class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+							/>
+						</div>
+						<div>
+							<label for="middle_name" class="block text-sm font-medium text-gray-700">
+								Middle Name
+							</label>
+							<input
+								type="text"
+								id="middle_name"
+								name="middle_name"
+								class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+							/>
+						</div>
+						<div>
+							<label for="last_name" class="block text-sm font-medium text-gray-700">
+								Last Name
+							</label>
+							<input
+								type="text"
+								id="last_name"
+								name="last_name"
+								required
+								class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+							/>
+						</div>
+					</div>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div>
+							<label for="birthdate" class="block text-sm font-medium text-gray-700">
+								Birthdate
+							</label>
+							<input
+								type="date"
+								id="birthdate"
+								name="birthdate"
+								required
+								class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+							/>
+						</div>
+						<div>
+							<label for="sex" class="block text-sm font-medium text-gray-700">
+								Sex
+							</label>
+							<select
+								id="sex"
+								name="sex"
+								required
+								class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+							>
+								<option value="">Select sex</option>
+								<option value="male">Male</option>
+								<option value="female">Female</option>
+							</select>
+						</div>
+					</div>
+					<div>
+						<label for="email" class="block text-sm font-medium text-gray-700">
+							Email
+						</label>
+						<input
+							type="email"
+							id="email"
+							name="email"
+							required
+							pattern={ constants.PatternEmail }
+							class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						/>
+					</div>
+					<div>
+						<label for="mobile_no" class="block text-sm font-medium text-gray-700">
+							Mobile Number
+						</label>
+						<input
+							type="tel"
+							id="mobile_no"
+							name="mobile_no"
+							required
+							pattern={ constants.PatternMobileNumber }
+							placeholder="09123456789"
+							class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						/>
+					</div>
+					<div>
+						<label for="password" class="block text-sm font-medium text-gray-700">
+							Password
+						</label>
+						<div class="relative mt-1">
+							<input
+								type="password"
+								id="password"
+								name="password"
+								required
+								maxlength="64"
+								pattern={ constants.PatternPassword }
+								class="block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+							/>
+							<button
+								type="button"
+								class="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none"
+								_="on click
+									if #password.type == 'password' then
+										set #password.type to 'text'
+										set my.innerText to 'Hide'
+									else
+										set #password.type to 'password'
+										set my.innerText to 'Show'
+									end"
+							>
+								Show
+							</button>
+						</div>
+					</div>
+					</div>
+					<div id="register-button-group" class="hidden">
+						<button
+							type="submit"
+							class="w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice"
+						>
+							Register
+						</button>
+					</div>
+				</form>
+				<div class="mt-4 text-center">
+					<p class="text-sm text-gray-600">
+						Already have an account?
+						<a href={ utils.URL("/customer") } class="text-cchoice hover:text-cchoice_dark font-medium">
+							Login here
+						</a>
+					</p>
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+templ CustomerPortalPage(profile models.CustomerProfile) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("[PORTAL] C-Choice Customer Portal")
+		</head>
+
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-col"
+			_="init call metrics_event('customer_visit', 'portal')"
+		>
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-6xl mx-auto">
+					<div class="text-center mb-8 mt-4">
+						<div class="flex justify-center mb-4">
+							<img src={ constants.PathSVGLogoOnly } alt="C-Choice Logo" class="w-20 h-20" />
+						</div>
+						<h1 class="text-3xl font-bold text-cchoice">
+							C-Choice Customer Portal
+						</h1>
+						<p class="text-lg text-gray-600 mt-2">
+							Welcome, { profile.FullName }
+						</p>
+					</div>
+
+					<div class="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
+						<a
+							href={ utils.URL("/customer/profile") }
+							class="block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice"
+						>
+							<div class="flex justify-center mb-4">
+								<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-cchoice" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+								</svg>
+							</div>
+							<h2 class="text-xl font-semibold text-gray-800 mb-2">Profile</h2>
+						</a>
+
+						<a
+							href={ utils.URL("/cpoints") }
+							class="block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice"
+						>
+							<div class="flex justify-center mb-4">
+								<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-cchoice" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+								</svg>
+							</div>
+							<h2 class="text-xl font-semibold text-gray-800 mb-2">C-Points</h2>
+						</a>
+					</div>
+
+					<div class="mt-8 text-center">
+						<form action={ utils.URL("/customer/logout") } method="POST">
+							<button
+								type="submit"
+								class="py-2 px-6 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice"
+							>
+								Log Out
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+templ CustomerProfilePage(profile models.CustomerProfile) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("[PROFILE] C-Choice Customer Portal")
+		</head>
+
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-col"
+		>
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-4xl mx-auto">
+					<div class="mb-4">
+						<a
+							href={ utils.URL("/customer/portal") }
+							class="inline-flex items-center text-cchoice hover:text-cchoice_dark transition-colors"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+							</svg>
+							Back to Portal
+						</a>
+					</div>
+					<div class="bg-white rounded-lg shadow-md p-6">
+						<div class="flex justify-between items-center mb-6">
+							<h1 class="text-2xl font-bold text-cchoice">My Profile</h1>
+							<a
+								href={ utils.URL("/customer/profile/edit") }
+								class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark transition-colors"
+							>
+								Edit Profile
+							</a>
+						</div>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<div>
+								<label class="block text-sm font-medium text-gray-500">Full Name</label>
+								<p class="text-gray-900">{ profile.FullName }</p>
+							</div>
+							<div>
+								<label class="block text-sm font-medium text-gray-500">Email</label>
+								<p class="text-gray-900">{ profile.Email }</p>
+							</div>
+							<div>
+								<label class="block text-sm font-medium text-gray-500">Mobile Number</label>
+								<p class="text-gray-900">{ profile.MobileNo }</p>
+							</div>
+							<div>
+								<label class="block text-sm font-medium text-gray-500">Birthdate</label>
+								<p class="text-gray-900">{ profile.Birthdate }</p>
+							</div>
+							<div>
+								<label class="block text-sm font-medium text-gray-500">Sex</label>
+								<p class="text-gray-900 capitalize">{ profile.Sex }</p>
+							</div>
+							<div>
+								<label class="block text-sm font-medium text-gray-500">Account Type</label>
+								<p class="text-gray-900 capitalize">{ profile.CustomerType.String() }</p>
+							</div>
+							if profile.CompanyName != "" {
+								<div>
+									<label class="block text-sm font-medium text-gray-500">Company Name</label>
+									<p class="text-gray-900">{ profile.CompanyName }</p>
+								</div>
+							}
+						</div>
+						<div class="mt-6 pt-6 border-t">
+							<a
+								href={ utils.URL("/customer/profile/edit") + "?tab=password" }
+								class="text-cchoice hover:text-cchoice_dark transition-colors"
+							>
+								Change Password
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+templ CustomerProfileEditForm(profile models.CustomerProfile) {
+	<form
+		action={ utils.URL("/customer/profile") }
+		method="POST"
+		class="space-y-4"
+		hx-patch={ utils.URL("/customer/profile") }
+		hx-trigger="submit"
+	>
+		<input type="hidden" name="_method" value="PATCH"/>
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+			<div>
+				<label for="first_name" class="block text-sm font-medium text-gray-700">
+					First Name
+				</label>
+				<input
+					type="text"
+					id="first_name"
+					name="first_name"
+					required
+					value={ profile.FirstName }
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+			<div>
+				<label for="middle_name" class="block text-sm font-medium text-gray-700">
+					Middle Name
+				</label>
+				<input
+					type="text"
+					id="middle_name"
+					name="middle_name"
+					value={ profile.MiddleName }
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+			<div>
+				<label for="last_name" class="block text-sm font-medium text-gray-700">
+					Last Name
+				</label>
+				<input
+					type="text"
+					id="last_name"
+					name="last_name"
+					required
+					value={ profile.LastName }
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+		</div>
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+			<div>
+				<label for="birthdate" class="block text-sm font-medium text-gray-700">
+					Birthdate
+				</label>
+				<input
+					type="date"
+					id="birthdate"
+					name="birthdate"
+					required
+					value={ profile.Birthdate }
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+			<div>
+				<label for="sex" class="block text-sm font-medium text-gray-700">
+					Sex
+				</label>
+				<select
+					id="sex"
+					name="sex"
+					required
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				>
+					<option value="male" selected?={ profile.Sex == "male" }>Male</option>
+					<option value="female" selected?={ profile.Sex == "female" }>Female</option>
+				</select>
+			</div>
+		</div>
+		<div>
+			<label for="mobile_no" class="block text-sm font-medium text-gray-700">
+				Mobile Number
+			</label>
+			<input
+				type="tel"
+				id="mobile_no"
+				name="mobile_no"
+				required
+				pattern={ constants.PatternMobileNumber }
+				placeholder="09123456789"
+				value={ profile.MobileNo }
+				class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+			/>
+		</div>
+		<div class="flex justify-end gap-4">
+			<a
+				href={ utils.URL("/customer/profile") }
+				class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice"
+			>
+				Cancel
+			</a>
+			<button
+				type="submit"
+				class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice"
+			>
+				Save Changes
+			</button>
+		</div>
+	</form>
+}

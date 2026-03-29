@@ -162,6 +162,19 @@ type AdminStaffProfile struct {
 	UserType         enums.StaffUserType
 }
 
+type CustomerProfile struct {
+	FullName     string
+	FirstName    string
+	MiddleName   string
+	LastName     string
+	Birthdate    string
+	Sex          string
+	Email        string
+	MobileNo     string
+	CustomerType enums.CustomerType
+	CompanyName  string
+}
+
 type AttendanceStat struct {
 	In            string
 	Out           string
