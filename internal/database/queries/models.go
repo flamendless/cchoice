@@ -81,6 +81,31 @@ type TblCheckoutPayment struct {
 	PaymentIntentID        sql.NullString
 }
 
+type TblCustomer struct {
+	ID           int64
+	FirstName    string
+	MiddleName   sql.NullString
+	LastName     string
+	Birthdate    string
+	Sex          string
+	Email        string
+	MobileNo     string
+	Password     string
+	CustomerType string
+	CreatedAt    string
+	UpdatedAt    string
+	DeletedAt    string
+}
+
+type TblCustomerCompany struct {
+	ID         int64
+	CustomerID int64
+	Name       string
+	CreatedAt  string
+	UpdatedAt  string
+	DeletedAt  string
+}
+
 type TblEmailJob struct {
 	ID                int64
 	QueueID           string

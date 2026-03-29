@@ -45,6 +45,7 @@ type Services struct {
 	location     *services.LocationService
 	attendance   *services.AttendanceService
 	report       *services.ReportService
+	customer     *services.CustomerService
 }
 
 type Server struct {
@@ -167,6 +168,7 @@ func NewServer() *ServerInstance {
 		location:     services.NewLocationService(cfg.Settings.ShopLocation),
 		attendance:   services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		report:       services.NewReportService(newServer.encoder, newServer.dbRO),
+		customer:     services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 	}
 
 	ctx := context.Background()

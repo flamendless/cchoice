@@ -134,13 +134,17 @@ templ HeaderDesktop() {
 			@common.IconAction(
 				"Cart",
 				"/carts",
-				svg.Cart("cart-icon-desktop", clsHeaderIconButton),
-				CartCount("cart-count-desktop", 0),
+				svg.Cart("cart-count-desktop", clsHeaderIconButton),
 			)
 			@common.IconAction(
 				"Track Order",
 				"/orders/track",
 				svg.TrackOrder(clsHeaderIconButton),
+			)
+			@common.IconAction(
+				"Log In",
+				"/customer",
+				svg.User(clsHeaderIconButton),
 			)
 		</div>
 	</div>
@@ -190,6 +194,11 @@ templ HeaderMobile() {
 				"/orders/track",
 				svg.TrackOrder(clsHeaderIconButton),
 			)
+			@common.IconAction(
+				"Log In",
+				"/customer",
+				svg.User(clsHeaderIconButton),
+			)
 			<button
 				id="btn-hamburger"
 				type="button"
@@ -231,7 +240,7 @@ templ Header() {
 				hx-target="#header-row1-texts"
 				hx-swap="outerHTML"
 			>
-					@HeaderRow1Texts(nil)
+				@HeaderRow1Texts(nil)
 			</div>
 
 			@HeaderMobile()
