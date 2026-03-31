@@ -178,6 +178,17 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 			redirectHX(w, r, utils.URLWithError(page, err.Error()))
 			return
 		}
+
+		if err := s.services.staffLog.CreateLog(
+			ctx,
+			s.sessionManager.GetString(ctx, SessionStaffID),
+			"export",
+			"attendance_report_csv",
+			"success",
+			nil,
+		); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		}
 	case enums.OUTPUT_FORMAT_XLSX:
 		w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 		file := excelize.NewFile()
