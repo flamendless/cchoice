@@ -177,6 +177,8 @@ func NewServer() *ServerInstance {
 	}
 
 	staffLogService := services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW)
+	locationService := services.NewLocationService(cfg.Settings.ShopLocation)
+	attendanceService := services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW)
 	cpointTokenService := services.NewCPointTokenService(cfg.CPointHMACSecret)
 
 	newServer.services = Services{
@@ -192,7 +194,7 @@ func NewServer() *ServerInstance {
 		qr:           services.NewQRService(newServer.cache),
 		report:       services.NewReportService(newServer.encoder, newServer.dbRO, staffLogService),
 		role:         services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		staff:        services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		staff:        services.NewStaffServiceWithDeps(newServer.encoder, newServer.dbRO, newServer.dbRW, attendanceService, locationService),
 		staffLog:     staffLogService,
 	}
 
