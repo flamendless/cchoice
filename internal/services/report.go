@@ -18,17 +18,23 @@ import (
 )
 
 type ReportService struct {
-	encoder encode.IEncode
-	dbRO    database.IService
+	encoder  encode.IEncode
+	dbRO     database.IService
+	staffLog *StaffLogsService
 }
 
 func NewReportService(
 	encoder encode.IEncode,
 	dbRO database.IService,
+	staffLog *StaffLogsService,
 ) *ReportService {
+	if staffLog == nil {
+		panic("staffLog service is required")
+	}
 	return &ReportService{
-		encoder: encoder,
-		dbRO:    dbRO,
+		encoder:  encoder,
+		dbRO:     dbRO,
+		staffLog: staffLog,
 	}
 }
 
@@ -36,18 +42,29 @@ func (s *ReportService) StreamReportCSV(
 	ctx context.Context,
 	writer *csv.Writer,
 	data []staff.StaffRow,
+	adminStaffID string,
 	staffID string,
 	filename string,
 	startDate string,
 	endDate string,
 ) error {
+	result := "success"
+	defer func() {
+		if err := s.staffLog.CreateLog(ctx, adminStaffID, "export", "attendance_report_csv", result, nil); err != nil {
+			logs.LogCtx(ctx).Error("[ReportService] failed to log csv report generation", zap.Error(err))
+		}
+	}()
+
 	if err := writer.Write([]string{"Report name: " + filename}); err != nil {
+		result = err.Error()
 		return err
 	}
 	if err := writer.Write([]string{"Start date: " + startDate}); err != nil {
+		result = err.Error()
 		return err
 	}
 	if err := writer.Write([]string{"End date: " + endDate}); err != nil {
+		result = err.Error()
 		return err
 	}
 
@@ -55,14 +72,17 @@ func (s *ReportService) StreamReportCSV(
 	if decodedStaffID != encode.INVALID {
 		totalDays, err := utils.GetTotalDaysBetweenDates(startDate, endDate)
 		if err != nil {
+			result = err.Error()
 			return err
 		}
 		if err := writer.Write([]string{fmt.Sprintf("Total days (present/total): %d/%d", len(data), totalDays)}); err != nil {
+			result = err.Error()
 			return err
 		}
 
 		staffDB, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedStaffID)
 		if err != nil {
+			result = err.Error()
 			return err
 		}
 		if err := writer.Write([]string{fmt.Sprintf(
@@ -70,6 +90,7 @@ func (s *ReportService) StreamReportCSV(
 			staffDB.TimeInSchedule.String,
 			staffDB.TimeOutSchedule.String,
 		)}); err != nil {
+			result = err.Error()
 			return err
 		}
 
@@ -173,25 +194,36 @@ func (s *ReportService) StreamReportXLSX(
 	ctx context.Context,
 	file *excelize.File,
 	data []staff.StaffRow,
+	adminStaffID string,
 	staffID string,
 	filename string,
 	startDate string,
 	endDate string,
 ) error {
+	result := "success"
+	defer func() {
+		if err := s.staffLog.CreateLog(ctx, adminStaffID, "export", "attendance_report_xlsx", result, nil); err != nil {
+			logs.LogCtx(ctx).Error("[ReportService] failed to log xlsx report generation", zap.Error(err))
+		}
+	}()
+
 	const sheet = "Sheet1"
 	row := 1
 
 	if err := file.SetCellValue(sheet, fmt.Sprintf("A%d", row), "Report name: "+filename); err != nil {
+		result = err.Error()
 		return err
 	}
 	row++
 
 	if err := file.SetCellValue(sheet, fmt.Sprintf("A%d", row), "Start date: "+startDate); err != nil {
+		result = err.Error()
 		return err
 	}
 	row++
 
 	if err := file.SetCellValue(sheet, fmt.Sprintf("A%d", row), "End date: "+endDate); err != nil {
+		result = err.Error()
 		return err
 	}
 	row++
@@ -359,7 +391,6 @@ func (s *ReportService) StreamReportXLSX(
 		}
 		row++
 	}
-
 	return nil
 }
 

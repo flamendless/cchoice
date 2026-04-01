@@ -130,6 +130,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 	}
 
 	staffID := r.FormValue("staff-id")
+	adminStaffID := s.sessionManager.GetString(ctx, SessionStaffID)
 	attendances, err := s.services.attendance.GetAttendance(ctx, staffID, startDate, endDate)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -149,7 +150,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		zap.String("file", reportName),
 		zap.String("start date", startDate),
 		zap.String("end date", endDate),
-		zap.String("staff id", s.sessionManager.GetString(ctx, SessionStaffID)),
+		zap.String("staff id", adminStaffID),
 		zap.String("param staff id", staffID),
 	)
 
@@ -163,6 +164,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 			ctx,
 			writer,
 			attendances,
+			adminStaffID,
 			staffID,
 			reportName,
 			startDate,
@@ -187,6 +189,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 			ctx,
 			file,
 			attendances,
+			adminStaffID,
 			staffID,
 			reportName,
 			startDate,
