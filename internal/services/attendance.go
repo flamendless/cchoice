@@ -22,8 +22,8 @@ import (
 
 type AttendanceService struct {
 	encoder      encode.IEncode
-	dbRO         database.Service
-	dbRW         database.Service
+	dbRO         database.IService
+	dbRW         database.IService
 	shopLocation types.Location
 }
 
@@ -39,7 +39,7 @@ type attendanceStatusResult struct {
 
 func NewAttendanceService(
 	encoder encode.IEncode,
-	ro, rw database.Service,
+	ro, rw database.IService,
 ) *AttendanceService {
 	return &AttendanceService{
 		encoder:      encoder,

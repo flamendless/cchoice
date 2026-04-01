@@ -16,8 +16,8 @@ import (
 
 type CustomerService struct {
 	encoder encode.IEncode
-	dbRO    database.Service
-	dbRW    database.Service
+	dbRO    database.IService
+	dbRW    database.IService
 }
 
 type RegisterCustomerParams struct {
@@ -45,8 +45,8 @@ type UpdateCustomerProfileParams struct {
 
 func NewCustomerService(
 	encoder encode.IEncode,
-	dbRO database.Service,
-	dbRW database.Service,
+	dbRO database.IService,
+	dbRW database.IService,
 ) *CustomerService {
 	return &CustomerService{
 		encoder: encoder,

@@ -9,14 +9,14 @@ import (
 
 type BrandService struct {
 	encoder encode.IEncode
-	dbRO    database.Service
-	dbRW    database.Service
+	dbRO    database.IService
+	dbRW    database.IService
 }
 
 func NewBrandService(
 	encoder encode.IEncode,
-	dbRO database.Service,
-	dbRW database.Service,
+	dbRO database.IService,
+	dbRW database.IService,
 ) *BrandService {
 	return &BrandService{
 		encoder: encoder,

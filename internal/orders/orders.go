@@ -69,7 +69,7 @@ func GenerateUniqueOrderReferenceNumber(ctx context.Context) (string, error) {
 
 func CreateOrderFromCheckout(
 	ctx context.Context,
-	dbRW database.Service,
+	dbRW database.IService,
 	params CreateOrderParams,
 ) (*queries.TblOrder, string, error) {
 	paymongoResponse, ok := params.CheckoutSessionResponse.(*paymongo.CreateCheckoutSessionResponse)

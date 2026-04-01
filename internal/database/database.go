@@ -22,7 +22,7 @@ const (
 	DB_MODE_RW DBMode = "rw"
 )
 
-type Service interface {
+type IService interface {
 	Health() map[string]string
 	Close() error
 	GetQueries() *queries.Queries
@@ -47,7 +47,7 @@ var (
 	dbInstanceRW *service
 )
 
-func New(mode DBMode) Service {
+func New(mode DBMode) IService {
 	dburl := conf.Conf().DBURL
 	switch mode {
 	case DB_MODE_RO:
@@ -148,4 +148,4 @@ func (s *service) Close() error {
 	return s.db.Close()
 }
 
-var _ Service = (*service)(nil)
+var _ IService = (*service)(nil)

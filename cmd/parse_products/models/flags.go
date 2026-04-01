@@ -3,7 +3,7 @@ package models
 import "cchoice/internal/database"
 
 type ParseProducts struct {
-	DB      database.Service
+	DB      database.IService
 	Metrics *Metrics
 }
 

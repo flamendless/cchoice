@@ -16,8 +16,8 @@ import (
 
 type OnOrderPaidParams struct {
 	ReferenceNumber string
-	DBRO            database.Service
-	DBRW            database.Service
+	DBRO            database.IService
+	DBRW            database.IService
 	EmailJobRunner  *jobs.EmailJobRunner
 }
 

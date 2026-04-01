@@ -19,7 +19,7 @@ type ProductImage struct {
 	ID        int64
 }
 
-func (pi *ProductImage) InsertToDB(ctx context.Context, db database.Service) (int64, error) {
+func (pi *ProductImage) InsertToDB(ctx context.Context, db database.IService) (int64, error) {
 	if pi == nil {
 		panic("nil ProductImage")
 	}

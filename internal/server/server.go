@@ -49,8 +49,8 @@ type Services struct {
 }
 
 type Server struct {
-	dbRO               database.Service
-	dbRW               database.Service
+	dbRO               database.IService
+	dbRW               database.IService
 	SF                 singleflight.Group
 	staticFS           http.FileSystem // For static assets (JS, CSS, icons) - always local
 	productImageFS     http.FileSystem // For product images - configurable (local or object storage)

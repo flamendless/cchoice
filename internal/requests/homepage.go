@@ -29,7 +29,7 @@ func GetSettingsData(
 	ctx context.Context,
 	cache *fastcache.Cache,
 	sf *singleflight.Group,
-	dbRO database.Service,
+	dbRO database.IService,
 	cacheKey []byte,
 	keys []string,
 ) (map[string]string, error) {
@@ -77,7 +77,7 @@ func GetCategoriesSidePanel(
 	ctx context.Context,
 	cache *fastcache.Cache,
 	sf *singleflight.Group,
-	dbRO database.Service,
+	dbRO database.IService,
 	cacheKey []byte,
 ) ([]models.CategorySidePanelText, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
@@ -135,7 +135,7 @@ func GetBrandsSidePanel(
 	ctx context.Context,
 	cache *fastcache.Cache,
 	sf *singleflight.Group,
-	dbRO database.Service,
+	dbRO database.IService,
 	encoder encode.IEncode,
 	cacheKey []byte,
 ) ([]models.BrandSidePanelText, error) {
@@ -188,7 +188,7 @@ func GetCategorySectionHandler(
 	ctx context.Context,
 	cache *fastcache.Cache,
 	sf *singleflight.Group,
-	dbRO database.Service,
+	dbRO database.IService,
 	encoder encode.IEncode,
 	cacheKey []byte,
 	page int,
@@ -295,7 +295,7 @@ func GetRandomSaleProduct(
 	ctx context.Context,
 	cache *fastcache.Cache,
 	sf *singleflight.Group,
-	dbRO database.Service,
+	dbRO database.IService,
 	encoder encode.IEncode,
 	getCDNURL models.CDNURLFunc,
 	cacheKey []byte,
@@ -374,7 +374,7 @@ func GetBrandsForAdmin(
 	ctx context.Context,
 	cache *fastcache.Cache,
 	sf *singleflight.Group,
-	dbRO database.Service,
+	dbRO database.IService,
 	cacheKey []byte,
 ) ([]queries.GetBrandsForSidePanelRow, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
@@ -417,7 +417,7 @@ func GetCategoriesForAdmin(
 	ctx context.Context,
 	cache *fastcache.Cache,
 	sf *singleflight.Group,
-	dbRO database.Service,
+	dbRO database.IService,
 	cacheKey []byte,
 ) (map[string][]string, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {

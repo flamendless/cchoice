@@ -120,7 +120,7 @@ func (product *Product) Duplicate() *Product {
 	return &newProduct
 }
 
-func (product *Product) GetDBID(ctx context.Context, db database.Service) int64 {
+func (product *Product) GetDBID(ctx context.Context, db database.IService) int64 {
 	existingProductID, err := db.GetQueries().GetProductIDBySerial(ctx, product.Serial)
 	if err != nil {
 		return 0
@@ -129,7 +129,7 @@ func (product *Product) GetDBID(ctx context.Context, db database.Service) int64 
 	return existingProductID
 }
 
-func (product *Product) GetOrInsertCategoryID(ctx context.Context, db database.Service) (int64, error) {
+func (product *Product) GetOrInsertCategoryID(ctx context.Context, db database.IService) (int64, error) {
 	var categoryID int64
 
 	existingProductCategory, err := db.GetQueries().GetProductCategoryByCategoryAndSubcategory(
@@ -198,7 +198,7 @@ func (product *Product) GetOrInsertCategoryID(ctx context.Context, db database.S
 	return categoryID, nil
 }
 
-func (product *Product) GetOrInsertProductSpecsID(ctx context.Context, db database.Service) (int64, error) {
+func (product *Product) GetOrInsertProductSpecsID(ctx context.Context, db database.IService) (int64, error) {
 	var productSpecsID int64
 
 	existingProductSpecs, err := db.GetQueries().GetProductSpecsByProductID(ctx, product.ID)
@@ -257,7 +257,7 @@ func (product *Product) GetOrInsertProductSpecsID(ctx context.Context, db databa
 	return productSpecsID, nil
 }
 
-func (product *Product) InsertToDB(ctx context.Context, db database.Service) (int64, error) {
+func (product *Product) InsertToDB(ctx context.Context, db database.IService) (int64, error) {
 	productSpecsID, err := product.GetOrInsertProductSpecsID(ctx, db)
 	if err != nil {
 		return 0, err
@@ -307,7 +307,7 @@ func (product *Product) InsertToDB(ctx context.Context, db database.Service) (in
 	return insertedProduct.ID, nil
 }
 
-func (product *Product) UpdateToDB(ctx context.Context, db database.Service) (int64, error) {
+func (product *Product) UpdateToDB(ctx context.Context, db database.IService) (int64, error) {
 	productSpecsID, err := product.GetOrInsertProductSpecsID(ctx, db)
 	if err != nil {
 		return 0, err

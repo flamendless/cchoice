@@ -42,7 +42,7 @@ func mustInitShippingService() shipping.IShippingService {
 	}
 }
 
-func mustInitGeocodingService(dbRW database.Service) geocoding.IGeocoder {
+func mustInitGeocodingService(dbRW database.IService) geocoding.IGeocoder {
 	cfg := conf.Conf()
 	switch cfg.GeocodingService {
 	case geocoding.GEOCODING_SERVICE_GOOGLEMAPS.String():

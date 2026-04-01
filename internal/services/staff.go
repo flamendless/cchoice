@@ -17,8 +17,8 @@ import (
 
 type StaffService struct {
 	encoder encode.IEncode
-	dbRO    database.Service
-	dbRW    database.Service
+	dbRO    database.IService
+	dbRW    database.IService
 }
 
 type UpdateProfileParams struct {
@@ -33,8 +33,8 @@ type UpdateProfileParams struct {
 
 func NewStaffService(
 	encoder encode.IEncode,
-	dbRO database.Service,
-	dbRW database.Service,
+	dbRO database.IService,
+	dbRW database.IService,
 ) *StaffService {
 	return &StaffService{
 		encoder: encoder,

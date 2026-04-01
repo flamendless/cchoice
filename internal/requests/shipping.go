@@ -24,7 +24,7 @@ func GetShippingQuotation(
 	sf *singleflight.Group,
 	shippingService shipping.IShippingService,
 	shippingRequest shipping.ShippingRequest,
-	db database.Service,
+	db database.IService,
 ) (*shipping.ShippingQuotation, error) {
 	cacheKey := []byte(generateShippingCacheKey(
 		shippingRequest.DeliveryLocation.Address,

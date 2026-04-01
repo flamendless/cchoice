@@ -27,7 +27,7 @@ type GoogleMapsGeocoder struct {
 	baseURL     string
 	httpClient  *http.Client
 	region      string
-	db          database.Service
+	db          database.IService
 	cacheExpiry time.Duration
 }
 
@@ -41,7 +41,7 @@ func validate() {
 	}
 }
 
-func MustInit(db database.Service) *GoogleMapsGeocoder {
+func MustInit(db database.IService) *GoogleMapsGeocoder {
 	validate()
 	cfg := conf.Conf()
 	return &GoogleMapsGeocoder{
@@ -56,7 +56,7 @@ func MustInit(db database.Service) *GoogleMapsGeocoder {
 	}
 }
 
-func MustInitWithCache(db database.Service, cacheExpiry time.Duration) *GoogleMapsGeocoder {
+func MustInitWithCache(db database.IService, cacheExpiry time.Duration) *GoogleMapsGeocoder {
 	validate()
 	cfg := conf.Conf()
 
