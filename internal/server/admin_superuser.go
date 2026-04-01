@@ -11,11 +11,9 @@ import (
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
-	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
-	staffmodels "cchoice/internal/staff"
 	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
@@ -28,11 +26,11 @@ func (s *Server) adminSuperuserHomeHandler(w http.ResponseWriter, r *http.Reques
 	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
 	staff, err := s.services.staff.GetCurrentStaff(ctx, staffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.String("staff_id", staffIDStr), zap.Error(err))
 		redirectHXLogin(w, r)
 		return
 	}
-	currentUserFullName := utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName)
+	currentUserFullName := staff.FullName
 
 	if err := compadmin.AdminSuperuserHomePage(currentUserFullName).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
@@ -63,28 +61,13 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
 
-	staffs, err := s.dbRO.GetQueries().GetAllStaffs(ctx, maxStaffListSize)
+	staffs, err := s.services.staff.GetAllStaffsRow(ctx, maxStaffListSize)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		staffs = []queries.GetAllStaffsRow{}
 	}
 
-	staffMap := make(map[int64]queries.GetAllStaffsRow)
-	for _, staff := range staffs {
-		staffMap[staff.ID] = staff
-	}
-
-	attendanceData := make([]models.Attendance, 0, len(attendances))
-	for _, att := range attendances {
-		staff, ok := staffMap[att.StaffID]
-		if !ok {
-			continue
-		}
-		attendanceData = append(
-			attendanceData,
-			s.services.attendance.ComputeData(staffmodels.StaffRowBase(staff), att),
-		)
-	}
+	attendanceData := s.services.attendance.ComputeAllAttendanceData(staffs, attendances)
 
 	if err := compadmin.AdminSuperuserAttendanceTable(attendanceData).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
@@ -220,52 +203,10 @@ func (s *Server) adminSuperuserTimeOffTableHandler(w http.ResponseWriter, r *htt
 	const logtag = "[Admin Superuser Time Off Table Handler]"
 	ctx := r.Context()
 
-	timeOffs, err := s.dbRO.GetQueries().GetAllStaffTimeOffs(ctx)
+	staffTimeOffs, err := s.services.attendance.GetAllStaffTimeOffs(ctx)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		timeOffs = []queries.GetAllStaffTimeOffsRow{}
-	}
-
-	staffTimeOffs := make([]models.StaffTimeOff, 0, len(timeOffs))
-	for _, to := range timeOffs {
-		var approvedBy string
-		var approvedAt string
-
-		if to.ApprovedBy.Valid && to.ApproverFirstName.Valid {
-			approvedBy = utils.BuildFullName(
-				to.ApproverFirstName.String,
-				to.ApproverMiddleName.String,
-				to.ApproverLastName.String,
-			)
-		} else {
-			approvedBy = "-"
-		}
-
-		if to.ApprovedAt.Valid {
-			approvedAt = to.ApprovedAt.Time.Format(constants.DateTimeLayoutISO)
-		} else {
-			approvedAt = "-"
-		}
-
-		fullName := utils.BuildFullName(
-			to.StaffFirstName,
-			to.StaffMiddleName.String,
-			to.StaffLastName,
-		)
-
-		staffTimeOffs = append(staffTimeOffs, models.StaffTimeOff{
-			ID:          s.encoder.Encode(to.ID),
-			StaffID:     s.encoder.Encode(to.StaffID),
-			FullName:    fullName,
-			Type:        enums.ParseTimeOffToEnum(to.Type),
-			CreatedAt:   utils.ConvertToPH(to.CreatedAt),
-			StartDate:   to.StartDate.Format(constants.DateLayoutISO),
-			EndDate:     to.EndDate.Format(constants.DateLayoutISO),
-			Description: to.Description,
-			Approved:    to.Approved.Bool,
-			ApprovedBy:  approvedBy,
-			ApprovedAt:  approvedAt,
-		})
+		staffTimeOffs = []models.StaffTimeOff{}
 	}
 
 	if err := compadmin.AdminSuperuserTimeOffTable(staffTimeOffs).Render(ctx, w); err != nil {
@@ -279,9 +220,9 @@ func (s *Server) adminSuperuserTimeOffApproveHandler(w http.ResponseWriter, r *h
 	const logtag = "[Admin Superuser Time Off Approve Handler]"
 	ctx := r.Context()
 	currentStaffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
-	staff, err := s.services.staff.GetCurrentStaff(ctx, currentStaffIDStr)
+	_, err := s.services.staff.GetCurrentStaff(ctx, currentStaffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.String("staff_id", currentStaffIDStr), zap.Error(err))
 		redirectHXLogin(w, r)
 		return
 	}
@@ -299,9 +240,9 @@ func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *ht
 	const logtag = "[Admin Superuser Time Off Cancel Handler]"
 	ctx := r.Context()
 	currentStaffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
-	staff, err := s.services.staff.GetCurrentStaff(ctx, currentStaffIDStr)
+	_, err := s.services.staff.GetCurrentStaff(ctx, currentStaffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.String("staff_id", currentStaffIDStr), zap.Error(err))
 		redirectHXLogin(w, r)
 		return
 	}

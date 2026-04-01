@@ -114,14 +114,22 @@ func (s *StaffService) GetAllForAdmin(ctx context.Context, search string) ([]que
 	return s.dbRO.GetQueries().GetAllStaffsForAdmin(ctx, search)
 }
 
-func (s *StaffService) GetCurrentStaff(ctx context.Context, staffID string) (queries.GetStaffByIDRow, error) {
+func (s *StaffService) GetAllStaffsRow(ctx context.Context, limit int64) ([]queries.GetAllStaffsRow, error) {
+	return s.dbRO.GetQueries().GetAllStaffs(ctx, limit)
+}
+
+func (s *StaffService) GetCurrentStaff(ctx context.Context, staffID string) (models.AdminStaffProfile, error) {
 	decodedID := s.encoder.Decode(staffID)
 	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedID)
-	return staff, err
+	if err != nil {
+		return models.AdminStaffProfile{}, err
+	}
+	return s.BuildProfile(staff), nil
 }
 
 func (s *StaffService) BuildProfile(staff queries.GetStaffByIDRow) models.AdminStaffProfile {
 	return models.AdminStaffProfile{
+		ID:               staff.ID,
 		FullName:         utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
 		FirstName:        staff.FirstName,
 		MiddleName:       staff.MiddleName.String,

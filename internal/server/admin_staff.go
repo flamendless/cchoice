@@ -26,17 +26,17 @@ func (s *Server) adminStaffHomeHandler(w http.ResponseWriter, r *http.Request) {
 	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
 	staff, err := s.services.staff.GetCurrentStaff(ctx, staffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.String("staff_id", s.sessionManager.GetString(ctx, SessionStaffID)), zap.Error(err))
 		redirectHXLogin(w, r)
 		return
 	}
 
 	roles, err := s.services.role.GetByStaffID(ctx, staffIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
+		logs.LogCtx(ctx).Error(logtag, zap.String("staff_id", s.sessionManager.GetString(ctx, SessionStaffID)), zap.Error(err))
 	}
 
-	currentUserFullName := utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName)
+	currentUserFullName := staff.FullName
 	if err := compadmin.AdminStaffHomePage(currentUserFullName, roles).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -53,12 +53,12 @@ func (s *Server) adminStaffProfileHandler(w http.ResponseWriter, r *http.Request
 
 	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("staff_id", s.sessionManager.GetString(ctx, SessionStaffID)))
 		redirectHXLogin(w, r)
 		return
 	}
 
-	profile := s.services.staff.BuildProfile(staff)
+	profile := staff
 
 	if err := compadmin.AdminProfilePage(profile).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
@@ -77,12 +77,12 @@ func (s *Server) adminStaffProfileHeaderHandler(w http.ResponseWriter, r *http.R
 
 	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("staff_id", s.sessionManager.GetString(ctx, SessionStaffID)))
 		redirectHXLogin(w, r)
 		return
 	}
 
-	profile := s.services.staff.BuildProfile(staff)
+	profile := staff
 
 	if err := compadmin.AdminProfileHeader(profile).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
@@ -139,18 +139,18 @@ func (s *Server) adminProfileEditFormHandler(w http.ResponseWriter, r *http.Requ
 
 	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("staff_id", s.sessionManager.GetString(ctx, SessionStaffID)))
 		redirectHXLogin(w, r)
 		return
 	}
 
-	profile := s.services.staff.BuildProfile(staff)
+	profile := staff
 
 	if err := compadmin.AdminProfileEditForm(profile).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),
-			zap.Int64("staff_id", staff.ID),
+			zap.String("staff_id", s.sessionManager.GetString(ctx, SessionStaffID)),
 			zap.Error(err),
 		)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -204,17 +204,17 @@ func (s *Server) adminStaffListHandler(w http.ResponseWriter, r *http.Request) {
 
 	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("staff_id", s.sessionManager.GetString(ctx, SessionStaffID)))
 		redirectHXLogin(w, r)
 		return
 	}
 
 	var list []models.Staff
-	switch enums.ParseStaffUserTypeToEnum(staff.UserType) {
+	switch staff.UserType {
 	case enums.STAFF_USER_TYPE_STAFF:
 		list = append(list, models.Staff{
 			ID:       s.encoder.Encode(staff.ID),
-			FullName: utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
+			FullName: staff.FullName,
 		})
 	case enums.STAFF_USER_TYPE_SUPERUSER:
 		list, err = s.services.staff.GetAll(ctx, 100)
@@ -233,7 +233,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 
 	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("staff_id", s.sessionManager.GetString(ctx, SessionStaffID)))
 		redirectHXLogin(w, r)
 		return
 	}
@@ -259,7 +259,13 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		hasLunchBreakOut = attendance.LunchBreakOut.Valid
 
 		rec := s.services.attendance.ComputeData(
-			staffmodels.StaffRowBase(staff),
+			staffmodels.StaffRowBase{
+				ID:              staff.ID,
+				FirstName:       staff.FirstName,
+				LastName:        staff.LastName,
+				TimeInSchedule:  sql.NullString{String: staff.ScheduledTimeIn, Valid: staff.ScheduledTimeIn != ""},
+				TimeOutSchedule: sql.NullString{String: staff.ScheduledTimeOut, Valid: staff.ScheduledTimeOut != ""},
+			},
 			staffmodels.StaffRow{
 				ID:                       staff.ID,
 				StaffID:                  staff.ID,
@@ -290,8 +296,8 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		attendance.OutLocation,
 	)
 
-	scheduledTimeIn := staff.TimeInSchedule.String
-	scheduledTimeOut := staff.TimeOutSchedule.String
+	scheduledTimeIn := staff.ScheduledTimeIn
+	scheduledTimeOut := staff.ScheduledTimeOut
 
 	canTimeIn := !hasTimeIn
 	canTimeOut := hasTimeIn && !hasTimeOut
@@ -307,7 +313,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	// }
 
 	locationDisplay, distanceMeters = s.services.location.ComputeLocationDisplay(ctx, s.sessionManager)
-	profile := s.services.staff.BuildProfile(staff)
+	profile := staff
 	profile.ScheduledTimeIn = scheduledTimeIn
 	profile.ScheduledTimeOut = scheduledTimeOut
 	profile.SelectedDate = today
@@ -342,7 +348,7 @@ func (s *Server) adminStaffAttendanceTableHandler(w http.ResponseWriter, r *http
 
 	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("staff_id", s.sessionManager.GetString(ctx, SessionStaffID)))
 		redirectHXLogin(w, r)
 		return
 	}
@@ -352,7 +358,13 @@ func (s *Server) adminStaffAttendanceTableHandler(w http.ResponseWriter, r *http
 	var record *models.Attendance
 	if err == nil {
 		rec := s.services.attendance.ComputeData(
-			staffmodels.StaffRowBase(staff),
+			staffmodels.StaffRowBase{
+				ID:              staff.ID,
+				FirstName:       staff.FirstName,
+				LastName:        staff.LastName,
+				TimeInSchedule:  sql.NullString{String: staff.ScheduledTimeIn, Valid: staff.ScheduledTimeIn != ""},
+				TimeOutSchedule: sql.NullString{String: staff.ScheduledTimeOut, Valid: staff.ScheduledTimeOut != ""},
+			},
 			staffmodels.StaffRow{
 				ID:                       staff.ID,
 				StaffID:                  staff.ID,
@@ -389,7 +401,7 @@ func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.
 
 	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Int64("staff_id", staff.ID))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("staff_id", s.sessionManager.GetString(ctx, SessionStaffID)))
 		redirectHXLogin(w, r)
 		return
 	}
@@ -399,7 +411,13 @@ func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.
 	var record *models.Attendance
 	if err == nil {
 		rec := s.services.attendance.ComputeData(
-			staffmodels.StaffRowBase(staff),
+			staffmodels.StaffRowBase{
+				ID:              staff.ID,
+				FirstName:       staff.FirstName,
+				LastName:        staff.LastName,
+				TimeInSchedule:  sql.NullString{String: staff.ScheduledTimeIn, Valid: staff.ScheduledTimeIn != ""},
+				TimeOutSchedule: sql.NullString{String: staff.ScheduledTimeOut, Valid: staff.ScheduledTimeOut != ""},
+			},
 			staffmodels.StaffRow{
 				ID:                       staff.ID,
 				StaffID:                  staff.ID,
@@ -605,7 +623,7 @@ func (s *Server) adminStaffAttendanceLocationHandler(w http.ResponseWriter, r *h
 
 	locationResult := s.services.location.ComputeLocation(attendanceLocation, GetLocation(ctx, s.sessionManager))
 
-	profile := s.services.staff.BuildProfile(staff)
+	profile := staff
 	profile.InShop = locationResult.InShop
 	profile.LocationDisplay = locationResult.LocationDisplay
 	profile.DistanceMeters = locationResult.DistanceMeters

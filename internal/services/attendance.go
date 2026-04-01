@@ -523,3 +523,74 @@ func (s *AttendanceService) GetExtraStats(ctx context.Context, staffID string, d
 	}
 	return res
 }
+
+func (s *AttendanceService) ComputeAllAttendanceData(staffs []queries.GetAllStaffsRow, attendances []staff.StaffRow) []models.Attendance {
+	staffMap := make(map[int64]queries.GetAllStaffsRow)
+	for _, staff := range staffs {
+		staffMap[staff.ID] = staff
+	}
+
+	attendanceData := make([]models.Attendance, 0, len(attendances))
+	for _, att := range attendances {
+		st, ok := staffMap[att.StaffID]
+		if !ok {
+			continue
+		}
+		attendanceData = append(
+			attendanceData,
+			s.ComputeData(staff.StaffRowBase(st), att),
+		)
+	}
+	return attendanceData
+}
+
+func (s *AttendanceService) GetAllStaffTimeOffs(ctx context.Context) ([]models.StaffTimeOff, error) {
+	timeOffs, err := s.dbRO.GetQueries().GetAllStaffTimeOffs(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	staffTimeOffs := make([]models.StaffTimeOff, 0, len(timeOffs))
+	for _, to := range timeOffs {
+		var approvedBy string
+		var approvedAt string
+
+		if to.ApprovedBy.Valid && to.ApproverFirstName.Valid {
+			approvedBy = utils.BuildFullName(
+				to.ApproverFirstName.String,
+				to.ApproverMiddleName.String,
+				to.ApproverLastName.String,
+			)
+		} else {
+			approvedBy = "-"
+		}
+
+		if to.ApprovedAt.Valid {
+			approvedAt = to.ApprovedAt.Time.Format(constants.DateTimeLayoutISO)
+		} else {
+			approvedAt = "-"
+		}
+
+		fullName := utils.BuildFullName(
+			to.StaffFirstName,
+			to.StaffMiddleName.String,
+			to.StaffLastName,
+		)
+
+		staffTimeOffs = append(staffTimeOffs, models.StaffTimeOff{
+			ID:          s.encoder.Encode(to.ID),
+			StaffID:     s.encoder.Encode(to.StaffID),
+			FullName:    fullName,
+			Type:        enums.ParseTimeOffToEnum(to.Type),
+			CreatedAt:   utils.ConvertToPH(to.CreatedAt),
+			StartDate:   to.StartDate.Format(constants.DateLayoutISO),
+			EndDate:     to.EndDate.Format(constants.DateLayoutISO),
+			Description: to.Description,
+			Approved:    to.Approved.Bool,
+			ApprovedBy:  approvedBy,
+			ApprovedAt:  approvedAt,
+		})
+	}
+
+	return staffTimeOffs, nil
+}
