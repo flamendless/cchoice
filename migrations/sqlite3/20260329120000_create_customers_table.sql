@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS tbl_customers (
     email TEXT NOT NULL UNIQUE,
     mobile_no TEXT NOT NULL,
     password TEXT NOT NULL,
-    customer_type TEXT NOT NULL CHECK(customer_type IN ('customer', 'company')),
+    customer_type TEXT NOT NULL CHECK(customer_type IN ('CUSTOMER', 'COMPANY')),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now')),
     deleted_at TEXT NOT NULL DEFAULT ('1970-01-01 00:00:00+00:00')

@@ -1,5 +1,7 @@
 package enums
 
+import "strings"
+
 //go:generate go tool stringer -type=CustomerType -trimprefix=CUSTOMER_TYPE_
 
 type CustomerType int
@@ -22,7 +24,7 @@ func ParseCustomerTypeToEnum(e string) CustomerType {
 }
 
 func MustParseCustomerTypeToEnum(e string) CustomerType {
-	switch e {
+	switch strings.ToUpper(e) {
 	case CUSTOMER_TYPE_CUSTOMER.String():
 		return CUSTOMER_TYPE_CUSTOMER
 	case CUSTOMER_TYPE_COMPANY.String():
