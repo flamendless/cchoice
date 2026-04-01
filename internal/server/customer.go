@@ -132,8 +132,14 @@ func (s *Server) customerRegisterHandler(w http.ResponseWriter, r *http.Request)
 	email := r.PostFormValue("email")
 	mobileNo := r.PostFormValue("mobile_no")
 	password := r.PostFormValue("password")
+	confirmPassword := r.PostFormValue("confirm_password")
 	customerType := r.PostFormValue("customer_type")
 	companyName := r.PostFormValue("company_name")
+
+	if password != confirmPassword {
+		redirectHX(w, r, utils.URLWithError(page, "Passwords must match"))
+		return
+	}
 
 	if firstName == "" || lastName == "" || birthdate == "" || sex == "" || email == "" || mobileNo == "" || password == "" || customerType == "" {
 		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
@@ -161,7 +167,7 @@ func (s *Server) customerRegisterHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	_, err := s.services.customer.Register(ctx, services.RegisterCustomerParams{
+	if _, err := s.services.customer.Register(ctx, services.RegisterCustomerParams{
 		FirstName:    firstName,
 		MiddleName:   middleName,
 		LastName:     lastName,
@@ -172,10 +178,9 @@ func (s *Server) customerRegisterHandler(w http.ResponseWriter, r *http.Request)
 		Password:     password,
 		CustomerType: customerTypeEnum,
 		CompanyName:  companyName,
-	})
-	if err != nil {
+	}); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Registration failed. Email may already be in use."))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 
