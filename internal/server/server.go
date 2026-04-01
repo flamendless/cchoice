@@ -159,16 +159,18 @@ func NewServer() *ServerInstance {
 	}
 
 	staffLogService := services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW)
+	locationService := services.NewLocationService(cfg.Settings.ShopLocation)
+	attendanceService := services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW)
 
 	newServer.services = Services{
 		product:      services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW, newServer.GetCDNURL),
 		productImage: services.NewProductImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
 		brand:        services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		staff:        services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		staff:        services.NewStaffServiceWithDeps(newServer.encoder, newServer.dbRO, newServer.dbRW, attendanceService, locationService),
 		staffLog:     staffLogService,
 		role:         services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		location:     services.NewLocationService(cfg.Settings.ShopLocation),
-		attendance:   services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		location:     locationService,
+		attendance:   attendanceService,
 		report:       services.NewReportService(newServer.encoder, newServer.dbRO, staffLogService),
 		customer:     services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 	}

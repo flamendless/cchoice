@@ -224,73 +224,12 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
-	profile, err := s.services.staff.GetCurrentStaff(ctx, staffIDStr)
+	profile, err := s.services.staff.GetCurrentStaffWithAttendance(ctx, staffIDStr, s.sessionManager)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("staff_id", profile.ID), zap.Error(err))
 		redirectHXLogin(w, r)
 		return
 	}
-
-	today := time.Now().Format(constants.DateLayoutISO)
-	dayAtt, err := s.services.attendance.GetStaffDayAttendance(ctx, staffIDStr, today)
-	var hasTimeIn, hasTimeOut bool
-	var hasLunchBreakIn, hasLunchBreakOut bool
-	var myAttendance *models.Attendance
-	var inShop, outShop *bool
-	var locationDisplay string
-	var distanceMeters float64
-	var inLocation, outLocation sql.NullString
-	if err != nil {
-		if err != sql.ErrNoRows {
-			logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-			redirectHX(w, r, utils.URLWithError("/admin/staff", "Error encountered"))
-			return
-		}
-	} else {
-		hasTimeIn = dayAtt.HasTimeIn
-		hasTimeOut = dayAtt.HasTimeOut
-		hasLunchBreakIn = dayAtt.HasLunchBreakIn
-		hasLunchBreakOut = dayAtt.HasLunchBreakOut
-		myAttendance = dayAtt.Computed
-		inLocation = dayAtt.InLocation
-		outLocation = dayAtt.OutLocation
-	}
-
-	inShop, outShop = s.services.location.CheckShopRadius(
-		ctx,
-		s.sessionManager,
-		inLocation,
-		outLocation,
-	)
-
-	canTimeIn := !hasTimeIn
-	canTimeOut := hasTimeIn && !hasTimeOut
-	canLunchBreakIn := hasTimeIn && !hasLunchBreakIn
-	canLunchBreakOut := !hasTimeOut && hasLunchBreakIn && !hasLunchBreakOut
-
-	//INFO: (flam) - allow all for now
-	// if profile.RequireInShop {
-	// 	if inShop == nil || !*inShop {
-	// 		canTimeIn = false
-	// 		canTimeOut = false
-	// 	}
-	// }
-
-	locationDisplay, distanceMeters = s.services.location.ComputeLocationDisplay(ctx, s.sessionManager)
-	profile.SelectedDate = today
-	profile.CurrentDate = time.Now().Format(constants.DateLayoutDisplay)
-	profile.CurrentTime = time.Now().Format(constants.TimeLayoutDisplay)
-	profile.HasTimeIn = hasTimeIn
-	profile.HasTimeOut = hasTimeOut
-	profile.CanTimeIn = canTimeIn
-	profile.CanTimeOut = canTimeOut
-	profile.CanLunchBreakIn = canLunchBreakIn
-	profile.CanLunchBreakOut = canLunchBreakOut
-	profile.MyAttendance = myAttendance
-	profile.InShop = inShop
-	profile.OutShop = outShop
-	profile.LocationDisplay = locationDisplay
-	profile.DistanceMeters = distanceMeters
 
 	if err := compadmin.AdminStaffPage(profile).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
