@@ -19,12 +19,12 @@ import (
 
 type ReportService struct {
 	encoder encode.IEncode
-	dbRO    database.Service
+	dbRO    database.IService
 }
 
 func NewReportService(
 	encoder encode.IEncode,
-	dbRO database.Service,
+	dbRO database.IService,
 ) *ReportService {
 	return &ReportService{
 		encoder: encoder,

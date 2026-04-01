@@ -18,8 +18,8 @@ import (
 type WebhookEventHandler func(ctx context.Context, event *WebhookEvent)
 
 type WebhookHandlerConfig struct {
-	DBRO           database.Service
-	DBRW           database.Service
+	DBRO           database.IService
+	DBRW           database.IService
 	EmailJobRunner *jobs.EmailJobRunner
 
 	OnPaymentPaid         WebhookEventHandler

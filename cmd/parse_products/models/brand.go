@@ -38,7 +38,7 @@ func NewBrand(brandName string) *Brand {
 	}
 }
 
-func (brand *Brand) GetDBID(ctx context.Context, db database.Service) int64 {
+func (brand *Brand) GetDBID(ctx context.Context, db database.IService) int64 {
 	existingBrandID, err := db.GetQueries().GetBrandsIDByName(ctx, brand.Name)
 	if err != nil {
 		return 0
@@ -47,7 +47,7 @@ func (brand *Brand) GetDBID(ctx context.Context, db database.Service) int64 {
 	return existingBrandID
 }
 
-func (brand *Brand) InsertToDB(ctx context.Context, db database.Service) (int64, error) {
+func (brand *Brand) InsertToDB(ctx context.Context, db database.IService) (int64, error) {
 	newBrandID, err := db.GetQueries().CreateBrands(ctx, queries.CreateBrandsParams{
 		Name:      brand.Name,
 		CreatedAt: brand.CreatedAt,
@@ -61,7 +61,7 @@ func (brand *Brand) InsertToDB(ctx context.Context, db database.Service) (int64,
 	return newBrandID, nil
 }
 
-func (brandImage *BrandImage) InsertToDB(ctx context.Context, db database.Service) (int64, error) {
+func (brandImage *BrandImage) InsertToDB(ctx context.Context, db database.IService) (int64, error) {
 	newBrandImageID, err := db.GetQueries().CreateBrandImages(
 		ctx,
 		queries.CreateBrandImagesParams{

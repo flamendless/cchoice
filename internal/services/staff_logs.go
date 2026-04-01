@@ -12,14 +12,14 @@ import (
 
 type StaffLogsService struct {
 	encoder encode.IEncode
-	dbRO    database.Service
-	dbRW    database.Service
+	dbRO    database.IService
+	dbRW    database.IService
 }
 
 func NewStaffLogsService(
 	encoder encode.IEncode,
-	dbRO database.Service,
-	dbRW database.Service,
+	dbRO database.IService,
+	dbRW database.IService,
 ) *StaffLogsService {
 	return &StaffLogsService{
 		encoder: encoder,

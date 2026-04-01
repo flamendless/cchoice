@@ -25,7 +25,7 @@ const (
 	maxStaffListSize     = 1000
 )
 
-func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentStr string) sql.NullInt64 {
+func getOrCreateUserAgentID(ctx context.Context, db database.IService, userAgentStr string) sql.NullInt64 {
 	if userAgentStr == "" {
 		return sql.NullInt64{}
 	}

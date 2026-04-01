@@ -44,12 +44,12 @@ type ThumbnailJobParams struct {
 type ThumbnailJobRunner struct {
 	queue            *goqite.Queue
 	runner           *jobs.Runner
-	dbRO             database.Service
-	dbRW             database.Service
+	dbRO             database.IService
+	dbRW             database.IService
 	thumbnailService IThumbnailService
 }
 
-func NewThumbnailJobRunner(db *sql.DB, dbRO, dbRW database.Service, thumbnailService IThumbnailService) *ThumbnailJobRunner {
+func NewThumbnailJobRunner(db *sql.DB, dbRO, dbRW database.IService, thumbnailService IThumbnailService) *ThumbnailJobRunner {
 	if db == nil {
 		panic("db is required")
 	}

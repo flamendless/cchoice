@@ -47,12 +47,12 @@ type EmailJobParams struct {
 type EmailJobRunner struct {
 	queue       *goqite.Queue
 	runner      *jobs.Runner
-	dbRO        database.Service
-	dbRW        database.Service
+	dbRO        database.IService
+	dbRW        database.IService
 	mailService mail.IMailService
 }
 
-func NewEmailJobRunner(db *sql.DB, dbRO, dbRW database.Service, mailService mail.IMailService) *EmailJobRunner {
+func NewEmailJobRunner(db *sql.DB, dbRO, dbRW database.IService, mailService mail.IMailService) *EmailJobRunner {
 	q := goqite.New(goqite.NewOpts{
 		DB:   db,
 		Name: EmailQueueName,

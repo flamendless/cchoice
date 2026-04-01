@@ -21,15 +21,15 @@ import (
 type ProductImageService struct {
 	objectStorage storage.IObjectStorage
 	encoder       encode.IEncode
-	dbRO          database.Service
-	dbRW          database.Service
+	dbRO          database.IService
+	dbRW          database.IService
 }
 
 func NewProductImageService(
 	objectStorage storage.IObjectStorage,
 	encoder encode.IEncode,
-	dbRO database.Service,
-	dbRW database.Service,
+	dbRO database.IService,
+	dbRW database.IService,
 ) *ProductImageService {
 	return &ProductImageService{
 		objectStorage: objectStorage,

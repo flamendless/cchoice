@@ -95,7 +95,7 @@ func CreateCart(
 
 func GetCheckoutLines(
 	ctx context.Context,
-	dbRO database.Service,
+	dbRO database.IService,
 	token string,
 ) ([]queries.GetCheckoutLinesByCheckoutIDRow, error) {
 	checkoutID, err := dbRO.GetQueries().GetCheckoutIDBySessionID(ctx, token)
@@ -113,7 +113,7 @@ func GetCheckoutLines(
 
 func GetCheckedCheckoutLines(
 	ctx context.Context,
-	dbRO database.Service,
+	dbRO database.IService,
 	token string,
 	checkedItemIDs []string,
 	encoder encode.IEncode,
@@ -149,7 +149,7 @@ func GetCheckedCheckoutLines(
 
 func KeepItemsInCheckoutLines(
 	ctx context.Context,
-	dbRW database.Service,
+	dbRW database.IService,
 	token string,
 	checkoutLineIDs []int64,
 ) error {

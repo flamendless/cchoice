@@ -34,16 +34,16 @@ type CreateProductInput struct {
 }
 
 type ProductService struct {
-	dbRO      database.Service
-	dbRW      database.Service
+	dbRO      database.IService
+	dbRW      database.IService
 	encoder   encode.IEncode
 	getCDNURL models.CDNURLFunc
 }
 
 func NewProductService(
 	encoder encode.IEncode,
-	dbRO database.Service,
-	dbRW database.Service,
+	dbRO database.IService,
+	dbRW database.IService,
 	cdnURLFunc models.CDNURLFunc,
 ) *ProductService {
 	return &ProductService{
