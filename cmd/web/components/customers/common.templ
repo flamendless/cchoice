@@ -429,65 +429,49 @@ templ CustomerProfilePage(profile models.CustomerProfile) {
 		</head>
 		<body
 			class="bg-cchoicesoft min-h-screen flex flex-col"
+			_="init call metrics_event('customer_visit', 'profile')"
 		>
 			@common.ErrorBanner()
 			@common.SuccessBanner()
 			<div class="flex-grow p-4">
-				<div class="max-w-4xl mx-auto">
-					<div class="bg-white rounded-lg shadow-md p-6">
+				<div class="max-w-2xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6 mb-6">
 						@header.CustomerPortalHeaderWithBack()
-						//TODO: Implement
-						<!-- <div class="flex justify-between items-center mb-6"> -->
-						<!-- 	<h1 class="text-2xl font-bold text-cchoice">My Profile</h1> -->
-						<!-- 	<a -->
-						<!-- 		href={ utils.URL("/customer/profile/edit") } -->
-						<!-- 		class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark transition-colors" -->
-						<!-- 	> -->
-						<!-- 		Edit Profile -->
-						<!-- 	</a> -->
-						<!-- </div> -->
-						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-							<div>
-								<label class="block text-sm font-medium text-gray-500">Full Name</label>
-								<p class="text-gray-900">{ profile.FullName }</p>
-							</div>
-							<div>
-								<label class="block text-sm font-medium text-gray-500">Email</label>
-								<p class="text-gray-900">{ profile.Email }</p>
-							</div>
-							<div>
-								<label class="block text-sm font-medium text-gray-500">Mobile Number</label>
-								<p class="text-gray-900">{ profile.MobileNo }</p>
-							</div>
-							<div>
-								<label class="block text-sm font-medium text-gray-500">Birthdate</label>
-								<p class="text-gray-900">{ profile.Birthdate }</p>
-							</div>
-							<div>
-								<label class="block text-sm font-medium text-gray-500">Sex</label>
-								<p class="text-gray-900 capitalize">{ profile.Sex }</p>
-							</div>
-							<div>
-								<label class="block text-sm font-medium text-gray-500">Account Type</label>
-								<p class="text-gray-900 capitalize">{ profile.CustomerType.String() }</p>
-							</div>
-							if profile.CompanyName != "" {
+						<h1 class="text-2xl font-bold text-cchoice text-center mb-6">My Profile</h1>
+						<div class="mb-8 p-4 bg-gray-50 rounded-lg">
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<div>
-									<label class="block text-sm font-medium text-gray-500">Company Name</label>
-									<p class="text-gray-900">{ profile.CompanyName }</p>
+									<p class="text-sm text-gray-500">Full Name</p>
+									<p class="font-medium text-gray-900">{ profile.FullName }</p>
 								</div>
-							}
+								<div>
+									<p class="text-sm text-gray-500">E-Mail</p>
+									<p class="font-medium text-gray-900">{ profile.Email }</p>
+								</div>
+								<div>
+									<p class="text-sm text-gray-500">Mobile No.</p>
+									<p class="font-medium text-gray-900">{ profile.MobileNo }</p>
+								</div>
+								<div>
+									<p class="text-sm text-gray-500">Birthdate</p>
+									<p class="font-medium text-gray-900">{ profile.Birthdate }</p>
+								</div>
+								<div>
+									<p class="text-sm text-gray-500">Sex</p>
+									<p class="font-medium text-gray-900 capitalize">{ profile.Sex }</p>
+								</div>
+								<div>
+									<p class="text-sm text-gray-500">Account Type</p>
+									<p class="font-medium text-gray-900 capitalize">{ profile.CustomerType.String() }</p>
+								</div>
+								if profile.CompanyName != "" {
+									<div>
+										<p class="text-sm text-gray-500">Company Name</p>
+										<p class="font-medium text-gray-900">{ profile.CompanyName }</p>
+									</div>
+								}
+							</div>
 						</div>
-
-						//TODO: Implement
-						<!-- <div class="mt-6 pt-6 border-t"> -->
-						<!-- 	<a -->
-						<!-- 		href={ utils.URL("/customer/profile/edit") + "?tab=password" } -->
-						<!-- 		class="text-cchoice hover:text-cchoice_dark transition-colors" -->
-						<!-- 	> -->
-						<!-- 		Change Password -->
-						<!-- 	</a> -->
-						<!-- </div> -->
 					</div>
 				</div>
 			</div>
