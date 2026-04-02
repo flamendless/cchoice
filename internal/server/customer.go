@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"net/http"
 
-	compcpoints "cchoice/cmd/web/components/cpoints"
 	compcustomer "cchoice/cmd/web/components/customers"
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
@@ -33,9 +32,6 @@ func AddCustomerHandlers(s *Server, r chi.Router) {
 	r.With(s.requireCustomerAuth).Get("/customer/profile/edit", s.customerProfileEditFormHandler)
 	r.With(s.requireCustomerAuth).Patch("/customer/profile", s.customerProfileUpdateHandler)
 	r.With(s.requireCustomerAuth).Post("/customer/change-password", s.customerChangePasswordHandler)
-
-	//TODO: move
-	r.Get("/cpoints", s.cpointsHomeHandler)
 }
 
 func (s *Server) customerLoginPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -243,7 +239,7 @@ func (s *Server) customerProfileEditFormHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	if err := compcustomer.CustomerProfileEditForm(profile).Render(ctx, w); err != nil {
+	if err := compcustomer.CustomerProfileEditPage(profile).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),
@@ -351,19 +347,4 @@ func (s *Server) customerChangePasswordHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	redirectHX(w, r, utils.URLWithSuccess(page, "Password changed successfully"))
-}
-
-// TODO: move
-func (s *Server) cpointsHomeHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[C-Points Home Handler]"
-	ctx := r.Context()
-
-	if err := compcpoints.CPointsHomePage().Render(ctx, w); err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.String("path", r.URL.Path),
-			zap.Error(err),
-		)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }
