@@ -133,7 +133,7 @@ func (s *CpointService) CreateCpoint(ctx context.Context, params CreateCpointPar
 	return cpointID, nil
 }
 
-func (s *CpointService) RedeemCpoint(ctx context.Context, code string) error {
+func (s *CpointService) RedeemCpoint(ctx context.Context, customerID string, code string) error {
 	cpoint, err := s.GetCpointByCode(ctx, code)
 	if err != nil {
 		return err
@@ -143,6 +143,14 @@ func (s *CpointService) RedeemCpoint(ctx context.Context, code string) error {
 	}
 	if cpoint.ExpiresAt != nil && cpoint.ExpiresAt.Before(time.Now()) {
 		return errs.ErrCpointExpired
+	}
+
+	customerIDDecoded := s.encoder.Decode(customerID)
+	if customerIDDecoded == encode.INVALID {
+		return errs.ErrDecode
+	}
+	if cpoint.CustomerID != customerIDDecoded {
+		return errs.ErrCpointNotOwnedByCustomer
 	}
 
 	if _, err = s.dbRW.GetQueries().RedeemCpoint(ctx, code); err != nil {

@@ -185,6 +185,7 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 	RegisterPaymentWebhooks(s, r)
 	AddAdminHandlers(s, r)
 	AddCustomerHandlers(s, r)
+	AddCPointsHandlers(s, r)
 
 	//INFO: (Brandon) - unused routes
 	r.Post("/checkouts", s.checkoutsHandler)

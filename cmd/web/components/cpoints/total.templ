@@ -1,0 +1,9 @@
+package components
+
+import "fmt"
+
+templ CPointsTotal(value int64) {
+	<div class="flex items-center justify-center gap-2">
+		<span class="text-3xl font-bold text-cchoice">{ fmt.Sprintf("%d", value) }</span>
+	</div>
+}
