@@ -6,6 +6,7 @@ import "cchoice/cmd/web/models"
 import "cchoice/internal/enums"
 import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
+import "cchoice/cmd/web/components/header"
 
 templ StaffAttendanceSingleTable(record *models.Attendance) {
 	<div class="overflow-x-auto">
@@ -113,86 +114,74 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 			@common.TabTitle("[STAFF] C-Choice Admin")
 		</head>
 		<body
-			class="bg-cchoicesoft min-h-screen flex flex-row"
+			class="bg-cchoicesoft min-h-screen flex flex-col"
 			_="init call metrics_event('admin_visit', 'staff')"
 		>
 			@common.ErrorBanner()
 			@common.SuccessBanner()
-			<div class="flex-grow flex flex-col items-center justify-center p-4">
-				<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
-					C-Choice Staff Admin Portal
-				</h1>
-				<div class="w-full max-w-4xl p-6 bg-white rounded-lg shadow-md">
-					<div class="mb-6">
-						@BackToHome(utils.URL("/admin/staff"))
-					</div>
-					@AdminHeader(&profile)
-					<div class="mb-6 p-4 bg-gray-50 rounded-lg">
-						@AdminProfileHeader(profile)
-					</div>
-					if profile.UserType != enums.STAFF_USER_TYPE_SUPERUSER {
-						@StaffLocationStatus(profile)
-					}
-					<div class="space-y-4">
-						<div class="flex flex-row gap-4">
-							<button
-								type="button"
-								class={ getButtonClass(profile.CanTimeIn) }
-								hx-post={ utils.URL("/admin/staff/time-in") }
-								hx-trigger="click"
-								hx-swap="none"
-								disabled?={ !profile.CanTimeIn }
-							>
-								Time In
-							</button>
-							<button
-								type="button"
-								class={ getButtonClass(profile.CanTimeOut) }
-								hx-post={ utils.URL("/admin/staff/time-out") }
-								hx-trigger="click"
-								hx-swap="none"
-								disabled?={ !profile.CanTimeOut }
-							>
-								Time Out
-							</button>
+			<div class="flex-grow p-4">
+				<div class="max-w-4xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.AdminStaffHeaderWithBackLink(utils.URL("/admin/staff"), "Back to Home")
+						<div class="mb-6 p-4 bg-gray-50 rounded-lg">
+							@AdminProfileHeader(profile)
 						</div>
-						<div class="flex flex-row gap-4">
-							<button
-								type="button"
-								class={ getButtonClass(profile.CanLunchBreakIn) }
-								hx-post={ utils.URL("/admin/staff/lunch-break-start") }
-								hx-trigger="click"
-								hx-swap="none"
-								disabled?={ !profile.CanLunchBreakIn }
-							>
-								Start Lunch Break
-							</button>
-							<button
-								type="button"
-								class={ getButtonClass(profile.CanLunchBreakOut) }
-								hx-post={ utils.URL("/admin/staff/lunch-break-end") }
-								hx-trigger="click"
-								hx-swap="none"
-								disabled?={ !profile.CanLunchBreakOut }
-							>
-								End Lunch Break
-							</button>
+						if profile.UserType != enums.STAFF_USER_TYPE_SUPERUSER {
+							@StaffLocationStatus(profile)
+						}
+						<div class="space-y-4">
+							<div class="flex flex-row gap-4">
+								<button
+									type="button"
+									class={ getButtonClass(profile.CanTimeIn) }
+									hx-post={ utils.URL("/admin/staff/time-in") }
+									hx-trigger="click"
+									hx-swap="none"
+									disabled?={ !profile.CanTimeIn }
+								>
+									Time In
+								</button>
+								<button
+									type="button"
+									class={ getButtonClass(profile.CanTimeOut) }
+									hx-post={ utils.URL("/admin/staff/time-out") }
+									hx-trigger="click"
+									hx-swap="none"
+									disabled?={ !profile.CanTimeOut }
+								>
+									Time Out
+								</button>
+							</div>
+							<div class="flex flex-row gap-4">
+								<button
+									type="button"
+									class={ getButtonClass(profile.CanLunchBreakIn) }
+									hx-post={ utils.URL("/admin/staff/lunch-break-start") }
+									hx-trigger="click"
+									hx-swap="none"
+									disabled?={ !profile.CanLunchBreakIn }
+								>
+									Start Lunch Break
+								</button>
+								<button
+									type="button"
+									class={ getButtonClass(profile.CanLunchBreakOut) }
+									hx-post={ utils.URL("/admin/staff/lunch-break-end") }
+									hx-trigger="click"
+									hx-swap="none"
+									disabled?={ !profile.CanLunchBreakOut }
+								>
+									End Lunch Break
+								</button>
+							</div>
 						</div>
+						@AttendanceSectionForStaff(
+							"My Attendance",
+							profile.SelectedDate,
+							profile.MyAttendance,
+							profile.UserType,
+						)
 					</div>
-					@AttendanceSectionForStaff(
-						"My Attendance",
-						profile.SelectedDate,
-						profile.MyAttendance,
-						profile.UserType,
-					)
-					<form action={ utils.URL("/admin/logout") } method="POST" class="mt-6">
-						<button
-							type="submit"
-							class="w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice"
-						>
-							Log Out
-						</button>
-					</form>
 				</div>
 			</div>
 			@ScriptClock()
