@@ -2,6 +2,7 @@ package components
 
 import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
+import "cchoice/cmd/web/components/header"
 import "cchoice/cmd/web/models"
 import "cchoice/internal/enums"
 import "cchoice/internal/constants"
@@ -27,13 +28,11 @@ templ AdminProfilePage(profile models.AdminStaffProfile) {
 			<div class="flex-grow p-4">
 				<div class="max-w-2xl mx-auto">
 					<div class="bg-white rounded-lg shadow-md p-6 mb-6">
-						<div class="mb-6">
-							if profile.UserType == enums.STAFF_USER_TYPE_SUPERUSER {
-								@BackToHome(utils.URL("/admin/superuser"))
-							} else {
-								@BackToHome(utils.URL("/admin/staff"))
-							}
-						</div>
+						if profile.UserType == enums.STAFF_USER_TYPE_SUPERUSER {
+							@header.AdminStaffHeaderWithBackLink(utils.URL("/admin/superuser"), "Back to Home")
+						} else {
+							@header.AdminStaffHeaderWithBackLink(utils.URL("/admin/staff"), "Back to Home")
+						}
 
 						@AdminProfileHeader(profile)
 						<div class="p-4 bg-gray-50 rounded-lg">
@@ -120,7 +119,7 @@ templ profileText(label string, value string) {
 }
 
 templ AdminProfileHeader(profile models.AdminStaffProfile) {
-	<h1 class="text-2xl font-bold text-cchoice mb-6">My Profile</h1>
+	<h1 class="text-2xl font-bold text-cchoice text-center mb-6">My Profile</h1>
 	@AdminProfilePersonalInfo(profile)
 }
 

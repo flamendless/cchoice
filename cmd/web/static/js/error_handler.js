@@ -88,4 +88,16 @@ function showErrorBanner(message) {
 	el_error_text.innerText = message;
 	el_error_closer.removeAttribute("hidden");
 	el_error_banner.removeAttribute("hidden");
+
+	if (typeof errorTimeout === 'undefined') {
+		var errorTimeout = null;
+	}
+
+	if (errorTimeout) {
+		clearTimeout(errorTimeout);
+	}
+
+	errorTimeout = setTimeout(function() {
+		el_error_banner.setAttribute("hidden", "true");
+	}, 5000);
 }

@@ -380,6 +380,16 @@ templ CustomerPortalPage(profile models.CustomerProfile) {
 			<div class="flex-grow p-4">
 				<div class="max-w-6xl mx-auto">
 					@header.CustomerPortalHeaderWithSubtitle("Welcome, " + profile.FullName)
+					<div class="text-center mb-6">
+						<form action={ utils.URL("/customer/logout") } method="POST">
+							<button
+								type="submit"
+								class="py-2 px-6 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice"
+							>
+								Log Out
+							</button>
+						</form>
+					</div>
 					<div class="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
 						<a
 							href={ utils.URL("/customer/profile") }
@@ -404,16 +414,6 @@ templ CustomerPortalPage(profile models.CustomerProfile) {
 							<h2 class="text-xl font-semibold text-gray-800 mb-2">C-Points</h2>
 						</a>
 					</div>
-					<div class="mt-8 text-center">
-						<form action={ utils.URL("/customer/logout") } method="POST">
-							<button
-								type="submit"
-								class="py-2 px-6 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice"
-							>
-								Log Out
-							</button>
-						</form>
-					</div>
 				</div>
 			</div>
 		</body>
@@ -434,8 +434,8 @@ templ CustomerProfilePage(profile models.CustomerProfile) {
 			@common.SuccessBanner()
 			<div class="flex-grow p-4">
 				<div class="max-w-4xl mx-auto">
-					@header.CustomerPortalHeaderWithBack()
 					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.CustomerPortalHeaderWithBack()
 						//TODO: Implement
 						<!-- <div class="flex justify-between items-center mb-6"> -->
 						<!-- 	<h1 class="text-2xl font-bold text-cchoice">My Profile</h1> -->
@@ -510,8 +510,8 @@ templ CustomerProfileEditPage(profile models.CustomerProfile) {
 			@common.SuccessBanner()
 			<div class="flex-grow p-4">
 				<div class="max-w-4xl mx-auto">
-					@header.CustomerPortalHeaderWithBack()
 					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.CustomerPortalHeaderWithBack()
 						<h2 class="text-2xl font-bold text-cchoice mb-6">Edit Profile</h2>
 						@CustomerProfileEditForm(profile)
 					</div>
