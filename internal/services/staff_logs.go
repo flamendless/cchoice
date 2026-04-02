@@ -8,6 +8,9 @@ import (
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
+	"cchoice/internal/logs"
+
+	"go.uber.org/zap"
 )
 
 type StaffLogsService struct {
@@ -45,6 +48,13 @@ func (s *StaffLogsService) CreateLog(
 		Result:      result,
 		UseragentID: useragentIDParam,
 	})
+	logs.Log().Info(
+		"StaffLogs",
+		zap.String("staff id", staffID),
+		zap.String("action", action),
+		zap.String("module", module),
+		zap.String("result", result),
+	)
 	return err
 }
 
