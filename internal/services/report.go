@@ -29,7 +29,7 @@ func NewReportService(
 	staffLog *StaffLogsService,
 ) *ReportService {
 	if staffLog == nil {
-		panic("staffLog service is required")
+		panic("StaffLogsService is required")
 	}
 	return &ReportService{
 		encoder:  encoder,

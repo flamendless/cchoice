@@ -36,16 +36,17 @@ import (
 )
 
 type Services struct {
+	attendance   *services.AttendanceService
+	brand        *services.BrandService
+	cpoint       *services.CpointService
+	customer     *services.CustomerService
+	location     *services.LocationService
 	product      *services.ProductService
 	productImage *services.ProductImageService
-	brand        *services.BrandService
+	report       *services.ReportService
+	role         *services.RoleService
 	staff        *services.StaffService
 	staffLog     *services.StaffLogsService
-	role         *services.RoleService
-	location     *services.LocationService
-	attendance   *services.AttendanceService
-	report       *services.ReportService
-	customer     *services.CustomerService
 }
 
 type Server struct {
@@ -161,16 +162,17 @@ func NewServer() *ServerInstance {
 	staffLogService := services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW)
 
 	newServer.services = Services{
+		attendance:   services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		brand:        services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		customer:     services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		cpoint:       services.NewCpointService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
+		location:     services.NewLocationService(cfg.Settings.ShopLocation),
 		product:      services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW, newServer.GetCDNURL),
 		productImage: services.NewProductImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
-		brand:        services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		report:       services.NewReportService(newServer.encoder, newServer.dbRO, staffLogService),
+		role:         services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staff:        services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staffLog:     staffLogService,
-		role:         services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		location:     services.NewLocationService(cfg.Settings.ShopLocation),
-		attendance:   services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		report:       services.NewReportService(newServer.encoder, newServer.dbRO, staffLogService),
-		customer:     services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 	}
 
 	ctx := context.Background()
