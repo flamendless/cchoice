@@ -699,7 +699,15 @@ func HasTrailingWhitespace() bool {
 		return false
 	}
 
-	args := append([]string{"-E", `[[:space:]]+$`}, files...)
+	validFiles := make([]string, 0, len(files))
+	for _, file := range files {
+		if strings.HasSuffix(file, ".png") {
+			continue
+		}
+		validFiles = append(validFiles, file)
+	}
+
+	args := append([]string{"-E", `[[:space:]]+$`}, validFiles...)
 	grepCmd := exec.Command("grep", args...)
 	out, err := grepCmd.CombinedOutput()
 	if err != nil {
