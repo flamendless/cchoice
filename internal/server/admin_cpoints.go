@@ -8,6 +8,8 @@ import (
 	"time"
 
 	compadmin "cchoice/cmd/web/components/admin"
+	"cchoice/internal/encode/b64"
+	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
@@ -94,6 +96,12 @@ func (s *Server) adminCPointsGeneratePostHandler(w http.ResponseWriter, r *http.
 	}
 
 	redemptionURL := utils.FullURL("/cpoints/redeem?code=" + cpoint.Code)
+
+	_, err = s.services.qr.GenerateQR(ctx, redemptionURL)
+	if err != nil {
+		logs.LogCtx(ctx).Warn("failed to generate QR code", zap.Error(err))
+	}
+
 	redirectURL := utils.URLWithSuccessParams("/admin/cpoints/code", map[string]string{
 		"code":        cpoint.Code,
 		"redemption":  redemptionURL,
@@ -116,5 +124,31 @@ func (s *Server) adminCPointsCodePageHandler(w http.ResponseWriter, r *http.Requ
 	if err := compadmin.AdminCPointsCodePage(code, redemptionURL).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (s *Server) adminCPointsQRHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin C-Points QR Handler]"
+	ctx := r.Context()
+
+	code := r.URL.Query().Get("code")
+	if code == "" {
+		http.Error(w, "code is required", http.StatusBadRequest)
+		return
+	}
+
+	redemptionURL := utils.FullURL("/cpoints/redeem?code=" + code)
+	qrBytes, err := s.services.qr.GenerateQR(ctx, redemptionURL)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, "failed to generate QR", http.StatusInternalServerError)
+		return
+	}
+
+	imgfmt := enums.IMAGE_FORMAT_PNG.DataURIPrefix()
+	qrBase64 := imgfmt + b64.ToBase64(qrBytes)
+
+	if err := compadmin.CPointsQRImage(qrBase64).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}
 }

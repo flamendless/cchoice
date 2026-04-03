@@ -80,6 +80,7 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_CPOINTS)).Get("/admin/cpoints/generate", s.adminCPointsGeneratePageHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_CPOINTS)).Post("/admin/cpoints/generate", s.adminCPointsGeneratePostHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_CPOINTS)).Get("/admin/cpoints/code", s.adminCPointsCodePageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_CPOINTS)).Get("/admin/cpoints/qr", s.adminCPointsQRHandler)
 
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser", s.adminSuperuserHomeHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/attendance", s.adminSuperuserAttendancePageHandler)

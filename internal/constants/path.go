@@ -13,4 +13,5 @@ const (
 	PathCORSealImageCDN         = "https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/CORSeal/public"
 	PathChangelogs              = "./CHANGELOGS.md"
 	MaxImagePathLength          = 512
+	PathLogoSmallLocal          = "cmd/web/static/svg/logo_only_small.png"
 )
