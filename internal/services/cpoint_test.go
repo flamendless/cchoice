@@ -8,7 +8,7 @@ import (
 )
 
 func TestGenerateCode(t *testing.T) {
-	svc := &CpointService{}
+	svc := &CPointService{}
 
 	tests := []struct {
 		name string
@@ -38,7 +38,7 @@ func TestGenerateCode(t *testing.T) {
 }
 
 func TestGenerateCode_Uniqueness(t *testing.T) {
-	svc := &CpointService{}
+	svc := &CPointService{}
 	codes := make(map[string]bool)
 
 	for i := 0; i < 1000; i++ {
@@ -49,7 +49,7 @@ func TestGenerateCode_Uniqueness(t *testing.T) {
 }
 
 func TestValidateCode(t *testing.T) {
-	svc := &CpointService{}
+	svc := &CPointService{}
 
 	tests := []struct {
 		name    string
@@ -84,7 +84,7 @@ func TestValidateCode(t *testing.T) {
 }
 
 func BenchmarkGenerateCode(b *testing.B) {
-	svc := &CpointService{}
+	svc := &CPointService{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -93,7 +93,7 @@ func BenchmarkGenerateCode(b *testing.B) {
 }
 
 func BenchmarkValidateCode_Valid(b *testing.B) {
-	svc := &CpointService{}
+	svc := &CPointService{}
 	code := "CP-ABC-123-DEF"
 
 	b.ResetTimer()
@@ -103,7 +103,7 @@ func BenchmarkValidateCode_Valid(b *testing.B) {
 }
 
 func BenchmarkValidateCode_Invalid(b *testing.B) {
-	svc := &CpointService{}
+	svc := &CPointService{}
 	code := "XX-ABC-123-DEF"
 
 	b.ResetTimer()

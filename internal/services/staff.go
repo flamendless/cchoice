@@ -10,6 +10,7 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
+	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 
 	"golang.org/x/crypto/bcrypt"
@@ -187,3 +188,9 @@ func (s *StaffService) GetTimeOffs(ctx context.Context, staffID string) ([]model
 	}
 	return staffTimeOffs, nil
 }
+
+func (s *StaffService) Log() {
+	logs.Log().Info("[StaffService] Loaded")
+}
+
+var _ IService = (*StaffService)(nil)

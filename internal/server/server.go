@@ -36,13 +36,15 @@ import (
 )
 
 type Services struct {
+	all          []services.IService
 	attendance   *services.AttendanceService
 	brand        *services.BrandService
-	cpoint       *services.CpointService
+	cpoint       *services.CPointService
 	customer     *services.CustomerService
 	location     *services.LocationService
 	product      *services.ProductService
 	productImage *services.ProductImageService
+	qr           *services.QRService
 	report       *services.ReportService
 	role         *services.RoleService
 	staff        *services.StaffService
@@ -169,10 +171,29 @@ func NewServer() *ServerInstance {
 		location:     services.NewLocationService(cfg.Settings.ShopLocation),
 		product:      services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW, newServer.GetCDNURL),
 		productImage: services.NewProductImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
+		qr:           services.NewQRService(newServer.cache),
 		report:       services.NewReportService(newServer.encoder, newServer.dbRO, staffLogService),
 		role:         services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staff:        services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staffLog:     staffLogService,
+	}
+
+	newServer.services.all = []services.IService{
+		newServer.services.attendance,
+		newServer.services.brand,
+		newServer.services.customer,
+		newServer.services.cpoint,
+		newServer.services.location,
+		newServer.services.product,
+		newServer.services.productImage,
+		newServer.services.qr,
+		newServer.services.report,
+		newServer.services.role,
+		newServer.services.staff,
+		newServer.services.staffLog,
+	}
+	for _, s := range newServer.services.all {
+		s.Log()
 	}
 
 	ctx := context.Background()

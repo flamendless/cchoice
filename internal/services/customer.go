@@ -9,6 +9,7 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
+	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 
 	"golang.org/x/crypto/bcrypt"
@@ -175,3 +176,9 @@ func (s *CustomerService) BuildProfile(ctx context.Context, customerID string) (
 
 	return profile, nil
 }
+
+func (s *CustomerService) Log() {
+	logs.Log().Info("[CustomerService] Loaded")
+}
+
+var _ IService = (*CustomerService)(nil)

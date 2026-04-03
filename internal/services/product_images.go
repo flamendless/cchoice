@@ -83,3 +83,9 @@ func (s *ProductImageService) UploadProductImage(
 
 	return s.objectStorage.PutObject(ctx, filename, file, contentType)
 }
+
+func (s *ProductImageService) Log() {
+	logs.Log().Info("[ProductImageService] Loaded")
+}
+
+var _ IService = (*ProductImageService)(nil)
