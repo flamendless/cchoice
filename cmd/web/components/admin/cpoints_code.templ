@@ -27,9 +27,15 @@ templ AdminCPointsCodePage(code string, redemptionURL string) {
 					<div class="bg-white rounded-lg shadow-md p-6">
 						@header.AdminStaffHeaderWithBack()
 						<div class="space-y-6">
-							<div class="text-center">
+							<div
+								class="text-center"
+								id="qr-code-container"
+								hx-get={ utils.URL("/admin/cpoints/qr?code=" + code) }
+								hx-trigger="load"
+								hx-swap="outerHTML"
+							>
 								<div class="bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-8 inline-block">
-									<p class="text-gray-400 text-sm">[QR Code Placeholder]</p>
+									<p class="text-gray-400 text-sm">Loading QR...</p>
 								</div>
 							</div>
 

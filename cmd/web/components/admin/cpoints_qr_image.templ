@@ -1,0 +1,9 @@
+package components
+
+templ CPointsQRImage(qrBase64 string) {
+	<img
+		src={ templ.SafeURL(qrBase64) }
+		alt="QR Code"
+		class="w-48 h-48 mx-auto"
+	/>
+}
