@@ -8,6 +8,7 @@ import (
 	"time"
 
 	compadmin "cchoice/cmd/web/components/admin"
+	"cchoice/internal/encode"
 	"cchoice/internal/encode/b64"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
@@ -82,6 +83,12 @@ func (s *Server) adminCPointsGeneratePostHandler(w http.ResponseWriter, r *http.
 	}
 
 	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
+	customerIDDecoded := s.encoder.Decode(customerID)
+	if customerIDDecoded == encode.INVALID {
+		redirectHX(w, r, utils.URLWithError(page, "Invalid customer"))
+		return
+	}
+
 	cpoint, err := s.services.cpoint.CreateCpoint(context.Background(), services.CreateCpointParams{
 		StaffID:     staffIDStr,
 		CustomerID:  customerID,
@@ -95,8 +102,7 @@ func (s *Server) adminCPointsGeneratePostHandler(w http.ResponseWriter, r *http.
 		return
 	}
 
-	redemptionURL := utils.FullURL("/cpoints/redeem?code=" + cpoint.Code)
-
+	redemptionURL := s.services.cpoint.GenerateRedemptionURL(cpoint.Code, customerIDDecoded)
 	_, err = s.services.qr.GenerateQR(ctx, redemptionURL)
 	if err != nil {
 		logs.LogCtx(ctx).Warn("failed to generate QR code", zap.Error(err))
@@ -137,7 +143,14 @@ func (s *Server) adminCPointsQRHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	redemptionURL := utils.FullURL("/cpoints/redeem?code=" + code)
+	cpoint, err := s.services.cpoint.GetCpointByCode(ctx, code)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, "cpoint not found", http.StatusNotFound)
+		return
+	}
+
+	redemptionURL := s.services.cpoint.GenerateRedemptionURL(code, cpoint.CustomerID)
 	qrBytes, err := s.services.qr.GenerateQR(ctx, redemptionURL)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))

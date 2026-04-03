@@ -14,6 +14,7 @@ import (
 func AddCPointsHandlers(s *Server, r chi.Router) {
 	r.With(s.requireCustomerAuth).Get("/cpoints", s.cpointsHomeHandler)
 	r.With(s.requireCustomerAuth).Get("/cpoints/total", s.cpointsTotalHandler)
+	r.With(s.requireCustomerAuth).Get("/cpoints/claim", s.cpointsClaimHandler)
 	r.With(s.requireCustomerAuth).Get("/cpoints/redeem", s.cpointsRedeemPageHandler)
 	r.With(s.requireCustomerAuth).Post("/cpoints/redeem", s.cpointsRedeemHandler)
 }
@@ -52,6 +53,32 @@ func (s *Server) cpointsTotalHandler(w http.ResponseWriter, r *http.Request) {
 	if err := compcpoints.CPointsTotal(cpoints.Total).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}
+}
+
+func (s *Server) cpointsClaimHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[C-Points Claim Handler]"
+	const page = "/cpoints"
+	ctx := r.Context()
+
+	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
+	if customerIDStr == "" {
+		redirectHX(w, r, utils.URLWithError("/customer", "Log in first"))
+		return
+	}
+
+	token := r.URL.Query().Get("token")
+	if token == "" {
+		redirectHX(w, r, utils.URLWithError(page, "Token is required"))
+		return
+	}
+
+	if err := s.services.cpoint.RedeemWithToken(ctx, token, customerIDStr); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	redirectHX(w, r, utils.URLWithSuccess(page, "C-Points redeemed successfully!"))
 }
 
 func (s *Server) cpointsRedeemPageHandler(w http.ResponseWriter, r *http.Request) {
