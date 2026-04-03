@@ -374,6 +374,16 @@ templ StaffOptions(staffs []models.Staff) {
 	}
 }
 
+templ CustomerOptions(customers []struct {
+	ID    string
+	Email string
+}) {
+	<option value="">-- Select Customer --</option>
+	for _, customer := range customers {
+		<option value={ customer.ID }>{ customer.Email }</option>
+	}
+}
+
 templ SubcategoryOptions(subcategories []string) {
 	<option value="">Select subcategory</option>
 	for _, subcat := range subcategories {

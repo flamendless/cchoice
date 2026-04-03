@@ -1,3 +1,22 @@
+-- name: GetAllCustomers :many
+SELECT
+    id,
+    first_name,
+    middle_name,
+    last_name,
+    birthdate,
+    sex,
+    email,
+    mobile_no,
+    password,
+    customer_type,
+    created_at,
+    updated_at
+FROM tbl_customers
+WHERE
+    deleted_at = '1970-01-01 00:00:00+00:00'
+ORDER BY email ASC;
+
 -- name: GetCustomerByEmail :one
 SELECT
     id,

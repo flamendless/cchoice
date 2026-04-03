@@ -321,3 +321,32 @@ func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *ht
 	}
 	redirectHX(w, r, utils.URLWithSuccess("/admin/superuser/time-off", "Time off request cancelled"))
 }
+
+func (s *Server) adminCustomersListHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Customers List Handler]"
+	ctx := r.Context()
+
+	customers, err := s.dbRO.GetQueries().GetAllCustomers(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		return
+	}
+
+	opts := make([]struct {
+		ID    string
+		Email string
+	}, len(customers))
+	for i, c := range customers {
+		opts[i] = struct {
+			ID    string
+			Email string
+		}{
+			ID:    s.encoder.Encode(c.ID),
+			Email: c.Email,
+		}
+	}
+
+	if err := compadmin.CustomerOptions(opts).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
+}

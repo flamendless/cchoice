@@ -42,19 +42,14 @@ func (s *Server) cpointsTotalHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cpoints, err := s.services.cpoint.GetCpointsByCustomerID(ctx, customerIDStr, true)
+	cpoints, err := s.services.cpoint.GetRedeemedCpointsByCustomerID(ctx, customerIDStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, "Failed to load cpoints", http.StatusInternalServerError)
 		return
 	}
 
-	var total int64
-	if len(cpoints) > 0 {
-		total = cpoints[0].Total
-	}
-
-	if err := compcpoints.CPointsTotal(total).Render(ctx, w); err != nil {
+	if err := compcpoints.CPointsTotal(cpoints.Total).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}
 }
@@ -80,7 +75,7 @@ func (s *Server) cpointsRedeemHandler(w http.ResponseWriter, r *http.Request) {
 
 	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
 	if customerIDStr == "" {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		redirectHX(w, r, utils.URLWithError("/customer", "Log in first"))
 		return
 	}
 

@@ -11,7 +11,7 @@ INSERT INTO tbl_cpoints (
     deleted_at
 ) VALUES (
     ?, ?, ?, ?, ?, datetime('now'), datetime('now'), datetime('now'), '1970-01-01 00:00:00+00:00'
-) RETURNING id;
+) RETURNING *;
 
 -- name: GetCpointsByCustomerID :many
 SELECT
@@ -31,7 +31,7 @@ WHERE
     AND deleted_at = '1970-01-01 00:00:00+00:00'
 ORDER BY created_at DESC;
 
--- name: GetCpointsByCustomerIDWithTotal :many
+-- name: GetRedeemedCpointsByCustomerID :many
 SELECT
     c.id,
     c.customer_id,
@@ -42,12 +42,12 @@ SELECT
     c.generated_at,
     c.redeemed_at,
     c.created_at,
-    c.updated_at,
-    COUNT(*) OVER() AS total
+    c.updated_at
 FROM tbl_cpoints c
 WHERE
     c.customer_id = ?
     AND c.deleted_at = '1970-01-01 00:00:00+00:00'
+    AND c.redeemed_at != ''
 ORDER BY c.created_at DESC;
 
 -- name: RedeemCpoint :one
