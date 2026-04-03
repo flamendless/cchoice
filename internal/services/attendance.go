@@ -523,3 +523,9 @@ func (s *AttendanceService) GetExtraStats(ctx context.Context, staffID string, d
 	}
 	return res
 }
+
+func (s *AttendanceService) Log() {
+	logs.Log().Info("[AttendanceService] Loaded")
+}
+
+var _ IService = (*AttendanceService)(nil)

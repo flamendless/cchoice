@@ -415,3 +415,9 @@ func formatLocationAndUseragent(
 	}
 	return result
 }
+
+func (s *ReportService) Log() {
+	logs.Log().Info("[ReportService] Loaded")
+}
+
+var _ IService = (*ReportService)(nil)

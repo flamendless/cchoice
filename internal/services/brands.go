@@ -5,6 +5,7 @@ import (
 
 	"cchoice/internal/database"
 	"cchoice/internal/encode"
+	"cchoice/internal/logs"
 )
 
 type BrandService struct {
@@ -32,3 +33,9 @@ func (s *BrandService) GetNameByID(ctx context.Context, brandID string) (string,
 	}
 	return brand.Name, nil
 }
+
+func (s *BrandService) Log() {
+	logs.Log().Info("[BrandService] Loaded")
+}
+
+var _ IService = (*BrandService)(nil)

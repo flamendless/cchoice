@@ -14,6 +14,7 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/logs"
 )
 
 type ProductSpecsInput struct {
@@ -198,3 +199,9 @@ func (s *ProductService) GetProductsForListingAdmin(
 
 	return productList, nil
 }
+
+func (s *ProductService) Log() {
+	logs.Log().Info("[ProductService] Loaded")
+}
+
+var _ IService = (*ProductService)(nil)

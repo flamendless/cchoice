@@ -19,7 +19,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type CpointService struct {
+type CPointService struct {
 	encoder  encode.IEncode
 	dbRO     database.IService
 	dbRW     database.IService
@@ -31,11 +31,11 @@ func NewCpointService(
 	dbRO database.IService,
 	dbRW database.IService,
 	staffLog *StaffLogsService,
-) *CpointService {
+) *CPointService {
 	if staffLog == nil {
 		panic("StaffLogsService is required")
 	}
-	return &CpointService{
+	return &CPointService{
 		encoder:  encoder,
 		dbRO:     dbRO,
 		dbRW:     dbRW,
@@ -72,7 +72,7 @@ type GetRedeemedCpointsWithTotal struct {
 const prefix = "CP"
 const cpointCodeChars = "ABCDEFGHJKMNPQRSTUVWXYZ123456789"
 
-func (s *CpointService) GenerateCode() string {
+func (s *CPointService) GenerateCode() string {
 	segments := []string{prefix, "", "", ""}
 	for i := 1; i <= 3; i++ {
 		segment := make([]byte, 3)
@@ -89,7 +89,7 @@ func (s *CpointService) GenerateCode() string {
 	return strings.Join(segments, "-")
 }
 
-func (s *CpointService) CreateCpoint(ctx context.Context, params CreateCpointParams) (Cpoint, error) {
+func (s *CPointService) CreateCpoint(ctx context.Context, params CreateCpointParams) (Cpoint, error) {
 	var result string
 	defer func() {
 		if err := s.staffLog.CreateLog(ctx, params.StaffID, "CREATE_CPOINT", "CPOINTS", result, nil); err != nil {
@@ -165,7 +165,7 @@ func (s *CpointService) CreateCpoint(ctx context.Context, params CreateCpointPar
 	}, nil
 }
 
-func (s *CpointService) RedeemCpoint(ctx context.Context, customerID string, code string) error {
+func (s *CPointService) RedeemCpoint(ctx context.Context, customerID string, code string) error {
 	cpoint, err := s.GetCpointByCode(ctx, code)
 	if err != nil {
 		return err
@@ -192,7 +192,7 @@ func (s *CpointService) RedeemCpoint(ctx context.Context, customerID string, cod
 	return nil
 }
 
-func (s *CpointService) GetCpointByCode(ctx context.Context, code string) (Cpoint, error) {
+func (s *CPointService) GetCpointByCode(ctx context.Context, code string) (Cpoint, error) {
 	row, err := s.dbRO.GetQueries().GetCpointByCode(ctx, code)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -236,7 +236,7 @@ func (s *CpointService) GetCpointByCode(ctx context.Context, code string) (Cpoin
 	}, nil
 }
 
-func (s *CpointService) GetRedeemedCpointsByCustomerID(ctx context.Context, customerID string) (GetRedeemedCpointsWithTotal, error) {
+func (s *CPointService) GetRedeemedCpointsByCustomerID(ctx context.Context, customerID string) (GetRedeemedCpointsWithTotal, error) {
 	customerIDDecoded := s.encoder.Decode(customerID)
 
 	rows, err := s.dbRO.GetQueries().GetRedeemedCpointsByCustomerID(ctx, customerIDDecoded)
@@ -287,11 +287,11 @@ func (s *CpointService) GetRedeemedCpointsByCustomerID(ctx context.Context, cust
 	return res, nil
 }
 
-func (s *CpointService) GenerateRedemptionURL(code string) string {
+func (s *CPointService) GenerateRedemptionURL(code string) string {
 	return utils.URL("/cpoints/redeem?code=" + code)
 }
 
-func (s *CpointService) ValidateCode(code string) error {
+func (s *CPointService) ValidateCode(code string) error {
 	if len(code) != 14 {
 		return errs.ErrInvalidInput
 	}
@@ -316,3 +316,9 @@ func (s *CpointService) ValidateCode(code string) error {
 
 	return nil
 }
+
+func (s *CPointService) Log() {
+	logs.Log().Info("[CpointService] Loaded")
+}
+
+var _ IService = (*CPointService)(nil)

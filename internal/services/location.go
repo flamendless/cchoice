@@ -9,8 +9,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"cchoice/internal/logs"
 	"cchoice/internal/types"
 	"cchoice/internal/utils"
+
 	"github.com/alexedwards/scs/v2"
 )
 
@@ -174,3 +176,8 @@ func (s *LocationService) ComputeLocation(
 	return result
 }
 
+func (s *LocationService) Log() {
+	logs.Log().Info("[LocationService] Loaded")
+}
+
+var _ IService = (*LocationService)(nil)

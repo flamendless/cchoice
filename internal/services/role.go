@@ -8,6 +8,7 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/logs"
 )
 
 type RoleService struct {
@@ -70,3 +71,9 @@ func (s *RoleService) RemoveRole(ctx context.Context, staffID string, role enums
 	})
 	return err
 }
+
+func (s *RoleService) Log() {
+	logs.Log().Info("[RoleService] Loaded")
+}
+
+var _ IService = (*RoleService)(nil)
