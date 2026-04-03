@@ -20,10 +20,11 @@ import (
 )
 
 type CPointService struct {
-	encoder  encode.IEncode
-	dbRO     database.IService
-	dbRW     database.IService
-	staffLog *StaffLogsService
+	encoder      encode.IEncode
+	dbRO         database.IService
+	dbRW         database.IService
+	staffLog     *StaffLogsService
+	tokenService *CPointTokenService
 }
 
 func NewCpointService(
@@ -31,15 +32,17 @@ func NewCpointService(
 	dbRO database.IService,
 	dbRW database.IService,
 	staffLog *StaffLogsService,
+	tokenService *CPointTokenService,
 ) *CPointService {
 	if staffLog == nil {
 		panic("StaffLogsService is required")
 	}
 	return &CPointService{
-		encoder:  encoder,
-		dbRO:     dbRO,
-		dbRW:     dbRW,
-		staffLog: staffLog,
+		encoder:      encoder,
+		dbRO:         dbRO,
+		dbRW:         dbRW,
+		staffLog:     staffLog,
+		tokenService: tokenService,
 	}
 }
 
@@ -287,8 +290,27 @@ func (s *CPointService) GetRedeemedCpointsByCustomerID(ctx context.Context, cust
 	return res, nil
 }
 
-func (s *CPointService) GenerateRedemptionURL(code string) string {
-	return utils.URL("/cpoints/redeem?code=" + code)
+func (s *CPointService) GenerateRedemptionURL(code string, customerID int64) string {
+	customerIDStr := s.encoder.Encode(customerID)
+	token, err := s.tokenService.Generate(code, customerIDStr, 24*time.Hour)
+	if err != nil {
+		logs.Log().Warn("[CPointService] GenerateRedemptionURL failed", zap.Error(err))
+		return ""
+	}
+	return utils.FullURL("/cpoints/claim?token=" + token)
+}
+
+func (s *CPointService) RedeemWithToken(ctx context.Context, token string, customerID string) error {
+	payload, err := s.tokenService.Verify(token)
+	if err != nil {
+		return err
+	}
+
+	if payload.UserID != customerID {
+		return errs.ErrCpointNotOwnedByCustomer
+	}
+
+	return s.RedeemCpoint(ctx, customerID, payload.Code)
 }
 
 func (s *CPointService) ValidateCode(code string) error {

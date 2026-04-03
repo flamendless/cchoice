@@ -40,6 +40,7 @@ type Services struct {
 	attendance   *services.AttendanceService
 	brand        *services.BrandService
 	cpoint       *services.CPointService
+	cpointToken  *services.CPointTokenService
 	customer     *services.CustomerService
 	location     *services.LocationService
 	product      *services.ProductService
@@ -162,12 +163,14 @@ func NewServer() *ServerInstance {
 	}
 
 	staffLogService := services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW)
+	cpointTokenService := services.NewCPointTokenService(cfg.CPointHMACSecret)
 
 	newServer.services = Services{
 		attendance:   services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		brand:        services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		customer:     services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		cpoint:       services.NewCpointService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
+		cpoint:       services.NewCpointService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, cpointTokenService),
+		cpointToken:  cpointTokenService,
 		location:     services.NewLocationService(cfg.Settings.ShopLocation),
 		product:      services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW, newServer.GetCDNURL),
 		productImage: services.NewProductImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
@@ -191,6 +194,7 @@ func NewServer() *ServerInstance {
 		newServer.services.role,
 		newServer.services.staff,
 		newServer.services.staffLog,
+		newServer.services.cpointToken,
 	}
 	for _, s := range newServer.services.all {
 		s.Log()

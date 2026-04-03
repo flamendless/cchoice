@@ -43,6 +43,7 @@ type appConfig struct {
 	MailerooConfig     MailerooConfig
 	Settings           Settings
 	BasicAuth          BasicAuth
+	CPointHMACSecret   string `env:"CPOINT_HMAC_SECRET" env-required:""`
 	Test               Test
 }
 

@@ -39,6 +39,18 @@ mkcert localhost 127.0.0.1 ::1
 
 ---
 
+# Generate HMAC Secret (for C-Points token signing)
+
+```bash
+openssl rand -base64 32
+```
+Set in `.env`:
+```
+CPOINT_HMAC_SECRET="your-generated-secret"
+```
+
+---
+
 # Commit Prefix
 - Feature
 - Maintenance:
