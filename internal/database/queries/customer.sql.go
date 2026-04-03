@@ -82,6 +82,77 @@ func (q *Queries) CreateCustomerCompany(ctx context.Context, arg CreateCustomerC
 	return id, err
 }
 
+const getAllCustomers = `-- name: GetAllCustomers :many
+SELECT
+    id,
+    first_name,
+    middle_name,
+    last_name,
+    birthdate,
+    sex,
+    email,
+    mobile_no,
+    password,
+    customer_type,
+    created_at,
+    updated_at
+FROM tbl_customers
+WHERE
+    deleted_at = '1970-01-01 00:00:00+00:00'
+ORDER BY email ASC
+`
+
+type GetAllCustomersRow struct {
+	ID           int64
+	FirstName    string
+	MiddleName   sql.NullString
+	LastName     string
+	Birthdate    string
+	Sex          string
+	Email        string
+	MobileNo     string
+	Password     string
+	CustomerType string
+	CreatedAt    string
+	UpdatedAt    string
+}
+
+func (q *Queries) GetAllCustomers(ctx context.Context) ([]GetAllCustomersRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllCustomers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllCustomersRow
+	for rows.Next() {
+		var i GetAllCustomersRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
+			&i.Birthdate,
+			&i.Sex,
+			&i.Email,
+			&i.MobileNo,
+			&i.Password,
+			&i.CustomerType,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getCustomerByEmail = `-- name: GetCustomerByEmail :one
 SELECT
     id,

@@ -122,41 +122,54 @@ func AdminSuperuserHomePage(fullName string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 templ.SafeURL
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/products"))
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/cpoints/generate"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 79, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 79, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4 6h16M4 10h16M4 14h16M4 18h16\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Manage Products</h2><p class=\"text-sm text-gray-500\">View and manage all products</p></a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M13 10V3L4 14h7v7l9-11h-7z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Generate C-Points</h2><p class=\"text-sm text-gray-500\">Generate C-Points for a customer</p></a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 templ.SafeURL
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/staffs"))
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/products"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 92, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 92, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Employees</h2><p class=\"text-sm text-gray-500\">View and manage employees</p></a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4 6h16M4 10h16M4 14h16M4 18h16\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Manage Products</h2><p class=\"text-sm text-gray-500\">View and manage all products</p></a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 templ.SafeURL
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/logs"))
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/staffs"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 105, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 105, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Logs</h2><p class=\"text-sm text-gray-500\">View staff action logs</p></a></div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Employees</h2><p class=\"text-sm text-gray-500\">View and manage employees</p></a> <a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var9 templ.SafeURL
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/logs"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 118, Col: 48}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Logs</h2><p class=\"text-sm text-gray-500\">View staff action logs</p></a></div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

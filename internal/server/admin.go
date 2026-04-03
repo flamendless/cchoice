@@ -59,6 +59,7 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth).Patch("/admin/profile", s.adminProfileUpdateHandler)
 	r.With(s.requireStaffAuth).Post("/admin/change-password", s.adminChangePasswordHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/list", s.adminStaffListHandler)
+	r.With(s.requireStaffAuth).Get("/admin/customers/list", s.adminCustomersListHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/attendance", s.adminStaffPageHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/attendance/table", s.adminStaffAttendanceTableHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff/attendance/rows", s.adminStaffAttendanceRowsHandler)
@@ -75,6 +76,10 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_PRODUCT)).Post("/admin/superuser/products/create", s.adminSuperuserProductsCreatePostHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_PRODUCT)).Get("/admin/superuser/products/subcategories", s.adminSuperuserProductsSubcategoriesHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_PRODUCT)).Get("/admin/superuser/products/validate-serial", s.adminSuperuserProductsValidateSerialHandler)
+
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_CPOINTS)).Get("/admin/cpoints/generate", s.adminCPointsGeneratePageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_CPOINTS)).Post("/admin/cpoints/generate", s.adminCPointsGeneratePostHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_CPOINTS)).Get("/admin/cpoints/code", s.adminCPointsCodePageHandler)
 
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser", s.adminSuperuserHomeHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/attendance", s.adminSuperuserAttendancePageHandler)

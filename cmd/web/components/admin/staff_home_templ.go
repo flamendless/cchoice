@@ -124,12 +124,31 @@ func AdminStaffHomePage(fullName string, roles []enums.StaffRole) templ.Componen
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 4v16m8-8H4\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Create Product</h2><p class=\"text-sm text-gray-500\">Create a product</p></a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 4v16m8-8H4\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Create Product</h2><p class=\"text-sm text-gray-500\">Create a product</p></a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div></div></body></html>")
+		if slices.Contains(roles, enums.STAFF_ROLE_CREATE_CPOINTS) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<a href=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var6 templ.SafeURL
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/cpoints/generate"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_home.templ`, Line: 81, Col: 51}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M13 10V3L4 14h7v7l9-11h-7z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Generate C-Points</h2><p class=\"text-sm text-gray-500\">Generate C-Points for a customer</p></a>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

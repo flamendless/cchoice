@@ -75,6 +75,21 @@ templ AdminStaffHomePage(fullName string, roles []enums.StaffRole) {
 								<p class="text-sm text-gray-500">Create a product</p>
 							</a>
 						}
+
+						if slices.Contains(roles, enums.STAFF_ROLE_CREATE_CPOINTS) {
+							<a
+								href={ utils.URL("/admin/cpoints/generate") }
+								class="block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice"
+							>
+								<div class="flex justify-center mb-4">
+									<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-cchoice" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+									</svg>
+								</div>
+								<h2 class="text-xl font-semibold text-gray-800 mb-2">Generate C-Points</h2>
+								<p class="text-sm text-gray-500">Generate C-Points for a customer</p>
+							</a>
+						}
 					</div>
 				</div>
 			</div>

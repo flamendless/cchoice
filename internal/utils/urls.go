@@ -6,6 +6,10 @@ import (
 	"net/url"
 )
 
+func FullURL(path string) string {
+	return conf.Conf().Server.Address + URL(path)
+}
+
 func URL(path string) string {
 	if conf.Conf().IsProd() {
 		return path
@@ -20,6 +24,20 @@ func URLf(path string, args ...any) string {
 func URLWithSuccess(path string, message string) string {
 	message = url.QueryEscape(message)
 	return URL(fmt.Sprintf("%s?success=%s", path, message))
+}
+
+func URLWithSuccessParams(path string, params map[string]string) string {
+	base := path
+	hasQuery := false
+	for k, v := range params {
+		sep := "?"
+		if hasQuery {
+			sep = "&"
+		}
+		base = fmt.Sprintf("%s%s%s=%s", base, sep, url.QueryEscape(k), url.QueryEscape(v))
+		hasQuery = true
+	}
+	return URL(base)
 }
 
 func URLWithError(path string, message string) string {

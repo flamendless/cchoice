@@ -23,7 +23,7 @@ INSERT INTO tbl_cpoints (
     deleted_at
 ) VALUES (
     ?, ?, ?, ?, ?, datetime('now'), datetime('now'), datetime('now'), '1970-01-01 00:00:00+00:00'
-) RETURNING id
+) RETURNING id, customer_id, code, value, product_skus, expires_at, generated_at, redeemed_at, created_at, updated_at, deleted_at
 `
 
 type CreateCpointParams struct {
@@ -34,7 +34,7 @@ type CreateCpointParams struct {
 	ExpiresAt   sql.NullString
 }
 
-func (q *Queries) CreateCpoint(ctx context.Context, arg CreateCpointParams) (int64, error) {
+func (q *Queries) CreateCpoint(ctx context.Context, arg CreateCpointParams) (TblCpoint, error) {
 	row := q.db.QueryRowContext(ctx, createCpoint,
 		arg.CustomerID,
 		arg.Code,
@@ -42,9 +42,21 @@ func (q *Queries) CreateCpoint(ctx context.Context, arg CreateCpointParams) (int
 		arg.ProductSkus,
 		arg.ExpiresAt,
 	)
-	var id int64
-	err := row.Scan(&id)
-	return id, err
+	var i TblCpoint
+	err := row.Scan(
+		&i.ID,
+		&i.CustomerID,
+		&i.Code,
+		&i.Value,
+		&i.ProductSkus,
+		&i.ExpiresAt,
+		&i.GeneratedAt,
+		&i.RedeemedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
 }
 
 const getCpointByCode = `-- name: GetCpointByCode :one
@@ -163,7 +175,7 @@ func (q *Queries) GetCpointsByCustomerID(ctx context.Context, customerID int64) 
 	return items, nil
 }
 
-const getCpointsByCustomerIDWithTotal = `-- name: GetCpointsByCustomerIDWithTotal :many
+const getRedeemedCpointsByCustomerID = `-- name: GetRedeemedCpointsByCustomerID :many
 SELECT
     c.id,
     c.customer_id,
@@ -174,16 +186,16 @@ SELECT
     c.generated_at,
     c.redeemed_at,
     c.created_at,
-    c.updated_at,
-    COUNT(*) OVER() AS total
+    c.updated_at
 FROM tbl_cpoints c
 WHERE
     c.customer_id = ?
     AND c.deleted_at = '1970-01-01 00:00:00+00:00'
+    AND c.redeemed_at != ''
 ORDER BY c.created_at DESC
 `
 
-type GetCpointsByCustomerIDWithTotalRow struct {
+type GetRedeemedCpointsByCustomerIDRow struct {
 	ID          int64
 	CustomerID  int64
 	Code        string
@@ -194,18 +206,17 @@ type GetCpointsByCustomerIDWithTotalRow struct {
 	RedeemedAt  sql.NullString
 	CreatedAt   string
 	UpdatedAt   string
-	Total       int64
 }
 
-func (q *Queries) GetCpointsByCustomerIDWithTotal(ctx context.Context, customerID int64) ([]GetCpointsByCustomerIDWithTotalRow, error) {
-	rows, err := q.db.QueryContext(ctx, getCpointsByCustomerIDWithTotal, customerID)
+func (q *Queries) GetRedeemedCpointsByCustomerID(ctx context.Context, customerID int64) ([]GetRedeemedCpointsByCustomerIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getRedeemedCpointsByCustomerID, customerID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetCpointsByCustomerIDWithTotalRow
+	var items []GetRedeemedCpointsByCustomerIDRow
 	for rows.Next() {
-		var i GetCpointsByCustomerIDWithTotalRow
+		var i GetRedeemedCpointsByCustomerIDRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.CustomerID,
@@ -217,7 +228,6 @@ func (q *Queries) GetCpointsByCustomerIDWithTotal(ctx context.Context, customerI
 			&i.RedeemedAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Total,
 		); err != nil {
 			return nil, err
 		}

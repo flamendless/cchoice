@@ -2,6 +2,7 @@ package server
 
 import (
 	"cchoice/internal/conf"
+	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/metrics"
 	"cchoice/internal/utils"
@@ -121,7 +122,7 @@ func (s *Server) requireStaffAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		staffID := s.encoder.Decode(s.sessionManager.GetString(r.Context(), SessionStaffID))
 		if staffID == 0 {
-			http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+			redirectHX(w, r, utils.URLWithError("/admin", "Login to access page"))
 			return
 		}
 		next.ServeHTTP(w, r)
@@ -132,12 +133,12 @@ func (s *Server) requireSuperuserAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		staff, err := s.services.staff.GetCurrentStaff(r.Context(), s.sessionManager.GetString(r.Context(), SessionStaffID))
 		if staff.ID == 0 {
-			http.Redirect(w, r, utils.URL("/admin"), http.StatusSeeOther)
+			redirectHX(w, r, utils.URLWithError("/admin", "Login to access page"))
 			return
 		}
 
 		if err != nil || staff.UserType != enums.STAFF_USER_TYPE_SUPERUSER.String() {
-			http.Redirect(w, r, utils.URL("/admin/staff"), http.StatusSeeOther)
+			redirectHX(w, r, utils.URLWithError("/admin/staff", "Login to access page"))
 			return
 		}
 		next.ServeHTTP(w, r)
@@ -147,8 +148,8 @@ func (s *Server) requireSuperuserAuth(next http.Handler) http.Handler {
 func (s *Server) requireCustomerAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		customerID := s.encoder.Decode(s.sessionManager.GetString(r.Context(), SessionCustomerID))
-		if customerID == 0 {
-			http.Redirect(w, r, utils.URL("/customer"), http.StatusSeeOther)
+		if customerID == encode.INVALID {
+			redirectHX(w, r, utils.URLWithError("/customer", "Login to access page"))
 			return
 		}
 		next.ServeHTTP(w, r)

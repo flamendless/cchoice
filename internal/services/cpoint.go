@@ -64,9 +64,9 @@ type Cpoint struct {
 	UpdatedAt   time.Time
 }
 
-type GetCpointsByCustomerIDRowWithTotal struct {
-	Cpoint
-	Total int64
+type GetRedeemedCpointsWithTotal struct {
+	CPoints []Cpoint
+	Total   int64
 }
 
 const prefix = "CP"
@@ -89,7 +89,7 @@ func (s *CpointService) GenerateCode() string {
 	return strings.Join(segments, "-")
 }
 
-func (s *CpointService) CreateCpoint(ctx context.Context, params CreateCpointParams) (int64, error) {
+func (s *CpointService) CreateCpoint(ctx context.Context, params CreateCpointParams) (Cpoint, error) {
 	var result string
 	defer func() {
 		if err := s.staffLog.CreateLog(ctx, params.StaffID, "CREATE_CPOINT", "CPOINTS", result, nil); err != nil {
@@ -98,7 +98,7 @@ func (s *CpointService) CreateCpoint(ctx context.Context, params CreateCpointPar
 	}()
 	customerIDDecoded := s.encoder.Decode(params.CustomerID)
 	if customerIDDecoded == encode.INVALID {
-		return 0, errs.ErrDecode
+		return Cpoint{}, errs.ErrDecode
 	}
 
 	code := s.GenerateCode()
@@ -116,7 +116,7 @@ func (s *CpointService) CreateCpoint(ctx context.Context, params CreateCpointPar
 		expiresAtStr = sql.NullString{String: oneYearLater.Format(time.RFC3339), Valid: true}
 	}
 
-	cpointID, err := s.dbRW.GetQueries().CreateCpoint(ctx, queries.CreateCpointParams{
+	cpoint, err := s.dbRW.GetQueries().CreateCpoint(ctx, queries.CreateCpointParams{
 		CustomerID:  customerIDDecoded,
 		Code:        code,
 		Value:       params.Value,
@@ -125,12 +125,44 @@ func (s *CpointService) CreateCpoint(ctx context.Context, params CreateCpointPar
 	})
 	if err != nil {
 		result = fmt.Sprintf("FAILURE: %v", err)
-		return 0, err
+		return Cpoint{}, err
 	}
 
-	result = fmt.Sprintf("SUCCESS: %d", cpointID)
+	result = "SUCCESS: " + s.encoder.Encode(cpoint.ID)
 
-	return cpointID, nil
+	var expiresAt *time.Time
+	if cpoint.ExpiresAt.Valid {
+		t, _ := time.Parse(time.RFC3339, cpoint.ExpiresAt.String)
+		expiresAt = &t
+	}
+
+	var redeemedAt *time.Time
+	if cpoint.RedeemedAt.Valid {
+		t, _ := time.Parse(time.RFC3339, cpoint.RedeemedAt.String)
+		redeemedAt = &t
+	}
+
+	generatedAt, _ := time.Parse(time.RFC3339, cpoint.GeneratedAt)
+	createdAt, _ := time.Parse(time.RFC3339, cpoint.CreatedAt)
+	updatedAt, _ := time.Parse(time.RFC3339, cpoint.UpdatedAt)
+
+	productSkus := []string{}
+	if cpoint.ProductSkus.Valid {
+		productSkus = strings.Split(cpoint.ProductSkus.String, ",")
+	}
+
+	return Cpoint{
+		ID:          cpoint.ID,
+		CustomerID:  cpoint.CustomerID,
+		Code:        cpoint.Code,
+		Value:       cpoint.Value,
+		ProductSkus: productSkus,
+		ExpiresAt:   expiresAt,
+		GeneratedAt: generatedAt,
+		RedeemedAt:  redeemedAt,
+		CreatedAt:   createdAt,
+		UpdatedAt:   updatedAt,
+	}, nil
 }
 
 func (s *CpointService) RedeemCpoint(ctx context.Context, customerID string, code string) error {
@@ -204,40 +236,17 @@ func (s *CpointService) GetCpointByCode(ctx context.Context, code string) (Cpoin
 	}, nil
 }
 
-func (s *CpointService) GetCpointsByCustomerID(ctx context.Context, customerID string, withTotal bool) ([]GetCpointsByCustomerIDRowWithTotal, error) {
+func (s *CpointService) GetRedeemedCpointsByCustomerID(ctx context.Context, customerID string) (GetRedeemedCpointsWithTotal, error) {
 	customerIDDecoded := s.encoder.Decode(customerID)
 
-	var rows []queries.GetCpointsByCustomerIDWithTotalRow
-	var err error
-
-	if withTotal {
-		rows, err = s.dbRO.GetQueries().GetCpointsByCustomerIDWithTotal(ctx, customerIDDecoded)
-	} else {
-		rawRows, err := s.dbRO.GetQueries().GetCpointsByCustomerID(ctx, customerIDDecoded)
-		if err != nil {
-			return nil, err
-		}
-		for _, r := range rawRows {
-			rows = append(rows, queries.GetCpointsByCustomerIDWithTotalRow{
-				ID:          r.ID,
-				CustomerID:  r.CustomerID,
-				Code:        r.Code,
-				Value:       r.Value,
-				ProductSkus: r.ProductSkus,
-				ExpiresAt:   r.ExpiresAt,
-				GeneratedAt: r.GeneratedAt,
-				RedeemedAt:  r.RedeemedAt,
-				CreatedAt:   r.CreatedAt,
-				UpdatedAt:   r.UpdatedAt,
-				Total:       0,
-			})
-		}
-	}
+	rows, err := s.dbRO.GetQueries().GetRedeemedCpointsByCustomerID(ctx, customerIDDecoded)
 	if err != nil {
-		return nil, err
+		return GetRedeemedCpointsWithTotal{}, err
 	}
 
-	result := make([]GetCpointsByCustomerIDRowWithTotal, 0, len(rows))
+	var res GetRedeemedCpointsWithTotal
+	res.CPoints = make([]Cpoint, 0, len(rows))
+
 	for _, r := range rows {
 		var expiresAt *time.Time
 		if r.ExpiresAt.Valid {
@@ -260,24 +269,22 @@ func (s *CpointService) GetCpointsByCustomerID(ctx context.Context, customerID s
 			productSkus = strings.Split(r.ProductSkus.String, ",")
 		}
 
-		result = append(result, GetCpointsByCustomerIDRowWithTotal{
-			Cpoint: Cpoint{
-				ID:          r.ID,
-				CustomerID:  r.CustomerID,
-				Code:        r.Code,
-				Value:       r.Value,
-				ProductSkus: productSkus,
-				ExpiresAt:   expiresAt,
-				GeneratedAt: generatedAt,
-				RedeemedAt:  redeemedAt,
-				CreatedAt:   createdAt,
-				UpdatedAt:   updatedAt,
-			},
-			Total: r.Total,
+		res.CPoints = append(res.CPoints, Cpoint{
+			ID:          r.ID,
+			CustomerID:  r.CustomerID,
+			Code:        r.Code,
+			Value:       r.Value,
+			ProductSkus: productSkus,
+			ExpiresAt:   expiresAt,
+			GeneratedAt: generatedAt,
+			RedeemedAt:  redeemedAt,
+			CreatedAt:   createdAt,
+			UpdatedAt:   updatedAt,
 		})
+		res.Total += r.Value
 	}
 
-	return result, nil
+	return res, nil
 }
 
 func (s *CpointService) GenerateRedemptionURL(code string) string {
