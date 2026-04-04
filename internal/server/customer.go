@@ -1,7 +1,6 @@
 package server
 
 import (
-	"database/sql"
 	"net/http"
 
 	compcustomer "cchoice/cmd/web/components/customers"
@@ -22,10 +21,14 @@ const (
 )
 
 func AddCustomerHandlers(s *Server, r chi.Router) {
+	r.Group(func(r chi.Router) {
+		r.Use(s.rateLimiter.Middleware)
+		r.Post("/customer/login", s.customerLoginHandler)
+		r.Post("/customer/register", s.customerRegisterHandler)
+	})
+
 	r.Get("/customer", s.customerLoginPageHandler)
-	r.Post("/customer/login", s.customerLoginHandler)
 	r.Get("/customer/register", s.customerRegisterPageHandler)
-	r.Post("/customer/register", s.customerRegisterHandler)
 	r.With(s.requireCustomerAuth).Post("/customer/logout", s.customerLogoutHandler)
 	r.With(s.requireCustomerAuth).Get("/customer/portal", s.customerPortalHandler)
 	r.With(s.requireCustomerAuth).Get("/customer/profile", s.customerProfileHandler)
@@ -65,13 +68,12 @@ func (s *Server) customerLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	email := r.PostFormValue("email")
-	password := r.PostFormValue("password")
-
 	if !constants.ReEmail.MatchString(email) {
 		redirectHX(w, r, utils.URLWithError(page, "Invalid email or password format"))
 		return
 	}
 
+	password := r.PostFormValue("password")
 	if !constants.RePassword.MatchString(password) {
 		redirectHX(w, r, utils.URLWithError(page, "Invalid email or password format"))
 		return
@@ -79,12 +81,7 @@ func (s *Server) customerLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	customer, err := s.services.customer.Login(ctx, email, password)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			redirectHX(w, r, utils.URLWithError(page, "Invalid email or password"))
-			return
-		}
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		redirectHX(w, r, utils.URLWithError(page, "Invalid email or password"))
 		return
 	}
 

@@ -15,6 +15,7 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/net/http2"
 	"golang.org/x/sync/singleflight"
+	"golang.org/x/time/rate"
 
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
@@ -26,6 +27,7 @@ import (
 	"cchoice/internal/jobs"
 	"cchoice/internal/logs"
 	"cchoice/internal/mail"
+	"cchoice/internal/middleware"
 	"cchoice/internal/payments"
 	"cchoice/internal/requests"
 	"cchoice/internal/services"
@@ -70,6 +72,7 @@ type Server struct {
 	thumbnailService   jobs.IThumbnailService
 	thumbnailJobRunner *jobs.ThumbnailJobRunner
 	services           Services
+	rateLimiter        *middleware.RateLimiter
 	address            string
 	port               int
 	portFS             int
@@ -160,6 +163,12 @@ func NewServer() *ServerInstance {
 		thumbnailJobRunner: thumbnailJobRunner,
 		useHTTP2:           cfg.Server.UseHTTP2,
 		useSSL:             cfg.Server.UseSSL,
+		rateLimiter: middleware.NewRateLimiterWithDebug(
+			rate.Limit(cfg.RateLimit.RPS),
+			cfg.RateLimit.Burst,
+			cfg.RateLimit.TTL,
+			cfg.IsLocal(),
+		),
 	}
 
 	staffLogService := services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW)
