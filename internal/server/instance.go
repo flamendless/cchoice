@@ -39,4 +39,8 @@ func (si *ServerInstance) StopBackgroundJobs() {
 		si.jobRunnerStop()
 		logs.Log().Info("Background job runners stopped")
 	}
+	if si.internal.rateLimiter != nil {
+		si.internal.rateLimiter.Stop()
+		logs.Log().Info("Rate limiter stopped")
+	}
 }

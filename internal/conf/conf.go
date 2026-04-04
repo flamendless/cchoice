@@ -3,6 +3,7 @@ package conf
 import (
 	"cchoice/cmd/web/static"
 	"strings"
+	"time"
 
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
@@ -44,11 +45,18 @@ type appConfig struct {
 	Settings           Settings
 	BasicAuth          BasicAuth
 	CPointHMACSecret   string `env:"CPOINT_HMAC_SECRET" env-required:""`
+	RateLimit          RateLimitConfig
 	Test               Test
 }
 
 type Test struct {
 	LocalUploadImage bool `env:"TEST_LOCAL_UPLOAD_IMAGE" env-default:"0"`
+}
+
+type RateLimitConfig struct {
+	RPS   int           `env:"RATE_LIMIT_RPS" env-default:"5"`
+	Burst int           `env:"RATE_LIMIT_BURST" env-default:"10"`
+	TTL   time.Duration `env:"RATE_LIMIT_TTL" env-default:"3m"`
 }
 
 type BasicAuth struct {
