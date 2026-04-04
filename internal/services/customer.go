@@ -3,12 +3,15 @@ package services
 import (
 	"context"
 	"database/sql"
+	"strings"
 
 	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 
@@ -57,6 +60,10 @@ func NewCustomerService(
 }
 
 func (s *CustomerService) Register(ctx context.Context, params RegisterCustomerParams) (int64, error) {
+	if !strings.HasPrefix(params.MobileNo, constants.PHMobilePrefix) {
+		return 0, errs.ErrValidationInvalidMobileNumber
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(params.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return 0, err

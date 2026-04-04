@@ -79,7 +79,7 @@ func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductI
 		Power:         sql.NullString{String: input.Specs.Power, Valid: true},
 		Capacity:      sql.NullString{String: input.Specs.Capacity, Valid: true},
 		ScopeOfSupply: sql.NullString{String: input.Specs.ScopeOfSupply, Valid: true},
-		Weight:        sql.NullFloat64{Float64: weightVal, Valid: weightErr != nil},
+		Weight:        sql.NullFloat64{Float64: weightVal, Valid: weightErr == nil},
 		WeightUnit:    sql.NullString{String: input.Specs.WeightUnit, Valid: true},
 	})
 	if err != nil {
