@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"cchoice/internal/constants"
 	"cchoice/internal/errs"
 	"errors"
 	"fmt"
@@ -100,7 +101,7 @@ func ValidateUserReg(data ValidateUserRegInput) error {
 		return err
 	}
 
-	validMobile := strings.HasPrefix(data.MobileNo, "+639")
+	validMobile := strings.HasPrefix(data.MobileNo, constants.PHMobilePrefix)
 	if !validMobile {
 		return errs.ErrValidationInvalidMobileNumber
 	}

@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"database/sql"
+	"strings"
 
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
@@ -10,6 +11,7 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 
@@ -80,6 +82,10 @@ func (s *StaffService) UpdatePassword(ctx context.Context, staffID string, passw
 }
 
 func (s *StaffService) UpdateProfile(ctx context.Context, params UpdateProfileParams) error {
+	if !strings.HasPrefix(params.MobileNo, constants.PHMobilePrefix) {
+		return errs.ErrValidationInvalidMobileNumber
+	}
+
 	decodedID := s.encoder.Decode(params.ID)
 	middleNameNull := sql.NullString{String: params.MiddleName, Valid: params.MiddleName != ""}
 
