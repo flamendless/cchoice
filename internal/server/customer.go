@@ -38,6 +38,11 @@ func (s *Server) customerLoginPageHandler(w http.ResponseWriter, r *http.Request
 	const logtag = "[Customer Login Page Handler]"
 	ctx := r.Context()
 
+	if s.sessionManager.GetString(ctx, SessionCustomerID) != "" {
+		redirectHX(w, r, utils.URL("/customer/portal"))
+		return
+	}
+
 	if err := compcustomer.CustomerLoginPage().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
