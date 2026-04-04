@@ -105,6 +105,25 @@ func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Login Page Handler]"
 	ctx := r.Context()
 
+	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
+	if staffIDStr != "" {
+		staffID := s.encoder.Decode(staffIDStr)
+		if staffID != 0 {
+			staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
+			if err == nil {
+				switch enums.ParseStaffUserTypeToEnum(staff.UserType) {
+				case enums.STAFF_USER_TYPE_SUPERUSER:
+					redirectHX(w, r, utils.URL("/admin/superuser"))
+				case enums.STAFF_USER_TYPE_STAFF:
+					redirectHX(w, r, utils.URL("/admin/staff"))
+				default:
+					redirectHX(w, r, utils.URL("/admin"))
+				}
+				return
+			}
+		}
+	}
+
 	if err := compadmin.AdminLoginPage().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
