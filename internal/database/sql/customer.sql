@@ -10,6 +10,7 @@ SELECT
     mobile_no,
     password,
     customer_type,
+    status,
     created_at,
     updated_at
 FROM tbl_customers
@@ -29,6 +30,7 @@ SELECT
     mobile_no,
     password,
     customer_type,
+    status,
     created_at,
     updated_at
 FROM tbl_customers
@@ -49,6 +51,7 @@ SELECT
     mobile_no,
     password,
     customer_type,
+    status,
     created_at,
     updated_at
 FROM tbl_customers
@@ -81,11 +84,12 @@ INSERT INTO tbl_customers (
     mobile_no,
     password,
     customer_type,
+    status,
     created_at,
     updated_at,
     deleted_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), '1970-01-01 00:00:00+00:00'
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, 'UNVERIFIED', datetime('now'), datetime('now'), '1970-01-01 00:00:00+00:00'
 ) RETURNING id;
 
 -- name: CreateCustomerCompany :one

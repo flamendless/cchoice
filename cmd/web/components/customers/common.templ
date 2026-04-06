@@ -5,6 +5,7 @@ import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/components/header"
 import "cchoice/cmd/web/models"
 import "cchoice/internal/constants"
+import "cchoice/internal/enums"
 
 templ CustomerLoginPage() {
 	<!DOCTYPE html>
@@ -434,6 +435,15 @@ templ CustomerProfilePage(profile models.CustomerProfile) {
 									<p class="font-medium text-gray-900">{ profile.FullName }</p>
 								</div>
 								<div>
+									<p class="text-sm text-gray-500">Status</p>
+									switch profile.Status {
+									case enums.CUSTOMER_STATUS_UNVERIFIED:
+										<span class="bg-yellow-100 text-yellow-800"> { profile.Status.String() } </span>
+									case enums.CUSTOMER_STATUS_VERIFIED:
+										<span class="bg-green-100 text-green-800"> { profile.Status.String() } </span>
+									}
+								</div>
+								<div>
 									<p class="text-sm text-gray-500">E-Mail</p>
 									<p class="font-medium text-gray-900">{ profile.Email }</p>
 								</div>
@@ -573,19 +583,7 @@ templ CustomerProfileEditForm(profile models.CustomerProfile) {
 			</div>
 		</div>
 		<div>
-			<label for="mobile_no" class="block text-sm font-medium text-gray-700">
-				Mobile Number
-			</label>
-			<input
-				type="tel"
-				id="mobile_no"
-				name="mobile_no"
-				required
-				pattern={ constants.PatternMobileNumber }
-				placeholder="09123456789"
-				value={ profile.MobileNo }
-				class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
-			/>
+			@common.MobileNumberInput("mobile_no", "mobile_no", "Mobile Number", "9123456789", profile.MobileNo, true)
 		</div>
 		<div class="flex justify-end gap-4">
 			<a

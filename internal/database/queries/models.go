@@ -106,6 +106,7 @@ type TblCustomer struct {
 	MobileNo     string
 	Password     string
 	CustomerType string
+	Status       string
 	CreatedAt    string
 	UpdatedAt    string
 	DeletedAt    string
