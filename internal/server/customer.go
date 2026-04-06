@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"strings"
 
 	compcustomer "cchoice/cmd/web/components/customers"
 	"cchoice/internal/constants"
@@ -149,6 +150,10 @@ func (s *Server) customerRegisterHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	if !strings.HasPrefix(mobileNo, constants.PHMobilePrefix) {
+		mobileNo = constants.PHMobilePrefix + mobileNo
+	}
+
 	if !constants.ReMobileNumber.MatchString(mobileNo) {
 		redirectHX(w, r, utils.URLWithError(page, "Invalid mobile number format"))
 		return
@@ -273,6 +278,10 @@ func (s *Server) customerProfileUpdateHandler(w http.ResponseWriter, r *http.Req
 	if firstName == "" || lastName == "" || birthdate == "" || sex == "" || mobileNo == "" {
 		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
 		return
+	}
+
+	if !strings.HasPrefix(mobileNo, constants.PHMobilePrefix) {
+		mobileNo = constants.PHMobilePrefix + mobileNo
 	}
 
 	if !constants.ReMobileNumber.MatchString(mobileNo) {

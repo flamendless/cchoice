@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"net/http"
+	"strings"
 	"time"
 
 	compadmin "cchoice/cmd/web/components/admin"
@@ -177,6 +178,15 @@ func (s *Server) adminProfileUpdateHandler(w http.ResponseWriter, r *http.Reques
 
 	if firstName == "" || lastName == "" || mobileNo == "" || birthdate == "" || dateHired == "" {
 		redirectHX(w, r, utils.URLWithError(page, "All required fields must be filled"))
+		return
+	}
+
+	if !strings.HasPrefix(mobileNo, constants.PHMobilePrefix) {
+		mobileNo = constants.PHMobilePrefix + mobileNo
+	}
+
+	if !constants.ReMobileNumber.MatchString(mobileNo) {
+		redirectHX(w, r, utils.URLWithError(page, "Invalid mobile number format"))
 		return
 	}
 

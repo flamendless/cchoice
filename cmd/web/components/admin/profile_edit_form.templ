@@ -2,6 +2,7 @@ package components
 
 import "cchoice/internal/utils"
 import "cchoice/cmd/web/models"
+import "cchoice/cmd/web/components/common"
 import "cchoice/internal/constants"
 
 templ AdminProfileEditForm(profile models.AdminStaffProfile) {
@@ -82,19 +83,7 @@ templ AdminProfileEditForm(profile models.AdminStaffProfile) {
 				/>
 			</div>
 			<div>
-				<label for="mobile_no" class="block text-sm font-medium text-gray-700">
-					Mobile Number <span class="text-red-500">*</span>
-				</label>
-				<input
-					type="tel"
-					id="mobile_no"
-					name="mobile_no"
-					value={ profile.MobileNo }
-					required
-					pattern={ constants.PatternMobileNumber }
-					placeholder="e.g., 09123456789"
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
-				/>
+				@common.MobileNumberInput("mobile_no", "mobile_no", "Mobile Number", "9123456789", profile.MobileNo, true)
 			</div>
 			<div>
 				<label for="birthdate" class="block text-sm font-medium text-gray-700">

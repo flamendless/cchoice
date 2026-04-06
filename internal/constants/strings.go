@@ -7,5 +7,5 @@ const (
 	Gob                  = "gob"
 	ViberURIPrefix       = "viber://chat?number="
 	PHP                  = "PHP"
-	PHMobilePrefix       = "+639"
+	PHMobilePrefix       = "+63"
 )
