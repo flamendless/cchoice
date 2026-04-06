@@ -7,7 +7,8 @@ const (
 	PatternPassword       = `[a-zA-Z0-9\-_.?#@]+`
 	PatternEmail          = `[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}`
 	PatternName           = `[a-zA-Z\s\-]+`
-	PatternMobileNumber   = `[0-9]{11}`
+	PatternMobileNumberFE = `[0-9]{10}`
+	PatternMobileNumber   = `\+63[0-9]{10}`
 	PatternOrderReference = `CCO-[0-9a-zA-Z]+[0-9A-F]{6}`
 	PatternPostalCode     = `[0-9]{4}`
 	PatternSize           = `/\d+x\d+/`

@@ -256,18 +256,7 @@ templ CustomerRegisterPage() {
 							/>
 						</div>
 						<div>
-							<label for="mobile_no" class="block text-sm font-medium text-gray-700">
-								Mobile Number
-							</label>
-							<input
-								type="tel"
-								id="mobile_no"
-								name="mobile_no"
-								required
-								pattern={ constants.PatternMobileNumber }
-								placeholder="09123456789"
-								class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
-							/>
+							@common.MobileNumberInput("mobile_no", "mobile_no", "Mobile Number", "9123456789", "", true)
 						</div>
 						<div>
 							<label for="password" class="block text-sm font-medium text-gray-700">

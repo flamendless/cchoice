@@ -10,6 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "cchoice/internal/utils"
 import "cchoice/cmd/web/models"
+import "cchoice/cmd/web/components/common"
 import "cchoice/internal/constants"
 
 func AdminProfileEditForm(profile models.AdminStaffProfile) templ.Component {
@@ -40,7 +41,7 @@ func AdminProfileEditForm(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/profile"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 23, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 24, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -53,7 +54,7 @@ func AdminProfileEditForm(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/profile"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 33, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 34, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -66,7 +67,7 @@ func AdminProfileEditForm(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(profile.FirstName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 46, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 47, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -79,7 +80,7 @@ func AdminProfileEditForm(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 50, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 51, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -92,7 +93,7 @@ func AdminProfileEditForm(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(profile.MiddleName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 62, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 63, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -105,7 +106,7 @@ func AdminProfileEditForm(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 64, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 65, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -118,7 +119,7 @@ func AdminProfileEditForm(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(profile.LastName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 76, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 77, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -131,65 +132,47 @@ func AdminProfileEditForm(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 80, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 81, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"mobile_no\" class=\"block text-sm font-medium text-gray-700\">Mobile Number <span class=\"text-red-500\">*</span></label> <input type=\"tel\" id=\"mobile_no\" name=\"mobile_no\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = common.MobileNumberInput("mobile_no", "mobile_no", "Mobile Number", "9123456789", profile.MobileNo, true).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div><div><label for=\"birthdate\" class=\"block text-sm font-medium text-gray-700\">Birthdate <span class=\"text-red-500\">*</span></label> <input type=\"date\" id=\"birthdate\" name=\"birthdate\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var10 string
-		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(profile.MobileNo)
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Birthdate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 92, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 96, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" required pattern=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"date_hired\" class=\"block text-sm font-medium text-gray-700\">Date Hired <span class=\"text-red-500\">*</span></label> <input type=\"date\" id=\"date_hired\" name=\"date_hired\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 string
-		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternMobileNumber)
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(profile.DateHired)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 94, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 109, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" placeholder=\"e.g., 09123456789\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"birthdate\" class=\"block text-sm font-medium text-gray-700\">Birthdate <span class=\"text-red-500\">*</span></label> <input type=\"date\" id=\"birthdate\" name=\"birthdate\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var12 string
-		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Birthdate)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 107, Col: 30}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"date_hired\" class=\"block text-sm font-medium text-gray-700\">Date Hired <span class=\"text-red-500\">*</span></label> <input type=\"date\" id=\"date_hired\" name=\"date_hired\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var13 string
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(profile.DateHired)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile_edit_form.templ`, Line: 120, Col: 30}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></form></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></form></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

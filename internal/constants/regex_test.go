@@ -26,8 +26,9 @@ func TestRegexVariables(t *testing.T) {
 		{"ReEmail invalid", ReEmail, false, "invalid-email"},
 		{"ReName valid", ReName, true, "John Doe"},
 		{"ReName invalid", ReName, false, "John123"},
-		{"ReMobileNumber valid", ReMobileNumber, true, "09123456789"},
-		{"ReMobileNumber invalid", ReMobileNumber, false, "0912345678"},
+		{"ReMobileNumber valid", ReMobileNumber, true, "+639111111111"},
+		{"ReMobileNumber invalid", ReMobileNumber, false, "09123456789"},
+		{"ReMobileNumber invalid 2", ReMobileNumber, false, "0912345678"},
 		{"RePostalCode valid", RePostalCode, true, "1234"},
 		{"RePostalCode invalid", RePostalCode, false, "12345"},
 	}
