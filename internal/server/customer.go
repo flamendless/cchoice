@@ -36,6 +36,8 @@ func AddCustomerHandlers(s *Server, r chi.Router) {
 	r.With(s.requireCustomerAuth).Get("/customer/profile/edit", s.customerProfileEditFormHandler)
 	r.With(s.requireCustomerAuth).Patch("/customer/profile", s.customerProfileUpdateHandler)
 	r.With(s.requireCustomerAuth).Post("/customer/change-password", s.customerChangePasswordHandler)
+	r.With(s.requireCustomerAuth).Post("/customer/verify/send", s.customerVerifySendHandler)
+	r.With(s.requireCustomerAuth).Post("/customer/verify", s.customerVerifyHandler)
 }
 
 func (s *Server) customerLoginPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -358,4 +360,57 @@ func (s *Server) customerChangePasswordHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	redirectHX(w, r, utils.URLWithSuccess(page, "Password changed successfully"))
+}
+
+func (s *Server) customerVerifySendHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Customer Verify Send Handler]"
+	const page = "/customer/profile"
+	ctx := r.Context()
+
+	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
+	customer, err := s.services.customer.GetByID(ctx, customerIDStr)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, "Unable to send verification code"))
+		return
+	}
+
+	if err := s.services.customerOTP.GenerateAndSendVerificationCode(ctx, services.GenerateOTPParams{
+		CustomerID: customerIDStr,
+		Email:      customer.Email,
+	}); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	redirectHX(w, r, utils.URLWithSuccess(page, "Verification code sent! Please check your email."))
+}
+
+func (s *Server) customerVerifyHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Customer Verify Handler]"
+	const page = "/customer/profile"
+	ctx := r.Context()
+
+	if err := r.ParseForm(); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+		return
+	}
+
+	otpCode := r.PostFormValue("otp_code")
+	if otpCode == "" {
+		redirectHX(w, r, utils.URLWithError(page, "Verification code is required"))
+		return
+	}
+
+	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
+	valid, err := s.services.customerOTP.VerifyCode(ctx, customerIDStr, otpCode)
+	if err != nil || !valid {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, "Invalid or expired verification code"))
+		return
+	}
+
+	redirectHX(w, r, utils.URLWithSuccess(page, "Email verified successfully!"))
 }

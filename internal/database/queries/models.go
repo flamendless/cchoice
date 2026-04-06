@@ -121,6 +121,15 @@ type TblCustomerCompany struct {
 	DeletedAt  string
 }
 
+type TblCustomerOtpCode struct {
+	ID         int64
+	CustomerID int64
+	OtpCode    string
+	ExpiresAt  string
+	CreatedAt  string
+	UsedAt     sql.NullString
+}
+
 type TblEmailJob struct {
 	ID                int64
 	QueueID           string
@@ -129,6 +138,7 @@ type TblEmailJob struct {
 	Subject           string
 	TemplateName      string
 	OrderID           sql.NullInt64
+	OtpCode           sql.NullString
 	CheckoutPaymentID sql.NullString
 	CreatedAt         time.Time
 	UpdatedAt         time.Time

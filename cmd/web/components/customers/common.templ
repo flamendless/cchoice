@@ -471,6 +471,51 @@ templ CustomerProfilePage(profile models.CustomerProfile) {
 								}
 							</div>
 						</div>
+
+						if profile.Status == enums.CUSTOMER_STATUS_UNVERIFIED {
+							<div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+								<p class="text-sm text-yellow-800 mb-4">Your email is not verified. Please verify to access all features.</p>
+								<div id="verify-container">
+									<form
+										hx-post={ utils.URL("/customer/verify/send") }
+										hx-target="#verify-container"
+										hx-swap="outerHTML"
+									>
+										<button
+											type="submit"
+											class="bg-cchoice text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors"
+										>
+											Send Verification Code
+										</button>
+									</form>
+								</div>
+
+								<div id="otp-input-container" class="mt-4">
+									<form
+										hx-post={ utils.URL("/customer/verify") }
+										hx-target="body"
+										hx-swap="beforeend"
+										class="flex gap-2"
+									>
+										<input
+											type="text"
+											name="otp_code"
+											placeholder="Enter 6-digit code"
+											maxlength="6"
+											pattern="[0-9]{6}"
+											class="border border-gray-300 px-3 py-2 rounded w-32 text-center tracking-widest"
+											required
+										/>
+										<button
+											type="submit"
+											class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
+										>
+											Verify Now
+										</button>
+									</form>
+								</div>
+							</div>
+						}
 					</div>
 				</div>
 			</div>
