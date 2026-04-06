@@ -227,10 +227,14 @@ func serve(
 		return err
 	}
 
-	if app == "admin" {
+	switch app {
+	case "admin":
 		openBrowser("http://localhost:7331/cchoice/admin")
 		app = "web"
-	} else {
+	case "customer":
+		openBrowser("http://localhost:7331/cchoice/customer")
+		app = "web"
+	default:
 		openBrowser("http://localhost:7331/cchoice")
 	}
 
@@ -264,6 +268,10 @@ func ServeWeb() error {
 
 func ServeAdmin() error {
 	return serve(".air.admin.toml", "admin")
+}
+
+func ServeCustomer() error {
+	return serve(".air.admin.toml", "customer")
 }
 
 func BuildGoose() error {
