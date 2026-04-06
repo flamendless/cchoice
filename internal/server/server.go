@@ -44,6 +44,7 @@ type Services struct {
 	cpoint       *services.CPointService
 	cpointToken  *services.CPointTokenService
 	customer     *services.CustomerService
+	customerOTP  *services.CustomerOTPService
 	location     *services.LocationService
 	product      *services.ProductService
 	productImage *services.ProductImageService
@@ -124,23 +125,27 @@ func NewServer() *ServerInstance {
 	var paymentGateway payments.IPaymentGateway
 	var shippingService shipping.IShippingService
 	var geocoder geocoding.IGeocoder
+	var thumbnailService *services.ThumbnailService
+	var thumbnailJobRunner *jobs.ThumbnailJobRunner
 
 	if cfg.IsWeb() {
 		objStorage, productImageFS = mustInitStorageProvider()
 		logs.Log().Info("Web mode: skipping payment, shipping, geocoding, mail services")
 	} else {
 		objStorage, productImageFS = mustInitStorageProvider()
-		mailService = mustInitMailService()
-		emailJobRunner = jobs.NewEmailJobRunner(dbRW.GetDB(), dbRO, dbRW, mailService)
 		paymentGateway = mustInitPaymentGateway()
 		shippingService = mustInitShippingService()
 		geocoder = mustInitGeocodingService(dbRW)
 	}
 
-	var thumbnailService *services.ThumbnailService
-	var thumbnailJobRunner *jobs.ThumbnailJobRunner
-	thumbnailService = services.NewThumbnailService(objStorage)
-	thumbnailJobRunner = jobs.NewThumbnailJobRunner(dbRW.GetDB(), dbRO, dbRW, thumbnailService)
+	if cfg.IsProd() || cfg.Test.LocalUploadImage {
+		thumbnailService = services.NewThumbnailService(objStorage)
+		thumbnailJobRunner = jobs.NewThumbnailJobRunner(dbRW.GetDB(), dbRO, dbRW, thumbnailService)
+	}
+	if cfg.IsProd() || cfg.Test.LocalOTP {
+		mailService = mustInitMailService()
+		emailJobRunner = jobs.NewEmailJobRunner(dbRW.GetDB(), dbRO, dbRW, mailService)
+	}
 
 	newServer := &Server{
 		address:            cfg.Server.Address,
@@ -178,6 +183,7 @@ func NewServer() *ServerInstance {
 		attendance:   services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		brand:        services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		customer:     services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		customerOTP:  services.NewCustomerOTPService(newServer.encoder, newServer.dbRO, newServer.dbRW, mailService, emailJobRunner),
 		cpoint:       services.NewCpointService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, cpointTokenService),
 		cpointToken:  cpointTokenService,
 		location:     services.NewLocationService(cfg.Settings.ShopLocation),
@@ -194,6 +200,7 @@ func NewServer() *ServerInstance {
 		newServer.services.attendance,
 		newServer.services.brand,
 		newServer.services.customer,
+		newServer.services.customerOTP,
 		newServer.services.cpoint,
 		newServer.services.location,
 		newServer.services.product,

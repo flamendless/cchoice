@@ -8,6 +8,7 @@ const (
 	EMAIL_TEMPLATE_UNDEFINED EmailTemplateName = iota
 	EMAIL_TEMPLATE_ORDER_CONFIRMATION
 	EMAIL_TEMPLATE_PAYMENT_CONFIRMATION
+	EMAIL_TEMPLATE_CUSTOMER_VERIFICATION
 )
 
 func ParseEmailTemplateNameToEnum(e string) EmailTemplateName {
@@ -16,6 +17,8 @@ func ParseEmailTemplateNameToEnum(e string) EmailTemplateName {
 		return EMAIL_TEMPLATE_ORDER_CONFIRMATION
 	case EMAIL_TEMPLATE_PAYMENT_CONFIRMATION.String():
 		return EMAIL_TEMPLATE_PAYMENT_CONFIRMATION
+	case EMAIL_TEMPLATE_CUSTOMER_VERIFICATION.String():
+		return EMAIL_TEMPLATE_CUSTOMER_VERIFICATION
 	default:
 		return EMAIL_TEMPLATE_UNDEFINED
 	}
@@ -27,6 +30,8 @@ func (e EmailTemplateName) FileName() string {
 		return "order_confirmation.html"
 	case EMAIL_TEMPLATE_PAYMENT_CONFIRMATION:
 		return "payment_confirmation.html"
+	case EMAIL_TEMPLATE_CUSTOMER_VERIFICATION:
+		return "customer_verification.html"
 	default:
 		return ""
 	}
@@ -38,6 +43,8 @@ func (e EmailTemplateName) DBValue() string {
 		return "order_confirmation"
 	case EMAIL_TEMPLATE_PAYMENT_CONFIRMATION:
 		return "payment_confirmation"
+	case EMAIL_TEMPLATE_CUSTOMER_VERIFICATION:
+		return "customer_verification"
 	default:
 		return ""
 	}
@@ -49,6 +56,8 @@ func ParseEmailTemplateNameFromDB(s string) EmailTemplateName {
 		return EMAIL_TEMPLATE_ORDER_CONFIRMATION
 	case "payment_confirmation":
 		return EMAIL_TEMPLATE_PAYMENT_CONFIRMATION
+	case "customer_verification":
+		return EMAIL_TEMPLATE_CUSTOMER_VERIFICATION
 	default:
 		return EMAIL_TEMPLATE_UNDEFINED
 	}

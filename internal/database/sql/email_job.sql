@@ -6,9 +6,10 @@ INSERT INTO tbl_email_jobs(
 	subject,
 	template_name,
 	order_id,
-	checkout_payment_id
+	checkout_payment_id,
+	otp_code
 ) VALUES (
-	?, ?, ?, ?, ?, ?, ?
+	?, ?, ?, ?, ?, ?, ?, ?
 ) RETURNING *;
 
 -- name: GetEmailJobByQueueID :one

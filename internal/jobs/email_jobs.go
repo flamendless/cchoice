@@ -42,6 +42,7 @@ type EmailJobParams struct {
 	CheckoutPaymentID *string
 	MobileNo          string
 	EMail             string
+	OTPCode           string
 }
 
 type EmailJobRunner struct {
@@ -130,6 +131,9 @@ func (ejr *EmailJobRunner) QueueEmailJob(ctx context.Context, params EmailJobPar
 	if params.CheckoutPaymentID != nil {
 		insertParams.CheckoutPaymentID = sql.NullString{String: *params.CheckoutPaymentID, Valid: true}
 	}
+	if params.OTPCode != "" {
+		insertParams.OtpCode = sql.NullString{String: params.OTPCode, Valid: true}
+	}
 
 	emailJob, err := ejr.dbRW.GetQueries().InsertEmailJob(ctx, insertParams)
 	if err != nil {
@@ -199,6 +203,8 @@ func (ejr *EmailJobRunner) handleSendEmail(ctx context.Context, m []byte) error 
 		return ejr.sendOrderConfirmationEmail(ctx, emailJob, recipient, cc, emailJob.Subject)
 	case enums.EMAIL_TEMPLATE_PAYMENT_CONFIRMATION:
 		return ejr.sendPaymentConfirmationEmail(ctx, emailJob, recipient, cc, emailJob.Subject)
+	case enums.EMAIL_TEMPLATE_CUSTOMER_VERIFICATION:
+		return ejr.sendCustomerVerificationEmail(ctx, emailJob, recipient, cc, emailJob.Subject)
 	default:
 		err := fmt.Errorf("unknown template: %s", emailJob.TemplateName)
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -311,6 +317,32 @@ func (ejr *EmailJobRunner) sendPaymentConfirmationEmail(ctx context.Context, ema
 		logtag,
 		zap.String("result", "success"),
 		zap.String("payment_reference", checkoutPayment.ReferenceNumber),
+		zap.String("recipient", recipient),
+		zap.Strings("cc", cc),
+	)
+
+	return nil
+}
+
+func (ejr *EmailJobRunner) sendCustomerVerificationEmail(ctx context.Context, emailJob queries.TblEmailJob, recipient string, cc []string, subject string) error {
+	const logtag = "[EmailJobRunner sendCustomerVerificationEmail]"
+
+	cfg := conf.Conf()
+	templateData := mail.TemplateData{
+		"OTPCode":  emailJob.OtpCode.String,
+		"LogoURL":  constants.PathEmailLogoCDN,
+		"MobileNo": cfg.Settings.MobileNo,
+		"EMail":    cfg.Settings.EMail,
+	}
+
+	if err := ejr.mailService.SendTemplateEmail(recipient, cc, subject, enums.EMAIL_TEMPLATE_CUSTOMER_VERIFICATION.FileName(), templateData); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		return errors.Join(errs.ErrJobsSendEmail, err)
+	}
+
+	logs.LogCtx(ctx).Info(
+		logtag,
+		zap.String("result", "success"),
 		zap.String("recipient", recipient),
 		zap.Strings("cc", cc),
 	)

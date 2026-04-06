@@ -172,6 +172,7 @@ func (s *CustomerService) BuildProfile(ctx context.Context, customerID string) (
 		Email:        customer.Email,
 		MobileNo:     customer.MobileNo,
 		CustomerType: enums.ParseCustomerTypeToEnum(customer.CustomerType),
+		Status:       enums.ParseCustomerStatusToEnum(customer.Status),
 	}
 
 	if profile.CustomerType == enums.CUSTOMER_TYPE_COMPANY {
