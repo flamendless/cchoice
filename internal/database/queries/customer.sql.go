@@ -21,11 +21,12 @@ INSERT INTO tbl_customers (
     mobile_no,
     password,
     customer_type,
+    status,
     created_at,
     updated_at,
     deleted_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), '1970-01-01 00:00:00+00:00'
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, 'UNVERIFIED', datetime('now'), datetime('now'), '1970-01-01 00:00:00+00:00'
 ) RETURNING id
 `
 
@@ -94,6 +95,7 @@ SELECT
     mobile_no,
     password,
     customer_type,
+    status,
     created_at,
     updated_at
 FROM tbl_customers
@@ -113,6 +115,7 @@ type GetAllCustomersRow struct {
 	MobileNo     string
 	Password     string
 	CustomerType string
+	Status       string
 	CreatedAt    string
 	UpdatedAt    string
 }
@@ -137,6 +140,7 @@ func (q *Queries) GetAllCustomers(ctx context.Context) ([]GetAllCustomersRow, er
 			&i.MobileNo,
 			&i.Password,
 			&i.CustomerType,
+			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -165,6 +169,7 @@ SELECT
     mobile_no,
     password,
     customer_type,
+    status,
     created_at,
     updated_at
 FROM tbl_customers
@@ -185,6 +190,7 @@ type GetCustomerByEmailRow struct {
 	MobileNo     string
 	Password     string
 	CustomerType string
+	Status       string
 	CreatedAt    string
 	UpdatedAt    string
 }
@@ -203,6 +209,7 @@ func (q *Queries) GetCustomerByEmail(ctx context.Context, email string) (GetCust
 		&i.MobileNo,
 		&i.Password,
 		&i.CustomerType,
+		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -221,6 +228,7 @@ SELECT
     mobile_no,
     password,
     customer_type,
+    status,
     created_at,
     updated_at
 FROM tbl_customers
@@ -241,6 +249,7 @@ type GetCustomerByIDRow struct {
 	MobileNo     string
 	Password     string
 	CustomerType string
+	Status       string
 	CreatedAt    string
 	UpdatedAt    string
 }
@@ -259,6 +268,7 @@ func (q *Queries) GetCustomerByID(ctx context.Context, id int64) (GetCustomerByI
 		&i.MobileNo,
 		&i.Password,
 		&i.CustomerType,
+		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

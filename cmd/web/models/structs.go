@@ -172,6 +172,7 @@ type CustomerProfile struct {
 	Email        string
 	MobileNo     string
 	CustomerType enums.CustomerType
+	Status       enums.CustomerStatus
 	CompanyName  string
 }
 
