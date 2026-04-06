@@ -2,6 +2,59 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.18"></a>
+## [release-v1.1.18] - 2026-04-06
+### Bugfix
+- Image size
+- Remove header content type for changelog handler
+
+### Docs
+- Add cpoints diagram
+- Release v1.1.17
+
+### Feature
+- Customer verification via OTP in email
+- QR code
+- C-Points generation
+- WIP C-Points
+- WIP customer login
+- Thumbnail service
+
+### Maintenance
+- Use constants for mobile number prefix and add validations
+- Add IService
+- Add audit logging for report exports
+- Update db interface naming
+- Add OutputFormat enum
+- Optimize map caching by pre-allocating province slice capacity
+- Inline err assignments into if expressions
+- Move AttendanceService and ReportService to shared Server struct
+- Use enum for AppEnv instead of strings
+
+### Performance
+- Store CDN URL in product images
+
+### Script
+- Add servecustomer in magefile
+- Exclude png file in trailing whitespace check
+
+### Server
+- Add customer status
+- Implement rate limit for customer endpoints
+- Implement HMAC based cpoints
+
+### Web
+- Block c-points for unverified users
+- Update mobile prefix
+- Logged in user should not be able to visit login page
+- Style customer profile
+- Improve and unify styles across admin and customer pages
+- Add customer cpoints and redeem pages
+- Add confirm password and fix bugs
+- Display uploaded image preview
+- Add product specs to admin products listing
+
+
 <a name="release-v1.1.17"></a>
 ## [release-v1.1.17] - 2026-03-19
 ### Docs
