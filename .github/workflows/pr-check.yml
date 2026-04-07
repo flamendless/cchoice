@@ -88,8 +88,6 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: stable
-      - name: Install libvips
-        run: sudo apt-get update && sudo apt-get install -y libvips-dev pkg-config
       - uses: golang/govulncheck-action@v1
 
   gensql:
@@ -102,8 +100,6 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: stable
-      - name: Install libvips
-        run: sudo apt-get update && sudo apt-get install -y libvips-dev pkg-config
       - run: go install github.com/magefile/mage@latest
       - run: mage gensql
 
@@ -117,14 +113,12 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: stable
-      - name: Install libvips
-        run: sudo apt-get update && sudo apt-get install -y libvips-dev pkg-config
-      - run: go install github.com/magefile/mage@latest
       - name: Install tailwindcss
         run: |
           curl -LO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
           chmod +x tailwindcss-linux-x64
           mv tailwindcss-linux-x64 tailwindcss
+      - run: go install github.com/magefile/mage@latest
       - run: mage gentempl
 
   build:
@@ -137,9 +131,8 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: stable
-      - name: Install libvips
-        run: sudo apt-get update && sudo apt-get install -y libvips-dev pkg-config
-      - run: go build
+      - run: go install github.com/magefile/mage@latest
+      - run: mage build
 
   lint:
     name: Lint
@@ -151,8 +144,6 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: stable
-      - name: Install libvips
-        run: sudo apt-get update && sudo apt-get install -y libvips-dev pkg-config
       - uses: golangci/golangci-lint-action@v9
         with:
           version: latest
