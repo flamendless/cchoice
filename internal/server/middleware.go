@@ -132,12 +132,7 @@ func (s *Server) requireStaffAuth(next http.Handler) http.Handler {
 func (s *Server) requireSuperuserAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		staff, err := s.services.staff.GetCurrentStaff(r.Context(), s.sessionManager.GetString(r.Context(), SessionStaffID))
-		if staff.ID == 0 {
-			redirectHX(w, r, utils.URLWithError("/admin", "Login to access page"))
-			return
-		}
-
-		if err != nil || staff.UserType != enums.STAFF_USER_TYPE_SUPERUSER.String() {
+		if err != nil || staff.UserType != enums.STAFF_USER_TYPE_SUPERUSER {
 			redirectHX(w, r, utils.URLWithError("/admin/staff", "Login to access page"))
 			return
 		}

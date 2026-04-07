@@ -135,6 +135,9 @@ func (s *StaffService) GetAllForAdmin(ctx context.Context, search string) ([]que
 
 func (s *StaffService) GetCurrentStaff(ctx context.Context, staffID string) (models.AdminStaffProfile, error) {
 	decodedID := s.encoder.Decode(staffID)
+	if decodedID == encode.INVALID {
+		return models.AdminStaffProfile{}, errs.ErrDecode
+	}
 	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedID)
 	if err != nil {
 		return models.AdminStaffProfile{}, err
