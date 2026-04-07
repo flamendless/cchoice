@@ -89,7 +89,7 @@ jobs:
         with:
           go-version: stable
       - name: Install libvips
-        run: sudo apt-get update sudo apt-get install -y libvips-dev pkg-config
+        run: sudo apt-get update && sudo apt-get install -y libvips-dev pkg-config
       - name: Verify libvips
         run: pkg-config --modversion vips
       - uses: golang/govulncheck-action@v1
@@ -137,7 +137,7 @@ jobs:
           go-version: stable
       - run: go install github.com/magefile/mage@latest
       - name: Install libvips
-        run: sudo apt-get update sudo apt-get install -y libvips-dev pkg-config
+        run: sudo apt-get update && sudo apt-get install -y libvips-dev pkg-config
       - name: Verify libvips
         run: pkg-config --modversion vips
       - run: mage build
@@ -153,7 +153,7 @@ jobs:
         with:
           go-version: stable
       - name: Install libvips
-        run: sudo apt-get update sudo apt-get install -y libvips-dev pkg-config
+        run: sudo apt-get update && sudo apt-get install -y libvips-dev pkg-config
       - name: Verify libvips
         run: pkg-config --modversion vips
       - uses: golangci/golangci-lint-action@v9
