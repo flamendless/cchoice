@@ -12,6 +12,7 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/staff"
 	"cchoice/internal/types"
@@ -411,6 +412,10 @@ func (s *AttendanceService) GetAllStaffTimeOffs(ctx context.Context) ([]models.S
 
 func (s *AttendanceService) GetStaffDayAttendance(ctx context.Context, staffID string, date string) (StaffDayAttendance, error) {
 	decodedID := s.encoder.Decode(staffID)
+	if decodedID == encode.INVALID {
+		return StaffDayAttendance{}, errs.ErrDecode
+	}
+
 	staffRow, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedID)
 	if err != nil {
 		return StaffDayAttendance{}, err
