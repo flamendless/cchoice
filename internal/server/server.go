@@ -176,18 +176,18 @@ func NewServer() *ServerInstance {
 		),
 	}
 
-	staffLogService := services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW)
-	locationService := services.NewLocationService(cfg.Settings.ShopLocation)
 	attendanceService := services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW)
 	cpointTokenService := services.NewCPointTokenService(cfg.CPointHMACSecret)
+	locationService := services.NewLocationService(cfg.Settings.ShopLocation)
+	staffLogService := services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW)
 
 	newServer.services = Services{
 		attendance:   services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		brand:        services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		customer:     services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		customerOTP:  services.NewCustomerOTPService(newServer.encoder, newServer.dbRO, newServer.dbRW, mailService, emailJobRunner),
 		cpoint:       services.NewCpointService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, cpointTokenService),
 		cpointToken:  cpointTokenService,
+		customer:     services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		customerOTP:  services.NewCustomerOTPService(newServer.encoder, newServer.dbRO, newServer.dbRW, mailService, emailJobRunner),
 		location:     services.NewLocationService(cfg.Settings.ShopLocation),
 		product:      services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW, newServer.GetCDNURL),
 		productImage: services.NewProductImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
@@ -201,9 +201,10 @@ func NewServer() *ServerInstance {
 	newServer.services.all = []services.IService{
 		newServer.services.attendance,
 		newServer.services.brand,
+		newServer.services.cpoint,
+		newServer.services.cpointToken,
 		newServer.services.customer,
 		newServer.services.customerOTP,
-		newServer.services.cpoint,
 		newServer.services.location,
 		newServer.services.product,
 		newServer.services.productImage,
@@ -212,7 +213,6 @@ func NewServer() *ServerInstance {
 		newServer.services.role,
 		newServer.services.staff,
 		newServer.services.staffLog,
-		newServer.services.cpointToken,
 	}
 	for _, s := range newServer.services.all {
 		s.Log()
