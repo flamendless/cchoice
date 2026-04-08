@@ -26,7 +26,7 @@ func NewMoneyFromString(price string, currency string) (*money.Money, error) {
 	return m, nil
 }
 
-//INFO: (Brandon) - 2nd return value 'price' can also be the same as the origPrice
+// INFO: (Brandon) - 2nd return value 'price' can also be the same as the origPrice
 func GetOrigAndDiscounted(
 	isOnSale int64,
 	unitPriceWithVat int64,

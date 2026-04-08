@@ -314,13 +314,13 @@ func Setup() error {
 		"commit-msg",
 	}
 	for _, hook := range hooks {
-		hookPath := "./.git/hooks/"+hook
+		hookPath := "./.git/hooks/" + hook
 		fmt.Println("Checking", hookPath)
 		if _, err := os.Stat(hookPath); os.IsNotExist(err) {
 			fmt.Println(hookPath, "not yet copied... Copying...")
 			if err := run(Command{
 				Type: CmdExec,
-				Cmd: "cp",
+				Cmd:  "cp",
 				Args: []string{fmt.Sprintf("./scripts/%s.sh", hook), hookPath},
 			}); err != nil {
 				return err
