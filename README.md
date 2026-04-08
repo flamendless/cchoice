@@ -11,6 +11,7 @@
 - `mage setupprod`
 - `mage genall`
 - `mage cleandb`
+- `mage dbup`
 - `mage genimages`
 - `mage genmaps`
 - `mage testall`

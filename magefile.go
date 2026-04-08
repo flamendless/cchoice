@@ -776,7 +776,7 @@ func CheckCommitPrefix() error {
 }
 
 func hasExtChanges(ext string) (bool, error) {
-	cmd := exec.Command("git", "diff", "--name-only", "HEAD", "--", ext)
+	cmd := exec.Command("git", "status", "--porcelain", "--", ext)
 	output, err := cmd.Output()
 	if err != nil {
 		cmd = exec.Command("git", "diff", "--name-only", "--cached", "--", ext)
