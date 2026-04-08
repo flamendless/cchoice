@@ -11,11 +11,12 @@ func _() {
 	_ = x[STAFF_ROLE_UNDEFINED-0]
 	_ = x[STAFF_ROLE_CREATE_PRODUCT-1]
 	_ = x[STAFF_ROLE_CREATE_CPOINTS-2]
+	_ = x[STAFF_ROLE_MANAGE_HOLIDAYS-3]
 }
 
-const _StaffRole_name = "UNDEFINEDCREATE_PRODUCTCREATE_CPOINTS"
+const _StaffRole_name = "UNDEFINEDCREATE_PRODUCTCREATE_CPOINTSMANAGE_HOLIDAYS"
 
-var _StaffRole_index = [...]uint8{0, 9, 23, 37}
+var _StaffRole_index = [...]uint8{0, 9, 23, 37, 52}
 
 func (i StaffRole) String() string {
 	idx := int(i) - 0
