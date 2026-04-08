@@ -309,23 +309,25 @@ func BuildGoose() error {
 }
 
 func Setup() error {
-	const pathPreCommitHook = "./.git/hooks/pre-commit"
-	if _, err := os.Stat(pathPreCommitHook); os.IsNotExist(err) {
-		if err := run(Command{Type: CmdExec, Cmd: "cp", Args: []string{"./scripts/pre-commit-unit-test.sh", pathPreCommitHook}}); err != nil {
-			return err
-		}
-		if err := os.Chmod(pathPreCommitHook, PERM); err != nil {
-			return err
-		}
+	hooks := []string{
+		"pre-commit",
+		"commit-msg",
 	}
-
-	const pathCommitMsgHook = "./.git/hooks/commit-msg"
-	if _, err := os.Stat(pathCommitMsgHook); os.IsNotExist(err) {
-		if err := run(Command{Type: CmdExec, Cmd: "cp", Args: []string{"./scripts/commit-msg.sh", pathCommitMsgHook}}); err != nil {
-			return err
-		}
-		if err := os.Chmod(pathCommitMsgHook, PERM); err != nil {
-			return err
+	for _, hook := range hooks {
+		hookPath := "./.git/hooks/"+hook
+		fmt.Println("Checking", hookPath)
+		if _, err := os.Stat(hookPath); os.IsNotExist(err) {
+			fmt.Println(hookPath, "not yet copied... Copying...")
+			if err := run(Command{
+				Type: CmdExec,
+				Cmd: "cp",
+				Args: []string{fmt.Sprintf("./scripts/%s.sh", hook), hookPath},
+			}); err != nil {
+				return err
+			}
+			if err := os.Chmod(hookPath, PERM); err != nil {
+				return err
+			}
 		}
 	}
 
