@@ -9,4 +9,6 @@ var (
 	ErrGeocodingEmptyCoordinates = errors.New("[GEOCODING]: Coordinates cannot be empty")
 	ErrGeocodingAddressTooShort  = errors.New("[GEOCODING]: Address is too short, minimum 10 characters required")
 	ErrGeocodingInvalidLocation  = errors.New("[GEOCODING]: Location must have either valid coordinates or an address")
+	ErrGeocodingLatLngRequired   = errors.New("[GEOCODING]: Lat and lng required")
+	ErrGeocodingInvalidLatLng    = errors.New("[GEOCODING]: Invalid lat/lng")
 )

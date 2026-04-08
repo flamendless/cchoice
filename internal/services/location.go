@@ -4,11 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/types"
 	"cchoice/internal/utils"
@@ -115,13 +115,13 @@ func (s *LocationService) ComputeLocationFromRequest(r *http.Request) (lat, lng 
 	}
 
 	if latStr == "" || lngStr == "" {
-		return 0, 0, errors.New("lat and lng required")
+		return 0, 0, errs.ErrGeocodingLatLngRequired
 	}
 
 	lat, err1 := strconv.ParseFloat(latStr, 64)
 	lng, err2 := strconv.ParseFloat(lngStr, 64)
 	if err1 != nil || err2 != nil {
-		return 0, 0, errors.New("invalid lat/lng")
+		return 0, 0, errs.ErrGeocodingInvalidLatLng
 	}
 
 	return lat, lng, nil

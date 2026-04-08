@@ -1,15 +1,16 @@
 package services
 
 import (
-	"cchoice/internal/logs"
 	"crypto/hmac"
 	"crypto/sha256"
 	"crypto/subtle"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"strings"
 	"time"
+
+	"cchoice/internal/errs"
+	"cchoice/internal/logs"
 )
 
 type CPointTokenService struct {
@@ -55,14 +56,14 @@ func (s *CPointTokenService) Generate(code string, userID string, ttl time.Durat
 func (s *CPointTokenService) Verify(token string) (*CPointTokenPayload, error) {
 	parts := strings.Split(token, ".")
 	if len(parts) != 2 {
-		return nil, errors.New("invalid token format")
+		return nil, errs.ErrCpointInvalidTokenFormat
 	}
 
 	encodedPayload, signature := parts[0], parts[1]
 
 	payloadBytes, err := base64.URLEncoding.DecodeString(encodedPayload)
 	if err != nil {
-		return nil, errors.New("invalid payload encoding")
+		return nil, errs.ErrCpointInvalidPayloadEncoding
 	}
 
 	h := hmac.New(sha256.New, s.secret)
@@ -70,20 +71,20 @@ func (s *CPointTokenService) Verify(token string) (*CPointTokenPayload, error) {
 	expectedSig := base64.URLEncoding.EncodeToString(h.Sum(nil))
 
 	if subtle.ConstantTimeCompare([]byte(signature), []byte(expectedSig)) != 1 {
-		return nil, errors.New("invalid signature")
+		return nil, errs.ErrCpointInvalidSignature
 	}
 
 	var payload CPointTokenPayload
 	if err := json.Unmarshal(payloadBytes, &payload); err != nil {
-		return nil, errors.New("invalid payload")
+		return nil, errs.ErrCpointInvalidPayload
 	}
 
 	if payload.Code == "" || payload.UserID == "" {
-		return nil, errors.New("missing required fields")
+		return nil, errs.ErrCpointMissingRequiredFields
 	}
 
 	if payload.Exp < time.Now().Unix() {
-		return nil, errors.New("token expired")
+		return nil, errs.ErrCpointTokenExpired
 	}
 
 	return &payload, nil
