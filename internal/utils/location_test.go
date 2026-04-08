@@ -16,11 +16,11 @@ func TestHaversineDistanceMeters(t *testing.T) {
 		tolerance float64
 	}{
 		{
-			name: "attendance sample coordinates",
-			lat1: 14.333199079659577,
-			lng1: 120.88151883134833,
-			lat2: 14.3329,
-			lng2: 120.8811,
+			name:      "attendance sample coordinates",
+			lat1:      14.333199079659577,
+			lng1:      120.88151883134833,
+			lat2:      14.3329,
+			lng2:      120.8811,
 			expected:  56.053545,
 			tolerance: 0.5,
 		},

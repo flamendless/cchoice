@@ -59,4 +59,3 @@ type StaffRow struct {
 	LunchBreakOutOs             sql.NullString
 	LunchBreakOutDevice         sql.NullString
 }
-

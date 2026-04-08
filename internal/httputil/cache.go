@@ -99,7 +99,6 @@ func setCacheControlHeaders(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400") // 1 hour, stale 1 day
 	}
 
-
 	if r.URL.RawQuery != "" {
 		w.Header().Set("Vary", "Accept, Accept-Encoding")
 	}

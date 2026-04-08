@@ -50,7 +50,7 @@ var scanReceiptCmd = &cobra.Command{
 		var ocrService scanner.IReceiptScanner
 		if ocrServiceName == receipt.RECEIPT_SCANNER_GOOGLEVISION.String() {
 			ocrService = googlevision.MustInit()
-			defer func(){
+			defer func() {
 				if err := ocrService.Close(); err != nil {
 					panic(err)
 				}

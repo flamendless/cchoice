@@ -117,7 +117,7 @@ func (w *CSVWriter) Write(data *scanner.ReceiptData, outputPath string) error {
 
 		for i, item := range data.Items {
 			if err := writer.Write([]string{
-				strconv.Itoa(i+1),
+				strconv.Itoa(i + 1),
 				item.Name,
 				item.Quantity,
 				item.Price,

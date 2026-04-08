@@ -10,9 +10,8 @@ type ChangeSection struct {
 }
 
 type ChangeLog struct {
-	Version string
-	Date    string
-	Anchor  string
+	Version  string
+	Date     string
+	Anchor   string
 	Sections []ChangeSection
 }
-
