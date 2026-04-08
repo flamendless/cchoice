@@ -319,6 +319,16 @@ func Setup() error {
 		}
 	}
 
+	const pathCommitMsgHook = "./.git/hooks/commit-msg"
+	if _, err := os.Stat(pathCommitMsgHook); os.IsNotExist(err) {
+		if err := run(Command{Type: CmdExec, Cmd: "cp", Args: []string{"./scripts/commit-msg.sh", pathCommitMsgHook}}); err != nil {
+			return err
+		}
+		if err := os.Chmod(pathCommitMsgHook, PERM); err != nil {
+			return err
+		}
+	}
+
 	const pathEnv = "./.env"
 	if _, err := os.Stat(pathEnv); os.IsNotExist(err) {
 		return run(Command{Type: CmdExec, Cmd: "cp", Args: []string{"./.env.sample", pathEnv}})
@@ -695,6 +705,7 @@ func SC() error {
 }
 
 func HasTrailingWhitespace() bool {
+	fmt.Println("Running has trailing whitespace...")
 	gitCmd := exec.Command("git", "diff", "--name-only", "HEAD")
 	var gitOut bytes.Buffer
 	gitCmd.Stdout = &gitOut
@@ -725,6 +736,41 @@ func HasTrailingWhitespace() bool {
 	}
 
 	return string(out) != ""
+}
+
+func CheckCommitPrefix() error {
+	fmt.Println("Running check commit prefix...")
+
+	msgBytes, err := os.ReadFile(".git/COMMIT_EDITMSG")
+	if err != nil {
+		return fmt.Errorf("failed to read commit message: %w", err)
+	}
+
+	commitMsg := strings.TrimSpace(string(msgBytes))
+	fmt.Println("Commit message:", commitMsg)
+
+	validPrefixes := []string{
+		"Feature",
+		"Maintenance",
+		"Deps",
+		"Toolings",
+		"Script",
+		"CICD",
+		"Config",
+		"Docs",
+		"Performance",
+		"Server",
+		"Web",
+		"Bugfix",
+	}
+
+	for _, p := range validPrefixes {
+		if strings.HasPrefix(commitMsg, p+":") {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("commit message '%s' does not start with a valid prefix", commitMsg)
 }
 
 func hasExtChanges(ext string) (bool, error) {
