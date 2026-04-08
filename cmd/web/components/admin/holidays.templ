@@ -1,0 +1,192 @@
+package components
+
+import (
+	"fmt"
+
+	"cchoice/cmd/web/models"
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/header"
+	"cchoice/internal/enums"
+	"cchoice/internal/utils"
+)
+
+templ AdminHolidaysListPage(title string) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("Holidays - C-Choice Admin")
+		</head>
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-col"
+			_="init call metrics_event('admin_visit', 'holidays list')"
+		>
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-7xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.AdminStaffHeaderWithBack()
+						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+							Manage Holidays
+						</h1>
+						@HolidaysListSection()
+					</div>
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+templ HolidaysListSection() {
+	<div
+		class="bg-white rounded-lg shadow-md p-6"
+		hx-get={ utils.URL("/admin/holidays/table") }
+		hx-trigger="load"
+		hx-target="#holidays-table"
+		hx-swap="innerHTML"
+	>
+		@HolidaysCreateForm()
+		<div id="holidays-table">
+		</div>
+	</div>
+}
+
+templ HolidaysCreateForm() {
+	<div class="mb-6 p-4 bg-gray-50 rounded-lg">
+		<h2 class="text-lg font-semibold mb-3">Add New Holiday</h2>
+		<form
+			hx-post={ utils.URL("/admin/holidays") }
+			hx-target="#holidays-table"
+			hx-swap="innerHTML"
+			class="flex flex-wrap gap-3 items-end"
+		>
+			<div>
+				<label class="block text-sm font-medium text-gray-700">Date</label>
+				<input
+					type="date"
+					name="date"
+					required
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-700">Name</label>
+				<input
+					type="text"
+					name="name"
+					placeholder="Holiday name"
+					required
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-700">Type</label>
+				<select
+					name="type"
+					required
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				>
+					for _, ht := range enums.AllHolidayTypes {
+						<option value={ ht.String() }>{ ht.String() }</option>
+					}
+				</select>
+			</div>
+			<button
+				type="submit"
+				class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2"
+			>
+				Add Holiday
+			</button>
+		</form>
+	</div>
+}
+
+templ AdminHolidaysListTable(holidays []models.AdminHolidayListItem) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-50">
+				<tr>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">
+						Date
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[30%]">
+						Name
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[30%]">
+						Type
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">
+						Actions
+					</th>
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				if len(holidays) == 0 {
+					<tr>
+						<td colspan="4" class="px-6 py-4 text-center text-gray-500">
+							No holidays found. Add a holiday above.
+						</td>
+					</tr>
+				} else {
+					for _, holiday := range holidays {
+						<tr id={ fmt.Sprintf("holiday-row-%s", holiday.ID) }>
+							<td class="px-6 py-4 whitespace-nowrap text-sm w-[20%] text-gray-900">
+								{ holiday.Date }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm w-[30%] text-gray-900">
+								{ holiday.Name }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm w-[30%]">
+								@HolidayTypeBadge(holiday.Type)
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm w-[20%]">
+								@HolidayActionsCell(holiday)
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ HolidayTypeBadge(holidayType enums.HolidayType) {
+	switch holidayType {
+	case enums.HOLIDAY_TYPE_PUBLIC:
+		<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+			Public
+		</span>
+	case enums.HOLIDAY_TYPE_REGULAR:
+		<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+			Regular
+		</span>
+	case enums.HOLIDAY_TYPE_SPECIAL_NON_WORKING:
+		<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+			Special Non-Working
+		</span>
+	case enums.HOLIDAY_TYPE_SPECIAL_WORKING:
+		<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+			Special Working
+		</span>
+	default:
+		<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+			Unknown
+		</span>
+	}
+}
+
+templ HolidayActionsCell(holiday models.AdminHolidayListItem) {
+	<div class="flex items-center gap-2">
+		<button
+			type="button"
+			class="text-red-600 hover:text-red-800 text-sm"
+			hx-delete={ utils.URLf("/admin/holidays/%s", holiday.ID) }
+			hx-target={ fmt.Sprintf("#holiday-row-%s", holiday.ID) }
+			hx-swap="outerHTML"
+			hx-confirm="Are you sure you want to delete this holiday?"
+		>
+			Delete
+		</button>
+	</div>
+}

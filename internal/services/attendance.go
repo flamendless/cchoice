@@ -25,6 +25,7 @@ type AttendanceService struct {
 	dbRO         database.IService
 	dbRW         database.IService
 	shopLocation types.Location
+	holiday      *HolidayService
 }
 
 type attendanceStatusResult struct {
@@ -40,12 +41,14 @@ type attendanceStatusResult struct {
 func NewAttendanceService(
 	encoder encode.IEncode,
 	ro, rw database.IService,
+	holiday *HolidayService,
 ) *AttendanceService {
 	return &AttendanceService{
 		encoder:      encoder,
 		dbRO:         ro,
 		dbRW:         rw,
 		shopLocation: conf.Conf().Settings.ShopLocation,
+		holiday:      holiday,
 	}
 }
 

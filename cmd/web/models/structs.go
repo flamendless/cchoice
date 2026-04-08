@@ -299,6 +299,13 @@ type AdminStaffListItem struct {
 	Roles    []enums.StaffRole
 }
 
+type AdminHolidayListItem struct {
+	ID   string
+	Date string
+	Name string
+	Type enums.HolidayType
+}
+
 type StaffLog struct {
 	ID         string
 	StaffID    string

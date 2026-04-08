@@ -174,6 +174,15 @@ type TblGeocodingCache struct {
 	ExpiresAt         sql.NullTime
 }
 
+type TblHoliday struct {
+	ID        int64
+	Date      string
+	Name      string
+	Type      string
+	CreatedAt string
+	UpdatedAt sql.NullString
+}
+
 type TblOrder struct {
 	ID                       int64
 	CheckoutID               int64
@@ -367,6 +376,9 @@ type TblStaffAttendance struct {
 	LunchBreakOut            sql.NullString
 	LunchBreakOutLocation    sql.NullString
 	LunchBreakOutUseragentID sql.NullInt64
+	IsHoliday                sql.NullInt64
+	HolidayType              sql.NullString
+	HolidayName              sql.NullString
 }
 
 type TblStaffLog struct {

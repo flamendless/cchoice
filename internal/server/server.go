@@ -45,6 +45,7 @@ type Services struct {
 	cpointToken  *services.CPointTokenService
 	customer     *services.CustomerService
 	customerOTP  *services.CustomerOTPService
+	holiday      *services.HolidayService
 	location     *services.LocationService
 	product      *services.ProductService
 	productImage *services.ProductImageService
@@ -178,19 +179,21 @@ func NewServer() *ServerInstance {
 
 	staffLogService := services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW)
 	cpointTokenService := services.NewCPointTokenService(cfg.CPointHMACSecret)
+	holidayService := services.NewHolidayService(newServer.encoder, newServer.dbRO, newServer.dbRW)
 
 	newServer.services = Services{
-		attendance:   services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		attendance:   services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW, holidayService),
 		brand:        services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		customer:     services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		customerOTP:  services.NewCustomerOTPService(newServer.encoder, newServer.dbRO, newServer.dbRW, mailService, emailJobRunner),
 		cpoint:       services.NewCpointService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, cpointTokenService),
 		cpointToken:  cpointTokenService,
+		holiday:      holidayService,
 		location:     services.NewLocationService(cfg.Settings.ShopLocation),
 		product:      services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW, newServer.GetCDNURL),
 		productImage: services.NewProductImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
 		qr:           services.NewQRService(newServer.cache),
-		report:       services.NewReportService(newServer.encoder, newServer.dbRO, staffLogService),
+		report:       services.NewReportService(newServer.encoder, newServer.dbRO, staffLogService, holidayService),
 		role:         services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staff:        services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staffLog:     staffLogService,
@@ -202,6 +205,7 @@ func NewServer() *ServerInstance {
 		newServer.services.customer,
 		newServer.services.customerOTP,
 		newServer.services.cpoint,
+		newServer.services.holiday,
 		newServer.services.location,
 		newServer.services.product,
 		newServer.services.productImage,
@@ -212,9 +216,12 @@ func NewServer() *ServerInstance {
 		newServer.services.staffLog,
 		newServer.services.cpointToken,
 	}
+
+	fmt.Println("========[SERVICES]========")
 	for _, s := range newServer.services.all {
 		s.Log()
 	}
+	fmt.Println("===========[END]==========")
 
 	ctx := context.Background()
 	settings, err := requests.GetSettingsData(

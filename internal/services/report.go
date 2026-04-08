@@ -11,6 +11,7 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/xuri/excelize/v2"
@@ -21,12 +22,31 @@ type ReportService struct {
 	encoder  encode.IEncode
 	dbRO     database.IService
 	staffLog *StaffLogsService
+	holiday  *HolidayService
+}
+
+var headers = []string{
+	"Date",
+	"Name",
+	"Time In",
+	"Time Out",
+	"Holiday",
+	"Holiday Type",
+	"Duration",
+	"In Loc/Useragent",
+	"Out Loc/Useragent",
+	"Lunch Break In",
+	"Lunch Break Out",
+	"Lunch Break Duration",
+	"Lunch Break In Loc/Useragent",
+	"Lunch Break Out Loc/Useragent",
 }
 
 func NewReportService(
 	encoder encode.IEncode,
 	dbRO database.IService,
 	staffLog *StaffLogsService,
+	holiday *HolidayService,
 ) *ReportService {
 	if staffLog == nil {
 		panic("StaffLogsService is required")
@@ -35,6 +55,7 @@ func NewReportService(
 		encoder:  encoder,
 		dbRO:     dbRO,
 		staffLog: staffLog,
+		holiday:  holiday,
 	}
 }
 
@@ -54,6 +75,44 @@ func (s *ReportService) StreamReportCSV(
 			logs.LogCtx(ctx).Error("[ReportService] failed to log csv report generation", zap.Error(err))
 		}
 	}()
+
+	startTime, err := time.Parse(constants.DateLayoutISO, startDate)
+	if err != nil {
+		result = err.Error()
+		return err
+	}
+	endTime, err := time.Parse(constants.DateLayoutISO, endDate)
+	if err != nil {
+		result = err.Error()
+		return err
+	}
+
+	holidays, err := s.holiday.GetHolidaysByDateRange(ctx, startTime, endTime)
+	if err != nil {
+		result = err.Error()
+		return err
+	}
+
+	holidayMap := make(map[string]Holiday, len(holidays))
+	for _, h := range holidays {
+		holidayMap[h.Date] = h
+	}
+
+	attMap := make(map[string]staff.StaffRow, len(data))
+	for _, att := range data {
+		attMap[att.ForDate] = att
+	}
+
+	allDates := make([]string, 0, len(attMap)+len(holidayMap))
+	for d := range attMap {
+		allDates = append(allDates, d)
+	}
+	for d := range holidayMap {
+		if _, ok := attMap[d]; !ok {
+			allDates = append(allDates, d)
+		}
+	}
+	sort.Strings(allDates)
 
 	if err := writer.Write([]string{"Report name: " + filename}); err != nil {
 		result = err.Error()
@@ -94,7 +153,7 @@ func (s *ReportService) StreamReportCSV(
 			return err
 		}
 
-		attendanceService := NewAttendanceService(s.encoder, s.dbRO, nil)
+		attendanceService := NewAttendanceService(s.encoder, s.dbRO, nil, s.holiday)
 		extraStats := attendanceService.GetExtraStats(ctx, staffID, data)
 		if err := writer.Write([]string{fmt.Sprintf("Total undertime count: %d (%.2f minutes)", extraStats.TotalUndertimeCount, extraStats.TotalUndertimeMinutes)}); err != nil {
 			return err
@@ -108,86 +167,135 @@ func (s *ReportService) StreamReportCSV(
 		if err := writer.Write([]string{fmt.Sprintf("Total overtime count: %d", extraStats.TotalOvertimeCount)}); err != nil {
 			return err
 		}
-	}
 
-	if err := writer.Write([]string{
-		"date",
-		"name of staff",
-		"time in",
-		"time out",
-		"duration",
-		"in location and useragent",
-		"out location and useragent",
-		"lunch break start",
-		"lunch break end",
-		"lunch break duration",
-		"lunch break start location and useragent",
-		"lunch break end location and useragent",
-	}); err != nil {
-		return err
-	}
-
-	for _, att := range data {
-		timeIn := utils.ExtractTimeToPH(att.TimeIn.String)
-		timeOut := utils.ExtractTimeToPH(att.TimeOut.String)
-
-		var duration string
-		if att.TimeIn.Valid && att.TimeOut.Valid {
-			inTime, err := time.Parse(constants.TimeLayoutHHMMSS, timeIn)
-			if err != nil {
-				logs.Log().Warn("report generation", zap.String("time in", timeIn), zap.Error(err))
-			}
-
-			outTime, err := time.Parse(constants.TimeLayoutHHMMSS, timeOut)
-			if err != nil {
-				logs.Log().Warn("report generation", zap.String("time out", timeOut), zap.Error(err))
-			}
-
-			duration = outTime.Sub(inTime).String()
-		}
-
-		inLocUA := formatLocationAndUseragent(att.InLocation.String, att.InBrowser, att.InBrowserVersion, att.InOs, att.InDevice)
-		outLocUA := formatLocationAndUseragent(att.OutLocation.String, att.OutBrowser, att.OutBrowserVersion, att.OutOs, att.OutDevice)
-
-		lbIn := utils.ExtractTimeToPH(att.LunchBreakIn.String)
-		lbOut := utils.ExtractTimeToPH(att.LunchBreakOut.String)
-
-		var lbDuration string
-		if att.LunchBreakIn.Valid && att.LunchBreakOut.Valid {
-			inTime, err := time.Parse(constants.TimeLayoutHHMMSS, lbIn)
-			if err != nil {
-				logs.Log().Warn("report generation", zap.String("lunch break start", lbIn), zap.Error(err))
-			}
-
-			outTime, err := time.Parse(constants.TimeLayoutHHMMSS, lbOut)
-			if err != nil {
-				logs.Log().Warn("report generation", zap.String("lunch break end", lbOut), zap.Error(err))
-			}
-
-			lbDuration = outTime.Sub(inTime).String()
-		}
-
-		lbInLocUA := formatLocationAndUseragent(att.LunchBreakInLocation.String, att.LunchBreakInBrowser, att.LunchBreakInBrowserVersion, att.LunchBreakInOs, att.LunchBreakInDevice)
-		lbOutLocUA := formatLocationAndUseragent(att.LunchBreakOutLocation.String, att.LunchBreakOutBrowser, att.LunchBreakOutBrowserVersion, att.LunchBreakOutOs, att.LunchBreakOutDevice)
-
-		if err := writer.Write([]string{
-			att.ForDate,
-			utils.BuildFullName(att.FirstName, att.MiddleName.String, att.LastName),
-			timeIn,
-			timeOut,
-			duration,
-			inLocUA,
-			outLocUA,
-			lbIn,
-			lbOut,
-			lbDuration,
-			lbInLocUA,
-			lbOutLocUA,
-		}); err != nil {
+		if err := writer.Write(headers); err != nil {
 			return err
 		}
 	}
+
+	for _, dateStr := range allDates {
+		if h, ok := holidayMap[dateStr]; ok {
+			if att, ok := attMap[dateStr]; ok {
+				if err := writer.Write(buildAttendanceRowWithHoliday(att, h)); err != nil {
+					return err
+				}
+			} else {
+				if err := writer.Write([]string{
+					dateStr,
+					"",
+					"",
+					"",
+					h.Name,
+					h.Type.String(),
+					"",
+					"",
+					"",
+					"",
+					"",
+					"",
+					"",
+					"",
+				}); err != nil {
+					return err
+				}
+			}
+		} else if att, ok := attMap[dateStr]; ok {
+			if err := writer.Write(buildAttendanceRow(att)); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
+}
+
+func buildAttendanceRow(att staff.StaffRow) []string {
+	timeIn := utils.ExtractTimeToPH(att.TimeIn.String)
+	timeOut := utils.ExtractTimeToPH(att.TimeOut.String)
+
+	var duration string
+	if att.TimeIn.Valid && att.TimeOut.Valid {
+		inTime, _ := time.Parse(constants.TimeLayoutHHMMSS, timeIn)
+		outTime, _ := time.Parse(constants.TimeLayoutHHMMSS, timeOut)
+		duration = outTime.Sub(inTime).String()
+	}
+
+	inLocUA := formatLocationAndUseragent(att.InLocation.String, att.InBrowser, att.InBrowserVersion, att.InOs, att.InDevice)
+	outLocUA := formatLocationAndUseragent(att.OutLocation.String, att.OutBrowser, att.OutBrowserVersion, att.OutOs, att.OutDevice)
+
+	lbIn := utils.ExtractTimeToPH(att.LunchBreakIn.String)
+	lbOut := utils.ExtractTimeToPH(att.LunchBreakOut.String)
+
+	var lbDuration string
+	if att.LunchBreakIn.Valid && att.LunchBreakOut.Valid {
+		inTime, _ := time.Parse(constants.TimeLayoutHHMMSS, lbIn)
+		outTime, _ := time.Parse(constants.TimeLayoutHHMMSS, lbOut)
+		lbDuration = outTime.Sub(inTime).String()
+	}
+
+	lbInLocUA := formatLocationAndUseragent(att.LunchBreakInLocation.String, att.LunchBreakInBrowser, att.LunchBreakInBrowserVersion, att.LunchBreakInOs, att.LunchBreakInDevice)
+	lbOutLocUA := formatLocationAndUseragent(att.LunchBreakOutLocation.String, att.LunchBreakOutBrowser, att.LunchBreakOutBrowserVersion, att.LunchBreakOutOs, att.LunchBreakOutDevice)
+
+	return []string{
+		att.ForDate,
+		utils.BuildFullName(att.FirstName, att.MiddleName.String, att.LastName),
+		timeIn,
+		timeOut,
+		"",
+		"",
+		duration,
+		inLocUA,
+		outLocUA,
+		lbIn,
+		lbOut,
+		lbDuration,
+		lbInLocUA,
+		lbOutLocUA,
+	}
+}
+
+func buildAttendanceRowWithHoliday(att staff.StaffRow, h Holiday) []string {
+	timeIn := utils.ExtractTimeToPH(att.TimeIn.String)
+	timeOut := utils.ExtractTimeToPH(att.TimeOut.String)
+
+	var duration string
+	if att.TimeIn.Valid && att.TimeOut.Valid {
+		inTime, _ := time.Parse(constants.TimeLayoutHHMMSS, timeIn)
+		outTime, _ := time.Parse(constants.TimeLayoutHHMMSS, timeOut)
+		duration = outTime.Sub(inTime).String()
+	}
+
+	inLocUA := formatLocationAndUseragent(att.InLocation.String, att.InBrowser, att.InBrowserVersion, att.InOs, att.InDevice)
+	outLocUA := formatLocationAndUseragent(att.OutLocation.String, att.OutBrowser, att.OutBrowserVersion, att.OutOs, att.OutDevice)
+
+	lbIn := utils.ExtractTimeToPH(att.LunchBreakIn.String)
+	lbOut := utils.ExtractTimeToPH(att.LunchBreakOut.String)
+
+	var lbDuration string
+	if att.LunchBreakIn.Valid && att.LunchBreakOut.Valid {
+		inTime, _ := time.Parse(constants.TimeLayoutHHMMSS, lbIn)
+		outTime, _ := time.Parse(constants.TimeLayoutHHMMSS, lbOut)
+		lbDuration = outTime.Sub(inTime).String()
+	}
+
+	lbInLocUA := formatLocationAndUseragent(att.LunchBreakInLocation.String, att.LunchBreakInBrowser, att.LunchBreakInBrowserVersion, att.LunchBreakInOs, att.LunchBreakInDevice)
+	lbOutLocUA := formatLocationAndUseragent(att.LunchBreakOutLocation.String, att.LunchBreakOutBrowser, att.LunchBreakOutBrowserVersion, att.LunchBreakOutOs, att.LunchBreakOutDevice)
+
+	return []string{
+		att.ForDate,
+		utils.BuildFullName(att.FirstName, att.MiddleName.String, att.LastName),
+		timeIn,
+		timeOut,
+		h.Name,
+		h.Type.String(),
+		duration,
+		inLocUA,
+		outLocUA,
+		lbIn,
+		lbOut,
+		lbDuration,
+		lbInLocUA,
+		lbOutLocUA,
+	}
 }
 
 func (s *ReportService) StreamReportXLSX(
@@ -206,6 +314,44 @@ func (s *ReportService) StreamReportXLSX(
 			logs.LogCtx(ctx).Error("[ReportService] failed to log xlsx report generation", zap.Error(err))
 		}
 	}()
+
+	startTime, err := time.Parse(constants.DateLayoutISO, startDate)
+	if err != nil {
+		result = err.Error()
+		return err
+	}
+	endTime, err := time.Parse(constants.DateLayoutISO, endDate)
+	if err != nil {
+		result = err.Error()
+		return err
+	}
+
+	holidays, err := s.holiday.GetHolidaysByDateRange(ctx, startTime, endTime)
+	if err != nil {
+		result = err.Error()
+		return err
+	}
+
+	holidayMap := make(map[string]Holiday, len(holidays))
+	for _, h := range holidays {
+		holidayMap[h.Date] = h
+	}
+
+	attMap := make(map[string]staff.StaffRow, len(data))
+	for _, att := range data {
+		attMap[att.ForDate] = att
+	}
+
+	allDates := make([]string, 0, len(attMap)+len(holidayMap))
+	for d := range attMap {
+		allDates = append(allDates, d)
+	}
+	for d := range holidayMap {
+		if _, ok := attMap[d]; !ok {
+			allDates = append(allDates, d)
+		}
+	}
+	sort.Strings(allDates)
 
 	const sheet = "Sheet1"
 	row := 1
@@ -260,7 +406,7 @@ func (s *ReportService) StreamReportXLSX(
 		}
 		row++
 
-		attendanceService := NewAttendanceService(s.encoder, s.dbRO, nil)
+		attendanceService := NewAttendanceService(s.encoder, s.dbRO, nil, s.holiday)
 		extraStats := attendanceService.GetExtraStats(ctx, staffID, data)
 		if err := file.SetCellValue(
 			sheet,
@@ -294,102 +440,57 @@ func (s *ReportService) StreamReportXLSX(
 			return err
 		}
 		row++
-	}
 
-	headers := []string{
-		"date",
-		"name of staff",
-		"time in",
-		"time out",
-		"duration",
-		"in location and useragent",
-		"out location and useragent",
-		"lunch break start",
-		"lunch break end",
-		"lunch break duration",
-		"lunch break start location and useragent",
-		"lunch break end location and useragent",
-	}
-
-	for colIdx, header := range headers {
-		col, err := excelize.ColumnNumberToName(colIdx + 1)
-		if err != nil {
-			return err
-		}
-		if err := file.SetCellValue("Sheet1", fmt.Sprintf("%s%d", col, row), header); err != nil {
-			return err
-		}
-	}
-	row++
-
-	for _, att := range data {
-		timeIn := utils.ExtractTimeToPH(att.TimeIn.String)
-		timeOut := utils.ExtractTimeToPH(att.TimeOut.String)
-
-		var duration string
-		if att.TimeIn.Valid && att.TimeOut.Valid {
-			inTime, err := time.Parse(constants.TimeLayoutHHMMSS, timeIn)
-			if err != nil {
-				logs.Log().Warn("report generation", zap.String("time in", timeIn), zap.Error(err))
-			}
-
-			outTime, err := time.Parse(constants.TimeLayoutHHMMSS, timeOut)
-			if err != nil {
-				logs.Log().Warn("report generation", zap.String("time out", timeOut), zap.Error(err))
-			}
-
-			duration = outTime.Sub(inTime).String()
-		}
-
-		inLocUA := formatLocationAndUseragent(att.InLocation.String, att.InBrowser, att.InBrowserVersion, att.InOs, att.InDevice)
-		outLocUA := formatLocationAndUseragent(att.OutLocation.String, att.OutBrowser, att.OutBrowserVersion, att.OutOs, att.OutDevice)
-
-		lbIn := utils.ExtractTimeToPH(att.LunchBreakIn.String)
-		lbOut := utils.ExtractTimeToPH(att.LunchBreakOut.String)
-
-		var lbDuration string
-		if att.LunchBreakIn.Valid && att.LunchBreakOut.Valid {
-			inTime, err := time.Parse(constants.TimeLayoutHHMMSS, lbIn)
-			if err != nil {
-				logs.Log().Warn("report generation", zap.String("lunch break start", lbIn), zap.Error(err))
-			}
-
-			outTime, err := time.Parse(constants.TimeLayoutHHMMSS, lbOut)
-			if err != nil {
-				logs.Log().Warn("report generation", zap.String("lunch break end", lbOut), zap.Error(err))
-			}
-
-			lbDuration = outTime.Sub(inTime).String()
-		}
-
-		lbInLocUA := formatLocationAndUseragent(att.LunchBreakInLocation.String, att.LunchBreakInBrowser, att.LunchBreakInBrowserVersion, att.LunchBreakInOs, att.LunchBreakInDevice)
-		lbOutLocUA := formatLocationAndUseragent(att.LunchBreakOutLocation.String, att.LunchBreakOutBrowser, att.LunchBreakOutBrowserVersion, att.LunchBreakOutOs, att.LunchBreakOutDevice)
-
-		values := []string{
-			att.ForDate,
-			utils.BuildFullName(att.FirstName, att.MiddleName.String, att.LastName),
-			timeIn,
-			timeOut,
-			duration,
-			inLocUA,
-			outLocUA,
-			lbIn,
-			lbOut,
-			lbDuration,
-			lbInLocUA,
-			lbOutLocUA,
-		}
-
-		for colIdx, value := range values {
+		for colIdx, header := range headers {
 			col, err := excelize.ColumnNumberToName(colIdx + 1)
 			if err != nil {
 				return err
 			}
-			if err := file.SetCellValue("Sheet1", fmt.Sprintf("%s%d", col, row), value); err != nil {
+			if err := file.SetCellValue(sheet, fmt.Sprintf("%s%d", col, row), header); err != nil {
 				return err
 			}
 		}
 		row++
+	}
+
+	for _, dateStr := range allDates {
+		if h, ok := holidayMap[dateStr]; ok {
+			if att, ok := attMap[dateStr]; ok {
+				values := buildAttendanceRowWithHoliday(att, h)
+				for colIdx, value := range values {
+					col, err := excelize.ColumnNumberToName(colIdx + 1)
+					if err != nil {
+						return err
+					}
+					if err := file.SetCellValue(sheet, fmt.Sprintf("%s%d", col, row), value); err != nil {
+						return err
+					}
+				}
+			} else {
+				if err := file.SetCellValue(sheet, fmt.Sprintf("A%d", row), dateStr); err != nil {
+					return err
+				}
+				if err := file.SetCellValue(sheet, fmt.Sprintf("E%d", row), h.Name); err != nil {
+					return err
+				}
+				if err := file.SetCellValue(sheet, fmt.Sprintf("F%d", row), h.Type.String()); err != nil {
+					return err
+				}
+			}
+			row++
+		} else if att, ok := attMap[dateStr]; ok {
+			values := buildAttendanceRow(att)
+			for colIdx, value := range values {
+				col, err := excelize.ColumnNumberToName(colIdx + 1)
+				if err != nil {
+					return err
+				}
+				if err := file.SetCellValue(sheet, fmt.Sprintf("%s%d", col, row), value); err != nil {
+					return err
+				}
+			}
+			row++
+		}
 	}
 	return nil
 }
