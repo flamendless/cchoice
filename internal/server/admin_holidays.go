@@ -22,7 +22,7 @@ func (s *Server) adminHolidaysListPageHandler(w http.ResponseWriter, r *http.Req
 
 	if err := compadmin.AdminHolidaysListPage("Holidays").Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", err.Error()))
 		return
 	}
 }
@@ -34,7 +34,7 @@ func (s *Server) adminHolidaysListTableHandler(w http.ResponseWriter, r *http.Re
 	holidays, err := s.services.holiday.GetAllHolidays(ctx)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Internal server error"))
 		return
 	}
 
@@ -50,7 +50,7 @@ func (s *Server) adminHolidaysListTableHandler(w http.ResponseWriter, r *http.Re
 
 	if err := compadmin.AdminHolidaysListTable(holidayList).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Internal server error"))
 		return
 	}
 }
@@ -64,30 +64,35 @@ func (s *Server) adminHolidaysCreateHandler(w http.ResponseWriter, r *http.Reque
 	holidayTypeStr := r.FormValue("type")
 
 	if dateStr == "" || name == "" || holidayTypeStr == "" {
-		http.Error(w, "date, name, and type are required", http.StatusBadRequest)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "date, name, and type are required"))
 		return
 	}
 
 	holidayType := enums.ParseHolidayTypeToEnum(holidayTypeStr)
 	if holidayType == enums.HOLIDAY_TYPE_UNDEFINED {
-		http.Error(w, "Invalid holiday type", http.StatusBadRequest)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Invalid holiday type"))
 		return
 	}
 
 	date, err := time.Parse(constants.DateLayoutISO, dateStr)
 	if err != nil {
-		http.Error(w, "Invalid date format", http.StatusBadRequest)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Invalid date format"))
 		return
 	}
 
-	_, err = s.services.holiday.CreateHoliday(ctx, date, name, holidayType)
-	if err != nil {
+	if _, err = s.services.holiday.CreateHoliday(
+		ctx,
+		s.sessionManager.GetString(ctx, SessionStaffID),
+		date,
+		name,
+		holidayType,
+	); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, "Failed to create holiday", http.StatusInternalServerError)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Failed to create holiday"))
 		return
 	}
 
-	redirectHX(w, r, utils.URL("/admin/holidays"))
+	redirectHX(w, r, utils.URLWithSuccess("/admin/holidays", "Holiday created successfully"))
 }
 
 func (s *Server) adminHolidaysUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -99,42 +104,47 @@ func (s *Server) adminHolidaysUpdateHandler(w http.ResponseWriter, r *http.Reque
 	holidayTypeStr := r.FormValue("type")
 
 	if idStr == "" || name == "" || holidayTypeStr == "" {
-		http.Error(w, "id, name, and type are required", http.StatusBadRequest)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "id, name, and type are required"))
 		return
 	}
 
 	id, err := time.Parse(constants.DateLayoutISO, idStr)
 	if err != nil {
-		http.Error(w, "Invalid id format", http.StatusBadRequest)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Invalid id format"))
 		return
 	}
 
 	holidayType := enums.ParseHolidayTypeToEnum(holidayTypeStr)
 	if holidayType == enums.HOLIDAY_TYPE_UNDEFINED {
-		http.Error(w, "Invalid holiday type", http.StatusBadRequest)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Invalid holiday type"))
 		return
 	}
 
 	existing, err := s.services.holiday.IsHoliday(ctx, id)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Internal server error"))
 		return
 	}
 
 	if existing == nil {
-		http.Error(w, "Holiday not found", http.StatusNotFound)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Holiday not found"))
 		return
 	}
 
-	_, err = s.services.holiday.UpdateHoliday(ctx, id.Unix(), name, holidayType)
-	if err != nil {
+	if _, err = s.services.holiday.UpdateHoliday(
+		ctx,
+		s.sessionManager.GetString(ctx, SessionStaffID),
+		id.Unix(),
+		name,
+		holidayType,
+	); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, "Failed to update holiday", http.StatusInternalServerError)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Failed to update holiday"))
 		return
 	}
 
-	redirectHX(w, r, utils.URL("/admin/holidays"))
+	redirectHX(w, r, utils.URLWithSuccess("/admin/holidays", "Holiday updated successfully"))
 }
 
 func (s *Server) adminHolidaysDeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -145,16 +155,15 @@ func (s *Server) adminHolidaysDeleteHandler(w http.ResponseWriter, r *http.Reque
 
 	id := s.encoder.Decode(idStr)
 	if id == encode.INVALID {
-		http.Error(w, "Invalid id format", http.StatusBadRequest)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Invalid id format"))
 		return
 	}
 
-	err := s.services.holiday.DeleteHoliday(ctx, id)
-	if err != nil {
+	if err := s.services.holiday.DeleteHoliday(ctx, s.sessionManager.GetString(ctx, SessionStaffID), id); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, "Failed to delete holiday", http.StatusInternalServerError)
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Failed to delete holiday"))
 		return
 	}
 
-	redirectHX(w, r, utils.URL("/admin/holidays"))
+	redirectHX(w, r, utils.URLWithSuccess("/admin/holidays", "Holiday deleted successfully"))
 }

@@ -179,7 +179,7 @@ func NewServer() *ServerInstance {
 
 	staffLogService := services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW)
 	cpointTokenService := services.NewCPointTokenService(cfg.CPointHMACSecret)
-	holidayService := services.NewHolidayService(newServer.encoder, newServer.dbRO, newServer.dbRW)
+	holidayService := services.NewHolidayService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService)
 
 	newServer.services = Services{
 		attendance:   services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW, holidayService),

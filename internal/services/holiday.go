@@ -28,9 +28,10 @@ type Holiday struct {
 }
 
 type HolidayService struct {
-	encoder encode.IEncode
-	dbRO    database.IService
-	dbRW    database.IService
+	encoder  encode.IEncode
+	dbRO     database.IService
+	dbRW     database.IService
+	staffLog *StaffLogsService
 
 	mu    sync.RWMutex
 	cache map[string]*Holiday
@@ -40,12 +41,17 @@ func NewHolidayService(
 	encoder encode.IEncode,
 	dbRO database.IService,
 	dbRW database.IService,
+	staffLog *StaffLogsService,
 ) *HolidayService {
+	if staffLog == nil {
+		panic("StaffLogsService is required")
+	}
 	s := &HolidayService{
-		encoder: encoder,
-		dbRO:    dbRO,
-		dbRW:    dbRW,
-		cache:   make(map[string]*Holiday),
+		encoder:  encoder,
+		dbRO:     dbRO,
+		dbRW:     dbRW,
+		staffLog: staffLog,
+		cache:    make(map[string]*Holiday),
 	}
 	s.loadCache(context.Background())
 	return s
@@ -145,38 +151,65 @@ func (s *HolidayService) GetHolidaysByDateRange(ctx context.Context, startDate, 
 	return result, nil
 }
 
-func (s *HolidayService) CreateHoliday(ctx context.Context, date time.Time, name string, holidayType enums.HolidayType) (int64, error) {
+func (s *HolidayService) CreateHoliday(ctx context.Context, staffID string, date time.Time, name string, holidayType enums.HolidayType) (int64, error) {
+	var result string
+	defer func() {
+		if err := s.staffLog.CreateLog(ctx, staffID, "create", "holidays", result, nil); err != nil {
+			logs.Log().Warn("create log", zap.Error(err))
+		}
+	}()
+
 	id, err := s.dbRW.GetQueries().CreateHoliday(ctx, queries.CreateHolidayParams{
 		Date: date.Format(constants.DateLayoutISO),
 		Name: name,
 		Type: holidayType.String(),
 	})
 	if err != nil {
+		result = err.Error()
 		return 0, errors.Join(errs.ErrHoliday, err)
 	}
 	s.RefreshCache(ctx)
+	result = "success"
 	return id, nil
 }
 
-func (s *HolidayService) UpdateHoliday(ctx context.Context, id int64, name string, holidayType enums.HolidayType) (int64, error) {
+func (s *HolidayService) UpdateHoliday(ctx context.Context, staffID string, id int64, name string, holidayType enums.HolidayType) (int64, error) {
+	var result string
+	defer func() {
+		if err := s.staffLog.CreateLog(ctx, staffID, "update", "holidays", result, nil); err != nil {
+			logs.Log().Warn("create log", zap.Error(err))
+		}
+	}()
+
 	id, err := s.dbRW.GetQueries().UpdateHoliday(ctx, queries.UpdateHolidayParams{
 		Name: name,
 		Type: holidayType.String(),
 		ID:   id,
 	})
 	if err != nil {
+		result = err.Error()
 		return 0, errors.Join(errs.ErrHoliday, err)
 	}
 	s.RefreshCache(ctx)
+	result = "success"
 	return id, nil
 }
 
-func (s *HolidayService) DeleteHoliday(ctx context.Context, id int64) error {
+func (s *HolidayService) DeleteHoliday(ctx context.Context, staffID string, id int64) error {
+	var result string
+	defer func() {
+		if err := s.staffLog.CreateLog(ctx, staffID, "delete", "holidays", result, nil); err != nil {
+			logs.Log().Warn("create log", zap.Error(err))
+		}
+	}()
+
 	err := s.dbRW.GetQueries().DeleteHoliday(ctx, id)
 	if err != nil {
+		result = err.Error()
 		return errors.Join(errs.ErrHoliday, err)
 	}
 	s.RefreshCache(ctx)
+	result = "success"
 	return nil
 }
 

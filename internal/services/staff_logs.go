@@ -54,6 +54,7 @@ func (s *StaffLogsService) CreateLog(
 		zap.String("action", action),
 		zap.String("module", module),
 		zap.String("result", result),
+		zap.Error(err),
 	)
 	return err
 }
