@@ -217,11 +217,11 @@ func NewServer() *ServerInstance {
 		newServer.services.cpointToken,
 	}
 
-	fmt.Println("========[SERVICES]========")
+	logs.Log().Info("========[SERVICES]========")
 	for _, s := range newServer.services.all {
 		s.Log()
 	}
-	fmt.Println("===========[END]==========")
+	logs.Log().Info("===========[END]==========")
 
 	ctx := context.Background()
 	settings, err := requests.GetSettingsData(
