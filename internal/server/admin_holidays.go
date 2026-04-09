@@ -108,8 +108,8 @@ func (s *Server) adminHolidaysUpdateHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	id, err := time.Parse(constants.DateLayoutISO, idStr)
-	if err != nil {
+	id := s.encoder.Decode(idStr)
+	if id == encode.INVALID {
 		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Invalid id format"))
 		return
 	}
@@ -120,25 +120,14 @@ func (s *Server) adminHolidaysUpdateHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	existing, err := s.services.holiday.IsHoliday(ctx, id)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Internal server error"))
-		return
-	}
-
-	if existing == nil {
-		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Holiday not found"))
-		return
-	}
-
-	if _, err = s.services.holiday.UpdateHoliday(
+	_, err := s.services.holiday.UpdateHoliday(
 		ctx,
 		s.sessionManager.GetString(ctx, SessionStaffID),
-		id.Unix(),
+		id,
 		name,
 		holidayType,
-	); err != nil {
+	)
+	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Failed to update holiday"))
 		return
@@ -166,4 +155,49 @@ func (s *Server) adminHolidaysDeleteHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	redirectHX(w, r, utils.URLWithSuccess("/admin/holidays", "Holiday deleted successfully"))
+}
+
+func (s *Server) adminHolidaysEditPageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Holidays Edit Page Handler]"
+	ctx := r.Context()
+
+	idStr := chi.URLParam(r, "id")
+
+	id := s.encoder.Decode(idStr)
+	if id == encode.INVALID {
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Invalid id format"))
+		return
+	}
+
+	holidays, err := s.services.holiday.GetAllHolidays(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Internal server error"))
+		return
+	}
+
+	var holidayItem *models.AdminHolidayListItem
+	for _, h := range holidays {
+		if h.ID == id {
+			holidayItem = &models.AdminHolidayListItem{
+				ID:   s.encoder.Encode(h.ID),
+				Date: h.Date,
+				Name: h.Name,
+				Type: h.Type,
+			}
+			break
+		}
+	}
+
+	if holidayItem == nil {
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Holiday not found"))
+		return
+	}
+
+	w.Header().Set("HX-Reswap", "innerHTML")
+	if err := compadmin.HolidayEditModal(*holidayItem).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Failed to render edit form"))
+		return
+	}
 }

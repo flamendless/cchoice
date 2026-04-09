@@ -102,6 +102,7 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_HOLIDAYS)).Get("/admin/holidays", s.adminHolidaysListPageHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_HOLIDAYS)).Get("/admin/holidays/table", s.adminHolidaysListTableHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_HOLIDAYS)).Get("/admin/holidays/{id}/edit", s.adminHolidaysEditPageHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_HOLIDAYS)).Post("/admin/holidays", s.adminHolidaysCreateHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_HOLIDAYS)).Patch("/admin/holidays/{id}", s.adminHolidaysUpdateHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_HOLIDAYS)).Delete("/admin/holidays/{id}", s.adminHolidaysDeleteHandler)

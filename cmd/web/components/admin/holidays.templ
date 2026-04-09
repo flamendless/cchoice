@@ -3,9 +3,9 @@ package components
 import (
 	"fmt"
 
-	"cchoice/cmd/web/models"
 	"cchoice/cmd/web/components/common"
 	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
 	"cchoice/internal/enums"
 	"cchoice/internal/utils"
 )
@@ -34,6 +34,7 @@ templ AdminHolidaysListPage(title string) {
 					</div>
 				</div>
 			</div>
+			<div id="holiday-edit-modal-container"></div>
 		</body>
 	</html>
 }
@@ -47,8 +48,7 @@ templ HolidaysListSection() {
 		hx-swap="innerHTML"
 	>
 		@HolidaysCreateForm()
-		<div id="holidays-table">
-		</div>
+		<div id="holidays-table"></div>
 	</div>
 }
 
@@ -153,26 +153,26 @@ templ AdminHolidaysListTable(holidays []models.AdminHolidayListItem) {
 
 templ HolidayTypeBadge(holidayType enums.HolidayType) {
 	switch holidayType {
-	case enums.HOLIDAY_TYPE_PUBLIC:
-		<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-			Public
-		</span>
-	case enums.HOLIDAY_TYPE_REGULAR:
-		<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-			Regular
-		</span>
-	case enums.HOLIDAY_TYPE_SPECIAL_NON_WORKING:
-		<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-			Special Non-Working
-		</span>
-	case enums.HOLIDAY_TYPE_SPECIAL_WORKING:
-		<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-			Special Working
-		</span>
-	default:
-		<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-			Unknown
-		</span>
+		case enums.HOLIDAY_TYPE_PUBLIC:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+				Public
+			</span>
+		case enums.HOLIDAY_TYPE_REGULAR:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+				Regular
+			</span>
+		case enums.HOLIDAY_TYPE_SPECIAL_NON_WORKING:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+				Special Non-Working
+			</span>
+		case enums.HOLIDAY_TYPE_SPECIAL_WORKING:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+				Special Working
+			</span>
+		default:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+				Unknown
+			</span>
 	}
 }
 
@@ -180,7 +180,16 @@ templ HolidayActionsCell(holiday models.AdminHolidayListItem) {
 	<div class="flex items-center gap-2">
 		<button
 			type="button"
-			class="text-red-600 hover:text-red-800 text-sm"
+			class="text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium"
+			hx-get={ utils.URLf("/admin/holidays/%s/edit", holiday.ID) }
+			hx-target="#holiday-edit-modal-container"
+			hx-swap="innerHTML"
+		>
+			Edit
+		</button>
+		<button
+			type="button"
+			class="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs font-medium"
 			hx-delete={ utils.URLf("/admin/holidays/%s", holiday.ID) }
 			hx-target={ fmt.Sprintf("#holiday-row-%s", holiday.ID) }
 			hx-swap="outerHTML"
@@ -189,4 +198,93 @@ templ HolidayActionsCell(holiday models.AdminHolidayListItem) {
 			Delete
 		</button>
 	</div>
+}
+
+templ HolidayEditModal(holiday models.AdminHolidayListItem) {
+	<div
+		id="holiday-edit-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="
+			on closeModal
+				set #holiday-edit-modal-container.innerHTML to ''
+			end
+			on keyup[key is 'Escape'] trigger closeModal
+		"
+	>
+		<div
+			class="absolute inset-0 bg-black/50"
+			_="on click trigger closeModal"
+		></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">Edit Holiday</h2>
+				<button
+					type="button"
+					class="text-gray-400 hover:text-gray-600"
+					_="on click trigger closeModal"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+			@HolidayEditForm(holiday)
+		</div>
+	</div>
+}
+
+templ HolidayEditForm(holiday models.AdminHolidayListItem) {
+	<form
+		hx-patch={ utils.URLf("/admin/holidays/%s", holiday.ID) }
+		hx-swap="outerHTML"
+		class="flex flex-col gap-2 w-full"
+		hx-on::after-request="if(event.detail.successful) { document.getElementById('holiday-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/holidays/table', { target: '#holidays-table', swap: 'innerHTML' }) }"
+	>
+		<div class="hidden">
+			<input type="text" name="id" value={ holiday.ID }/>
+		</div>
+
+		<div>
+			<label class="block text-sm font-medium text-gray-700">Name</label>
+			<input
+				type="text"
+				name="name"
+				value={ holiday.Name }
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			/>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700">Type</label>
+			<select
+				name="type"
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			>
+				for _, ht := range enums.AllHolidayTypes {
+					<option
+						value={ ht.String() }
+						selected?={ holiday.Type == ht }
+					>
+						{ ht.String() }
+					</option>
+				}
+			</select>
+		</div>
+		<div class="flex w-full gap-1 justify-center">
+			<button
+				type="submit"
+				class="px-3 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm"
+			>
+				Save
+			</button>
+			<button
+				type="button"
+				class="px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
+				_="on click trigger closeModal"
+			>
+				Cancel
+			</button>
+		</div>
+	</form>
 }
