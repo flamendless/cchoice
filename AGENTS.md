@@ -201,6 +201,22 @@ go run -tags="fts5,staticfs" ./main.go
 - In handlers, define `const logtag = "[FOO]"` for logging
 - In handlers that have redirects, use `const page = "url"`
 
+### Admin Services
+- In services that have CRUD like holidays creation, products creation, and so on, record the activity in `StaffLogsService`.
+- Follow convention in `reports.go`:
+```go
+	result := "success"
+	defer func() {
+		if err := s.staffLog.CreateLog(ctx, adminStaffID, "export", "attendance_report_xlsx", result, nil); err != nil {
+			logs.LogCtx(ctx).Error("[ReportService] failed to log xlsx report generation", zap.Error(err))
+		}
+	}()
+
+    if err := foo(); err != nil {
+        result = err.Error()
+    }
+```
+
 ---
 
 ## Project Structure
