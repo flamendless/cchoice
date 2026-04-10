@@ -291,7 +291,12 @@ func (s *Server) adminSuperuserTimeOffApproveHandler(w http.ResponseWriter, r *h
 
 	timeOffID := chi.URLParam(r, "id")
 	if err := s.services.attendance.ApproveTimeOff(ctx, timeOffID, currentStaffIDStr); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.String("time_off_id", timeOffID), zap.Error(err))
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("staff_id", currentStaffIDStr),
+			zap.String("time_off_id", timeOffID),
+			zap.Error(err),
+		)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -310,9 +315,10 @@ func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *ht
 	}
 
 	timeOffID := chi.URLParam(r, "id")
-	if err := s.services.attendance.CancelTimeOff(ctx, timeOffID); err != nil {
+	if err := s.services.attendance.CancelTimeOff(ctx, timeOffID, currentStaffIDStr); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
+			zap.String("staff_id", currentStaffIDStr),
 			zap.String("time_off_id", timeOffID),
 			zap.Error(err),
 		)

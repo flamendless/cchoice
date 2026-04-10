@@ -26,6 +26,7 @@ type AttendanceService struct {
 	dbRW         database.IService
 	shopLocation types.Location
 	holiday      *HolidayService
+	staffLog     *StaffLogsService
 }
 
 type attendanceStatusResult struct {
@@ -42,13 +43,18 @@ func NewAttendanceService(
 	encoder encode.IEncode,
 	ro, rw database.IService,
 	holiday *HolidayService,
+	staffLog *StaffLogsService,
 ) *AttendanceService {
+	if staffLog == nil {
+		panic("StaffLogsService is required")
+	}
 	return &AttendanceService{
 		encoder:      encoder,
 		dbRO:         ro,
 		dbRW:         rw,
 		shopLocation: conf.Conf().Settings.ShopLocation,
 		holiday:      holiday,
+		staffLog:     staffLog,
 	}
 }
 
@@ -253,16 +259,55 @@ func (s *AttendanceService) ApproveTimeOff(
 	timeOffID string,
 	approvedByID string,
 ) error {
-	_, err := s.dbRW.GetQueries().ApproveStaffTimeOff(ctx, queries.ApproveStaffTimeOffParams{
+	result := "success"
+	defer func() {
+		if err := s.staffLog.CreateLog(
+			ctx,
+			approvedByID,
+			constants.ActionApprove,
+			constants.ModuleTimeOff,
+			result,
+			nil,
+		); err != nil {
+			logs.Log().Warn("create log", zap.Error(err))
+		}
+	}()
+
+	if _, err := s.dbRW.GetQueries().ApproveStaffTimeOff(ctx, queries.ApproveStaffTimeOffParams{
 		ApprovedBy: sql.NullInt64{Int64: s.encoder.Decode(approvedByID), Valid: true},
 		ID:         s.encoder.Decode(timeOffID),
-	})
-	return err
+	}); err != nil {
+		result = err.Error()
+		return err
+	}
+
+	return nil
 }
 
-func (s *AttendanceService) CancelTimeOff(ctx context.Context, timeOffID string) error {
-	_, err := s.dbRW.GetQueries().CancelStaffTimeOff(ctx, s.encoder.Decode(timeOffID))
-	return err
+func (s *AttendanceService) CancelTimeOff(
+	ctx context.Context,
+	timeOffID string,
+	approvedByID string,
+) error {
+	result := "success"
+	defer func() {
+		if err := s.staffLog.CreateLog(
+			ctx,
+			approvedByID,
+			constants.ActionCancel,
+			constants.ModuleTimeOff,
+			result,
+			nil,
+		); err != nil {
+			logs.Log().Warn("create log", zap.Error(err))
+		}
+	}()
+
+	if _, err := s.dbRW.GetQueries().CancelStaffTimeOff(ctx, s.encoder.Decode(timeOffID)); err != nil {
+		result = err.Error()
+		return err
+	}
+	return nil
 }
 
 func (s *AttendanceService) GetAttendance(

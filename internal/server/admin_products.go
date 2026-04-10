@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"math"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/conf"
+	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
@@ -178,8 +180,8 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		if err := s.services.staffLog.CreateLog(
 			context.Background(),
 			s.sessionManager.GetString(ctx, SessionStaffID),
-			"create",
-			"products",
+			constants.ActionCreate,
+			constants.ModuleProducts,
 			result,
 			nil,
 		); err != nil {
@@ -274,6 +276,8 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		}
 	}
+
+	result = fmt.Sprintf("success. ID '%s'", s.encoder.Encode(product.ID))
 
 	logs.LogCtx(ctx).Info(logtag, zap.Int64("product_id", product.ID), zap.String("name", name))
 	redirectHX(w, r, utils.URLWithSuccess(page, "Product created successfully"))
@@ -404,8 +408,8 @@ func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter
 		if err := s.services.staffLog.CreateLog(
 			context.Background(),
 			s.sessionManager.GetString(ctx, SessionStaffID),
-			"update status",
-			"products",
+			constants.ActionUpdateStatus,
+			constants.ModuleProducts,
 			result,
 			nil,
 		); err != nil {
@@ -425,6 +429,7 @@ func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter
 		return
 	}
 
+	result = fmt.Sprintf("success. ID '%s'", productIDStr)
 	redirectHX(w, r, utils.URLWithSuccess(page, "Product status updated successfully"))
 }
 
@@ -444,8 +449,8 @@ func (s *Server) adminSuperuserProductsDeleteHandler(w http.ResponseWriter, r *h
 		if err := s.services.staffLog.CreateLog(
 			context.Background(),
 			s.sessionManager.GetString(ctx, SessionStaffID),
-			"delete",
-			"products",
+			constants.ActionDelete,
+			constants.ModuleProducts,
 			result,
 			nil,
 		); err != nil {
@@ -464,5 +469,6 @@ func (s *Server) adminSuperuserProductsDeleteHandler(w http.ResponseWriter, r *h
 		return
 	}
 
+	result = fmt.Sprintf("success. ID '%s'", productIDStr)
 	redirectHX(w, r, utils.URLWithSuccess(page, "Product deleted successfully"))
 }

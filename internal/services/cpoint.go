@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
@@ -23,16 +24,16 @@ type CPointService struct {
 	encoder      encode.IEncode
 	dbRO         database.IService
 	dbRW         database.IService
-	staffLog     *StaffLogsService
 	tokenService *CPointTokenService
+	staffLog     *StaffLogsService
 }
 
 func NewCpointService(
 	encoder encode.IEncode,
 	dbRO database.IService,
 	dbRW database.IService,
-	staffLog *StaffLogsService,
 	tokenService *CPointTokenService,
+	staffLog *StaffLogsService,
 ) *CPointService {
 	if staffLog == nil {
 		panic("StaffLogsService is required")
@@ -41,8 +42,8 @@ func NewCpointService(
 		encoder:      encoder,
 		dbRO:         dbRO,
 		dbRW:         dbRW,
-		staffLog:     staffLog,
 		tokenService: tokenService,
+		staffLog:     staffLog,
 	}
 }
 
@@ -95,7 +96,14 @@ func (s *CPointService) GenerateCode() string {
 func (s *CPointService) CreateCpoint(ctx context.Context, params CreateCpointParams) (Cpoint, error) {
 	var result string
 	defer func() {
-		if err := s.staffLog.CreateLog(ctx, params.StaffID, "CREATE_CPOINT", "CPOINTS", result, nil); err != nil {
+		if err := s.staffLog.CreateLog(
+			ctx,
+			params.StaffID,
+			constants.ActionCreate,
+			constants.ModuleCPoints,
+			result,
+			nil,
+		); err != nil {
 			logs.Log().Warn("create log", zap.Error(err))
 		}
 	}()
