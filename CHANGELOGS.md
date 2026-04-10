@@ -2,6 +2,39 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.19"></a>
+## [release-v1.1.19] - 2026-04-10
+### AI
+- Add admin services section
+- Add LLM rule
+
+### CICD
+- Fix apt
+- Add libvips and pkg-config
+- Fix
+- Add pkg-config
+- Add libvips
+
+### Feature
+- Holidays
+
+### Maintenance
+- Fix formatting
+- Update errs
+- Organize enum files
+
+### Script
+- Update hasExtChanges
+- Simplify hooks
+- Add commit-msg hook that checks commit prefix
+
+### Server
+- Invoke StaffLogsService and update http errors and redirects
+
+### Web
+- Edit holidays
+
+
 <a name="release-v1.1.18"></a>
 ## [release-v1.1.18] - 2026-04-06
 ### Bugfix
