@@ -427,3 +427,42 @@ func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter
 
 	redirectHX(w, r, utils.URLWithSuccess(page, "Product status updated successfully"))
 }
+
+func (s *Server) adminSuperuserProductsDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Products Delete Handler]"
+	const page = "/admin/superuser/products"
+	ctx := r.Context()
+
+	productIDStr := chi.URLParam(r, "id")
+	if productIDStr == "" {
+		redirectHX(w, r, utils.URLWithError(page, "Invalid product ID"))
+		return
+	}
+
+	result := "success"
+	defer func() {
+		if err := s.services.staffLog.CreateLog(
+			context.Background(),
+			s.sessionManager.GetString(ctx, SessionStaffID),
+			"delete",
+			"products",
+			result,
+			nil,
+		); err != nil {
+			logs.Log().Error(logtag, zap.Error(err))
+		}
+	}()
+
+	if err := s.services.product.DeleteProduct(ctx, productIDStr); err != nil {
+		result = err.Error()
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("product_id", productIDStr),
+			zap.Error(err),
+		)
+		redirectHX(w, r, utils.URLWithError(page, "Failed to delete product"))
+		return
+	}
+
+	redirectHX(w, r, utils.URLWithSuccess(page, "Product deleted successfully"))
+}

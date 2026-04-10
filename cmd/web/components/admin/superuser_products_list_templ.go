@@ -1025,12 +1025,16 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-				case enums.PRODUCT_STATUS_DELETED:
-					templ_7745c5c3_Err = ProductActionDraft(p.ID).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, " ")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, " ")
+					templ_7745c5c3_Err = ProductActionDelete(p.ID).Render(ctx, templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				case enums.PRODUCT_STATUS_DELETED:
+					templ_7745c5c3_Err = ProductActionDraft(p.ID).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
