@@ -152,9 +152,16 @@ func (s *HolidayService) GetHolidaysByDateRange(ctx context.Context, startDate, 
 }
 
 func (s *HolidayService) CreateHoliday(ctx context.Context, staffID string, date time.Time, name string, holidayType enums.HolidayType) (int64, error) {
-	var result string
+	result := "success"
 	defer func() {
-		if err := s.staffLog.CreateLog(ctx, staffID, "create", "holidays", result, nil); err != nil {
+		if err := s.staffLog.CreateLog(
+			ctx,
+			staffID,
+			constants.ActionCreate,
+			constants.ModuleHolidays,
+			result,
+			nil,
+		); err != nil {
 			logs.Log().Warn("create log", zap.Error(err))
 		}
 	}()
@@ -169,14 +176,20 @@ func (s *HolidayService) CreateHoliday(ctx context.Context, staffID string, date
 		return 0, errors.Join(errs.ErrHoliday, err)
 	}
 	s.RefreshCache(ctx)
-	result = "success"
 	return id, nil
 }
 
 func (s *HolidayService) UpdateHoliday(ctx context.Context, staffID string, id int64, name string, holidayType enums.HolidayType) (int64, error) {
-	var result string
+	result := "success"
 	defer func() {
-		if err := s.staffLog.CreateLog(ctx, staffID, "update", "holidays", result, nil); err != nil {
+		if err := s.staffLog.CreateLog(
+			ctx,
+			staffID,
+			constants.ActionUpdate,
+			constants.ModuleHolidays,
+			result,
+			nil,
+		); err != nil {
 			logs.Log().Warn("create log", zap.Error(err))
 		}
 	}()
@@ -191,14 +204,20 @@ func (s *HolidayService) UpdateHoliday(ctx context.Context, staffID string, id i
 		return 0, errors.Join(errs.ErrHoliday, err)
 	}
 	s.RefreshCache(ctx)
-	result = "success"
 	return id, nil
 }
 
 func (s *HolidayService) DeleteHoliday(ctx context.Context, staffID string, id int64) error {
-	var result string
+	result := "success"
 	defer func() {
-		if err := s.staffLog.CreateLog(ctx, staffID, "delete", "holidays", result, nil); err != nil {
+		if err := s.staffLog.CreateLog(
+			ctx,
+			staffID,
+			constants.ActionDelete,
+			constants.ModuleHolidays,
+			result,
+			nil,
+		); err != nil {
 			logs.Log().Warn("create log", zap.Error(err))
 		}
 	}()
@@ -209,7 +228,6 @@ func (s *HolidayService) DeleteHoliday(ctx context.Context, staffID string, id i
 		return errors.Join(errs.ErrHoliday, err)
 	}
 	s.RefreshCache(ctx)
-	result = "success"
 	return nil
 }
 

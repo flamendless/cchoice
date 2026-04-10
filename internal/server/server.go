@@ -180,20 +180,21 @@ func NewServer() *ServerInstance {
 	staffLogService := services.NewStaffLogsService(newServer.encoder, newServer.dbRO, newServer.dbRW)
 	cpointTokenService := services.NewCPointTokenService(cfg.CPointHMACSecret)
 	holidayService := services.NewHolidayService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService)
+	attendanceService := services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW, holidayService, staffLogService)
 
 	newServer.services = Services{
-		attendance:   services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW, holidayService),
+		attendance:   attendanceService,
 		brand:        services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		customer:     services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		customerOTP:  services.NewCustomerOTPService(newServer.encoder, newServer.dbRO, newServer.dbRW, mailService, emailJobRunner),
-		cpoint:       services.NewCpointService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, cpointTokenService),
+		cpoint:       services.NewCpointService(newServer.encoder, newServer.dbRO, newServer.dbRW, cpointTokenService, staffLogService),
 		cpointToken:  cpointTokenService,
 		holiday:      holidayService,
 		location:     services.NewLocationService(cfg.Settings.ShopLocation),
 		product:      services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW, newServer.GetCDNURL),
 		productImage: services.NewProductImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
 		qr:           services.NewQRService(newServer.cache),
-		report:       services.NewReportService(newServer.encoder, newServer.dbRO, staffLogService, holidayService),
+		report:       services.NewReportService(newServer.encoder, newServer.dbRO, attendanceService, holidayService, staffLogService),
 		role:         services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staff:        services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staffLog:     staffLogService,

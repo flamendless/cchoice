@@ -19,10 +19,11 @@ import (
 )
 
 type ReportService struct {
-	encoder  encode.IEncode
-	dbRO     database.IService
-	staffLog *StaffLogsService
-	holiday  *HolidayService
+	encoder           encode.IEncode
+	dbRO              database.IService
+	attendanceService *AttendanceService
+	holiday           *HolidayService
+	staffLog          *StaffLogsService
 }
 
 var headers = []string{
@@ -45,17 +46,22 @@ var headers = []string{
 func NewReportService(
 	encoder encode.IEncode,
 	dbRO database.IService,
-	staffLog *StaffLogsService,
+	attendanceService *AttendanceService,
 	holiday *HolidayService,
+	staffLog *StaffLogsService,
 ) *ReportService {
+	if attendanceService == nil {
+		panic("AttendanceService is required")
+	}
 	if staffLog == nil {
 		panic("StaffLogsService is required")
 	}
 	return &ReportService{
-		encoder:  encoder,
-		dbRO:     dbRO,
-		staffLog: staffLog,
-		holiday:  holiday,
+		encoder:           encoder,
+		dbRO:              dbRO,
+		attendanceService: attendanceService,
+		holiday:           holiday,
+		staffLog:          staffLog,
 	}
 }
 
@@ -71,7 +77,14 @@ func (s *ReportService) StreamReportCSV(
 ) error {
 	result := "success"
 	defer func() {
-		if err := s.staffLog.CreateLog(ctx, adminStaffID, "export", "attendance_report_csv", result, nil); err != nil {
+		if err := s.staffLog.CreateLog(
+			ctx,
+			adminStaffID,
+			constants.ActionExport,
+			constants.ModuleAttendanceReportCSV,
+			result,
+			nil,
+		); err != nil {
 			logs.LogCtx(ctx).Error("[ReportService] failed to log csv report generation", zap.Error(err))
 		}
 	}()
@@ -153,8 +166,7 @@ func (s *ReportService) StreamReportCSV(
 			return err
 		}
 
-		attendanceService := NewAttendanceService(s.encoder, s.dbRO, nil, s.holiday)
-		extraStats := attendanceService.GetExtraStats(ctx, staffID, data)
+		extraStats := s.attendanceService.GetExtraStats(ctx, staffID, data)
 		if err := writer.Write([]string{fmt.Sprintf("Total undertime count: %d (%.2f minutes)", extraStats.TotalUndertimeCount, extraStats.TotalUndertimeMinutes)}); err != nil {
 			return err
 		}
@@ -310,7 +322,14 @@ func (s *ReportService) StreamReportXLSX(
 ) error {
 	result := "success"
 	defer func() {
-		if err := s.staffLog.CreateLog(ctx, adminStaffID, "export", "attendance_report_xlsx", result, nil); err != nil {
+		if err := s.staffLog.CreateLog(
+			ctx,
+			adminStaffID,
+			constants.ActionExport,
+			constants.ModuleAttendanceReportXLSX,
+			result,
+			nil,
+		); err != nil {
 			logs.LogCtx(ctx).Error("[ReportService] failed to log xlsx report generation", zap.Error(err))
 		}
 	}()
@@ -406,8 +425,7 @@ func (s *ReportService) StreamReportXLSX(
 		}
 		row++
 
-		attendanceService := NewAttendanceService(s.encoder, s.dbRO, nil, s.holiday)
-		extraStats := attendanceService.GetExtraStats(ctx, staffID, data)
+		extraStats := s.attendanceService.GetExtraStats(ctx, staffID, data)
 		if err := file.SetCellValue(
 			sheet,
 			fmt.Sprintf("A%d", row),
