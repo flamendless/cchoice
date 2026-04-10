@@ -80,6 +80,7 @@ CPOINT_HMAC_SECRET="your-generated-secret"
 - Web
     - E-Mail
 - Bugfix
+- AI
 
 ---
 

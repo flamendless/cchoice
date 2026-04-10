@@ -764,6 +764,7 @@ func CheckCommitPrefix() error {
 		"Server",
 		"Web",
 		"Bugfix",
+		"AI",
 	}
 
 	for _, p := range validPrefixes {
