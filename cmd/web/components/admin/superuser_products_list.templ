@@ -143,8 +143,9 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 									@ProductActionDraft(p.ID)
 								case enums.PRODUCT_STATUS_DRAFT:
 									@ProductActionPublish(p.ID)
+									@ProductActionDelete(p.ID)
 								case enums.PRODUCT_STATUS_DELETED:
-									@ProductActionDraft(p.ID) //TODO: Implement Soft Deletion
+									@ProductActionDraft(p.ID)
 							}
 							</div>
 						}

@@ -12,8 +12,6 @@ import (
 )
 
 const adminGetProductsForListing = `-- name: AdminGetProductsForListing :many
-;
-
 SELECT
 	tbl_products.id,
 	tbl_products.name,
@@ -587,7 +585,8 @@ INNER JOIN tbl_products ON tbl_products.id = tbl_products_fts.rowid
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 WHERE
-	tbl_products_fts.name MATCH ?
+	tbl_products.status = 'ACTIVE'
+	AND tbl_products_fts.name MATCH ?
 LIMIT ?
 `
 
@@ -1268,59 +1267,6 @@ func (q *Queries) GetProductsByStatusSortByNameDesc(ctx context.Context, status 
 	return items, nil
 }
 
-const getProductsListing = `-- name: GetProductsListing :many
-SELECT
-	tbl_products.id,
-	tbl_products.name,
-	tbl_products.description,
-	tbl_products.unit_price_with_vat,
-	tbl_products.unit_price_with_vat_currency,
-	tbl_brands.name AS brand_name
-FROM tbl_products
-INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-ORDER BY tbl_products.created_at DESC
-LIMIT ?
-`
-
-type GetProductsListingRow struct {
-	ID                       int64
-	Name                     string
-	Description              sql.NullString
-	UnitPriceWithVat         int64
-	UnitPriceWithVatCurrency string
-	BrandName                string
-}
-
-func (q *Queries) GetProductsListing(ctx context.Context, limit int64) ([]GetProductsListingRow, error) {
-	rows, err := q.db.QueryContext(ctx, getProductsListing, limit)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetProductsListingRow
-	for rows.Next() {
-		var i GetProductsListingRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Description,
-			&i.UnitPriceWithVat,
-			&i.UnitPriceWithVatCurrency,
-			&i.BrandName,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getProductsWithSort = `-- name: GetProductsWithSort :many
 SELECT id, serial, name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at
 FROM tbl_products
@@ -1399,7 +1345,8 @@ LEFT JOIN tbl_product_sales
 	AND datetime('now') BETWEEN
 		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
 LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
-WHERE tbl_product_sales.id IS NOT NULL
+WHERE tbl_products.status = 'ACTIVE'
+AND tbl_product_sales.id IS NOT NULL
 ORDER BY RANDOM()
 LIMIT 1
 `
@@ -1441,6 +1388,17 @@ func (q *Queries) GetRandomProductOnSale(ctx context.Context) (GetRandomProductO
 		&i.CdnUrlThumbnail,
 	)
 	return i, err
+}
+
+const softDeleteProduct = `-- name: SoftDeleteProduct :exec
+UPDATE tbl_products
+SET status = 'DELETED', updated_at = datetime('now'), deleted_at = datetime('now')
+WHERE id = ?
+`
+
+func (q *Queries) SoftDeleteProduct(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, softDeleteProduct, id)
+	return err
 }
 
 const updateProducts = `-- name: UpdateProducts :execlastid

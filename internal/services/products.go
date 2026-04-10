@@ -154,6 +154,15 @@ func (s *ProductService) UpdateProductStatus(ctx context.Context, productID stri
 	})
 }
 
+func (s *ProductService) DeleteProduct(ctx context.Context, productID string) error {
+	decodedProductID := s.encoder.Decode(productID)
+	if decodedProductID == encode.INVALID {
+		return errs.ErrDecode
+	}
+
+	return s.dbRW.GetQueries().SoftDeleteProduct(ctx, decodedProductID)
+}
+
 func (s *ProductService) GetProductsForListingAdmin(
 	ctx context.Context,
 	search, status string,

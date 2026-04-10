@@ -177,20 +177,6 @@ SET
 	deleted_at = ?
 WHERE id = ?;
 
--- name: GetProductsListing :many
-SELECT
-	tbl_products.id,
-	tbl_products.name,
-	tbl_products.description,
-	tbl_products.unit_price_with_vat,
-	tbl_products.unit_price_with_vat_currency,
-	tbl_brands.name AS brand_name
-FROM tbl_products
-INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-ORDER BY tbl_products.created_at DESC
-LIMIT ?
-;
-
 -- name: AdminGetProductsForListing :many
 SELECT
 	tbl_products.id,
@@ -251,7 +237,8 @@ INNER JOIN tbl_products ON tbl_products.id = tbl_products_fts.rowid
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 WHERE
-	tbl_products_fts.name MATCH ?
+	tbl_products.status = 'ACTIVE'
+	AND tbl_products_fts.name MATCH ?
 LIMIT ?;
 
 -- name: GetRandomProductOnSale :one
@@ -284,9 +271,15 @@ LEFT JOIN tbl_product_sales
 	AND datetime('now') BETWEEN
 		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
 LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
-WHERE tbl_product_sales.id IS NOT NULL
+WHERE tbl_products.status = 'ACTIVE'
+AND tbl_product_sales.id IS NOT NULL
 ORDER BY RANDOM()
 LIMIT 1;
+
+-- name: SoftDeleteProduct :exec
+UPDATE tbl_products
+SET status = 'DELETED', updated_at = datetime('now'), deleted_at = datetime('now')
+WHERE id = ?;
 
 -- name: UpdateProductsStatus :exec
 UPDATE tbl_products
