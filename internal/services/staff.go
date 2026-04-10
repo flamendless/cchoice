@@ -171,6 +171,11 @@ func (s *StaffService) GetCurrentStaffWithAttendance(
 		return profile, nil
 	}
 
+	profile.CanTimeIn = true
+	profile.CanTimeOut = false
+	profile.CanLunchBreakIn = false
+	profile.CanLunchBreakOut = false
+
 	dayAtt, err := s.attendance.GetStaffDayAttendance(ctx, staffID, today)
 	if err != nil {
 		if err != sql.ErrNoRows {
