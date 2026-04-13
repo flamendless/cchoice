@@ -56,9 +56,12 @@ NEVER RUN/APPLY MIGRATIONS. USERS SHOULD MANUALLY DO THAT.
 
 ALWAYS USE `go tool` to run commands like:
 - go tool templ
+- go tool air
+- go tool sqlc
 
 ENUMS:
 - always use go stringer for enums
+- always do `strings.ToUpper` the enum string in the `switch` block
 
 ---
 
@@ -193,6 +196,7 @@ go run -tags="fts5,staticfs" ./main.go
 - Generated code in `internal/database/queries/`
 - Use `mage gensql` to regenerate
 - Parameter structs: `queries.CreateCustomerParams{...}`
+- Always use UPPERCASE for text values like in CHECK CONSTRAINTS
 
 ### Templates (templ)
 - Templates in `cmd/web/components/`
