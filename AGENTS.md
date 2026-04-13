@@ -106,6 +106,12 @@ go test ./internal/utils/... -run TestValidate
 go test ./internal/payments/... -bench=.
 ```
 
+## Building and Generation
+- Always use `mage build` to build the project.
+- Always use `mage gentempl` to generate templ files.
+- Always use `mage gensql` to generate sql files.
+
+
 ---
 
 ## Code Style Guidelines
