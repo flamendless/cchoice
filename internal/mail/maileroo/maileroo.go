@@ -99,9 +99,9 @@ func (m *Maileroo) sendEmail(ctx context.Context, to string, cc []string, subjec
 	}
 
 	if isHTML {
-		emailData.HTML = maileroo.StrPtr(body)
+		emailData.HTML = new(body)
 	} else {
-		emailData.Plain = maileroo.StrPtr(body)
+		emailData.Plain = new(body)
 	}
 
 	referenceID, err := m.client.SendBasicEmail(ctx, emailData)

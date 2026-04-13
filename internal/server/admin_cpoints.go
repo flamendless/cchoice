@@ -73,8 +73,8 @@ func (s *Server) adminCPointsGeneratePostHandler(w http.ResponseWriter, r *http.
 
 	var productSkus []string
 	if productSkusStr != "" {
-		parts := strings.Split(productSkusStr, ",")
-		for _, part := range parts {
+		parts := strings.SplitSeq(productSkusStr, ",")
+		for part := range parts {
 			sku := strings.TrimSpace(part)
 			if sku != "" {
 				productSkus = append(productSkus, sku)

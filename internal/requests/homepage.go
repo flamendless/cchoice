@@ -7,6 +7,7 @@ import (
 	"encoding/gob"
 	"encoding/hex"
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 
@@ -460,13 +461,7 @@ func GetCategoriesForAdmin(
 			categories[cat] = []string{}
 		}
 		if subcat != "" {
-			hasSubcat := false
-			for _, s := range categories[cat] {
-				if s == subcat {
-					hasSubcat = true
-					break
-				}
-			}
+			hasSubcat := slices.Contains(categories[cat], subcat)
 			if !hasSubcat {
 				categories[cat] = append(categories[cat], subcat)
 			}

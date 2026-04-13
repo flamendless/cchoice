@@ -9,6 +9,7 @@ import (
 	"context"
 	"crypto/subtle"
 	"net/http"
+	"slices"
 	"strconv"
 
 	"github.com/go-chi/chi/v5/middleware"
@@ -182,12 +183,7 @@ func (s *Server) HasRole(ctx context.Context, role enums.StaffRole) bool {
 	}
 
 	roleStr := role.String()
-	for _, r := range roles {
-		if r == roleStr {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(roles, roleStr)
 }
 
 func (s *Server) AllowRoles(roles ...enums.StaffRole) func(http.Handler) http.Handler {

@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -113,8 +114,8 @@ func parseOutputFormats() []string {
 	formats := []string{}
 
 	if scanOutputFmt != "" {
-		parts := strings.Split(scanOutputFmt, ",")
-		for _, part := range parts {
+		parts := strings.SplitSeq(scanOutputFmt, ",")
+		for part := range parts {
 			format := strings.TrimSpace(strings.ToLower(part))
 			if format == "csv" || format == "json" {
 				formats = append(formats, format)
@@ -156,10 +157,5 @@ func writeOutput(data *scanner.ReceiptData, format string) error {
 }
 
 func contains(slice []string, value string) bool {
-	for _, item := range slice {
-		if item == value {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, value)
 }
