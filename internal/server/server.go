@@ -181,6 +181,7 @@ func NewServer() *ServerInstance {
 	cpointTokenService := services.NewCPointTokenService(cfg.CPointHMACSecret)
 	holidayService := services.NewHolidayService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService)
 	attendanceService := services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW, holidayService, staffLogService)
+	locationService := services.NewLocationService(cfg.Settings.ShopLocation)
 
 	newServer.services = Services{
 		attendance:   attendanceService,
@@ -190,13 +191,13 @@ func NewServer() *ServerInstance {
 		cpoint:       services.NewCpointService(newServer.encoder, newServer.dbRO, newServer.dbRW, cpointTokenService, staffLogService),
 		cpointToken:  cpointTokenService,
 		holiday:      holidayService,
-		location:     services.NewLocationService(cfg.Settings.ShopLocation),
+		location:     locationService,
 		product:      services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW, newServer.GetCDNURL),
 		productImage: services.NewProductImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
 		qr:           services.NewQRService(newServer.cache),
 		report:       services.NewReportService(newServer.encoder, newServer.dbRO, attendanceService, holidayService, staffLogService),
 		role:         services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		staff:        services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		staff:        services.NewStaffServiceWithDeps(newServer.encoder, newServer.dbRO, newServer.dbRW, attendanceService, locationService),
 		staffLog:     staffLogService,
 	}
 
