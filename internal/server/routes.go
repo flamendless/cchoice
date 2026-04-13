@@ -487,6 +487,19 @@ func (s *Server) versionHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Header Texts Handler]"
 	cfg := conf.Conf()
+	ctx := r.Context()
+
+	logInLabel := "Log In"
+
+	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
+	if customerIDStr != "" {
+		profile, err := s.services.customer.BuildProfile(ctx, customerIDStr)
+		if err != nil {
+			logs.Log().Warn(logtag, zap.Error(err))
+		} else {
+			logInLabel = "Hi, " + profile.FirstName
+		}
+	}
 
 	texts := []models.HeaderRowText{
 		{
@@ -498,12 +511,11 @@ func (s *Server) headerTextsHandler(w http.ResponseWriter, r *http.Request) {
 			URL:   "mailto:" + cfg.Settings.EMail,
 		},
 		{
-			Label: "Log In",
-			URL:   "/log-in",
+			Label: logInLabel,
+			URL:   utils.URL("/customer"),
 		},
 	}
 
-	ctx := r.Context()
 	if err := compheader.HeaderRow1Texts(texts).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
