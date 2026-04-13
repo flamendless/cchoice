@@ -12,7 +12,6 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/services"
-	staffmodels "cchoice/internal/staff"
 	"cchoice/internal/types"
 	"cchoice/internal/utils"
 
@@ -269,8 +268,8 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 		hasLunchBreakOut = attendance.LunchBreakOut.Valid
 
 		rec := s.services.attendance.ComputeData(
-			staffmodels.StaffRowBase(staff),
-			staffmodels.StaffRow{
+			services.StaffRowBase(staff),
+			services.StaffRow{
 				ID:                       staff.ID,
 				StaffID:                  staff.ID,
 				ForDate:                  attendance.ForDate,
@@ -362,8 +361,8 @@ func (s *Server) adminStaffAttendanceTableHandler(w http.ResponseWriter, r *http
 	var record *models.Attendance
 	if err == nil {
 		rec := s.services.attendance.ComputeData(
-			staffmodels.StaffRowBase(staff),
-			staffmodels.StaffRow{
+			services.StaffRowBase(staff),
+			services.StaffRow{
 				ID:                       staff.ID,
 				StaffID:                  staff.ID,
 				ForDate:                  attendance.ForDate,
@@ -409,8 +408,8 @@ func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.
 	var record *models.Attendance
 	if err == nil {
 		rec := s.services.attendance.ComputeData(
-			staffmodels.StaffRowBase(staff),
-			staffmodels.StaffRow{
+			services.StaffRowBase(staff),
+			services.StaffRow{
 				ID:                       staff.ID,
 				StaffID:                  staff.ID,
 				ForDate:                  attendance.ForDate,

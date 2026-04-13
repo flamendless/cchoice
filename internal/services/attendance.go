@@ -13,7 +13,6 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
-	"cchoice/internal/staff"
 	"cchoice/internal/types"
 	"cchoice/internal/utils"
 
@@ -27,16 +26,6 @@ type AttendanceService struct {
 	holiday      *HolidayService
 	staffLog     *StaffLogsService
 	shopLocation types.Location
-}
-
-type attendanceStatusResult struct {
-	duration      string
-	durationColor string
-	inStatus      enums.TimeInStatus
-	outStatus     enums.TimeOutStatus
-	inLate        time.Duration
-	undertime     time.Duration
-	earlyIn       time.Duration
 }
 
 func NewAttendanceService(
@@ -315,9 +304,9 @@ func (s *AttendanceService) GetAttendance(
 	staffID string,
 	startDate string,
 	endDate string,
-) ([]staff.StaffRow, error) {
+) ([]StaffRow, error) {
 	dbStaffID := s.encoder.Decode(staffID)
-	var data []staff.StaffRow
+	var data []StaffRow
 	if dbStaffID != encode.INVALID {
 		attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByDateRangeAndStaffID(ctx, queries.GetStaffAttendanceByDateRangeAndStaffIDParams{
 			StaffID:   dbStaffID,
@@ -328,9 +317,9 @@ func (s *AttendanceService) GetAttendance(
 			return data, err
 		}
 
-		data = make([]staff.StaffRow, 0, len(attendances))
+		data = make([]StaffRow, 0, len(attendances))
 		for _, att := range attendances {
-			data = append(data, staff.StaffRow(att))
+			data = append(data, StaffRow(att))
 		}
 	} else {
 		attendances, err := s.dbRO.GetQueries().GetStaffAttendanceByDateRange(ctx, queries.GetStaffAttendanceByDateRangeParams{
@@ -341,17 +330,17 @@ func (s *AttendanceService) GetAttendance(
 			return data, err
 		}
 
-		data = make([]staff.StaffRow, 0, len(attendances))
+		data = make([]StaffRow, 0, len(attendances))
 		for _, att := range attendances {
-			data = append(data, staff.StaffRow(att))
+			data = append(data, StaffRow(att))
 		}
 	}
 	return data, nil
 }
 
 func (s *AttendanceService) ComputeData(
-	staff staff.StaffRowBase,
-	att staff.StaffRow,
+	staff StaffRowBase,
+	att StaffRow,
 ) models.Attendance {
 	schedIn, schedOut := "", ""
 	if staff.TimeInSchedule.Valid {
@@ -534,16 +523,7 @@ func computeInOutStatus(actualIn, actualOut, schedIn, schedOut string) attendanc
 	return out
 }
 
-type AttendanceExtraStats struct {
-	TotalUndertimeMinutes float64
-	TotalLateMinutes      float64
-	TotalUndertimeCount   int
-	TotalLateCount        int
-	TotalEarlyInCount     int
-	TotalOvertimeCount    int
-}
-
-func (s *AttendanceService) GetExtraStats(ctx context.Context, staffID string, data []staff.StaffRow) AttendanceExtraStats {
+func (s *AttendanceService) GetExtraStats(ctx context.Context, staffID string, data []StaffRow) AttendanceExtraStats {
 	var res AttendanceExtraStats
 
 	decodedStaffID := s.encoder.Decode(staffID)
@@ -553,7 +533,7 @@ func (s *AttendanceService) GetExtraStats(ctx context.Context, staffID string, d
 	}
 
 	for _, d := range data {
-		c := s.ComputeData(staff.StaffRowBase(staffDB), d)
+		c := s.ComputeData(StaffRowBase(staffDB), d)
 		res.TotalLateMinutes += c.Attendance.InLate.Minutes()
 		if c.Attendance.InStatus == enums.TIME_IN_STATUS_LATE {
 			res.TotalLateCount++

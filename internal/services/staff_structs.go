@@ -1,4 +1,4 @@
-package staff
+package services
 
 import "database/sql"
 
@@ -58,4 +58,14 @@ type StaffRow struct {
 	LunchBreakOutBrowserVersion sql.NullString
 	LunchBreakOutOs             sql.NullString
 	LunchBreakOutDevice         sql.NullString
+}
+
+type UpdateProfileParams struct {
+	ID         string
+	FirstName  string
+	MiddleName string
+	LastName   string
+	MobileNo   string
+	Birthdate  string
+	DateHired  string
 }

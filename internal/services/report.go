@@ -1,18 +1,18 @@
 package services
 
 import (
-	"cchoice/internal/constants"
-	"cchoice/internal/database"
-	"cchoice/internal/encode"
-	"cchoice/internal/logs"
-	"cchoice/internal/staff"
-	"cchoice/internal/utils"
 	"context"
 	"database/sql"
 	"encoding/csv"
 	"fmt"
 	"sort"
 	"time"
+
+	"cchoice/internal/constants"
+	"cchoice/internal/database"
+	"cchoice/internal/encode"
+	"cchoice/internal/logs"
+	"cchoice/internal/utils"
 
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
@@ -68,7 +68,7 @@ func NewReportService(
 func (s *ReportService) StreamReportCSV(
 	ctx context.Context,
 	writer *csv.Writer,
-	data []staff.StaffRow,
+	data []StaffRow,
 	adminStaffID string,
 	staffID string,
 	filename string,
@@ -111,7 +111,7 @@ func (s *ReportService) StreamReportCSV(
 		holidayMap[h.Date] = h
 	}
 
-	attMap := make(map[string]staff.StaffRow, len(data))
+	attMap := make(map[string]StaffRow, len(data))
 	for _, att := range data {
 		attMap[att.ForDate] = att
 	}
@@ -220,7 +220,7 @@ func (s *ReportService) StreamReportCSV(
 	return nil
 }
 
-func buildAttendanceRow(att staff.StaffRow) []string {
+func buildAttendanceRow(att StaffRow) []string {
 	timeIn := utils.ExtractTimeToPH(att.TimeIn.String)
 	timeOut := utils.ExtractTimeToPH(att.TimeOut.String)
 
@@ -265,7 +265,7 @@ func buildAttendanceRow(att staff.StaffRow) []string {
 	}
 }
 
-func buildAttendanceRowWithHoliday(att staff.StaffRow, h Holiday) []string {
+func buildAttendanceRowWithHoliday(att StaffRow, h Holiday) []string {
 	timeIn := utils.ExtractTimeToPH(att.TimeIn.String)
 	timeOut := utils.ExtractTimeToPH(att.TimeOut.String)
 
@@ -313,7 +313,7 @@ func buildAttendanceRowWithHoliday(att staff.StaffRow, h Holiday) []string {
 func (s *ReportService) StreamReportXLSX(
 	ctx context.Context,
 	file *excelize.File,
-	data []staff.StaffRow,
+	data []StaffRow,
 	adminStaffID string,
 	staffID string,
 	filename string,
@@ -356,7 +356,7 @@ func (s *ReportService) StreamReportXLSX(
 		holidayMap[h.Date] = h
 	}
 
-	attMap := make(map[string]staff.StaffRow, len(data))
+	attMap := make(map[string]StaffRow, len(data))
 	for _, att := range data {
 		attMap[att.ForDate] = att
 	}

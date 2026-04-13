@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"sync"
 	"time"
@@ -17,15 +16,6 @@ import (
 
 	"go.uber.org/zap"
 )
-
-type Holiday struct {
-	CreatedAt time.Time      `json:"created_at"`
-	Date      string         `json:"date"`
-	Name      string         `json:"name"`
-	UpdatedAt sql.NullString `json:"updated_at"`
-	ID        int64
-	Type      enums.HolidayType `json:"type"`
-}
 
 type HolidayService struct {
 	encoder  encode.IEncode

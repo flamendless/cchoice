@@ -17,12 +17,6 @@ type CPointTokenService struct {
 	secret []byte
 }
 
-type CPointTokenPayload struct {
-	Code   string `json:"code"`
-	UserID string `json:"uid"`
-	Exp    int64  `json:"exp"`
-}
-
 func NewCPointTokenService(secret string) *CPointTokenService {
 	if secret == "" {
 		panic("secret is required")

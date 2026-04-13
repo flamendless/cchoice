@@ -15,7 +15,7 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
-	staffmodels "cchoice/internal/staff"
+	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
@@ -82,7 +82,7 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 		}
 		attendanceData = append(
 			attendanceData,
-			s.services.attendance.ComputeData(staffmodels.StaffRowBase(staff), att),
+			s.services.attendance.ComputeData(services.StaffRowBase(staff), att),
 		)
 	}
 
