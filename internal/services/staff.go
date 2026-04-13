@@ -176,11 +176,6 @@ func (s *StaffService) GetCurrentStaffWithAttendance(
 	profile.CurrentDate = time.Now().Format(constants.DateLayoutDisplay)
 	profile.CurrentTime = time.Now().Format(constants.TimeLayoutDisplay)
 
-	if s.attendance == nil || s.location == nil {
-		logs.LogCtx(ctx).Error("[StaffService] attendance or location service not initialized")
-		return profile, nil
-	}
-
 	profile.CanTimeIn = true
 	profile.CanTimeOut = false
 	profile.CanLunchBreakIn = false
