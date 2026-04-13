@@ -51,3 +51,11 @@ func CalculateTotalWeightFromCheckoutLines(checkoutLines []queries.GetCheckoutLi
 
 	return strconv.FormatFloat(totalWeightKg, 'f', 2, 64), nil
 }
+
+func ToWeightDisplay(weight float64, unit string) string {
+	var weightStr string
+	if weight > 0 {
+		weightStr = fmt.Sprintf("%.2f %s", weight, unit)
+	}
+	return weightStr
+}

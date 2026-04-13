@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -15,6 +14,7 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/utils"
 )
 
 type ProductService struct {
@@ -148,11 +148,12 @@ func (s *ProductService) DeleteProduct(ctx context.Context, productID string) er
 
 func (s *ProductService) GetProductsForListingAdmin(
 	ctx context.Context,
-	search, status string,
+	search string,
+	status enums.ProductStatus,
 ) ([]models.AdminProductListItem, error) {
 	products, err := s.dbRO.GetQueries().AdminGetProductsForListing(ctx, queries.AdminGetProductsForListingParams{
 		Search: sql.NullString{String: search, Valid: search != ""},
-		Status: sql.NullString{String: status, Valid: status != ""},
+		Status: sql.NullString{String: status.String(), Valid: status != enums.PRODUCT_STATUS_UNDEFINED},
 	})
 	if err != nil {
 		return nil, err
@@ -160,11 +161,6 @@ func (s *ProductService) GetProductsForListingAdmin(
 
 	productList := make([]models.AdminProductListItem, 0, len(products))
 	for _, p := range products {
-		var weightStr string
-		if p.Weight > 0 {
-			weightStr = fmt.Sprintf("%.2f %s", p.Weight, p.WeightUnit)
-		}
-
 		productList = append(productList, models.AdminProductListItem{
 			ID:            s.encoder.Encode(p.ID),
 			Name:          p.Name,
@@ -184,7 +180,7 @@ func (s *ProductService) GetProductsForListingAdmin(
 			Power:         p.Power,
 			Capacity:      p.Capacity,
 			ScopeOfSupply: p.ScopeOfSupply,
-			Weight:        weightStr,
+			Weight:        utils.ToWeightDisplay(p.Weight, p.WeightUnit),
 			WeightUnit:    p.WeightUnit,
 		})
 	}

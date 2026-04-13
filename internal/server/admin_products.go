@@ -359,7 +359,18 @@ func (s *Server) adminSuperuserProductsListTableHandler(w http.ResponseWriter, r
 	ctx := r.Context()
 
 	search := r.URL.Query().Get("search")
-	status := r.URL.Query().Get("status")
+	statusStr := r.URL.Query().Get("status")
+	status := enums.ParseProductStatusToEnum(statusStr)
+	if statusStr != "" && status == enums.PRODUCT_STATUS_UNDEFINED {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("search", search),
+			zap.String("status", statusStr),
+			zap.Error(errs.ErrEnumInvalid),
+		)
+		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", errs.ErrEnumInvalid.Error()))
+		return
+	}
 
 	productList, err := s.services.product.GetProductsForListingAdmin(ctx, search, status)
 	if err != nil {
@@ -368,8 +379,13 @@ func (s *Server) adminSuperuserProductsListTableHandler(w http.ResponseWriter, r
 	}
 
 	if err := compadmin.AdminSuperuserProductsListTable(productList).Render(ctx, w); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("search", search),
+			zap.String("status", statusStr),
+			zap.Error(err),
+		)
+		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", err.Error()))
 		return
 	}
 }
