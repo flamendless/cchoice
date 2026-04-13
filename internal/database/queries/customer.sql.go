@@ -157,6 +157,75 @@ func (q *Queries) GetAllCustomers(ctx context.Context) ([]GetAllCustomersRow, er
 	return items, nil
 }
 
+const getAllCustomersWithCompany = `-- name: GetAllCustomersWithCompany :many
+SELECT
+    c.id,
+    c.email,
+    c.first_name,
+    c.middle_name,
+    c.last_name,
+    c.birthdate,
+    c.sex,
+    c.customer_type,
+    c.status,
+    c.created_at,
+    cc.name AS company_name
+FROM tbl_customers c
+LEFT JOIN tbl_customer_companies cc ON c.id = cc.customer_id AND cc.deleted_at = '1970-01-01 00:00:00+00:00'
+WHERE
+    c.deleted_at = '1970-01-01 00:00:00+00:00'
+ORDER BY c.email ASC
+`
+
+type GetAllCustomersWithCompanyRow struct {
+	ID           int64
+	Email        string
+	FirstName    string
+	MiddleName   sql.NullString
+	LastName     string
+	Birthdate    string
+	Sex          string
+	CustomerType string
+	Status       string
+	CreatedAt    string
+	CompanyName  sql.NullString
+}
+
+func (q *Queries) GetAllCustomersWithCompany(ctx context.Context) ([]GetAllCustomersWithCompanyRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllCustomersWithCompany)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllCustomersWithCompanyRow
+	for rows.Next() {
+		var i GetAllCustomersWithCompanyRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Email,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
+			&i.Birthdate,
+			&i.Sex,
+			&i.CustomerType,
+			&i.Status,
+			&i.CreatedAt,
+			&i.CompanyName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getCustomerByEmail = `-- name: GetCustomerByEmail :one
 SELECT
     id,

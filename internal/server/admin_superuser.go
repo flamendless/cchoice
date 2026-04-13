@@ -332,27 +332,13 @@ func (s *Server) adminCustomersListHandler(w http.ResponseWriter, r *http.Reques
 	const logtag = "[Admin Customers List Handler]"
 	ctx := r.Context()
 
-	customers, err := s.dbRO.GetQueries().GetAllCustomers(ctx)
+	customers, err := s.services.customer.GetAllCustomers(ctx)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		return
 	}
 
-	opts := make([]struct {
-		ID    string
-		Email string
-	}, len(customers))
-	for i, c := range customers {
-		opts[i] = struct {
-			ID    string
-			Email string
-		}{
-			ID:    s.encoder.Encode(c.ID),
-			Email: c.Email,
-		}
-	}
-
-	if err := compadmin.CustomerOptions(opts).Render(ctx, w); err != nil {
+	if err := compadmin.CustomerOptions(customers).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}
 }

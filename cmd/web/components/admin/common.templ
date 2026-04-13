@@ -6,6 +6,7 @@ import "cchoice/cmd/web/models"
 import "cchoice/internal/enums"
 import "cchoice/internal/constants"
 import "fmt"
+import "cchoice/internal/services"
 
 var scrImageUpload = templ.NewOnceHandle()
 
@@ -374,10 +375,7 @@ templ StaffOptions(staffs []models.Staff) {
 	}
 }
 
-templ CustomerOptions(customers []struct {
-	ID    string
-	Email string
-}) {
+templ CustomerOptions(customers []services.CustomerListItem) {
 	<option value="">-- Select Customer --</option>
 	for _, customer := range customers {
 		<option value={ customer.ID }>{ customer.Email }</option>
@@ -389,7 +387,6 @@ templ SubcategoryOptions(subcategories []string) {
 	for _, subcat := range subcategories {
 		<option value={ subcat }>{ subcat }</option>
 	}
-	<!-- <option value="__new__">+ Add New Subcategory</option> -->
 }
 
 templ SerialValidationResult(isValid bool) {

@@ -9,6 +9,11 @@ const (
 	CUSTOMER_STATUS_VERIFIED
 )
 
+var AllCustomerStatuses = []CustomerStatus{
+	CUSTOMER_STATUS_UNVERIFIED,
+	CUSTOMER_STATUS_VERIFIED,
+}
+
 func ParseCustomerStatusToEnum(e string) CustomerStatus {
 	switch e {
 	case CUSTOMER_STATUS_VERIFIED.String():

@@ -12,6 +12,11 @@ const (
 	CUSTOMER_TYPE_COMPANY
 )
 
+var AllCustomerTypes = []CustomerType{
+	CUSTOMER_TYPE_CUSTOMER,
+	CUSTOMER_TYPE_COMPANY,
+}
+
 func ParseCustomerTypeToEnum(e string) CustomerType {
 	switch e {
 	case CUSTOMER_TYPE_CUSTOMER.String():
