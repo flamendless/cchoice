@@ -43,15 +43,15 @@ type Config struct {
 }
 
 type CloudflareResponse struct {
-	Success  bool              `json:"success"`
+	Result   map[string]any    `json:"result"`
 	Errors   []CloudflareError `json:"errors"`
 	Messages []string          `json:"messages"`
-	Result   map[string]any    `json:"result"`
+	Success  bool              `json:"success"`
 }
 
 type CloudflareError struct {
-	Code    int    `json:"code"`
 	Message string `json:"message"`
+	Code    int    `json:"code"`
 }
 
 type ImageUploadResult struct {
@@ -369,8 +369,8 @@ func (c *Client) HeadBucket(ctx context.Context) error {
 
 type BatchUploadImage struct {
 	Key         string
-	Data        []byte
 	ContentType string
+	Data        []byte
 }
 
 func (c *Client) BatchUpload(ctx context.Context, images []BatchUploadImage) ([]string, []error) {

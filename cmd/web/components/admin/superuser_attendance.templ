@@ -28,7 +28,6 @@ templ AdminSuperuserAttendancePage(title string, selectedDate string) {
 						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
 							Employee Attendance
 						</h1>
-
 						@AttendanceSectionSuperuserPage(title, selectedDate)
 					</div>
 				</div>
@@ -66,7 +65,6 @@ templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 					}
 					@TableHead("Staff ID")
 					@TableHead("Full Name")
-
 					@TableHead("Time In")
 					@TableHead("Time Out")
 					@TableHead("Duration")
@@ -76,7 +74,6 @@ templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 					@TableHead("Time Out Location")
 					@TableHead("Time In Device")
 					@TableHead("Time Out Device")
-
 					@TableHead("Lunch Break Start")
 					@TableHead("Lunch Break End")
 					@TableHead("Lunch Break Duration")
@@ -111,7 +108,6 @@ templ AdminSuperuserAttendanceTable(attendances []models.Attendance) {
 						@LatLong(att.Attendance.OutLocation)
 						@Device(att.Attendance.InDeviceInfo)
 						@Device(att.Attendance.OutDeviceInfo)
-
 						@In(att.LunchBreak.In, att.LunchBreak.InStatus)
 						@Out(att.LunchBreak.Out, att.LunchBreak.OutStatus)
 						@Duration(att.LunchBreak.Duration, att.LunchBreak.DurationColor)

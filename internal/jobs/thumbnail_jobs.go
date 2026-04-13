@@ -35,10 +35,10 @@ type ThumbnailJobPayload struct {
 }
 
 type ThumbnailJobParams struct {
-	ProductID  int64
 	Brand      string
 	SourcePath string
 	Filename   string
+	ProductID  int64
 }
 
 type ThumbnailJobRunner struct {

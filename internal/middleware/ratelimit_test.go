@@ -24,7 +24,7 @@ func TestAllowsUnderLimit(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/customer/login", nil)
 	req.RemoteAddr = "192.168.1.1:1234"
 
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		w := httptest.NewRecorder()
 		middleware.ServeHTTP(w, req)
 		if !nextCalled {
@@ -48,7 +48,7 @@ func TestBlocksOverLimit(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/customer/login", nil)
 	req.RemoteAddr = "192.168.1.1:1234"
 
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		w := httptest.NewRecorder()
 		middleware.ServeHTTP(w, req)
 		if !nextCalled {
@@ -102,11 +102,11 @@ func TestConcurrentAccess(t *testing.T) {
 	middleware := rl.Middleware(next)
 
 	var wg sync.WaitGroup
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			for j := 0; j < 50; j++ {
+			for range 50 {
 				req := httptest.NewRequest(http.MethodPost, "/customer/login", nil)
 				req.RemoteAddr = "192.168.1.1:1234"
 				w := httptest.NewRecorder()

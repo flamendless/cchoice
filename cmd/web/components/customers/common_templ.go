@@ -271,7 +271,7 @@ func CustomerRegisterPage() templ.Component {
 		var templ_7745c5c3_Var14 templ.SafeURL
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 347, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 345, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -345,7 +345,7 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var16 templ.SafeURL
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/logout"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 374, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 372, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
@@ -358,7 +358,7 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var17 templ.SafeURL
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/profile"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 385, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 383, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
@@ -376,7 +376,7 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 			var templ_7745c5c3_Var18 templ.SafeURL
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/cpoints"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 397, Col: 36}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 395, Col: 36}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
@@ -394,7 +394,7 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 			var templ_7745c5c3_Var19 string
 			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(`on click call showErrorBanner('You must verify your account first')`)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 410, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 408, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 			if templ_7745c5c3_Err != nil {
@@ -473,7 +473,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(profile.FullName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 452, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 450, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -492,7 +492,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Status.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 458, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 456, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -510,7 +510,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 			var templ_7745c5c3_Var23 string
 			templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Status.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 460, Col: 78}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 458, Col: 78}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 			if templ_7745c5c3_Err != nil {
@@ -528,7 +528,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 465, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 463, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
@@ -541,7 +541,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(profile.MobileNo)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 469, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 467, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
@@ -554,7 +554,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Birthdate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 473, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 471, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
@@ -567,7 +567,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Sex)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 477, Col: 70}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 475, Col: 70}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
@@ -580,7 +580,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(profile.CustomerType.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 481, Col: 88}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 479, Col: 88}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {
@@ -598,7 +598,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 			var templ_7745c5c3_Var29 string
 			templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(profile.CompanyName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 486, Col: 68}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 484, Col: 68}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 			if templ_7745c5c3_Err != nil {
@@ -621,7 +621,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 			var templ_7745c5c3_Var30 string
 			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/customer/verify/send"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 497, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 494, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 			if templ_7745c5c3_Err != nil {
@@ -634,7 +634,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 			var templ_7745c5c3_Var31 string
 			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/customer/verify"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 512, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 508, Col: 49}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 			if templ_7745c5c3_Err != nil {
@@ -750,7 +750,7 @@ func CustomerProfileEditForm(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var34 templ.SafeURL
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/profile"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 571, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 566, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
@@ -763,7 +763,7 @@ func CustomerProfileEditForm(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var35 string
 		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/customer/profile"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 574, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 569, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 		if templ_7745c5c3_Err != nil {
@@ -776,7 +776,7 @@ func CustomerProfileEditForm(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var36 string
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(profile.FirstName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 588, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 583, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 		if templ_7745c5c3_Err != nil {
@@ -789,7 +789,7 @@ func CustomerProfileEditForm(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var37 string
 		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(profile.MiddleName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 600, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 595, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 		if templ_7745c5c3_Err != nil {
@@ -802,7 +802,7 @@ func CustomerProfileEditForm(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var38 string
 		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(profile.LastName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 613, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 608, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 		if templ_7745c5c3_Err != nil {
@@ -815,7 +815,7 @@ func CustomerProfileEditForm(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var39 string
 		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Birthdate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 628, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 623, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 		if templ_7745c5c3_Err != nil {
@@ -856,7 +856,7 @@ func CustomerProfileEditForm(profile models.CustomerProfile) templ.Component {
 		var templ_7745c5c3_Var40 templ.SafeURL
 		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/profile"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 652, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 647, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 		if templ_7745c5c3_Err != nil {

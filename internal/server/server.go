@@ -38,7 +38,6 @@ import (
 )
 
 type Services struct {
-	all          []services.IService
 	attendance   *services.AttendanceService
 	brand        *services.BrandService
 	cpoint       *services.CPointService
@@ -54,6 +53,7 @@ type Services struct {
 	role         *services.RoleService
 	staff        *services.StaffService
 	staffLog     *services.StaffLogsService
+	all          []services.IService
 }
 
 type Server struct {
@@ -62,20 +62,20 @@ type Server struct {
 	SF                 singleflight.Group
 	staticFS           http.FileSystem // For static assets (JS, CSS, icons) - always local
 	productImageFS     http.FileSystem // For product images - configurable (local or object storage)
-	cache              *fastcache.Cache
-	sessionManager     *scs.SessionManager
 	paymentGateway     payments.IPaymentGateway
 	shippingService    shipping.IShippingService
 	geocoder           geocoding.IGeocoder
 	objectStorage      storage.IObjectStorage
 	encoder            encode.IEncode
 	mailService        mail.IMailService
-	mailJobRunner      *jobs.EmailJobRunner
 	thumbnailService   jobs.IThumbnailService
+	cache              *fastcache.Cache
+	sessionManager     *scs.SessionManager
+	mailJobRunner      *jobs.EmailJobRunner
 	thumbnailJobRunner *jobs.ThumbnailJobRunner
-	services           Services
 	rateLimiter        *middleware.RateLimiter
 	address            string
+	services           Services
 	port               int
 	portFS             int
 	useHTTP2           bool

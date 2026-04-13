@@ -380,7 +380,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var14 string
 				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(p.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 93, Col: 48}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 94, Col: 13}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
@@ -407,7 +407,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var16 string
 				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 94, Col: 50}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 97, Col: 15}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 				if templ_7745c5c3_Err != nil {
@@ -434,7 +434,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var18 string
 				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(p.Serial)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 95, Col: 52}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 100, Col: 17}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {
@@ -465,7 +465,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var20 string
 				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(p.Description)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 96, Col: 87}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 103, Col: 34}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 				if templ_7745c5c3_Err != nil {
@@ -478,7 +478,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var21 string
 				templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(p.Description)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 96, Col: 105}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 103, Col: 52}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 				if templ_7745c5c3_Err != nil {
@@ -509,7 +509,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var23 string
 				templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(p.Brand)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 97, Col: 51}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 106, Col: 16}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 				if templ_7745c5c3_Err != nil {
@@ -540,7 +540,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var25 string
 				templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(p.Colours)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 98, Col: 83}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 109, Col: 30}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 				if templ_7745c5c3_Err != nil {
@@ -553,7 +553,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var26 string
 				templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(p.Colours)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 98, Col: 97}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 109, Col: 44}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 				if templ_7745c5c3_Err != nil {
@@ -588,7 +588,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var28 string
 				templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(p.Sizes)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 99, Col: 81}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 112, Col: 28}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 				if templ_7745c5c3_Err != nil {
@@ -601,7 +601,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var29 string
 				templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(p.Sizes)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 99, Col: 93}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 112, Col: 40}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 				if templ_7745c5c3_Err != nil {
@@ -636,7 +636,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var31 string
 				templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(p.Segmentation)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 100, Col: 88}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 115, Col: 35}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 				if templ_7745c5c3_Err != nil {
@@ -649,7 +649,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var32 string
 				templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(p.Segmentation)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 100, Col: 107}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 115, Col: 54}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 				if templ_7745c5c3_Err != nil {
@@ -684,7 +684,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var34 string
 				templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(p.PartNumber)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 101, Col: 86}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 118, Col: 33}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 				if templ_7745c5c3_Err != nil {
@@ -697,7 +697,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var35 string
 				templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(p.PartNumber)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 101, Col: 103}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 118, Col: 50}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 				if templ_7745c5c3_Err != nil {
@@ -732,7 +732,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var37 string
 				templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(p.Power)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 102, Col: 81}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 121, Col: 28}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 				if templ_7745c5c3_Err != nil {
@@ -745,7 +745,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var38 string
 				templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(p.Power)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 102, Col: 93}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 121, Col: 40}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 				if templ_7745c5c3_Err != nil {
@@ -780,7 +780,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var40 string
 				templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(p.Capacity)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 103, Col: 84}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 124, Col: 31}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 				if templ_7745c5c3_Err != nil {
@@ -793,7 +793,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var41 string
 				templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(p.Capacity)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 103, Col: 99}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 124, Col: 46}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 				if templ_7745c5c3_Err != nil {
@@ -828,7 +828,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var43 string
 				templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(p.ScopeOfSupply)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 104, Col: 89}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 127, Col: 36}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 				if templ_7745c5c3_Err != nil {
@@ -841,7 +841,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var44 string
 				templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(p.ScopeOfSupply)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 104, Col: 109}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 127, Col: 56}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 				if templ_7745c5c3_Err != nil {
@@ -872,7 +872,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var46 string
 				templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.JoinStringErrs(p.Weight)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 105, Col: 52}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 130, Col: 17}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var46))
 				if templ_7745c5c3_Err != nil {
@@ -899,7 +899,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var48 string
 				templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.JoinStringErrs(p.CreatedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 106, Col: 55}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 133, Col: 20}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var48))
 				if templ_7745c5c3_Err != nil {
@@ -926,7 +926,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				var templ_7745c5c3_Var50 string
 				templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(p.UpdatedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 107, Col: 55}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 136, Col: 20}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 				if templ_7745c5c3_Err != nil {
@@ -984,7 +984,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 					var templ_7745c5c3_Var53 templ.SafeURL
 					templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinURLErrs(p.CDNURL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 113, Col: 24}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 145, Col: 25}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
 					if templ_7745c5c3_Err != nil {
@@ -1003,7 +1003,7 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 					var templ_7745c5c3_Var54 templ.SafeURL
 					templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinURLErrs(p.CDNURL1280)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 128, Col: 28}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 159, Col: 29}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
 					if templ_7745c5c3_Err != nil {

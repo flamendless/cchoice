@@ -113,7 +113,7 @@ func BenchmarkGenerateQR(b *testing.B) {
 	content := "http://localhost:8080/cpoints/redeem?code=CP-TEST-123-ABC"
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = svc.GenerateQR(ctx, content)
 	}
 }
@@ -127,7 +127,7 @@ func BenchmarkGenerateQR_Cached(b *testing.B) {
 	_, _ = svc.GenerateQR(ctx, content)
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = svc.GenerateQR(ctx, content)
 	}
 }

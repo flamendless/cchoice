@@ -22,16 +22,16 @@ import (
 
 type Client struct {
 	minioClient    *minio.Client
-	bucketEnum     enums.LinodeBucketEnum
-	basePrefix     string
-	endpoint       string
 	urlCache       sync.Map
 	presignedCache sync.Map
+	basePrefix     string
+	endpoint       string
+	bucketEnum     enums.LinodeBucketEnum
 }
 
 type presignedCacheEntry struct {
-	url    string
 	expiry time.Time
+	url    string
 }
 
 type Config struct {
@@ -45,9 +45,9 @@ type Config struct {
 }
 
 type ObjectInfo struct {
+	LastModified *time.Time
 	Key          string
 	Size         int64
-	LastModified *time.Time
 }
 
 type HeadObjectOutput struct {

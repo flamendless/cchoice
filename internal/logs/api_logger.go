@@ -16,14 +16,14 @@ type ServiceStringer interface {
 }
 
 type ExternalAPILogParams struct {
-	CheckoutID *int64
-	Service    string
 	API        ServiceStringer
-	Endpoint   string
-	HTTPMethod string
 	Payload    any
 	Response   any
 	Error      error
+	CheckoutID *int64
+	Service    string
+	Endpoint   string
+	HTTPMethod string
 }
 
 func LogExternalAPICall(ctx context.Context, db *queries.Queries, params ExternalAPILogParams) {

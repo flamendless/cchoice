@@ -22,7 +22,6 @@ templ HomePageBody(data models.HomePageData) {
 		@SaleBanner(data.RandomSaleProduct)
 		@header.Header()
 		@MobileSidebar()
-
 		<style>
 			#desktop-sidebar {
 				position: sticky;
@@ -55,7 +54,6 @@ templ HomePageBody(data models.HomePageData) {
 				}
 			}
 		</style>
-
 		<div class="flex flex-col">
 			<div class="flex items-start">
 				<div id="desktop-sidebar">
@@ -70,7 +68,6 @@ templ HomePageBody(data models.HomePageData) {
 				</div>
 			</div>
 		</div>
-
 		@footer.Footer()
 		@LoadImageSrc()
 		@LoadModalImage()
@@ -202,4 +199,3 @@ script PrefetchSaleProductImages() {
 		runPrefetch(evt.target);
 	});
 }
-

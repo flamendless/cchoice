@@ -18,8 +18,8 @@ import (
 
 type LocationResult struct {
 	InShop          *bool
-	DistanceMeters  float64
 	LocationDisplay string
+	DistanceMeters  float64
 }
 
 type LocationService struct {

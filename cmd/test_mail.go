@@ -20,10 +20,10 @@ import (
 type testMailFlags struct {
 	Service  string
 	To       string
-	CC       []string
 	Subject  string
 	Body     string
 	Template string
+	CC       []string
 }
 
 var flagTestMail testMailFlags

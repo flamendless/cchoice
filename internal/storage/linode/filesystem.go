@@ -21,26 +21,26 @@ import (
 
 type LinodeFS struct {
 	objstorage *Client
-	bucketEnum enums.LinodeBucketEnum
 	basePrefix string
+	bucketEnum enums.LinodeBucketEnum
 }
 
 type LinodeFile struct {
-	body       io.ReadCloser
-	name       string
-	size       int64
 	modTime    time.Time
-	pos        int64
-	isDir      bool
+	body       io.ReadCloser
 	objstorage *Client
+	name       string
 	bucket     string
 	key        string
+	size       int64
+	pos        int64
+	isDir      bool
 }
 
 type fileInfo struct {
+	modTime time.Time
 	name    string
 	size    int64
-	modTime time.Time
 	isDir   bool
 }
 

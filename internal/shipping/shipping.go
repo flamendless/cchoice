@@ -60,8 +60,8 @@ type ShippingQuotation struct {
 	Metadata     map[string]any `json:"metadata,omitempty"`
 	ID           string         `json:"id,omitempty"`
 	Currency     string         `json:"currency"`
-	ServiceType  ServiceType    `json:"service_type"`
 	ExpiresAt    string         `json:"expires_at,omitempty"`
+	ServiceType  ServiceType    `json:"service_type"`
 	Fee          float64        `json:"fee"`
 	DistanceKm   float64        `json:"distance_km"`
 	EstimatedETA int            `json:"estimated_eta"`

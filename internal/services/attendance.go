@@ -24,16 +24,16 @@ type AttendanceService struct {
 	encoder      encode.IEncode
 	dbRO         database.IService
 	dbRW         database.IService
-	shopLocation types.Location
 	holiday      *HolidayService
 	staffLog     *StaffLogsService
+	shopLocation types.Location
 }
 
 type attendanceStatusResult struct {
-	inStatus      enums.TimeInStatus
-	outStatus     enums.TimeOutStatus
 	duration      string
 	durationColor string
+	inStatus      enums.TimeInStatus
+	outStatus     enums.TimeOutStatus
 	inLate        time.Duration
 	undertime     time.Duration
 	earlyIn       time.Duration

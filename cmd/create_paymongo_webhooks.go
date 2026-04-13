@@ -10,9 +10,9 @@ import (
 )
 
 type createPaymongoWebhooksFlags struct {
-	LiveMode bool
 	URL      string
 	Events   []string
+	LiveMode bool
 }
 
 var flagCreatePaymongoWebhooks createPaymongoWebhooksFlags

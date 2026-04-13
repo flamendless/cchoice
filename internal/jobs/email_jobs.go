@@ -34,15 +34,15 @@ type EmailJobPayload struct {
 }
 
 type EmailJobParams struct {
+	OrderID           *int64
+	CheckoutPaymentID *string
 	Recipient         string
 	CC                string
 	Subject           string
-	TemplateName      enums.EmailTemplateName
-	OrderID           *int64
-	CheckoutPaymentID *string
 	MobileNo          string
 	EMail             string
 	OTPCode           string
+	TemplateName      enums.EmailTemplateName
 }
 
 type EmailJobRunner struct {

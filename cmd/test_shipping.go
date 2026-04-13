@@ -31,13 +31,13 @@ type TestCase struct {
 }
 
 type QuotationResult struct {
+	Error        error
 	Destination  string
 	Weight       string
 	Fee          float64
 	Distance     float64
 	ETA          int
 	FreeDelivery bool
-	Error        error
 }
 
 func init() {

@@ -10,9 +10,9 @@ type BrandImage struct {
 }
 
 type PostHomeContent struct {
+	BrandImage  *BrandImage
 	Title       string
 	Description string
-	BrandImage  *BrandImage
 }
 
 type PostHomeContentSection struct {
@@ -22,18 +22,18 @@ type PostHomeContentSection struct {
 }
 
 type HomePageData struct {
-	Sections          []PostHomeContentSection
 	RandomSaleProduct *RandomSaleProduct
+	Sections          []PostHomeContentSection
 }
 
 type RandomSaleProduct struct {
-	queries.GetRandomProductOnSaleRow
 	ProductID          string
 	CDNURL             string
 	CDNURL1280         string
 	OrigPriceDisplay   string
 	PriceDisplay       string
 	DiscountPercentage string
+	queries.GetRandomProductOnSaleRow
 }
 
 type BrandLogoURLFunc func(filename string) string

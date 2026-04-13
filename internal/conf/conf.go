@@ -21,31 +21,31 @@ var appCfg *appConfig
 var once sync.Once
 
 type appConfig struct {
-	Server             ServerConfig
+	Linode             LinodeConfig
+	Business           BusinessConfig
+	PayMongo           PayMongoConfig
+	CloudflareImages   CloudflareImagesConfig
+	Lalamove           LalamoveConfig
+	MailerooConfig     MailerooConfig
+	BasicAuth          BasicAuth
 	AppEnvRaw          string `env:"APP_ENV" env-required:""`
-	AppEnv             enums.AppEnv
 	DBURL              string `env:"DB_URL" env-required:""`
 	PaymentService     string `env:"PAYMENT_SERVICE" env-required:""`
-	PayMongo           PayMongoConfig
 	ShippingService    string `env:"SHIPPING_SERVICE" env-required:""`
-	Lalamove           LalamoveConfig
 	GeocodingService   string `env:"GEOCODING_SERVICE" env-required:""`
 	GoogleMaps         GoogleMapsConfig
 	OCRService         string `env:"OCR_SERVICE"`
 	GoogleVisionConfig GoogleVisionConfig
-	Business           BusinessConfig
 	FSMode             string `env:"FSMODE" env-required:""`
 	EncodeSalt         string `env:"ENCODE_SALT" env-required:""`
-	LogMinLevel        int    `env:"LOG_MIN_LEVEL" env-default:"1"`
 	StorageProvider    string `env:"STORAGE_PROVIDER" env-default:"LOCAL"`
-	Linode             LinodeConfig
-	CloudflareImages   CloudflareImagesConfig
 	MailService        string `env:"MAIL_SERVICE"`
-	MailerooConfig     MailerooConfig
-	Settings           Settings
-	BasicAuth          BasicAuth
 	CPointHMACSecret   string `env:"CPOINT_HMAC_SECRET" env-required:""`
+	Server             ServerConfig
+	Settings           Settings
 	RateLimit          RateLimitConfig
+	AppEnv             enums.AppEnv
+	LogMinLevel        int `env:"LOG_MIN_LEVEL" env-default:"1"`
 	Test               Test
 }
 
@@ -73,9 +73,9 @@ type Settings struct {
 	URLWaze         string
 	URLFacebook     string
 	URLTikTok       string
-	ShowPromoBanner bool
-	ShopLocation    types.Location
 	VATPercentage   string
+	ShopLocation    types.Location
+	ShowPromoBanner bool
 }
 
 type MailerooConfig struct {
@@ -86,12 +86,12 @@ type MailerooConfig struct {
 
 type ServerConfig struct {
 	Address  string `env:"ADDRESS" env-required:""`
+	CertPath string `env:"CERTPATH"`
+	KeyPath  string `env:"KEYPATH"`
 	Port     int    `env:"PORT" env-required:""`
 	PortFS   int    `env:"PORT_FS" env-required:""`
 	UseSSL   bool   `env:"USESSL"`
 	UseHTTP2 bool   `env:"USEHTTP2"`
-	CertPath string `env:"CERTPATH"`
-	KeyPath  string `env:"KEYPATH"`
 }
 
 type PayMongoConfig struct {
@@ -129,14 +129,14 @@ type BusinessConfig struct {
 }
 
 type LinodeConfig struct {
-	Endpoint   string `env:"LINODE_ENDPOINT"`
-	Region     string `env:"LINODE_REGION" env-default:""`
-	BasePrefix string `env:"LINODE_BASE_PREFIX" env-default:""`
+	buckets map[enums.LinodeBucketEnum]LinodeBucketConfig
 
 	Public  LinodeBucketConfig `env-prefix:"LINODE_PUBLIC_"`
 	Private LinodeBucketConfig `env-prefix:"LINODE_PRIVATE_"`
 
-	buckets map[enums.LinodeBucketEnum]LinodeBucketConfig
+	Endpoint   string `env:"LINODE_ENDPOINT"`
+	Region     string `env:"LINODE_REGION" env-default:""`
+	BasePrefix string `env:"LINODE_BASE_PREFIX" env-default:""`
 }
 
 type LinodeBucketConfig struct {

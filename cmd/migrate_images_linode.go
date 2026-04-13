@@ -22,9 +22,9 @@ import (
 
 var flagsMigrateImagesLinode struct {
 	basePath         string
+	bucket           string
 	dryRun           bool
 	panicImmediately bool
-	bucket           string
 }
 
 func init() {
