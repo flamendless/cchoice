@@ -96,6 +96,8 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireSuperuserAuth).Delete("/admin/superuser/products/{id}", s.adminSuperuserProductsDeleteHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/logs", s.adminSuperuserLogsPageHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/logs/table", s.adminSuperuserLogsTableHandler)
+	r.With(s.requireSuperuserAuth).Get("/admin/superuser/customers", s.adminCustomersListPageHandler)
+	r.With(s.requireSuperuserAuth).Get("/admin/superuser/customers/table", s.adminCustomersListTableHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/staffs", s.adminSuperuserStaffsListPageHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/staffs/table", s.adminSuperuserStaffsListTableHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/staffs/roles", s.adminSuperuserStaffsRolesOptionsHandler)

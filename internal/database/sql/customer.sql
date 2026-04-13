@@ -125,3 +125,22 @@ SET
 WHERE
     id = ?
 RETURNING id;
+
+-- name: GetAllCustomersWithCompany :many
+SELECT
+    c.id,
+    c.email,
+    c.first_name,
+    c.middle_name,
+    c.last_name,
+    c.birthdate,
+    c.sex,
+    c.customer_type,
+    c.status,
+    c.created_at,
+    cc.name AS company_name
+FROM tbl_customers c
+LEFT JOIN tbl_customer_companies cc ON c.id = cc.customer_id AND cc.deleted_at = '1970-01-01 00:00:00+00:00'
+WHERE
+    c.deleted_at = '1970-01-01 00:00:00+00:00'
+ORDER BY c.email ASC;

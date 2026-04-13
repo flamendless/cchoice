@@ -33,8 +33,8 @@ type RegisterCustomerParams struct {
 	Email        string
 	MobileNo     string
 	Password     string
-	CustomerType enums.CustomerType
 	CompanyName  string
+	CustomerType enums.CustomerType
 }
 
 type UpdateCustomerProfileParams struct {
@@ -45,6 +45,20 @@ type UpdateCustomerProfileParams struct {
 	MobileNo   string
 	Birthdate  string
 	Sex        string
+}
+
+type CustomerListItem struct {
+	ID           string
+	Email        string
+	FirstName    string
+	MiddleName   string
+	LastName     string
+	Birthdate    string
+	Sex          string
+	CompanyName  string
+	CreatedAt    string
+	CustomerType enums.CustomerType
+	IsVerified   enums.CustomerStatus
 }
 
 func NewCustomerService(
@@ -183,6 +197,95 @@ func (s *CustomerService) BuildProfile(ctx context.Context, customerID string) (
 	}
 
 	return profile, nil
+}
+
+func (s *CustomerService) GetAllCustomers(ctx context.Context) ([]CustomerListItem, error) {
+	rows, err := s.dbRO.GetQueries().GetAllCustomersWithCompany(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	customers := make([]CustomerListItem, 0, len(rows))
+	for _, r := range rows {
+		customers = append(customers, CustomerListItem{
+			ID:           s.encoder.Encode(r.ID),
+			Email:        r.Email,
+			FirstName:    r.FirstName,
+			MiddleName:   r.MiddleName.String,
+			LastName:     r.LastName,
+			Birthdate:    r.Birthdate,
+			Sex:          r.Sex,
+			CustomerType: enums.ParseCustomerTypeToEnum(r.CustomerType),
+			CompanyName:  r.CompanyName.String,
+			IsVerified:   enums.ParseCustomerStatusToEnum(r.Status),
+			CreatedAt:    r.CreatedAt,
+		})
+	}
+
+	return customers, nil
+}
+
+func (s *CustomerService) FilterCustomers(
+	ctx context.Context,
+	email string,
+	customerType string,
+	status string,
+) ([]CustomerListItem, error) {
+	customers, err := s.GetAllCustomers(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if email == "" && customerType == "" && status == "" {
+		return customers, nil
+	}
+
+	filtered := make([]CustomerListItem, 0)
+	for _, c := range customers {
+		if email != "" && !containsIgnoreCase(c.Email, email) {
+			continue
+		}
+		if customerType != "" && c.CustomerType.String() != customerType {
+			continue
+		}
+		if status != "" && c.IsVerified.String() != status {
+			continue
+		}
+		filtered = append(filtered, c)
+	}
+
+	return filtered, nil
+}
+
+func containsIgnoreCase(s, substr string) bool {
+	return len(substr) == 0 || containsLower(toLower(s), toLower(substr))
+}
+
+func toLower(s string) string {
+	result := make([]byte, len(s))
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c >= 'A' && c <= 'Z' {
+			c += 'a' - 'A'
+		}
+		result[i] = c
+	}
+	return string(result)
+}
+
+func containsLower(s, substr string) bool {
+	if len(substr) == 0 {
+		return true
+	}
+	if len(substr) > len(s) {
+		return false
+	}
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *CustomerService) Log() {
