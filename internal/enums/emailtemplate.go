@@ -9,6 +9,7 @@ const (
 	EMAIL_TEMPLATE_ORDER_CONFIRMATION
 	EMAIL_TEMPLATE_PAYMENT_CONFIRMATION
 	EMAIL_TEMPLATE_CUSTOMER_VERIFICATION
+	EMAIL_TEMPLATE_PASSWORD_RESET
 )
 
 func ParseEmailTemplateNameToEnum(e string) EmailTemplateName {
@@ -32,6 +33,8 @@ func (e EmailTemplateName) FileName() string {
 		return "payment_confirmation.html"
 	case EMAIL_TEMPLATE_CUSTOMER_VERIFICATION:
 		return "customer_verification.html"
+	case EMAIL_TEMPLATE_PASSWORD_RESET:
+		return "password_reset.html"
 	default:
 		return ""
 	}
@@ -45,6 +48,8 @@ func (e EmailTemplateName) DBValue() string {
 		return "payment_confirmation"
 	case EMAIL_TEMPLATE_CUSTOMER_VERIFICATION:
 		return "customer_verification"
+	case EMAIL_TEMPLATE_PASSWORD_RESET:
+		return "password_reset"
 	default:
 		return ""
 	}
@@ -58,6 +63,8 @@ func ParseEmailTemplateNameFromDB(s string) EmailTemplateName {
 		return EMAIL_TEMPLATE_PAYMENT_CONFIRMATION
 	case "customer_verification":
 		return EMAIL_TEMPLATE_CUSTOMER_VERIFICATION
+	case "password_reset":
+		return EMAIL_TEMPLATE_PASSWORD_RESET
 	default:
 		return EMAIL_TEMPLATE_UNDEFINED
 	}

@@ -12,11 +12,12 @@ func _() {
 	_ = x[EMAIL_TEMPLATE_ORDER_CONFIRMATION-1]
 	_ = x[EMAIL_TEMPLATE_PAYMENT_CONFIRMATION-2]
 	_ = x[EMAIL_TEMPLATE_CUSTOMER_VERIFICATION-3]
+	_ = x[EMAIL_TEMPLATE_PASSWORD_RESET-4]
 }
 
-const _EmailTemplateName_name = "UNDEFINEDORDER_CONFIRMATIONPAYMENT_CONFIRMATIONCUSTOMER_VERIFICATION"
+const _EmailTemplateName_name = "UNDEFINEDORDER_CONFIRMATIONPAYMENT_CONFIRMATIONCUSTOMER_VERIFICATIONPASSWORD_RESET"
 
-var _EmailTemplateName_index = [...]uint8{0, 9, 27, 47, 68}
+var _EmailTemplateName_index = [...]uint8{0, 9, 27, 47, 68, 82}
 
 func (i EmailTemplateName) String() string {
 	idx := int(i) - 0

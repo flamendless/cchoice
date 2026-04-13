@@ -6,6 +6,8 @@ const (
 	ActionCreate       = "create"
 	ActionDelete       = "delete"
 	ActionExport       = "export"
+	ActionReset        = "reset"
+	ActionTrigger      = "trigger"
 	ActionUpdate       = "update"
 	ActionUpdateStatus = "update status"
 )
@@ -15,6 +17,7 @@ const (
 	ModuleAttendanceReportXLSX = "attendance_report_xlsx"
 	ModuleCPoints              = "cpoints"
 	ModuleHolidays             = "holidays"
+	ModulePasswordReset        = "password_reset"
 	ModuleProducts             = "products"
 	ModuleTimeOff              = "time_off"
 )

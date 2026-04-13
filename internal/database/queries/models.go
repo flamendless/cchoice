@@ -244,6 +244,16 @@ type TblOrderLine struct {
 	UpdatedAt      time.Time
 }
 
+type TblPasswordResetToken struct {
+	ID        int64
+	UserID    int64
+	UserType  string
+	TokenHash string
+	ExpiresAt string
+	UsedAt    sql.NullString
+	CreatedAt string
+}
+
 type TblProduct struct {
 	ID                          int64
 	Serial                      string

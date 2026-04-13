@@ -81,6 +81,7 @@ func (s *CPointService) CreateCpoint(ctx context.Context, params CreateCpointPar
 			logs.Log().Warn("create log", zap.Error(err))
 		}
 	}()
+
 	customerIDDecoded := s.encoder.Decode(params.CustomerID)
 	if customerIDDecoded == encode.INVALID {
 		return Cpoint{}, errs.ErrDecode

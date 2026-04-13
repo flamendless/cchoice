@@ -198,6 +198,11 @@ templ AdminLoginPage() {
 						</span>
 					</button>
 				</form>
+				<div class="mt-4 text-center">
+					<a href={ utils.URL("/auth/forgot-password?type=staff") } class="text-sm text-cchoice hover:text-cchoice_dark">
+						Forgot password?
+					</a>
+				</div>
 				@ScriptAdminLogin()
 			</div>
 		</body>
