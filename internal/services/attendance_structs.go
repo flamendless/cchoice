@@ -3,6 +3,9 @@ package services
 import (
 	"time"
 
+	"database/sql"
+	"cchoice/cmd/web/models"
+
 	"cchoice/internal/enums"
 )
 
@@ -23,4 +26,14 @@ type AttendanceExtraStats struct {
 	TotalLateCount        int
 	TotalEarlyInCount     int
 	TotalOvertimeCount    int
+}
+
+type StaffDayAttendance struct {
+	HasTimeIn        bool
+	HasTimeOut       bool
+	HasLunchBreakIn  bool
+	HasLunchBreakOut bool
+	Computed         *models.Attendance
+	InLocation       sql.NullString
+	OutLocation      sql.NullString
 }

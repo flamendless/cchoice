@@ -9,7 +9,10 @@ import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/components/header"
 
 templ StaffAttendanceSingleTable(record *models.Attendance) {
-	<div class="overflow-x-auto">
+	if record == nil {
+		<p class="text-gray-500 text-center py-4">No attendance record</p>
+	} else {
+		<div class="overflow-x-auto">
 		<table class="min-w-full divide-y divide-gray-200">
 			<thead class="bg-gray-50">
 				<tr>
@@ -32,11 +35,15 @@ templ StaffAttendanceSingleTable(record *models.Attendance) {
 				</tr>
 			</tbody>
 		</table>
-	</div>
+		</div>
+	}
 }
 
 templ StaffAttendanceRows(record *models.Attendance) {
-	<div class="overflow-x-auto">
+	if record == nil {
+		<p class="text-gray-500 text-center py-4">No attendance record</p>
+	} else {
+		<div class="overflow-x-auto">
 		<table class="min-w-full divide-y divide-gray-200">
 			<tbody class="bg-white divide-y divide-gray-200">
 				<tr>
@@ -65,7 +72,8 @@ templ StaffAttendanceRows(record *models.Attendance) {
 				</tr>
 			</tbody>
 		</table>
-	</div>
+		</div>
+	}
 }
 
 templ AttendanceSectionForStaff(
