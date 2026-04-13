@@ -22,8 +22,7 @@ func FormToStruct(r *http.Request, dst any) error {
 	}
 
 	sliceFields := map[string]struct{}{}
-	for i := 0; i < elem.NumField(); i++ {
-		f := elem.Field(i)
+	for f := range elem.Fields() {
 		if f.Type.Kind() == reflect.Slice {
 			if tag := f.Tag.Get("json"); tag != "" {
 				sliceFields[tag] = struct{}{}
