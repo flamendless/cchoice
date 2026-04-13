@@ -240,10 +240,8 @@ var cmdParseProducts = &cobra.Command{
 		for start, end := 0, 0; start <= len(products)-1; start = end {
 			end = min(start+batchsize, len(products))
 			batch := products[start:end]
-			wg.Add(1)
 
-			go func() {
-				defer wg.Done()
+			wg.Go(func() {
 				for _, product := range batch {
 					existingProductId := product.GetDBID(cmd.Context(), tpl.CtxApp.DB)
 					if existingProductId != 0 {
@@ -300,7 +298,7 @@ var cmdParseProducts = &cobra.Command{
 						}
 					}
 				}
-			}()
+			})
 		}
 		wg.Wait()
 		tpl.CtxApp.Metrics.Add("Get product IDS (parallel)", time.Since(startWG))
