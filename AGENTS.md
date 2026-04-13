@@ -47,6 +47,7 @@ mage cleandb   # Clean DB and re-parse products
 ```
 
 ### Migration
+Use this command to create new migration files:
 ```bash
 ./tmp/goose create <filename> sql # Create new migration
 ```
@@ -149,6 +150,25 @@ import (
 - Wrap errors with context: `return 0, fmt.Errorf("failed to create customer: %w", err)`
 - Use sentinel errors: `var ErrInvalidCode = errors.New("invalid code")` in `internal/errs`
 - Check errors explicitly: `if err != nil { return ... }`
+- Convention: Avoid things like `fmt.Errorf("invalid user type")`, return `errs.ErrInvalidUserType` instead
+- if the only return value is `error`, then always check it within if statement. Sample:
+```go
+//DO NOT DO THIS
+err := foo()
+if err != nil {...}
+
+//DO THIS INSTEAD
+if err := foo(); err != nil {...}
+```
+- if there are multiple return values but the others are discarded except the `err`, do this as well:
+```go
+//DO NOT DO THIS
+_, err := foo()
+if err != nil {...}
+
+//DO THIS INSTEAD
+if _, err := foo(); err != nil {...}
+- if error is in http handlers, use redirectHX with utils.URLWithError
 
 ### Types
 - Use `sql.NullString`, `sql.NullInt64` for nullable DB fields
@@ -200,8 +220,20 @@ go run -tags="fts5,staticfs" ./main.go
 - Use `redirectHX` and combinations of utils.URL or utils.URLWithError or utils.URLWithSuccess
 - Use `utils.URL` always in templ src or hx-
 
+### Links / URLs
+- always build urls with utils.URL like `utils.URL("/test")` or `utils.URL(fmt.Sprintf(...))`
+
 ### Time
 - Always define/use date/time layout in constants package instead of hardcoded strings
+- always do above for date/time parsing
+
+### Email templates
+- create templates in ./templates
+- always reference existing templates like `templates/customer_verification.html`
+- always add cchoice logo in header
+
+### Any
+- use `any` instead of `interface{}`
 
 ### Handlers
 - In handlers, define `const logtag = "[FOO]"` for logging
@@ -222,6 +254,9 @@ go run -tags="fts5,staticfs" ./main.go
         result = err.Error()
     }
 ```
+
+### More
+- Use recommendations by `modernize` tools with go 1.26 and above as basis
 
 ---
 
