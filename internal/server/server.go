@@ -38,22 +38,23 @@ import (
 )
 
 type Services struct {
-	attendance   *services.AttendanceService
-	brand        *services.BrandService
-	cpoint       *services.CPointService
-	cpointToken  *services.CPointTokenService
-	customer     *services.CustomerService
-	customerOTP  *services.CustomerOTPService
-	holiday      *services.HolidayService
-	location     *services.LocationService
-	product      *services.ProductService
-	productImage *services.ProductImageService
-	qr           *services.QRService
-	report       *services.ReportService
-	role         *services.RoleService
-	staff        *services.StaffService
-	staffLog     *services.StaffLogsService
-	all          []services.IService
+	attendance    *services.AttendanceService
+	brand         *services.BrandService
+	cpoint        *services.CPointService
+	cpointToken   *services.CPointTokenService
+	customer      *services.CustomerService
+	customerOTP   *services.CustomerOTPService
+	passwordReset *services.PasswordResetService
+	holiday       *services.HolidayService
+	location      *services.LocationService
+	product       *services.ProductService
+	productImage  *services.ProductImageService
+	qr            *services.QRService
+	report        *services.ReportService
+	role          *services.RoleService
+	staff         *services.StaffService
+	staffLog      *services.StaffLogsService
+	all           []services.IService
 }
 
 type Server struct {
@@ -183,21 +184,22 @@ func NewServer() *ServerInstance {
 	attendanceService := services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW, holidayService, staffLogService)
 
 	newServer.services = Services{
-		attendance:   attendanceService,
-		brand:        services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		customer:     services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		customerOTP:  services.NewCustomerOTPService(newServer.encoder, newServer.dbRO, newServer.dbRW, mailService, emailJobRunner),
-		cpoint:       services.NewCpointService(newServer.encoder, newServer.dbRO, newServer.dbRW, cpointTokenService, staffLogService),
-		cpointToken:  cpointTokenService,
-		holiday:      holidayService,
-		location:     services.NewLocationService(cfg.Settings.ShopLocation),
-		product:      services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW, newServer.GetCDNURL),
-		productImage: services.NewProductImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
-		qr:           services.NewQRService(newServer.cache),
-		report:       services.NewReportService(newServer.encoder, newServer.dbRO, attendanceService, holidayService, staffLogService),
-		role:         services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		staff:        services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		staffLog:     staffLogService,
+		attendance:    attendanceService,
+		brand:         services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		customer:      services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		customerOTP:   services.NewCustomerOTPService(newServer.encoder, newServer.dbRO, newServer.dbRW, mailService, emailJobRunner),
+		passwordReset: services.NewPasswordResetService(newServer.encoder, newServer.dbRO, newServer.dbRW, emailJobRunner, staffLogService),
+		cpoint:        services.NewCpointService(newServer.encoder, newServer.dbRO, newServer.dbRW, cpointTokenService, staffLogService),
+		cpointToken:   cpointTokenService,
+		holiday:       holidayService,
+		location:      services.NewLocationService(cfg.Settings.ShopLocation),
+		product:       services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW, newServer.GetCDNURL),
+		productImage:  services.NewProductImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
+		qr:            services.NewQRService(newServer.cache),
+		report:        services.NewReportService(newServer.encoder, newServer.dbRO, attendanceService, holidayService, staffLogService),
+		role:          services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		staff:         services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		staffLog:      staffLogService,
 	}
 
 	newServer.services.all = []services.IService{
@@ -205,6 +207,7 @@ func NewServer() *ServerInstance {
 		newServer.services.brand,
 		newServer.services.customer,
 		newServer.services.customerOTP,
+		newServer.services.passwordReset,
 		newServer.services.cpoint,
 		newServer.services.holiday,
 		newServer.services.location,
