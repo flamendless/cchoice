@@ -34,11 +34,6 @@ type CustomerOTPService struct {
 	emailRunner *jobs.EmailJobRunner
 }
 
-type GenerateOTPParams struct {
-	CustomerID string
-	Email      string
-}
-
 func NewCustomerOTPService(
 	encoder encode.IEncode,
 	dbRO database.IService,

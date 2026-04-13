@@ -24,16 +24,6 @@ type StaffService struct {
 	dbRW    database.IService
 }
 
-type UpdateProfileParams struct {
-	ID         string
-	FirstName  string
-	MiddleName string
-	LastName   string
-	MobileNo   string
-	Birthdate  string
-	DateHired  string
-}
-
 func NewStaffService(
 	encoder encode.IEncode,
 	dbRO database.IService,

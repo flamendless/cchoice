@@ -18,12 +18,6 @@ import (
 	"go.uber.org/zap"
 )
 
-type closerBuffer struct {
-	*bytes.Buffer
-}
-
-func (closerBuffer) Close() error { return nil }
-
 type QRService struct {
 	cache    *fastcache.Cache
 	logoPath string
