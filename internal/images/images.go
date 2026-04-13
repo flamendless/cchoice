@@ -17,7 +17,7 @@ import (
 )
 
 func ImageToB64(format enums.ImageFormat, data []byte) string {
-	return enums.ImageFormat(format).DataURIPrefix() + b64.ToBase64(data)
+	return format.DataURIPrefix() + b64.ToBase64(data)
 }
 
 func GetImageDataB64(

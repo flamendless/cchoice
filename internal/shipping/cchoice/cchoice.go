@@ -19,13 +19,13 @@ import (
 )
 
 type CChoiceService struct {
+	businessLocation *shipping.Location
 	shippingService  shipping.ShippingService
 	baseFee          float64
 	feePerKm         float64
 	feePerKg         float64
 	maxDistance      float64
 	limitDistance    bool
-	businessLocation *shipping.Location
 }
 
 func MustInit() *CChoiceService {

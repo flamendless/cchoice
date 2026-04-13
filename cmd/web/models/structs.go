@@ -49,13 +49,13 @@ type GroupedCategorySection struct {
 }
 
 type CategorySectionProduct struct {
-	queries.GetProductsByCategoryIDRow
 	ProductID          string
 	CDNURL             string
 	CDNURL1280         string
 	OrigPriceDisplay   string
 	PriceDisplay       string
 	DiscountPercentage string
+	queries.GetProductsByCategoryIDRow
 }
 
 type CategorySectionProducts struct {
@@ -97,11 +97,11 @@ func ToCategorySectionProducts[T queries.GetProductsByCategoryIDRow](
 }
 
 type SearchResultProduct struct {
-	queries.GetProductsBySearchQueryRow
 	ProductID    string
 	CDNURL       string
 	CDNURL1280   string
 	PriceDisplay string
+	queries.GetProductsBySearchQueryRow
 }
 
 func ToSearchResultProduct[T queries.GetProductsBySearchQueryRow](
@@ -131,6 +131,9 @@ func ToSearchResultProduct[T queries.GetProductsBySearchQueryRow](
 }
 
 type AdminStaffProfile struct {
+	MyAttendance     *Attendance
+	InShop           *bool
+	OutShop          *bool
 	FullName         string
 	FirstName        string
 	MiddleName       string
@@ -145,6 +148,11 @@ type AdminStaffProfile struct {
 	SelectedDate     string
 	CurrentDate      string
 	CurrentTime      string
+	LocationDisplay  string
+	DistanceMeters   float64
+	Lat              float64
+	Lng              float64
+	UserType         enums.StaffUserType
 	HasTimeIn        bool
 	HasTimeOut       bool
 	CanTimeIn        bool
@@ -152,14 +160,6 @@ type AdminStaffProfile struct {
 	CanLunchBreakIn  bool
 	CanLunchBreakOut bool
 	RequireInShop    bool
-	MyAttendance     *Attendance
-	InShop           *bool
-	OutShop          *bool
-	LocationDisplay  string
-	DistanceMeters   float64
-	Lat              float64
-	Lng              float64
-	UserType         enums.StaffUserType
 }
 
 type CustomerProfile struct {
@@ -171,27 +171,27 @@ type CustomerProfile struct {
 	Sex          string
 	Email        string
 	MobileNo     string
+	CompanyName  string
 	CustomerType enums.CustomerType
 	Status       enums.CustomerStatus
-	CompanyName  string
 }
 
 type AttendanceStat struct {
 	In            string
 	Out           string
-	InStatus      enums.TimeInStatus
-	OutStatus     enums.TimeOutStatus
 	Duration      string
 	DurationColor string
+	InLocation    string
+	OutLocation   string
+	InDeviceInfo  string
+	OutDeviceInfo string
+	InStatus      enums.TimeInStatus
+	OutStatus     enums.TimeOutStatus
 	InLate        time.Duration
 	Undertime     time.Duration
 	EarlyIn       time.Duration
 	InShop        bool
 	OutShop       bool
-	InLocation    string
-	OutLocation   string
-	InDeviceInfo  string
-	OutDeviceInfo string
 }
 
 type Attendance struct {
@@ -228,11 +228,11 @@ type AdminSubcategory struct {
 }
 
 type AdminProductForm struct {
+	CategoriesJSON string
+	VATPercentage  string
 	Brands         []AdminBrand
 	Categories     []AdminCategory
-	CategoriesJSON string
 	Subcategories  []AdminSubcategory
-	VATPercentage  string
 }
 
 type AdminProductSpecsForm struct {
@@ -253,7 +253,6 @@ type AdminProductListItem struct {
 	Serial        string
 	Description   string
 	Brand         string
-	Status        enums.ProductStatus
 	ThumbnailPath string
 	CDNURL        string
 	CDNURL1280    string
@@ -268,20 +267,21 @@ type AdminProductListItem struct {
 	ScopeOfSupply string
 	Weight        string
 	WeightUnit    string
+	Status        enums.ProductStatus
 }
 
 type StaffTimeOff struct {
 	ID          string
 	StaffID     string
 	FullName    string
-	Type        enums.TimeOff
 	StartDate   string
 	EndDate     string
 	Description string
 	CreatedAt   string
-	Approved    bool
 	ApprovedBy  string
 	ApprovedAt  string
+	Type        enums.TimeOff
+	Approved    bool
 }
 
 type Staff struct {
@@ -295,8 +295,8 @@ type AdminStaffListItem struct {
 	Position string
 	Email    string
 	MobileNo string
-	UserType enums.StaffUserType
 	Roles    []enums.StaffRole
+	UserType enums.StaffUserType
 }
 
 type AdminHolidayListItem struct {
@@ -317,4 +317,18 @@ type StaffLog struct {
 	Action     string
 	Module     string
 	Result     string
+}
+
+type AdminCustomerListItem struct {
+	ID           string
+	Email        string
+	FirstName    string
+	MiddleName   string
+	LastName     string
+	Birthdate    string
+	Sex          string
+	CompanyName  string
+	CreatedAt    string
+	CustomerType enums.CustomerType
+	IsVerified   enums.CustomerStatus
 }

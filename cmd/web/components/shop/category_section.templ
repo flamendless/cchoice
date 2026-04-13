@@ -1,12 +1,12 @@
 package shop
 
 import (
+	"cchoice/cmd/web/components/common"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/conf"
 	"cchoice/internal/utils"
 	"fmt"
 	"strconv"
-	"cchoice/cmd/web/components/common"
 )
 
 var fetchMult = 0.4
@@ -24,7 +24,6 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 				{ data.Subcategory }
 			</p>
 		}
-
 		<div class="flex flex-row flex-wrap">
 			for _, product := range data.Products {
 				<div class="group flex flex-col items-center m-1 sm:m-2 ml-2 sm:ml-4 p-2 rounded-lg hover:bg-cchoicesoft transition-colors">
@@ -41,7 +40,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 							data-product-brand={ product.BrandName }
 							data-product-price={ product.PriceDisplay }
 							data-product-on-sale={ strconv.FormatBool(utils.IsProductOnSale(product.DiscountPercentage)) }
-						_="
+							_="
 							on click
 								async call metrics_event('product_click', #selected-product-id.value)
 								set #selected-product-id.value to my @data-product-id

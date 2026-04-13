@@ -23,12 +23,12 @@ import (
 
 type Lalamove struct {
 	client           *http.Client
+	businessLocation *shipping.Location
 	apiKey           string
 	secret           string
 	baseURL          string
 	apiVersion       string
 	shippingService  shipping.ShippingService
-	businessLocation *shipping.Location
 }
 
 func validate() {

@@ -1,16 +1,16 @@
 package cart
 
 import (
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/footer"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/components/svg"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/utils"
 	"fmt"
 	"strings"
 	"time"
-	"cchoice/cmd/web/components/common"
-	"cchoice/cmd/web/components/header"
-	"cchoice/cmd/web/components/footer"
-	"cchoice/cmd/web/components/svg"
 )
 
 templ CartPage(body templ.Component) {
@@ -46,7 +46,6 @@ templ CartPageBody(summaryContent templ.Component) {
 					>
 						//CartCheckoutLineItem
 					</div>
-
 					<!-- Column 2: Shipping Address (full width on mobile, 1/4 on desktop) -->
 					<div class="flex flex-col gap-[8px] w-full lg:w-1/4">
 						<div
@@ -61,7 +60,6 @@ templ CartPageBody(summaryContent templ.Component) {
 							</div>
 						</div>
 					</div>
-
 					<!-- Column 3: Payment & Summary (full width on mobile, 1/4 on desktop) -->
 					<div class="flex flex-col gap-[8px] w-full lg:w-1/4">
 						<div
@@ -85,7 +83,6 @@ templ CartPageBody(summaryContent templ.Component) {
 								//CartPaymentMethod
 							</div>
 						</div>
-
 						<div
 							id="cart-summary"
 							class="flex flex-col gap-1 border rounded h-auto"
@@ -104,7 +101,6 @@ templ CartPageBody(summaryContent templ.Component) {
 								}
 							</div>
 						</div>
-
 						<div
 							id="cart-proceed"
 							class="flex flex-col gap-1 border rounded h-auto p-2"
@@ -299,7 +295,6 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 			/>
 			@common.DiscountRibbon(cl.DiscountPercentage)
 		</div>
-
 		<div class="flex flex-row grow w-full">
 			<div class="flex-1">
 				<h2 class="text-sm sm:text-base font-semibold">{ cl.Name }</h2>
@@ -366,4 +361,3 @@ templ CartSubcard(id string, label string, others ...templ.Component) {
 		{ children... }
 	</div>
 }
-

@@ -20,14 +20,15 @@ type Visitor struct {
 
 type RateLimiter struct {
 	visitors map[string]*Visitor
-	mu       sync.Mutex
+
+	stopCleanup chan struct{}
 
 	rate  rate.Limit
 	burst int
 	ttl   time.Duration
-	debug bool
+	mu    sync.Mutex
 
-	stopCleanup chan struct{}
+	debug bool
 }
 
 func NewRateLimiter(r rate.Limit, burst int, ttl time.Duration) *RateLimiter {

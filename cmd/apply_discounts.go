@@ -192,10 +192,10 @@ const (
 
 type ParsedDiscount struct {
 	Kind       DiscountKind
+	Raw        string
 	Value      int64 // percent OR cents
 	IsSubtract bool
 	ShouldSkip bool
-	Raw        string
 }
 
 func parseDiscount(raw string) (ParsedDiscount, error) {

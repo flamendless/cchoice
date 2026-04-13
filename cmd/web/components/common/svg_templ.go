@@ -616,7 +616,7 @@ func svgSearch(id string, cls string) templ.Component {
 			var templ_7745c5c3_Var36 string
 			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(id)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/svg.templ`, Line: 172, Col: 9}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/svg.templ`, Line: 181, Col: 10}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 			if templ_7745c5c3_Err != nil {

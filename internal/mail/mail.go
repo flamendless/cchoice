@@ -2,9 +2,9 @@ package mail
 
 type EmailMessage struct {
 	To      string
-	CC      []string
 	Subject string
 	Body    string
+	CC      []string
 	IsHTML  bool
 }
 

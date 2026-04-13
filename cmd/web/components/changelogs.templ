@@ -10,7 +10,6 @@ templ ChangeLogs(logs []changelogs.ChangeLog, limit int) {
 			@common.HeadMeta()
 			@common.TabTitle("[CHANGELOGS] C-Choice Construction Supplies")
 		</head>
-
 		<div class="flex flex-col justify-center items-center max-w-5xl mx-auto px-4 py-4 space-y-4">
 			<div class="w-[50vw] my-2 py-4 flex flex-col justify-center items-center p-4 border border-cchoice">
 				<h1 class="text-2xl font-semibold tracking-tight text-cchoice">
@@ -26,12 +25,11 @@ templ ChangeLogs(logs []changelogs.ChangeLog, limit int) {
 					>
 						Made by @flamendless
 					</a>
-					<br>
+					<br/>
 					Displaying up to { limit } sections
 				</h2>
 			</div>
-			<hr>
-
+			<hr/>
 			for _, log := range logs {
 				<section id={ log.Anchor } class="w-[50vw] border border-cchoice rounded-xl">
 					<header class="px-5 py-4 bg-cchoice rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
@@ -46,7 +44,6 @@ templ ChangeLogs(logs []changelogs.ChangeLog, limit int) {
 							}
 						</div>
 					</header>
-
 					<div class="px-5 py-4 space-y-6">
 						for _, section := range log.Sections {
 							<div>
@@ -55,7 +52,6 @@ templ ChangeLogs(logs []changelogs.ChangeLog, limit int) {
 										{ section.Title }
 									</span>
 								</div>
-
 								<ul class="list-disc pl-5 space-y-1 text-sm text-gray-800">
 									for _, item := range section.Items {
 										<li>{ item.Text }</li>

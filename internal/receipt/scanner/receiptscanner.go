@@ -22,7 +22,6 @@ type ReceiptData struct {
 	SoldTo          string
 	CustomerTIN     string
 	CustomerAddress string
-	Items           []LineItem
 	Subtotal        string
 	Tax             string
 	Total           string
@@ -34,14 +33,15 @@ type ReceiptData struct {
 	LessWithholding string
 	AmountNetOfVAT  string
 	AddVAT          string
+	Items           []LineItem
 }
 
 type ScanResult struct {
+	ScannedAt time.Time
+	Error     error
 	Data      *ReceiptData
 	ImagePath string
-	ScannedAt time.Time
 	Success   bool
-	Error     error
 }
 
 type IReceiptScanner interface {

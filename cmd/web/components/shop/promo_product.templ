@@ -41,8 +41,7 @@ templ SaleBanner(product *models.RandomSaleProduct) {
 					overflow-hidden cursor-pointer
 					transform transition-transform hover:scale-105
 				"
-				_={
-					fmt.Sprintf(`
+				_={ fmt.Sprintf(`
 						on click
 							async call metrics_event('promo_product_click', '%s')
 							go to url '%s'
@@ -50,8 +49,7 @@ templ SaleBanner(product *models.RandomSaleProduct) {
 						`,
 						product.ProductID,
 						utils.URL("/product/"+product.ProductID),
-					)
-				}
+					) }
 			>
 				<!-- Product Image -->
 				<img
@@ -60,7 +58,6 @@ templ SaleBanner(product *models.RandomSaleProduct) {
 					class="w-full h-64 object-cover"
 					loading="lazy"
 				/>
-
 				<!-- Product Info -->
 				<div class="p-6 bg-gradient-to-r from-cchoicesoft to-white">
 					<div class="flex items-center justify-between mb-3">
@@ -76,7 +73,6 @@ templ SaleBanner(product *models.RandomSaleProduct) {
 							Limited Offer
 						</div>
 					</div>
-
 					<div class="flex items-center justify-between">
 						<div>
 							<p class="text-2xl font-bold text-cchoice">
@@ -86,7 +82,6 @@ templ SaleBanner(product *models.RandomSaleProduct) {
 								{ product.OrigPriceDisplay }
 							</p>
 						</div>
-
 						<div
 							class="
 								bg-red-600 text-white
@@ -96,11 +91,9 @@ templ SaleBanner(product *models.RandomSaleProduct) {
 						>
 							-{ product.DiscountPercentage }
 						</div>
-
 						@common.AddToCartPromoProduct()
 					</div>
 				</div>
-
 				<button
 					type="button"
 					class="

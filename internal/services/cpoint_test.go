@@ -41,7 +41,7 @@ func TestGenerateCode_Uniqueness(t *testing.T) {
 	svc := &CPointService{}
 	codes := make(map[string]bool)
 
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		code := svc.GenerateCode()
 		assert.False(t, codes[code], "code %s should be unique", code)
 		codes[code] = true
@@ -87,7 +87,7 @@ func BenchmarkGenerateCode(b *testing.B) {
 	svc := &CPointService{}
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		svc.GenerateCode()
 	}
 }
@@ -97,7 +97,7 @@ func BenchmarkValidateCode_Valid(b *testing.B) {
 	code := "CP-ABC-123-DEF"
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_ = svc.ValidateCode(code)
 	}
 }
@@ -107,7 +107,7 @@ func BenchmarkValidateCode_Invalid(b *testing.B) {
 	code := "XX-ABC-123-DEF"
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_ = svc.ValidateCode(code)
 	}
 }

@@ -76,7 +76,7 @@ var cmdPopulateProductImagesCDN = &cobra.Command{
 			}
 			images = make([]queries.GetProductImagesWithEmptyCDNURLsRow, 0, len(res))
 			for _, d := range res {
-				images = append(images, queries.GetProductImagesWithEmptyCDNURLsRow(d))
+				images = append(images, d)
 			}
 		}
 

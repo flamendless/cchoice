@@ -32,9 +32,9 @@ const (
 )
 
 type WebhookSignature struct {
-	Timestamp     int64
 	TestSignature string
 	LiveSignature string
+	Timestamp     int64
 }
 
 type WebhookEvent struct {
@@ -48,13 +48,13 @@ type WebhookEventData struct {
 }
 
 type WebhookEventAttributes struct {
-	Type            string         `json:"type"`
-	Livemode        bool           `json:"livemode"`
 	Data            map[string]any `json:"data"`
 	PreviousData    map[string]any `json:"previous_data"`
+	Type            string         `json:"type"`
 	PendingWebhooks int            `json:"pending_webhooks"`
 	CreatedAt       int64          `json:"created_at"`
 	UpdatedAt       int64          `json:"updated_at"`
+	Livemode        bool           `json:"livemode"`
 }
 
 type CreateWebhookRequest struct {
@@ -81,13 +81,13 @@ type CreateWebhookResponseData struct {
 }
 
 type CreateWebhookResponseAttributes struct {
-	Livemode  bool     `json:"livemode"`
 	SecretKey string   `json:"secret_key"`
 	Status    string   `json:"status"`
 	URL       string   `json:"url"`
 	Events    []string `json:"events"`
 	CreatedAt int64    `json:"created_at"`
 	UpdatedAt int64    `json:"updated_at"`
+	Livemode  bool     `json:"livemode"`
 }
 
 func ParseWebhookSignature(header string) (*WebhookSignature, error) {

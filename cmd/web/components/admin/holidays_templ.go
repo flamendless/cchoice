@@ -527,7 +527,7 @@ func HolidayEditForm(holiday models.AdminHolidayListItem) templ.Component {
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(holiday.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 252, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 251, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -545,7 +545,7 @@ func HolidayEditForm(holiday models.AdminHolidayListItem) templ.Component {
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(ht.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 266, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 265, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -568,7 +568,7 @@ func HolidayEditForm(holiday models.AdminHolidayListItem) templ.Component {
 			var templ_7745c5c3_Var23 string
 			templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(ht.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 269, Col: 19}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 268, Col: 19}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 			if templ_7745c5c3_Err != nil {

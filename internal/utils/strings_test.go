@@ -109,7 +109,7 @@ func TestLabelToID(t *testing.T) {
 }
 
 func TestGenString(t *testing.T) {
-	for n := 0; n < 3; n++ {
+	for range 3 {
 		got := GenString(10)
 		assert.Len(t, got, 10)
 		for _, c := range got {

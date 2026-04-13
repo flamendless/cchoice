@@ -32,18 +32,18 @@ import (
 )
 
 type CreateOrderParams struct {
-	CheckoutID              int64
-	Checkout                cart.CartCheckout
-	CheckoutLines           []queries.GetCheckoutLinesByCheckoutIDRow
 	CheckoutSessionResponse payments.CreateCheckoutSessionResponse
-	ShippingQuotation       *shipping.ShippingQuotation
-	ShippingCoordinates     *shipping.Coordinates
-	DeliveryETA             string
 	PaymentGateway          payments.IPaymentGateway
 	Geocoder                geocoding.IGeocoder
+	Encoder                 encode.IEncode
+	ShippingQuotation       *shipping.ShippingQuotation
+	ShippingCoordinates     *shipping.Coordinates
 	Cache                   *fastcache.Cache
 	SingleFlight            *singleflight.Group
-	Encoder                 encode.IEncode
+	DeliveryETA             string
+	Checkout                cart.CartCheckout
+	CheckoutLines           []queries.GetCheckoutLinesByCheckoutIDRow
+	CheckoutID              int64
 }
 
 const (

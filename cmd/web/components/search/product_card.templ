@@ -52,7 +52,7 @@ templ SearchResultProductCard(product models.SearchResultProduct) {
 			data-product-name={ product.Name }
 			data-product-brand={ product.BrandName }
 			data-product-price={ product.PriceDisplay }
-		_="
+			_="
 			on click
 				async call metrics_event('search_result_click', #selected-product-id.value)
 				set #selected-product-id.value to my @data-product-id

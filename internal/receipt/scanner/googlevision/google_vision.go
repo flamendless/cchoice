@@ -121,8 +121,8 @@ type StructuredData struct {
 }
 
 type Row struct {
-	Y     float32
 	Words []WordInfo
+	Y     float32
 }
 
 func (g *GoogleVisionScanner) extractStructuredData(fullAnnotation *visionpb.TextAnnotation) *StructuredData {

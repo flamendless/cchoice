@@ -239,8 +239,8 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 	g.SetLimit(10)
 
 	type checkoutLineWithImage struct {
-		line    queries.GetCheckoutLinesByCheckoutIDRow
 		imgData string
+		line    queries.GetCheckoutLinesByCheckoutIDRow
 		index   int
 	}
 

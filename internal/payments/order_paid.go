@@ -15,16 +15,16 @@ import (
 )
 
 type OnOrderPaidParams struct {
-	ReferenceNumber string
 	DBRO            database.IService
 	DBRW            database.IService
 	EmailJobRunner  *jobs.EmailJobRunner
+	ReferenceNumber string
 }
 
 type OnOrderPaidResult struct {
 	OrderNumber   string
-	OrderID       int64
 	CustomerEmail string
+	OrderID       int64
 }
 
 func OnOrderPaid(ctx context.Context, params OnOrderPaidParams) (*OnOrderPaidResult, error) {

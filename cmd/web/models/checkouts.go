@@ -14,9 +14,9 @@ type CheckoutLine struct {
 	ThumbnailPath      string
 	CDNURL             string
 	CDNURL1280         string
+	WeightDisplay      string
+	DiscountPercentage string
 	Quantity           int64
 	WeightKg           float64
-	WeightDisplay      string
 	Checked            bool
-	DiscountPercentage string
 }

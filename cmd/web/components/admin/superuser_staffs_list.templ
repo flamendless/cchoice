@@ -3,9 +3,9 @@ package components
 import (
 	"fmt"
 
-	"cchoice/cmd/web/models"
 	"cchoice/cmd/web/components/common"
 	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
 	"cchoice/internal/enums"
 	"cchoice/internal/utils"
 )
@@ -47,8 +47,7 @@ templ StaffsListSection() {
 		hx-swap="innerHTML"
 	>
 		@StaffSearchToolbar(utils.URL("/admin/superuser/staffs/table"))
-		<div id="staffs-table">
-		</div>
+		<div id="staffs-table"></div>
 	</div>
 }
 
@@ -150,8 +149,7 @@ templ StaffRolesCell(staffID string, userType enums.StaffUserType, roles []enums
 				>
 					+ add role
 				</button>
-				<div id={ fmt.Sprintf("staff-roles-%s", staffID) }>
-				</div>
+				<div id={ fmt.Sprintf("staff-roles-%s", staffID) }></div>
 				//StaffRoleDropdown
 			</div>
 		</div>

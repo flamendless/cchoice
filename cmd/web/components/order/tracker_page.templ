@@ -50,7 +50,6 @@ templ OrderTrackerSearchBox() {
 			>
 				<!-- Search icon -->
 				@svg.Search("order-track-icon-search", "")
-
 				<!-- Spinner -->
 				<svg
 					id="order-track-icon-spinner"
@@ -75,11 +74,10 @@ templ OrderTrackerSearchBox() {
 							values="685;-685"
 							keySplines="0 0 1 1"
 							repeatCount="indefinite"
-						/>
+						></animate>
 					</path>
 				</svg>
 			</div>
-
 			<input
 				type="search"
 				id="order-track-input"
@@ -93,7 +91,6 @@ templ OrderTrackerSearchBox() {
 					focus:ring-cchoice focus:border-cchoice
 				"
 			/>
-
 			<button
 				type="submit"
 				class="
@@ -116,7 +113,7 @@ templ OrderTrackerSearchBox() {
 
 templ OrderTrackerSearchBoxPlain() {
 	<form
-		hx-get={utils.URL("/orders/track")}
+		hx-get={ utils.URL("/orders/track") }
 		hx-target="#order-result"
 		hx-push-url="true"
 		hx-trigger="submit"
@@ -133,7 +130,6 @@ templ OrderTrackerSearchBoxPlain() {
 				focus:outline-none focus:ring-2 focus:ring-green-500
 			"
 		/>
-
 		<button
 			type="submit"
 			class="
@@ -152,15 +148,12 @@ templ OrderTrackerPageBody(orderNo string, deliveryETA string, email string, mob
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
 		@common.ErrorBanner()
 		@header.Header()
-
 		<div class="flex flex-col items-center content-center px-2 pb-8 pt-[16px] gap-4">
 			<div class="flex flex-col items-center justify-center gap-4 max-w-2xl mx-auto px-8">
 				@OrderTrackerSearchBox()
-
 				<div class="flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-2">
 					@svg.Truck("w-12 h-12 text-green-600")
 				</div>
-
 				if orderNo != "" {
 					<h1 class="text-3xl font-semibold text-cchoice-800">Order Tracker:</h1>
 					<p class="text-lg text-gray-600 text-center">
@@ -173,20 +166,18 @@ templ OrderTrackerPageBody(orderNo string, deliveryETA string, email string, mob
 						<p class="text-base font-mono font-semibold text-green-800">{ deliveryETA }</p>
 					</div>
 				}
-
 				<p class="text-base text-gray-500 text-center">
 					<p class="text-base font-mono font-semibold text-green-800">
 						Need help? Reach out via:
-						<a href={templ.URL(email)} class="underline">
+						<a href={ templ.URL(email) } class="underline">
 							email
 						</a>
 						or
-						<a href={templ.SafeURL(mobileNo)} class="underline">
+						<a href={ templ.SafeURL(mobileNo) } class="underline">
 							mobile
 						</a>
 					</p>
 				</p>
-
 				<div class="flex flex-row gap-4 mt-4">
 					@common.ContinueShopping()
 				</div>
@@ -200,14 +191,12 @@ templ OrderTrackerPageBodyError(orderNo string, email string, mobileNo string) {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
 		@common.ErrorBanner()
 		@header.Header()
-
 		<div class="flex flex-col items-center content-center px-2 pb-8 pt-[16px] gap-4">
 			<div class="flex flex-col items-center justify-center gap-4 max-w-2xl mx-auto px-8">
 				@OrderTrackerSearchBox()
 				<div class="flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-2">
 					@svg.Exclamation("w-12 h-12 text-red-500")
 				</div>
-
 				<h1 class="text-3xl font-semibold text-cchoice-800">Order Tracker:</h1>
 				<p class="text-lg text-gray-600 text-center">
 					Here is your order delivery detail
@@ -216,24 +205,21 @@ templ OrderTrackerPageBodyError(orderNo string, email string, mobileNo string) {
 					<p class="text-sm text-gray-600 mb-1">Order Reference Number:</p>
 					<p class="text-base font-mono font-semibold text-red-800">{ orderNo }</p>
 				</div>
-
 				<div class="bg-red-50 border border-red-200 rounded-lg p-4 mt-2">
 					<p class="text-sm text-gray-600 mb-1">Unfortunately, we can't find your order in your system.</p>
 				</div>
-
 				<p class="text-base text-gray-500 text-center">
 					<p class="text-base font-mono font-semibold text-red-800">
 						Need help? Reach out via:
-						<a href={templ.URL(email)} class="underline">
+						<a href={ templ.URL(email) } class="underline">
 							email
 						</a>
 						or
-						<a href={templ.SafeURL(mobileNo)} class="underline">
+						<a href={ templ.SafeURL(mobileNo) } class="underline">
 							mobile
 						</a>
 					</p>
 				</p>
-
 				<div class="flex flex-row gap-4 mt-4">
 					@common.ContinueShopping()
 				</div>

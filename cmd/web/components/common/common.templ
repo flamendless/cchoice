@@ -10,7 +10,7 @@ const DISCOUNT_RIBBON = true
 
 var (
 	onceHeadLinks = templ.NewOnceHandle()
-	faviconsizes = []string{
+	faviconsizes  = []string{
 		"114x114",
 		"128x128",
 		"152x152",
@@ -71,18 +71,14 @@ templ HeadMeta() {
 	/>
 	<meta name="twitter:card" content="summary"/>
 	<meta charset="UTF-8"/>
-
 	@onceHeadLinks.Once() {
 		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ utils.URL("/static/images/favicons/favicon.ico") }/>
-
 		for _, size := range faviconsizes {
 			<link rel="icon" type="image/png" sizes={ size } href={ fmt.Sprintf("https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-%s/public", size) }/>
 		}
-
 		<link href={ utils.URL("/static/css/tailwind.css") } rel="stylesheet"/>
 		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/htmx.min.js")) }></script>
 		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/hyperscript.min.js")) }></script>
-
 		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/metrics.js")) }></script>
 		@templ.JSONScript("url-prefix", utils.URL(""))
 		<script>
@@ -180,7 +176,7 @@ templ ContinueShopping() {
 
 templ GMapsLink(url string) {
 	<a
-		href={url}
+		href={ url }
 		target="_blank"
 		rel="noopener noreferrer"
 		aria-label="Open in Google Maps"
@@ -199,7 +195,7 @@ templ GMapsLink(url string) {
 			fill="currentColor"
 			class="w-6 h-6"
 		>
-			<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/>
+			<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"></path>
 		</svg>
 		<span class="text-sm font-medium">Google Maps</span>
 	</a>
@@ -207,7 +203,7 @@ templ GMapsLink(url string) {
 
 templ WazeLink(url string) {
 	<a
-		href={url}
+		href={ url }
 		target="_blank"
 		rel="noopener noreferrer"
 		aria-label="Open in Waze"
@@ -226,12 +222,11 @@ templ WazeLink(url string) {
 			fill="currentColor"
 			class="w-6 h-6"
 		>
-			<path d="M12 2C6.48 2 2 6.03 2 11c0 3.04 1.74 5.73 4.4 7.4L6 22l4.07-2.03c.63.1 1.27.15 1.93.15 5.52 0 10-4.03 10-9s-4.48-9-10-9zm-3 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+			<path d="M12 2C6.48 2 2 6.03 2 11c0 3.04 1.74 5.73 4.4 7.4L6 22l4.07-2.03c.63.1 1.27.15 1.93.15 5.52 0 10-4.03 10-9s-4.48-9-10-9zm-3 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"></path>
 		</svg>
 		<span class="text-sm font-medium">Waze</span>
 	</a>
 }
-
 
 templ DiscountRibbon(percentage string) {
 	if DISCOUNT_RIBBON && percentage != "" {
@@ -343,4 +338,3 @@ templ AddToCartPromoProduct() {
 		</span>
 	</button>
 }
-

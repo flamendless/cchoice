@@ -23,11 +23,11 @@ import (
 )
 
 type GoogleMapsGeocoder struct {
+	db          database.IService
+	httpClient  *http.Client
 	apiKey      string
 	baseURL     string
-	httpClient  *http.Client
 	region      string
-	db          database.IService
 	cacheExpiry time.Duration
 }
 

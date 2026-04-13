@@ -19,12 +19,12 @@ import (
 )
 
 type Holiday struct {
+	CreatedAt time.Time      `json:"created_at"`
+	Date      string         `json:"date"`
+	Name      string         `json:"name"`
+	UpdatedAt sql.NullString `json:"updated_at"`
 	ID        int64
-	Date      string            `json:"date"`
-	Name      string            `json:"name"`
 	Type      enums.HolidayType `json:"type"`
-	CreatedAt time.Time         `json:"created_at"`
-	UpdatedAt sql.NullString    `json:"updated_at"`
 }
 
 type HolidayService struct {
@@ -33,8 +33,9 @@ type HolidayService struct {
 	dbRW     database.IService
 	staffLog *StaffLogsService
 
-	mu    sync.RWMutex
 	cache map[string]*Holiday
+
+	mu sync.RWMutex
 }
 
 func NewHolidayService(
