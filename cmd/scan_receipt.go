@@ -123,10 +123,10 @@ func parseOutputFormats() []string {
 		}
 	}
 
-	if scanCSV && !contains(formats, "csv") {
+	if scanCSV && !slices.Contains(formats, "csv") {
 		formats = append(formats, "csv")
 	}
-	if scanJSON && !contains(formats, "json") {
+	if scanJSON && !slices.Contains(formats, "json") {
 		formats = append(formats, "json")
 	}
 
@@ -154,8 +154,4 @@ func writeOutput(data *scanner.ReceiptData, format string) error {
 	default:
 		return fmt.Errorf("%w: %s", errs.ErrReceiptInvalidFormat, format)
 	}
-}
-
-func contains(slice []string, value string) bool {
-	return slices.Contains(slice, value)
 }
