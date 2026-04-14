@@ -740,6 +740,20 @@ func HasTrailingWhitespace() bool {
 	grepCmd := exec.Command("grep", args...)
 	out, err := grepCmd.CombinedOutput()
 	if err != nil {
+		msgs := strings.Split(string(out), "\n")
+		var n int
+		for _, msg := range msgs {
+			if msg == "" {
+				n++
+				continue
+			}
+			if strings.HasSuffix(msg, "No such file or directory") {
+				n++
+			}
+		}
+		if n == len(msgs) {
+			return false
+		}
 		if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() == 1 {
 			return err == nil
 		}
