@@ -212,7 +212,7 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 			return
 		}
 
-		filename = s.services.productImage.GenerateFilename(filepath.Ext(header.Filename), brandName, name)
+		filename = s.services.image.GenerateFilename(filepath.Ext(header.Filename), brandName, name)
 		buf := bytes.Buffer{}
 		if _, err := io.Copy(&buf, file); err != nil {
 			result = err.Error()
@@ -222,7 +222,7 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		}
 
 		contentType := header.Header.Get("Content-Type")
-		if err := s.services.productImage.UploadProductImage(
+		if err := s.services.image.UploadProductImage(
 			ctx,
 			brandName,
 			filename,

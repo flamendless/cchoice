@@ -98,11 +98,11 @@ templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
 										required
 										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
 										_="on change
-									if my.value
-										trigger get on #subcategory
-										remove @disabled from #subcategory
-									end
-								"
+											if my.value
+												trigger get on #subcategory
+												remove @disabled from #subcategory
+											end
+										"
 									>
 										<option value="">Select a category</option>
 										for _, cat := range formData.Categories {
@@ -354,7 +354,8 @@ templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
 					</div>
 				</div>
 			</div>
-			@ScrImageUpload()
+
+			@ScrProductImageUpload()
 		</body>
 	</html>
 }

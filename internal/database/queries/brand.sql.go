@@ -81,6 +81,64 @@ func (q *Queries) CreateBrands(ctx context.Context, arg CreateBrandsParams) (int
 	return id, err
 }
 
+const getAllBrands = `-- name: GetAllBrands :many
+SELECT
+	tbl_brands.id AS id,
+	tbl_brands.name AS name,
+	tbl_brand_images.id AS brand_image_id,
+	tbl_brand_images.path AS path,
+	tbl_brand_images.s3_url AS s3_url,
+	tbl_brands.created_at AS created_at,
+	COUNT(tbl_products.id) AS product_count
+FROM tbl_brands
+LEFT JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id AND tbl_brand_images.is_main = true
+LEFT JOIN tbl_products ON tbl_products.brand_id = tbl_brands.id AND tbl_products.deleted_at = '1970-01-01 00:00:00+00:00'
+WHERE tbl_brands.deleted_at = '1970-01-01 00:00:00+00:00'
+GROUP BY tbl_brands.id, tbl_brand_images.id
+ORDER BY tbl_brands.name ASC
+`
+
+type GetAllBrandsRow struct {
+	ID           int64
+	Name         string
+	BrandImageID sql.NullInt64
+	Path         sql.NullString
+	S3Url        sql.NullString
+	CreatedAt    time.Time
+	ProductCount int64
+}
+
+func (q *Queries) GetAllBrands(ctx context.Context) ([]GetAllBrandsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllBrands)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllBrandsRow
+	for rows.Next() {
+		var i GetAllBrandsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.BrandImageID,
+			&i.Path,
+			&i.S3Url,
+			&i.CreatedAt,
+			&i.ProductCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getBrandImageS3URLByPath = `-- name: GetBrandImageS3URLByPath :one
 SELECT s3_url
 FROM tbl_brand_images
@@ -239,4 +297,104 @@ func (q *Queries) GetBrandsLogos(ctx context.Context, limit int64) ([]GetBrandsL
 		return nil, err
 	}
 	return items, nil
+}
+
+const searchBrandsByName = `-- name: SearchBrandsByName :many
+SELECT
+	tbl_brands.id AS id,
+	tbl_brands.name AS name,
+	tbl_brand_images.id AS brand_image_id,
+	tbl_brand_images.path AS path,
+	tbl_brand_images.s3_url AS s3_url,
+	tbl_brands.created_at AS created_at,
+	COUNT(tbl_products.id) AS product_count
+FROM tbl_brands
+LEFT JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id AND tbl_brand_images.is_main = true
+LEFT JOIN tbl_products ON tbl_products.brand_id = tbl_brands.id AND tbl_products.deleted_at = '1970-01-01 00:00:00+00:00'
+WHERE
+	tbl_brands.deleted_at = '1970-01-01 00:00:00+00:00'
+	AND LOWER(tbl_brands.name) LIKE LOWER(?)
+GROUP BY tbl_brands.id, tbl_brand_images.id
+ORDER BY tbl_brands.name ASC
+`
+
+type SearchBrandsByNameRow struct {
+	ID           int64
+	Name         string
+	BrandImageID sql.NullInt64
+	Path         sql.NullString
+	S3Url        sql.NullString
+	CreatedAt    time.Time
+	ProductCount int64
+}
+
+func (q *Queries) SearchBrandsByName(ctx context.Context, lower string) ([]SearchBrandsByNameRow, error) {
+	rows, err := q.db.QueryContext(ctx, searchBrandsByName, lower)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SearchBrandsByNameRow
+	for rows.Next() {
+		var i SearchBrandsByNameRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.BrandImageID,
+			&i.Path,
+			&i.S3Url,
+			&i.CreatedAt,
+			&i.ProductCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const softDeleteBrand = `-- name: SoftDeleteBrand :exec
+UPDATE tbl_brands
+SET
+	deleted_at = ?
+WHERE
+	id = ?
+	AND deleted_at = '1970-01-01 00:00:00+00:00'
+`
+
+type SoftDeleteBrandParams struct {
+	DeletedAt time.Time
+	ID        int64
+}
+
+func (q *Queries) SoftDeleteBrand(ctx context.Context, arg SoftDeleteBrandParams) error {
+	_, err := q.db.ExecContext(ctx, softDeleteBrand, arg.DeletedAt, arg.ID)
+	return err
+}
+
+const updateBrand = `-- name: UpdateBrand :exec
+UPDATE tbl_brands
+SET
+	name = ?,
+	updated_at = ?
+WHERE
+	id = ?
+	AND deleted_at = '1970-01-01 00:00:00+00:00'
+`
+
+type UpdateBrandParams struct {
+	Name      string
+	UpdatedAt time.Time
+	ID        int64
+}
+
+func (q *Queries) UpdateBrand(ctx context.Context, arg UpdateBrandParams) error {
+	_, err := q.db.ExecContext(ctx, updateBrand, arg.Name, arg.UpdatedAt, arg.ID)
+	return err
 }

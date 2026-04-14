@@ -306,6 +306,15 @@ type AdminHolidayListItem struct {
 	Type enums.HolidayType
 }
 
+type AdminBrandListItem struct {
+	ID           string
+	Name         string
+	LogoS3URL    string
+	BrandImageID string
+	ProductCount int64
+	CreatedAt    string
+}
+
 type StaffLog struct {
 	ID         string
 	StaffID    string

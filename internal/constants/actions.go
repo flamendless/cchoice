@@ -15,6 +15,7 @@ const (
 const (
 	ModuleAttendanceReportCSV  = "attendance_report_csv"
 	ModuleAttendanceReportXLSX = "attendance_report_xlsx"
+	ModuleBrands               = "brands"
 	ModuleCPoints              = "cpoints"
 	ModuleHolidays             = "holidays"
 	ModulePasswordReset        = "password_reset"

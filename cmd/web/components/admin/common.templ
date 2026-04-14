@@ -8,11 +8,19 @@ import "cchoice/internal/constants"
 import "fmt"
 import "cchoice/internal/services"
 
-var scrImageUpload = templ.NewOnceHandle()
+var scrProductImageUpload = templ.NewOnceHandle()
+var scrBrandImageUpload = templ.NewOnceHandle()
 
-templ ScrImageUpload() {
-	@scrImageUpload.Once() {
-		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/image_upload.js")) }>
+templ ScrProductImageUpload() {
+	@scrProductImageUpload.Once() {
+		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/product_image_upload.js")) }>
+		</script>
+	}
+}
+
+templ ScrBrandImageUpload() {
+	@scrBrandImageUpload.Once() {
+		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/brand_image_upload.js")) }>
 		</script>
 	}
 }

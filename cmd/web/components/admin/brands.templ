@@ -1,0 +1,378 @@
+package components
+
+import (
+	"fmt"
+
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/utils"
+)
+
+templ AdminBrandsListPage(title string) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("Brands - C-Choice Admin")
+		</head>
+
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-col"
+			_="init call metrics_event('admin_visit', 'brands list')"
+		>
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-7xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.AdminStaffHeaderWithBack()
+						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+							Manage Brands
+						</h1>
+						@BrandsListSection()
+					</div>
+				</div>
+			</div>
+			<div id="brand-create-modal-container"></div>
+			<div id="brand-edit-modal-container"></div>
+			@ScrBrandImageUpload()
+		</body>
+	</html>
+}
+
+templ BrandsListSection() {
+	<div
+		class="bg-white rounded-lg shadow-md p-6"
+		hx-get={ utils.URL("/admin/brands/table") }
+		hx-trigger="load"
+		hx-target="#brands-table"
+		hx-swap="innerHTML"
+	>
+		@BrandsToolbar()
+		<div id="brands-table"></div>
+	</div>
+}
+
+templ BrandsToolbar() {
+	<div class="mb-6 flex flex-wrap gap-3 items-center justify-between">
+		<form
+			class="flex gap-2 items-center"
+			hx-get={ utils.URL("/admin/brands/table") }
+			hx-target="#brands-table"
+			hx-swap="innerHTML"
+		>
+			<input
+				type="text"
+				name="search"
+				placeholder="Search brands..."
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+			/>
+			<button
+				type="submit"
+				class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2"
+			>
+				Search
+			</button>
+		</form>
+		<button
+			type="button"
+			class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2"
+			hx-get={ utils.URL("/admin/brands/create") }
+			hx-target="#brand-create-modal-container"
+			hx-swap="innerHTML"
+		>
+			Create Brand
+		</button>
+	</div>
+}
+
+templ BrandCreateModal() {
+	<div
+		id="brand-create-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="
+			on closeModal
+				set #brand-create-modal-container.innerHTML to ''
+			end
+			on keyup[key is 'Escape'] trigger closeModal
+		"
+	>
+		<div
+			class="absolute inset-0 bg-black/50"
+			_="on click trigger closeModal"
+		></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">Create Brand</h2>
+				<button
+					type="button"
+					class="text-gray-400 hover:text-gray-600"
+					_="on click trigger closeModal"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			@BrandCreateForm()
+		</div>
+	</div>
+}
+
+templ BrandCreateForm() {
+	<form
+		hx-post={ utils.URL("/admin/brands") }
+		hx-swap="outerHTML"
+		enctype="multipart/form-data"
+		class="flex flex-col gap-4"
+		hx-on::after-request="if(event.detail.successful) { document.getElementById('brand-create-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/brands/table', { target: '#brands-table', swap: 'innerHTML' }) }"
+	>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">
+				Brand Name <span class="text-red-500">*</span>
+			</label>
+			<input
+				type="text"
+				name="name"
+				placeholder="Enter brand name"
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			/>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">
+				Brand Logo
+			</label>
+			<input
+				type="file"
+				id="brand_logo"
+				name="logo"
+				accept="image/jpeg,image/png,image/webp"
+				class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cchoice file:text-white hover:file:bg-cchoicedark"
+				oninput="handleLogoPreview(this)"
+			/>
+			<p class="mt-1 text-xs text-gray-500">Max file size: 10MB. Allowed: JPEG, PNG, WebP</p>
+			<div class="mt-2">
+				<img
+					id="brand-create-logo-preview"
+					src=""
+					class="hidden h-24 w-24 object-contain rounded border border-gray-200"
+				/>
+			</div>
+		</div>
+		<div class="flex w-full gap-2 justify-end">
+			<button
+				type="button"
+				class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
+				_="on click trigger closeModal"
+			>
+				Cancel
+			</button>
+			<button
+				type="submit"
+				class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm"
+			>
+				Create
+			</button>
+		</div>
+	</form>
+}
+
+templ AdminBrandsListTable(brands []models.AdminBrandListItem, searchQuery string) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-50">
+				<tr>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+						Logo
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[25%]">
+						Name
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">
+						Products
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">
+						Created At
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">
+						Actions
+					</th>
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				if len(brands) == 0 {
+					<tr>
+						<td colspan="5" class="px-6 py-4 text-center text-gray-500">
+							No brands found.
+							if searchQuery != "" {
+								<a href={ utils.URL("/admin/brands/table") } class="text-cchoice hover:underline">Clear search</a>
+							}
+						</td>
+					</tr>
+				} else {
+					for _, brand := range brands {
+						<tr id={ fmt.Sprintf("brand-row-%s", brand.ID) }>
+							<td class="px-6 py-4 whitespace-nowrap w-[15%]">
+								if brand.LogoS3URL != "" {
+									<img
+										src={ brand.LogoS3URL }
+										alt={ brand.Name }
+										class="h-10 w-10 object-contain rounded"
+									/>
+								} else {
+									<div class="h-10 w-10 bg-gray-200 rounded flex items-center justify-center">
+										<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+										</svg>
+									</div>
+								}
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm w-[25%] text-gray-900">
+								{ brand.Name }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm w-[20%] text-gray-900">
+								{ fmt.Sprintf("%d", brand.ProductCount) }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm w-[20%] text-gray-900">
+								{ brand.CreatedAt }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm w-[20%]">
+								@BrandActionsCell(brand)
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ BrandActionsCell(brand models.AdminBrandListItem) {
+	<div class="flex items-center gap-2">
+		<button
+			type="button"
+			class="text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium"
+			hx-get={ utils.URLf("/admin/brands/%s/edit", brand.ID) }
+			hx-target="#brand-edit-modal-container"
+			hx-swap="innerHTML"
+		>
+			Edit
+		</button>
+		<button
+			type="button"
+			class="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs font-medium"
+			hx-delete={ utils.URLf("/admin/brands/%s", brand.ID) }
+			hx-target={ fmt.Sprintf("#brand-row-%s", brand.ID) }
+			hx-swap="outerHTML"
+			hx-confirm="Are you sure you want to delete this brand?"
+		>
+			Delete
+		</button>
+	</div>
+}
+
+templ BrandEditModal(brand models.AdminBrandListItem) {
+	<div
+		id="brand-edit-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="
+			on closeModal
+				set #brand-edit-modal-container.innerHTML to ''
+			end
+			on keyup[key is 'Escape'] trigger closeModal
+		"
+	>
+		<div
+			class="absolute inset-0 bg-black/50"
+			_="on click trigger closeModal"
+		></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">Edit Brand</h2>
+				<button
+					type="button"
+					class="text-gray-400 hover:text-gray-600"
+					_="on click trigger closeModal"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			@BrandEditForm(brand)
+		</div>
+	</div>
+}
+
+templ BrandEditForm(brand models.AdminBrandListItem) {
+	<form
+		hx-patch={ utils.URLf("/admin/brands/%s", brand.ID) }
+		hx-swap="outerHTML"
+		class="flex flex-col gap-4"
+		hx-on::after-request="if(event.detail.successful) { document.getElementById('brand-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/brands/table', { target: '#brands-table', swap: 'innerHTML' }) }"
+	>
+		<div class="hidden">
+			<input type="text" name="id" value={ brand.ID }/>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">
+				Brand Name <span class="text-red-500">*</span>
+			</label>
+			<input
+				type="text"
+				name="name"
+				value={ brand.Name }
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			/>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">
+				Brand Logo
+			</label>
+			if brand.LogoS3URL != "" {
+				<div class="mb-2">
+					<img
+						id="brand-edit-logo-preview"
+						src={ brand.LogoS3URL }
+						class="h-24 w-24 object-contain rounded border border-gray-200"
+					/>
+				</div>
+			} else {
+				<div class="mb-2">
+					<img
+						id="brand-edit-logo-preview"
+						src=""
+						class="hidden h-24 w-24 object-contain rounded border border-gray-200"
+					/>
+				</div>
+			}
+			<input
+				type="file"
+				id="brand_logo"
+				name="logo"
+				accept="image/jpeg,image/png,image/webp"
+				class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cchoice file:text-white hover:file:bg-cchoicedark"
+				oninput="handleLogoPreview(this)"
+			/>
+			<p class="mt-1 text-xs text-gray-500">Max file size: 10MB. Allowed: JPEG, PNG, WebP</p>
+		</div>
+		<div class="flex w-full gap-2 justify-end">
+			<button
+				type="button"
+				class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
+				_="on click trigger closeModal"
+			>
+				Cancel
+			</button>
+			<button
+				type="submit"
+				class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm"
+			>
+				Save
+			</button>
+		</div>
+	</form>
+}
