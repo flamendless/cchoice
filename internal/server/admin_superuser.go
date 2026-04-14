@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -11,6 +12,7 @@ import (
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
+	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
@@ -41,6 +43,47 @@ func (s *Server) adminSuperuserHomeHandler(w http.ResponseWriter, r *http.Reques
 			zap.Error(err),
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (s *Server) adminSuperuserEnvsHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Envs Handler]"
+	ctx := r.Context()
+
+	cfg := conf.Conf()
+	vars := []models.EnvVar{
+		{Key: "Server.Address", Value: cfg.Server.Address},
+		{Key: "Server.Port", Value: strconv.Itoa(cfg.Server.Port)},
+		{Key: "Server.PortFS", Value: strconv.Itoa(cfg.Server.PortFS)},
+		{Key: "Server.UseSSL", Value: strconv.FormatBool(cfg.Server.UseSSL)},
+		{Key: "Server.UseHTTP2", Value: strconv.FormatBool(cfg.Server.UseHTTP2)},
+		{Key: "Settings.MobileNo", Value: cfg.Settings.MobileNo},
+		{Key: "Settings.EMail", Value: cfg.Settings.EMail},
+		{Key: "Settings.Address", Value: cfg.Settings.Address},
+		{Key: "Settings.URLGMap", Value: cfg.Settings.URLGMap},
+		{Key: "Settings.URLWaze", Value: cfg.Settings.URLWaze},
+		{Key: "Settings.URLFacebook", Value: cfg.Settings.URLFacebook},
+		{Key: "Settings.URLTikTok", Value: cfg.Settings.URLTikTok},
+		{Key: "Settings.VATPercentage", Value: cfg.Settings.VATPercentage},
+		{Key: "Settings.ShowPromoBanner", Value: strconv.FormatBool(cfg.Settings.ShowPromoBanner)},
+		{Key: "AppEnv", Value: cfg.AppEnv.String()},
+		{Key: "Business.Lat", Value: cfg.Business.Lat},
+		{Key: "Business.Lng", Value: cfg.Business.Lng},
+		{Key: "Business.Address", Value: cfg.Business.Address},
+		{Key: "Business.Line1", Value: cfg.Business.Line1},
+		{Key: "Business.Line2", Value: cfg.Business.Line2},
+		{Key: "Business.City", Value: cfg.Business.City},
+		{Key: "Business.State", Value: cfg.Business.State},
+		{Key: "Business.PostalCode", Value: cfg.Business.PostalCode},
+		{Key: "Business.Country", Value: cfg.Business.Country},
+		{Key: "Test.LocalUploadImage", Value: strconv.FormatBool(cfg.Test.LocalUploadImage)},
+		{Key: "Test.LocalOTP", Value: strconv.FormatBool(cfg.Test.LocalOTP)},
+		{Key: "Test.LocalForgotPassword", Value: strconv.FormatBool(cfg.Test.LocalForgotPassword)},
+	}
+
+	if err := compadmin.AdminSuperuserEnvsPage(vars).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		redirectHX(w, r, utils.URLWithError("/admin/superuser/envs", err.Error()))
 	}
 }
 
