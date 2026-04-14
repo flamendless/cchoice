@@ -45,7 +45,7 @@ func NewPasswordResetService(
 	emailRunner *jobs.EmailJobRunner,
 	staffLog *StaffLogsService,
 ) *PasswordResetService {
-	if (conf.Conf().IsProd() || conf.Conf().Test.LocalOTP) && emailRunner == nil {
+	if (conf.Conf().IsProd() || conf.Conf().Test.LocalForgotPassword) && emailRunner == nil {
 		panic("emailRunner is required")
 	}
 	if staffLog == nil {
@@ -149,7 +149,7 @@ func (s *PasswordResetService) RequestReset(ctx context.Context, email string, u
 	}
 
 	resetLink := fmt.Sprintf("%s?token=%s", utils.FullURL("/auth/reset-password"), rawToken)
-	if conf.Conf().IsProd() || conf.Conf().Test.LocalOTP {
+	if conf.Conf().IsProd() || conf.Conf().Test.LocalForgotPassword {
 		if err = s.emailRunner.QueueEmailJob(ctx, jobs.EmailJobParams{
 			Recipient:    userEmail,
 			Subject:      "Reset Your Password - C-Choice",
