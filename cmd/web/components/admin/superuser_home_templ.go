@@ -148,67 +148,80 @@ func AdminSuperuserHomePage(fullName string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 templ.SafeURL
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/staffs"))
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/brands"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 97, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 97, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Employees</h2><p class=\"text-sm text-gray-500\">View and manage employees</p></a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Manage Brands</h2><p class=\"text-sm text-gray-500\">View and manage product brands</p></a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 templ.SafeURL
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/logs"))
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/staffs"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 109, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 109, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Logs</h2><p class=\"text-sm text-gray-500\">View staff action logs</p></a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Employees</h2><p class=\"text-sm text-gray-500\">View and manage employees</p></a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var10 templ.SafeURL
-		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/holidays"))
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/logs"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 121, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 121, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Holidays</h2><p class=\"text-sm text-gray-500\">Manage Philippines holidays</p></a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Logs</h2><p class=\"text-sm text-gray-500\">View staff action logs</p></a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 templ.SafeURL
-		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/customers"))
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/holidays"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 133, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 133, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Customers</h2><p class=\"text-sm text-gray-500\">View all registered customers</p></a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Holidays</h2><p class=\"text-sm text-gray-500\">Manage Philippines holidays</p></a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var12 templ.SafeURL
-		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/envs"))
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/customers"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 145, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 145, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z\"></path> <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15 12a3 3 0 11-6 0 3 3 0 016 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Envs</h2><p class=\"text-sm text-gray-500\">View application configuration</p></a></div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Customers</h2><p class=\"text-sm text-gray-500\">View all registered customers</p></a> <a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var13 templ.SafeURL
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/envs"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 157, Col: 48}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z\"></path> <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15 12a3 3 0 11-6 0 3 3 0 016 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Envs</h2><p class=\"text-sm text-gray-500\">View application configuration</p></a></div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

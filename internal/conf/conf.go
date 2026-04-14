@@ -50,9 +50,9 @@ type appConfig struct {
 }
 
 type Test struct {
-	LocalUploadImage    bool `env:"TEST_LOCAL_UPLOAD_IMAGE" env-default:"0"`
-	LocalOTP            bool `env:"TEST_LOCAL_OTP" env-default:"0"`
-	LocalForgotPassword bool `env:"TEST_LOCAL_FORGOT_PASSWORD" env-default:"0"`
+	LocalUploadImage    bool `env:"TEST_LOCAL_UPLOAD_IMAGE" env-default:"0"`    // true = uploads to cloudflare
+	LocalOTP            bool `env:"TEST_LOCAL_OTP" env-default:"0"`             // true = sends an email
+	LocalForgotPassword bool `env:"TEST_LOCAL_FORGOT_PASSWORD" env-default:"0"` // true = sends an email
 }
 
 type RateLimitConfig struct {

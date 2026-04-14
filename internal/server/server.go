@@ -48,7 +48,7 @@ type Services struct {
 	holiday       *services.HolidayService
 	location      *services.LocationService
 	product       *services.ProductService
-	productImage  *services.ProductImageService
+	image         *services.ImageService
 	qr            *services.QRService
 	report        *services.ReportService
 	role          *services.RoleService
@@ -185,7 +185,7 @@ func NewServer() *ServerInstance {
 
 	newServer.services = Services{
 		attendance:    attendanceService,
-		brand:         services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		brand:         services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
 		customer:      services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		customerOTP:   services.NewCustomerOTPService(newServer.encoder, newServer.dbRO, newServer.dbRW, mailService, emailJobRunner),
 		passwordReset: services.NewPasswordResetService(newServer.encoder, newServer.dbRO, newServer.dbRW, emailJobRunner, staffLogService),
@@ -194,7 +194,7 @@ func NewServer() *ServerInstance {
 		holiday:       holidayService,
 		location:      services.NewLocationService(cfg.Settings.ShopLocation),
 		product:       services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW, newServer.GetCDNURL),
-		productImage:  services.NewProductImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
+		image:         services.NewImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
 		qr:            services.NewQRService(newServer.cache),
 		report:        services.NewReportService(newServer.encoder, newServer.dbRO, attendanceService, holidayService, staffLogService),
 		role:          services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
@@ -212,7 +212,7 @@ func NewServer() *ServerInstance {
 		newServer.services.holiday,
 		newServer.services.location,
 		newServer.services.product,
-		newServer.services.productImage,
+		newServer.services.image,
 		newServer.services.qr,
 		newServer.services.report,
 		newServer.services.role,

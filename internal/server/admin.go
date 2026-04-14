@@ -110,6 +110,14 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_HOLIDAYS)).Post("/admin/holidays", s.adminHolidaysCreateHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_HOLIDAYS)).Patch("/admin/holidays/{id}", s.adminHolidaysUpdateHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_HOLIDAYS)).Delete("/admin/holidays/{id}", s.adminHolidaysDeleteHandler)
+
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_BRANDS)).Get("/admin/brands", s.adminBrandsListPageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_BRANDS)).Get("/admin/brands/table", s.adminBrandsListTableHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_BRANDS)).Get("/admin/brands/create", s.adminBrandsCreatePageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_BRANDS)).Get("/admin/brands/{id}/edit", s.adminBrandsEditPageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_BRANDS)).Post("/admin/brands", s.adminBrandsCreateHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_BRANDS)).Patch("/admin/brands/{id}", s.adminBrandsUpdateHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_BRANDS)).Delete("/admin/brands/{id}", s.adminBrandsDeleteHandler)
 }
 
 func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {

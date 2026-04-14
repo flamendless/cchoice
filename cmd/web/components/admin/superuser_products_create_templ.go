@@ -146,7 +146,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-target=\"#serial-validation-result\" hx-swap=\"innerHTML\" hx-include=\"#serial\">Check</button></div><div id=\"serial-validation-result\"></div></div><div><label for=\"category\" class=\"block text-sm font-medium text-gray-700 mb-1\">Category <span class=\"text-red-500\">*</span></label> <select id=\"category\" name=\"category\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"on change\n\t\t\t\t\t\t\t\t\tif my.value\n\t\t\t\t\t\t\t\t\t\ttrigger get on #subcategory\n\t\t\t\t\t\t\t\t\t\tremove @disabled from #subcategory\n\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\"><option value=\"\">Select a category</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-target=\"#serial-validation-result\" hx-swap=\"innerHTML\" hx-include=\"#serial\">Check</button></div><div id=\"serial-validation-result\"></div></div><div><label for=\"category\" class=\"block text-sm font-medium text-gray-700 mb-1\">Category <span class=\"text-red-500\">*</span></label> <select id=\"category\" name=\"category\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"on change\n\t\t\t\t\t\t\t\t\t\t\tif my.value\n\t\t\t\t\t\t\t\t\t\t\t\ttrigger get on #subcategory\n\t\t\t\t\t\t\t\t\t\t\t\tremove @disabled from #subcategory\n\t\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\t\"><option value=\"\">Select a category</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -267,7 +267,7 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ScrImageUpload().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ScrProductImageUpload().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
