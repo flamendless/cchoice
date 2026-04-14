@@ -144,7 +144,7 @@ func NewServer() *ServerInstance {
 		thumbnailService = services.NewThumbnailService(objStorage)
 		thumbnailJobRunner = jobs.NewThumbnailJobRunner(dbRW.GetDB(), dbRO, dbRW, thumbnailService)
 	}
-	if cfg.IsProd() || cfg.Test.LocalOTP {
+	if cfg.IsProd() || cfg.Test.LocalOTP || cfg.Test.LocalForgotPassword {
 		mailService = mustInitMailService()
 		emailJobRunner = jobs.NewEmailJobRunner(dbRW.GetDB(), dbRO, dbRW, mailService)
 	}
