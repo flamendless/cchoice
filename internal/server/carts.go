@@ -813,7 +813,7 @@ func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Reque
 			if errors.As(err, &dnsErr) && dnsErr.Err == "no such host" {
 				return
 			}
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Issue with payment gateway", http.StatusInternalServerError)
 			return
 		}
 
@@ -873,7 +873,6 @@ func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Reque
 				logtag,
 				zap.Error(err),
 			)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
 }
