@@ -46,6 +46,7 @@ func (pg PaymentGateway) GetAllPaymentMethods() []PaymentMethod {
 		PAYMENT_METHOD_GCASH,
 		PAYMENT_METHOD_GRAB_PAY,
 		PAYMENT_METHOD_PAYMAYA,
+		PAYMENT_METHOD_SHOPEE_PAY,
 	}
 }
 
@@ -56,5 +57,6 @@ func (pg PaymentGateway) GetPrioritizedPaymentMethods() []PaymentMethod {
 		PAYMENT_METHOD_BRANKAS_BDO,
 		PAYMENT_METHOD_GCASH,
 		PAYMENT_METHOD_PAYMAYA,
+		PAYMENT_METHOD_SHOPEE_PAY,
 	}
 }

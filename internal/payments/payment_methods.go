@@ -2,9 +2,7 @@ package payments
 
 import (
 	"cchoice/internal/constants"
-	"cchoice/internal/errs"
 	"cchoice/internal/logs"
-	"fmt"
 	"strings"
 
 	"github.com/goccy/go-json"
@@ -20,6 +18,7 @@ const (
 	PAYMENT_METHOD_COD
 
 	// PAYMONGO
+	// INFO: Make sure to add new enum to GetAllPaymentMethods()
 	PAYMENT_METHOD_QRPH
 	PAYMENT_METHOD_BILLEASE
 	PAYMENT_METHOD_CARD
@@ -31,6 +30,7 @@ const (
 	PAYMENT_METHOD_GCASH
 	PAYMENT_METHOD_GRAB_PAY
 	PAYMENT_METHOD_PAYMAYA
+	PAYMENT_METHOD_SHOPEE_PAY
 )
 
 func (pm PaymentMethod) MarshalJSON() ([]byte, error) {
@@ -63,6 +63,8 @@ func (pm PaymentMethod) GetDisplayText() string {
 		return "GrabPay"
 	case PAYMENT_METHOD_PAYMAYA:
 		return "Maya"
+	case PAYMENT_METHOD_SHOPEE_PAY:
+		return "ShopeePay"
 	default:
 		logs.Log().Warn("Unhandled payment display name", zap.Any("pm", pm))
 		return pm.String()
@@ -92,6 +94,8 @@ func (pm PaymentMethod) GetImagePath() string {
 		imgPath += "grabpay.webp"
 	case PAYMENT_METHOD_PAYMAYA:
 		imgPath += "maya.webp"
+	case PAYMENT_METHOD_SHOPEE_PAY:
+		imgPath += "shopee_pay.webp"
 	default:
 		logs.Log().Warn("Unhandled payment method", zap.Any("pm", pm))
 		return ""
@@ -125,7 +129,10 @@ func ParsePaymentMethodToEnum(pm string) PaymentMethod {
 		return PAYMENT_METHOD_GRAB_PAY
 	case PAYMENT_METHOD_PAYMAYA.String():
 		return PAYMENT_METHOD_PAYMAYA
+	case PAYMENT_METHOD_SHOPEE_PAY.String():
+		return PAYMENT_METHOD_SHOPEE_PAY
 	default:
-		panic(fmt.Errorf("%w: '%s'", errs.ErrCmdUndefinedService, pm))
+		logs.Log().Warn("Payment method unhandled", zap.String("pm", pm))
 	}
+	return PAYMENT_METHOD_UNDEFINED
 }

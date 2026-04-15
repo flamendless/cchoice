@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"cchoice/internal/conf"
 )
 
 templ CartPage(body templ.Component) {
@@ -77,7 +78,11 @@ templ CartPageBody(summaryContent templ.Component) {
 							>
 								<div id="payment-loading" class="flex flex-col items-center justify-center gap-2 w-full">
 									@svg.Infinite("payment-spinner")
-									<span class="text-sm text-gray-500">Loading payment methods...</span>
+									if conf.Conf().IsWeb() {
+										<span class="text-sm text-gray-500">WEB MODE. NO PAYMENT SERVICE INITIALIZED</span>
+									} else {
+										<span class="text-sm text-gray-500">Loading payment methods...</span>
+									}
 								</div>
 								@CartSubcard("payment-methods", "Payment Method")
 								//CartPaymentMethod
