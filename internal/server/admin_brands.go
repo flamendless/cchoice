@@ -11,6 +11,7 @@ import (
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/encode"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 
@@ -159,17 +160,41 @@ func (s *Server) adminBrandsUpdateHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	id := s.encoder.Decode(idStr)
-	if id == encode.INVALID {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid id format"))
+	if id := s.encoder.Decode(idStr); id == encode.INVALID {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrDecode.Error()))
 		return
+	}
+
+	var logoS3URL string
+
+	if conf.Conf().Test.LocalUploadImage || conf.Conf().IsProd() {
+		file, header, err := r.FormFile("logo")
+		if err == nil {
+			defer file.Close()
+
+			contentType := header.Header.Get("Content-Type")
+			filename := s.services.image.GenerateFilename(filepath.Ext(header.Filename), name)
+			buf := bytes.Buffer{}
+			if _, err := io.Copy(&buf, file); err != nil {
+				redirectHX(w, r, utils.URLWithError(page, err.Error()))
+				return
+			}
+
+			if err := s.services.image.UploadBrandImage(ctx, name, filename, &buf, contentType); err != nil {
+				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+				redirectHX(w, r, utils.URLWithError(page, err.Error()))
+				return
+			}
+			logoS3URL = filename
+		}
 	}
 
 	err := s.services.brand.UpdateBrand(
 		ctx,
 		s.sessionManager.GetString(ctx, SessionStaffID),
-		id,
+		idStr,
 		name,
+		logoS3URL,
 	)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))

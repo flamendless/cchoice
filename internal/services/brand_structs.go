@@ -3,11 +3,10 @@ package services
 import "time"
 
 type Brand struct {
-	ID           int64
+	CreatedAt    time.Time
 	Name         string
 	LogoS3URL    string
+	ID           int64
 	BrandImageID int64
 	ProductCount int64
-	CreatedAt    time.Time
 }
-

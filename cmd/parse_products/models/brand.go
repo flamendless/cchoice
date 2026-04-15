@@ -48,12 +48,7 @@ func (brand *Brand) GetDBID(ctx context.Context, db database.IService) int64 {
 }
 
 func (brand *Brand) InsertToDB(ctx context.Context, db database.IService) (int64, error) {
-	newBrandID, err := db.GetQueries().CreateBrands(ctx, queries.CreateBrandsParams{
-		Name:      brand.Name,
-		CreatedAt: brand.CreatedAt,
-		UpdatedAt: brand.UpdatedAt,
-		DeletedAt: brand.DeletedAt,
-	})
+	newBrandID, err := db.GetQueries().CreateBrands(ctx, brand.Name)
 	if err != nil {
 		return 0, err
 	}
@@ -65,13 +60,10 @@ func (brandImage *BrandImage) InsertToDB(ctx context.Context, db database.IServi
 	newBrandImageID, err := db.GetQueries().CreateBrandImages(
 		ctx,
 		queries.CreateBrandImagesParams{
-			BrandID:   brandImage.BrandID,
-			Path:      brandImage.Path,
-			S3Url:     sql.NullString{Valid: brandImage.S3URL != "", String: brandImage.S3URL},
-			IsMain:    brandImage.IsMain,
-			CreatedAt: brandImage.CreatedAt,
-			UpdatedAt: brandImage.UpdatedAt,
-			DeletedAt: brandImage.DeletedAt,
+			BrandID: brandImage.BrandID,
+			Path:    brandImage.Path,
+			S3Url:   sql.NullString{Valid: brandImage.S3URL != "", String: brandImage.S3URL},
+			IsMain:  brandImage.IsMain,
 		},
 	)
 	if err != nil {

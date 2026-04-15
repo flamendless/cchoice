@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
@@ -116,27 +115,17 @@ func (s *BrandService) CreateBrand(ctx context.Context, staffID string, name str
 		}
 	}()
 
-	now := time.Now().UTC()
-
-	brandID, err := s.dbRW.GetQueries().CreateBrands(ctx, queries.CreateBrandsParams{
-		Name:      name,
-		CreatedAt: now,
-		UpdatedAt: now,
-		DeletedAt: time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
-	})
+	brandID, err := s.dbRW.GetQueries().CreateBrands(ctx, name)
 	if err != nil {
 		result = err.Error()
 		return 0, errors.Join(errs.ErrBrand, err)
 	}
 
 	_, err = s.dbRW.GetQueries().CreateBrandImages(ctx, queries.CreateBrandImagesParams{
-		BrandID:   brandID,
-		Path:      "",
-		S3Url:     sql.NullString{String: logoS3URL, Valid: logoS3URL != ""},
-		IsMain:    true,
-		CreatedAt: now,
-		UpdatedAt: now,
-		DeletedAt: time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
+		BrandID: brandID,
+		Path:    "",
+		S3Url:   sql.NullString{String: logoS3URL, Valid: logoS3URL != ""},
+		IsMain:  true,
 	})
 	if err != nil {
 		result = err.Error()
@@ -146,7 +135,7 @@ func (s *BrandService) CreateBrand(ctx context.Context, staffID string, name str
 	return brandID, nil
 }
 
-func (s *BrandService) UpdateBrand(ctx context.Context, staffID string, id int64, name string) error {
+func (s *BrandService) UpdateBrand(ctx context.Context, staffID string, id string, name string, logoS3URL string) error {
 	result := "success"
 	defer func() {
 		if err := s.staffLog.CreateLog(
@@ -161,14 +150,24 @@ func (s *BrandService) UpdateBrand(ctx context.Context, staffID string, id int64
 		}
 	}()
 
+	brandID := s.encoder.Decode(id)
 	err := s.dbRW.GetQueries().UpdateBrand(ctx, queries.UpdateBrandParams{
-		Name:      name,
-		UpdatedAt: time.Now().UTC(),
-		ID:        id,
+		ID:   brandID,
+		Name: name,
 	})
 	if err != nil {
 		result = err.Error()
 		return errors.Join(errs.ErrBrand, err)
+	}
+
+	if logoS3URL != "" {
+		if err := s.dbRW.GetQueries().UpdateBrandImage(ctx, queries.UpdateBrandImageParams{
+			BrandID: brandID,
+			S3Url:   sql.NullString{String: logoS3URL, Valid: true},
+		}); err != nil {
+			result = err.Error()
+			return errors.Join(errs.ErrBrand, err)
+		}
 	}
 
 	return nil
@@ -189,11 +188,7 @@ func (s *BrandService) DeleteBrand(ctx context.Context, staffID string, id int64
 		}
 	}()
 
-	err := s.dbRW.GetQueries().SoftDeleteBrand(ctx, queries.SoftDeleteBrandParams{
-		DeletedAt: time.Now().UTC(),
-		ID:        id,
-	})
-	if err != nil {
+	if err := s.dbRW.GetQueries().SoftDeleteBrand(ctx, id); err != nil {
 		result = err.Error()
 		return errors.Join(errs.ErrBrand, err)
 	}
