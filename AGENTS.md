@@ -68,15 +68,7 @@ ENUMS:
 ## Lint Commands
 
 ```bash
-mage sc        # Run all: fmt, vet, templ fmt, betteralign, nilaway, unconvert, modernize, govulncheck
-go fmt ./...   # Format code
-go vet ./...   # Go vet
-go tool templ fmt ./cmd/web/components  # Format templ files
-go tool betteralign -apply ./...       # Optimize alignment
-go tool nilaway ./...                 # Nilaway nil analysis
-go tool unconvert ./...               # Remove unnecessary conversions
-golangci-lint run                     # Run golangci-lint (if installed)
-golangci-lint config verify          # Verify config
+mage scf        # Run all: fmt, vet, templ fmt, betteralign, nilaway, unconvert, modernize, govulncheck
 ```
 
 ---

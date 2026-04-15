@@ -716,6 +716,35 @@ func SC() error {
 	return nil
 }
 
+func SCF() error {
+	steps := [][]string{
+		{"go", "fmt", "./..."},
+		{"go", "mod", "tidy"},
+		{"go", "vet", "./..."},
+		{"go", "tool", "templ", "fmt", "./cmd/web/components"},
+		{
+			"go",
+			"tool",
+			"betteralign",
+			"-apply",
+			"-exclude_dirs",
+			"cmd/web/models/",
+			"-exclude_dirs",
+			"internal/services",
+			"./...",
+		},
+		{"go", "tool", "smrcptr", "./..."},
+		{"go", "tool", "unconvert", "./..."},
+		{"go", "run", "golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@latest", "-test", "./..."},
+	}
+	for _, step := range steps {
+		if err := run(Command{Type: CmdExec, Cmd: step[0], Args: step[1:]}); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func HasTrailingWhitespace() bool {
 	fmt.Println("Running has trailing whitespace...")
 	gitCmd := exec.Command("git", "diff", "--name-only", "HEAD")
