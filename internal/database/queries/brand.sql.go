@@ -22,18 +22,16 @@ INSERT INTO tbl_brand_images (
 	deleted_at
 ) VALUES (
 	?, ?, ?, ?,
-	?, ?, ?
+	DATETIME('now'),
+	DATETIME('now'), '1970-01-01 00:00:00+00:00'
 ) RETURNING id
 `
 
 type CreateBrandImagesParams struct {
-	BrandID   int64
-	Path      string
-	S3Url     sql.NullString
-	IsMain    bool
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
+	BrandID int64
+	Path    string
+	S3Url   sql.NullString
+	IsMain  bool
 }
 
 func (q *Queries) CreateBrandImages(ctx context.Context, arg CreateBrandImagesParams) (int64, error) {
@@ -42,9 +40,6 @@ func (q *Queries) CreateBrandImages(ctx context.Context, arg CreateBrandImagesPa
 		arg.Path,
 		arg.S3Url,
 		arg.IsMain,
-		arg.CreatedAt,
-		arg.UpdatedAt,
-		arg.DeletedAt,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -58,24 +53,14 @@ INSERT INTO tbl_brands (
 	updated_at,
 	deleted_at
 ) VALUES (
-	?, ?, ?, ?
+	?,
+	DATETIME('now'),
+	DATETIME('now'), '1970-01-01 00:00:00+00:00'
 ) RETURNING id
 `
 
-type CreateBrandsParams struct {
-	Name      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
-}
-
-func (q *Queries) CreateBrands(ctx context.Context, arg CreateBrandsParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, createBrands,
-		arg.Name,
-		arg.CreatedAt,
-		arg.UpdatedAt,
-		arg.DeletedAt,
-	)
+func (q *Queries) CreateBrands(ctx context.Context, name string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createBrands, name)
 	var id int64
 	err := row.Scan(&id)
 	return id, err
@@ -362,19 +347,14 @@ func (q *Queries) SearchBrandsByName(ctx context.Context, lower string) ([]Searc
 const softDeleteBrand = `-- name: SoftDeleteBrand :exec
 UPDATE tbl_brands
 SET
-	deleted_at = ?
+	deleted_at = DATETIME('now')
 WHERE
 	id = ?
 	AND deleted_at = '1970-01-01 00:00:00+00:00'
 `
 
-type SoftDeleteBrandParams struct {
-	DeletedAt time.Time
-	ID        int64
-}
-
-func (q *Queries) SoftDeleteBrand(ctx context.Context, arg SoftDeleteBrandParams) error {
-	_, err := q.db.ExecContext(ctx, softDeleteBrand, arg.DeletedAt, arg.ID)
+func (q *Queries) SoftDeleteBrand(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, softDeleteBrand, id)
 	return err
 }
 
@@ -382,19 +362,39 @@ const updateBrand = `-- name: UpdateBrand :exec
 UPDATE tbl_brands
 SET
 	name = ?,
-	updated_at = ?
+	updated_at = DATETIME('now')
 WHERE
 	id = ?
 	AND deleted_at = '1970-01-01 00:00:00+00:00'
 `
 
 type UpdateBrandParams struct {
-	Name      string
-	UpdatedAt time.Time
-	ID        int64
+	Name string
+	ID   int64
 }
 
 func (q *Queries) UpdateBrand(ctx context.Context, arg UpdateBrandParams) error {
-	_, err := q.db.ExecContext(ctx, updateBrand, arg.Name, arg.UpdatedAt, arg.ID)
+	_, err := q.db.ExecContext(ctx, updateBrand, arg.Name, arg.ID)
+	return err
+}
+
+const updateBrandImage = `-- name: UpdateBrandImage :exec
+UPDATE tbl_brand_images
+SET
+	s3_url = ?,
+	updated_at = DATETIME('now')
+WHERE
+	brand_id = ?
+	AND is_main = true
+	AND deleted_at = '1970-01-01 00:00:00+00:00'
+`
+
+type UpdateBrandImageParams struct {
+	S3Url   sql.NullString
+	BrandID int64
+}
+
+func (q *Queries) UpdateBrandImage(ctx context.Context, arg UpdateBrandImageParams) error {
+	_, err := q.db.ExecContext(ctx, updateBrandImage, arg.S3Url, arg.BrandID)
 	return err
 }

@@ -45,7 +45,9 @@ INSERT INTO tbl_brands (
 	updated_at,
 	deleted_at
 ) VALUES (
-	?, ?, ?, ?
+	?,
+	DATETIME('now'),
+	DATETIME('now'), '1970-01-01 00:00:00+00:00'
 ) RETURNING id;
 
 -- name: CreateBrandImages :one
@@ -59,7 +61,8 @@ INSERT INTO tbl_brand_images (
 	deleted_at
 ) VALUES (
 	?, ?, ?, ?,
-	?, ?, ?
+	DATETIME('now'),
+	DATETIME('now'), '1970-01-01 00:00:00+00:00'
 ) RETURNING id;
 
 -- name: GetBrandsForSidePanel :many
@@ -109,15 +112,25 @@ ORDER BY tbl_brands.name ASC;
 UPDATE tbl_brands
 SET
 	name = ?,
-	updated_at = ?
+	updated_at = DATETIME('now')
 WHERE
 	id = ?
+	AND deleted_at = '1970-01-01 00:00:00+00:00';
+
+-- name: UpdateBrandImage :exec
+UPDATE tbl_brand_images
+SET
+	s3_url = ?,
+	updated_at = DATETIME('now')
+WHERE
+	brand_id = ?
+	AND is_main = true
 	AND deleted_at = '1970-01-01 00:00:00+00:00';
 
 -- name: SoftDeleteBrand :exec
 UPDATE tbl_brands
 SET
-	deleted_at = ?
+	deleted_at = DATETIME('now')
 WHERE
 	id = ?
 	AND deleted_at = '1970-01-01 00:00:00+00:00';
