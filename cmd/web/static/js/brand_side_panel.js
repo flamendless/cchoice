@@ -14,7 +14,7 @@
 
 				this.classList.add("underline", "bg-cchoice", "font-semibold", "text-white");
 
-				// TODO (Brandon): Implement brand filtering logic. For now, just navigate to the URL
+				// TODO: (Brandon): Implement brand filtering logic. For now, just navigate to the URL
 				const brandName = this.getAttribute("data-brand-name");
 				console.log("Brand filter clicked:", brandName);
 
