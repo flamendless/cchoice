@@ -48,7 +48,9 @@ func (s *ImageService) GenerateFilename(
 	sanitizedName := strings.ReplaceAll(strings.Join(paths, "_"), " ", "_")
 	var id string
 	if !conf.Conf().IsProd() {
-		id = "DEV_"
+		if !strings.HasPrefix(id, "DEV_") {
+			id = "DEV_"
+		}
 	}
 	return fmt.Sprintf("%s%s_%s%s", id, sanitizedName, uuid, ext)
 }
