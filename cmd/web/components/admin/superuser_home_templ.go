@@ -12,25 +12,26 @@ import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/components/header"
 import "cchoice/cmd/web/components/svg"
+import "cchoice/cmd/web/models"
 
-var superuserMenuCards = []struct {
-	Link        string
-	Title       string
-	Description string
-	Icon        templ.Component
-}{
-	{"/admin/superuser/attendance", "Attendance", "View and manage employee attendance records", svg.Clock("text-cchoice")},
-	{"/admin/superuser/time-off", "Time Off", "View and manage staff time off records", svg.Box("text-cchoice")},
-	{"/admin/profile", "Profile", "View and manage your profile", svg.User("text-cchoice")},
-	{"/admin/superuser/products/create", "Create Product", "Create a product", svg.Box("text-cchoice")},
-	{"/admin/cpoints/generate", "Generate C-Points", "Generate C-Points for a customer", svg.Lightning("text-cchoice")},
-	{"/admin/superuser/products", "Manage Products", "View and manage all products", svg.MenuLines("text-cchoice")},
-	{"/admin/brands", "Manage Brands", "View and manage product brands", svg.Building("text-cchoice")},
-	{"/admin/superuser/staffs", "Employees", "View and manage employees", svg.People("text-cchoice")},
-	{"/admin/superuser/logs", "Logs", "View staff action logs", svg.Document("text-cchoice")},
-	{"/admin/holidays", "Holidays", "Manage Philippines holidays", svg.Calendar("text-cchoice")},
-	{"/admin/superuser/customers", "Customers", "View all registered customers", svg.Group("text-cchoice")},
-	{"/admin/superuser/envs", "Envs", "View application configuration", svg.Gear("text-cchoice")},
+var superuserMenuCards = []models.SuperuserMenuCard{
+	{Link: "/admin/profile", Title: "Profile", Description: "View and manage your profile", Icon: svg.User("text-cchoice")},
+	{Link: "/admin/superuser/attendance", Title: "Attendance", Description: "View and manage employee attendance records", Icon: svg.Clock("text-cchoice")},
+	{Link: "/admin/superuser/time-off", Title: "Time Off", Description: "View and manage staff time off records", Icon: svg.Box("text-cchoice")},
+	{Link: "/admin/holidays", Title: "Holidays", Description: "Manage Philippines holidays", Icon: svg.Calendar("text-cchoice")},
+	{Link: "/admin/superuser/staffs", Title: "Employees", Description: "View and manage employees", Icon: svg.People("text-cchoice")},
+
+	{Link: "/admin/superuser/products", Title: "Manage Products", Description: "View and manage all products", Icon: svg.MenuLines("text-cchoice")},
+	{Link: "/admin/superuser/products/create", Title: "Create Product", Description: "Create a product", Icon: svg.Box("text-cchoice")},
+
+	{Link: "/admin/brands", Title: "Manage Brands", Description: "View and manage product brands", Icon: svg.Building("text-cchoice")},
+
+	{Link: "/admin/cpoints/generate", Title: "Generate C-Points", Description: "Generate C-Points for a customer", Icon: svg.Lightning("text-cchoice")},
+
+	{Link: "/admin/superuser/customers", Title: "Customers", Description: "View all registered customers", Icon: svg.Group("text-cchoice")},
+
+	{Link: "/admin/superuser/logs", Title: "Logs", Description: "View staff action logs", Icon: svg.Document("text-cchoice")},
+	{Link: "/admin/superuser/envs", Title: "Envs", Description: "View application configuration", Icon: svg.Gear("text-cchoice")},
 }
 
 func AdminSuperuserHomePage(fullName string) templ.Component {
@@ -98,7 +99,7 @@ func AdminSuperuserHomePage(fullName string) templ.Component {
 			var templ_7745c5c3_Var2 templ.SafeURL
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL(card.Link))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 47, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 48, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -119,7 +120,7 @@ func AdminSuperuserHomePage(fullName string) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(card.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 53, Col: 73}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 54, Col: 73}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -132,7 +133,7 @@ func AdminSuperuserHomePage(fullName string) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(card.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 54, Col: 59}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 55, Col: 59}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
