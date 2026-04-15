@@ -259,6 +259,9 @@ go run -tags="fts5,staticfs" ./main.go
     }
 ```
 
+### Queries
+- instead of passing updated at values from go -> sql, define the updated_at = NOW in sqlc code
+
 ### More
 - Use recommendations by `modernize` tools with go 1.26 and above as basis
 
