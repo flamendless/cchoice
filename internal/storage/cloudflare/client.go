@@ -160,7 +160,9 @@ func (c *Client) normalizeKey(key string) string {
 	key = strings.ReplaceAll(key, "/", "-")
 	key = strings.ReplaceAll(key, "\\", "-")
 	if !conf.Conf().IsProd() {
-		key = "DEV_" + key
+		if !strings.HasPrefix(key, "DEV_") {
+			key = "DEV_" + key
+		}
 	}
 	return key
 }

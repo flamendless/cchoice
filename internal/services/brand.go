@@ -171,7 +171,7 @@ func (s *BrandService) UpdateBrand(ctx context.Context, staffID string, id strin
 	return nil
 }
 
-func (s *BrandService) DeleteBrand(ctx context.Context, staffID string, id int64) error {
+func (s *BrandService) DeleteBrand(ctx context.Context, staffID string, id string) error {
 	result := "success"
 	defer func() {
 		if err := s.staffLog.CreateLog(
@@ -186,7 +186,12 @@ func (s *BrandService) DeleteBrand(ctx context.Context, staffID string, id int64
 		}
 	}()
 
-	if err := s.dbRW.GetQueries().SoftDeleteBrand(ctx, id); err != nil {
+	brandID := s.encoder.Decode(id)
+	if brandID == encode.INVALID {
+		return errs.ErrDecode
+	}
+
+	if err := s.dbRW.GetQueries().SoftDeleteBrand(ctx, brandID); err != nil {
 		result = err.Error()
 		return errors.Join(errs.ErrBrand, err)
 	}

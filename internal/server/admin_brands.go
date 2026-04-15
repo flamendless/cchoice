@@ -187,34 +187,32 @@ func (s *Server) adminBrandsUpdateHandler(w http.ResponseWriter, r *http.Request
 	var logoS3URL string
 	if conf.Conf().Test.LocalUploadImage || conf.Conf().IsProd() {
 		file, header, err := r.FormFile("logo")
-		if err != nil {
-			redirectHX(w, r, utils.URLWithError(page, "Logo image is required"))
-			return
-		}
-		defer file.Close()
+		if err == nil {
+			defer file.Close()
 
-		filename := s.services.image.GenerateFilename(filepath.Ext(header.Filename), brandName)
-		buf := bytes.Buffer{}
-		if _, err := io.Copy(&buf, file); err != nil {
-			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-			redirectHX(w, r, utils.URLWithError(page, "Failed to read image"))
-			return
-		}
+			filename := s.services.image.GenerateFilename(filepath.Ext(header.Filename), brandName)
+			buf := bytes.Buffer{}
+			if _, err := io.Copy(&buf, file); err != nil {
+				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+				redirectHX(w, r, utils.URLWithError(page, "Failed to read image"))
+				return
+			}
 
-		contentType := header.Header.Get("Content-Type")
-		url, err := s.services.image.UploadBrandImage(
-			ctx,
-			brandName,
-			filename,
-			&buf,
-			contentType,
-		)
-		if err != nil {
-			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-			redirectHX(w, r, utils.URLWithError(page, err.Error()))
-			return
+			contentType := header.Header.Get("Content-Type")
+			url, err := s.services.image.UploadBrandImage(
+				ctx,
+				brandName,
+				filename,
+				&buf,
+				contentType,
+			)
+			if err != nil {
+				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+				redirectHX(w, r, utils.URLWithError(page, err.Error()))
+				return
+			}
+			logoS3URL = url
 		}
-		logoS3URL = url
 	}
 
 	if err := s.services.brand.UpdateBrand(
@@ -238,14 +236,7 @@ func (s *Server) adminBrandsDeleteHandler(w http.ResponseWriter, r *http.Request
 	ctx := r.Context()
 
 	idStr := chi.URLParam(r, "id")
-
-	id := s.encoder.Decode(idStr)
-	if id == encode.INVALID {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid id format"))
-		return
-	}
-
-	if err := s.services.brand.DeleteBrand(ctx, s.sessionManager.GetString(ctx, SessionStaffID), id); err != nil {
+	if err := s.services.brand.DeleteBrand(ctx, s.sessionManager.GetString(ctx, SessionStaffID), idStr); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, "Failed to delete brand"))
 		return
