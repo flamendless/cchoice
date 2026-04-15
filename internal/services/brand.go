@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
@@ -100,7 +101,7 @@ func (s *BrandService) SearchBrandsByName(ctx context.Context, name string) ([]B
 	return result, nil
 }
 
-func (s *BrandService) CreateBrand(ctx context.Context, staffID string, name string, logoS3URL string) (int64, error) {
+func (s *BrandService) CreateBrand(ctx context.Context, staffID string, name string, logoS3URL string) (string, error) {
 	result := "success"
 	defer func() {
 		if err := s.staffLog.CreateLog(
@@ -118,9 +119,10 @@ func (s *BrandService) CreateBrand(ctx context.Context, staffID string, name str
 	brandID, err := s.dbRW.GetQueries().CreateBrands(ctx, name)
 	if err != nil {
 		result = err.Error()
-		return 0, errors.Join(errs.ErrBrand, err)
+		return "", errors.Join(errs.ErrBrand, err)
 	}
 
+	brandIDStr := s.encoder.Encode(brandID)
 	if _, err = s.dbRW.GetQueries().CreateBrandImages(ctx, queries.CreateBrandImagesParams{
 		BrandID: brandID,
 		Path:    "",
@@ -128,10 +130,11 @@ func (s *BrandService) CreateBrand(ctx context.Context, staffID string, name str
 		IsMain:  true,
 	}); err != nil {
 		result = err.Error()
-		return 0, errors.Join(errs.ErrBrand, err)
+		return brandIDStr, errors.Join(errs.ErrBrand, err)
 	}
 
-	return brandID, nil
+	result = fmt.Sprintf("success. ID '%s'", brandIDStr)
+	return brandIDStr, nil
 }
 
 func (s *BrandService) UpdateBrand(ctx context.Context, staffID string, id string, name string, logoS3URL string) error {
