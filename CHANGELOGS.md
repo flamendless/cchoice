@@ -2,6 +2,59 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.20"></a>
+## [release-v1.1.20] - 2026-04-15
+### AI
+- Update
+
+### Feature
+- WIP Brand management
+
+### Maintenance
+- Apply code reviews
+- Refactor contains check in scan_receipt
+- Address static analysis reports
+- Update enum usage
+
+### Script
+- Fix regex
+- Create scf
+- Update betteralign excludes
+- Handle deleted/renamed file edge case in has trailing whitespace
+
+### Server
+- Add shopee pay
+- Add LocalForgotPassword testing env var
+
+### Web
+- Organize superuser cards
+- Simplify superuser home
+- Display safe env vars in superuser portal
+
+
+<a name="dev-v0.1.4"></a>
+## [dev-v0.1.4] - 2026-04-13
+### AI
+- Update
+- Explicitly state mage commands
+
+### Feature
+- Forgot password
+
+### Maintenance
+- Separate structs to files
+- Static analysis
+- Add more staff logs and modularize it via constants
+
+### Server
+- Implement product deletion
+
+### Web
+- Show logged in customer in shop page
+- Add back to shop
+- Customers table
+
+
 <a name="release-v1.1.19"></a>
 ## [release-v1.1.19] - 2026-04-10
 ### AI
