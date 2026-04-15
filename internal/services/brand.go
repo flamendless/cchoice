@@ -121,13 +121,12 @@ func (s *BrandService) CreateBrand(ctx context.Context, staffID string, name str
 		return 0, errors.Join(errs.ErrBrand, err)
 	}
 
-	_, err = s.dbRW.GetQueries().CreateBrandImages(ctx, queries.CreateBrandImagesParams{
+	if _, err = s.dbRW.GetQueries().CreateBrandImages(ctx, queries.CreateBrandImagesParams{
 		BrandID: brandID,
 		Path:    "",
 		S3Url:   sql.NullString{String: logoS3URL, Valid: logoS3URL != ""},
 		IsMain:  true,
-	})
-	if err != nil {
+	}); err != nil {
 		result = err.Error()
 		return 0, errors.Join(errs.ErrBrand, err)
 	}
@@ -151,11 +150,10 @@ func (s *BrandService) UpdateBrand(ctx context.Context, staffID string, id strin
 	}()
 
 	brandID := s.encoder.Decode(id)
-	err := s.dbRW.GetQueries().UpdateBrand(ctx, queries.UpdateBrandParams{
+	if err := s.dbRW.GetQueries().UpdateBrand(ctx, queries.UpdateBrandParams{
 		ID:   brandID,
 		Name: name,
-	})
-	if err != nil {
+	}); err != nil {
 		result = err.Error()
 		return errors.Join(errs.ErrBrand, err)
 	}

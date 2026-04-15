@@ -191,9 +191,6 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 
 	var filename string
 	var brandName string
-	//INFO: Add true || conf.Conf... to test locally.
-	//      true || TestLocalUploadImage = 0 -> test locally the cloudflare upload
-	//      TestLocalUploadImage = 1         -> test locally the local upload
 	if conf.Conf().Test.LocalUploadImage || conf.Conf().IsProd() {
 		file, header, err := r.FormFile("product_image")
 		if err != nil {

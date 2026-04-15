@@ -159,6 +159,9 @@ func (c *Client) normalizeKey(key string) string {
 	key = strings.TrimSuffix(key, ext)
 	key = strings.ReplaceAll(key, "/", "-")
 	key = strings.ReplaceAll(key, "\\", "-")
+	if !conf.Conf().IsProd() {
+		key = "DEV_" + key
+	}
 	return key
 }
 

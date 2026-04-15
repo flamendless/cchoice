@@ -101,14 +101,19 @@ func (s *Server) adminBrandsCreateHandler(w http.ResponseWriter, r *http.Request
 	const page = "/admin/brands"
 	ctx := r.Context()
 
-	name := r.FormValue("name")
-	if name == "" {
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
+		return
+	}
+
+	brandName := r.FormValue("name")
+	if brandName == "" {
 		redirectHX(w, r, utils.URLWithError(page, "Brand name is required"))
 		return
 	}
 
 	var logoS3URL string
-
 	if conf.Conf().Test.LocalUploadImage || conf.Conf().IsProd() {
 		file, header, err := r.FormFile("logo")
 		if err != nil {
@@ -117,26 +122,34 @@ func (s *Server) adminBrandsCreateHandler(w http.ResponseWriter, r *http.Request
 		}
 		defer file.Close()
 
-		contentType := header.Header.Get("Content-Type")
-		filename := s.services.image.GenerateFilename(filepath.Ext(header.Filename), name)
+		filename := s.services.image.GenerateFilename(filepath.Ext(header.Filename), brandName)
 		buf := bytes.Buffer{}
 		if _, err := io.Copy(&buf, file); err != nil {
-			redirectHX(w, r, utils.URLWithError(page, err.Error()))
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			redirectHX(w, r, utils.URLWithError(page, "Failed to read image"))
 			return
 		}
 
-		if err := s.services.image.UploadBrandImage(ctx, name, filename, &buf, contentType); err != nil {
+		contentType := header.Header.Get("Content-Type")
+		url, err := s.services.image.UploadBrandImage(
+			ctx,
+			brandName,
+			filename,
+			&buf,
+			contentType,
+		)
+		if err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, err.Error()))
 			return
 		}
-		logoS3URL = filename
+		logoS3URL = url
 	}
 
 	if _, err := s.services.brand.CreateBrand(
 		ctx,
 		s.sessionManager.GetString(ctx, SessionStaffID),
-		name,
+		brandName,
 		logoS3URL,
 	); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -152,51 +165,65 @@ func (s *Server) adminBrandsUpdateHandler(w http.ResponseWriter, r *http.Request
 	const page = "/admin/brands"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
-	name := r.FormValue("name")
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
+		return
+	}
 
-	if idStr == "" || name == "" {
+	brandID := chi.URLParam(r, "id")
+	brandName := r.FormValue("name")
+
+	if brandID == "" || brandName == "" {
 		redirectHX(w, r, utils.URLWithError(page, "id and name are required"))
 		return
 	}
 
-	if id := s.encoder.Decode(idStr); id == encode.INVALID {
+	if id := s.encoder.Decode(brandID); id == encode.INVALID {
 		redirectHX(w, r, utils.URLWithError(page, errs.ErrDecode.Error()))
 		return
 	}
 
 	var logoS3URL string
-
 	if conf.Conf().Test.LocalUploadImage || conf.Conf().IsProd() {
 		file, header, err := r.FormFile("logo")
-		if err == nil {
-			defer file.Close()
-
-			contentType := header.Header.Get("Content-Type")
-			filename := s.services.image.GenerateFilename(filepath.Ext(header.Filename), name)
-			buf := bytes.Buffer{}
-			if _, err := io.Copy(&buf, file); err != nil {
-				redirectHX(w, r, utils.URLWithError(page, err.Error()))
-				return
-			}
-
-			if err := s.services.image.UploadBrandImage(ctx, name, filename, &buf, contentType); err != nil {
-				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-				redirectHX(w, r, utils.URLWithError(page, err.Error()))
-				return
-			}
-			logoS3URL = filename
+		if err != nil {
+			redirectHX(w, r, utils.URLWithError(page, "Logo image is required"))
+			return
 		}
+		defer file.Close()
+
+		filename := s.services.image.GenerateFilename(filepath.Ext(header.Filename), brandName)
+		buf := bytes.Buffer{}
+		if _, err := io.Copy(&buf, file); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			redirectHX(w, r, utils.URLWithError(page, "Failed to read image"))
+			return
+		}
+
+		contentType := header.Header.Get("Content-Type")
+		url, err := s.services.image.UploadBrandImage(
+			ctx,
+			brandName,
+			filename,
+			&buf,
+			contentType,
+		)
+		if err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			redirectHX(w, r, utils.URLWithError(page, err.Error()))
+			return
+		}
+		logoS3URL = url
 	}
 
-	err := s.services.brand.UpdateBrand(
+	if err := s.services.brand.UpdateBrand(
 		ctx,
 		s.sessionManager.GetString(ctx, SessionStaffID),
-		idStr,
-		name,
+		brandID,
+		brandName,
 		logoS3URL,
-	)
-	if err != nil {
+	); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, "Failed to update brand"))
 		return
