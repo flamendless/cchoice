@@ -220,7 +220,7 @@ func BrandCreateModal() templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div id=\"brand-create-modal\" class=\"fixed inset-0 z-50 flex items-center justify-center\" _=\"\n\t\t\ton closeModal\n\t\t\t\tset #brand-create-modal-container.innerHTML to ''\n\t\t\tend\n\t\t\ton keyup[key is 'Escape'] trigger closeModal\n\t\t\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">Create Brand</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div id=\"brand-create-modal\" class=\"fixed inset-0 z-50 flex items-center justify-center\" _=\"\n\t\t\ton closeModal\n\t\t\t\tset #brand-create-modal-container.innerHTML to ''\n\t\t\tend\n\t\t\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">Create Brand</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -264,7 +264,7 @@ func BrandCreateForm() templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/brands"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 124, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 123, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -316,7 +316,7 @@ func AdminBrandsListTable(brands []models.AdminBrandListItem, searchQuery string
 				var templ_7745c5c3_Var11 templ.SafeURL
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/brands/table"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 209, Col: 50}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 208, Col: 50}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -340,7 +340,7 @@ func AdminBrandsListTable(brands []models.AdminBrandListItem, searchQuery string
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("brand-row-%s", brand.ID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 215, Col: 52}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 214, Col: 52}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -358,7 +358,7 @@ func AdminBrandsListTable(brands []models.AdminBrandListItem, searchQuery string
 					var templ_7745c5c3_Var13 string
 					templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(brand.LogoS3URL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 219, Col: 31}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 218, Col: 31}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 					if templ_7745c5c3_Err != nil {
@@ -371,7 +371,7 @@ func AdminBrandsListTable(brands []models.AdminBrandListItem, searchQuery string
 					var templ_7745c5c3_Var14 string
 					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(brand.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 220, Col: 26}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 219, Col: 26}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 					if templ_7745c5c3_Err != nil {
@@ -394,7 +394,7 @@ func AdminBrandsListTable(brands []models.AdminBrandListItem, searchQuery string
 				var templ_7745c5c3_Var15 string
 				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(brand.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 232, Col: 20}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 231, Col: 20}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 				if templ_7745c5c3_Err != nil {
@@ -407,7 +407,7 @@ func AdminBrandsListTable(brands []models.AdminBrandListItem, searchQuery string
 				var templ_7745c5c3_Var16 string
 				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", brand.ProductCount))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 235, Col: 47}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 234, Col: 47}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 				if templ_7745c5c3_Err != nil {
@@ -420,7 +420,7 @@ func AdminBrandsListTable(brands []models.AdminBrandListItem, searchQuery string
 				var templ_7745c5c3_Var17 string
 				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(brand.CreatedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 238, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 237, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
@@ -476,7 +476,7 @@ func BrandActionsCell(brand models.AdminBrandListItem) templ.Component {
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URLf("/admin/brands/%s/edit", brand.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 256, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 255, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -489,7 +489,7 @@ func BrandActionsCell(brand models.AdminBrandListItem) templ.Component {
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URLf("/admin/brands/%s", brand.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 265, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 264, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -502,7 +502,7 @@ func BrandActionsCell(brand models.AdminBrandListItem) templ.Component {
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("#brand-row-%s", brand.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 266, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 265, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -537,7 +537,7 @@ func BrandEditModal(brand models.AdminBrandListItem) templ.Component {
 			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<div id=\"brand-edit-modal\" class=\"fixed inset-0 z-50 flex items-center justify-center\" _=\"\n\t\t\ton closeModal\n\t\t\t\tset #brand-edit-modal-container.innerHTML to ''\n\t\t\tend\n\t\t\ton keyup[key is 'Escape'] trigger closeModal\n\t\t\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">Edit Brand</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<div id=\"brand-edit-modal\" class=\"fixed inset-0 z-50 flex items-center justify-center\" _=\"\n\t\t\ton closeModal\n\t\t\t\tset #brand-edit-modal-container.innerHTML to ''\n\t\t\tend\n\t\t\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">Edit Brand</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -581,20 +581,20 @@ func BrandEditForm(brand models.AdminBrandListItem) templ.Component {
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URLf("/admin/brands/%s", brand.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 310, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 308, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" hx-swap=\"outerHTML\" class=\"flex flex-col gap-4\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('brand-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/brands/table', { target: '#brands-table', swap: 'innerHTML' }) }\"><div class=\"hidden\"><input type=\"text\" name=\"id\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" hx-swap=\"outerHTML\" enctype=\"multipart/form-data\" class=\"flex flex-col gap-4\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('brand-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/brands/table', { target: '#brands-table', swap: 'innerHTML' }) }\"><div class=\"hidden\"><input type=\"text\" name=\"id\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(brand.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 316, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 315, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
@@ -607,7 +607,7 @@ func BrandEditForm(brand models.AdminBrandListItem) templ.Component {
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(brand.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 325, Col: 22}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 324, Col: 22}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
@@ -625,7 +625,7 @@ func BrandEditForm(brand models.AdminBrandListItem) templ.Component {
 			var templ_7745c5c3_Var27 string
 			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(brand.LogoS3URL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 338, Col: 27}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/brands.templ`, Line: 337, Col: 27}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 			if templ_7745c5c3_Err != nil {

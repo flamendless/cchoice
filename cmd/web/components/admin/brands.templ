@@ -94,7 +94,6 @@ templ BrandCreateModal() {
 			on closeModal
 				set #brand-create-modal-container.innerHTML to ''
 			end
-			on keyup[key is 'Escape'] trigger closeModal
 		"
 	>
 		<div
@@ -280,7 +279,6 @@ templ BrandEditModal(brand models.AdminBrandListItem) {
 			on closeModal
 				set #brand-edit-modal-container.innerHTML to ''
 			end
-			on keyup[key is 'Escape'] trigger closeModal
 		"
 	>
 		<div
@@ -309,6 +307,7 @@ templ BrandEditForm(brand models.AdminBrandListItem) {
 	<form
 		hx-patch={ utils.URLf("/admin/brands/%s", brand.ID) }
 		hx-swap="outerHTML"
+		enctype="multipart/form-data"
 		class="flex flex-col gap-4"
 		hx-on::after-request="if(event.detail.successful) { document.getElementById('brand-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/brands/table', { target: '#brands-table', swap: 'innerHTML' }) }"
 	>

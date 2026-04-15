@@ -46,7 +46,11 @@ func (s *ImageService) GenerateFilename(
 ) string {
 	uuid := utils.GenString(16)
 	sanitizedName := strings.ReplaceAll(strings.Join(paths, "_"), " ", "_")
-	return fmt.Sprintf("%s_%s%s", sanitizedName, uuid, ext)
+	var id string
+	if !conf.Conf().IsProd() {
+		id = "DEV_"
+	}
+	return fmt.Sprintf("%s%s_%s%s", id, sanitizedName, uuid, ext)
 }
 
 func (s *ImageService) ValidateContentType(contentType string) error {
@@ -93,13 +97,13 @@ func (s *ImageService) UploadProductImage(
 
 	logs.Log().Info(
 		logtag,
-		zap.String("uploading/storing file", filename),
+		zap.String("storing product image", filename),
 		zap.Stringer("using", s.objectStorage.ProviderEnum()),
 		zap.String("brand", brand),
 		zap.Bool("local storage", isLocalStorage),
 	)
 
-	if conf.Conf().Test.LocalUploadImage || isLocalStorage {
+	if !conf.Conf().Test.LocalUploadImage || isLocalStorage {
 		sourceName := filepath.Base(filename)
 		localPath := filepath.Join("cmd/web/static/images/product_images", strings.ToLower(brand), "original", sourceName)
 		if err := os.MkdirAll(filepath.Dir(localPath), 0755); err != nil {
@@ -120,18 +124,18 @@ func (s *ImageService) UploadProductImage(
 
 func (s *ImageService) UploadBrandImage(
 	ctx context.Context,
-	brandName string,
+	brand string,
 	filename string,
 	file io.Reader,
 	contentType string,
-) error {
+) (string, error) {
 	const logtag = "[ImageService] Brand"
 	if err := s.ValidateContentType(contentType); err != nil {
-		return err
+		return "", err
 	}
 	data, err := s.ValidateSize(file)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	file = bytes.NewReader(data)
@@ -139,29 +143,34 @@ func (s *ImageService) UploadBrandImage(
 
 	logs.Log().Info(
 		logtag,
-		zap.String("uploading/storing brand image", filename),
+		zap.String("storing brand image", filename),
 		zap.Stringer("using", s.objectStorage.ProviderEnum()),
-		zap.String("brand", brandName),
+		zap.String("brand", brand),
 		zap.Bool("local storage", isLocalStorage),
 	)
 
-	if conf.Conf().Test.LocalUploadImage || isLocalStorage {
+	if !conf.Conf().Test.LocalUploadImage || isLocalStorage {
 		sourceName := filepath.Base(filename)
-		localPath := filepath.Join("cmd/web/static/images/brand_images", strings.ToLower(brandName), sourceName)
+		localPath := filepath.Join("cmd/web/static/images/brand_images", strings.ToLower(brand), sourceName)
 		if err := os.MkdirAll(filepath.Dir(localPath), 0755); err != nil {
-			return err
+			return "", err
 		}
 		data, err := io.ReadAll(file)
 		if err != nil {
-			return err
+			return "", err
 		}
 		if err := os.WriteFile(localPath, data, 0644); err != nil {
-			return err
+			return "", err
 		}
-		return nil
+		return filename, nil
 	}
 
-	return s.objectStorage.PutObject(ctx, filename, file, contentType)
+	if err := s.objectStorage.PutObject(ctx, filename, file, contentType); err != nil {
+		return "", err
+	}
+
+	key := s.objectStorage.GetPublicURL(filename)
+	return key, nil
 }
 
 func (s *ImageService) Log() {

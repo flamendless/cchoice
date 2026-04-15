@@ -122,10 +122,6 @@ templ HeaderDesktop() {
 						add .hidden to #search-results
 					end
 				end
-
-				on keyup[key is 'Escape'] from document
-					add .hidden to #search-results
-				end
 			"
 		>
 			@search.SearchBarDesktop()
@@ -173,10 +169,6 @@ templ HeaderMobile() {
 						if event.target.closest('#search-mobile-wrapper') == null
 							add .hidden to #search-mobile-results
 						end
-					end
-
-					on keyup[key is 'Escape'] from document
-						add .hidden to #search-mobile-results
 					end
 				"
 			>

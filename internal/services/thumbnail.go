@@ -48,7 +48,7 @@ func (s *ThumbnailService) ProcessImageVariants(ctx context.Context, sourcePath,
 	var err error
 
 	isLocalStorage := s.objectStorage.ProviderEnum() == storage.STORAGE_PROVIDER_LOCAL
-	if conf.Conf().Test.LocalUploadImage || isLocalStorage {
+	if !conf.Conf().Test.LocalUploadImage || isLocalStorage {
 		localPath := filepath.Join("cmd/web/static/images/product_images", strings.ToLower(brand), "original", filepath.Base(filename))
 		sourceImageData, err = os.ReadFile(localPath)
 		if err != nil {

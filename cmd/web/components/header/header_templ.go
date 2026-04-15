@@ -316,7 +316,7 @@ func HeaderDesktop() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<div id=\"search-wrapper\" class=\"w-full flex items-center place-content-center px-8 py-2\" _=\"\n\t\t\t\ton click from document\n\t\t\t\t\tif event.target.closest('#search-wrapper') == null\n\t\t\t\t\t\tadd .hidden to #search-results\n\t\t\t\t\tend\n\t\t\t\tend\n\n\t\t\t\ton keyup[key is 'Escape'] from document\n\t\t\t\t\tadd .hidden to #search-results\n\t\t\t\tend\n\t\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<div id=\"search-wrapper\" class=\"w-full flex items-center place-content-center px-8 py-2\" _=\"\n\t\t\t\ton click from document\n\t\t\t\t\tif event.target.closest('#search-wrapper') == null\n\t\t\t\t\t\tadd .hidden to #search-results\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -389,7 +389,7 @@ func HeaderMobile() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div><div class=\"flex w-full justify-end\"><div id=\"search-mobile-wrapper\" class=\"flex flex-col items-center place-center place-content-center group py-2 stroke-cchoice rounded-full cursor-pointer hover:bg-cchoice_border text-nowrap text-xs text-cchoice hover:text-white\" _=\"\n\t\t\t\t\ton click from document\n\t\t\t\t\t\tif event.target.closest('#search-mobile-wrapper') == null\n\t\t\t\t\t\t\tadd .hidden to #search-mobile-results\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\n\t\t\t\t\ton keyup[key is 'Escape'] from document\n\t\t\t\t\t\tadd .hidden to #search-mobile-results\n\t\t\t\t\tend\n\t\t\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div><div class=\"flex w-full justify-end\"><div id=\"search-mobile-wrapper\" class=\"flex flex-col items-center place-center place-content-center group py-2 stroke-cchoice rounded-full cursor-pointer hover:bg-cchoice_border text-nowrap text-xs text-cchoice hover:text-white\" _=\"\n\t\t\t\t\ton click from document\n\t\t\t\t\t\tif event.target.closest('#search-mobile-wrapper') == null\n\t\t\t\t\t\t\tadd .hidden to #search-mobile-results\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -474,7 +474,7 @@ func Header() templ.Component {
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/settings/header-texts"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 238, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 230, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
@@ -544,7 +544,7 @@ func CustomerPortalHeader() templ.Component {
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathSVGLogoOnly)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 255, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 247, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -586,7 +586,7 @@ func CustomerPortalHeaderWithSubtitle(subtitle string) templ.Component {
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathSVGLogoOnly)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 266, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 258, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -604,7 +604,7 @@ func CustomerPortalHeaderWithSubtitle(subtitle string) templ.Component {
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(subtitle)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 273, Col: 14}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 265, Col: 14}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -651,7 +651,7 @@ func CustomerPortalHeaderWithBack() templ.Component {
 		var templ_7745c5c3_Var24 templ.SafeURL
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/portal"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 282, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 274, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
@@ -664,7 +664,7 @@ func CustomerPortalHeaderWithBack() templ.Component {
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathSVGLogoOnly)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 293, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 285, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
@@ -706,7 +706,7 @@ func CustomerPortalHeaderWithBackLink(backURL string, backLabel string) templ.Co
 		var templ_7745c5c3_Var27 templ.SafeURL
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinURLErrs(backURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 304, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 296, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
@@ -719,7 +719,7 @@ func CustomerPortalHeaderWithBackLink(backURL string, backLabel string) templ.Co
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(backLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 310, Col: 14}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 302, Col: 14}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {
@@ -732,7 +732,7 @@ func CustomerPortalHeaderWithBackLink(backURL string, backLabel string) templ.Co
 		var templ_7745c5c3_Var29 string
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathSVGLogoOnly)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 315, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 307, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
@@ -774,7 +774,7 @@ func AdminStaffHeaderWithLogout() templ.Component {
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathSVGLogoOnly)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 326, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 318, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
@@ -787,7 +787,7 @@ func AdminStaffHeaderWithLogout() templ.Component {
 		var templ_7745c5c3_Var32 templ.SafeURL
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/logout"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 333, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 325, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 		if templ_7745c5c3_Err != nil {
@@ -829,7 +829,7 @@ func AdminStaffHeaderWithSubtitle(fullName string) templ.Component {
 		var templ_7745c5c3_Var34 string
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathSVGLogoOnly)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 347, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 339, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
@@ -847,7 +847,7 @@ func AdminStaffHeaderWithSubtitle(fullName string) templ.Component {
 			var templ_7745c5c3_Var35 string
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(fullName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 354, Col: 23}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 346, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 			if templ_7745c5c3_Err != nil {
@@ -865,7 +865,7 @@ func AdminStaffHeaderWithSubtitle(fullName string) templ.Component {
 		var templ_7745c5c3_Var36 templ.SafeURL
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/logout"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 359, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 351, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 		if templ_7745c5c3_Err != nil {
@@ -907,7 +907,7 @@ func AdminStaffHeaderWithBack() templ.Component {
 		var templ_7745c5c3_Var38 templ.SafeURL
 		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 373, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 365, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 		if templ_7745c5c3_Err != nil {
@@ -920,7 +920,7 @@ func AdminStaffHeaderWithBack() templ.Component {
 		var templ_7745c5c3_Var39 string
 		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathSVGLogoOnly)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 384, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 376, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 		if templ_7745c5c3_Err != nil {
@@ -962,7 +962,7 @@ func AdminStaffHeaderWithBackLink(backURL string, backLabel string) templ.Compon
 		var templ_7745c5c3_Var41 templ.SafeURL
 		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinURLErrs(backURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 395, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 387, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 		if templ_7745c5c3_Err != nil {
@@ -975,7 +975,7 @@ func AdminStaffHeaderWithBackLink(backURL string, backLabel string) templ.Compon
 		var templ_7745c5c3_Var42 string
 		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(backLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 401, Col: 14}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 393, Col: 14}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 		if templ_7745c5c3_Err != nil {
@@ -988,7 +988,7 @@ func AdminStaffHeaderWithBackLink(backURL string, backLabel string) templ.Compon
 		var templ_7745c5c3_Var43 string
 		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathSVGLogoOnly)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 406, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 398, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 		if templ_7745c5c3_Err != nil {
@@ -1030,7 +1030,7 @@ func AdminStaffHeaderWithBackLinkSimple(backURL string, backLabel string) templ.
 		var templ_7745c5c3_Var45 templ.SafeURL
 		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinURLErrs(backURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 417, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 409, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 		if templ_7745c5c3_Err != nil {
@@ -1043,7 +1043,7 @@ func AdminStaffHeaderWithBackLinkSimple(backURL string, backLabel string) templ.
 		var templ_7745c5c3_Var46 string
 		templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.JoinStringErrs(backLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 423, Col: 14}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 415, Col: 14}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var46))
 		if templ_7745c5c3_Err != nil {
@@ -1056,7 +1056,7 @@ func AdminStaffHeaderWithBackLinkSimple(backURL string, backLabel string) templ.
 		var templ_7745c5c3_Var47 string
 		templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathSVGLogoOnly)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 427, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `header/header.templ`, Line: 419, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
 		if templ_7745c5c3_Err != nil {

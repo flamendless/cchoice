@@ -457,7 +457,7 @@ func HolidayEditModal(holiday models.AdminHolidayListItem) templ.Component {
 			templ_7745c5c3_Var17 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<div id=\"holiday-edit-modal\" class=\"fixed inset-0 z-50 flex items-center justify-center\" _=\"\n\t\t\ton closeModal\n\t\t\t\tset #holiday-edit-modal-container.innerHTML to ''\n\t\t\tend\n\t\t\ton keyup[key is 'Escape'] trigger closeModal\n\t\t\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">Edit Holiday</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<div id=\"holiday-edit-modal\" class=\"fixed inset-0 z-50 flex items-center justify-center\" _=\"\n\t\t\ton closeModal\n\t\t\t\tset #holiday-edit-modal-container.innerHTML to ''\n\t\t\tend\n\t\t\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">Edit Holiday</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -501,7 +501,7 @@ func HolidayEditForm(holiday models.AdminHolidayListItem) templ.Component {
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URLf("/admin/holidays/%s", holiday.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 238, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 237, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -514,7 +514,7 @@ func HolidayEditForm(holiday models.AdminHolidayListItem) templ.Component {
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(holiday.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 244, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 243, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -527,7 +527,7 @@ func HolidayEditForm(holiday models.AdminHolidayListItem) templ.Component {
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(holiday.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 251, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 250, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -545,7 +545,7 @@ func HolidayEditForm(holiday models.AdminHolidayListItem) templ.Component {
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(ht.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 265, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 264, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -568,7 +568,7 @@ func HolidayEditForm(holiday models.AdminHolidayListItem) templ.Component {
 			var templ_7745c5c3_Var23 string
 			templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(ht.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 268, Col: 19}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/holidays.templ`, Line: 267, Col: 19}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 			if templ_7745c5c3_Err != nil {
