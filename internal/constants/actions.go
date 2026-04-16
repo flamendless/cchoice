@@ -20,5 +20,6 @@ const (
 	ModuleHolidays             = "holidays"
 	ModulePasswordReset        = "password_reset"
 	ModuleProducts             = "products"
+	ModulePromos               = "promos"
 	ModuleTimeOff              = "time_off"
 )

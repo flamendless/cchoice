@@ -194,7 +194,6 @@ func (s *Server) adminHolidaysEditPageHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	w.Header().Set("HX-Reswap", "innerHTML")
 	if err := compadmin.HolidayEditModal(*holidayItem).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError("/admin/holidays", "Failed to render edit form"))

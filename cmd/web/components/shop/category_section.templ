@@ -115,11 +115,9 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 				</div>
 			}
 		</div>
-
 		if category.Label != "" {
 			@common.HR()
 		}
-
 		if i == len(categories)-1 {
 			<div
 				class="category-sections-inf-load"

@@ -118,6 +118,14 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_BRANDS)).Post("/admin/brands", s.adminBrandsCreateHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_BRANDS)).Patch("/admin/brands/{id}", s.adminBrandsUpdateHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_BRANDS)).Delete("/admin/brands/{id}", s.adminBrandsDeleteHandler)
+
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PROMOS)).Get("/admin/promos", s.adminPromosListPageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PROMOS)).Get("/admin/promos/table", s.adminPromosListTableHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PROMOS)).Get("/admin/promos/create", s.adminPromosCreatePageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PROMOS)).Get("/admin/promos/{id}/edit", s.adminPromosEditPageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PROMOS)).Post("/admin/promos", s.adminPromosCreateHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PROMOS)).Patch("/admin/promos/{id}", s.adminPromosUpdateHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PROMOS)).Delete("/admin/promos/{id}", s.adminPromosDeleteHandler)
 }
 
 func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {
