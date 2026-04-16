@@ -4,6 +4,7 @@ import (
 	"cchoice/cmd/web/components/common"
 	"cchoice/cmd/web/components/header"
 	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/utils"
 )
@@ -34,7 +35,7 @@ templ AdminPromosListPage(title string) {
 			</div>
 			<div id="promo-create-modal-container"></div>
 			<div id="promo-edit-modal-container"></div>
-			@ScrImagePreview()
+			@ScrImageUpload()
 		</body>
 	</html>
 }
@@ -306,26 +307,16 @@ templ PromoCreateForm() {
 				}
 			</select>
 		</div>
-		<div id="media_upload_field" class="flex flex-col gap-4">
-			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-1">
-					Media File <span class="text-red-500">*</span>
-				</label>
-				<input
-					type="file"
-					name="media_file"
-					accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
-					class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cchoice file:text-white hover:file:bg-cchoicedark"
-					oninput="handlePromoImagePreview(this)"
-				/>
-				<p class="mt-1 text-xs text-gray-500">Max file size: 10MB. Allowed: JPEG, PNG, WebP, MP4, WebM</p>
-			</div>
-			<div id="promo-image-preview" class="hidden">
-				<img
-					src=""
-					class="h-32 w-full object-contain rounded border border-gray-200"
-				/>
-			</div>
+		<div id="media_upload_field">
+			@ImageUploadField(ImageUploadParams{
+				Name:         "media_file",
+				Label:        "Media File",
+				Accept:       "image/jpeg,image/png,image/webp",
+				MaxSize:      constants.MaxSizeImageUpload,
+				PreviewClass: "h-32 w-full object-contain rounded border border-gray-200",
+				Required:     true,
+				HelpText:    "Max file size: 10MB. Allowed: JPEG, PNG, WebP",
+			})
 		</div>
 		<div id="media_url_field" class="hidden">
 			<label class="block text-sm font-medium text-gray-700 mb-1">
@@ -452,26 +443,16 @@ templ PromoEditForm(promo models.AdminPromoListItem) {
 			</select>
 		</div>
 		if promo.Type == enums.PROMO_TYPE_BANNER_IMAGE {
-			<div id="edit_media_upload_field" class="flex flex-col gap-4">
-				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-1">
-						Media File
-					</label>
-					<input
-						type="file"
-						name="media_file"
-						accept="image/jpeg,image/png,image/webp"
-						class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cchoice file:text-white hover:file:bg-cchoicedark"
-						oninput="handlePromoImagePreview(this)"
-					/>
-					<p class="mt-1 text-xs text-gray-500">Leave empty to keep current. Allowed: JPEG, PNG, WebP</p>
-				</div>
-				<div id="promo-image-preview">
-					<img
-						src={ promo.MediaURL }
-						class="h-32 w-full object-contain rounded border border-gray-200"
-					/>
-				</div>
+			<div id="edit_media_upload_field">
+				@ImageUploadField(ImageUploadParams{
+					Name:         "media_file",
+					Label:       "Media File",
+					Accept:      "image/jpeg,image/png,image/webp",
+					MaxSize:     constants.MaxSizeImageUpload,
+					ExistingURL: promo.MediaURL,
+					PreviewClass: "h-32 w-full object-contain rounded border border-gray-200",
+					HelpText:    "Leave empty to keep current. Allowed: JPEG, PNG, WebP",
+				})
 			</div>
 		} else if promo.Type == enums.PROMO_TYPE_BANNER_VIDEO {
 			<div id="edit_media_url_field">
