@@ -6,7 +6,7 @@ import "cchoice/cmd/web/components/header"
 import "cchoice/cmd/web/components/svg"
 import "cchoice/cmd/web/models"
 
-var superuserMenuCards = []models.SuperuserMenuCard{
+var staffCards = []models.StaffCard{
 	{Link: "/admin/profile", Title: "Profile", Description: "View and manage your profile", Icon: svg.User("text-cchoice")},
 	{Link: "/admin/superuser/attendance", Title: "Attendance", Description: "View and manage employee attendance records", Icon: svg.Clock("text-cchoice")},
 	{Link: "/admin/superuser/time-off", Title: "Time Off", Description: "View and manage staff time off records", Icon: svg.Box("text-cchoice")},
@@ -45,7 +45,7 @@ templ AdminSuperuserHomePage(fullName string) {
 				<div class="max-w-6xl mx-auto">
 					@header.AdminStaffHeaderWithSubtitle(fullName)
 					<div class="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
-						for _, card := range superuserMenuCards {
+						for _, card := range staffCards {
 							<a
 								href={ utils.URL(card.Link) }
 								class="block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice"

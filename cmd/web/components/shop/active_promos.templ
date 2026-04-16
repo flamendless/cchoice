@@ -12,33 +12,33 @@ templ ActivePromosSection(promos []models.PromoItem) {
 			for _, promo := range promos {
 				<div class="flex flex-col justify-center w-full lg:w-1/2 overflow-hidden rounded-lg shadow-md bg-cchoicesoft">
 					switch promo.Type {
-					case enums.PROMO_TYPE_BANNER_VIDEO:
-						if utils.IsYouTubeURL(promo.MediaURL) {
-							<iframe
-								class="w-full aspect-video"
-								src={ templ.URL(utils.ConvertYouTubeToEmbed(promo.MediaURL)) }
-								title={ promo.Title }
-								frameborder="0"
-								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-								allowfullscreen
-							></iframe>
-						} else {
-							<video
+						case enums.PROMO_TYPE_BANNER_VIDEO:
+							if utils.IsYouTubeURL(promo.MediaURL) {
+								<iframe
+									class="w-full aspect-video"
+									src={ templ.URL(utils.ConvertYouTubeToEmbed(promo.MediaURL)) }
+									title={ promo.Title }
+									frameborder="0"
+									allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+									allowfullscreen
+								></iframe>
+							} else {
+								<video
+									class="w-full h-auto object-cover"
+									src={ promo.MediaURL }
+									autoplay
+									loop
+									muted
+									playsinline
+								></video>
+							}
+						case enums.PROMO_TYPE_BANNER_IMAGE:
+							<img
 								class="w-full h-auto object-cover"
 								src={ promo.MediaURL }
-								autoplay
-								loop
-								muted
-								playsinline
-							></video>
-						}
-					case enums.PROMO_TYPE_BANNER_IMAGE:
-						<img
-							class="w-full h-auto object-cover"
-							src={ promo.MediaURL }
-							alt={ promo.Title }
-							loading="lazy"
-						/>
+								alt={ promo.Title }
+								loading="lazy"
+							/>
 					}
 					<div class="p-4">
 						if promo.Title != "" {
