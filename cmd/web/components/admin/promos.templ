@@ -315,7 +315,7 @@ templ PromoCreateForm() {
 				MaxSize:      constants.MaxSizeImageUpload,
 				PreviewClass: "h-32 w-full object-contain rounded border border-gray-200",
 				Required:     true,
-				HelpText:    "Max file size: 3MB. Allowed: JPEG, PNG, WebP",
+				HelpText:     "Max file size: 3MB. Allowed: JPEG, PNG, WebP",
 			})
 		</div>
 		<div id="media_url_field" class="hidden">
@@ -472,12 +472,12 @@ templ PromoEditForm(promo models.AdminPromoListItem) {
 			<div id="edit_media_upload_field">
 				@ImageUploadField(ImageUploadParams{
 					Name:         "media_file",
-					Label:       "Media File",
-					Accept:      "image/jpeg,image/png,image/webp",
-					MaxSize:     constants.MaxSizeImageUpload,
-					ExistingURL: promo.MediaURL,
+					Label:        "Media File",
+					Accept:       "image/jpeg,image/png,image/webp",
+					MaxSize:      constants.MaxSizeImageUpload,
+					ExistingURL:  promo.MediaURL,
 					PreviewClass: "h-32 w-full object-contain rounded border border-gray-200",
-					HelpText:    "Leave empty to keep current. Allowed: JPEG, PNG, WebP",
+					HelpText:     "Leave empty to keep current. Allowed: JPEG, PNG, WebP",
 				})
 			</div>
 		} else if promo.Type == enums.PROMO_TYPE_BANNER_VIDEO {

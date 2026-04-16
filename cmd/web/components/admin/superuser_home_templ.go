@@ -14,7 +14,7 @@ import "cchoice/cmd/web/components/header"
 import "cchoice/cmd/web/components/svg"
 import "cchoice/cmd/web/models"
 
-var superuserMenuCards = []models.SuperuserMenuCard{
+var staffCards = []models.StaffCard{
 	{Link: "/admin/profile", Title: "Profile", Description: "View and manage your profile", Icon: svg.User("text-cchoice")},
 	{Link: "/admin/superuser/attendance", Title: "Attendance", Description: "View and manage employee attendance records", Icon: svg.Clock("text-cchoice")},
 	{Link: "/admin/superuser/time-off", Title: "Time Off", Description: "View and manage staff time off records", Icon: svg.Box("text-cchoice")},
@@ -93,7 +93,7 @@ func AdminSuperuserHomePage(fullName string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, card := range superuserMenuCards {
+		for _, card := range staffCards {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
