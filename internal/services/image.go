@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"cchoice/internal/conf"
+	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/encode"
 	"cchoice/internal/logs"
@@ -72,7 +73,7 @@ func (s *ImageService) ValidateSize(file io.Reader) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(data) > 10*1024*1024 {
+	if len(data) > int(constants.MaxSizeImageUpload) {
 		return nil, fmt.Errorf("file too large: %d bytes", len(data))
 	}
 	return data, nil

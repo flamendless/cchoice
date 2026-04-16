@@ -281,7 +281,7 @@ func BrandCreateForm() templ.Component {
 			Accept:       "image/jpeg,image/png,image/webp",
 			MaxSize:      constants.MaxSizeImageUpload,
 			PreviewClass: "h-24 w-24 object-contain rounded border border-gray-200",
-			HelpText:     "Max file size: 10MB. Allowed: JPEG, PNG, WebP",
+			HelpText:     "Max file size: 3MB. Allowed: JPEG, PNG, WebP",
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -640,7 +640,7 @@ func BrandEditForm(brand models.AdminBrandListItem) templ.Component {
 			MaxSize:      constants.MaxSizeImageUpload,
 			ExistingURL:  brand.LogoS3URL,
 			PreviewClass: "h-24 w-24 object-contain rounded border border-gray-200",
-			HelpText:     "Max file size: 10MB. Allowed: JPEG, PNG, WebP",
+			HelpText:     "Max file size: 3MB. Allowed: JPEG, PNG, WebP",
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
