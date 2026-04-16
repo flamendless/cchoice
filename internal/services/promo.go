@@ -1,6 +1,7 @@
 package services
 
 import (
+	"cmp"
 	"context"
 	"database/sql"
 	"errors"
@@ -149,19 +150,20 @@ func (s *PromoService) UpdatePromo(
 	}()
 
 	id := s.encoder.Decode(promoID)
-	if id == encode.INVALID {
-		return errs.ErrDecode
+	promo, err := s.GetPromoByID(ctx, id)
+	if err != nil {
+		return err
 	}
 
 	if err := s.dbRW.GetQueries().UpdatePromo(ctx, queries.UpdatePromoParams{
+		ID:          id,
 		Title:       title,
 		Description: description,
-		MediaUrl:    mediaURL,
+		MediaUrl:    cmp.Or(mediaURL, promo.MediaURL),
 		StartDate:   startDate.Format(constants.DateLayoutISO),
 		EndDate:     endDate.Format(constants.DateLayoutISO),
 		Type:        promoType.String(),
 		Status:      promoStatus.String(),
-		ID:          id,
 	}); err != nil {
 		result = err.Error()
 		return errors.Join(errs.ErrPromo, err)

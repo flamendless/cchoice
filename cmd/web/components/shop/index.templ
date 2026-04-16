@@ -20,8 +20,13 @@ templ HomePageBody(data models.HomePageData) {
 	<body class="m-0 p-0 overflow-x-hidden custom-scrollbar">
 		@common.ErrorBanner()
 		@common.SuccessBanner()
-		@SaleBanner(data.RandomSaleProduct)
+		if data.RandomSaleProduct.DiscountPercentage != "" {
+			@SaleBanner(data.RandomSaleProduct)
+		}
 		@header.Header()
+		if len(data.ActivePromos) > 0 {
+			@ActivePromosSection(data.ActivePromos)
+		}
 		@MobileSidebar()
 		<style>
 			#desktop-sidebar {

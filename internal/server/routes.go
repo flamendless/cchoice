@@ -364,8 +364,8 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Index handler]"
 	ctx := r.Context()
 
-	var randomSaleProduct *models.RandomSaleProduct
-	if conf.Conf().Settings.ShowPromoBanner {
+	var randomSaleProduct models.RandomSaleProduct
+	if conf.Conf().Settings.ShowRandomSaleProduct {
 		requestID := middleware.GetReqID(ctx)
 		saleProductCacheKey := requests.GenerateRandomSaleProductCacheKey(requestID)
 		res, err := requests.GetRandomSaleProduct(
@@ -378,24 +378,45 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 			saleProductCacheKey,
 		)
 		if err != nil {
-			logs.LogCtx(ctx).Error(
-				logtag,
-				zap.Error(err),
-				zap.String("message", "failed to get random sale product"),
-			)
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("message", "failed to get random sale product"))
 		}
-		randomSaleProduct = res
-
-		if randomSaleProduct != nil {
+		if res != nil {
+			randomSaleProduct = *res
 			metrics.Promo.ProductImpressionHit(randomSaleProduct.ProductID, randomSaleProduct.Name)
 		}
 	}
 
-	logs.Log().Info(logtag, zap.Bool("promo product banner", randomSaleProduct != nil))
+	var promoBanners []models.PromoItem
+	if conf.Conf().Settings.ShowPromoBanners {
+		activePromos, err := s.services.promo.GetActivePromos(ctx)
+		if err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("message", "failed to get active promos"))
+		}
+
+		promoBanners = make([]models.PromoItem, 0, len(activePromos))
+		for _, p := range activePromos {
+			fmt.Println(1111, p.Title, p.MediaURL)
+			promoBanners = append(promoBanners, models.PromoItem{
+				ID:          s.encoder.Encode(p.ID),
+				Title:       p.Title,
+				Description: p.Description,
+				MediaURL:    p.MediaURL,
+				Type:        p.Type,
+			})
+		}
+	}
+
+	fmt.Println(2222, promoBanners)
+	logs.Log().Info(
+		logtag,
+		zap.String("random sale product", randomSaleProduct.ProductID),
+		zap.Int("promo banners", len(promoBanners)),
+	)
 
 	homePageData := models.HomePageData{
 		Sections:          models.BuildPostHomeContentSections(s.GetBrandLogoCDNURL),
 		RandomSaleProduct: randomSaleProduct,
+		ActivePromos:      promoBanners,
 	}
 
 	if err := compshop.HomePage(homePageData).Render(ctx, w); err != nil {

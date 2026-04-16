@@ -245,9 +245,10 @@ func NewServer() *ServerInstance {
 			"url_waze",
 			"url_facebook",
 			"url_tiktok",
-			"show_promo_banner",
 			"shop_location",
 			"vat_percentage",
+			"show_random_sale_product",
+			"show_promo_banners",
 		},
 	)
 	if err != nil {
@@ -314,6 +315,8 @@ func NewServer() *ServerInstance {
 		zap.Duration("Write timeout", writeTimeout),
 		zap.String("Encoder", newServer.encoder.Name()),
 		zap.Any("Tests", cfg.Test),
+		zap.Bool("ShowRandomSaleProduct", cfg.Settings.ShowRandomSaleProduct),
+		zap.Bool("ShowPromoBanners", cfg.Settings.ShowPromoBanners),
 	}
 
 	if newServer.shippingService != nil {

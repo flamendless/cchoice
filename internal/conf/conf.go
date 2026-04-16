@@ -67,16 +67,17 @@ type BasicAuth struct {
 }
 
 type Settings struct {
-	MobileNo        string
-	EMail           string
-	Address         string
-	URLGMap         string
-	URLWaze         string
-	URLFacebook     string
-	URLTikTok       string
-	VATPercentage   string
-	ShopLocation    types.Location
-	ShowPromoBanner bool
+	MobileNo              string
+	EMail                 string
+	Address               string
+	URLGMap               string
+	URLWaze               string
+	URLFacebook           string
+	URLTikTok             string
+	VATPercentage         string
+	ShopLocation          types.Location
+	ShowRandomSaleProduct bool
+	ShowPromoBanners      bool
 }
 
 type MailerooConfig struct {
@@ -224,9 +225,14 @@ func (c *appConfig) SetSettings(settings map[string]string) {
 	c.Settings.URLFacebook = settings["url_facebook"]
 	c.Settings.URLTikTok = settings["url_tiktok"]
 
-	spb := settings["show_promo_banner"]
+	srsp := settings["show_random_sale_product"]
+	if srsp == "true" || srsp == "1" {
+		c.Settings.ShowRandomSaleProduct = true
+	}
+
+	spb := settings["show_promo_banners"]
 	if spb == "true" || spb == "1" {
-		c.Settings.ShowPromoBanner = true
+		c.Settings.ShowPromoBanners = true
 	}
 
 	if raw := settings["shop_location"]; raw != "" {

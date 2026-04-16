@@ -23,7 +23,7 @@ INSERT INTO tbl_promos (
     deleted_at
 ) VALUES (
     ?, ?, ?, ?, ?, ?,
-    'draft',
+    'DRAFT',
     datetime('now'),
     datetime('now'),
     '1970-01-01 00:00:00+00:00'
@@ -68,10 +68,10 @@ SELECT
     deleted_at
 FROM tbl_promos
 WHERE deleted_at = '1970-01-01 00:00:00+00:00'
-AND status = 'published'
+AND status = 'PUBLISHED'
 AND start_date <= datetime('now')
 AND end_date >= datetime('now')
-ORDER BY created_at DESC
+ORDER BY updated_at DESC
 `
 
 func (q *Queries) GetActivePromos(ctx context.Context) ([]TblPromo, error) {
@@ -124,7 +124,7 @@ SELECT
     deleted_at
 FROM tbl_promos
 WHERE deleted_at = '1970-01-01 00:00:00+00:00'
-ORDER BY created_at DESC
+ORDER BY updated_at DESC
 `
 
 func (q *Queries) GetAllPromos(ctx context.Context) ([]TblPromo, error) {
@@ -203,7 +203,7 @@ func (q *Queries) GetPromoByID(ctx context.Context, id int64) (TblPromo, error) 
 const softDeletePromo = `-- name: SoftDeletePromo :exec
 UPDATE tbl_promos
 SET
-    status = 'deleted',
+    status = 'DELETED',
     deleted_at = datetime('now')
 WHERE id = ?
 AND deleted_at = '1970-01-01 00:00:00+00:00'
