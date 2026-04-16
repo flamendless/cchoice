@@ -223,6 +223,11 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 	promoStatusStr := r.FormValue("status")
 
 	if idStr == "" || title == "" || description == "" || startDateStr == "" || endDateStr == "" || promoTypeStr == "" || promoStatusStr == "" {
+		logs.Log().Warn(
+			logtag,
+			zap.String("id", idStr),
+			zap.Any("form value", r.Form),
+		)
 		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
 		return
 	}
@@ -241,6 +246,11 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 
 	promoType := enums.MustParsePromoTypeToEnum(promoTypeStr)
 	promoStatus := enums.MustParsePromoStatusToEnum(promoStatusStr)
+
+	if promoStatus == enums.PROMO_STATUS_DELETED {
+		s.adminPromosDeleteHandler(w, r)
+		return
+	}
 
 	if err := s.services.promo.UpdatePromo(
 		ctx,
