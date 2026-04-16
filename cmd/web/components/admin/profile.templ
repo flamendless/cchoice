@@ -86,7 +86,14 @@ templ AdminProfilePage(profile models.AdminStaffProfile) {
 										<button
 											type="button"
 											class="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none"
-											_="on click if #new_password.type == 'password' then set #new_password.type to 'text' set my innerText to 'Hide' else set #new_password.type to 'password' set my innerText to 'Show' end"
+											_="on click
+												if #confirm_password.type == 'password' then
+													set #confirm_password.type to 'text'
+													set my innerText to 'Hide'
+												else
+													set #confirm_password.type to 'password'
+													set my innerText to 'Show'
+											end"
 										>
 											Show
 										</button>
