@@ -1,6 +1,9 @@
 package models
 
-import "cchoice/internal/database/queries"
+import (
+	"cchoice/internal/database/queries"
+	"cchoice/internal/enums"
+)
 
 type BrandImage struct {
 	Filename     string
@@ -21,9 +24,18 @@ type PostHomeContentSection struct {
 	Others []PostHomeContent
 }
 
+type PromoItem struct {
+	ID          string
+	Title       string
+	Description string
+	MediaURL    string
+	Type        enums.PromoType
+}
+
 type HomePageData struct {
-	RandomSaleProduct *RandomSaleProduct
+	RandomSaleProduct RandomSaleProduct
 	Sections          []PostHomeContentSection
+	ActivePromos      []PromoItem
 }
 
 type RandomSaleProduct struct {
