@@ -108,7 +108,7 @@ func (s *Server) adminCPointsGeneratePostHandler(w http.ResponseWriter, r *http.
 		logs.LogCtx(ctx).Warn("failed to generate QR code", zap.Error(err))
 	}
 
-	redirectURL := utils.URLWithSuccessParams("/admin/cpoints/code", map[string]string{
+	redirectURL := utils.URLWithParams("/admin/cpoints/code", map[string]string{
 		"code":        cpoint.Code,
 		"redemption":  redemptionURL,
 		"customer_id": customerID,
