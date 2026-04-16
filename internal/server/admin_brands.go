@@ -34,7 +34,6 @@ func (s *Server) adminBrandsCreatePageHandler(w http.ResponseWriter, r *http.Req
 	const logtag = "[Admin Brands Create Page Handler]"
 	ctx := r.Context()
 
-	w.Header().Set("HX-Reswap", "innerHTML")
 	if err := compadmin.BrandCreateModal().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError("/admin/brands", err.Error()))
@@ -284,7 +283,6 @@ func (s *Server) adminBrandsEditPageHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	w.Header().Set("HX-Reswap", "innerHTML")
 	if err := compadmin.BrandEditModal(*brandItem).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError("/admin/brands", "Failed to render edit form"))

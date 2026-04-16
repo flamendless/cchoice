@@ -189,11 +189,13 @@ go run -tags="fts5,staticfs" ./main.go
 - Use `mage gensql` to regenerate
 - Parameter structs: `queries.CreateCustomerParams{...}`
 - Always use UPPERCASE for text values like in CHECK CONSTRAINTS
+- Always use UPPERCASE for default values for TEXT like `status TEXT NOT NULL DEFAULT 'DRAFT',`
 
 ### Templates (templ)
 - Templates in `cmd/web/components/`
 - Use `mage gentempl` to generate Go code
 - Format with `go tool templ fmt ./cmd/web/components`
+- always use enums if possible instead of string
 
 ### Testing
 - Use `github.com/stretchr/testify/assert` for assertions
@@ -222,6 +224,7 @@ go run -tags="fts5,staticfs" ./main.go
 ### Time
 - Always define/use date/time layout in constants package instead of hardcoded strings
 - always do above for date/time parsing
+- always do above for date/time format
 
 ### Email templates
 - create templates in ./templates

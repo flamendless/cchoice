@@ -1,0 +1,96 @@
+-- name: GetPromoByID :one
+SELECT
+    id,
+    title,
+    description,
+    media_url,
+    start_date,
+    end_date,
+    type,
+    status,
+    created_at,
+    updated_at,
+    deleted_at
+FROM tbl_promos
+WHERE id = ?
+AND deleted_at = '1970-01-01 00:00:00+00:00'
+LIMIT 1;
+
+-- name: GetAllPromos :many
+SELECT
+    id,
+    title,
+    description,
+    media_url,
+    start_date,
+    end_date,
+    type,
+    status,
+    created_at,
+    updated_at,
+    deleted_at
+FROM tbl_promos
+WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+ORDER BY created_at DESC;
+
+-- name: GetActivePromos :many
+SELECT
+    id,
+    title,
+    description,
+    media_url,
+    start_date,
+    end_date,
+    type,
+    status,
+    created_at,
+    updated_at,
+    deleted_at
+FROM tbl_promos
+WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+AND status = 'published'
+AND start_date <= datetime('now')
+AND end_date >= datetime('now')
+ORDER BY created_at DESC;
+
+-- name: CreatePromo :one
+INSERT INTO tbl_promos (
+    title,
+    description,
+    media_url,
+    start_date,
+    end_date,
+    type,
+    status,
+    created_at,
+    updated_at,
+    deleted_at
+) VALUES (
+    ?, ?, ?, ?, ?, ?,
+    'draft',
+    datetime('now'),
+    datetime('now'),
+    '1970-01-01 00:00:00+00:00'
+) RETURNING id;
+
+-- name: UpdatePromo :exec
+UPDATE tbl_promos
+SET
+    title = ?,
+    description = ?,
+    media_url = ?,
+    start_date = ?,
+    end_date = ?,
+    type = ?,
+    status = ?,
+    updated_at = datetime('now')
+WHERE id = ?
+AND deleted_at = '1970-01-01 00:00:00+00:00';
+
+-- name: SoftDeletePromo :exec
+UPDATE tbl_promos
+SET
+    status = 'deleted',
+    deleted_at = datetime('now')
+WHERE id = ?
+AND deleted_at = '1970-01-01 00:00:00+00:00';

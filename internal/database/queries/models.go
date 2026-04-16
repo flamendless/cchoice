@@ -331,6 +331,20 @@ type TblProductsFt struct {
 	Name   string
 }
 
+type TblPromo struct {
+	ID          int64
+	Title       string
+	Description string
+	MediaUrl    string
+	StartDate   string
+	EndDate     string
+	Type        string
+	Status      string
+	CreatedAt   string
+	UpdatedAt   string
+	DeletedAt   string
+}
+
 type TblSetting struct {
 	ID    int64
 	Name  string
