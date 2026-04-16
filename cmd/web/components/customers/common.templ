@@ -275,7 +275,7 @@ templ CustomerRegisterPage() {
 						</div>
 						<div>
 							<label for="password" class="block text-sm font-medium text-gray-700">
-								Password
+								Password (8-32 length)
 							</label>
 							<div class="relative mt-1">
 								<input
@@ -283,6 +283,7 @@ templ CustomerRegisterPage() {
 									id="password"
 									name="password"
 									required
+									minlength="8"
 									maxlength="64"
 									pattern={ constants.PatternPassword }
 									class="block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
@@ -313,6 +314,7 @@ templ CustomerRegisterPage() {
 									id="confirm_password"
 									name="confirm_password"
 									required
+									minlength="8"
 									maxlength="64"
 									pattern={ constants.PatternPassword }
 									class="block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"

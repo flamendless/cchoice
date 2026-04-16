@@ -138,33 +138,33 @@ func ResetPasswordPage(usertype enums.UserType, token string, email string) temp
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"><div><label for=\"new_password\" class=\"block text-sm font-medium text-gray-700\">New Password</label><div class=\"relative mt-1\"><input type=\"password\" id=\"new_password\" name=\"new_password\" required maxlength=\"64\" pattern=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"><div><label for=\"new_password\" class=\"block text-sm font-medium text-gray-700\">New Password (8-32 length)</label><div class=\"relative mt-1\"><input type=\"password\" id=\"new_password\" name=\"new_password\" required minlength=\"8\" maxlength=\"64\" pattern=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternPassword)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 68, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 69, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click\n\t\t\t\t\t\t\t\t\tif #new_password.type == 'password' then set #new_password.type to 'text'\n\t\t\t\t\t\t\t\t\t\tset my innerText to 'Hide'\n\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\tset #new_password.type to 'password'\n\t\t\t\t\t\t\t\t\t\tset my innerText to 'Show'\n\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\">Show</button></div></div><div><label for=\"confirm_password\" class=\"block text-sm font-medium text-gray-700\">Confirm Password</label><div class=\"relative mt-1\"><input type=\"password\" id=\"confirm_password\" name=\"confirm_password\" required maxlength=\"64\" pattern=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click\n\t\t\t\t\t\t\t\t\tif #new_password.type == 'password' then set #new_password.type to 'text'\n\t\t\t\t\t\t\t\t\t\tset my.innerText to 'Hide'\n\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\tset #new_password.type to 'password'\n\t\t\t\t\t\t\t\t\t\tset my.innerText to 'Show'\n\t\t\t\t\t\t\t\t\tend\">Show</button></div></div><div><label for=\"confirm_password\" class=\"block text-sm font-medium text-gray-700\">Confirm Password</label><div class=\"relative mt-1\"><input type=\"password\" id=\"confirm_password\" name=\"confirm_password\" required minlength=\"8\" maxlength=\"64\" pattern=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternPassword)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 98, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 99, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" class=\"block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"\n\t\t\t\t\t\t\t\t\ton input or change\n\t\t\t\t\t\t\t\t\t\tif #new_password.value != my.value\n\t\t\t\t\t\t\t\t\t\t\tcall me.setCustomValidity('Passwords do not match')\n\t\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\t\tcall me.setCustomValidity('')\n\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click\n\t\t\t\t\t\t\t\t\tif #confirm_password.type == 'password' then set #confirm_password.type to 'text'\n\t\t\t\t\t\t\t\t\t\tset my innerText to 'Hide'\n\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\tset #confirm_password.type to 'password'\n\t\t\t\t\t\t\t\t\t\tset my innerText to 'Show'\n\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\">Show</button></div></div><button type=\"submit\" class=\"w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\"><span id=\"reset-btn-content\" class=\"inline-flex items-center gap-2\"><span id=\"reset-spinner\" class=\"w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0\" aria-hidden=\"true\"></span> <span class=\"reset-btn-text\">Reset Password</span></span></button></form><div class=\"mt-6 text-center text-sm\"><p class=\"text-gray-600\">Remember your password? ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" class=\"block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click\n\t\t\t\t\t\t\t\t\tif #new_password.type == 'password' then set #new_password.type to 'text'\n\t\t\t\t\t\t\t\t\t\tset my innerText to 'Hide'\n\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\tset #new_password.type to 'password'\n\t\t\t\t\t\t\t\t\t\tset my innerText to 'Show'\n\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\">Show</button></div></div><button type=\"submit\" class=\"w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\"><span id=\"reset-btn-content\" class=\"inline-flex items-center gap-2\"><span id=\"reset-spinner\" class=\"w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0\" aria-hidden=\"true\"></span> <span class=\"reset-btn-text\">Reset Password</span></span></button></form><div class=\"mt-6 text-center text-sm\"><p class=\"text-gray-600\">Remember your password? ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -177,7 +177,7 @@ func ResetPasswordPage(usertype enums.UserType, token string, email string) temp
 			var templ_7745c5c3_Var10 templ.SafeURL
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 142, Col: 37}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 133, Col: 37}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -195,7 +195,7 @@ func ResetPasswordPage(usertype enums.UserType, token string, email string) temp
 			var templ_7745c5c3_Var11 templ.SafeURL
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 146, Col: 40}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 137, Col: 40}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
