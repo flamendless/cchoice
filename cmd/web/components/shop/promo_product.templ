@@ -36,11 +36,11 @@ templ SaleBanner(product *models.RandomSaleProduct) {
 			<div
 				id="sale-banner-content"
 				class="
-					relative w-full max-w-md mx-4
-					bg-white rounded-2xl shadow-2xl
-					overflow-hidden cursor-pointer
-					transform transition-transform hover:scale-105
-				"
+				relative w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto
+				bg-white rounded-2xl shadow-2xl
+				overflow-hidden cursor-pointer
+				transform transition-transform hover:scale-105
+			"
 				_={ fmt.Sprintf(`
 						on click
 							async call metrics_event('promo_product_click', '%s')

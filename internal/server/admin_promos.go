@@ -207,7 +207,7 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 	const page = "/admin/promos"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
 		return
@@ -222,14 +222,8 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 	promoTypeStr := r.FormValue("type")
 	promoStatusStr := r.FormValue("status")
 
-	if idStr == "" || title == "" || description == "" || mediaURL == "" || startDateStr == "" || endDateStr == "" || promoTypeStr == "" || promoStatusStr == "" {
+	if idStr == "" || title == "" || description == "" || startDateStr == "" || endDateStr == "" || promoTypeStr == "" || promoStatusStr == "" {
 		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
-		return
-	}
-
-	id := s.encoder.Decode(idStr)
-	if id == encode.INVALID {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid id format"))
 		return
 	}
 
@@ -251,7 +245,7 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 	if err := s.services.promo.UpdatePromo(
 		ctx,
 		s.sessionManager.GetString(ctx, SessionStaffID),
-		id,
+		idStr,
 		title,
 		description,
 		mediaURL,
@@ -274,13 +268,7 @@ func (s *Server) adminPromosDeleteHandler(w http.ResponseWriter, r *http.Request
 	ctx := r.Context()
 
 	idStr := chi.URLParam(r, "id")
-	id := s.encoder.Decode(idStr)
-	if id == encode.INVALID {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid id format"))
-		return
-	}
-
-	if err := s.services.promo.DeletePromo(ctx, s.sessionManager.GetString(ctx, SessionStaffID), id); err != nil {
+	if err := s.services.promo.DeletePromo(ctx, s.sessionManager.GetString(ctx, SessionStaffID), idStr); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, "Failed to delete promo"))
 		return

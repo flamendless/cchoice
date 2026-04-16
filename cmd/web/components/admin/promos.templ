@@ -4,8 +4,8 @@ import (
 	"cchoice/cmd/web/components/common"
 	"cchoice/cmd/web/components/header"
 	"cchoice/cmd/web/models"
-	"cchoice/internal/utils"
 	"cchoice/internal/enums"
+	"cchoice/internal/utils"
 )
 
 templ AdminPromosListPage(title string) {
@@ -34,6 +34,7 @@ templ AdminPromosListPage(title string) {
 			</div>
 			<div id="promo-create-modal-container"></div>
 			<div id="promo-edit-modal-container"></div>
+			@ScrImagePreview()
 		</body>
 	</html>
 }
@@ -172,7 +173,7 @@ templ PromoMediaLink(url string, mediaType enums.PromoType) {
 		</a>
 	} else if mediaType == enums.PROMO_TYPE_BANNER_IMAGE {
 		<a
-			href={ utils.URL(url) }
+			href={ templ.URL(url) }
 			target="_blank"
 			rel="noopener noreferrer"
 			class="text-cchoice hover:underline flex items-center gap-1"
@@ -216,7 +217,7 @@ templ PromoCreateModal() {
 		"
 	>
 		<div class="absolute inset-0 bg-black/50" _="on click trigger closeModal"></div>
-		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 overflow-y-auto max-h-[90vh]">
 			<div class="flex justify-between items-center mb-4">
 				<h2 class="text-xl font-semibold text-gray-900">Create Promo</h2>
 				<button
@@ -298,24 +299,33 @@ templ PromoCreateForm() {
 				name="type"
 				required
 				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
-				onchange=" toggleMediaInput(this.value)"
+				onchange="toggleMediaInput(this.value)"
 			>
 				for _, pt := range enums.AllPromoTypes {
 					<option value={ pt.String() }>{ pt.String() }</option>
 				}
 			</select>
 		</div>
-		<div id="media_upload_field">
-			<label class="block text-sm font-medium text-gray-700 mb-1">
-				Media File <span class="text-red-500">*</span>
-			</label>
-			<input
-				type="file"
-				name="media_file"
-				accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
-				class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cchoice file:text-white hover:file:bg-cchoicedark"
-			/>
-			<p class="mt-1 text-xs text-gray-500">Max file size: 10MB. Allowed: JPEG, PNG, WebP, MP4, WebM</p>
+		<div id="media_upload_field" class="flex flex-col gap-4">
+			<div>
+				<label class="block text-sm font-medium text-gray-700 mb-1">
+					Media File <span class="text-red-500">*</span>
+				</label>
+				<input
+					type="file"
+					name="media_file"
+					accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
+					class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cchoice file:text-white hover:file:bg-cchoicedark"
+					oninput="handlePromoImagePreview(this)"
+				/>
+				<p class="mt-1 text-xs text-gray-500">Max file size: 10MB. Allowed: JPEG, PNG, WebP, MP4, WebM</p>
+			</div>
+			<div id="promo-image-preview" class="hidden">
+				<img
+					src=""
+					class="h-32 w-full object-contain rounded border border-gray-200"
+				/>
+			</div>
 		</div>
 		<div id="media_url_field" class="hidden">
 			<label class="block text-sm font-medium text-gray-700 mb-1">
@@ -333,7 +343,6 @@ templ PromoCreateForm() {
 			function toggleMediaInput(promoType) {
 				const urlField = document.getElementById('media_url_field');
 				const uploadField = document.getElementById('media_upload_field');
-				console.log(promotype)
 				if (promoType === 'BANNER_VIDEO') {
 					urlField.classList.remove('hidden');
 					uploadField.classList.add('hidden');
@@ -375,7 +384,7 @@ templ PromoEditModal(promo models.AdminPromoListItem) {
 		"
 	>
 		<div class="absolute inset-0 bg-black/50" _="on click trigger closeModal"></div>
-		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 overflow-y-auto max-h-[90vh]">
 			<div class="flex justify-between items-center mb-4">
 				<h2 class="text-xl font-semibold text-gray-900">Edit Promo</h2>
 				<button
@@ -435,7 +444,7 @@ templ PromoEditForm(promo models.AdminPromoListItem) {
 				name="type"
 				required
 				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
-				hx-on="change:toggleEditMediaInput(this.value)"
+				onchange="toggleEditMediaInput(this.value)"
 			>
 				for _, pt := range enums.AllPromoTypes {
 					<option value={ pt.String() } selected?={ promo.Type == pt }>{ pt.String() }</option>
@@ -443,18 +452,26 @@ templ PromoEditForm(promo models.AdminPromoListItem) {
 			</select>
 		</div>
 		if promo.Type == enums.PROMO_TYPE_BANNER_IMAGE {
-			<div id="edit_media_upload_field">
-				<label class="block text-sm font-medium text-gray-700 mb-1">
-					Media File
-				</label>
-				<input
-					type="file"
-					name="media_file"
-					accept="image/jpeg,image/png,image/webp"
-					class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cchoice file:text-white hover:file:bg-cchoicedark"
-				/>
-				<p class="mt-1 text-xs text-gray-500">Leave empty to keep current. Allowed: JPEG, PNG, WebP</p>
-				<p class="mt-1 text-xs text-gray-500">Current: { promo.MediaURL }</p>
+			<div id="edit_media_upload_field" class="flex flex-col gap-4">
+				<div>
+					<label class="block text-sm font-medium text-gray-700 mb-1">
+						Media File
+					</label>
+					<input
+						type="file"
+						name="media_file"
+						accept="image/jpeg,image/png,image/webp"
+						class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cchoice file:text-white hover:file:bg-cchoicedark"
+						oninput="handlePromoImagePreview(this)"
+					/>
+					<p class="mt-1 text-xs text-gray-500">Leave empty to keep current. Allowed: JPEG, PNG, WebP</p>
+				</div>
+				<div id="promo-image-preview">
+					<img
+						src={ promo.MediaURL }
+						class="h-32 w-full object-contain rounded border border-gray-200"
+					/>
+				</div>
 			</div>
 		} else if promo.Type == enums.PROMO_TYPE_BANNER_VIDEO {
 			<div id="edit_media_url_field">
@@ -468,6 +485,22 @@ templ PromoEditForm(promo models.AdminPromoListItem) {
 					required
 					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
 				/>
+				<p class="mt-1 text-xs text-gray-500">Provide YouTube video URL</p>
+				if promo.MediaURL != "" {
+					<div class="mt-2">
+						<a
+							href={ templ.URL(promo.MediaURL) }
+							target="_blank"
+							rel="noopener noreferrer"
+							class="inline-flex items-center gap-2 px-3 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+							</svg>
+							Open Video
+						</a>
+					</div>
+				}
 			</div>
 		}
 		<script>

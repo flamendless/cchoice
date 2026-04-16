@@ -35,7 +35,7 @@ templ AdminBrandsListPage(title string) {
 			</div>
 			<div id="brand-create-modal-container"></div>
 			<div id="brand-edit-modal-container"></div>
-			@ScrBrandImageUpload()
+			@ScrImagePreview()
 		</body>
 	</html>
 }
@@ -100,7 +100,7 @@ templ BrandCreateModal() {
 			class="absolute inset-0 bg-black/50"
 			_="on click trigger closeModal"
 		></div>
-		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 overflow-y-auto max-h-[90vh]">
 			<div class="flex justify-between items-center mb-4">
 				<h2 class="text-xl font-semibold text-gray-900">Create Brand</h2>
 				<button
@@ -148,7 +148,7 @@ templ BrandCreateForm() {
 				name="logo"
 				accept="image/jpeg,image/png,image/webp"
 				class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cchoice file:text-white hover:file:bg-cchoicedark"
-				oninput="handleLogoPreview(this)"
+				oninput="handleImagePreview(this)"
 			/>
 			<p class="mt-1 text-xs text-gray-500">Max file size: 10MB. Allowed: JPEG, PNG, WebP</p>
 			<div class="mt-2">
@@ -285,7 +285,7 @@ templ BrandEditModal(brand models.AdminBrandListItem) {
 			class="absolute inset-0 bg-black/50"
 			_="on click trigger closeModal"
 		></div>
-		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 overflow-y-auto max-h-[90vh]">
 			<div class="flex justify-between items-center mb-4">
 				<h2 class="text-xl font-semibold text-gray-900">Edit Brand</h2>
 				<button
@@ -353,7 +353,7 @@ templ BrandEditForm(brand models.AdminBrandListItem) {
 				name="logo"
 				accept="image/jpeg,image/png,image/webp"
 				class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cchoice file:text-white hover:file:bg-cchoicedark"
-				oninput="handleLogoPreview(this)"
+				oninput="handleImagePreview(this)"
 			/>
 			<p class="mt-1 text-xs text-gray-500">Max file size: 10MB. Allowed: JPEG, PNG, WebP</p>
 		</div>
