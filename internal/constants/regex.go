@@ -29,6 +29,13 @@ var (
 	RePostalCode     = regexp.MustCompile(`^` + PatternPostalCode + `$`)
 )
 
+var YoutubePatterns = []*regexp.Regexp{
+	regexp.MustCompile(`(?:https?://)?(?:www\.)?youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})`),
+	regexp.MustCompile(`(?:https?://)?(?:www\.)?youtu\.be/([a-zA-Z0-9_-]{11})`),
+	regexp.MustCompile(`(?:https?://)?(?:www\.)?youtube\.com/embed/([a-zA-Z0-9_-]{11})`),
+	regexp.MustCompile(`(?:https?://)?(?:www\.)?youtube\.com/v/([a-zA-Z0-9_-]{11})`),
+}
+
 func ToPath1280(path string) string {
 	return ReSize.ReplaceAllString(path, Pattern1280)
 }

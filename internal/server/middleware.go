@@ -31,10 +31,12 @@ func SecurityHeadersMiddleware(next http.Handler) http.Handler {
 			"font-src 'self' data: fonts.googleapis.com fonts.gstatic.com; " +
 			"object-src 'none'; " +
 			"media-src 'self'; " +
+			"frame-src https://www.youtube.com https://www.youtube-nocookie.com; " +
 			"frame-ancestors 'none'; " +
 			"base-uri 'self'; " +
 			"form-action 'self'; " +
 			"upgrade-insecure-requests;"
+
 		w.Header().Set("Content-Security-Policy", csp)
 
 		permissions := "accelerometer=(), " +

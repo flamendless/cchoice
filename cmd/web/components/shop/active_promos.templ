@@ -3,23 +3,35 @@ package shop
 import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/enums"
+	"cchoice/internal/utils"
 )
 
 templ ActivePromosSection(promos []models.PromoItem) {
 	<div class="w-full px-4 py-6">
 		<div class="flex flex-col lg:flex-row gap-4">
 			for _, promo := range promos {
-				<div class="w-full lg:w-1/2 overflow-hidden rounded-lg shadow-md bg-cchoicesoft">
+				<div class="flex flex-col justify-center w-full lg:w-1/2 overflow-hidden rounded-lg shadow-md bg-cchoicesoft">
 					switch promo.Type {
 					case enums.PROMO_TYPE_BANNER_VIDEO:
-						<video
-							class="w-full h-auto object-cover"
-							src={ promo.MediaURL }
-							autoplay
-							loop
-							muted
-							playsinline
-						></video>
+						if utils.IsYouTubeURL(promo.MediaURL) {
+							<iframe
+								class="w-full aspect-video"
+								src={ templ.URL(utils.ConvertYouTubeToEmbed(promo.MediaURL)) }
+								title={ promo.Title }
+								frameborder="0"
+								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen
+							></iframe>
+						} else {
+							<video
+								class="w-full h-auto object-cover"
+								src={ promo.MediaURL }
+								autoplay
+								loop
+								muted
+								playsinline
+							></video>
+						}
 					case enums.PROMO_TYPE_BANNER_IMAGE:
 						<img
 							class="w-full h-auto object-cover"

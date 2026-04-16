@@ -325,10 +325,10 @@ templ PromoCreateForm() {
 			<input
 				type="url"
 				name="media_url"
-				placeholder="https://youtube.com/watch"
+				placeholder="https://youtube.com/watch?v=..."
 				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
 			/>
-			<p class="mt-1 text-xs text-gray-500">Provide video URL</p>
+			<p class="mt-1 text-xs text-gray-500">Provide video URL or YouTube link</p>
 		</div>
 		<script>
 			function toggleMediaInput(promoType) {
@@ -492,7 +492,7 @@ templ PromoEditForm(promo models.AdminPromoListItem) {
 					required
 					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
 				/>
-				<p class="mt-1 text-xs text-gray-500">Provide YouTube video URL</p>
+				<p class="mt-1 text-xs text-gray-500">Provide video URL or YouTube link</p>
 				if promo.MediaURL != "" {
 					<div class="mt-2">
 						<a
