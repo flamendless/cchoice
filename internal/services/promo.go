@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	"cchoice/internal/constants"
@@ -88,7 +89,7 @@ func (s *PromoService) CreatePromo(
 	startDate time.Time,
 	endDate time.Time,
 	promoType enums.PromoType,
-) (int64, error) {
+) (string, error) {
 	result := "success"
 	defer func() {
 		if err := s.staffLog.CreateLog(
@@ -113,16 +114,18 @@ func (s *PromoService) CreatePromo(
 	})
 	if err != nil {
 		result = err.Error()
-		return 0, errors.Join(errs.ErrPromo, err)
+		return "", errors.Join(errs.ErrPromo, err)
 	}
 
-	return id, nil
+	promoID := s.encoder.Encode(id)
+	result = fmt.Sprintf("success. ID '%s'", promoID)
+	return promoID, nil
 }
 
 func (s *PromoService) UpdatePromo(
 	ctx context.Context,
 	staffID string,
-	id int64,
+	promoID string,
 	title string,
 	description string,
 	mediaURL string,
@@ -145,7 +148,12 @@ func (s *PromoService) UpdatePromo(
 		}
 	}()
 
-	err := s.dbRW.GetQueries().UpdatePromo(ctx, queries.UpdatePromoParams{
+	id := s.encoder.Decode(promoID)
+	if id == encode.INVALID {
+		return errs.ErrDecode
+	}
+
+	if err := s.dbRW.GetQueries().UpdatePromo(ctx, queries.UpdatePromoParams{
 		Title:       title,
 		Description: description,
 		MediaUrl:    mediaURL,
@@ -154,16 +162,16 @@ func (s *PromoService) UpdatePromo(
 		Type:        promoType.String(),
 		Status:      promoStatus.String(),
 		ID:          id,
-	})
-	if err != nil {
+	}); err != nil {
 		result = err.Error()
 		return errors.Join(errs.ErrPromo, err)
 	}
 
+	result = fmt.Sprintf("success. ID '%s'", promoID)
 	return nil
 }
 
-func (s *PromoService) DeletePromo(ctx context.Context, staffID string, id int64) error {
+func (s *PromoService) DeletePromo(ctx context.Context, staffID string, promoID string) error {
 	result := "success"
 	defer func() {
 		if err := s.staffLog.CreateLog(
@@ -178,12 +186,17 @@ func (s *PromoService) DeletePromo(ctx context.Context, staffID string, id int64
 		}
 	}()
 
-	err := s.dbRW.GetQueries().SoftDeletePromo(ctx, id)
-	if err != nil {
+	id := s.encoder.Decode(promoID)
+	if id == encode.INVALID {
+		return errs.ErrDecode
+	}
+
+	if err := s.dbRW.GetQueries().SoftDeletePromo(ctx, id); err != nil {
 		result = err.Error()
 		return errors.Join(errs.ErrPromo, err)
 	}
 
+	result = fmt.Sprintf("success. ID '%s'", promoID)
 	return nil
 }
 

@@ -9,7 +9,7 @@ import "fmt"
 import "cchoice/internal/services"
 
 var scrProductImageUpload = templ.NewOnceHandle()
-var scrBrandImageUpload = templ.NewOnceHandle()
+var scrImagePreview = templ.NewOnceHandle()
 
 templ ScrProductImageUpload() {
 	@scrProductImageUpload.Once() {
@@ -18,9 +18,9 @@ templ ScrProductImageUpload() {
 	}
 }
 
-templ ScrBrandImageUpload() {
-	@scrBrandImageUpload.Once() {
-		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/brand_image_upload.js")) }>
+templ ScrImagePreview() {
+	@scrImagePreview.Once() {
+		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/image_preview.js")) }>
 		</script>
 	}
 }

@@ -257,6 +257,9 @@ go run -tags="fts5,staticfs" ./main.go
 ### Queries
 - instead of passing updated at values from go -> sql, define the updated_at = NOW in sqlc code
 
+### Services
+- always accept and return ids as strings and do decode/encode in the service
+
 ### More
 - Use recommendations by `modernize` tools with go 1.26 and above as basis
 
@@ -272,6 +275,7 @@ cchoice/
 │   └── parse_map/
 ├── internal/       # Internal packages
 │   ├── services/   # Business logic
+
 │   ├── database/  # DB service and queries
 │   ├── utils/     # Utility functions
 │   ├── httputil/  # HTTP utilities
@@ -310,3 +314,7 @@ cchoice/
 - air for hot reload
 
 For `.env` setup, copy `.env.sample` to `.env` and fill in values.
+
+---
+
+DO NOT RUN `mage sc` and `mage scf` and `mage dbup` and `mage dbdown`
