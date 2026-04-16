@@ -4,7 +4,7 @@ import "regexp"
 
 const (
 	Pattern1280           = `/1280x1280/`
-	PatternPassword       = `[a-zA-Z0-9\-_.?#@]+`
+	PatternPassword       = `[a-zA-Z0-9\-_.?#@]{8,32}`
 	PatternEmail          = `[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}`
 	PatternName           = `[a-zA-Z\s\-]+`
 	PatternMobileNumberFE = `[0-9]{10}`

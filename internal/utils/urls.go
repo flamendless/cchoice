@@ -21,12 +21,7 @@ func URLf(path string, args ...any) string {
 	return URL(fmt.Sprintf(path, args...))
 }
 
-func URLWithSuccess(path string, message string) string {
-	message = url.QueryEscape(message)
-	return URL(fmt.Sprintf("%s?success=%s", path, message))
-}
-
-func URLWithSuccessParams(path string, params map[string]string) string {
+func URLWithParams(path string, params map[string]string) string {
 	base := path
 	hasQuery := false
 	for k, v := range params {
@@ -38,6 +33,11 @@ func URLWithSuccessParams(path string, params map[string]string) string {
 		hasQuery = true
 	}
 	return URL(base)
+}
+
+func URLWithSuccess(path string, message string) string {
+	message = url.QueryEscape(message)
+	return URL(fmt.Sprintf("%s?success=%s", path, message))
 }
 
 func URLWithError(path string, message string) string {

@@ -48,36 +48,73 @@ func (s *Server) forgotPasswordHandler(w http.ResponseWriter, r *http.Request) {
 	const page = "/auth/forgot-password"
 	ctx := r.Context()
 
+	userTypeStr := r.PostFormValue("user_type")
 	if err := r.ParseForm(); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		redirectHX(w, r, utils.URLWithParams(
+			page,
+			map[string]string{
+				"error": err.Error(),
+				"type":  userTypeStr,
+			},
+		))
 		return
 	}
 
 	email := r.PostFormValue("email")
 	if !constants.ReEmail.MatchString(email) {
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
+		redirectHX(w, r, utils.URLWithParams(
+			page,
+			map[string]string{
+				"error": errs.ErrInvalidParams.Error(),
+				"type":  userTypeStr,
+			},
+		))
 		return
 	}
 
-	userTypeStr := r.PostFormValue("user_type")
 	userType := enums.ParseUserTypeToEnum(userTypeStr)
 	if !userType.IsValid() {
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
+		redirectHX(w, r, utils.URLWithParams(
+			page,
+			map[string]string{
+				"error": errs.ErrInvalidParams.Error(),
+				"type":  userTypeStr,
+			},
+		))
 		return
 	}
 
 	if err := s.services.passwordReset.RequestReset(ctx, email, userType); err != nil {
 		if err == errs.ErrPasswordResetRateLimited {
-			redirectHX(w, r, utils.URLWithError(page, errs.ErrPasswordResetRateLimited.Error()))
+			redirectHX(w, r, utils.URLWithParams(
+				page,
+				map[string]string{
+					"error": errs.ErrPasswordResetRateLimited.Error(),
+					"type":  userTypeStr,
+				},
+			))
 			return
 		}
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		redirectHX(w, r, utils.URLWithParams(
+			page,
+			map[string]string{
+				"error": err.Error(),
+				"type":  userTypeStr,
+			},
+		))
 		return
 	}
 
 	redirectHX(w, r, utils.URLWithSuccess(page, "Check your e-mail"))
+	redirectHX(w, r, utils.URLWithParams(
+		page,
+		map[string]string{
+			"success": "Check your e-mail",
+			"type":    userTypeStr,
+		},
+	))
 }
 
 func (s *Server) resetPasswordPageHandler(w http.ResponseWriter, r *http.Request) {
