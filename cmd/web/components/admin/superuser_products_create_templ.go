@@ -11,12 +11,12 @@ import templruntime "github.com/a-h/templ/runtime"
 import "fmt"
 
 import "cchoice/cmd/web/models"
-import "cchoice/internal/utils"
+import "cchoice/internal/constants"
 import "cchoice/internal/enums"
+import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/components/svg"
 import "cchoice/cmd/web/components/header"
-import "cchoice/internal/constants"
 
 func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -242,20 +242,36 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div><div class=\"md:col-span-2\"><label for=\"spec_scope_of_supply\" class=\"block text-sm font-medium text-gray-700 mb-1\">Scope of Supply <span class=\"text-red-500\">*</span></label> <textarea id=\"spec_scope_of_supply\" name=\"spec_scope_of_supply\" required rows=\"3\" maxlength=\"1000\" placeholder=\"List items included in the package\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></textarea></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Image</h2><div><label for=\"product_image\" class=\"block text-sm font-medium text-gray-700 mb-1\">Product Image <span class=\"text-red-500\">*</span></label> <input type=\"file\" id=\"product_image\" name=\"product_image\" accept=\"image/jpeg,image/png,image/webp,image/gif\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" required><p class=\"text-xs text-gray-500 mt-1\">Allowed formats: JPEG, PNG, WebP, GIF. Max size: 10MB.</p><div id=\"image-preview-container\" class=\"hidden mt-2 p-2 border border-gray-200 rounded-md bg-gray-50\"><img id=\"product-image-preview\" src=\"\" alt=\"Product image preview\" class=\"max-w-xs max-h-48 object-contain mx-auto\"></div></div></div><div class=\"flex justify-end gap-4 pt-4 border-t\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div><div class=\"md:col-span-2\"><label for=\"spec_scope_of_supply\" class=\"block text-sm font-medium text-gray-700 mb-1\">Scope of Supply <span class=\"text-red-500\">*</span></label> <textarea id=\"spec_scope_of_supply\" name=\"spec_scope_of_supply\" required rows=\"3\" maxlength=\"1000\" placeholder=\"List items included in the package\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></textarea></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Image</h2>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ImageUploadField(ImageUploadParams{
+			Name:         "product_image",
+			Label:        "Product Image",
+			Accept:       "image/jpeg,image/png,image/webp,image/gif",
+			MaxSize:      constants.MaxSizeImageUpload,
+			PreviewClass: "max-w-xs max-h-48 object-contain mx-auto",
+			Required:     true,
+			HelpText:     "Allowed formats: JPEG, PNG, WebP, GIF. Max size: 10MB.",
+		}).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div><div class=\"flex justify-end gap-4 pt-4 border-t\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var13 templ.SafeURL
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 336, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_create.templ`, Line: 321, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" id=\"submit-btn\" class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice disabled:opacity-50 disabled:cursor-not-allowed\" _=\"on click call metrics_event('admin_exec', 'create product')\"><span id=\"submit-btn-content\" class=\"flex items-center gap-2\"><span class=\"submit-btn-text\">Create Product</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" id=\"submit-btn\" class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice disabled:opacity-50 disabled:cursor-not-allowed\" _=\"on click call metrics_event('admin_exec', 'create product')\"><span id=\"submit-btn-content\" class=\"flex items-center gap-2\"><span class=\"submit-btn-text\">Create Product</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -263,15 +279,15 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</span></button></div></form></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</span></button></div></form></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ScrProductImageUpload().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ScrImageUpload().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

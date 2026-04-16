@@ -12,6 +12,7 @@ import (
 	"cchoice/cmd/web/components/common"
 	"cchoice/cmd/web/components/header"
 	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/utils"
 )
@@ -81,7 +82,7 @@ func AdminPromosListPage(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ScrImagePreview().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ScrImageUpload().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -121,7 +122,7 @@ func PromosListSection() templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/promos/table"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 45, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 46, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -171,7 +172,7 @@ func PromosToolbar() templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/promos/create"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 60, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 61, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -224,7 +225,7 @@ func AdminPromosListTable(promos []models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs("promo-row-" + promo.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 106, Col: 38}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 107, Col: 38}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -237,7 +238,7 @@ func AdminPromosListTable(promos []models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(promo.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 108, Col: 21}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 109, Col: 21}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -258,7 +259,7 @@ func AdminPromosListTable(promos []models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(promo.StartDate)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 114, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 115, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -271,7 +272,7 @@ func AdminPromosListTable(promos []models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(promo.EndDate)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 114, Col: 45}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 115, Col: 45}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -284,7 +285,7 @@ func AdminPromosListTable(promos []models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(promo.Type)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 117, Col: 20}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 118, Col: 20}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -305,7 +306,7 @@ func AdminPromosListTable(promos []models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(promo.CreatedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 123, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 124, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -361,7 +362,7 @@ func PromoActionsCell(promo models.AdminPromoListItem) templ.Component {
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URLf("/admin/promos/%s/edit", promo.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 141, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 142, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -374,7 +375,7 @@ func PromoActionsCell(promo models.AdminPromoListItem) templ.Component {
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URLf("/admin/promos/%s", promo.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 150, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 151, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
@@ -387,7 +388,7 @@ func PromoActionsCell(promo models.AdminPromoListItem) templ.Component {
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs("#promo-row-" + promo.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 151, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 152, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
@@ -430,7 +431,7 @@ func PromoMediaLink(url string, mediaType enums.PromoType) templ.Component {
 			var templ_7745c5c3_Var18 templ.SafeURL
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(url))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 163, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 164, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
@@ -448,7 +449,7 @@ func PromoMediaLink(url string, mediaType enums.PromoType) templ.Component {
 			var templ_7745c5c3_Var19 templ.SafeURL
 			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(url))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 176, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 177, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 			if templ_7745c5c3_Err != nil {
@@ -493,7 +494,7 @@ func PromoStatusBadge(status enums.PromoStatus) templ.Component {
 			var templ_7745c5c3_Var21 string
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 193, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 194, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {
@@ -511,7 +512,7 @@ func PromoStatusBadge(status enums.PromoStatus) templ.Component {
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 197, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 198, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -529,7 +530,7 @@ func PromoStatusBadge(status enums.PromoStatus) templ.Component {
 			var templ_7745c5c3_Var23 string
 			templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 201, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 202, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 			if templ_7745c5c3_Err != nil {
@@ -547,7 +548,7 @@ func PromoStatusBadge(status enums.PromoStatus) templ.Component {
 			var templ_7745c5c3_Var24 string
 			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 205, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 206, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 			if templ_7745c5c3_Err != nil {
@@ -627,7 +628,7 @@ func PromoCreateForm() templ.Component {
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/promos"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 241, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 242, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
@@ -645,7 +646,7 @@ func PromoCreateForm() templ.Component {
 			var templ_7745c5c3_Var28 string
 			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(pt.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 305, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 306, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 			if templ_7745c5c3_Err != nil {
@@ -658,7 +659,7 @@ func PromoCreateForm() templ.Component {
 			var templ_7745c5c3_Var29 string
 			templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(pt.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 305, Col: 48}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 306, Col: 48}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 			if templ_7745c5c3_Err != nil {
@@ -669,7 +670,23 @@ func PromoCreateForm() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</select></div><div id=\"media_upload_field\" class=\"flex flex-col gap-4\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Media File <span class=\"text-red-500\">*</span></label> <input type=\"file\" name=\"media_file\" accept=\"image/jpeg,image/png,image/webp,video/mp4,video/webm\" class=\"mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cchoice file:text-white hover:file:bg-cchoicedark\" oninput=\"handlePromoImagePreview(this)\"><p class=\"mt-1 text-xs text-gray-500\">Max file size: 10MB. Allowed: JPEG, PNG, WebP, MP4, WebM</p></div><div id=\"promo-image-preview\" class=\"hidden\"><img src=\"\" class=\"h-32 w-full object-contain rounded border border-gray-200\"></div></div><div id=\"media_url_field\" class=\"hidden\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Media URL <span class=\"text-red-500\">*</span></label> <input type=\"url\" name=\"media_url\" placeholder=\"https://youtube.com/watch\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"><p class=\"mt-1 text-xs text-gray-500\">Provide video URL</p></div><script>\n\t\t\tfunction toggleMediaInput(promoType) {\n\t\t\t\tconst urlField = document.getElementById('media_url_field');\n\t\t\t\tconst uploadField = document.getElementById('media_upload_field');\n\t\t\t\tif (promoType === 'BANNER_VIDEO') {\n\t\t\t\t\turlField.classList.remove('hidden');\n\t\t\t\t\tuploadField.classList.add('hidden');\n\t\t\t\t\turlField.querySelector('input').setAttribute('required', 'true');\n\t\t\t\t\tuploadField.querySelector('input').removeAttribute('required');\n\t\t\t\t} else {\n\t\t\t\t\turlField.classList.add('hidden');\n\t\t\t\t\tuploadField.classList.remove('hidden');\n\t\t\t\t\turlField.querySelector('input').removeAttribute('required');\n\t\t\t\t\tuploadField.querySelector('input').setAttribute('required', 'true');\n\t\t\t\t}\n\t\t\t}\n\t\t</script><div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm\">Create</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</select></div><div id=\"media_upload_field\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ImageUploadField(ImageUploadParams{
+			Name:         "media_file",
+			Label:        "Media File",
+			Accept:       "image/jpeg,image/png,image/webp",
+			MaxSize:      constants.MaxSizeImageUpload,
+			PreviewClass: "h-32 w-full object-contain rounded border border-gray-200",
+			Required:     true,
+			HelpText:     "Max file size: 10MB. Allowed: JPEG, PNG, WebP",
+		}).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</div><div id=\"media_url_field\" class=\"hidden\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Media URL <span class=\"text-red-500\">*</span></label> <input type=\"url\" name=\"media_url\" placeholder=\"https://youtube.com/watch\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"><p class=\"mt-1 text-xs text-gray-500\">Provide video URL</p></div><script>\n\t\t\tfunction toggleMediaInput(promoType) {\n\t\t\t\tconst urlField = document.getElementById('media_url_field');\n\t\t\t\tconst uploadField = document.getElementById('media_upload_field');\n\t\t\t\tif (promoType === 'BANNER_VIDEO') {\n\t\t\t\t\turlField.classList.remove('hidden');\n\t\t\t\t\tuploadField.classList.add('hidden');\n\t\t\t\t\turlField.querySelector('input').setAttribute('required', 'true');\n\t\t\t\t\tuploadField.querySelector('input').removeAttribute('required');\n\t\t\t\t} else {\n\t\t\t\t\turlField.classList.add('hidden');\n\t\t\t\t\tuploadField.classList.remove('hidden');\n\t\t\t\t\turlField.querySelector('input').removeAttribute('required');\n\t\t\t\t\tuploadField.querySelector('input').setAttribute('required', 'true');\n\t\t\t\t}\n\t\t\t}\n\t\t</script><div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm\">Create</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -698,7 +715,7 @@ func PromoEditModal(promo models.AdminPromoListItem) templ.Component {
 			templ_7745c5c3_Var30 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<div id=\"promo-edit-modal\" class=\"fixed inset-0 z-50 flex items-center justify-center\" _=\"\n\t\t\ton closeModal\n\t\t\t\tset #promo-edit-modal-container.innerHTML to ''\n\t\t\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 overflow-y-auto max-h-[90vh]\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">Edit Promo</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<div id=\"promo-edit-modal\" class=\"fixed inset-0 z-50 flex items-center justify-center\" _=\"\n\t\t\ton closeModal\n\t\t\t\tset #promo-edit-modal-container.innerHTML to ''\n\t\t\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 overflow-y-auto max-h-[90vh]\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">Edit Promo</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -706,7 +723,7 @@ func PromoEditModal(promo models.AdminPromoListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -735,215 +752,218 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 			templ_7745c5c3_Var31 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "<form enctype=\"multipart/form-data\" hx-patch=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "<form enctype=\"multipart/form-data\" hx-patch=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var32 string
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URLf("/admin/promos/%s", promo.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 408, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 399, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\" hx-swap=\"outerHTML\" class=\"flex flex-col gap-4\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('promo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/promos/table', { target: '#promos-table', swap: 'innerHTML' }) }\"><div class=\"hidden\"><input type=\"text\" name=\"id\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "\" hx-swap=\"outerHTML\" class=\"flex flex-col gap-4\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('promo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/promos/table', { target: '#promos-table', swap: 'innerHTML' }) }\"><div class=\"hidden\"><input type=\"text\" name=\"id\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var33 string
 		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(promo.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 414, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 405, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Title <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"title\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Title <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"title\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var34 string
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(promo.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 423, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 414, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Description <span class=\"text-red-500\">*</span></label> <textarea name=\"description\" required rows=\"3\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Description <span class=\"text-red-500\">*</span></label> <textarea name=\"description\" required rows=\"3\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var35 string
 		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(promo.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 437, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 428, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "</textarea></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Type <span class=\"text-red-500\">*</span></label> <select name=\"type\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\" onchange=\"toggleEditMediaInput(this.value)\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</textarea></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Type <span class=\"text-red-500\">*</span></label> <select name=\"type\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\" onchange=\"toggleEditMediaInput(this.value)\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, pt := range enums.AllPromoTypes {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "<option value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var36 string
 			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(pt.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 450, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 441, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if promo.Type == pt {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, " selected")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, " selected")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, ">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, ">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var37 string
 			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(pt.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 450, Col: 79}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 441, Col: 79}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</option>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</option>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</select></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if promo.Type == enums.PROMO_TYPE_BANNER_IMAGE {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<div id=\"edit_media_upload_field\" class=\"flex flex-col gap-4\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Media File</label> <input type=\"file\" name=\"media_file\" accept=\"image/jpeg,image/png,image/webp\" class=\"mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cchoice file:text-white hover:file:bg-cchoicedark\" oninput=\"handlePromoImagePreview(this)\"><p class=\"mt-1 text-xs text-gray-500\">Leave empty to keep current. Allowed: JPEG, PNG, WebP</p></div><div id=\"promo-image-preview\"><img src=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<div id=\"edit_media_upload_field\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = ImageUploadField(ImageUploadParams{
+				Name:         "media_file",
+				Label:        "Media File",
+				Accept:       "image/jpeg,image/png,image/webp",
+				MaxSize:      constants.MaxSizeImageUpload,
+				ExistingURL:  promo.MediaURL,
+				PreviewClass: "h-32 w-full object-contain rounded border border-gray-200",
+				HelpText:     "Leave empty to keep current. Allowed: JPEG, PNG, WebP",
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else if promo.Type == enums.PROMO_TYPE_BANNER_VIDEO {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "<div id=\"edit_media_url_field\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Media URL <span class=\"text-red-500\">*</span></label> <input type=\"url\" name=\"media_url\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var38 string
 			templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(promo.MediaURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 471, Col: 26}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 465, Col: 27}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "\" class=\"h-32 w-full object-contain rounded border border-gray-200\"></div></div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else if promo.Type == enums.PROMO_TYPE_BANNER_VIDEO {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "<div id=\"edit_media_url_field\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Media URL <span class=\"text-red-500\">*</span></label> <input type=\"url\" name=\"media_url\" value=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var39 string
-			templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(promo.MediaURL)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 484, Col: 27}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"><p class=\"mt-1 text-xs text-gray-500\">Provide YouTube video URL</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"><p class=\"mt-1 text-xs text-gray-500\">Provide YouTube video URL</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if promo.MediaURL != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "<div class=\"mt-2\"><a href=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "<div class=\"mt-2\"><a href=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var40 templ.SafeURL
-				templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(promo.MediaURL))
+				var templ_7745c5c3_Var39 templ.SafeURL
+				templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(promo.MediaURL))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 492, Col: 39}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 473, Col: 39}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"inline-flex items-center gap-2 px-3 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14\"></path></svg> Open Video</a></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"inline-flex items-center gap-2 px-3 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14\"></path></svg> Open Video</a></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "<script>\n\t\t\tfunction toggleEditMediaInput(newType) {\n\t\t\t\tconst urlField = document.getElementById('edit_media_url_field');\n\t\t\t\tconst uploadField = document.getElementById('edit_media_upload_field');\n\t\t\t\tif (newType === 'BANNER_VIDEO') {\n\t\t\t\t\tif (urlField) urlField.classList.remove('hidden');\n\t\t\t\t\tif (uploadField) uploadField.classList.add('hidden');\n\t\t\t\t} else {\n\t\t\t\t\tif (urlField) urlField.classList.add('hidden');\n\t\t\t\t\tif (uploadField) uploadField.classList.remove('hidden');\n\t\t\t\t}\n\t\t\t}\n\t\t</script><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Status <span class=\"text-red-500\">*</span></label> <select name=\"status\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "<script>\n\t\t\tfunction toggleEditMediaInput(newType) {\n\t\t\t\tconst urlField = document.getElementById('edit_media_url_field');\n\t\t\t\tconst uploadField = document.getElementById('edit_media_upload_field');\n\t\t\t\tif (newType === 'BANNER_VIDEO') {\n\t\t\t\t\tif (urlField) urlField.classList.remove('hidden');\n\t\t\t\t\tif (uploadField) uploadField.classList.add('hidden');\n\t\t\t\t} else {\n\t\t\t\t\tif (urlField) urlField.classList.add('hidden');\n\t\t\t\t\tif (uploadField) uploadField.classList.remove('hidden');\n\t\t\t\t}\n\t\t\t}\n\t\t</script><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Status <span class=\"text-red-500\">*</span></label> <select name=\"status\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, ps := range enums.AllPromoStatuses {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "<option value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "<option value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var40 string
+			templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(ps.String())
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 510, Col: 32}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if promo.Status == ps {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, " selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, ">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var41 string
 			templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(ps.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 529, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 510, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			if promo.Status == ps {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, " selected")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, ">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var42 string
-			templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(ps.String())
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 529, Col: 81}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "</option>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "</option>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "</select></div><div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm\">Save</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "</select></div><div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm\">Save</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -1,0 +1,66 @@
+package components
+
+import (
+	"strconv"
+
+	"cchoice/internal/utils"
+)
+
+var scrImageUpload = templ.NewOnceHandle()
+
+templ ScrImageUpload() {
+	@scrImageUpload.Once() {
+		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/image_upload.js")) }>
+		</script>
+	}
+}
+
+type ImageUploadParams struct {
+	Name         string
+	Label        string
+	Accept       string
+	MaxSize      int64
+	ExistingURL  string
+	PreviewClass string
+	Required     bool
+	HelpText     string
+}
+
+templ ImageUploadField(params ImageUploadParams) {
+	<div>
+		<label class="block text-sm font-medium text-gray-700 mb-1">
+			{ params.Label }
+			if params.Required {
+				<span class="text-red-500">*</span>
+			}
+		</label>
+		<input
+			type="file"
+			name={ params.Name }
+			accept={ params.Accept }
+			class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cchoice file:text-white hover:file:bg-cchoicedark"
+			data-upload-preview
+			data-max-size={ strconv.FormatInt(params.MaxSize, 10) }
+		/>
+		if params.HelpText != "" {
+			<p class="mt-1 text-xs text-gray-500">{ params.HelpText }</p>
+		}
+		if params.ExistingURL != "" {
+			<div data-upload-preview-container class="mt-2">
+				<img
+					data-upload-preview-image
+					src={ params.ExistingURL }
+					class={ params.PreviewClass }
+				/>
+			</div>
+		} else {
+			<div data-upload-preview-container class="hidden mt-2">
+				<img
+					data-upload-preview-image
+					src=""
+					class={ params.PreviewClass }
+				/>
+			</div>
+		}
+	</div>
+}

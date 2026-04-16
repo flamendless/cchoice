@@ -8,23 +8,6 @@ import "cchoice/internal/constants"
 import "fmt"
 import "cchoice/internal/services"
 
-var scrProductImageUpload = templ.NewOnceHandle()
-var scrImagePreview = templ.NewOnceHandle()
-
-templ ScrProductImageUpload() {
-	@scrProductImageUpload.Once() {
-		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/product_image_upload.js")) }>
-		</script>
-	}
-}
-
-templ ScrImagePreview() {
-	@scrImagePreview.Once() {
-		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/image_preview.js")) }>
-		</script>
-	}
-}
-
 templ AdminHeader(profile *models.AdminStaffProfile) {
 	if profile == nil {
 		<div
