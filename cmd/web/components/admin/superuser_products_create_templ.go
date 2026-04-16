@@ -249,11 +249,11 @@ func AdminSuperuserProductsPage(formData models.AdminProductForm) templ.Componen
 		templ_7745c5c3_Err = ImageUploadField(ImageUploadParams{
 			Name:         "product_image",
 			Label:        "Product Image",
-			Accept:       "image/jpeg,image/png,image/webp,image/gif",
+			Accept:       "image/jpeg,image/png,image/webp",
 			MaxSize:      constants.MaxSizeImageUpload,
 			PreviewClass: "max-w-xs max-h-48 object-contain mx-auto",
 			Required:     true,
-			HelpText:     "Allowed formats: JPEG, PNG, WebP, GIF. Max size: 10MB.",
+			HelpText:     "Allowed formats: JPEG, PNG, WebP. Max size: 3MB.",
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

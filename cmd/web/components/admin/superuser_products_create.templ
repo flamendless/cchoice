@@ -309,11 +309,11 @@ templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
 								@ImageUploadField(ImageUploadParams{
 									Name:         "product_image",
 									Label:       "Product Image",
-									Accept:      "image/jpeg,image/png,image/webp,image/gif",
+									Accept:      "image/jpeg,image/png,image/webp",
 									MaxSize:     constants.MaxSizeImageUpload,
 									PreviewClass: "max-w-xs max-h-48 object-contain mx-auto",
 									Required:    true,
-									HelpText:    "Allowed formats: JPEG, PNG, WebP, GIF. Max size: 10MB.",
+									HelpText:    "Allowed formats: JPEG, PNG, WebP. Max size: 3MB.",
 								})
 							</div>
 							<div class="flex justify-end gap-4 pt-4 border-t">

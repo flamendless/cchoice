@@ -145,7 +145,7 @@ templ BrandCreateForm() {
 			Accept:       "image/jpeg,image/png,image/webp",
 			MaxSize:      constants.MaxSizeImageUpload,
 			PreviewClass: "h-24 w-24 object-contain rounded border border-gray-200",
-			HelpText:     "Max file size: 10MB. Allowed: JPEG, PNG, WebP",
+			HelpText:     "Max file size: 3MB. Allowed: JPEG, PNG, WebP",
 		})
 		<div class="flex w-full gap-2 justify-end">
 			<button
@@ -319,9 +319,9 @@ templ BrandEditForm(brand models.AdminBrandListItem) {
 			Label:        "Brand Logo",
 			Accept:       "image/jpeg,image/png,image/webp",
 			MaxSize:      constants.MaxSizeImageUpload,
-			ExistingURL: brand.LogoS3URL,
+			ExistingURL:  brand.LogoS3URL,
 			PreviewClass: "h-24 w-24 object-contain rounded border border-gray-200",
-			HelpText:     "Max file size: 10MB. Allowed: JPEG, PNG, WebP",
+			HelpText:     "Max file size: 3MB. Allowed: JPEG, PNG, WebP",
 		})
 		<div class="flex w-full gap-2 justify-end">
 			<button

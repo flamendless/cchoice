@@ -681,7 +681,7 @@ func PromoCreateForm() templ.Component {
 			MaxSize:      constants.MaxSizeImageUpload,
 			PreviewClass: "h-32 w-full object-contain rounded border border-gray-200",
 			Required:     true,
-			HelpText:     "Max file size: 10MB. Allowed: JPEG, PNG, WebP",
+			HelpText:     "Max file size: 3MB. Allowed: JPEG, PNG, WebP",
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
