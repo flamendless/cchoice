@@ -77,8 +77,8 @@ func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductI
 		BrandID:                     brandID,
 		Status:                      enums.PRODUCT_STATUS_DRAFT.String(),
 		ProductSpecsID:              sql.NullInt64{Int64: specs.ID, Valid: true},
-		UnitPriceWithoutVat:         input.UnitPriceWithoutVat,
-		UnitPriceWithVat:            input.UnitPriceWithVat,
+		UnitPriceWithoutVat:         input.UnitPriceWithoutVat * 100,
+		UnitPriceWithVat:            input.UnitPriceWithVat * 100,
 		UnitPriceWithoutVatCurrency: constants.PHP,
 		UnitPriceWithVatCurrency:    constants.PHP,
 		CreatedAt:                   now,
@@ -161,12 +161,16 @@ func (s *ProductService) GetProductsForListingAdmin(
 
 	productList := make([]models.AdminProductListItem, 0, len(products))
 	for _, p := range products {
+		price := utils.NewMoney(p.UnitPriceWithVat, p.UnitPriceWithVatCurrency)
 		productList = append(productList, models.AdminProductListItem{
 			ID:            s.encoder.Encode(p.ID),
 			Name:          p.Name,
 			Serial:        p.Serial,
 			Description:   p.Description.String,
 			Brand:         p.BrandName,
+			Price:         price.Display(),
+			Category:      p.Category,
+			Subcategory:   p.Subcategory,
 			Status:        enums.ParseProductStatusToEnum(p.Status),
 			ThumbnailPath: p.ThumbnailPath,
 			CDNURL:        s.getCDNURL(p.ThumbnailPath),

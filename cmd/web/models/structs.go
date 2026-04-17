@@ -253,6 +253,9 @@ type AdminProductListItem struct {
 	Serial        string
 	Description   string
 	Brand         string
+	Price         string
+	Category      string
+	Subcategory   string
 	ThumbnailPath string
 	CDNURL        string
 	CDNURL1280    string
