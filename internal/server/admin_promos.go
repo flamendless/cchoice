@@ -263,6 +263,30 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	if promoType == enums.PROMO_TYPE_BANNER_IMAGE {
+		file, header, err := r.FormFile("media_file")
+		if err == nil {
+			defer file.Close()
+
+			filename := s.services.image.GenerateFilename(filepath.Ext(header.Filename), title)
+			buf := bytes.Buffer{}
+			if _, err := io.Copy(&buf, file); err != nil {
+				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+				redirectHX(w, r, utils.URLWithError(page, "Failed to read file"))
+				return
+			}
+
+			contentType := header.Header.Get("Content-Type")
+			url, err := s.services.image.UploadBrandImage(ctx, title, filename, &buf, contentType)
+			if err != nil {
+				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+				redirectHX(w, r, utils.URLWithError(page, err.Error()))
+				return
+			}
+			mediaURL = url
+		}
+	}
+
 	if err := s.services.promo.UpdatePromo(
 		ctx,
 		s.sessionManager.GetString(ctx, SessionStaffID),
