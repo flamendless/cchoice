@@ -14,12 +14,12 @@ templ MobileSearchToggle() {
 		"
 		_="
 			on click
-				async call metrics_event('mobile_search_toggle')
 				toggle .hidden on #mobile-search-panel
 				if #mobile-search-panel does not match .hidden
 					wait 0.05s
 					focus() on #search-mobile
 				end
+				async call metrics_event('mobile_search_toggle')
 			end
 		"
 	>
@@ -31,7 +31,8 @@ templ MobileSearchPanel() {
 	<div
 		id="mobile-search-panel"
 		class="
-			absolute left-0 w-1/2
+			absolute top-full left-0 right-0 w-full
+			z-[60] shadow-md
 			hidden lg:hidden
 			border-b border-searchbar
 			bg-white px-3 py-2
