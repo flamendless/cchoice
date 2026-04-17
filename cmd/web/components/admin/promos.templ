@@ -274,10 +274,17 @@ templ PromoCreateForm() {
 					Start Date <span class="text-red-500">*</span>
 				</label>
 				<input
+					id="start_date"
 					type="date"
 					name="start_date"
 					required
 					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+					_="on change
+						set #end_date.min to my.value
+						if #end_date.value < my.value
+							set #end_date.value to ''
+						end
+					"
 				/>
 			</div>
 			<div>
@@ -285,10 +292,17 @@ templ PromoCreateForm() {
 					End Date <span class="text-red-500">*</span>
 				</label>
 				<input
+					id="end_date"
 					type="date"
 					name="end_date"
 					required
 					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+					_="on change
+						set #start_date.max to my.value
+						if #start_date.value > my.value
+							set #start_date.value to ''
+						end
+					"
 				/>
 			</div>
 		</div>
@@ -433,11 +447,18 @@ templ PromoEditForm(promo models.AdminPromoListItem) {
 					Start Date <span class="text-red-500">*</span>
 				</label>
 				<input
+					id="start_date"
 					type="date"
 					name="start_date"
 					required
 					value={ promo.StartDate }
 					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+					_="on change
+						set #end_date.min to my.value
+						if #end_date.value < my.value
+							set #end_date.value to ''
+						end
+					"
 				/>
 			</div>
 			<div>
@@ -445,11 +466,18 @@ templ PromoEditForm(promo models.AdminPromoListItem) {
 					End Date <span class="text-red-500">*</span>
 				</label>
 				<input
+					id="end_date"
 					type="date"
 					name="end_date"
 					required
 					value={ promo.EndDate }
 					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+					_="on change
+						set #start_date.max to my.value
+						if #start_date.value > my.value
+							set #start_date.value to ''
+						end
+					"
 				/>
 			</div>
 		</div>
