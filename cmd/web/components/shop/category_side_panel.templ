@@ -14,7 +14,7 @@ templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 				id={ "category-link-" + category.ScrollTargetID }
 				href={ templ.SafeURL(utils.URL("#" + category.ScrollTargetID)) }
 				class="
-					text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer
+					text-base lg:text-xs font-light ml-2 my-1 lg:my-0.5 py-1.5 lg:py-0.5 cursor-pointer
 					hover:underline hover:bg-cchoicesoft transition-colors
 					category-scroll-link
 				"
