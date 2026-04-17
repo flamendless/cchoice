@@ -71,17 +71,20 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 					@TableHeader("3%", "ID")
 					@TableHeader("5%", "Name")
 					@TableHeader("5%", "Serial")
-					@TableHeader("6%", "Description")
+					<!-- @TableHeader("6%", "Description") -->
 					@TableHeader("4%", "Brand")
-					@TableHeader("5%", "Colours")
-					@TableHeader("5%", "Sizes")
-					@TableHeader("5%", "Segment")
-					@TableHeader("5%", "Part No.")
-					@TableHeader("5%", "Power")
-					@TableHeader("5%", "Capacity")
-					@TableHeader("6%", "Scope of Supply")
+					@TableHeader("6%", "Price")
+					@TableHeader("6%", "Category")
+					@TableHeader("6%", "Subcategory")
+					<!-- @TableHeader("5%", "Colours") -->
+					<!-- @TableHeader("5%", "Sizes") -->
+					<!-- @TableHeader("5%", "Segment") -->
+					<!-- @TableHeader("5%", "Part No.") -->
+					<!-- @TableHeader("5%", "Power") -->
+					<!-- @TableHeader("5%", "Capacity") -->
+					<!-- @TableHeader("6%", "Scope of Supply") -->
 					@TableHeader("5%", "Weight")
-					@TableHeader("4%", "Created At")
+					<!-- @TableHeader("4%", "Created At") -->
 					@TableHeader("4%", "Updated At")
 					@TableHeader("4%", "Status")
 					@TableHeader("8%", "Actions")
@@ -99,39 +102,48 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 						@TableCell("5%", "text-gray-900") {
 							{ p.Serial }
 						}
-						@TableCell("6%", "text-gray-900 max-w-xs truncate") {
-							<span title={ p.Description }>{ p.Description }</span>
-						}
+						<!-- @TableCell("6%", "text-gray-900 max-w-xs truncate") { -->
+						<!-- 	<span title={ p.Description }>{ p.Description }</span> -->
+						<!-- } -->
 						@TableCell("4%", "text-gray-900") {
 							{ p.Brand }
 						}
-						@TableCell("5%", "text-gray-900 max-w-xs truncate") {
-							<span title={ p.Colours }>{ p.Colours }</span>
-						}
-						@TableCell("5%", "text-gray-900 max-w-xs truncate") {
-							<span title={ p.Sizes }>{ p.Sizes }</span>
-						}
-						@TableCell("5%", "text-gray-900 max-w-xs truncate") {
-							<span title={ p.Segmentation }>{ p.Segmentation }</span>
-						}
-						@TableCell("5%", "text-gray-900 max-w-xs truncate") {
-							<span title={ p.PartNumber }>{ p.PartNumber }</span>
-						}
-						@TableCell("5%", "text-gray-900 max-w-xs truncate") {
-							<span title={ p.Power }>{ p.Power }</span>
-						}
-						@TableCell("5%", "text-gray-900 max-w-xs truncate") {
-							<span title={ p.Capacity }>{ p.Capacity }</span>
+						@TableCell("6%", "text-gray-900") {
+							{ p.Price }
 						}
 						@TableCell("6%", "text-gray-900 max-w-xs truncate") {
-							<span title={ p.ScopeOfSupply }>{ p.ScopeOfSupply }</span>
+							<span title={ p.Category }>{ p.Category }</span>
 						}
+						@TableCell("6%", "text-gray-900 max-w-xs truncate") {
+							<span title={ p.Subcategory }>{ p.Subcategory }</span>
+						}
+						<!-- @TableCell("5%", "text-gray-900 max-w-xs truncate") { -->
+						<!-- 	<span title={ p.Colours }>{ p.Colours }</span> -->
+						<!-- } -->
+						<!-- @TableCell("5%", "text-gray-900 max-w-xs truncate") { -->
+						<!-- 	<span title={ p.Sizes }>{ p.Sizes }</span> -->
+						<!-- } -->
+						<!-- @TableCell("5%", "text-gray-900 max-w-xs truncate") { -->
+						<!-- 	<span title={ p.Segmentation }>{ p.Segmentation }</span> -->
+						<!-- } -->
+						<!-- @TableCell("5%", "text-gray-900 max-w-xs truncate") { -->
+						<!-- 	<span title={ p.PartNumber }>{ p.PartNumber }</span> -->
+						<!-- } -->
+						<!-- @TableCell("5%", "text-gray-900 max-w-xs truncate") { -->
+						<!-- 	<span title={ p.Power }>{ p.Power }</span> -->
+						<!-- } -->
+						<!-- @TableCell("5%", "text-gray-900 max-w-xs truncate") { -->
+						<!-- 	<span title={ p.Capacity }>{ p.Capacity }</span> -->
+						<!-- } -->
+						<!-- @TableCell("6%", "text-gray-900 max-w-xs truncate") { -->
+						<!-- 	<span title={ p.ScopeOfSupply }>{ p.ScopeOfSupply }</span> -->
+						<!-- } -->
 						@TableCell("5%", "text-gray-900") {
 							{ p.Weight }
 						}
-						@TableCell("4%", "text-gray-900") {
-							{ p.CreatedAt }
-						}
+						<!-- @TableCell("4%", "text-gray-900") { -->
+						<!-- 	{ p.CreatedAt } -->
+						<!-- } -->
 						@TableCell("4%", "text-gray-900") {
 							{ p.UpdatedAt }
 						}

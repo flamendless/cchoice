@@ -274,6 +274,7 @@ func (q *Queries) GetProductCategoryByID(ctx context.Context, id int64) (TblProd
 const getProductsByCategoryID = `-- name: GetProductsByCategoryID :many
 SELECT
 	tbl_products.id,
+	tbl_products.serial,
 	tbl_products.name,
 	tbl_products.description,
 	tbl_products.unit_price_with_vat,
@@ -305,8 +306,10 @@ LEFT JOIN tbl_product_sales
 	AND tbl_product_sales.is_active = 1
 	AND datetime('now') BETWEEN
 		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
-WHERE tbl_products.status = 'ACTIVE'
-AND tbl_products_categories.category_id = ?
+WHERE
+	tbl_products.status = 'ACTIVE'
+	AND thumbnail_path != 'static/images/empty_96x96.webp'
+	AND tbl_products_categories.category_id = ?
 ORDER BY is_on_sale DESC, tbl_products.created_at DESC
 LIMIT ?
 `
@@ -318,6 +321,7 @@ type GetProductsByCategoryIDParams struct {
 
 type GetProductsByCategoryIDRow struct {
 	ID                       int64
+	Serial                   string
 	Name                     string
 	Description              sql.NullString
 	UnitPriceWithVat         int64
@@ -344,6 +348,7 @@ func (q *Queries) GetProductsByCategoryID(ctx context.Context, arg GetProductsBy
 		var i GetProductsByCategoryIDRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.Serial,
 			&i.Name,
 			&i.Description,
 			&i.UnitPriceWithVat,

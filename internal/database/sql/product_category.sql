@@ -61,6 +61,7 @@ LIMIT ?;
 -- name: GetProductsByCategoryID :many
 SELECT
 	tbl_products.id,
+	tbl_products.serial,
 	tbl_products.name,
 	tbl_products.description,
 	tbl_products.unit_price_with_vat,
@@ -92,8 +93,10 @@ LEFT JOIN tbl_product_sales
 	AND tbl_product_sales.is_active = 1
 	AND datetime('now') BETWEEN
 		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
-WHERE tbl_products.status = 'ACTIVE'
-AND tbl_products_categories.category_id = ?
+WHERE
+	tbl_products.status = 'ACTIVE'
+	AND thumbnail_path != 'static/images/empty_96x96.webp'
+	AND tbl_products_categories.category_id = ?
 ORDER BY is_on_sale DESC, tbl_products.created_at DESC
 LIMIT ?
 ;
