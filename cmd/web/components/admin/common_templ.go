@@ -1417,7 +1417,7 @@ func ProductActionPublish(productID string) templ.Component {
 	})
 }
 
-func ProductActionDraft(productID string) templ.Component {
+func ProductActionEdit(productID string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -1438,33 +1438,75 @@ func ProductActionDraft(productID string) templ.Component {
 			templ_7745c5c3_Var67 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 97, "<button class=\"text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium\" hx-patch=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 97, "<a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var68 string
-		templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL(fmt.Sprintf("/admin/superuser/products/%s/status", productID)))
+		var templ_7745c5c3_Var68 templ.SafeURL
+		templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL(fmt.Sprintf("/admin/superuser/products/%s/edit", productID)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/common.templ`, Line: 461, Col: 85}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/common.templ`, Line: 460, Col: 79}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var68))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 98, "\" hx-vals=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 98, "\" class=\"inline-block px-3 py-1 text-xs font-medium rounded text-center text-white bg-green-600 hover:bg-green-700\">Edit</a>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var69 string
-		templ_7745c5c3_Var69, templ_7745c5c3_Err = templ.JoinStringErrs(`{"status": "DRAFT"}`)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/common.templ`, Line: 462, Col: 33}
+		return nil
+	})
+}
+
+func ProductActionDraft(productID string) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var69))
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var69 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var69 == nil {
+			templ_7745c5c3_Var69 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 99, "<button class=\"text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium\" hx-patch=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 99, "\">Draft</button>")
+		var templ_7745c5c3_Var70 string
+		templ_7745c5c3_Var70, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL(fmt.Sprintf("/admin/superuser/products/%s/status", productID)))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/common.templ`, Line: 470, Col: 85}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var70))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, "\" hx-vals=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var71 string
+		templ_7745c5c3_Var71, templ_7745c5c3_Err = templ.JoinStringErrs(`{"status": "DRAFT"}`)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/common.templ`, Line: 471, Col: 33}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var71))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, "\">Draft</button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1488,25 +1530,25 @@ func ProductActionDelete(productID string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var70 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var70 == nil {
-			templ_7745c5c3_Var70 = templ.NopComponent
+		templ_7745c5c3_Var72 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var72 == nil {
+			templ_7745c5c3_Var72 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, "<button class=\"text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs font-medium\" hx-delete=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "<button class=\"text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs font-medium\" hx-delete=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var71 string
-		templ_7745c5c3_Var71, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/superuser/products/" + productID))
+		var templ_7745c5c3_Var73 string
+		templ_7745c5c3_Var73, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/superuser/products/" + productID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/common.templ`, Line: 471, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/common.templ`, Line: 480, Col: 65}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var71))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var73))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, "\" hx-confirm=\"Are you sure you want to delete this product?\">Delete</button>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "\" hx-confirm=\"Are you sure you want to delete this product?\">Delete</button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1530,59 +1572,59 @@ func WeightUnitDropdown(selected enums.WeightUnit) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var72 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var72 == nil {
-			templ_7745c5c3_Var72 = templ.NopComponent
+		templ_7745c5c3_Var74 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var74 == nil {
+			templ_7745c5c3_Var74 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "<select id=\"spec_weight_unit\" name=\"spec_weight_unit\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select unit</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "<select id=\"spec_weight_unit\" name=\"spec_weight_unit\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select unit</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, wu := range enums.AllWeightUnits {
 			v := wu.String()
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "<option value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var73 string
-			templ_7745c5c3_Var73, templ_7745c5c3_Err = templ.JoinStringErrs(v)
+			var templ_7745c5c3_Var75 string
+			templ_7745c5c3_Var75, templ_7745c5c3_Err = templ.JoinStringErrs(v)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/common.templ`, Line: 489, Col: 13}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/common.templ`, Line: 498, Col: 13}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var73))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var75))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if selected == wu {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, " selected")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, " selected")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, ">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, ">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var74 string
-			templ_7745c5c3_Var74, templ_7745c5c3_Err = templ.JoinStringErrs(v)
+			var templ_7745c5c3_Var76 string
+			templ_7745c5c3_Var76, templ_7745c5c3_Err = templ.JoinStringErrs(v)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/common.templ`, Line: 492, Col: 7}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/common.templ`, Line: 501, Col: 7}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var74))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var76))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, "</option>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 109, "</option>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, "</select>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, "</select>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

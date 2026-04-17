@@ -32,3 +32,17 @@ INSERT INTO tbl_product_specs (
 	?, ?, ?, ?,
 	?
 ) RETURNING *;
+
+-- name: UpdateProductSpecs :exec
+UPDATE tbl_product_specs
+SET
+	colours = ?,
+	sizes = ?,
+	segmentation = ?,
+	part_number = ?,
+	power = ?,
+	capacity = ?,
+	scope_of_supply = ?,
+	weight = ?,
+	weight_unit = ?
+WHERE id = ?;

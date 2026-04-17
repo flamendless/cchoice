@@ -37,6 +37,14 @@ INSERT INTO tbl_products_categories (
 ON CONFLICT (product_id, category_id) DO NOTHING
 RETURNING *;
 
+-- name: DeleteProductsCategories :exec
+DELETE FROM tbl_products_categories
+WHERE product_id = ?;
+
+-- name: GetProductsCategoriesByProductID :many
+SELECT category_id FROM tbl_products_categories
+WHERE product_id = ?;
+
 -- name: SetInitialPromotedProductCategories :many
 UPDATE tbl_product_categories
 SET promoted_at_homepage = true

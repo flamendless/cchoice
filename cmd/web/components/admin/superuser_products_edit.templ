@@ -1,0 +1,366 @@
+package components
+
+import "fmt"
+
+import "cchoice/cmd/web/models"
+import "cchoice/internal/constants"
+import "cchoice/internal/enums"
+import "cchoice/internal/utils"
+import "cchoice/cmd/web/components/common"
+import "cchoice/cmd/web/components/svg"
+import "cchoice/cmd/web/components/header"
+
+templ AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("[SUPERUSER] Edit Product - C-Choice Admin")
+			<style>
+				#submit-btn-content #submit-spinner { display: none; }
+				#submit-btn-content.htmx-request #submit-spinner { display: inline-block; }
+				#submit-btn-content.htmx-request .submit-btn-text { display: none; }
+			</style>
+		</head>
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-col"
+			_="init call metrics_event('admin_visit', 'products_edit')"
+		>
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-4xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.AdminStaffHeaderWithBack()
+						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+							Edit Product
+						</h1>
+						<form
+							hx-patch={ utils.URL(fmt.Sprintf("/admin/superuser/products/%s", formData.ProductID)) }
+							hx-swap="outerHTML"
+							hx-target="body"
+							hx-indicator="#submit-btn-content"
+							enctype="multipart/form-data"
+							class="space-y-6"
+						>
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+								<div>
+									<label for="brand" class="block text-sm font-medium text-gray-700 mb-1">
+										Brand <span class="text-red-500">*</span>
+									</label>
+									<select
+										id="brand"
+										name="brand_id"
+										required
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									>
+										<option value="">Select a brand</option>
+										for _, brand := range formData.Brands {
+											<option
+												value={ brand.ID }
+												selected?={ brand.ID == formData.BrandID }
+											>
+												{ brand.Name }
+											</option>
+										}
+									</select>
+								</div>
+								<div>
+									<label class="block text-sm font-medium text-gray-700 mb-1">
+										Serial Number
+									</label>
+									<div class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-600">
+										{ formData.Serial }
+									</div>
+									<input type="hidden" name="serial" value={ formData.Serial }/>
+									<p class="text-xs text-gray-500 mt-1">Serial number cannot be changed</p>
+								</div>
+								<div>
+									<label for="status" class="block text-sm font-medium text-gray-700 mb-1">
+										Status <span class="text-red-500">*</span>
+									</label>
+									<select
+										id="status"
+										name="status"
+										required
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									>
+										for _, ps := range enums.AllProductStatuses {
+											<option
+												value={ ps.String() }
+												selected?={ formData.Status == ps }
+											>
+												{ ps.String() }
+											</option>
+										}
+									</select>
+								</div>
+								<div>
+									<label for="category" class="block text-sm font-medium text-gray-700 mb-1">
+										Category <span class="text-red-500">*</span>
+									</label>
+									<select
+										id="category"
+										name="category"
+										required
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+										_="on change
+											if my.value
+												trigger get on #subcategory
+												remove @disabled from #subcategory
+											end
+										"
+									>
+										<option value="">Select a category</option>
+										for _, cat := range formData.Categories {
+											<option
+												value={ cat.Category }
+												selected?={ cat.Category == formData.Category }
+											>
+												{ cat.Category }
+											</option>
+										}
+									</select>
+								</div>
+								<div>
+									<label for="subcategory" class="block text-sm font-medium text-gray-700 mb-1">
+										Subcategory <span class="text-red-500">*</span>
+									</label>
+									<select
+										id="subcategory"
+										name="subcategory"
+										class="disabled:opacity-50 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+										required
+										hx-get={ utils.URL("/admin/superuser/products/subcategories") }
+										hx-trigger="get"
+										hx-include="#category"
+										hx-swap="innerHTML"
+										hx-target="this"
+									>
+										<option value={ formData.Subcategory } selected>{ formData.Subcategory }</option>
+									</select>
+								</div>
+								<div class="md:col-span-2">
+									<label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+										Product Name <span class="text-red-500">*</span>
+									</label>
+									<input
+										type="text"
+										id="name"
+										name="name"
+										required
+										minlength="2"
+										maxlength="255"
+										pattern={ constants.PatternProductName }
+										value={ formData.Name }
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									/>
+								</div>
+								<div>
+									<label for="price" class="block text-sm font-medium text-gray-700 mb-1">
+										Unit Price (with VAT) <span class="text-red-500">*</span>
+									</label>
+									<div class="relative">
+										<span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₱</span>
+										<input
+											type="number"
+											id="price"
+											name="price"
+											required
+											min="0.01"
+											step="0.01"
+											max="999999999.99"
+											value={ formData.Price }
+											class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+										/>
+									</div>
+									<p class="text-xs text-gray-500 mt-1">
+										Price includes { formData.VATPercentage }% VAT
+									</p>
+								</div>
+								<div class="md:col-span-2">
+									<label for="description" class="block text-sm font-medium text-gray-700 mb-1">
+										Description <span class="text-red-500">*</span>
+									</label>
+									<textarea
+										id="description"
+										name="description"
+										required
+										rows="4"
+										maxlength="2000"
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									>{ formData.Description }</textarea>
+								</div>
+							</div>
+							<div class="border-t pt-6">
+								<h2 class="text-lg font-semibold text-gray-800 mb-4">Product Specifications</h2>
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+									<div>
+										<label for="spec_colours" class="block text-sm font-medium text-gray-700 mb-1">
+											Colours <span class="text-red-500">*</span>
+										</label>
+										<input
+											type="text"
+											id="spec_colours"
+											name="spec_colours"
+											required
+											maxlength="500"
+											placeholder="e.g., Red, Blue, Green"
+											value={ formData.Specs.Colours }
+											class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+										/>
+									</div>
+									<div>
+										<label for="spec_sizes" class="block text-sm font-medium text-gray-700 mb-1">
+											Sizes <span class="text-red-500">*</span>
+										</label>
+										<input
+											type="text"
+											id="spec_sizes"
+											name="spec_sizes"
+											required
+											maxlength="500"
+											placeholder="e.g., S, M, L, XL"
+											value={ formData.Specs.Sizes }
+											class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+										/>
+									</div>
+									<div>
+										<label for="spec_segmentation" class="block text-sm font-medium text-gray-700 mb-1">
+											Segmentation <span class="text-red-500">*</span>
+										</label>
+										<input
+											type="text"
+											id="spec_segmentation"
+											name="spec_segmentation"
+											required
+											maxlength="255"
+											placeholder="e.g., Industrial, Commercial, Residential"
+											value={ formData.Specs.Segmentation }
+											class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+										/>
+									</div>
+									<div>
+										<label for="spec_part_number" class="block text-sm font-medium text-gray-700 mb-1">
+											Part Number <span class="text-red-500">*</span>
+										</label>
+										<input
+											type="text"
+											id="spec_part_number"
+											name="spec_part_number"
+											required
+											maxlength="100"
+											pattern={ constants.PatternSerialNumber }
+											value={ formData.Specs.PartNumber }
+											class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+										/>
+									</div>
+									<div>
+										<label for="spec_power" class="block text-sm font-medium text-gray-700 mb-1">
+											Power <span class="text-red-500">*</span>
+										</label>
+										<input
+											type="text"
+											id="spec_power"
+											name="spec_power"
+											required
+											maxlength="100"
+											placeholder="e.g., 500W, 1.5HP"
+											value={ formData.Specs.Power }
+											class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+										/>
+									</div>
+									<div>
+										<label for="spec_capacity" class="block text-sm font-medium text-gray-700 mb-1">
+											Capacity <span class="text-red-500">*</span>
+										</label>
+										<input
+											type="text"
+											id="spec_capacity"
+											name="spec_capacity"
+											required
+											maxlength="100"
+											placeholder="e.g., 20L, 100kg"
+											value={ formData.Specs.Capacity }
+											class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+										/>
+									</div>
+									<div>
+										<label for="spec_weight" class="block text-sm font-medium text-gray-700 mb-1">
+											Weight <span class="text-red-500">*</span>
+										</label>
+										<input
+											type="number"
+											id="spec_weight"
+											name="spec_weight"
+											required
+											min="0.01"
+											step="0.01"
+											max="999999999.99"
+											placeholder="e.g., 10.5"
+											value={ formData.Specs.Weight }
+											class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+										/>
+									</div>
+									<div>
+										<label for="spec_weight_unit" class="block text-sm font-medium text-gray-700 mb-1">
+											Weight Unit <span class="text-red-500">*</span>
+										</label>
+										@WeightUnitDropdown(enums.ParseWeightUnitToEnum(formData.Specs.WeightUnit))
+									</div>
+									<div class="md:col-span-2">
+										<label for="spec_scope_of_supply" class="block text-sm font-medium text-gray-700 mb-1">
+											Scope of Supply <span class="text-red-500">*</span>
+										</label>
+										<textarea
+											id="spec_scope_of_supply"
+											name="spec_scope_of_supply"
+											required
+											rows="3"
+											maxlength="1000"
+											placeholder="List items included in the package"
+											class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+										>{ formData.Specs.ScopeOfSupply }</textarea>
+									</div>
+								</div>
+							</div>
+							<div class="border-t pt-6">
+								<h2 class="text-lg font-semibold text-gray-800 mb-4">Product Image</h2>
+								@ImageUploadField(ImageUploadParams{
+									Name:         "product_image",
+									Label:        "Product Image",
+									Accept:       "image/jpeg,image/png,image/webp",
+									MaxSize:      constants.MaxSizeImageUpload,
+									PreviewClass: "max-w-xs max-h-48 object-contain mx-auto",
+									Required:     false,
+									HelpText:     "Allowed formats: JPEG, PNG, WebP. Max size: 3MB. Leave empty to keep current image.",
+									ExistingURL:  formData.ImageCDNURL,
+								})
+							</div>
+							<div class="flex justify-end gap-4 pt-4 border-t">
+								<a
+									href={ utils.URL("/admin/superuser/products") }
+									class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+								>
+									Cancel
+								</a>
+								<button
+									type="submit"
+									id="submit-btn"
+									class="px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice disabled:opacity-50 disabled:cursor-not-allowed"
+									_="on click call metrics_event('admin_exec', 'update product')"
+								>
+									<span id="submit-btn-content" class="flex items-center gap-2">
+										<span class="submit-btn-text">Update Product</span>
+										@svg.Infinite("submit-spinner")
+									</span>
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			@ScrImageUpload()
+		</body>
+	</html>
+}

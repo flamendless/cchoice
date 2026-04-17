@@ -1,18 +1,13 @@
 package models
 
 import (
-	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"context"
 	"database/sql"
-	"time"
 )
 
 type ProductImage struct {
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
 	Product   *Product
 	Path      string
 	Thumbnail string
@@ -26,14 +21,10 @@ func (pi *ProductImage) InsertToDB(ctx context.Context, db database.IService) (i
 	if pi.Product == nil {
 		panic("nil ProductImage.Product")
 	}
-	now := time.Now().UTC()
 	insertedProductImage, err := db.GetQueries().CreateProductImage(ctx, queries.CreateProductImageParams{
 		ProductID: pi.Product.ID,
 		Path:      pi.Path,
 		Thumbnail: sql.NullString{Valid: pi.Thumbnail != "", String: pi.Thumbnail},
-		CreatedAt: now,
-		UpdatedAt: now,
-		DeletedAt: constants.DtBeginning,
 	})
 	if err != nil {
 		return 0, err

@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"strconv"
-	"time"
 
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
@@ -69,7 +68,6 @@ func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductI
 		return nil, err
 	}
 
-	now := time.Now().UTC()
 	product, err := s.dbRW.GetQueries().CreateProducts(ctx, queries.CreateProductsParams{
 		Serial:                      input.Serial,
 		Name:                        input.Name,
@@ -81,9 +79,6 @@ func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductI
 		UnitPriceWithVat:            input.UnitPriceWithVat * 100,
 		UnitPriceWithoutVatCurrency: constants.PHP,
 		UnitPriceWithVatCurrency:    constants.PHP,
-		CreatedAt:                   now,
-		UpdatedAt:                   now,
-		DeletedAt:                   constants.DtBeginning,
 	})
 	if err != nil {
 		return nil, err
@@ -106,9 +101,6 @@ func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductI
 			Thumbnail:       sql.NullString{String: input.ImagePath, Valid: true},
 			CdnUrl:          sql.NullString{String: cdnURL, Valid: cdnURL != ""},
 			CdnUrlThumbnail: sql.NullString{String: cdnURLThumbnail, Valid: cdnURLThumbnail != ""},
-			CreatedAt:       now,
-			UpdatedAt:       now,
-			DeletedAt:       constants.DtBeginning,
 		}); err != nil {
 			return nil, err
 		}
@@ -190,6 +182,133 @@ func (s *ProductService) GetProductsForListingAdmin(
 	}
 
 	return productList, nil
+}
+
+func (s *ProductService) GetProductByIDForEdit(ctx context.Context, productID string) (*ProductForEdit, error) {
+	decodedProductID := s.encoder.Decode(productID)
+	if decodedProductID == encode.INVALID {
+		return nil, errs.ErrDecode
+	}
+
+	product, err := s.dbRO.GetQueries().GetProductsByID(ctx, decodedProductID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ProductForEdit{
+		ID:                          product.ID,
+		Serial:                      product.Serial,
+		Name:                        product.Name,
+		Description:                 product.Description.String,
+		BrandID:                     product.BrandID,
+		BrandName:                   product.BrandName,
+		Status:                      product.Status,
+		Category:                    product.ProductCategory,
+		Subcategory:                 product.ProductSubcategory,
+		ProductSpecsID:              product.ProductSpecsID.Int64,
+		UnitPriceWithoutVat:         product.UnitPriceWithoutVat,
+		UnitPriceWithoutVatCurrency: product.UnitPriceWithoutVatCurrency,
+		UnitPriceWithVat:            product.UnitPriceWithVat,
+		UnitPriceWithVatCurrency:    product.UnitPriceWithVatCurrency,
+		Specs: ProductSpecsInput{
+			Colours:       product.Colours.String,
+			Sizes:         product.Sizes.String,
+			Segmentation:  product.Segmentation.String,
+			PartNumber:    product.PartNumber.String,
+			Power:         product.Power.String,
+			Capacity:      product.Capacity.String,
+			ScopeOfSupply: product.ScopeOfSupply.String,
+			Weight:        strconv.FormatFloat(product.Weight.Float64, 'f', -1, 64),
+			WeightUnit:    product.WeightUnit.String,
+		},
+	}, nil
+}
+
+func (s *ProductService) UpdateProduct(ctx context.Context, input UpdateProductInput) error {
+	productID := s.encoder.Decode(input.ProductID)
+	if productID == encode.INVALID {
+		return errs.ErrDecode
+	}
+
+	brandID := s.encoder.Decode(input.BrandID)
+	if _, err := s.dbRO.GetQueries().GetBrandsByID(ctx, brandID); err != nil {
+		return err
+	}
+
+	categoryRow, err := s.dbRO.GetQueries().GetProductCategoryByCategoryAndSubcategory(ctx, queries.GetProductCategoryByCategoryAndSubcategoryParams{
+		Category:    sql.NullString{String: input.Category, Valid: true},
+		Subcategory: sql.NullString{String: input.Subcategory, Valid: true},
+	})
+	if err != nil {
+		return err
+	}
+
+	existingProduct, err := s.dbRO.GetQueries().GetProductsByID(ctx, productID)
+	if err != nil {
+		return err
+	}
+
+	weightVal, weightErr := strconv.ParseFloat(input.Specs.Weight, 64)
+	if err := s.dbRW.GetQueries().UpdateProductSpecs(ctx, queries.UpdateProductSpecsParams{
+		ID:            existingProduct.ProductSpecsID.Int64,
+		Colours:       sql.NullString{String: input.Specs.Colours, Valid: true},
+		Sizes:         sql.NullString{String: input.Specs.Sizes, Valid: true},
+		Segmentation:  sql.NullString{String: input.Specs.Segmentation, Valid: true},
+		PartNumber:    sql.NullString{String: input.Specs.PartNumber, Valid: true},
+		Power:         sql.NullString{String: input.Specs.Power, Valid: true},
+		Capacity:      sql.NullString{String: input.Specs.Capacity, Valid: true},
+		ScopeOfSupply: sql.NullString{String: input.Specs.ScopeOfSupply, Valid: true},
+		Weight:        sql.NullFloat64{Float64: weightVal, Valid: weightErr == nil},
+		WeightUnit:    sql.NullString{String: input.Specs.WeightUnit, Valid: true},
+	}); err != nil {
+		return err
+	}
+
+	if _, err := s.dbRW.GetQueries().UpdateProducts(ctx, queries.UpdateProductsParams{
+		ID:                          productID,
+		Name:                        input.Name,
+		Description:                 sql.NullString{String: input.Description, Valid: true},
+		BrandID:                     brandID,
+		Status:                      input.Status,
+		ProductSpecsID:              existingProduct.ProductSpecsID,
+		UnitPriceWithoutVat:         input.UnitPriceWithoutVat * 100,
+		UnitPriceWithVat:            input.UnitPriceWithVat * 100,
+		UnitPriceWithoutVatCurrency: existingProduct.UnitPriceWithoutVatCurrency,
+		UnitPriceWithVatCurrency:    existingProduct.UnitPriceWithVatCurrency,
+	}); err != nil {
+		return err
+	}
+
+	categoryChanged := existingProduct.ProductCategory != input.Category ||
+		existingProduct.ProductSubcategory != input.Subcategory
+	if categoryChanged {
+		if err := s.dbRW.GetQueries().DeleteProductsCategories(ctx, productID); err != nil {
+			return err
+		}
+
+		if _, err := s.dbRW.GetQueries().CreateProductsCategories(ctx, queries.CreateProductsCategoriesParams{
+			ProductID:  productID,
+			CategoryID: categoryRow.ID,
+		}); err != nil {
+			return err
+		}
+	}
+
+	if input.ImagePath != "" {
+		cdnURL := s.getCDNURL(input.ImagePath)
+		cdnURLThumbnail := s.getCDNURL(constants.ToPath1280(input.ImagePath))
+		if _, err = s.dbRW.GetQueries().CreateProductImage(ctx, queries.CreateProductImageParams{
+			ProductID:       productID,
+			Path:            input.ImagePath,
+			Thumbnail:       sql.NullString{String: input.ImagePath, Valid: true},
+			CdnUrl:          sql.NullString{String: cdnURL, Valid: cdnURL != ""},
+			CdnUrlThumbnail: sql.NullString{String: cdnURLThumbnail, Valid: cdnURLThumbnail != ""},
+		}); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (s *ProductService) Log() {

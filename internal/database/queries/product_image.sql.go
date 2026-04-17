@@ -8,7 +8,6 @@ package queries
 import (
 	"context"
 	"database/sql"
-	"time"
 )
 
 const createProductImage = `-- name: CreateProductImage :one
@@ -17,12 +16,9 @@ INSERT INTO tbl_product_images (
 	path,
 	thumbnail,
 	cdn_url,
-	cdn_url_thumbnail,
-	created_at,
-	updated_at,
-	deleted_at
+	cdn_url_thumbnail
 ) VALUES (
-	?, ?, ?, ?, ?, ?, ?, ?
+	?, ?, ?, ?, ?
 ) RETURNING id, product_id, path, thumbnail, created_at, updated_at, deleted_at, cdn_url, cdn_url_thumbnail
 `
 
@@ -32,9 +28,6 @@ type CreateProductImageParams struct {
 	Thumbnail       sql.NullString
 	CdnUrl          sql.NullString
 	CdnUrlThumbnail sql.NullString
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-	DeletedAt       time.Time
 }
 
 func (q *Queries) CreateProductImage(ctx context.Context, arg CreateProductImageParams) (TblProductImage, error) {
@@ -44,9 +37,6 @@ func (q *Queries) CreateProductImage(ctx context.Context, arg CreateProductImage
 		arg.Thumbnail,
 		arg.CdnUrl,
 		arg.CdnUrlThumbnail,
-		arg.CreatedAt,
-		arg.UpdatedAt,
-		arg.DeletedAt,
 	)
 	var i TblProductImage
 	err := row.Scan(

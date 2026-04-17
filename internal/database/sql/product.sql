@@ -1,11 +1,15 @@
 -- name: GetProductsByID :one
 SELECT
-	*,
-	tbl_brands.name AS brand_name
+	tbl_products.*,
+	tbl_brands.name AS brand_name,
+	COALESCE(pc.category, '') AS product_category,
+	COALESCE(pc.subcategory, '') AS product_subcategory,
+	tbl_product_specs.*
 FROM tbl_products
--- INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
 INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_categories AS pc ON pc.id = tbl_products_categories.category_id
 WHERE tbl_products.id = ?
 LIMIT 1;
 
@@ -149,15 +153,11 @@ INSERT INTO tbl_products (
 	unit_price_without_vat,
 	unit_price_with_vat,
 	unit_price_without_vat_currency,
-	unit_price_with_vat_currency,
-	created_at,
-	updated_at,
-	deleted_at
+	unit_price_with_vat_currency
 ) VALUES (
 	?, ?, ?, ?,
 	?, ?, ?, ?,
-	?, ?, ?, ?,
-	?
+	?, ?
 ) RETURNING *;
 
 -- name: UpdateProducts :execlastid
@@ -172,9 +172,7 @@ SET
 	unit_price_with_vat = ?,
 	unit_price_without_vat_currency = ?,
 	unit_price_with_vat_currency = ?,
-	created_at = ?,
-	updated_at = ?,
-	deleted_at = ?
+	updated_at = datetime('now')
 WHERE id = ?;
 
 -- name: AdminGetProductsForListing :many

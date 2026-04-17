@@ -263,6 +263,7 @@ go run -tags="fts5,staticfs" ./main.go
 ### More
 - Use recommendations by `modernize` tools with go 1.26 and above as basis
 - always define regex in constants/regex.go, use regexp.MustCompile
+- avoid passing created_at, updated_at, deleted_at if possible IF it can be set in the sql level
 
 ---
 

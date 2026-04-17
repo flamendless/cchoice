@@ -4,12 +4,9 @@ INSERT INTO tbl_product_images (
 	path,
 	thumbnail,
 	cdn_url,
-	cdn_url_thumbnail,
-	created_at,
-	updated_at,
-	deleted_at
+	cdn_url_thumbnail
 ) VALUES (
-	?, ?, ?, ?, ?, ?, ?, ?
+	?, ?, ?, ?, ?
 ) RETURNING *;
 
 -- name: GetProductImageByProductID :one

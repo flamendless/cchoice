@@ -273,6 +273,26 @@ type AdminProductListItem struct {
 	Status        enums.ProductStatus
 }
 
+type AdminProductEditForm struct {
+	ProductID      string
+	Serial         string
+	Name           string
+	Description    string
+	BrandID        string
+	BrandName      string
+	Category       string
+	Subcategory    string
+	Price          string
+	Status         enums.ProductStatus
+	Specs          AdminProductSpecsForm
+	ImagePath      string
+	ImageCDNURL    string
+	CategoriesJSON string
+	VATPercentage  string
+	Brands         []AdminBrand
+	Categories     []AdminCategory
+}
+
 type StaffTimeOff struct {
 	ID          string
 	StaffID     string

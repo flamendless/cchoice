@@ -11,6 +11,12 @@ const (
 	PRODUCT_STATUS_DRAFT
 )
 
+var AllProductStatuses = []ProductStatus{
+	PRODUCT_STATUS_ACTIVE,
+	PRODUCT_STATUS_DELETED,
+	PRODUCT_STATUS_DRAFT,
+}
+
 func ParseProductStatusToEnum(e string) ProductStatus {
 	switch e {
 	case PRODUCT_STATUS_ACTIVE.String():
