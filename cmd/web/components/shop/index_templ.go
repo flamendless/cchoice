@@ -34,7 +34,7 @@ func HomePage(data models.HomePageData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"overflow-x-hidden\"><head>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"overflow-x-clip\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -83,7 +83,7 @@ func HomePageBody(data models.HomePageData) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<body class=\"m-0 p-0 overflow-x-hidden custom-scrollbar\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<body class=\"m-0 p-0 overflow-x-clip custom-scrollbar\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -115,7 +115,7 @@ func HomePageBody(data models.HomePageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<style>\n\t\t\t#desktop-sidebar {\n\t\t\t\tposition: sticky;\n\t\t\t\ttop: 0;\n\t\t\t\tleft: 0;\n\t\t\t\tz-index: 40;\n\t\t\t\tmin-width: 15%;\n\t\t\t\tmax-width: 15%;\n\t\t\t\twidth: 15%;\n\t\t\t\tmargin-left: 0.125rem;\n\t\t\t\tpadding-right: 1.5rem;\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\theight: 100%;\n\t\t\t\toverflow: auto;\n\t\t\t}\n\t\t\t#main-content {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: flex-start;\n\t\t\t\twidth: 100%;\n\t\t\t\tborder-left: 2px solid #F6b08A;\n\t\t\t}\n\t\t\t@media (max-width: 1023px) {\n\t\t\t\t#desktop-sidebar {\n\t\t\t\t\tdisplay: none !important;\n\t\t\t\t}\n\t\t\t\t#main-content {\n\t\t\t\t\twidth: 100% !important;\n\t\t\t\t\tborder-left: none !important;\n\t\t\t\t}\n\t\t\t}\n\t\t</style><div class=\"flex flex-col\"><div class=\"flex items-start\"><div id=\"desktop-sidebar\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<style>\n\t\t\t#desktop-sidebar {\n\t\t\t\tposition: sticky;\n\t\t\t\ttop: 80px; /* Offset for the sticky header */\n\t\t\t\tleft: 0;\n\t\t\t\tz-index: 40;\n\t\t\t\tmin-width: 15%;\n\t\t\t\tmax-width: 15%;\n\t\t\t\twidth: 15%;\n\t\t\t\tmargin-left: 0.125rem;\n\t\t\t\tpadding-right: 1.5rem;\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\theight: calc(100vh - 80px);\n\t\t\t\toverflow-y: auto;\n\t\t\t}\n\t\t\t#main-content {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: flex-start;\n\t\t\t\twidth: 100%;\n\t\t\t\tborder-left: 2px solid #F6b08A;\n\t\t\t}\n\t\t\t@media (max-width: 1023px) {\n\t\t\t\t#desktop-sidebar {\n\t\t\t\t\tdisplay: none !important;\n\t\t\t\t}\n\t\t\t\t#main-content {\n\t\t\t\t\twidth: 100% !important;\n\t\t\t\t\tborder-left: none !important;\n\t\t\t\t}\n\t\t\t}\n\t\t</style><div class=\"flex flex-col\"><div class=\"flex items-start\"><div id=\"desktop-sidebar\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

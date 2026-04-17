@@ -7,7 +7,7 @@ import "cchoice/cmd/web/components/footer"
 
 templ HomePage(data models.HomePageData) {
 	<!DOCTYPE html>
-	<html lang="en" class="overflow-x-hidden">
+	<html lang="en" class="overflow-x-clip">
 		<head>
 			@common.HeadMeta()
 			@common.TabTitle("Home")
@@ -17,7 +17,7 @@ templ HomePage(data models.HomePageData) {
 }
 
 templ HomePageBody(data models.HomePageData) {
-	<body class="m-0 p-0 overflow-x-hidden custom-scrollbar">
+	<body class="m-0 p-0 overflow-x-clip custom-scrollbar">
 		@common.ErrorBanner()
 		@common.SuccessBanner()
 		if data.RandomSaleProduct.DiscountPercentage != "" {
@@ -31,7 +31,7 @@ templ HomePageBody(data models.HomePageData) {
 		<style>
 			#desktop-sidebar {
 				position: sticky;
-				top: 0;
+				top: 80px; /* Offset for the sticky header */
 				left: 0;
 				z-index: 40;
 				min-width: 15%;
@@ -41,8 +41,8 @@ templ HomePageBody(data models.HomePageData) {
 				padding-right: 1.5rem;
 				display: flex;
 				flex-direction: column;
-				height: 100%;
-				overflow: auto;
+				height: calc(100vh - 80px);
+				overflow-y: auto;
 			}
 			#main-content {
 				display: flex;

@@ -64,7 +64,7 @@ func CategoriesSidePanelList(categories []models.CategorySidePanelText) templ.Co
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft transition-colors category-scroll-link\" data-scroll-target=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"text-base lg:text-xs font-light ml-2 my-1 lg:my-0.5 py-1.5 lg:py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft transition-colors category-scroll-link\" data-scroll-target=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
