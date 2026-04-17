@@ -32,7 +32,7 @@ func MobileSearchToggle() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<button type=\"button\" aria-label=\"Open search\" class=\"text-cchoice p-2 rounded-full lg:hidden hover:bg-cchoice_border\" _=\"\n\t\t\ton click\n\t\t\t\tasync call metrics_event('mobile_search_toggle')\n\t\t\t\ttoggle .hidden on #mobile-search-panel\n\t\t\t\tif #mobile-search-panel does not match .hidden\n\t\t\t\t\twait 0.05s\n\t\t\t\t\tfocus() on #search-mobile\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<button type=\"button\" aria-label=\"Open search\" class=\"text-cchoice p-2 rounded-full lg:hidden hover:bg-cchoice_border\" _=\"\n\t\t\ton click\n\t\t\t\ttoggle .hidden on #mobile-search-panel\n\t\t\t\tif #mobile-search-panel does not match .hidden\n\t\t\t\t\twait 0.05s\n\t\t\t\t\tfocus() on #search-mobile\n\t\t\t\tend\n\t\t\t\tasync call metrics_event('mobile_search_toggle')\n\t\t\tend\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -69,7 +69,7 @@ func MobileSearchPanel() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div id=\"mobile-search-panel\" class=\"absolute left-0 w-1/2 hidden lg:hidden border-b border-searchbar bg-white px-3 py-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div id=\"mobile-search-panel\" class=\"absolute top-full left-0 right-0 w-full z-[60] shadow-md hidden lg:hidden border-b border-searchbar bg-white px-3 py-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -113,7 +113,7 @@ func SearchBarMobile() templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/search"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `search/searchbar_mobile.templ`, Line: 67, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `search/searchbar_mobile.templ`, Line: 68, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
