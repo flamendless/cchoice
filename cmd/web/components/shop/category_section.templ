@@ -30,7 +30,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 					<div class="relative inline-block">
 						<img
 							src={ product.CDNURL }
-							class="w-20 max-w-20 h-20 sm:w-24 sm:max-w-24 sm:h-24 cursor-zoom-in"
+							class="w-20 max-w-20 h-20 sm:w-24 sm:max-w-24 sm:h-24 cursor-zoom-in object-contain"
 							title="show high-quality image"
 							alt={ product.Name + " thumbnail" }
 							loading={ func() string { if utils.IsProductOnSale(product.DiscountPercentage) { return "eager" }; return "lazy" }() }

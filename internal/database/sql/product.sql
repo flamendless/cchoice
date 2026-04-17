@@ -185,6 +185,8 @@ SELECT
 	tbl_products.description,
 	tbl_brands.name AS brand_name,
 	tbl_products.status,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
 	tbl_products.created_at,
 	tbl_products.updated_at,
 	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
@@ -198,11 +200,22 @@ SELECT
 	COALESCE(tbl_product_specs.capacity, '') AS capacity,
 	COALESCE(tbl_product_specs.scope_of_supply, '') AS scope_of_supply,
 	COALESCE(tbl_product_specs.weight, 0) AS weight,
-	COALESCE(tbl_product_specs.weight_unit, '') AS weight_unit
+	COALESCE(tbl_product_specs.weight_unit, '') AS weight_unit,
+	COALESCE(categories.category, '') AS category,
+	COALESCE(categories.subcategory, '') AS subcategory
 FROM tbl_products
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 LEFT JOIN tbl_product_specs ON tbl_product_specs.id = tbl_products.product_specs_id
+LEFT JOIN (
+	SELECT
+		tbl_products_categories.product_id,
+		GROUP_CONCAT(tbl_product_categories.category, ', ') AS category,
+		GROUP_CONCAT(tbl_product_categories.subcategory, ', ') AS subcategory
+	FROM tbl_products_categories
+	INNER JOIN tbl_product_categories ON tbl_product_categories.id = tbl_products_categories.category_id
+	GROUP BY tbl_products_categories.product_id
+) AS categories ON categories.product_id = tbl_products.id
 WHERE
 	(@search IS NULL OR @search = '' OR LOWER(tbl_products.serial) LIKE '%' || LOWER(@search) || '%')
 	AND (@status IS NULL OR @status = '' OR tbl_products.status = @status)
@@ -238,6 +251,7 @@ INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 WHERE
 	tbl_products.status = 'ACTIVE'
+	AND thumbnail_path != 'static/images/empty_96x96.webp'
 	AND tbl_products_fts.name MATCH ?
 LIMIT ?;
 
@@ -271,8 +285,10 @@ LEFT JOIN tbl_product_sales
 	AND datetime('now') BETWEEN
 		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
 LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
-WHERE tbl_products.status = 'ACTIVE'
-AND tbl_product_sales.id IS NOT NULL
+WHERE
+	tbl_products.status = 'ACTIVE'
+	AND thumbnail_path != 'static/images/empty_96x96.webp'
+	AND tbl_product_sales.id IS NOT NULL
 ORDER BY RANDOM()
 LIMIT 1;
 

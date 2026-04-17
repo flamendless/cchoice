@@ -100,7 +100,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"w-20 max-w-20 h-20 sm:w-24 sm:max-w-24 sm:h-24 cursor-zoom-in\" title=\"show high-quality image\" alt=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"w-20 max-w-20 h-20 sm:w-24 sm:max-w-24 sm:h-24 cursor-zoom-in object-contain\" title=\"show high-quality image\" alt=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
