@@ -1,7 +1,6 @@
 package models
 
 import (
-	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
@@ -264,7 +263,6 @@ func (product *Product) InsertToDB(ctx context.Context, db database.IService) (i
 	}
 	product.ProductSpecs.ID = productSpecsID
 
-	now := time.Now().UTC()
 	insertedProduct, err := db.GetQueries().CreateProducts(
 		ctx,
 		queries.CreateProductsParams{
@@ -285,11 +283,7 @@ func (product *Product) InsertToDB(ctx context.Context, db database.IService) (i
 			UnitPriceWithVat:    product.UnitPriceWithVat.Amount() * 100,
 
 			UnitPriceWithoutVatCurrency: product.UnitPriceWithoutVat.Currency().Code,
-			UnitPriceWithVatCurrency:    product.UnitPriceWithVat.Currency().Code,
-
-			CreatedAt: now,
-			UpdatedAt: now,
-			DeletedAt: constants.DtBeginning,
+			UnitPriceWithVatCurrency:    product.UnitPriceWithoutVat.Currency().Code,
 		},
 	)
 	if err != nil {
@@ -314,7 +308,6 @@ func (product *Product) UpdateToDB(ctx context.Context, db database.IService) (i
 	}
 	product.ProductSpecs.ID = productSpecsID
 
-	now := time.Now().UTC()
 	updatedID, err := db.GetQueries().UpdateProducts(
 		ctx,
 		queries.UpdateProductsParams{
@@ -335,8 +328,7 @@ func (product *Product) UpdateToDB(ctx context.Context, db database.IService) (i
 			UnitPriceWithVat:    product.UnitPriceWithVat.Amount() * 100,
 
 			UnitPriceWithoutVatCurrency: product.UnitPriceWithoutVat.Currency().Code,
-			UnitPriceWithVatCurrency:    product.UnitPriceWithVat.Currency().Code,
-			UpdatedAt:                   now,
+			UnitPriceWithVatCurrency:    product.UnitPriceWithoutVat.Currency().Code,
 		},
 	)
 	if err != nil {

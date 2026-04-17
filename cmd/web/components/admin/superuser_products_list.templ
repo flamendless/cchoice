@@ -185,6 +185,7 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 										@ProductActionDraft(p.ID)
 									case enums.PRODUCT_STATUS_DRAFT:
 										@ProductActionPublish(p.ID)
+										@ProductActionEdit(p.ID)
 										@ProductActionDelete(p.ID)
 									case enums.PRODUCT_STATUS_DELETED:
 										@ProductActionDraft(p.ID)

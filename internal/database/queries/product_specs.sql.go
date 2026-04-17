@@ -158,3 +158,47 @@ func (q *Queries) GetProductSpecsByProductID(ctx context.Context, id int64) (Tbl
 	)
 	return i, err
 }
+
+const updateProductSpecs = `-- name: UpdateProductSpecs :exec
+UPDATE tbl_product_specs
+SET
+	colours = ?,
+	sizes = ?,
+	segmentation = ?,
+	part_number = ?,
+	power = ?,
+	capacity = ?,
+	scope_of_supply = ?,
+	weight = ?,
+	weight_unit = ?
+WHERE id = ?
+`
+
+type UpdateProductSpecsParams struct {
+	Colours       sql.NullString
+	Sizes         sql.NullString
+	Segmentation  sql.NullString
+	PartNumber    sql.NullString
+	Power         sql.NullString
+	Capacity      sql.NullString
+	ScopeOfSupply sql.NullString
+	Weight        sql.NullFloat64
+	WeightUnit    sql.NullString
+	ID            int64
+}
+
+func (q *Queries) UpdateProductSpecs(ctx context.Context, arg UpdateProductSpecsParams) error {
+	_, err := q.db.ExecContext(ctx, updateProductSpecs,
+		arg.Colours,
+		arg.Sizes,
+		arg.Segmentation,
+		arg.PartNumber,
+		arg.Power,
+		arg.Capacity,
+		arg.ScopeOfSupply,
+		arg.Weight,
+		arg.WeightUnit,
+		arg.ID,
+	)
+	return err
+}

@@ -58,6 +58,16 @@ func (q *Queries) CreateProductsCategories(ctx context.Context, arg CreateProduc
 	return i, err
 }
 
+const deleteProductsCategories = `-- name: DeleteProductsCategories :exec
+DELETE FROM tbl_products_categories
+WHERE product_id = ?
+`
+
+func (q *Queries) DeleteProductsCategories(ctx context.Context, productID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteProductsCategories, productID)
+	return err
+}
+
 const getProductCategoriesByPromoted = `-- name: GetProductCategoriesByPromoted :many
 ;
 
@@ -392,6 +402,34 @@ func (q *Queries) GetProductsCategoriesByIDs(ctx context.Context, arg GetProduct
 	var id int64
 	err := row.Scan(&id)
 	return id, err
+}
+
+const getProductsCategoriesByProductID = `-- name: GetProductsCategoriesByProductID :many
+SELECT category_id FROM tbl_products_categories
+WHERE product_id = ?
+`
+
+func (q *Queries) GetProductsCategoriesByProductID(ctx context.Context, productID int64) ([]int64, error) {
+	rows, err := q.db.QueryContext(ctx, getProductsCategoriesByProductID, productID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []int64
+	for rows.Next() {
+		var category_id int64
+		if err := rows.Scan(&category_id); err != nil {
+			return nil, err
+		}
+		items = append(items, category_id)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const setInitialPromotedProductCategories = `-- name: SetInitialPromotedProductCategories :many
