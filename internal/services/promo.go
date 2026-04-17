@@ -105,6 +105,11 @@ func (s *PromoService) CreatePromo(
 		}
 	}()
 
+	if startDate.After(endDate) {
+		result = errs.ErrValidationStartEndDates.Error()
+		return "", errs.ErrValidationStartEndDates
+	}
+
 	id, err := s.dbRW.GetQueries().CreatePromo(ctx, queries.CreatePromoParams{
 		Title:       title,
 		Description: description,
@@ -152,7 +157,13 @@ func (s *PromoService) UpdatePromo(
 	id := s.encoder.Decode(promoID)
 	promo, err := s.GetPromoByID(ctx, id)
 	if err != nil {
+		result = err.Error()
 		return err
+	}
+
+	if startDate.After(endDate) {
+		result = errs.ErrValidationStartEndDates.Error()
+		return errs.ErrValidationStartEndDates
 	}
 
 	if err := s.dbRW.GetQueries().UpdatePromo(ctx, queries.UpdatePromoParams{
