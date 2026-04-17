@@ -12,6 +12,7 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 
@@ -100,6 +101,11 @@ func (s *Server) adminPromosCreateHandler(w http.ResponseWriter, r *http.Request
 	endDate, err := time.Parse(constants.DateLayoutISO, endDateStr)
 	if err != nil {
 		redirectHX(w, r, utils.URLWithError(page, "Invalid end date format"))
+		return
+	}
+
+	if startDate.After(endDate) {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrValidationStartEndDates.Error()))
 		return
 	}
 
@@ -241,6 +247,11 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 	endDate, err := time.Parse(constants.DateLayoutISO, endDateStr)
 	if err != nil {
 		redirectHX(w, r, utils.URLWithError(page, "Invalid end date format"))
+		return
+	}
+
+	if startDate.After(endDate) {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrValidationStartEndDates.Error()))
 		return
 	}
 
