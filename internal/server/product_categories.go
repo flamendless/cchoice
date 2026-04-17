@@ -155,10 +155,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		if !strings.HasSuffix(product.ThumbnailPath, constants.EmptyImageFilename) {
 			validProducts = append(validProducts, i)
 		} else {
-			logs.LogCtx(ctx).Debug(
-				"No valid image/thumbnail",
-				zap.Int64("product id", product.ID),
-			)
+			logs.LogCtx(ctx).Debug("No valid image/thumbnail", zap.Int64("product id", product.ID))
 		}
 	}
 

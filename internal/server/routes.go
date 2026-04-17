@@ -395,7 +395,6 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 
 		promoBanners = make([]models.PromoItem, 0, len(activePromos))
 		for _, p := range activePromos {
-			fmt.Println(1111, p.Title, p.MediaURL)
 			promoBanners = append(promoBanners, models.PromoItem{
 				ID:          s.encoder.Encode(p.ID),
 				Title:       p.Title,
@@ -406,7 +405,6 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Println(2222, promoBanners)
 	logs.Log().Info(
 		logtag,
 		zap.String("random sale product", randomSaleProduct.ProductID),
