@@ -176,6 +176,10 @@ func (s *ImageService) UploadBrandImage(
 	return key, nil
 }
 
+func (s *ImageService) ID() string {
+	return "Image"
+}
+
 func (s *ImageService) Log() {
 	logs.Log().Info("[ImageService] Loaded")
 }

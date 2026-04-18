@@ -222,6 +222,10 @@ func (s *HolidayService) DeleteHoliday(ctx context.Context, staffID string, id i
 	return nil
 }
 
+func (s *HolidayService) ID() string {
+	return "Holiday"
+}
+
 func (s *HolidayService) Log() {
 	logs.Log().Info("[HolidayService] Loaded")
 }

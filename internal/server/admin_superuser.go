@@ -51,7 +51,8 @@ func (s *Server) adminSuperuserEnvsHandler(w http.ResponseWriter, r *http.Reques
 	ctx := r.Context()
 
 	cfg := conf.Conf()
-	vars := []models.EnvVar{
+	vars := make([]models.EnvVar, 0, 64)
+	vars = append(vars, []models.EnvVar{
 		{Key: "Server.Address", Value: cfg.Server.Address},
 		{Key: "Server.Port", Value: strconv.Itoa(cfg.Server.Port)},
 		{Key: "Server.PortFS", Value: strconv.Itoa(cfg.Server.PortFS)},
@@ -80,6 +81,13 @@ func (s *Server) adminSuperuserEnvsHandler(w http.ResponseWriter, r *http.Reques
 		{Key: "Test.LocalUploadImage", Value: strconv.FormatBool(cfg.Test.LocalUploadImage)},
 		{Key: "Test.LocalOTP", Value: strconv.FormatBool(cfg.Test.LocalOTP)},
 		{Key: "Test.LocalForgotPassword", Value: strconv.FormatBool(cfg.Test.LocalForgotPassword)},
+	}...)
+
+	for _, s := range s.services.all {
+		vars = append(vars, models.EnvVar{
+			Key:   "Services." + s.ID(),
+			Value: strconv.FormatBool(s != nil),
+		})
 	}
 
 	if err := compadmin.AdminSuperuserEnvsPage(vars).Render(ctx, w); err != nil {

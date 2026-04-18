@@ -204,6 +204,10 @@ func (s *ThumbnailService) buildStorageKey(brand, sizeFolder, filename, ext stri
 	return fmt.Sprintf("product_images/%s/%s/%s%s", brand, sizeFolder, filename, ext)
 }
 
+func (s *ThumbnailService) ID() string {
+	return "Thumbnail"
+}
+
 func (s *ThumbnailService) Log() {
 	logs.Log().Info("[ThumbnailService] Loaded")
 }

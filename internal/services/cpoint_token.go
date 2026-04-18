@@ -84,6 +84,10 @@ func (s *CPointTokenService) Verify(token string) (*CPointTokenPayload, error) {
 	return &payload, nil
 }
 
+func (s *CPointTokenService) ID() string {
+	return "CPointToken"
+}
+
 func (s CPointTokenService) Log() {
 	logs.Log().Info("[CPointToken] Loaded")
 }

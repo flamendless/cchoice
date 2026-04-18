@@ -185,6 +185,10 @@ func (s *StaffService) GetTimeOffs(ctx context.Context, staffID string) ([]model
 	return staffTimeOffs, nil
 }
 
+func (s *StaffService) ID() string {
+	return "Staff"
+}
+
 func (s *StaffService) Log() {
 	logs.Log().Info("[StaffService] Loaded")
 }

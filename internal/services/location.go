@@ -176,6 +176,10 @@ func (s *LocationService) ComputeLocation(
 	return result
 }
 
+func (s *LocationService) ID() string {
+	return "Location"
+}
+
 func (s *LocationService) Log() {
 	logs.Log().Info("[LocationService] Loaded")
 }

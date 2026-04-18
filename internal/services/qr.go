@@ -78,6 +78,10 @@ func (s *QRService) GenerateQRBase64(ctx context.Context, content string) (strin
 	return imgfmt + b64.ToBase64(qrBytes), nil
 }
 
+func (s *QRService) ID() string {
+	return "QR"
+}
+
 func (s *QRService) Log() {
 	logs.Log().Info("[QRService] Loaded")
 }

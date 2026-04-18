@@ -72,6 +72,10 @@ func (s *RoleService) RemoveRole(ctx context.Context, staffID string, role enums
 	return err
 }
 
+func (s *RoleService) ID() string {
+	return "Role"
+}
+
 func (s *RoleService) Log() {
 	logs.Log().Info("[RoleService] Loaded")
 }

@@ -234,6 +234,10 @@ func (s *PromoService) mapRowToPromo(p queries.TblPromo) *Promo {
 	}
 }
 
+func (s *PromoService) ID() string {
+	return "Promo"
+}
+
 func (s *PromoService) Log() {
 	logs.Log().Info("[PromoService] Loaded")
 }

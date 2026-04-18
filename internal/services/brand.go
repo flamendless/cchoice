@@ -202,6 +202,10 @@ func (s *BrandService) DeleteBrand(ctx context.Context, staffID string, id strin
 	return nil
 }
 
+func (s *BrandService) ID() string {
+	return "Brand"
+}
+
 func (s *BrandService) Log() {
 	logs.Log().Info("[BrandService] Loaded")
 }
