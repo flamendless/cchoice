@@ -1,0 +1,66 @@
+package product
+
+import "cchoice/cmd/web/models"
+import "cchoice/internal/utils"
+
+templ AddToCart(data models.ProductPageData) {
+	<div class="flex flex-col gap-4">
+		<div class="flex items-center gap-4">
+			<div class="flex items-center border rounded-lg overflow-hidden h-full w-[20%]">
+				<input
+					type="number"
+					id="product-qty"
+					name="quantity"
+					value="1"
+					min="1"
+					max="99"
+					class="w-full h-full text-center border-none focus:outline-none focus:ring-0"
+					hx-validate="false"
+				/>
+			</div>
+			<button
+				type="button"
+				id="btn-add-to-cart"
+				class="bg-cchoice text-white px-6 py-3 rounded-lg font-semibold
+					hover:bg-cchoice_dark transition-colors cursor-pointer"
+				data-product-id={ data.ProductID }
+				data-product-name={ data.Name }
+				data-product-price={ data.PriceDisplay }
+				data-product-brand={ data.BrandName }
+				data-product-image={ data.CDNURL1280 }
+				hx-post={ utils.URL("/carts/lines") }
+				hx-include="#selected-product-id,#product-qty"
+				hx-swap="none"
+				_="
+					on click
+						async call metrics_event('add_to_cart', #selected-product-id.value)
+						log 'Added to cart: ' + #selected-product-id.value
+						halt
+					end
+					on htmx:afterRequest
+						trigger get on #cart-count-desktop
+						trigger get on #cart-count-mobile
+						if #cart-icon-desktop
+							add .cart-icon-animate to #cart-icon-desktop
+							wait 400ms
+							remove .cart-icon-animate from #cart-icon-desktop
+						end
+						if #cart-icon-mobile
+							add .cart-icon-animate to #cart-icon-mobile
+							wait 400ms
+							remove .cart-icon-animate from #cart-icon-mobile
+						end
+					end
+				"
+			>
+				Add to Cart
+			</button>
+			<input
+				type="hidden"
+				id="selected-product-id"
+				name="product_id"
+				value=""
+			/>
+		</div>
+	</div>
+}

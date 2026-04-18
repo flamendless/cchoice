@@ -227,8 +227,8 @@ func NewServer() *ServerInstance {
 
 	if !cfg.IsProd() {
 		v := reflect.ValueOf(newServer.services)
-		if v.NumField() != len(newServer.services.all) {
-			panic("Mismatch lengths in services")
+		if v.NumField()-1 != len(newServer.services.all) {
+			panic(fmt.Sprintf("Mismatch lengths in services. All %d != services %d", v.NumField()-1, len(newServer.services.all)))
 		}
 	}
 

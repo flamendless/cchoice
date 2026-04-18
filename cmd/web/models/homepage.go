@@ -48,6 +48,45 @@ type RandomSaleProduct struct {
 	queries.GetRandomProductOnSaleRow
 }
 
+type ProductPageData struct {
+	ProductID                  string
+	Serial                     string
+	Name                       string
+	Description                string
+	BrandID                    string
+	BrandName                  string
+	BrandThumbnail             string
+	ProductCategory            string
+	ProductSubcategory         string
+	ImagePath                  string
+	ThumbnailPath              string
+	CDNURL                     string
+	CDNURL1280                 string
+	UnitPriceWithoutVat        int64
+	UnitPriceWithVat           int64
+	UnitPriceWithoutVatDisplay string
+	PriceDisplay               string
+	OrigPriceDisplay           string
+	DiscountPercentage         string
+	IsOnSale                   bool
+	Colours                    []string
+	Sizes                      []string
+	Specs                      map[string]string
+	RelatedProducts            []RelatedProduct
+}
+
+type RelatedProduct struct {
+	ProductID          string
+	Name               string
+	Serial             string
+	BrandName          string
+	CDNURL             string
+	CDNURL1280         string
+	OrigPriceDisplay   string
+	PriceDisplay       string
+	DiscountPercentage string
+}
+
 type BrandLogoURLFunc func(filename string) string
 
 func BuildPostHomeContentSections(getBrandLogoURL BrandLogoURLFunc) []PostHomeContentSection {

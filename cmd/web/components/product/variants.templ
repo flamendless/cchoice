@@ -1,0 +1,43 @@
+package product
+
+import "cchoice/cmd/web/models"
+import "strings"
+
+templ ProductVariants(data models.ProductPageData) {
+	<div class="flex flex-col gap-4">
+		if len(data.Colours) > 0 && data.Colours[0] != "" {
+			<div class="flex flex-col gap-2">
+				<span class="text-sm font-medium text-gray-700">Colour:</span>
+				<div class="flex flex-wrap gap-2">
+					for _, colour := range data.Colours {
+						<button
+							type="button"
+							class="px-4 py-2 border rounded-lg text-sm font-medium
+								text-gray-700 hover:border-cchoice hover:text-cchoice
+								transition-colors cursor-pointer"
+						>
+							{ strings.TrimSpace(colour) }
+						</button>
+					}
+				</div>
+			</div>
+		}
+		if len(data.Sizes) > 0 && data.Sizes[0] != "" {
+			<div class="flex flex-col gap-2">
+				<span class="text-sm font-medium text-gray-700">Size:</span>
+				<div class="flex flex-wrap gap-2">
+					for _, size := range data.Sizes {
+						<button
+							type="button"
+							class="px-4 py-2 border rounded-lg text-sm font-medium
+								text-gray-700 hover:border-cchoice hover:text-cchoice
+								transition-colors cursor-pointer"
+						>
+							{ strings.TrimSpace(size) }
+						</button>
+					}
+				</div>
+			</div>
+		}
+	</div>
+}

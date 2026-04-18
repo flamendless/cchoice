@@ -488,7 +488,7 @@ templ PromoEditForm(promo models.AdminPromoListItem) {
 			<p class="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-700">
 				{ promo.Type.String() }
 			</p>
-			<input type="hidden" name="type" value={ promo.Type.String() } />
+			<input type="hidden" name="type" value={ promo.Type.String() }/>
 		</div>
 		if promo.Type == enums.PROMO_TYPE_BANNER_IMAGE {
 			<div id="edit_media_upload_field">

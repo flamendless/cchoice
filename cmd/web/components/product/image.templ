@@ -1,0 +1,16 @@
+package product
+
+import "cchoice/cmd/web/models"
+
+templ ProductImage(data models.ProductPageData) {
+	<div class="flex flex-col gap-4">
+		<div class="relative aspect-square w-full max-w-lg bg-gray-100 rounded-lg overflow-hidden">
+			<img
+				id="product-main-image"
+				src={ data.CDNURL }
+				alt={ data.Name }
+				class="w-full h-full object-contain"
+			/>
+		</div>
+	</div>
+}
