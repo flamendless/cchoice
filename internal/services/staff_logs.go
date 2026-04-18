@@ -90,6 +90,10 @@ func (s *StaffLogsService) GetAllAsModel(ctx context.Context) ([]models.StaffLog
 	return logsList, nil
 }
 
+func (s *StaffLogsService) ID() string {
+	return "StaffLogs"
+}
+
 func (s *StaffLogsService) Log() {
 	logs.Log().Info("[StaffLogsService] Loaded")
 }

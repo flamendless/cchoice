@@ -311,6 +311,10 @@ func (s *ProductService) UpdateProduct(ctx context.Context, input UpdateProductI
 	return nil
 }
 
+func (s *ProductService) ID() string {
+	return "Product"
+}
+
 func (s *ProductService) Log() {
 	logs.Log().Info("[ProductService] Loaded")
 }

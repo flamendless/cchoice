@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strings"
 	"time"
 
@@ -222,6 +223,13 @@ func NewServer() *ServerInstance {
 		newServer.services.staff,
 		newServer.services.staffLog,
 		newServer.services.cpointToken,
+	}
+
+	if !cfg.IsProd() {
+		v := reflect.ValueOf(newServer.services)
+		if v.NumField() != len(newServer.services.all) {
+			panic("Mismatch lengths in services")
+		}
 	}
 
 	logs.Log().Info("========[SERVICES]========")

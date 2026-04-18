@@ -61,10 +61,6 @@ func NewPasswordResetService(
 	}
 }
 
-func (s *PasswordResetService) Log() {
-	logs.Log().Info("[PasswordResetService]")
-}
-
 func (s *PasswordResetService) RequestReset(ctx context.Context, email string, userType enums.UserType) error {
 	const logtag = "[PasswordResetService RequestReset]"
 
@@ -300,6 +296,14 @@ func (s *PasswordResetService) ResetPassword(ctx context.Context, token string, 
 	return userType, nil
 }
 
+func (s *PasswordResetService) ID() string {
+	return "PasswordReset"
+}
+
+func (s *PasswordResetService) Log() {
+	logs.Log().Info("[PasswordResetService]")
+}
+
 func generateResetToken() (string, error) {
 	token := make([]byte, ResetTokenLength)
 	if _, err := rand.Read(token); err != nil {
@@ -312,3 +316,5 @@ func hashToken(token string) string {
 	hash := sha256.Sum256([]byte(token))
 	return base64.URLEncoding.EncodeToString(hash[:])
 }
+
+var _ IService = (*PasswordResetService)(nil)

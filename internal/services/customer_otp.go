@@ -146,6 +146,10 @@ func generateRandomOTP() (string, error) {
 	return fmt.Sprintf("%06d", n), nil
 }
 
+func (s *CustomerOTPService) ID() string {
+	return "CustomerOTP"
+}
+
 func (s *CustomerOTPService) Log() {
 	logs.Log().Info("[CustomerOTPService] Loaded")
 }

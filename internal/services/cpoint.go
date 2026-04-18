@@ -322,6 +322,10 @@ func (s *CPointService) ValidateCode(code string) error {
 	return nil
 }
 
+func (s *CPointService) ID() string {
+	return "CPoint"
+}
+
 func (s *CPointService) Log() {
 	logs.Log().Info("[CpointService] Loaded")
 }

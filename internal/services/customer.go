@@ -251,6 +251,10 @@ func containsLower(s, substr string) bool {
 	return false
 }
 
+func (s *CustomerService) ID() string {
+	return "Customer"
+}
+
 func (s *CustomerService) Log() {
 	logs.Log().Info("[CustomerService] Loaded")
 }

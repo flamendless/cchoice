@@ -535,6 +535,10 @@ func formatLocationAndUseragent(
 	return result
 }
 
+func (s *ReportService) ID() string {
+	return "Report"
+}
+
 func (s *ReportService) Log() {
 	logs.Log().Info("[ReportService] Loaded")
 }
