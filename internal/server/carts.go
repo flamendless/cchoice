@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"slices"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -350,23 +351,33 @@ func (s *Server) addProductToCartHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	var qty int64 = 1
+	if qtyStr := r.Form.Get("product-qty"); qtyStr != "" {
+		n, err := strconv.ParseInt(qtyStr, 10, 64)
+		if err != nil {
+			qty = n
+		}
+	}
+
 	dbProductID := s.encoder.Decode(productID)
 	if _, err := s.dbRO.GetQueries().CheckProductExistsByID(ctx, dbProductID); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("token", token),
+			zap.String("product id", productID),
+			zap.Int64("qty", qty),
 			zap.Error(err),
 		)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	checkoutLineProductIDs, err := AddToCheckoutLineProductIDs(ctx, s.sessionManager, productID)
-	if err != nil {
+	if _, err := AddToCheckoutLineProductIDs(ctx, s.sessionManager, productID, qty); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("token", token),
 			zap.String("product id", productID),
+			zap.Int64("qty", qty),
 			zap.Error(err),
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -376,7 +387,8 @@ func (s *Server) addProductToCartHandler(w http.ResponseWriter, r *http.Request)
 	logs.LogCtx(ctx).Info(
 		logtag,
 		zap.String("token", token),
-		zap.Strings("checkout line product ids", checkoutLineProductIDs),
+		zap.String("product id", productID),
+		zap.Int64("qty", qty),
 	)
 	w.WriteHeader(http.StatusOK)
 }

@@ -27,6 +27,7 @@ func AddToCheckoutLineProductIDs(
 	ctx context.Context,
 	sm *scs.SessionManager,
 	productID string,
+	qty int64,
 ) ([]string, error) {
 	if !sm.Exists(ctx, skCheckoutLineProductIDs) {
 		sm.Put(ctx, skCheckoutLineProductIDs, []string{})
@@ -37,8 +38,10 @@ func AddToCheckoutLineProductIDs(
 		return nil, errs.ErrSessionCheckoutLineProductIDs
 	}
 
-	checkoutLineProductIDs = append(checkoutLineProductIDs, productID)
-	sm.Put(ctx, skCheckoutLineProductIDs, checkoutLineProductIDs)
+	for range qty {
+		checkoutLineProductIDs = append(checkoutLineProductIDs, productID)
+		sm.Put(ctx, skCheckoutLineProductIDs, checkoutLineProductIDs)
+	}
 
 	return checkoutLineProductIDs, nil
 }

@@ -1,0 +1,26 @@
+package product
+
+import "cchoice/cmd/web/models"
+
+templ ProductHeader(data models.ProductPageData) {
+	<div class="flex flex-col gap-2">
+		// TODO: if we have brand page now
+		<!-- <a -->
+		<!-- 	href={ utils.URLf("/brands/%s", data.BrandID) } -->
+		<!-- 	class="text-sm text-gray-500 font-medium">{ data.BrandName } -->
+		<!-- </a> -->
+		if data.BrandThumbnail != "" {
+			<img
+				src={ data.BrandThumbnail }
+				alt={ data.BrandName }
+				class="w-[96px]"
+			/>
+		} else {
+			<p class="text-sm text-gray-500 font-medium">{ data.BrandName }</p>
+		}
+		<h1 class="text-2xl font-bold text-gray-900">{ data.Name }</h1>
+		<p class="text-sm text-gray-600">
+			Serial: { data.Serial }
+		</p>
+	</div>
+}

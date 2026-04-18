@@ -272,6 +272,154 @@ func (q *Queries) GetProductIDBySerial(ctx context.Context, serial string) (int6
 	return id, err
 }
 
+const getProductPage = `-- name: GetProductPage :one
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.status,
+	tbl_products.unit_price_without_vat,
+	tbl_products.unit_price_without_vat_currency,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_products.created_at,
+	tbl_products.updated_at,
+	tbl_brands.id AS brand_id,
+	tbl_brands.name AS brand_name,
+	tbl_brand_images.path AS brand_thumbnail_path,
+	tbl_brand_images.s3_url AS brand_thumbnail_url,
+	COALESCE(pc.category, '') AS product_category,
+	COALESCE(pc.subcategory, '') AS product_subcategory,
+	COALESCE(tbl_product_images.path, '') AS image_path,
+	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	COALESCE(tbl_product_images.cdn_url, '') AS cdn_url,
+	COALESCE(tbl_product_images.cdn_url_thumbnail, '') AS cdn_url_thumbnail,
+	COALESCE(tbl_product_specs.colours, '') AS colours,
+	COALESCE(tbl_product_specs.sizes, '') AS sizes,
+	COALESCE(tbl_product_specs.segmentation, '') AS segmentation,
+	COALESCE(tbl_product_specs.part_number, '') AS part_number,
+	COALESCE(tbl_product_specs.power, '') AS power,
+	COALESCE(tbl_product_specs.capacity, '') AS capacity,
+	COALESCE(tbl_product_specs.scope_of_supply, '') AS scope_of_supply,
+	COALESCE(tbl_product_specs.weight, 0) AS weight,
+	COALESCE(tbl_product_specs.weight_unit, '') AS weight_unit,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.sale_price_with_vat
+		ELSE tbl_products.unit_price_with_vat
+	END AS sale_price_with_vat,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.sale_price_with_vat_currency
+		ELSE tbl_products.unit_price_with_vat_currency
+	END AS sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.discount_type
+		ELSE ''
+	END AS discount_type,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.discount_value
+		ELSE 0
+	END AS discount_value
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+INNER JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id
+LEFT JOIN tbl_product_specs ON tbl_product_specs.id = tbl_products.product_specs_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_categories AS pc ON pc.id = tbl_products_categories.category_id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE tbl_products.id = ? AND tbl_products.status = 'ACTIVE'
+LIMIT 1
+`
+
+type GetProductPageRow struct {
+	ID                          int64
+	Serial                      string
+	Name                        string
+	Description                 sql.NullString
+	Status                      string
+	UnitPriceWithoutVat         int64
+	UnitPriceWithoutVatCurrency string
+	UnitPriceWithVat            int64
+	UnitPriceWithVatCurrency    string
+	CreatedAt                   time.Time
+	UpdatedAt                   time.Time
+	BrandID                     int64
+	BrandName                   string
+	BrandThumbnailPath          string
+	BrandThumbnailUrl           sql.NullString
+	ProductCategory             string
+	ProductSubcategory          string
+	ImagePath                   string
+	ThumbnailPath               string
+	CdnUrl                      string
+	CdnUrlThumbnail             string
+	Colours                     string
+	Sizes                       string
+	Segmentation                string
+	PartNumber                  string
+	Power                       string
+	Capacity                    string
+	ScopeOfSupply               string
+	Weight                      float64
+	WeightUnit                  string
+	IsOnSale                    int64
+	SalePriceWithVat            interface{}
+	SalePriceWithVatCurrency    interface{}
+	DiscountType                string
+	DiscountValue               int64
+}
+
+func (q *Queries) GetProductPage(ctx context.Context, id int64) (GetProductPageRow, error) {
+	row := q.db.QueryRowContext(ctx, getProductPage, id)
+	var i GetProductPageRow
+	err := row.Scan(
+		&i.ID,
+		&i.Serial,
+		&i.Name,
+		&i.Description,
+		&i.Status,
+		&i.UnitPriceWithoutVat,
+		&i.UnitPriceWithoutVatCurrency,
+		&i.UnitPriceWithVat,
+		&i.UnitPriceWithVatCurrency,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.BrandID,
+		&i.BrandName,
+		&i.BrandThumbnailPath,
+		&i.BrandThumbnailUrl,
+		&i.ProductCategory,
+		&i.ProductSubcategory,
+		&i.ImagePath,
+		&i.ThumbnailPath,
+		&i.CdnUrl,
+		&i.CdnUrlThumbnail,
+		&i.Colours,
+		&i.Sizes,
+		&i.Segmentation,
+		&i.PartNumber,
+		&i.Power,
+		&i.Capacity,
+		&i.ScopeOfSupply,
+		&i.Weight,
+		&i.WeightUnit,
+		&i.IsOnSale,
+		&i.SalePriceWithVat,
+		&i.SalePriceWithVatCurrency,
+		&i.DiscountType,
+		&i.DiscountValue,
+	)
+	return i, err
+}
+
 const getProducts = `-- name: GetProducts :many
 SELECT
 	tbl_products.id, serial, tbl_products.name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, tbl_product_categories.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at,
@@ -1400,6 +1548,100 @@ func (q *Queries) GetRandomProductOnSale(ctx context.Context) (GetRandomProductO
 		&i.CdnUrlThumbnail,
 	)
 	return i, err
+}
+
+const getRelatedProductsByCategory = `-- name: GetRelatedProductsByCategory :many
+SELECT
+	tbl_products.id,
+	tbl_products.name,
+	tbl_products.serial,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_brands.name AS brand_name,
+	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	COALESCE(tbl_product_images.cdn_url, '') AS cdn_url,
+	COALESCE(tbl_product_images.cdn_url_thumbnail, '') AS cdn_url_thumbnail,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.sale_price_with_vat
+		ELSE tbl_products.unit_price_with_vat
+	END AS sale_price_with_vat,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.sale_price_with_vat_currency
+		ELSE tbl_products.unit_price_with_vat_currency
+	END AS sale_price_with_vat_currency
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE tbl_products_categories.category_id = ?
+	AND tbl_products.id != ?
+	AND tbl_products.status = 'ACTIVE'
+	AND COALESCE(tbl_product_images.thumbnail, '') != ''
+LIMIT 6
+`
+
+type GetRelatedProductsByCategoryParams struct {
+	CategoryID int64
+	ID         int64
+}
+
+type GetRelatedProductsByCategoryRow struct {
+	ID                       int64
+	Name                     string
+	Serial                   string
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	BrandName                string
+	ThumbnailPath            string
+	CdnUrl                   string
+	CdnUrlThumbnail          string
+	IsOnSale                 int64
+	SalePriceWithVat         interface{}
+	SalePriceWithVatCurrency interface{}
+}
+
+func (q *Queries) GetRelatedProductsByCategory(ctx context.Context, arg GetRelatedProductsByCategoryParams) ([]GetRelatedProductsByCategoryRow, error) {
+	rows, err := q.db.QueryContext(ctx, getRelatedProductsByCategory, arg.CategoryID, arg.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRelatedProductsByCategoryRow
+	for rows.Next() {
+		var i GetRelatedProductsByCategoryRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Serial,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
+			&i.BrandName,
+			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
+			&i.IsOnSale,
+			&i.SalePriceWithVat,
+			&i.SalePriceWithVatCurrency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const softDeleteProduct = `-- name: SoftDeleteProduct :exec

@@ -299,3 +299,106 @@ WHERE id = ?;
 UPDATE tbl_products
 SET status = ?, updated_at = datetime('now')
 WHERE id = ?;
+
+-- name: GetProductPage :one
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.status,
+	tbl_products.unit_price_without_vat,
+	tbl_products.unit_price_without_vat_currency,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_products.created_at,
+	tbl_products.updated_at,
+	tbl_brands.id AS brand_id,
+	tbl_brands.name AS brand_name,
+	tbl_brand_images.path AS brand_thumbnail_path,
+	tbl_brand_images.s3_url AS brand_thumbnail_url,
+	COALESCE(pc.category, '') AS product_category,
+	COALESCE(pc.subcategory, '') AS product_subcategory,
+	COALESCE(tbl_product_images.path, '') AS image_path,
+	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	COALESCE(tbl_product_images.cdn_url, '') AS cdn_url,
+	COALESCE(tbl_product_images.cdn_url_thumbnail, '') AS cdn_url_thumbnail,
+	COALESCE(tbl_product_specs.colours, '') AS colours,
+	COALESCE(tbl_product_specs.sizes, '') AS sizes,
+	COALESCE(tbl_product_specs.segmentation, '') AS segmentation,
+	COALESCE(tbl_product_specs.part_number, '') AS part_number,
+	COALESCE(tbl_product_specs.power, '') AS power,
+	COALESCE(tbl_product_specs.capacity, '') AS capacity,
+	COALESCE(tbl_product_specs.scope_of_supply, '') AS scope_of_supply,
+	COALESCE(tbl_product_specs.weight, 0) AS weight,
+	COALESCE(tbl_product_specs.weight_unit, '') AS weight_unit,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.sale_price_with_vat
+		ELSE tbl_products.unit_price_with_vat
+	END AS sale_price_with_vat,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.sale_price_with_vat_currency
+		ELSE tbl_products.unit_price_with_vat_currency
+	END AS sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.discount_type
+		ELSE ''
+	END AS discount_type,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.discount_value
+		ELSE 0
+	END AS discount_value
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+INNER JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id
+LEFT JOIN tbl_product_specs ON tbl_product_specs.id = tbl_products.product_specs_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_categories AS pc ON pc.id = tbl_products_categories.category_id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE tbl_products.id = ? AND tbl_products.status = 'ACTIVE'
+LIMIT 1;
+
+-- name: GetRelatedProductsByCategory :many
+SELECT
+	tbl_products.id,
+	tbl_products.name,
+	tbl_products.serial,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_brands.name AS brand_name,
+	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	COALESCE(tbl_product_images.cdn_url, '') AS cdn_url,
+	COALESCE(tbl_product_images.cdn_url_thumbnail, '') AS cdn_url_thumbnail,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.sale_price_with_vat
+		ELSE tbl_products.unit_price_with_vat
+	END AS sale_price_with_vat,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.sale_price_with_vat_currency
+		ELSE tbl_products.unit_price_with_vat_currency
+	END AS sale_price_with_vat_currency
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE tbl_products_categories.category_id = ?
+	AND tbl_products.id != ?
+	AND tbl_products.status = 'ACTIVE'
+	AND COALESCE(tbl_product_images.thumbnail, '') != ''
+LIMIT 6;

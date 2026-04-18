@@ -177,6 +177,7 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 	r.Post("/search", s.searchHandler)
 
 	AddProductCategoriesHandlers(s, r)
+	AddProductHandlers(s, r)
 	AddBrandsHandlers(s, r)
 	AddCartsHandlers(s, r)
 	AddOrdersHandlers(s, r)
@@ -191,8 +192,6 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 	//INFO: (Brandon) - unused routes
 	r.Post("/checkouts", s.checkoutsHandler)
 
-	//INFO: (Brandon) Maintenance page for undefined routes
-	r.Get("/product/{id}", s.maintenancePageHandler)
 	r.Get("/terms", s.termsHandler)
 	r.Get("/privacy", s.privacyHandler)
 	r.NotFound(s.maintenancePageHandler)

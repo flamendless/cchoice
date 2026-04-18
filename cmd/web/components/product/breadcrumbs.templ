@@ -1,0 +1,20 @@
+package product
+
+import "cchoice/cmd/web/models"
+import "cchoice/internal/utils"
+
+templ Breadcrumbs(data models.ProductPageData) {
+	<nav class="flex items-center gap-2 text-sm text-gray-600 mb-4">
+		<a href={ utils.URL("/") } class="hover:text-cchoice transition-colors">Home</a>
+		<span class="text-gray-400">/</span>
+		if data.ProductCategory != "" {
+			<a href={ utils.URLf("/categories/%s", data.ProductCategory) } class="hover:text-cchoice transition-colors">{ data.ProductCategory }</a>
+			<span class="text-gray-400">/</span>
+		}
+		if data.ProductSubcategory != "" {
+			<a href={ utils.URLf("/categories/%s/%s",data.ProductCategory, data.ProductSubcategory) } class="hover:text-cchoice transition-colors">{ data.ProductSubcategory }</a>
+			<span class="text-gray-400">/</span>
+		}
+		<span class="text-gray-800 font-medium truncate max-w-[200px]">{ data.Name }</span>
+	</nav>
+}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"strconv"
+	"strings"
 
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
@@ -309,6 +310,180 @@ func (s *ProductService) UpdateProduct(ctx context.Context, input UpdateProductI
 	}
 
 	return nil
+}
+
+func (s *ProductService) GetProductPage(ctx context.Context, productID string) (*models.ProductPageData, error) {
+	decodedProductID := s.encoder.Decode(productID)
+	if decodedProductID == encode.INVALID {
+		return nil, errs.ErrDecode
+	}
+
+	row, err := s.dbRO.GetQueries().GetProductPage(ctx, decodedProductID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errs.ErrNotFound
+		}
+		return nil, err
+	}
+
+	origPrice := utils.NewMoney(row.UnitPriceWithVat, row.UnitPriceWithVatCurrency)
+	var salePrice int64
+	var saleCurrency string
+	if row.IsOnSale == 1 {
+		if sp, ok := row.SalePriceWithVat.(int64); ok {
+			salePrice = sp
+		} else {
+			salePrice = row.UnitPriceWithVat
+		}
+		if sc, ok := row.SalePriceWithVatCurrency.(string); ok {
+			saleCurrency = sc
+		} else {
+			saleCurrency = row.UnitPriceWithVatCurrency
+		}
+	} else {
+		salePrice = row.UnitPriceWithVat
+		saleCurrency = row.UnitPriceWithVatCurrency
+	}
+
+	discountedPrice := utils.NewMoney(salePrice, saleCurrency)
+	_, _, discountPercentage := utils.GetOrigAndDiscounted(
+		row.IsOnSale,
+		row.UnitPriceWithVat,
+		row.UnitPriceWithVatCurrency,
+		sql.NullInt64{Int64: salePrice, Valid: row.IsOnSale == 1},
+		sql.NullString{String: saleCurrency, Valid: row.IsOnSale == 1},
+	)
+
+	cdnURL := row.CdnUrl
+	if cdnURL == "" {
+		cdnURL = s.getCDNURL(row.ThumbnailPath)
+	}
+	cdnURL1280 := row.CdnUrlThumbnail
+	if cdnURL1280 == "" {
+		cdnURL1280 = s.getCDNURL(constants.ToPath1280(row.ThumbnailPath))
+	}
+
+	colours := strings.Split(row.Colours, ",")
+	sizes := strings.Split(row.Sizes, ",")
+
+	specs := make(map[string]string)
+	if row.Segmentation != "" {
+		specs["Segmentation"] = row.Segmentation
+	}
+	if row.PartNumber != "" {
+		specs["Part Number"] = row.PartNumber
+	}
+	if row.Power != "" {
+		specs["Power"] = row.Power
+	}
+	if row.Capacity != "" {
+		specs["Capacity"] = row.Capacity
+	}
+	if row.ScopeOfSupply != "" {
+		specs["Scope of Supply"] = row.ScopeOfSupply
+	}
+	if row.Weight > 0 {
+		specs["Weight"] = utils.ToWeightDisplay(row.Weight, row.WeightUnit)
+	}
+
+	return &models.ProductPageData{
+		ProductID:                  s.encoder.Encode(row.ID),
+		Serial:                     row.Serial,
+		Name:                       row.Name,
+		Description:                row.Description.String,
+		BrandID:                    s.encoder.Encode(row.BrandID),
+		BrandName:                  row.BrandName,
+		BrandThumbnail:             row.BrandThumbnailUrl.String,
+		ProductCategory:            row.ProductCategory,
+		ProductSubcategory:         row.ProductSubcategory,
+		ImagePath:                  row.ImagePath,
+		ThumbnailPath:              row.ThumbnailPath,
+		CDNURL:                     cdnURL,
+		CDNURL1280:                 cdnURL1280,
+		UnitPriceWithoutVat:        row.UnitPriceWithoutVat,
+		UnitPriceWithVat:           row.UnitPriceWithVat,
+		UnitPriceWithoutVatDisplay: origPrice.Display(),
+		PriceDisplay:               discountedPrice.Display(),
+		OrigPriceDisplay:           origPrice.Display(),
+		DiscountPercentage:         discountPercentage,
+		IsOnSale:                   row.IsOnSale == 1,
+		Colours:                    colours,
+		Sizes:                      sizes,
+		Specs:                      specs,
+	}, nil
+}
+
+func (s *ProductService) GetRelatedProducts(ctx context.Context, categoryID int64, excludeProductID int64) ([]models.RelatedProduct, error) {
+	rows, err := s.dbRO.GetQueries().GetRelatedProductsByCategory(ctx, queries.GetRelatedProductsByCategoryParams{
+		CategoryID: categoryID,
+		ID:         excludeProductID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	products := make([]models.RelatedProduct, 0, len(rows))
+	for _, r := range rows {
+		origPrice := utils.NewMoney(r.UnitPriceWithVat, r.UnitPriceWithVatCurrency)
+		var salePrice int64
+		if r.IsOnSale == 1 {
+			if sp, ok := r.SalePriceWithVat.(int64); ok {
+				salePrice = sp
+			} else {
+				salePrice = r.UnitPriceWithVat
+			}
+		} else {
+			salePrice = r.UnitPriceWithVat
+		}
+		discountedPrice := utils.NewMoney(salePrice, r.UnitPriceWithVatCurrency)
+		_, _, discountPercentage := utils.GetOrigAndDiscounted(
+			r.IsOnSale,
+			r.UnitPriceWithVat,
+			r.UnitPriceWithVatCurrency,
+			sql.NullInt64{Int64: salePrice, Valid: r.IsOnSale == 1},
+			sql.NullString{String: r.UnitPriceWithVatCurrency, Valid: r.IsOnSale == 1},
+		)
+
+		cdnURL := r.CdnUrl
+		if cdnURL == "" {
+			cdnURL = s.getCDNURL(r.ThumbnailPath)
+		}
+		cdnURL1280 := r.CdnUrlThumbnail
+		if cdnURL1280 == "" {
+			cdnURL1280 = s.getCDNURL(constants.ToPath1280(r.ThumbnailPath))
+		}
+
+		products = append(products, models.RelatedProduct{
+			ProductID:          s.encoder.Encode(r.ID),
+			Name:               r.Name,
+			Serial:             r.Serial,
+			BrandName:          r.BrandName,
+			CDNURL:             cdnURL,
+			CDNURL1280:         cdnURL1280,
+			OrigPriceDisplay:   origPrice.Display(),
+			PriceDisplay:       discountedPrice.Display(),
+			DiscountPercentage: discountPercentage,
+		})
+	}
+
+	return products, nil
+}
+
+func (s *ProductService) GetProductCategoryID(ctx context.Context, productID int64) (int64, error) {
+	row, err := s.dbRO.GetQueries().GetProductPage(ctx, productID)
+	if err != nil {
+		return 0, err
+	}
+
+	categoryRow, err := s.dbRO.GetQueries().GetProductCategoryByCategoryAndSubcategory(ctx, queries.GetProductCategoryByCategoryAndSubcategoryParams{
+		Category:    sql.NullString{String: row.ProductCategory, Valid: row.ProductCategory != ""},
+		Subcategory: sql.NullString{String: row.ProductSubcategory, Valid: row.ProductSubcategory != ""},
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	return categoryRow.ID, nil
 }
 
 func (s *ProductService) ID() string {
