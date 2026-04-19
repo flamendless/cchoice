@@ -346,15 +346,15 @@ func (s *Server) addProductToCartHandler(w http.ResponseWriter, r *http.Request)
 
 	productID := r.Form.Get("product_id")
 	if productID == "" {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(errs.ErrInvalidParams))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(errs.ErrInvalidParams), zap.Any("form", r.Form))
 		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
 
 	var qty int64 = 1
-	if qtyStr := r.Form.Get("product-qty"); qtyStr != "" {
+	if qtyStr := r.FormValue("quantity"); qtyStr != "" {
 		n, err := strconv.ParseInt(qtyStr, 10, 64)
-		if err != nil {
+		if err == nil {
 			qty = n
 		}
 	}
@@ -801,7 +801,13 @@ func (s *Server) getPaymentImageURL(pm payments.PaymentMethod) string {
 
 func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Cart Payment Methods Handler]"
+	const page = "/carts"
 	ctx := r.Context()
+
+	if s.paymentGateway == nil {
+		redirectHX(w, r, utils.URLWithError(page, "Payment gateway is not initialized. Perhaps in DEV mode?"))
+		return
+	}
 
 	cod, err := s.dbRO.GetQueries().GetSettingsCOD(ctx)
 	paymentMethods := []models.AvailablePaymentMethod{

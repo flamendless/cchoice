@@ -110,7 +110,20 @@ func AddToCart(data models.ProductPageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-include=\"#selected-product-id,#product-qty\" hx-swap=\"none\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tasync call metrics_event('add_to_cart', #selected-product-id.value)\n\t\t\t\t\t\tlog 'Added to cart: ' + #selected-product-id.value\n\t\t\t\t\t\thalt\n\t\t\t\t\tend\n\t\t\t\t\ton htmx:afterRequest\n\t\t\t\t\t\ttrigger get on #cart-count-desktop\n\t\t\t\t\t\ttrigger get on #cart-count-mobile\n\t\t\t\t\t\tif #cart-icon-desktop\n\t\t\t\t\t\t\tadd .cart-icon-animate to #cart-icon-desktop\n\t\t\t\t\t\t\twait 400ms\n\t\t\t\t\t\t\tremove .cart-icon-animate from #cart-icon-desktop\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif #cart-icon-mobile\n\t\t\t\t\t\t\tadd .cart-icon-animate to #cart-icon-mobile\n\t\t\t\t\t\t\twait 400ms\n\t\t\t\t\t\t\tremove .cart-icon-animate from #cart-icon-mobile\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\">Add to Cart</button> <input type=\"hidden\" id=\"selected-product-id\" name=\"product_id\" value=\"\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-include=\"#selected-product-id,#product-qty\" hx-swap=\"none\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tasync call metrics_event('add_to_cart', #selected-product-id.value)\n\t\t\t\t\t\tlog 'Added to cart: ' + #selected-product-id.value\n\t\t\t\t\tend\n\t\t\t\t\ton htmx:afterRequest\n\t\t\t\t\t\ttrigger get on #cart-count-desktop\n\t\t\t\t\t\ttrigger get on #cart-count-mobile\n\t\t\t\t\t\tif #cart-icon-desktop\n\t\t\t\t\t\t\tadd .cart-icon-animate to #cart-icon-desktop\n\t\t\t\t\t\t\twait 400ms\n\t\t\t\t\t\t\tremove .cart-icon-animate from #cart-icon-desktop\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif #cart-icon-mobile\n\t\t\t\t\t\t\tadd .cart-icon-animate to #cart-icon-mobile\n\t\t\t\t\t\t\twait 400ms\n\t\t\t\t\t\t\tremove .cart-icon-animate from #cart-icon-mobile\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\">Add to Cart</button> <input type=\"hidden\" id=\"selected-product-id\" name=\"product_id\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(data.ProductID)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 61, Col: 26}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
