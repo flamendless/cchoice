@@ -269,6 +269,7 @@ type TblProduct struct {
 	CreatedAt                   time.Time
 	UpdatedAt                   time.Time
 	DeletedAt                   time.Time
+	Slug                        sql.NullString
 }
 
 type TblProductCategory struct {

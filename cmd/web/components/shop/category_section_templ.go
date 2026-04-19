@@ -92,9 +92,9 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 templ.SafeURL
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URLf("/product/%s", product.ProductID))
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URLf("/product/%s", product.Slug))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/category_section.templ`, Line: 31, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/category_section.templ`, Line: 31, Col: 51}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {

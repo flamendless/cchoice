@@ -50,6 +50,7 @@ type GroupedCategorySection struct {
 
 type CategorySectionProduct struct {
 	ProductID          string
+	Slug               string
 	CDNURL             string
 	CDNURL1280         string
 	OrigPriceDisplay   string
@@ -86,6 +87,7 @@ func ToCategorySectionProducts[T queries.GetProductsByCategoryIDRow](
 		res = append(res, CategorySectionProduct{
 			GetProductsByCategoryIDRow: r,
 			ProductID:                  encoder.Encode(r.ID),
+			Slug:                       r.Slug.String,
 			CDNURL:                     r.CdnUrlThumbnail.String,
 			CDNURL1280:                 r.CdnUrl.String,
 			OrigPriceDisplay:           origPrice.Display(),
@@ -250,6 +252,7 @@ type AdminProductSpecsForm struct {
 type AdminProductListItem struct {
 	ID            string
 	Name          string
+	Slug          string
 	Serial        string
 	Description   string
 	Brand         string

@@ -285,6 +285,7 @@ const getProductsByCategoryID = `-- name: GetProductsByCategoryID :many
 SELECT
 	tbl_products.id,
 	tbl_products.serial,
+	tbl_products.slug,
 	tbl_products.name,
 	tbl_products.description,
 	tbl_products.unit_price_with_vat,
@@ -332,6 +333,7 @@ type GetProductsByCategoryIDParams struct {
 type GetProductsByCategoryIDRow struct {
 	ID                       int64
 	Serial                   string
+	Slug                     sql.NullString
 	Name                     string
 	Description              sql.NullString
 	UnitPriceWithVat         int64
@@ -359,6 +361,7 @@ func (q *Queries) GetProductsByCategoryID(ctx context.Context, arg GetProductsBy
 		if err := rows.Scan(
 			&i.ID,
 			&i.Serial,
+			&i.Slug,
 			&i.Name,
 			&i.Description,
 			&i.UnitPriceWithVat,

@@ -73,6 +73,7 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 					@TableHeader("5%", "Serial")
 					<!-- @TableHeader("6%", "Description") -->
 					@TableHeader("4%", "Brand")
+					@TableHeader("4%", "Slug")
 					@TableHeader("6%", "Price")
 					@TableHeader("6%", "Category")
 					@TableHeader("6%", "Subcategory")
@@ -107,6 +108,9 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 						<!-- } -->
 						@TableCell("4%", "text-gray-900") {
 							{ p.Brand }
+						}
+						@TableCell("4%", "text-gray-900") {
+							{ p.Slug }
 						}
 						@TableCell("6%", "text-gray-900") {
 							{ p.Price }

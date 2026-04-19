@@ -146,6 +146,7 @@ LIMIT 1;
 INSERT INTO tbl_products (
 	serial,
 	name,
+	slug,
 	description,
 	brand_id,
 	status,
@@ -157,13 +158,14 @@ INSERT INTO tbl_products (
 ) VALUES (
 	?, ?, ?, ?,
 	?, ?, ?, ?,
-	?, ?
+	?, ?, ?
 ) RETURNING *;
 
 -- name: UpdateProducts :execlastid
 UPDATE tbl_products
 SET
 	name = ?,
+	slug = ?,
 	description = ?,
 	brand_id = ?,
 	status = ?,
@@ -180,6 +182,7 @@ SELECT
 	tbl_products.id,
 	tbl_products.name,
 	tbl_products.serial,
+	tbl_products.slug,
 	tbl_products.description,
 	tbl_brands.name AS brand_name,
 	tbl_products.status,
@@ -363,7 +366,7 @@ LEFT JOIN tbl_product_sales
 	ON tbl_product_sales.product_id = tbl_products.id
 	AND tbl_product_sales.is_active = 1
 	AND datetime('now') BETWEEN tbl_product_sales.starts_at AND tbl_product_sales.ends_at
-WHERE tbl_products.id = ? AND tbl_products.status = 'ACTIVE'
+WHERE tbl_products.slug = ? AND tbl_products.status = 'ACTIVE'
 LIMIT 1;
 
 -- name: GetRelatedProductsByCategory :many
@@ -402,3 +405,25 @@ WHERE tbl_products_categories.category_id = ?
 	AND tbl_products.status = 'ACTIVE'
 	AND COALESCE(tbl_product_images.thumbnail, '') != ''
 LIMIT 6;
+
+-- name: GetProductsWithoutSlugs :many
+SELECT
+	tbl_products.id,
+	tbl_products.name,
+	tbl_products.serial,
+	tbl_brands.name as brand_name,
+	COALESCE(pc.category, '') AS product_category,
+	COALESCE(pc.subcategory, '') AS product_subcategory,
+	COALESCE(tbl_product_specs.power, '') AS power,
+	COALESCE(tbl_product_specs.capacity, '') AS capacity
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_specs ON tbl_product_specs.id = tbl_products.product_specs_id
+LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_categories AS pc ON pc.id = tbl_products_categories.category_id
+WHERE
+	slug = '' or slug IS NULL
+	AND tbl_products.status = 'ACTIVE';
+
+-- name: UpdateProductSlugByID :exec
+UPDATE tbl_products SET slug = ? WHERE id = ?;
