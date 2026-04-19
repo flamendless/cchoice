@@ -35,7 +35,6 @@ templ AddToCart(data models.ProductPageData) {
 					on click
 						async call metrics_event('add_to_cart', #selected-product-id.value)
 						log 'Added to cart: ' + #selected-product-id.value
-						halt
 					end
 					on htmx:afterRequest
 						trigger get on #cart-count-desktop
@@ -59,7 +58,7 @@ templ AddToCart(data models.ProductPageData) {
 				type="hidden"
 				id="selected-product-id"
 				name="product_id"
-				value=""
+				value={ data.ProductID }
 			/>
 		</div>
 	</div>

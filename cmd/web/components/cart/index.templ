@@ -28,6 +28,7 @@ templ CartPage(body templ.Component) {
 templ CartPageBody(summaryContent templ.Component) {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
 		@common.ErrorBanner()
+		@common.SuccessBanner()
 		@header.Header()
 		<div class="flex flex-col items-center content-center px-2 pb-32 gap-4">
 			<form
@@ -167,6 +168,7 @@ templ CartSummaryContentEmpty() {
 templ CartPageBodyEmpty() {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
 		@common.ErrorBanner()
+		@common.SuccessBanner()
 		@header.Header()
 		<div class="flex flex-col items-center content-center pt-[128px]">
 			@EmptyCart()
