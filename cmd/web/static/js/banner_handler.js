@@ -55,9 +55,9 @@ document.body.addEventListener("htmx:afterRequest", function(evt) {
 		} else {
 			el_error_text.innerText = `Error: ${xhr.statusText} (${xhr.status}) - ${xhr.responseText}`;
 		}
+
 		el_error_closer.removeAttribute("hidden");
 		el_error_banner.removeAttribute("hidden");
-
 		el_success_banner.setAttribute("hidden", "true");
 	}
 });

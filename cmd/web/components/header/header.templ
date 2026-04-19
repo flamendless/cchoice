@@ -130,7 +130,8 @@ templ HeaderDesktop() {
 			@common.IconAction(
 				"Cart",
 				"/carts",
-				svg.Cart("cart-count-desktop", clsHeaderIconButton),
+				svg.Cart("cart-icon-desktop", clsHeaderIconButton),
+				CartCount("cart-count-desktop", 0),
 			)
 			@common.IconAction(
 				"Track Order",
