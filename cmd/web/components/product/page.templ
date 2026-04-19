@@ -12,7 +12,8 @@ templ ProductPage(data models.ProductPageData) {
 	<html lang="en" class="overflow-x-hidden">
 		<head>
 			@common.HeadMeta()
-			@common.TabTitle(data.Name + " | CChoice")
+			<!-- @common.TabTitle(data.Name + " | CChoice") -->
+			@Meta(data.Meta)
 		</head>
 		<body class="min-h-screen flex flex-col bg-white">
 			@common.ErrorBanner()
@@ -27,10 +28,14 @@ templ ProductPage(data models.ProductPageData) {
 						@ProductPrice(data)
 						@ProductVariants(data)
 						@AddToCart(data)
+						<div class="flex flex-col gap-1 text-sm text-gray-600 mt-4">
+							<h4 class="text-md font-bold">Product Description:</h4>
+							<p>{ data.Description }</p>
+						</div>
+						<div class="mt-3">
+							@ProductSpecs(data.Specs)
+						</div>
 					</div>
-				</div>
-				<div class="mt-6">
-					@ProductSpecs(data)
 				</div>
 				@RelatedProducts(data.RelatedProducts)
 			</main>

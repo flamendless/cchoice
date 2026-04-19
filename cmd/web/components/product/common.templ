@@ -1,0 +1,8 @@
+package product
+
+import "cchoice/cmd/web/models"
+
+templ Meta(meta models.ProductsMeta) {
+	<title>{ meta.Title }</title>
+	<meta name="description" content={ meta.Content }>
+}
