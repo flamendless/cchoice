@@ -801,11 +801,10 @@ func (s *Server) getPaymentImageURL(pm payments.PaymentMethod) string {
 
 func (s *Server) cartsPaymentMethodsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Cart Payment Methods Handler]"
-	const page = "/carts"
 	ctx := r.Context()
 
 	if s.paymentGateway == nil {
-		redirectHX(w, r, utils.URLWithError(page, "Payment gateway is not initialized. Perhaps in DEV mode?"))
+		http.Error(w, "Payment gateway is not initialized. Perhaps in DEV mode?", http.StatusInternalServerError)
 		return
 	}
 
