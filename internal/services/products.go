@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -382,27 +383,17 @@ func (s *ProductService) GetProductPage(ctx context.Context, slug string) (*mode
 	colours := strings.Split(row.Colours, ",")
 	sizes := strings.Split(row.Sizes, ",")
 
-	specs := make(map[string]string)
-	if row.Segmentation != "" {
-		specs["Segmentation"] = row.Segmentation
-	}
-	if row.PartNumber != "" {
-		specs["Part Number"] = row.PartNumber
-	}
-	if row.Power != "" {
-		specs["Power"] = row.Power
-	}
-	if row.Capacity != "" {
-		specs["Capacity"] = row.Capacity
-	}
-	if row.ScopeOfSupply != "" {
-		specs["Scope of Supply"] = row.ScopeOfSupply
-	}
-	if row.Weight > 0 {
-		specs["Weight"] = utils.ToWeightDisplay(row.Weight, row.WeightUnit)
+	specs := []models.ProductSpec{
+		models.ProductSpec{Label: "Segmentation", Value: row.Segmentation},
+		models.ProductSpec{Label: "Part Number", Value: row.PartNumber},
+		models.ProductSpec{Label: "Power", Value: row.Power},
+		models.ProductSpec{Label: "Capacity", Value: row.Capacity},
+		models.ProductSpec{Label: "Scope of Supply", Value: row.ScopeOfSupply},
+		models.ProductSpec{Label: "Weight", Value: utils.ToWeightDisplay(row.Weight, row.WeightUnit)},
 	}
 
 	return &models.ProductPageData{
+		Meta:                       s.GenerateMeta(&row),
 		ProductID:                  s.encoder.Encode(row.ID),
 		Serial:                     row.Serial,
 		Name:                       row.Name,
@@ -427,6 +418,28 @@ func (s *ProductService) GetProductPage(ctx context.Context, slug string) (*mode
 		Sizes:                      sizes,
 		Specs:                      specs,
 	}, nil
+}
+
+func (s *ProductService) GenerateMeta(product *queries.GetProductPageRow) models.ProductsMeta {
+	title := fmt.Sprintf(
+		"%s %s %s (%s) - Price, Specs, Buy Online",
+		product.BrandName,
+		product.Name,
+		product.Power,
+		product.Serial,
+	)
+	content := fmt.Sprintf(
+		"Buy %s %s %s (%s). Power Tool. Durable. Quality. Best Prices in the Philippines. Free Shipping Available. %s",
+		product.BrandName,
+		product.Name,
+		product.Power,
+		product.Serial,
+		product.Description.String,
+	)
+	return models.ProductsMeta{
+		Title:   title,
+		Content: content,
+	}
 }
 
 func (s *ProductService) ID() string {

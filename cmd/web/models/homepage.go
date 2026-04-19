@@ -48,7 +48,13 @@ type RandomSaleProduct struct {
 	queries.GetRandomProductOnSaleRow
 }
 
+type ProductSpec struct {
+	Label string
+	Value string
+}
+
 type ProductPageData struct {
+	Meta                       ProductsMeta
 	ProductID                  string
 	Serial                     string
 	Name                       string
@@ -71,7 +77,7 @@ type ProductPageData struct {
 	IsOnSale                   bool
 	Colours                    []string
 	Sizes                      []string
-	Specs                      map[string]string
+	Specs                      []ProductSpec
 	RelatedProducts            []RelatedProduct
 }
 

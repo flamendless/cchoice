@@ -1,6 +1,7 @@
 package product
 
 import "cchoice/cmd/web/models"
+import "fmt"
 
 templ ProductImage(data models.ProductPageData) {
 	<div class="flex flex-col gap-4">
@@ -8,7 +9,7 @@ templ ProductImage(data models.ProductPageData) {
 			<img
 				id="product-main-image"
 				src={ data.CDNURL }
-				alt={ data.Name }
+				alt={ fmt.Sprintf("%s %s", data.BrandName, data.Name) }
 				class="w-full h-full object-contain"
 			/>
 		</div>

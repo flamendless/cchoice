@@ -2,17 +2,19 @@ package product
 
 import "cchoice/cmd/web/models"
 
-templ ProductSpecs(data models.ProductPageData) {
+templ ProductSpecs(specs []models.ProductSpec) {
 	<div class="flex flex-col gap-4">
 		<h2 class="text-xl font-bold text-gray-900">Specifications</h2>
 		<div class="overflow-x-auto">
 			<table class="w-full text-sm">
 				<tbody>
-					for label, value := range data.Specs {
-						<tr class="border-b">
-							<td class="py-3 px-4 text-gray-500 font-medium w-1/3">{ label }</td>
-							<td class="py-3 px-4 text-gray-900">{ value }</td>
-						</tr>
+					for _, spec := range specs {
+						if spec.Value != "" {
+							<tr class="border-b">
+								<td class="py-3 px-4 text-gray-500 font-medium w-1/3">{ spec.Label }</td>
+								<td class="py-3 px-4 text-gray-900">{ spec.Value }</td>
+							</tr>
+						}
 					}
 				</tbody>
 			</table>
