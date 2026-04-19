@@ -28,7 +28,7 @@ templ CategorySectionProducts(data models.CategorySectionProducts) {
 			for _, product := range data.Products {
 				<a
 					class="group flex flex-col items-center m-1 sm:m-2 ml-2 sm:ml-4 p-2 rounded-lg hover:bg-cchoicesoft transition-colors cursor-pointer"
-					href={ utils.URLf("/product/%s", product.ProductID) }
+					href={ utils.URLf("/product/%s", product.Slug) }
 				>
 					<div class="relative inline-block">
 						<img

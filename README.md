@@ -92,4 +92,5 @@ CPOINT_HMAC_SECRET="your-generated-secret"
 
 # NOTES:
 
-For GH workflow, comment out `[ -z "$PS1" ] && return` in server's .bashrc
+- For GH workflow, comment out `[ -z "$PS1" ] && return` in server's .bashrc.
+- After setup, there are cases wherein we must update/populate data, look at `commands.md` for the list

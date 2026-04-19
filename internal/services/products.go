@@ -40,7 +40,7 @@ func NewProductService(
 
 func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductInput) (*queries.TblProduct, error) {
 	brandID := s.encoder.Decode(input.BrandID)
-	_, err := s.dbRO.GetQueries().GetBrandsByID(ctx, brandID)
+	brand, err := s.dbRO.GetQueries().GetBrandsByID(ctx, brandID)
 	if err != nil {
 		return nil, err
 	}
@@ -80,6 +80,16 @@ func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductI
 		UnitPriceWithVat:            input.UnitPriceWithVat * 100,
 		UnitPriceWithoutVatCurrency: constants.PHP,
 		UnitPriceWithVatCurrency:    constants.PHP,
+		Slug: sql.NullString{
+			Valid: true,
+			String: utils.ProductSlug(
+				brand.Name,
+				categoryRow.Category.String,
+				categoryRow.Subcategory.String,
+				input.Serial,
+				input.Specs.Power,
+			),
+		},
 	})
 	if err != nil {
 		return nil, err
@@ -159,6 +169,7 @@ func (s *ProductService) GetProductsForListingAdmin(
 			ID:            s.encoder.Encode(p.ID),
 			Name:          p.Name,
 			Serial:        p.Serial,
+			Slug:          p.Slug.String,
 			Description:   p.Description.String,
 			Brand:         p.BrandName,
 			Price:         price.Display(),
@@ -232,7 +243,8 @@ func (s *ProductService) UpdateProduct(ctx context.Context, input UpdateProductI
 	}
 
 	brandID := s.encoder.Decode(input.BrandID)
-	if _, err := s.dbRO.GetQueries().GetBrandsByID(ctx, brandID); err != nil {
+	brand, err := s.dbRO.GetQueries().GetBrandsByID(ctx, brandID)
+	if err != nil {
 		return err
 	}
 
@@ -276,12 +288,21 @@ func (s *ProductService) UpdateProduct(ctx context.Context, input UpdateProductI
 		UnitPriceWithVat:            input.UnitPriceWithVat * 100,
 		UnitPriceWithoutVatCurrency: existingProduct.UnitPriceWithoutVatCurrency,
 		UnitPriceWithVatCurrency:    existingProduct.UnitPriceWithVatCurrency,
+		Slug: sql.NullString{
+			Valid: true,
+			String: utils.ProductSlug(
+				brand.Name,
+				categoryRow.Category.String,
+				categoryRow.Subcategory.String,
+				existingProduct.Serial,
+				input.Specs.Power,
+			),
+		},
 	}); err != nil {
 		return err
 	}
 
-	categoryChanged := existingProduct.ProductCategory != input.Category ||
-		existingProduct.ProductSubcategory != input.Subcategory
+	categoryChanged := existingProduct.ProductCategory != input.Category || existingProduct.ProductSubcategory != input.Subcategory
 	if categoryChanged {
 		if err := s.dbRW.GetQueries().DeleteProductsCategories(ctx, productID); err != nil {
 			return err
@@ -312,13 +333,8 @@ func (s *ProductService) UpdateProduct(ctx context.Context, input UpdateProductI
 	return nil
 }
 
-func (s *ProductService) GetProductPage(ctx context.Context, productID string) (*models.ProductPageData, error) {
-	decodedProductID := s.encoder.Decode(productID)
-	if decodedProductID == encode.INVALID {
-		return nil, errs.ErrDecode
-	}
-
-	row, err := s.dbRO.GetQueries().GetProductPage(ctx, decodedProductID)
+func (s *ProductService) GetProductPage(ctx context.Context, slug string) (*models.ProductPageData, error) {
+	row, err := s.dbRO.GetQueries().GetProductPage(ctx, sql.NullString{Valid: slug != "", String: slug})
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errs.ErrNotFound
@@ -411,79 +427,6 @@ func (s *ProductService) GetProductPage(ctx context.Context, productID string) (
 		Sizes:                      sizes,
 		Specs:                      specs,
 	}, nil
-}
-
-func (s *ProductService) GetRelatedProducts(ctx context.Context, categoryID int64, excludeProductID int64) ([]models.RelatedProduct, error) {
-	rows, err := s.dbRO.GetQueries().GetRelatedProductsByCategory(ctx, queries.GetRelatedProductsByCategoryParams{
-		CategoryID: categoryID,
-		ID:         excludeProductID,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	products := make([]models.RelatedProduct, 0, len(rows))
-	for _, r := range rows {
-		origPrice := utils.NewMoney(r.UnitPriceWithVat, r.UnitPriceWithVatCurrency)
-		var salePrice int64
-		if r.IsOnSale == 1 {
-			if sp, ok := r.SalePriceWithVat.(int64); ok {
-				salePrice = sp
-			} else {
-				salePrice = r.UnitPriceWithVat
-			}
-		} else {
-			salePrice = r.UnitPriceWithVat
-		}
-		discountedPrice := utils.NewMoney(salePrice, r.UnitPriceWithVatCurrency)
-		_, _, discountPercentage := utils.GetOrigAndDiscounted(
-			r.IsOnSale,
-			r.UnitPriceWithVat,
-			r.UnitPriceWithVatCurrency,
-			sql.NullInt64{Int64: salePrice, Valid: r.IsOnSale == 1},
-			sql.NullString{String: r.UnitPriceWithVatCurrency, Valid: r.IsOnSale == 1},
-		)
-
-		cdnURL := r.CdnUrl
-		if cdnURL == "" {
-			cdnURL = s.getCDNURL(r.ThumbnailPath)
-		}
-		cdnURL1280 := r.CdnUrlThumbnail
-		if cdnURL1280 == "" {
-			cdnURL1280 = s.getCDNURL(constants.ToPath1280(r.ThumbnailPath))
-		}
-
-		products = append(products, models.RelatedProduct{
-			ProductID:          s.encoder.Encode(r.ID),
-			Name:               r.Name,
-			Serial:             r.Serial,
-			BrandName:          r.BrandName,
-			CDNURL:             cdnURL,
-			CDNURL1280:         cdnURL1280,
-			OrigPriceDisplay:   origPrice.Display(),
-			PriceDisplay:       discountedPrice.Display(),
-			DiscountPercentage: discountPercentage,
-		})
-	}
-
-	return products, nil
-}
-
-func (s *ProductService) GetProductCategoryID(ctx context.Context, productID int64) (int64, error) {
-	row, err := s.dbRO.GetQueries().GetProductPage(ctx, productID)
-	if err != nil {
-		return 0, err
-	}
-
-	categoryRow, err := s.dbRO.GetQueries().GetProductCategoryByCategoryAndSubcategory(ctx, queries.GetProductCategoryByCategoryAndSubcategoryParams{
-		Category:    sql.NullString{String: row.ProductCategory, Valid: row.ProductCategory != ""},
-		Subcategory: sql.NullString{String: row.ProductSubcategory, Valid: row.ProductSubcategory != ""},
-	})
-	if err != nil {
-		return 0, err
-	}
-
-	return categoryRow.ID, nil
 }
 
 func (s *ProductService) ID() string {

@@ -13,7 +13,7 @@ import (
 )
 
 func AddProductHandlers(s *Server, r chi.Router) {
-	r.Get("/product/{id}", s.productPageHandler)
+	r.Get("/product/{slug}", s.productPageHandler)
 }
 
 func (s *Server) productPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -21,36 +21,26 @@ func (s *Server) productPageHandler(w http.ResponseWriter, r *http.Request) {
 	const page = "/"
 	ctx := r.Context()
 
-	productID := chi.URLParam(r, "id")
-	if productID == "" {
+	slug := chi.URLParam(r, "slug")
+	if slug == "" {
 		redirectHX(w, r, utils.URLWithError(page, errs.ErrNotFound.Error()))
 		return
 	}
 
-	decodedProductID := s.encoder.Decode(productID)
+	productData, err := s.services.product.GetProductPage(ctx, slug)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("slug", slug))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	decodedProductID := s.encoder.Decode(productData.ProductID)
 	if decodedProductID == encode.INVALID {
 		redirectHX(w, r, utils.URLWithError(page, errs.ErrNotFound.Error()))
 		return
 	}
 
-	productData, err := s.services.product.GetProductPage(ctx, productID)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("product_id", productID))
-		redirectHX(w, r, utils.URLWithError(page, err.Error()))
-		return
-	}
-
-	categoryID, err := s.services.product.GetProductCategoryID(ctx, decodedProductID)
-	if err != nil {
-		logs.LogCtx(ctx).Warn(logtag, zap.Error(err), zap.String("product_id", productID))
-	} else {
-		relatedProducts, err := s.services.product.GetRelatedProducts(ctx, categoryID, decodedProductID)
-		if err != nil {
-			logs.LogCtx(ctx).Warn(logtag, zap.Error(err), zap.String("product_id", productID))
-		} else {
-			productData.RelatedProducts = relatedProducts
-		}
-	}
+	// TODO: Query related products by category
 
 	if err := compproduct.ProductPage(*productData).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(

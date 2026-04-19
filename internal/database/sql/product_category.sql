@@ -70,6 +70,7 @@ LIMIT ?;
 SELECT
 	tbl_products.id,
 	tbl_products.serial,
+	tbl_products.slug,
 	tbl_products.name,
 	tbl_products.description,
 	tbl_products.unit_price_with_vat,
