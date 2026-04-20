@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 
@@ -30,8 +31,10 @@ func (s *Server) handleTrackedLink(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	if link == nil {
-		http.NotFound(w, r)
+
+	switch link.Status {
+	case enums.TRACKED_LINK_STATUS_DRAFT, enums.TRACKED_LINK_STATUS_DELETED:
+		redirectHX(w, r, utils.URL("/"))
 		return
 	}
 
