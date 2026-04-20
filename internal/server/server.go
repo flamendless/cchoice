@@ -56,6 +56,7 @@ type Services struct {
 	role          *services.RoleService
 	staff         *services.StaffService
 	staffLog      *services.StaffLogsService
+	trackedLink   *services.TrackLinkService
 	all           []services.IService
 }
 
@@ -203,26 +204,28 @@ func NewServer() *ServerInstance {
 		role:          services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staff:         services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staffLog:      staffLogService,
+		trackedLink:   services.NewTrackLinkService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
 	}
 
 	newServer.services.all = []services.IService{
 		newServer.services.attendance,
 		newServer.services.brand,
+		newServer.services.cpoint,
+		newServer.services.cpointToken,
 		newServer.services.customer,
 		newServer.services.customerOTP,
-		newServer.services.passwordReset,
-		newServer.services.cpoint,
 		newServer.services.holiday,
-		newServer.services.location,
-		newServer.services.product,
 		newServer.services.image,
+		newServer.services.location,
+		newServer.services.passwordReset,
+		newServer.services.product,
 		newServer.services.promo,
 		newServer.services.qr,
 		newServer.services.report,
 		newServer.services.role,
 		newServer.services.staff,
 		newServer.services.staffLog,
-		newServer.services.cpointToken,
+		newServer.services.trackedLink,
 	}
 
 	if !cfg.IsProd() {

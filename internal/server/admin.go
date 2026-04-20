@@ -128,6 +128,15 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PROMOS)).Post("/admin/promos", s.adminPromosCreateHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PROMOS)).Patch("/admin/promos/{id}", s.adminPromosUpdateHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PROMOS)).Delete("/admin/promos/{id}", s.adminPromosDeleteHandler)
+
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Get("/admin/tracked-links", s.adminTrackedLinksListPageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Get("/admin/tracked-links/table", s.adminTrackedLinksListTableHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Get("/admin/tracked-links/create", s.adminTrackedLinksCreateModalHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Get("/admin/tracked-links/{id}/edit", s.adminTrackedLinksEditPageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Post("/admin/tracked-links", s.adminTrackedLinksCreateHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Patch("/admin/tracked-links/{id}", s.adminTrackedLinksUpdateHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Delete("/admin/tracked-links/{id}", s.adminTrackedLinksDeleteHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Post("/admin/tracked-links/{id}/qr", s.handleTrackedLinkQR)
 }
 
 func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {

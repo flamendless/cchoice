@@ -22,4 +22,5 @@ const (
 	ModuleProducts             = "products"
 	ModulePromos               = "promos"
 	ModuleTimeOff              = "time_off"
+	ModuleTrackedLinks         = "tracked_links"
 )
