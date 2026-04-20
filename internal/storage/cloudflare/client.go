@@ -3,6 +3,7 @@ package cloudflare
 import (
 	"bytes"
 	"cchoice/internal/conf"
+	"cchoice/internal/constants"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/storage"
@@ -160,6 +161,11 @@ func (c *Client) normalizeKey(key string) string {
 	key = strings.ReplaceAll(key, "/", "-")
 	key = strings.ReplaceAll(key, "\\", "-")
 	if !conf.Conf().IsProd() {
+		for _, exc := range constants.CDNExcludePrefixKey {
+			if strings.HasPrefix(key, exc) {
+				return key
+			}
+		}
 		if !strings.HasPrefix(key, "DEV_") {
 			key = "DEV_" + key
 		}
