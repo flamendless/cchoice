@@ -69,8 +69,8 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 			<thead class="bg-gray-50">
 				<tr>
 					@TableHeader("3%", "ID")
-					@TableHeader("5%", "Name")
 					@TableHeader("5%", "Serial")
+					@TableHeader("5%", "Name")
 					<!-- @TableHeader("6%", "Description") -->
 					@TableHeader("4%", "Brand")
 					@TableHeader("4%", "Slug")
@@ -98,10 +98,10 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 							{ p.ID }
 						}
 						@TableCell("5%", "text-gray-900") {
-							{ p.Name }
+							{ p.Serial }
 						}
 						@TableCell("5%", "text-gray-900") {
-							{ p.Serial }
+							{ p.Name }
 						}
 						<!-- @TableCell("6%", "text-gray-900 max-w-xs truncate") { -->
 						<!-- 	<span title={ p.Description }>{ p.Description }</span> -->

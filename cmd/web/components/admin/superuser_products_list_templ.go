@@ -279,11 +279,11 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TableHeader("5%", "Name").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TableHeader("5%", "Serial").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TableHeader("5%", "Serial").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TableHeader("5%", "Name").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -397,9 +397,9 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				}
 				ctx = templ.InitializeContext(ctx)
 				var templ_7745c5c3_Var16 string
-				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
+				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(p.Serial)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 101, Col: 15}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 101, Col: 17}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 				if templ_7745c5c3_Err != nil {
@@ -424,9 +424,9 @@ func AdminSuperuserProductsListTable(products []models.AdminProductListItem) tem
 				}
 				ctx = templ.InitializeContext(ctx)
 				var templ_7745c5c3_Var18 string
-				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(p.Serial)
+				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 104, Col: 17}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_list.templ`, Line: 104, Col: 15}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {
