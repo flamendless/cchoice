@@ -9,3 +9,8 @@ const (
 	PHP                  = "PHP"
 	PHMobilePrefix       = "+63"
 )
+
+var CDNExcludePrefixKey = []string{
+	"payments-",
+	"brand_logos-",
+}
