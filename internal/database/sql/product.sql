@@ -442,9 +442,7 @@ INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 LEFT JOIN tbl_product_specs ON tbl_product_specs.id = tbl_products.product_specs_id
 LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
 LEFT JOIN tbl_product_categories AS pc ON pc.id = tbl_products_categories.category_id
-WHERE
-	slug = '' or slug IS NULL
-	AND tbl_products.status = 'ACTIVE';
+WHERE slug = '' or slug IS NULL;
 
 -- name: UpdateProductSlugByID :exec
 UPDATE tbl_products SET slug = ? WHERE id = ?;
