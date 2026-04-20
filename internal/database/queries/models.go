@@ -327,6 +327,8 @@ type TblProductsCategory struct {
 	ID         int64
 	CategoryID int64
 	ProductID  int64
+	CreatedAt  sql.NullTime
+	UpdatedAt  sql.NullTime
 }
 
 type TblProductsFt struct {

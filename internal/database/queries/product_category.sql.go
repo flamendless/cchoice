@@ -49,7 +49,7 @@ INSERT INTO tbl_products_categories (
 	updated_at
 ) VALUES (?, ?, datetime('now'), datetime('now'))
 ON CONFLICT (product_id, category_id) DO NOTHING
-RETURNING id, category_id, product_id
+RETURNING id, category_id, product_id, created_at, updated_at
 `
 
 type CreateProductsCategoriesParams struct {
@@ -60,7 +60,13 @@ type CreateProductsCategoriesParams struct {
 func (q *Queries) CreateProductsCategories(ctx context.Context, arg CreateProductsCategoriesParams) (TblProductsCategory, error) {
 	row := q.db.QueryRowContext(ctx, createProductsCategories, arg.ProductID, arg.CategoryID)
 	var i TblProductsCategory
-	err := row.Scan(&i.ID, &i.CategoryID, &i.ProductID)
+	err := row.Scan(
+		&i.ID,
+		&i.CategoryID,
+		&i.ProductID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
 	return i, err
 }
 
