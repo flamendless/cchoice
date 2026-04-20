@@ -63,7 +63,6 @@ func (s *TrackLinkService) GetTrackedLinkBySlug(ctx context.Context, slugs strin
 		}
 		return nil, err
 	}
-
 	return s.mapRowToTrackedLink(link), nil
 }
 

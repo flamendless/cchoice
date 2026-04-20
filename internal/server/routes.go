@@ -159,6 +159,11 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 		http.ServeContent(w, req, info.Name(), info.ModTime(), file)
 	})))
 
+	r.Get("/terms", s.termsHandler)
+	r.Get("/privacy", s.privacyHandler)
+	r.Get("/maintenance", s.maintenancePageHandler)
+	r.NotFound(s.maintenancePageHandler)
+
 	r.Get("/changelogs", s.changelogsHandler)
 	r.Get("/health", s.healthHandler)
 	r.Get("/version", s.versionHandler)
@@ -192,10 +197,6 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 
 	//INFO: (Brandon) - unused routes
 	r.Post("/checkouts", s.checkoutsHandler)
-
-	r.Get("/terms", s.termsHandler)
-	r.Get("/privacy", s.privacyHandler)
-	r.NotFound(s.maintenancePageHandler)
 }
 
 func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
