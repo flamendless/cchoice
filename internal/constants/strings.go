@@ -8,6 +8,7 @@ const (
 	ViberURIPrefix       = "viber://chat?number="
 	PHP                  = "PHP"
 	PHMobilePrefix       = "+63"
+	PrefixHTTPS          = "https://"
 )
 
 var CDNExcludePrefixKey = []string{

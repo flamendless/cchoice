@@ -1,0 +1,660 @@
+package components
+
+import (
+	"fmt"
+
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/enums"
+	"cchoice/internal/utils"
+)
+
+templ AdminTrackedLinksListPage(title string) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("Tracked Links - C-Choice Admin")
+		</head>
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-col"
+			_="init call metrics_event('admin_visit', 'tracked links list')"
+		>
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-7xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.AdminStaffHeaderWithBack()
+						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+							Manage Tracked Links
+						</h1>
+						@TrackedLinksListSection()
+					</div>
+				</div>
+			</div>
+			<div id="tracked-links-create-modal-container"></div>
+			<div id="tracked-links-edit-modal-container"></div>
+			<div id="tracked-links-qr-modal-container"></div>
+		</body>
+	</html>
+}
+
+templ TrackedLinksListSection() {
+	<div
+		class="bg-white rounded-lg shadow-md p-6"
+		hx-get={ utils.URL("/admin/tracked-links/table") }
+		hx-trigger="load"
+		hx-target="#tracked-links-table"
+		hx-swap="innerHTML"
+	>
+		<div class="mb-4 flex justify-between items-center">
+			<h2 class="text-lg font-semibold">All Tracked Links</h2>
+			<button
+				type="button"
+				class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2"
+				hx-get={ utils.URL("/admin/tracked-links/create") }
+				hx-target="#tracked-links-create-modal-container"
+				hx-swap="innerHTML"
+			>
+				Create
+			</button>
+		</div>
+		<div id="tracked-links-table"></div>
+	</div>
+}
+
+templ TrackedLinksCreateForm() {
+	<div class="mb-6 p-4 bg-gray-50 rounded-lg">
+		<h2 class="text-lg font-semibold mb-3">Add New Tracked Link</h2>
+		<form
+			hx-post={ utils.URL("/admin/tracked-links") }
+			hx-target="#tracked-links-table"
+			hx-swap="innerHTML"
+			class="flex flex-wrap gap-3 items-end"
+		>
+			<div>
+				<label class="block text-sm font-medium text-gray-700">Name</label>
+				<input
+					type="text"
+					name="name"
+					placeholder="Link name"
+					required
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-700">Slug</label>
+				<input
+					type="text"
+					name="slug"
+					placeholder="e.g. ig-bio"
+					required
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-700">Destination URL</label>
+				<input
+					type="url"
+					name="destination_url"
+					placeholder="https://example.com"
+					required
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-700">Source</label>
+				<select
+					name="source"
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				>
+					<option value="">Select source</option>
+					for _, s := range enums.AllTrackedLinkSources {
+						<option value={ s.String() }>{ s.String() }</option>
+					}
+				</select>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-700">Medium</label>
+				<select
+					name="medium"
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				>
+					<option value="">Select medium</option>
+					for _, m := range enums.AllTrackedLinkMediums {
+						<option value={ m.String() }>{ m.String() }</option>
+					}
+				</select>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-700">Campaign</label>
+				<input
+					type="text"
+					name="campaign"
+					placeholder="Campaign name"
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				/>
+			</div>
+			<button
+				type="submit"
+				class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2"
+			>
+				Add Link
+			</button>
+		</form>
+	</div>
+}
+
+templ AdminTrackedLinksListTable(links []models.AdminTrackedLinkListItem) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-50">
+				<tr>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+						Name
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+						Slug
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+						Destination
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+						Source
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+						Medium
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+						Campaign
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+						Clicks
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+						Status
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+						Actions
+					</th>
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				if len(links) == 0 {
+					<tr>
+						<td colspan="8" class="px-6 py-4 text-center text-gray-500">
+							No tracked links found. Add a link above.
+						</td>
+					</tr>
+				} else {
+					for _, link := range links {
+						<tr id={ fmt.Sprintf("tracked-link-row-%s", link.ID) }>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+								{ link.Name }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+								<div class="flex items-center gap-2">
+									<span>/l/{ link.Slug }</span>
+									<button
+										type="button"
+										class="text-cchoice hover:text-cchoicedark cursor-pointer"
+										title="Copy slug"
+										_={ fmt.Sprintf("on click navigator.clipboard.writeText('/l/%s')", link.Slug) }
+									>
+										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+										</svg>
+									</button>
+								</div>
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 max-w-xs truncate">
+								{ link.DestinationURL }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm">
+								@TrackedLinkSourceBadge(link.Source)
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm">
+								@TrackedLinkMediumBadge(link.Medium)
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+								{ link.Campaign }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+								{ fmt.Sprintf("%d", link.Clicks) }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm">
+								@TrackedLinkStatusBadge(link.Status)
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm">
+								@TrackedLinkActionsCell(link)
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ TrackedLinkSourceBadge(source enums.TrackedLinkSource) {
+	switch source {
+		case enums.TRACKED_LINK_SOURCE_QR:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+				QR
+			</span>
+		case enums.TRACKED_LINK_SOURCE_EMAIL:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+				Email
+			</span>
+		case enums.TRACKED_LINK_SOURCE_FACEBOOK:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+				Facebook
+			</span>
+		default:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+				-
+			</span>
+	}
+}
+
+templ TrackedLinkMediumBadge(medium enums.TrackedLinkMedium) {
+	switch medium {
+		case enums.TRACKED_LINK_MEDIUM_SOCIAL:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
+				Social
+			</span>
+		case enums.TRACKED_LINK_MEDIUM_BUSINESS_CARD:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+				Business Card
+			</span>
+		default:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+				-
+			</span>
+	}
+}
+
+templ TrackedLinkStatusBadge(status enums.TrackedLinkStatus) {
+	switch status {
+		case enums.TRACKED_LINK_STATUS_DRAFT:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+				Draft
+			</span>
+		case enums.TRACKED_LINK_STATUS_ACTIVE:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+				Active
+			</span>
+		case enums.TRACKED_LINK_STATUS_DELETED:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+				Deleted
+			</span>
+		default:
+			<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+				Unknown
+			</span>
+	}
+}
+
+templ TrackedLinkActionsCell(link models.AdminTrackedLinkListItem) {
+	<div class="flex items-center gap-2">
+		<form
+			method="POST"
+			action={ utils.URLf("/admin/tracked-links/%s/qr", link.ID) }
+			class="w-full sm:w-auto"
+		>
+			<button
+				type="submit"
+				class="text-cchoice bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium"
+				title="Generate QR"
+				_="
+					on click
+						call metrics_event('admin_exec', 'generate tracked link qr')
+					end
+				"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+				</svg>
+			</button>
+		</form>
+
+		<button
+			type="button"
+			class="text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium"
+			hx-get={ utils.URLf("/admin/tracked-links/%s/edit", link.ID) }
+			hx-target="#tracked-links-edit-modal-container"
+			hx-swap="innerHTML"
+		>
+			Edit
+		</button>
+		<button
+			type="button"
+			class="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs font-medium"
+			hx-delete={ utils.URLf("/admin/tracked-links/%s", link.ID) }
+			hx-target={ fmt.Sprintf("#tracked-link-row-%s", link.ID) }
+			hx-swap="outerHTML"
+			hx-confirm="Are you sure you want to delete this tracked link?"
+		>
+			Delete
+		</button>
+	</div>
+}
+
+templ AdminTrackedLinksEditModal(link models.AdminTrackedLinkListItem) {
+	<div
+		id="tracked-links-edit-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="
+			on closeModal
+				set #tracked-links-edit-modal-container.innerHTML to ''
+			end
+		"
+	>
+		<div
+			class="absolute inset-0 bg-black/50"
+			_="on click trigger closeModal"
+		></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">Edit Tracked Link</h2>
+				<button
+					type="button"
+					class="text-gray-400 hover:text-gray-600"
+					_="on click trigger closeModal"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			@TrackedLinksEditForm(link)
+		</div>
+	</div>
+}
+
+templ TrackedLinksEditForm(link models.AdminTrackedLinkListItem) {
+	<form
+		hx-patch={ utils.URLf("/admin/tracked-links/%s", link.ID) }
+		hx-swap="outerHTML"
+		class="flex flex-col gap-2 w-full"
+		hx-on::after-request="if(event.detail.successful) { document.getElementById('tracked-links-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/tracked-links/table', { target: '#tracked-links-table', swap: 'innerHTML' }) }"
+	>
+		<div>
+			<label class="block text-sm font-medium text-gray-700">Name</label>
+			<input
+				type="text"
+				name="name"
+				value={ link.Name }
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			/>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700">Slug</label>
+			<input
+				type="text"
+				name="slug"
+				value={ link.Slug }
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			/>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700">Destination URL</label>
+			<input
+				type="url"
+				name="destination_url"
+				value={ link.DestinationURL }
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			/>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700">Source</label>
+			<select
+				name="source"
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			>
+				<option value="">Select source</option>
+				for _, s := range enums.AllTrackedLinkSources {
+					<option
+						value={ s.String() }
+						selected?={ link.Source == s }
+					>
+						{ s.String() }
+					</option>
+				}
+			</select>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700">Medium</label>
+			<select
+				name="medium"
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			>
+				<option value="">Select medium</option>
+				for _, m := range enums.AllTrackedLinkMediums {
+					<option
+						value={ m.String() }
+						selected?={ link.Medium == m }
+					>
+						{ m.String() }
+					</option>
+				}
+			</select>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700">Campaign</label>
+			<input
+				type="text"
+				name="campaign"
+				value={ link.Campaign }
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			/>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700">Status</label>
+			<select
+				name="status"
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			>
+				for _, s := range enums.AllTrackedLinkStatuses {
+					<option
+						value={ s.String() }
+						selected?={ link.Status == s }
+					>
+						{ s.String() }
+					</option>
+				}
+			</select>
+		</div>
+		<div class="flex w-full gap-1 justify-center">
+			<button
+				type="submit"
+				class="px-3 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm"
+			>
+				Save
+			</button>
+			<button
+				type="button"
+				class="px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
+				_="on click trigger closeModal"
+			>
+				Cancel
+			</button>
+		</div>
+	</form>
+}
+
+templ AdminTrackedLinksCreateModal() {
+	<div
+		id="tracked-links-create-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="
+			on closeModal
+				set #tracked-links-create-modal-container.innerHTML to ''
+			end
+		"
+	>
+		<div
+			class="absolute inset-0 bg-black/50"
+			_="on click trigger closeModal"
+		></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 overflow-y-auto max-h-[90vh]">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">Create Tracked Link</h2>
+				<button
+					type="button"
+					class="text-gray-400 hover:text-gray-600"
+					_="on click trigger closeModal"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			@TrackedLinksCreateFormModal()
+		</div>
+	</div>
+}
+
+templ TrackedLinksCreateFormModal() {
+	<form
+		hx-post={ utils.URL("/admin/tracked-links") }
+		hx-swap="outerHTML"
+		class="flex flex-col gap-3"
+		hx-on::after-request="if(event.detail.successful) { document.getElementById('tracked-links-create-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/tracked-links/table', { target: '#tracked-links-table', swap: 'innerHTML' }) }"
+	>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
+			<input
+				type="text"
+				name="name"
+				placeholder="Link name"
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			/>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Slug <span class="text-red-500">*</span></label>
+			<input
+				type="text"
+				name="slug"
+				placeholder="e.g. ig-bio"
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			/>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Destination URL <span class="text-red-500">*</span></label>
+			<input
+				type="url"
+				name="destination_url"
+				placeholder="https://example.com"
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			/>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Source</label>
+			<select
+				name="source"
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			>
+				<option value="">Select source</option>
+				for _, s := range enums.AllTrackedLinkSources {
+					<option value={ s.String() }>{ s.String() }</option>
+				}
+			</select>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Medium</label>
+			<select
+				name="medium"
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			>
+				<option value="">Select medium</option>
+				for _, m := range enums.AllTrackedLinkMediums {
+					<option value={ m.String() }>{ m.String() }</option>
+				}
+			</select>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Campaign</label>
+			<input
+				type="text"
+				name="campaign"
+				placeholder="Campaign name"
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			/>
+		</div>
+		<div class="flex w-full gap-1 justify-center">
+			<button
+				type="submit"
+				class="px-3 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm"
+			>
+				Create
+			</button>
+			<button
+				type="button"
+				class="px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
+				_="on click trigger closeModal"
+			>
+				Cancel
+			</button>
+		</div>
+	</form>
+}
+
+type QRData struct {
+	Base64   string
+	Filename string
+}
+
+templ AdminTrackedLinksQRModal(qr QRData) {
+	<div
+		id="tracked-links-qr-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="
+			on closeQRModal
+				set #tracked-links-qr-modal-container.innerHTML to ''
+			end
+		"
+	>
+		<div
+			class="absolute inset-0 bg-black/50"
+			_="on click trigger closeQRModal"
+		></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-sm mx-4">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">QR Code</h2>
+				<button
+					type="button"
+					class="text-gray-400 hover:text-gray-600"
+					_="on click trigger closeQRModal"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			<div class="flex flex-col items-center gap-4">
+				<img
+					src={ qr.Base64 }
+					alt="QR Code"
+					class="w-64 h-64"
+				/>
+				<a
+					href={ qr.Base64 }
+					download={ qr.Filename }
+					class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2"
+				>
+					Download QR
+				</a>
+			</div>
+		</div>
+	</div>
+}

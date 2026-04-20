@@ -12,7 +12,7 @@ templ Breadcrumbs(data models.ProductPageData) {
 			<span class="text-gray-400">/</span>
 		}
 		if data.ProductSubcategory != "" {
-			<a href={ utils.URLf("/categories/%s/%s",data.ProductCategory, data.ProductSubcategory) } class="hover:text-cchoice transition-colors">{ data.ProductSubcategory }</a>
+			<a href={ utils.URLf("/categories/%s/%s", data.ProductCategory, data.ProductSubcategory) } class="hover:text-cchoice transition-colors">{ data.ProductSubcategory }</a>
 			<span class="text-gray-400">/</span>
 		}
 		<span class="text-gray-800 font-medium truncate max-w-[200px]">{ data.Name }</span>

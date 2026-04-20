@@ -22,6 +22,7 @@ var staffCardsWithRoles = []struct {
 	{Card: models.StaffCard{Link: "/admin/cpoints/generate", Title: "Generate C-Points", Description: "Generate C-Points for a customer", Icon: svg.Lightning("text-cchoice")}, AllowedRole: enums.STAFF_ROLE_CREATE_CPOINTS},
 	{Card: models.StaffCard{Link: "/admin/holidays", Title: "Holidays", Description: "Manage Philippines holidays", Icon: svg.Calendar("text-cchoice")}, AllowedRole: enums.STAFF_ROLE_MANAGE_HOLIDAYS},
 	{Card: models.StaffCard{Link: "/admin/promos", Title: "Manage Promos", Description: "Manage promos", Icon: svg.Box("text-cchoice")}, AllowedRole: enums.STAFF_ROLE_MANAGE_PROMOS},
+	{Card: models.StaffCard{Link: "/admin/tracked-links", Title: "Tracked Links", Description: "Manage tracked links", Icon: svg.Link("text-cchoice")}, AllowedRole: enums.STAFF_ROLE_MANAGE_TRACKED_LINKS},
 }
 
 func filterStaffCardsByRole(roles []enums.StaffRole) []models.StaffCard {

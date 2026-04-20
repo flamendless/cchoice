@@ -367,3 +367,15 @@ type AdminCustomerListItem struct {
 	CustomerType enums.CustomerType
 	IsVerified   enums.CustomerStatus
 }
+
+type AdminTrackedLinkListItem struct {
+	ID             string
+	Name           string
+	Slug           string
+	DestinationURL string
+	Source         enums.TrackedLinkSource
+	Medium         enums.TrackedLinkMedium
+	Campaign       string
+	Clicks         int64
+	Status         enums.TrackedLinkStatus
+}

@@ -183,6 +183,19 @@ type TblHoliday struct {
 	UpdatedAt sql.NullString
 }
 
+type TblLinkClick struct {
+	ID          int64
+	LinkID      string
+	ClickedAt   string
+	Referrer    sql.NullString
+	UserAgent   sql.NullString
+	IpHash      sql.NullString
+	Device      sql.NullString
+	UtmSource   sql.NullString
+	UtmMedium   sql.NullString
+	UtmCampaign sql.NullString
+}
+
 type TblOrder struct {
 	ID                       int64
 	CheckoutID               int64
@@ -452,6 +465,20 @@ type TblThumbnailJob struct {
 	ErrorMessage sql.NullString
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+}
+
+type TblTrackedLink struct {
+	ID             string
+	Name           string
+	Slug           string
+	DestinationUrl string
+	Source         sql.NullString
+	Medium         sql.NullString
+	Campaign       sql.NullString
+	Status         string
+	StaffID        sql.NullString
+	CreatedAt      string
+	UpdatedAt      string
 }
 
 type TblUseragent struct {

@@ -162,6 +162,7 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 	r.Get("/changelogs", s.changelogsHandler)
 	r.Get("/health", s.healthHandler)
 	r.Get("/version", s.versionHandler)
+	r.Get("/l/{slug}", s.handleTrackedLink)
 
 	r.With(MetricsBasicAuth).Handle("/metrics", promhttp.Handler())
 	r.Post("/metrics/event", s.metricsEventHandler)
