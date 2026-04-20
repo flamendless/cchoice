@@ -39,7 +39,7 @@ func NewProductService(
 	}
 }
 
-func (s *ProductService) CreateProduct(ctx context.Context, input CreateProductInput) (*queries.TblProduct, error) {
+func (s *ProductService) Create(ctx context.Context, input CreateProductInput) (*queries.TblProduct, error) {
 	brandID := s.encoder.Decode(input.BrandID)
 	brand, err := s.dbRO.GetQueries().GetBrandsByID(ctx, brandID)
 	if err != nil {
@@ -129,7 +129,7 @@ func (s *ProductService) ValidateSerial(ctx context.Context, serial string) (boo
 	return false, nil
 }
 
-func (s *ProductService) UpdateProductStatus(ctx context.Context, productID string, status enums.ProductStatus) error {
+func (s *ProductService) UpdateStatus(ctx context.Context, productID string, status enums.ProductStatus) error {
 	decodedProductID := s.encoder.Decode(productID)
 	if decodedProductID == encode.INVALID {
 		return errs.ErrDecode
@@ -141,7 +141,7 @@ func (s *ProductService) UpdateProductStatus(ctx context.Context, productID stri
 	})
 }
 
-func (s *ProductService) DeleteProduct(ctx context.Context, productID string) error {
+func (s *ProductService) Delete(ctx context.Context, productID string) error {
 	decodedProductID := s.encoder.Decode(productID)
 	if decodedProductID == encode.INVALID {
 		return errs.ErrDecode
@@ -150,7 +150,7 @@ func (s *ProductService) DeleteProduct(ctx context.Context, productID string) er
 	return s.dbRW.GetQueries().SoftDeleteProduct(ctx, decodedProductID)
 }
 
-func (s *ProductService) GetProductsForListingAdmin(
+func (s *ProductService) GetForListingAdmin(
 	ctx context.Context,
 	search string,
 	status enums.ProductStatus,
@@ -197,7 +197,7 @@ func (s *ProductService) GetProductsForListingAdmin(
 	return productList, nil
 }
 
-func (s *ProductService) GetProductByIDForEdit(ctx context.Context, productID string) (*ProductForEdit, error) {
+func (s *ProductService) GetByIDForEdit(ctx context.Context, productID string) (*ProductForEdit, error) {
 	decodedProductID := s.encoder.Decode(productID)
 	if decodedProductID == encode.INVALID {
 		return nil, errs.ErrDecode
@@ -237,7 +237,7 @@ func (s *ProductService) GetProductByIDForEdit(ctx context.Context, productID st
 	}, nil
 }
 
-func (s *ProductService) UpdateProduct(ctx context.Context, input UpdateProductInput) error {
+func (s *ProductService) Update(ctx context.Context, input UpdateProductInput) error {
 	productID := s.encoder.Decode(input.ProductID)
 	if productID == encode.INVALID {
 		return errs.ErrDecode
@@ -334,7 +334,7 @@ func (s *ProductService) UpdateProduct(ctx context.Context, input UpdateProductI
 	return nil
 }
 
-func (s *ProductService) GetProductPage(ctx context.Context, slug string) (*models.ProductPageData, error) {
+func (s *ProductService) GetForPage(ctx context.Context, slug string) (*models.ProductPageData, error) {
 	row, err := s.dbRO.GetQueries().GetProductPage(ctx, sql.NullString{Valid: slug != "", String: slug})
 	if err != nil {
 		if err == sql.ErrNoRows {

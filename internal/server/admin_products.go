@@ -233,7 +233,7 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		}
 	}
 
-	product, err := s.services.product.CreateProduct(ctx, services.CreateProductInput{
+	product, err := s.services.product.Create(ctx, services.CreateProductInput{
 		Serial:      serial,
 		Name:        name,
 		Description: description,
@@ -369,7 +369,7 @@ func (s *Server) adminSuperuserProductsListTableHandler(w http.ResponseWriter, r
 		return
 	}
 
-	productList, err := s.services.product.GetProductsForListingAdmin(ctx, search, status)
+	productList, err := s.services.product.GetForListingAdmin(ctx, search, status)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		productList = []models.AdminProductListItem{}
@@ -430,7 +430,7 @@ func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter
 		}
 	}()
 
-	if err := s.services.product.UpdateProductStatus(ctx, productIDStr, status); err != nil {
+	if err := s.services.product.UpdateStatus(ctx, productIDStr, status); err != nil {
 		result = err.Error()
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -471,7 +471,7 @@ func (s *Server) adminSuperuserProductsDeleteHandler(w http.ResponseWriter, r *h
 		}
 	}()
 
-	if err := s.services.product.DeleteProduct(ctx, productIDStr); err != nil {
+	if err := s.services.product.Delete(ctx, productIDStr); err != nil {
 		result = err.Error()
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -497,7 +497,7 @@ func (s *Server) adminSuperuserProductsEditPageHandler(w http.ResponseWriter, r 
 		return
 	}
 
-	product, err := s.services.product.GetProductByIDForEdit(ctx, productID)
+	product, err := s.services.product.GetByIDForEdit(ctx, productID)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("product_id", productID), zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
@@ -721,7 +721,7 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 		}
 	}()
 
-	if err := s.services.product.UpdateProduct(ctx, input); err != nil {
+	if err := s.services.product.Update(ctx, input); err != nil {
 		result = err.Error()
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, "Failed to update product"))

@@ -27,7 +27,7 @@ func (s *Server) productPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	productData, err := s.services.product.GetProductPage(ctx, slug)
+	productData, err := s.services.product.GetForPage(ctx, slug)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("slug", slug))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))

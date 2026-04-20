@@ -4,10 +4,14 @@ SELECT
 	tbl_brands.name AS brand_name,
 	COALESCE(pc.category, '') AS product_category,
 	COALESCE(pc.subcategory, '') AS product_subcategory,
-	tbl_product_specs.*
+	tbl_product_specs.*,
+	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
 FROM tbl_products
 INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
 LEFT JOIN tbl_product_categories AS pc ON pc.id = tbl_products_categories.category_id
 WHERE tbl_products.id = ?
@@ -206,7 +210,13 @@ SELECT
 	COALESCE(categories.subcategory, '') AS subcategory
 FROM tbl_products
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_images ON tbl_product_images.id = (
+	SELECT tpi.id
+	FROM tbl_product_images tpi
+	WHERE tpi.product_id = tbl_products.id
+	ORDER BY tpi.updated_at DESC
+	LIMIT 1
+)
 LEFT JOIN tbl_product_specs ON tbl_product_specs.id = tbl_products.product_specs_id
 LEFT JOIN (
 	SELECT
@@ -359,7 +369,13 @@ FROM tbl_products
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 INNER JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id
 LEFT JOIN tbl_product_specs ON tbl_product_specs.id = tbl_products.product_specs_id
-LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_images ON tbl_product_images.id = (
+	SELECT tpi.id
+	FROM tbl_product_images tpi
+	WHERE tpi.product_id = tbl_products.id
+	ORDER BY tpi.updated_at DESC
+	LIMIT 1
+)
 LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
 LEFT JOIN tbl_product_categories AS pc ON pc.id = tbl_products_categories.category_id
 LEFT JOIN tbl_product_sales
