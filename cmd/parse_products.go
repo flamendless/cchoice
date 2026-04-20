@@ -18,7 +18,6 @@ import (
 	"cchoice/cmd/parse_products/models"
 	"cchoice/cmd/parse_products/templates"
 	"cchoice/internal/conf"
-	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
@@ -182,15 +181,11 @@ var cmdParseProducts = &cobra.Command{
 			if err != nil {
 				panic(err)
 			}
-			now := time.Now().UTC()
 			path := "static/images/brand_logos/" + parseProductsFlags.Template + "." + parseProductsFlags.ImagesFormat
 			brandImage := models.BrandImage{
-				BrandID:   brandID,
-				Path:      path,
-				IsMain:    true,
-				CreatedAt: now,
-				UpdatedAt: now,
-				DeletedAt: constants.DtBeginning,
+				BrandID: brandID,
+				Path:    path,
+				IsMain:  true,
 			}
 
 			cfg := conf.Conf()

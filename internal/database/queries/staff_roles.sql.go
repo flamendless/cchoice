@@ -10,7 +10,7 @@ import (
 )
 
 const createStaffRole = `-- name: CreateStaffRole :one
-INSERT INTO tbl_staff_roles (staff_id, role, created_at) VALUES (?, ?, datetime('now')) RETURNING id
+INSERT INTO tbl_staff_roles (staff_id, role, created_at, updated_at) VALUES (?, ?, datetime('now'), datetime('now')) RETURNING id
 `
 
 type CreateStaffRoleParams struct {

@@ -81,9 +81,11 @@ INSERT INTO tbl_geocoding_cache (
 	formatted_address,
 	place_id,
 	response_data,
-	expires_at
+	expires_at,
+	created_at,
+	updated_at
 )
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
 RETURNING id, address, normalized_address, latitude, longitude,
 	formatted_address, place_id, response_data,
 	created_at, updated_at, expires_at
@@ -176,9 +178,11 @@ INSERT INTO tbl_geocoding_cache (
 	formatted_address,
 	place_id,
 	response_data,
-	expires_at
+	expires_at,
+	created_at,
+	updated_at
 )
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
 ON CONFLICT(normalized_address) DO UPDATE SET
 	address = excluded.address,
 	latitude = excluded.latitude,
@@ -186,7 +190,7 @@ ON CONFLICT(normalized_address) DO UPDATE SET
 	formatted_address = excluded.formatted_address,
 	place_id = excluded.place_id,
 	response_data = excluded.response_data,
-	updated_at = CURRENT_TIMESTAMP,
+	updated_at = datetime('now'),
 	expires_at = excluded.expires_at
 RETURNING id, address, normalized_address, latitude, longitude,
 	formatted_address, place_id, response_data,

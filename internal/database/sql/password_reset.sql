@@ -4,12 +4,14 @@ INSERT INTO tbl_password_reset_tokens (
     user_type,
     token_hash,
     expires_at,
-    created_at
+    created_at,
+    updated_at
 ) VALUES (
     ?,
     ?,
     ?,
     datetime('now', '+15 minutes'),
+    datetime('now'),
     datetime('now')
 ) RETURNING id;
 

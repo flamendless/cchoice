@@ -52,6 +52,9 @@ Use this command to create new migration files:
 ./tmp/goose create <filename> sql # Create new migration
 ```
 
+- always set defaults of created_at and updated_at to use `datetime('now')`
+- always set created_at and updated_at in create/update queries
+
 NEVER RUN/APPLY MIGRATIONS. USERS SHOULD MANUALLY DO THAT.
 
 ALWAYS USE `go tool` to run commands like:

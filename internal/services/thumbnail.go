@@ -113,9 +113,18 @@ func (s *ThumbnailService) ProcessImageVariants(ctx context.Context, sourcePath,
 		})
 		logs.LogCtx(ctx).Info(logtag, zap.String("stored", "local"), zap.String("path", originalPath))
 	} else {
-		if err := s.objectStorage.PutObjectFromBytes(ctx, originalKey, sourceImageData, utils.GetContentType(sourceExt)); err != nil {
-			logs.LogCtx(ctx).Error(logtag, zap.String("key", originalKey), zap.Error(err))
-			return nil, err
+		exists, err := s.objectStorage.ObjectExists(ctx, originalKey)
+		if err != nil {
+			logs.LogCtx(ctx).Warn(logtag, zap.String("key", originalKey), zap.Error(err))
+		}
+		if exists {
+			logs.LogCtx(ctx).Info(logtag, zap.String("reusing", "cloud"), zap.String("key", originalKey))
+		} else {
+			if err := s.objectStorage.PutObjectFromBytes(ctx, originalKey, sourceImageData, utils.GetContentType(sourceExt)); err != nil {
+				logs.LogCtx(ctx).Error(logtag, zap.String("key", originalKey), zap.Error(err))
+				return nil, err
+			}
+			logs.LogCtx(ctx).Info(logtag, zap.String("stored", "cloud"), zap.String("key", originalKey))
 		}
 		originalURL := s.objectStorage.GetPublicURL(originalKey)
 		variants = append(variants, types.ThumbnailVariant{
@@ -124,14 +133,14 @@ func (s *ThumbnailService) ProcessImageVariants(ctx context.Context, sourcePath,
 			URL:        originalURL,
 			IsOriginal: true,
 		})
-		logs.LogCtx(ctx).Info(logtag, zap.String("stored", "cloud"), zap.String("key", originalKey), zap.String("url", originalURL))
 	}
 
 	for _, size := range types.ImageSizes {
 		folderName := fmt.Sprintf("%dx%d", size.Width, size.Height)
 
 		if sourceWidth < size.Width || sourceHeight < size.Height {
-			logs.LogCtx(ctx).Info(logtag,
+			logs.LogCtx(ctx).Info(
+				logtag,
 				zap.String("size", folderName),
 				zap.String("reason", "source smaller than target, using source for both 640x640 and 1280x1280"),
 			)
@@ -180,9 +189,18 @@ func (s *ThumbnailService) ProcessImageVariants(ctx context.Context, sourcePath,
 			})
 			logs.LogCtx(ctx).Info(logtag, zap.String("stored", "local"), zap.String("size", folderName), zap.String("path", webpPath))
 		} else {
-			if err := s.objectStorage.PutObjectFromBytes(ctx, storageKey, imgBytes, "image/webp"); err != nil {
-				logs.LogCtx(ctx).Error(logtag, zap.String("key", storageKey), zap.Error(err))
-				return nil, err
+			exists, err := s.objectStorage.ObjectExists(ctx, storageKey)
+			if err != nil {
+				logs.LogCtx(ctx).Warn(logtag, zap.String("key", storageKey), zap.Error(err))
+			}
+			if exists {
+				logs.LogCtx(ctx).Info(logtag, zap.String("reusing", "cloud"), zap.String("size", folderName), zap.String("key", storageKey))
+			} else {
+				if err := s.objectStorage.PutObjectFromBytes(ctx, storageKey, imgBytes, "image/webp"); err != nil {
+					logs.LogCtx(ctx).Error(logtag, zap.String("key", storageKey), zap.Error(err))
+					return nil, err
+				}
+				logs.LogCtx(ctx).Info(logtag, zap.String("stored", "cloud"), zap.String("size", folderName), zap.String("key", storageKey))
 			}
 			webpURL := s.objectStorage.GetPublicURL(storageKey)
 			variants = append(variants, types.ThumbnailVariant{
@@ -190,7 +208,6 @@ func (s *ThumbnailService) ProcessImageVariants(ctx context.Context, sourcePath,
 				Path: storageKey,
 				URL:  webpURL,
 			})
-			logs.LogCtx(ctx).Info(logtag, zap.String("stored", "cloud"), zap.String("size", folderName), zap.String("key", storageKey), zap.String("url", webpURL))
 		}
 	}
 

@@ -319,6 +319,8 @@ type TblProductSpec struct {
 	ScopeOfSupply sql.NullString
 	WeightUnit    sql.NullString
 	Weight        sql.NullFloat64
+	CreatedAt     sql.NullTime
+	UpdatedAt     sql.NullTime
 }
 
 type TblProductsCategory struct {

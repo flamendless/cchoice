@@ -7,10 +7,13 @@ INSERT INTO tbl_checkout_lines(
 	description,
 	amount,
 	currency,
-	quantity
+	quantity,
+	created_at,
+	updated_at
 ) VALUES (
 	?, ?, ?, ?,
-	?, ?, ?, ?
+	?, ?, ?, ?,
+	datetime('now'), datetime('now')
 ) RETURNING *;
 
 -- name: DeleteCheckoutLineByID :exec
@@ -77,7 +80,7 @@ WHERE tbl_checkout_lines.checkout_id = ?;
 
 -- name: UpdateCheckoutLineQtyByID :one
 UPDATE tbl_checkout_lines
-SET quantity = MIN(99, MAX(1, quantity + ?))
+SET quantity = MIN(99, MAX(1, quantity + ?)), updated_at = datetime('now')
 WHERE id = ?
 RETURNING quantity;
 
@@ -121,11 +124,14 @@ INSERT INTO tbl_checkout_payments(
 	metadata_remarks,
 	metadata_notes,
 	metadata_customer_number,
-	payment_intent_id
+	payment_intent_id,
+	created_at,
+	updated_at
 ) VALUES (
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
-	?, ?, ?, ?, ?
+	?, ?, ?, ?, ?,
+	datetime('now'), datetime('now')
 ) RETURNING *;
 
 -- name: GetCheckoutPaymentByID :one

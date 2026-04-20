@@ -76,10 +76,13 @@ INSERT INTO tbl_checkout_lines(
 	description,
 	amount,
 	currency,
-	quantity
+	quantity,
+	created_at,
+	updated_at
 ) VALUES (
 	?, ?, ?, ?,
-	?, ?, ?, ?
+	?, ?, ?, ?,
+	datetime('now'), datetime('now')
 ) RETURNING id, checkout_id, product_id, name, serial, description, amount, currency, quantity, created_at, updated_at
 `
 
@@ -138,11 +141,14 @@ INSERT INTO tbl_checkout_payments(
 	metadata_remarks,
 	metadata_notes,
 	metadata_customer_number,
-	payment_intent_id
+	payment_intent_id,
+	created_at,
+	updated_at
 ) VALUES (
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
-	?, ?, ?, ?, ?
+	?, ?, ?, ?, ?,
+	datetime('now'), datetime('now')
 ) RETURNING id, gateway, checkout_id, status, description, total_amount, checkout_url, client_key, reference_number, payment_method_type, paid_at, metadata_remarks, metadata_notes, metadata_customer_number, created_at, updated_at, payment_intent_id
 `
 
@@ -492,7 +498,7 @@ func (q *Queries) RemoveItemInCheckoutLinesByID(ctx context.Context, arg RemoveI
 
 const updateCheckoutLineQtyByID = `-- name: UpdateCheckoutLineQtyByID :one
 UPDATE tbl_checkout_lines
-SET quantity = MIN(99, MAX(1, quantity + ?))
+SET quantity = MIN(99, MAX(1, quantity + ?)), updated_at = datetime('now')
 WHERE id = ?
 RETURNING quantity
 `

@@ -49,7 +49,9 @@ INSERT INTO tbl_orders(
 	shipping_tracking_number,
 	shipping_eta,
 	notes,
-	remarks
+	remarks,
+	created_at,
+	updated_at
 ) VALUES (
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
@@ -58,7 +60,9 @@ INSERT INTO tbl_orders(
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
-	?, ?, ?
+	?, ?, ?,
+	datetime('now'),
+	datetime('now')
 ) RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta
 `
 
@@ -203,10 +207,14 @@ INSERT INTO tbl_order_lines(
 	unit_price,
 	quantity,
 	total_price,
-	currency
+	currency,
+	created_at,
+	updated_at
 ) VALUES (
 	?, ?, ?, ?, ?,
-	?, ?, ?, ?, ?
+	?, ?, ?, ?, ?,
+	datetime('now'),
+	datetime('now')
 ) RETURNING id, order_id, checkout_line_id, product_id, name, serial, description, unit_price, quantity, total_price, currency, created_at, updated_at
 `
 

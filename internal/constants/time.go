@@ -3,7 +3,7 @@ package constants
 import "time"
 
 var (
-	DtBeginning time.Time
+	DtBeginning = time.Unix(0, 0).UTC()
 )
 
 const (
@@ -15,7 +15,3 @@ const (
 	TimeLayoutHHMMSS    = "15:04:05"
 	TimeLayoutDisplay   = "03:04:05 PM"
 )
-
-func init() {
-	DtBeginning = time.Unix(0, 0).UTC()
-}

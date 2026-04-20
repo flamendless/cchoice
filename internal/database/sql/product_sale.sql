@@ -11,12 +11,11 @@ INSERT INTO tbl_product_sales (
 	ends_at,
 	is_active,
 	created_at,
-	updated_at,
-	deleted_at
+	updated_at
 ) VALUES (
-	?, ?, ?, ?,
-	?, ?, ?, ?,
-	?, ?, ?, ?,
-	?
+	?, ?, ?, ?, ?,
+	?, ?, ?, ?, ?,
+	datetime('now'),
+	datetime('now')
 ) RETURNING *;
 

@@ -20,12 +20,16 @@ INSERT INTO tbl_product_specs (
 	capacity,
 	scope_of_supply,
 	weight,
-	weight_unit
+	weight_unit,
+	created_at,
+	updated_at
 ) VALUES (
 	?, ?, ?, ?,
 	?, ?, ?, ?,
-	?
-) RETURNING id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight
+	?,
+	datetime('now'),
+	datetime('now')
+) RETURNING id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, created_at, updated_at
 `
 
 type CreateProductSpecsParams struct {
@@ -64,12 +68,14 @@ func (q *Queries) CreateProductSpecs(ctx context.Context, arg CreateProductSpecs
 		&i.ScopeOfSupply,
 		&i.WeightUnit,
 		&i.Weight,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getProductSpecs = `-- name: GetProductSpecs :many
-SELECT id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight
+SELECT id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, created_at, updated_at
 FROM tbl_product_specs
 ORDER BY id DESC
 `
@@ -94,6 +100,8 @@ func (q *Queries) GetProductSpecs(ctx context.Context) ([]TblProductSpec, error)
 			&i.ScopeOfSupply,
 			&i.WeightUnit,
 			&i.Weight,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -109,7 +117,7 @@ func (q *Queries) GetProductSpecs(ctx context.Context) ([]TblProductSpec, error)
 }
 
 const getProductSpecsByID = `-- name: GetProductSpecsByID :one
-SELECT id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight
+SELECT id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, created_at, updated_at
 FROM tbl_product_specs
 WHERE id = ?
 LIMIT 1
@@ -129,12 +137,14 @@ func (q *Queries) GetProductSpecsByID(ctx context.Context, id int64) (TblProduct
 		&i.ScopeOfSupply,
 		&i.WeightUnit,
 		&i.Weight,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getProductSpecsByProductID = `-- name: GetProductSpecsByProductID :one
-SELECT tbl_product_specs.id, tbl_product_specs.colours, tbl_product_specs.sizes, tbl_product_specs.segmentation, tbl_product_specs.part_number, tbl_product_specs.power, tbl_product_specs.capacity, tbl_product_specs.scope_of_supply, tbl_product_specs.weight_unit, tbl_product_specs.weight
+SELECT tbl_product_specs.id, tbl_product_specs.colours, tbl_product_specs.sizes, tbl_product_specs.segmentation, tbl_product_specs.part_number, tbl_product_specs.power, tbl_product_specs.capacity, tbl_product_specs.scope_of_supply, tbl_product_specs.weight_unit, tbl_product_specs.weight, tbl_product_specs.created_at, tbl_product_specs.updated_at
 FROM tbl_product_specs
 INNER JOIN tbl_products ON tbl_products.product_specs_id = tbl_product_specs.id
 WHERE tbl_products.id = ?
@@ -155,6 +165,8 @@ func (q *Queries) GetProductSpecsByProductID(ctx context.Context, id int64) (Tbl
 		&i.ScopeOfSupply,
 		&i.WeightUnit,
 		&i.Weight,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -170,7 +182,8 @@ SET
 	capacity = ?,
 	scope_of_supply = ?,
 	weight = ?,
-	weight_unit = ?
+	weight_unit = ?,
+	updated_at = datetime('now')
 WHERE id = ?
 `
 

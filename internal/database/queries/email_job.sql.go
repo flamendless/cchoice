@@ -151,9 +151,13 @@ INSERT INTO tbl_email_jobs(
 	template_name,
 	order_id,
 	checkout_payment_id,
-	otp_code
+	otp_code,
+	created_at,
+	updated_at
 ) VALUES (
-	?, ?, ?, ?, ?, ?, ?, ?
+	?, ?, ?, ?, ?, ?, ?, ?,
+	datetime('now'),
+	datetime('now')
 ) RETURNING id, queue_id, recipient, cc, subject, template_name, order_id, otp_code, checkout_payment_id, created_at, updated_at
 `
 

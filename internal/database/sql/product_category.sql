@@ -19,9 +19,13 @@ LIMIT 1;
 -- name: CreateProductCategory :one
 INSERT INTO tbl_product_categories (
 	category,
-	subcategory
+	subcategory,
+	created_at,
+	updated_at
 ) VALUES (
-	?, ?
+	?, ?,
+	datetime('now'),
+	datetime('now')
 ) RETURNING *;
 
 -- name: GetProductsCategoriesByIDs :one
@@ -32,8 +36,10 @@ LIMIT 1;
 -- name: CreateProductsCategories :one
 INSERT INTO tbl_products_categories (
 	product_id,
-	category_id
-) VALUES (?, ?)
+	category_id,
+	created_at,
+	updated_at
+) VALUES (?, ?, datetime('now'), datetime('now'))
 ON CONFLICT (product_id, category_id) DO NOTHING
 RETURNING *;
 
