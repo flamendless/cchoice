@@ -320,14 +320,26 @@ func (s *ProductService) Update(ctx context.Context, input UpdateProductInput) e
 	if input.ImagePath != "" {
 		cdnURL := s.getCDNURL(input.ImagePath)
 		cdnURLThumbnail := s.getCDNURL(constants.ToPath1280(input.ImagePath))
-		if err = s.dbRW.GetQueries().UpdateProductImage(ctx, queries.UpdateProductImageParams{
-			ID:              existingProduct.ProductImageID.Int64,
-			Path:            input.ImagePath,
-			Thumbnail:       sql.NullString{String: input.ImagePath, Valid: true},
-			CdnUrl:          sql.NullString{String: cdnURL, Valid: cdnURL != ""},
-			CdnUrlThumbnail: sql.NullString{String: cdnURLThumbnail, Valid: cdnURLThumbnail != ""},
-		}); err != nil {
-			return err
+		if !existingProduct.ProductImageID.Valid || existingProduct.ProductImageID.Int64 == 0 {
+			if _, err = s.dbRW.GetQueries().CreateProductImage(ctx, queries.CreateProductImageParams{
+				ProductID:       productID,
+				Path:            input.ImagePath,
+				Thumbnail:       sql.NullString{String: input.ImagePath, Valid: true},
+				CdnUrl:          sql.NullString{String: cdnURL, Valid: cdnURL != ""},
+				CdnUrlThumbnail: sql.NullString{String: cdnURLThumbnail, Valid: cdnURLThumbnail != ""},
+			}); err != nil {
+				return err
+			}
+		} else {
+			if err = s.dbRW.GetQueries().UpdateProductImage(ctx, queries.UpdateProductImageParams{
+				ID:              existingProduct.ProductImageID.Int64,
+				Path:            input.ImagePath,
+				Thumbnail:       sql.NullString{String: input.ImagePath, Valid: true},
+				CdnUrl:          sql.NullString{String: cdnURL, Valid: cdnURL != ""},
+				CdnUrlThumbnail: sql.NullString{String: cdnURLThumbnail, Valid: cdnURLThumbnail != ""},
+			}); err != nil {
+				return err
+			}
 		}
 	}
 
