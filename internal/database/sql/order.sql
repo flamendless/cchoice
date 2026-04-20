@@ -37,7 +37,9 @@ INSERT INTO tbl_orders(
 	shipping_tracking_number,
 	shipping_eta,
 	notes,
-	remarks
+	remarks,
+	created_at,
+	updated_at
 ) VALUES (
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
@@ -46,7 +48,9 @@ INSERT INTO tbl_orders(
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
-	?, ?, ?
+	?, ?, ?,
+	datetime('now'),
+	datetime('now')
 ) RETURNING *;
 
 -- name: GetOrderByID :one
@@ -105,10 +109,14 @@ INSERT INTO tbl_order_lines(
 	unit_price,
 	quantity,
 	total_price,
-	currency
+	currency,
+	created_at,
+	updated_at
 ) VALUES (
 	?, ?, ?, ?, ?,
-	?, ?, ?, ?, ?
+	?, ?, ?, ?, ?,
+	datetime('now'),
+	datetime('now')
 ) RETURNING *;
 
 -- name: GetOrderLinesByOrderID :many

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/errs"
@@ -156,9 +155,6 @@ var cmdApplyDiscount = &cobra.Command{
 					StartsAt:                    now,
 					EndsAt:                      now.AddDate(1, 0, 0),
 					IsActive:                    true,
-					CreatedAt:                   now,
-					UpdatedAt:                   now,
-					DeletedAt:                   constants.DtBeginning,
 				})
 				if err != nil {
 					return err

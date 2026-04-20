@@ -26,11 +26,15 @@ INSERT INTO tbl_product_specs (
 	capacity,
 	scope_of_supply,
 	weight,
-	weight_unit
+	weight_unit,
+	created_at,
+	updated_at
 ) VALUES (
 	?, ?, ?, ?,
 	?, ?, ?, ?,
-	?
+	?,
+	datetime('now'),
+	datetime('now')
 ) RETURNING *;
 
 -- name: UpdateProductSpecs :exec
@@ -44,5 +48,6 @@ SET
 	capacity = ?,
 	scope_of_supply = ?,
 	weight = ?,
-	weight_unit = ?
+	weight_unit = ?,
+	updated_at = datetime('now')
 WHERE id = ?;

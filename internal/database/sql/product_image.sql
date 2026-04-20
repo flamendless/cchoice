@@ -4,10 +4,24 @@ INSERT INTO tbl_product_images (
 	path,
 	thumbnail,
 	cdn_url,
-	cdn_url_thumbnail
+	cdn_url_thumbnail,
+	created_at,
+	updated_at
 ) VALUES (
-	?, ?, ?, ?, ?
+	?, ?, ?, ?, ?, datetime('now'), datetime('now')
 ) RETURNING *;
+
+-- name: UpdateProductImage :exec
+UPDATE tbl_product_images
+SET
+	path = ?,
+	thumbnail = ?,
+	cdn_url = ?,
+	cdn_url_thumbnail = ?,
+	created_at = datetime('now'),
+	updated_at = datetime('now')
+WHERE id = ?
+;
 
 -- name: GetProductImageByProductID :one
 SELECT * FROM tbl_product_images

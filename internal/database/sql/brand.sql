@@ -42,12 +42,11 @@ LIMIT ?;
 INSERT INTO tbl_brands (
 	name,
 	created_at,
-	updated_at,
-	deleted_at
+	updated_at
 ) VALUES (
 	?,
 	DATETIME('now'),
-	DATETIME('now'), '1970-01-01 00:00:00+00:00'
+	DATETIME('now')
 ) RETURNING id;
 
 -- name: CreateBrandImages :one
@@ -57,12 +56,11 @@ INSERT INTO tbl_brand_images (
 	s3_url,
 	is_main,
 	created_at,
-	updated_at,
-	deleted_at
+	updated_at
 ) VALUES (
 	?, ?, ?, ?,
 	DATETIME('now'),
-	DATETIME('now'), '1970-01-01 00:00:00+00:00'
+	DATETIME('now')
 ) RETURNING id;
 
 -- name: GetBrandsForSidePanel :many

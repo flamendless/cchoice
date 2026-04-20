@@ -1,7 +1,6 @@
 package models
 
 import (
-	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"context"
@@ -29,13 +28,7 @@ type BrandImage struct {
 }
 
 func NewBrand(brandName string) *Brand {
-	now := time.Now().UTC()
-	return &Brand{
-		Name:      brandName,
-		CreatedAt: now,
-		UpdatedAt: now,
-		DeletedAt: constants.DtBeginning,
-	}
+	return &Brand{Name: brandName}
 }
 
 func (brand *Brand) GetDBID(ctx context.Context, db database.IService) int64 {

@@ -3,9 +3,13 @@ INSERT INTO tbl_thumbnail_jobs (
 	queue_id,
 	product_id,
 	brand,
-	source_path
+	source_path,
+	created_at,
+	updated_at
 ) VALUES (
-	?, ?, ?, ?
+	?, ?, ?, ?,
+	datetime('now'),
+	datetime('now')
 ) RETURNING *;
 
 -- name: GetThumbnailJobByID :one

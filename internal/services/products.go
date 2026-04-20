@@ -320,8 +320,8 @@ func (s *ProductService) Update(ctx context.Context, input UpdateProductInput) e
 	if input.ImagePath != "" {
 		cdnURL := s.getCDNURL(input.ImagePath)
 		cdnURLThumbnail := s.getCDNURL(constants.ToPath1280(input.ImagePath))
-		if _, err = s.dbRW.GetQueries().CreateProductImage(ctx, queries.CreateProductImageParams{
-			ProductID:       productID,
+		if err = s.dbRW.GetQueries().UpdateProductImage(ctx, queries.UpdateProductImageParams{
+			ID:              existingProduct.ProductImageID.Int64,
 			Path:            input.ImagePath,
 			Thumbnail:       sql.NullString{String: input.ImagePath, Valid: true},
 			CdnUrl:          sql.NullString{String: cdnURL, Valid: cdnURL != ""},

@@ -14,9 +14,10 @@ INSERT INTO tbl_holidays (
     date,
     name,
     type,
-    created_at
+    created_at,
+    updated_at
 ) VALUES (
-    ?, ?, ?, datetime('now')
+    ?, ?, ?, datetime('now'), datetime('now')
 ) RETURNING id
 `
 

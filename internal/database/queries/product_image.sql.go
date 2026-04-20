@@ -16,9 +16,11 @@ INSERT INTO tbl_product_images (
 	path,
 	thumbnail,
 	cdn_url,
-	cdn_url_thumbnail
+	cdn_url_thumbnail,
+	created_at,
+	updated_at
 ) VALUES (
-	?, ?, ?, ?, ?
+	?, ?, ?, ?, ?, datetime('now'), datetime('now')
 ) RETURNING id, product_id, path, thumbnail, created_at, updated_at, deleted_at, cdn_url, cdn_url_thumbnail
 `
 
@@ -91,6 +93,8 @@ func (q *Queries) GetAllProductImages(ctx context.Context) ([]TblProductImage, e
 }
 
 const getProductImageByProductID = `-- name: GetProductImageByProductID :one
+;
+
 SELECT id, product_id, path, thumbnail, created_at, updated_at, deleted_at, cdn_url, cdn_url_thumbnail FROM tbl_product_images
 WHERE product_id = ?
 LIMIT 1
@@ -212,6 +216,37 @@ func (q *Queries) GetProductImagesWithEmptyCDNURLsForce(ctx context.Context) ([]
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateProductImage = `-- name: UpdateProductImage :exec
+UPDATE tbl_product_images
+SET
+	path = ?,
+	thumbnail = ?,
+	cdn_url = ?,
+	cdn_url_thumbnail = ?,
+	created_at = datetime('now'),
+	updated_at = datetime('now')
+WHERE id = ?
+`
+
+type UpdateProductImageParams struct {
+	Path            string
+	Thumbnail       sql.NullString
+	CdnUrl          sql.NullString
+	CdnUrlThumbnail sql.NullString
+	ID              int64
+}
+
+func (q *Queries) UpdateProductImage(ctx context.Context, arg UpdateProductImageParams) error {
+	_, err := q.db.ExecContext(ctx, updateProductImage,
+		arg.Path,
+		arg.Thumbnail,
+		arg.CdnUrl,
+		arg.CdnUrlThumbnail,
+		arg.ID,
+	)
+	return err
 }
 
 const updateProductImageCDNURLs = `-- name: UpdateProductImageCDNURLs :one

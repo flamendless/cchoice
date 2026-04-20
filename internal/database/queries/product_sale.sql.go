@@ -23,13 +23,12 @@ INSERT INTO tbl_product_sales (
 	ends_at,
 	is_active,
 	created_at,
-	updated_at,
-	deleted_at
+	updated_at
 ) VALUES (
-	?, ?, ?, ?,
-	?, ?, ?, ?,
-	?, ?, ?, ?,
-	?
+	?, ?, ?, ?, ?,
+	?, ?, ?, ?, ?,
+	datetime('now'),
+	datetime('now')
 ) RETURNING id, product_id, sale_price_without_vat, sale_price_with_vat, sale_price_without_vat_currency, sale_price_with_vat_currency, discount_type, discount_value, starts_at, ends_at, is_active, created_at, updated_at, deleted_at
 `
 
@@ -44,9 +43,6 @@ type CreateProductSaleParams struct {
 	StartsAt                    time.Time
 	EndsAt                      time.Time
 	IsActive                    bool
-	CreatedAt                   time.Time
-	UpdatedAt                   time.Time
-	DeletedAt                   time.Time
 }
 
 func (q *Queries) CreateProductSale(ctx context.Context, arg CreateProductSaleParams) (TblProductSale, error) {
@@ -61,9 +57,6 @@ func (q *Queries) CreateProductSale(ctx context.Context, arg CreateProductSalePa
 		arg.StartsAt,
 		arg.EndsAt,
 		arg.IsActive,
-		arg.CreatedAt,
-		arg.UpdatedAt,
-		arg.DeletedAt,
 	)
 	var i TblProductSale
 	err := row.Scan(

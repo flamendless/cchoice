@@ -16,13 +16,15 @@ INSERT INTO tbl_staff_logs (
     action,
     module,
     result,
-    useragent_id
+    useragent_id,
+    created_at
 ) VALUES (
     ?,
     ?,
     ?,
     ?,
-    ?
+    ?,
+    datetime('now')
 ) RETURNING id
 `
 

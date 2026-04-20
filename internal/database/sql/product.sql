@@ -6,6 +6,7 @@ SELECT
 	COALESCE(pc.subcategory, '') AS product_subcategory,
 	tbl_product_specs.*,
 	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	tbl_product_images.id AS product_image_id,
 	tbl_product_images.cdn_url,
 	tbl_product_images.cdn_url_thumbnail
 FROM tbl_products
@@ -158,11 +159,15 @@ INSERT INTO tbl_products (
 	unit_price_without_vat,
 	unit_price_with_vat,
 	unit_price_without_vat_currency,
-	unit_price_with_vat_currency
+	unit_price_with_vat_currency,
+	created_at,
+	updated_at
 ) VALUES (
 	?, ?, ?, ?,
 	?, ?, ?, ?,
-	?, ?, ?
+	?, ?, ?,
+	datetime('now'),
+	datetime('now')
 ) RETURNING *;
 
 -- name: UpdateProducts :execlastid
