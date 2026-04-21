@@ -705,7 +705,7 @@ func AddToCart() templ.Component {
 	})
 }
 
-func AddToCartPromoProduct() templ.Component {
+func DevRibbon() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -726,20 +726,51 @@ func AddToCartPromoProduct() templ.Component {
 			templ_7745c5c3_Var35 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<button id=\"btn-add-to-cart\" class=\"flex justify-center items-center relative inline-block w-12 h-12 bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group rounded-full hover:bg-cchoicesoft\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"")
+		if !conf.Conf().IsProd() {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<div class=\"fixed top-0 right-0 w-24 h-24 -mr-12 -mt-12 bg-red-600/80 rotate-45 flex items-center justify-center z-999 shadow-lg\"><span class=\"text-white font-bold text-sm tracking-wider mt-16\">DEV</span></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		return nil
+	})
+}
+
+func AddToCartPromoProduct() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var36 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var36 == nil {
+			templ_7745c5c3_Var36 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<button id=\"btn-add-to-cart\" class=\"flex justify-center items-center relative inline-block w-12 h-12 bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group rounded-full hover:bg-cchoicesoft\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var36 string
-		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/lines"))
+		var templ_7745c5c3_Var37 string
+		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/lines"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 308, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 326, Col: 37}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\" hx-include=\"#promo-product-id\" hx-swap=\"none\" _=\"\n\t\t\ton click\n\t\t\t\tasync call metrics_event('add_to_cart', #promo-product-id.value)\n\t\t\t\tlog 'Added to cart: ' + #promo-product-id.value\n\t\t\t\thalt\n\t\t\tend\n\t\t\ton htmx:afterRequest\n\t\t\t\ttrigger get on #cart-count-desktop\n\t\t\t\ttrigger get on #cart-count-mobile\n\t\t\t\tif #cart-icon-desktop\n\t\t\t\t\tadd .cart-icon-animate to #cart-icon-desktop\n\t\t\t\t\twait 400ms\n\t\t\t\t\tremove .cart-icon-animate from #cart-icon-desktop\n\t\t\t\tend\n\t\t\t\tif #cart-icon-mobile\n\t\t\t\t\tadd .cart-icon-animate to #cart-icon-mobile\n\t\t\t\t\twait 400ms\n\t\t\t\t\tremove .cart-icon-animate from #cart-icon-mobile\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" hx-include=\"#promo-product-id\" hx-swap=\"none\" _=\"\n\t\t\ton click\n\t\t\t\tasync call metrics_event('add_to_cart', #promo-product-id.value)\n\t\t\t\tlog 'Added to cart: ' + #promo-product-id.value\n\t\t\t\thalt\n\t\t\tend\n\t\t\ton htmx:afterRequest\n\t\t\t\ttrigger get on #cart-count-desktop\n\t\t\t\ttrigger get on #cart-count-mobile\n\t\t\t\tif #cart-icon-desktop\n\t\t\t\t\tadd .cart-icon-animate to #cart-icon-desktop\n\t\t\t\t\twait 400ms\n\t\t\t\t\tremove .cart-icon-animate from #cart-icon-desktop\n\t\t\t\tend\n\t\t\t\tif #cart-icon-mobile\n\t\t\t\t\tadd .cart-icon-animate to #cart-icon-mobile\n\t\t\t\t\twait 400ms\n\t\t\t\t\tremove .cart-icon-animate from #cart-icon-mobile\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -747,7 +778,7 @@ func AddToCartPromoProduct() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<span class=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow\">+1</span></button>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<span class=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow\">+1</span></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

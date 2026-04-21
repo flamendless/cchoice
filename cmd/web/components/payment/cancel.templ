@@ -18,6 +18,7 @@ templ CancelPaymentPage(body templ.Component) {
 
 templ CancelPaymentPageBody(orderRefNumber string) {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
+		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()
 		@header.Header()

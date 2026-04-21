@@ -295,6 +295,24 @@ templ AddToCart() {
 	/>
 }
 
+templ DevRibbon() {
+	if !conf.Conf().IsProd() {
+		<div
+			class="
+				fixed top-0 right-0
+				w-24 h-24 -mr-12 -mt-12
+				bg-red-600/80 rotate-45
+				flex items-center justify-center
+				z-999 shadow-lg
+			"
+		>
+			<span class="text-white font-bold text-sm tracking-wider mt-16">
+				DEV
+			</span>
+		</div>
+	}
+}
+
 templ AddToCartPromoProduct() {
 	<button
 		id="btn-add-to-cart"
