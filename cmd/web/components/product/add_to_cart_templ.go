@@ -32,14 +32,14 @@ func AddToCart(data models.ProductPageData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex flex-col gap-4\"><div class=\"flex items-center gap-4\"><div class=\"flex items-center border rounded-lg overflow-hidden h-full w-[20%]\"><input type=\"number\" id=\"product-qty\" name=\"quantity\" value=\"1\" min=\"1\" max=\"99\" class=\"w-full h-full text-center border-none focus:outline-none focus:ring-0\" hx-validate=\"false\"></div><button type=\"button\" id=\"btn-add-to-cart\" class=\"bg-cchoice text-white px-6 py-3 rounded-lg font-semibold hover:bg-cchoice_dark transition-colors cursor-pointer\" data-product-id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex flex-col gap-4\"><div class=\"flex items-center gap-2\"><button type=\"button\" id=\"btn-qty-decrease\" class=\"p-2 border rounded-l-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\" disabled=\"true\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tset currentVal to Number(#product-qty.value)\n\t\t\t\t\t\tif currentVal > 1\n\t\t\t\t\t\t\tset #product-qty.value to String(currentVal - 1)\n\t\t\t\t\t\t\tif currentVal - 1 <= 1\n\t\t\t\t\t\t\t\tset me.disabled to true\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif currentVal - 1 < 99\n\t\t\t\t\t\t\t\tset #btn-qty-increase.disabled to false\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M20 12H4\"></path></svg></button> <input type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]*\" id=\"product-qty\" name=\"quantity\" value=\"1\" class=\"w-8 text-center focus:outline-none focus:ring-0\" hx-validate=\"false\" _=\"\n\t\t\t\t\ton input\n\t\t\t\t\t\tif Number(me.value) <= 1\n\t\t\t\t\t\t\tset #btn-qty-decrease.disabled to true\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tset #btn-qty-decrease.disabled to false\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif Number(me.value) >= 99\n\t\t\t\t\t\t\tset #btn-qty-increase.disabled to true\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tset #btn-qty-increase.disabled to false\n\t\t\t\t\t\tend\n\t\t\t\t\ton keyup\n\t\t\t\t\t\tif me.value is ''\n\t\t\t\t\t\t\tset me.value to '1'\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif Number(me.value) < 1\n\t\t\t\t\t\t\tset me.value to '1'\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif Number(me.value) > 99\n\t\t\t\t\t\t\tset me.value to '99'\n\t\t\t\t\t\tend\n\t\t\t\t\"> <button type=\"button\" id=\"btn-qty-increase\" class=\"p-2 border rounded-r-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tset currentVal to Number(#product-qty.value)\n\t\t\t\t\t\tif currentVal < 99\n\t\t\t\t\t\t\tset #product-qty.value to String(currentVal + 1)\n\t\t\t\t\t\t\tif currentVal + 1 >= 99\n\t\t\t\t\t\t\t\tset me.disabled to true\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif currentVal + 1 > 1\n\t\t\t\t\t\t\t\tset #btn-qty-decrease.disabled to false\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg></button> <button type=\"button\" id=\"btn-add-to-cart\" class=\"bg-cchoice text-white px-6 py-3 rounded-lg font-semibold hover:bg-cchoice_dark transition-colors cursor-pointer mx-4\" data-product-id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(data.ProductID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 26, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 93, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -52,7 +52,7 @@ func AddToCart(data models.ProductPageData) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 27, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 94, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -65,7 +65,7 @@ func AddToCart(data models.ProductPageData) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.PriceDisplay)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 28, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 95, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -78,7 +78,7 @@ func AddToCart(data models.ProductPageData) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(data.BrandName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 29, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 96, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -91,7 +91,7 @@ func AddToCart(data models.ProductPageData) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(data.CDNURL1280)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 30, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 97, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -104,7 +104,7 @@ func AddToCart(data models.ProductPageData) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/lines"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 31, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 98, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -117,7 +117,7 @@ func AddToCart(data models.ProductPageData) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(data.ProductID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 61, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 128, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {

@@ -615,7 +615,7 @@ func btnQtyDecrease(cl models.CheckoutLine) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" alt=\"decrease quantity button\" aria-label=\"Decrease quantity\" title=\"Decrease quantity\" class=\"p-1 border rounded disabled:opacity-40 group hover:bg-cchoice cursor-pointer disabled:cursor-not-allowed\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" alt=\"decrease quantity button\" aria-label=\"Decrease quantity\" title=\"Decrease quantity\" class=\"p-1 border rounded bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -651,7 +651,7 @@ func btnQtyDecrease(cl models.CheckoutLine) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\" hx-swap=\"textContent\" _=\"\n\t\t\ton htmx:afterRequest\n\t\t\t\tput me.closest('.cart-line').querySelector('[name^=qty-]').textContent into txtQty\n\t\t\t\tput txtQty.split(':')[1].trim() into qty\n\t\t\t\tset qty to Number(qty)\n\n\t\t\t\tif qty <= 1\n\t\t\t\t\tset me.disabled to true\n\t\t\t\telse\n\t\t\t\t\tset me.disabled to false\n\t\t\t\tend\n\n\t\t\t\tput me.id.replace('btn-minus-', 'btn-plus-') into plusID\n\t\t\t\tput document.querySelector('#' + plusID) into btnPlus\n\t\t\t\tif btnPlus is not null\n\t\t\t\t\ttrigger htmx:afterRequest on btnPlus\n\t\t\t\tend\n\n\t\t\t\ttrigger cartUpdated on the body\n\t\t\tend\n\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4 text-cchoice-600 group-hover:bg-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M20 12H4\"></path></svg></button>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\" hx-swap=\"textContent\" _=\"\n\t\t\ton htmx:afterRequest\n\t\t\t\tput me.closest('.cart-line').querySelector('[name^=qty-]').textContent into txtQty\n\t\t\t\tput txtQty.split(':')[1].trim() into qty\n\t\t\t\tset qty to Number(qty)\n\n\t\t\t\tif qty <= 1\n\t\t\t\t\tset me.disabled to true\n\t\t\t\telse\n\t\t\t\t\tset me.disabled to false\n\t\t\t\tend\n\n\t\t\t\tput me.id.replace('btn-minus-', 'btn-plus-') into plusID\n\t\t\t\tput document.querySelector('#' + plusID) into btnPlus\n\t\t\t\tif btnPlus is not null\n\t\t\t\t\ttrigger htmx:afterRequest on btnPlus\n\t\t\t\tend\n\n\t\t\t\ttrigger cartUpdated on the body\n\t\t\tend\n\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M20 12H4\"></path></svg></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -693,7 +693,7 @@ func btnQtyIncrease(cl models.CheckoutLine) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" alt=\"increase quantity button\" aria-label=\"Increase quantity\" title=\"Increase quantity\" class=\"p-1 border rounded disabled:opacity-40 group hover:bg-cchoice cursor-pointer disabled:cursor-not-allowed\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" alt=\"increase quantity button\" aria-label=\"Increase quantity\" title=\"Increase quantity\" class=\"p-1 border rounded bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -729,7 +729,7 @@ func btnQtyIncrease(cl models.CheckoutLine) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" hx-swap=\"textContent\" _=\"\n\t\t\ton htmx:afterRequest\n\t\t\t\tput me.closest('.cart-line').querySelector('[name^=qty-]').textContent into txtQty\n\t\t\t\tput txtQty.split(':')[1].trim() into qty\n\t\t\t\tset qty to Number(qty)\n\n\t\t\t\tif qty >= 99\n\t\t\t\t\tset me.disabled to true\n\t\t\t\telse\n\t\t\t\t\tset me.disabled to false\n\t\t\t\tend\n\n\t\t\t\tput me.id.replace('btn-plus-', 'btn-minus-') into minusID\n\t\t\t\tput document.querySelector('#' + minusID) into btnMinus\n\t\t\t\tif btnMinus is not null\n\t\t\t\t\ttrigger htmx:afterRequest on btnMinus\n\t\t\t\tend\n\n\t\t\t\ttrigger cartUpdated on the body\n\t\t\tend\n\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4 text-cchoice-600 group-hover:bg-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg></button>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" hx-swap=\"textContent\" _=\"\n\t\t\ton htmx:afterRequest\n\t\t\t\tput me.closest('.cart-line').querySelector('[name^=qty-]').textContent into txtQty\n\t\t\t\tput txtQty.split(':')[1].trim() into qty\n\t\t\t\tset qty to Number(qty)\n\n\t\t\t\tif qty >= 99\n\t\t\t\t\tset me.disabled to true\n\t\t\t\telse\n\t\t\t\t\tset me.disabled to false\n\t\t\t\tend\n\n\t\t\t\tput me.id.replace('btn-plus-', 'btn-minus-') into minusID\n\t\t\t\tput document.querySelector('#' + minusID) into btnMinus\n\t\t\t\tif btnMinus is not null\n\t\t\t\t\ttrigger htmx:afterRequest on btnMinus\n\t\t\t\tend\n\n\t\t\t\ttrigger cartUpdated on the body\n\t\t\tend\n\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
