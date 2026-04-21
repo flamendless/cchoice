@@ -18,6 +18,7 @@ const (
 	ModuleBrands               = "brands"
 	ModuleCPoints              = "cpoints"
 	ModuleHolidays             = "holidays"
+	ModuleProductInventories   = "product_inventories"
 	ModulePasswordReset        = "password_reset"
 	ModuleProducts             = "products"
 	ModulePromos               = "promos"

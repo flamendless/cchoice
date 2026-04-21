@@ -246,7 +246,7 @@ type AdminProductSpecsForm struct {
 	Capacity      string
 	ScopeOfSupply string
 	Weight        string
-	WeightUnit    string
+	WeightUnit    enums.WeightUnit
 }
 
 type AdminProductListItem struct {
@@ -274,6 +274,7 @@ type AdminProductListItem struct {
 	Weight        string
 	WeightUnit    string
 	Status        enums.ProductStatus
+	Stocks        string
 }
 
 type AdminProductEditForm struct {
@@ -294,6 +295,8 @@ type AdminProductEditForm struct {
 	VATPercentage  string
 	Brands         []AdminBrand
 	Categories     []AdminCategory
+	StocksIn       enums.StocksIn
+	Stocks         string
 }
 
 type StaffTimeOff struct {
