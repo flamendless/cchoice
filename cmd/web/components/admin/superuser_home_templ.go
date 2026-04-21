@@ -23,7 +23,7 @@ var staffCards = []models.StaffCard{
 
 	{Link: "/admin/superuser/products", Title: "Manage Products", Description: "View and manage all products", Icon: svg.MenuLines("text-cchoice")},
 	{Link: "/admin/superuser/products/create", Title: "Create Product", Description: "Create a product", Icon: svg.Box("text-cchoice")},
-	{Link: "/admin/inventories", Title: "Manage Inventories", Description: "Manage product inventory stocks", Icon: svg.Box("text-cchoice")},
+	{Link: "/admin/product-inventories", Title: "Manage Product Inventories", Description: "Manage product inventory stocks", Icon: svg.Box("text-cchoice")},
 
 	{Link: "/admin/brands", Title: "Manage Brands", Description: "View and manage product brands", Icon: svg.Building("text-cchoice")},
 

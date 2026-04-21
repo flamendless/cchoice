@@ -58,3 +58,21 @@ FROM tbl_product_inventories
 INNER JOIN tbl_products ON tbl_products.id = tbl_product_inventories.product_id
 ORDER BY tbl_products.name ASC
 LIMIT ?;
+
+-- name: AdminGetProductInventoriesListing :many
+SELECT
+    tbl_product_inventories.id,
+    tbl_product_inventories.stocks,
+    tbl_product_inventories.stocks_in,
+    tbl_product_inventories.updated_at,
+    tbl_products.serial AS product_serial
+FROM tbl_product_inventories
+INNER JOIN tbl_products ON tbl_products.id = tbl_product_inventories.product_id
+ORDER BY
+    CASE
+        WHEN tbl_product_inventories.stocks = 0 THEN 0
+        WHEN tbl_product_inventories.stocks <= 10 THEN 1
+        ELSE 2
+    END ASC,
+    tbl_product_inventories.stocks ASC,
+    tbl_product_inventories.updated_at DESC;

@@ -10,6 +10,62 @@ import (
 	"database/sql"
 )
 
+const adminGetProductInventoriesListing = `-- name: AdminGetProductInventoriesListing :many
+SELECT
+    tbl_product_inventories.id,
+    tbl_product_inventories.stocks,
+    tbl_product_inventories.stocks_in,
+    tbl_product_inventories.updated_at,
+    tbl_products.serial AS product_serial
+FROM tbl_product_inventories
+INNER JOIN tbl_products ON tbl_products.id = tbl_product_inventories.product_id
+ORDER BY
+    CASE
+        WHEN tbl_product_inventories.stocks = 0 THEN 0
+        WHEN tbl_product_inventories.stocks <= 10 THEN 1
+        ELSE 2
+    END ASC,
+    tbl_product_inventories.stocks ASC,
+    tbl_product_inventories.updated_at DESC
+`
+
+type AdminGetProductInventoriesListingRow struct {
+	ID            int64
+	Stocks        int64
+	StocksIn      string
+	UpdatedAt     string
+	ProductSerial string
+}
+
+func (q *Queries) AdminGetProductInventoriesListing(ctx context.Context) ([]AdminGetProductInventoriesListingRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetProductInventoriesListing)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetProductInventoriesListingRow
+	for rows.Next() {
+		var i AdminGetProductInventoriesListingRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Stocks,
+			&i.StocksIn,
+			&i.UpdatedAt,
+			&i.ProductSerial,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const createProductInventory = `-- name: CreateProductInventory :one
 INSERT INTO tbl_product_inventories (
     product_id,

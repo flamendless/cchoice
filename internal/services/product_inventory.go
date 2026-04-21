@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
@@ -58,6 +59,26 @@ func (s *ProductInventoryService) GetByProductID(ctx context.Context, productID 
 	return s.mapRowToProductInventory(inv), nil
 }
 
+func (s *ProductInventoryService) GetListingForAdmin(ctx context.Context) ([]models.AdminProductInventoryListItem, error) {
+	inventories, err := s.dbRO.GetQueries().AdminGetProductInventoriesListing(ctx)
+	if err != nil {
+		return nil, errors.Join(errs.ErrProductInventory, err)
+	}
+
+	items := make([]models.AdminProductInventoryListItem, 0, len(inventories))
+	for _, inv := range inventories {
+		items = append(items, models.AdminProductInventoryListItem{
+			ID:            s.encoder.Encode(inv.ID),
+			ProductSerial: inv.ProductSerial,
+			StocksIn:      enums.ParseStocksInToEnum(inv.StocksIn),
+			Stocks:        inv.Stocks,
+			UpdatedAt:     inv.UpdatedAt,
+		})
+	}
+
+	return items, nil
+}
+
 func (s *ProductInventoryService) Create(
 	ctx context.Context,
 	staffID string,
@@ -79,13 +100,13 @@ func (s *ProductInventoryService) Create(
 		}
 	}()
 
-	decoded := s.encoder.Decode(productID)
-	if decoded == encode.INVALID {
+	productDBID := s.encoder.Decode(productID)
+	if productDBID == encode.INVALID {
 		result = errs.ErrDecode.Error()
 		return "", errs.ErrDecode
 	}
 
-	_, err := s.dbRO.GetQueries().GetProductInventoryByProductID(ctx, decoded)
+	_, err := s.dbRO.GetQueries().GetProductInventoryByProductID(ctx, productDBID)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		result = err.Error()
 		return "", errors.Join(errs.ErrProductInventory, err)
@@ -96,7 +117,7 @@ func (s *ProductInventoryService) Create(
 	}
 
 	id, err := s.dbRW.GetQueries().CreateProductInventory(ctx, queries.CreateProductInventoryParams{
-		ProductID: decoded,
+		ProductID: productDBID,
 		Stocks:    stocks,
 		StocksIn:  stocksIn.String(),
 	})
@@ -131,14 +152,14 @@ func (s *ProductInventoryService) SetQty(
 		}
 	}()
 
-	decoded := s.encoder.Decode(productID)
-	if decoded == encode.INVALID {
+	productDBID := s.encoder.Decode(productID)
+	if productDBID == encode.INVALID {
 		result = errs.ErrDecode.Error()
 		return errs.ErrDecode
 	}
 
 	if err := s.dbRW.GetQueries().UpdateProductInventory(ctx, queries.UpdateProductInventoryParams{
-		ProductID: decoded,
+		ProductID: productDBID,
 		StocksIn:  stocksIn.String(),
 		Stocks:    qty,
 	}); err != nil {
