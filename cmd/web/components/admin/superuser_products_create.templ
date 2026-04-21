@@ -26,6 +26,7 @@ templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
 			class="bg-cchoicesoft min-h-screen flex flex-col"
 			_="init call metrics_event('admin_visit', 'products')"
 		>
+			@common.DevRibbon()
 			@common.ErrorBanner()
 			@common.SuccessBanner()
 			<div class="flex-grow p-4">

@@ -52,6 +52,10 @@ func ResetPasswordPage(usertype enums.UserType, token string, email string) temp
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = common.DevRibbon().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = common.ErrorBanner().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -67,7 +71,7 @@ func ResetPasswordPage(usertype enums.UserType, token string, email string) temp
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 29, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 30, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -80,7 +84,7 @@ func ResetPasswordPage(usertype enums.UserType, token string, email string) temp
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathSVGLogoOnly)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 38, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 39, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -93,7 +97,7 @@ func ResetPasswordPage(usertype enums.UserType, token string, email string) temp
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 46, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 47, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -106,7 +110,7 @@ func ResetPasswordPage(usertype enums.UserType, token string, email string) temp
 		var templ_7745c5c3_Var5 templ.SafeURL
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/auth/reset-password"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 50, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 51, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -119,7 +123,7 @@ func ResetPasswordPage(usertype enums.UserType, token string, email string) temp
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/auth/reset-password"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 52, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 53, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -132,7 +136,7 @@ func ResetPasswordPage(usertype enums.UserType, token string, email string) temp
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(token)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 56, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 57, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -145,7 +149,7 @@ func ResetPasswordPage(usertype enums.UserType, token string, email string) temp
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternPassword)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 69, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 70, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -158,7 +162,7 @@ func ResetPasswordPage(usertype enums.UserType, token string, email string) temp
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternPassword)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 99, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 100, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -177,7 +181,7 @@ func ResetPasswordPage(usertype enums.UserType, token string, email string) temp
 			var templ_7745c5c3_Var10 templ.SafeURL
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 133, Col: 37}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 134, Col: 37}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -195,7 +199,7 @@ func ResetPasswordPage(usertype enums.UserType, token string, email string) temp
 			var templ_7745c5c3_Var11 templ.SafeURL
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 137, Col: 40}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/reset_password.templ`, Line: 138, Col: 40}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {

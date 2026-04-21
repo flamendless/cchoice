@@ -52,6 +52,10 @@ func AdminProfilePage(profile models.AdminStaffProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = common.DevRibbon().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = common.ErrorBanner().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -86,7 +90,7 @@ func AdminProfilePage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/change-password"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile.templ`, Line: 42, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile.templ`, Line: 43, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -99,7 +103,7 @@ func AdminProfilePage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternPassword)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile.templ`, Line: 59, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile.templ`, Line: 60, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -112,7 +116,7 @@ func AdminProfilePage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternPassword)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile.templ`, Line: 83, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile.templ`, Line: 84, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -154,7 +158,7 @@ func profileText(label string, value string) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile.templ`, Line: 122, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile.templ`, Line: 123, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -167,7 +171,7 @@ func profileText(label string, value string) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile.templ`, Line: 123, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile.templ`, Line: 124, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -242,7 +246,7 @@ func AdminProfilePersonalInfo(profile models.AdminStaffProfile) templ.Component 
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/profile/edit"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile.templ`, Line: 139, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/profile.templ`, Line: 140, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {

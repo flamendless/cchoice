@@ -55,6 +55,10 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = common.DevRibbon().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = common.ErrorBanner().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -78,7 +82,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL(fmt.Sprintf("/admin/superuser/products/%s", formData.ProductID)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 39, Col: 92}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 40, Col: 92}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -96,7 +100,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(brand.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 60, Col: 28}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 61, Col: 28}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -119,7 +123,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(brand.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 63, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 64, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -137,7 +141,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Serial)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 73, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 74, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -150,7 +154,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Serial)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 75, Col: 67}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 76, Col: 67}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -168,7 +172,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(ps.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 90, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 91, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -191,7 +195,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(ps.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 93, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 94, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -214,7 +218,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(cat.Category)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 117, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 118, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -237,7 +241,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(cat.Category)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 120, Col: 26}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 121, Col: 26}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -255,7 +259,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/superuser/products/subcategories"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 134, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 135, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -268,7 +272,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Subcategory)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 140, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 141, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -281,7 +285,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Subcategory)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 140, Col: 80}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 141, Col: 80}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -294,7 +298,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternProductName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 154, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 155, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -307,7 +311,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 155, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 156, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
@@ -320,7 +324,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Price)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 173, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 174, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
@@ -333,7 +337,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(formData.VATPercentage)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 178, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 179, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
@@ -346,7 +350,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 192, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 193, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -359,7 +363,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Specs.Colours)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 209, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 210, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -372,7 +376,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Specs.Sizes)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 224, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 225, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -385,7 +389,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Specs.Segmentation)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 239, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 240, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -398,7 +402,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternSerialNumber)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 253, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 254, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
@@ -411,7 +415,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Specs.PartNumber)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 254, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 255, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
@@ -424,7 +428,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Specs.Power)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 269, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 270, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
@@ -437,7 +441,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Specs.Capacity)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 284, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 285, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
@@ -450,7 +454,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Specs.Weight)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 301, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 302, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
@@ -471,7 +475,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Specs.ScopeOfSupply)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 323, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 324, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
@@ -501,7 +505,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		var templ_7745c5c3_Var28 templ.SafeURL
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/products"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 342, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 343, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {

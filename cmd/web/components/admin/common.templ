@@ -112,6 +112,7 @@ templ AdminLoginPage() {
 			class="bg-cchoicesoft min-h-screen flex items-center justify-center"
 			_="init call metrics_event('admin_visit', 'login')"
 		>
+			@common.DevRibbon()
 			@common.ErrorBanner()
 			@common.SuccessBanner()
 			<div class="w-full max-w-lg p-8 bg-white rounded-lg shadow-md">

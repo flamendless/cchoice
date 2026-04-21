@@ -23,6 +23,7 @@ templ CustomerLoginPage() {
 			class="bg-cchoicesoft min-h-screen flex items-center justify-center"
 			_="init call metrics_event('customer_visit', 'login')"
 		>
+			@common.DevRibbon()
 			@common.ErrorBanner()
 			@common.SuccessBanner()
 			<div class="w-full max-w-lg p-8 bg-white rounded-lg shadow-md">
@@ -134,6 +135,7 @@ templ CustomerRegisterPage() {
 			class="bg-cchoicesoft min-h-screen flex items-center justify-center"
 			_="init call metrics_event('customer_visit', 'register')"
 		>
+			@common.DevRibbon()
 			@common.ErrorBanner()
 			@common.SuccessBanner()
 			<div class="w-full max-w-2xl p-8 bg-white rounded-lg shadow-md">
@@ -379,6 +381,7 @@ templ CustomerPortalPage(profile models.CustomerProfile) {
 			class="bg-cchoicesoft min-h-screen flex flex-col"
 			_="init call metrics_event('customer_visit', 'portal')"
 		>
+			@common.DevRibbon()
 			@common.ErrorBanner()
 			@common.SuccessBanner()
 			<div class="flex-grow p-4">
@@ -458,6 +461,7 @@ templ CustomerProfilePage(profile models.CustomerProfile) {
 			class="bg-cchoicesoft min-h-screen flex flex-col"
 			_="init call metrics_event('customer_visit', 'profile')"
 		>
+			@common.DevRibbon()
 			@common.ErrorBanner()
 			@common.SuccessBanner()
 			<div class="flex-grow p-4">
@@ -568,6 +572,7 @@ templ CustomerProfileEditPage(profile models.CustomerProfile) {
 		<body
 			class="bg-cchoicesoft min-h-screen flex flex-col"
 		>
+			@common.DevRibbon()
 			@common.ErrorBanner()
 			@common.SuccessBanner()
 			<div class="flex-grow p-4">

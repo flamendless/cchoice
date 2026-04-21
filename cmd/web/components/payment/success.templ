@@ -19,6 +19,7 @@ templ SuccessPaymentPage(body templ.Component) {
 
 templ SuccessPaymentPageBody(orderRefNumber string) {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
+		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()
 		@header.Header()

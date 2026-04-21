@@ -54,6 +54,10 @@ func AdminPromosListPage(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = common.DevRibbon().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = common.ErrorBanner().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -122,7 +126,7 @@ func PromosListSection() templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/promos/table"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 46, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 47, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -172,7 +176,7 @@ func PromosToolbar() templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/promos/create"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 61, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 62, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -225,7 +229,7 @@ func AdminPromosListTable(promos []models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs("promo-row-" + promo.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 107, Col: 38}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 108, Col: 38}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -238,7 +242,7 @@ func AdminPromosListTable(promos []models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(promo.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 109, Col: 21}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 110, Col: 21}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -259,7 +263,7 @@ func AdminPromosListTable(promos []models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(promo.StartDate)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 115, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 116, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -272,7 +276,7 @@ func AdminPromosListTable(promos []models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(promo.EndDate)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 115, Col: 45}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 116, Col: 45}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -285,7 +289,7 @@ func AdminPromosListTable(promos []models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(promo.Type)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 118, Col: 20}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 119, Col: 20}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -306,7 +310,7 @@ func AdminPromosListTable(promos []models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(promo.CreatedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 124, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 125, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -362,7 +366,7 @@ func PromoActionsCell(promo models.AdminPromoListItem) templ.Component {
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URLf("/admin/promos/%s/edit", promo.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 142, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 143, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -375,7 +379,7 @@ func PromoActionsCell(promo models.AdminPromoListItem) templ.Component {
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URLf("/admin/promos/%s", promo.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 151, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 152, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
@@ -388,7 +392,7 @@ func PromoActionsCell(promo models.AdminPromoListItem) templ.Component {
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs("#promo-row-" + promo.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 152, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 153, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
@@ -431,7 +435,7 @@ func PromoMediaLink(url string, mediaType enums.PromoType) templ.Component {
 			var templ_7745c5c3_Var18 templ.SafeURL
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(url))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 164, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 165, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
@@ -449,7 +453,7 @@ func PromoMediaLink(url string, mediaType enums.PromoType) templ.Component {
 			var templ_7745c5c3_Var19 templ.SafeURL
 			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(url))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 177, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 178, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 			if templ_7745c5c3_Err != nil {
@@ -494,7 +498,7 @@ func PromoStatusBadge(status enums.PromoStatus) templ.Component {
 			var templ_7745c5c3_Var21 string
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 194, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 195, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {
@@ -512,7 +516,7 @@ func PromoStatusBadge(status enums.PromoStatus) templ.Component {
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 198, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 199, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -530,7 +534,7 @@ func PromoStatusBadge(status enums.PromoStatus) templ.Component {
 			var templ_7745c5c3_Var23 string
 			templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 202, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 203, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 			if templ_7745c5c3_Err != nil {
@@ -548,7 +552,7 @@ func PromoStatusBadge(status enums.PromoStatus) templ.Component {
 			var templ_7745c5c3_Var24 string
 			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 206, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 207, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 			if templ_7745c5c3_Err != nil {
@@ -628,7 +632,7 @@ func PromoCreateForm() templ.Component {
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/promos"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 242, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 243, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
@@ -646,7 +650,7 @@ func PromoCreateForm() templ.Component {
 			var templ_7745c5c3_Var28 string
 			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(pt.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 320, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 321, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 			if templ_7745c5c3_Err != nil {
@@ -659,7 +663,7 @@ func PromoCreateForm() templ.Component {
 			var templ_7745c5c3_Var29 string
 			templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(pt.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 320, Col: 48}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 321, Col: 48}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 			if templ_7745c5c3_Err != nil {
@@ -759,7 +763,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 		var templ_7745c5c3_Var32 string
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URLf("/admin/promos/%s", promo.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 413, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 414, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 		if templ_7745c5c3_Err != nil {
@@ -772,7 +776,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 		var templ_7745c5c3_Var33 string
 		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(promo.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 419, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 420, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 		if templ_7745c5c3_Err != nil {
@@ -785,7 +789,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 		var templ_7745c5c3_Var34 string
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(promo.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 428, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 429, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
@@ -798,7 +802,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 		var templ_7745c5c3_Var35 string
 		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(promo.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 442, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 443, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 		if templ_7745c5c3_Err != nil {
@@ -811,7 +815,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 		var templ_7745c5c3_Var36 string
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(promo.StartDate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 454, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 455, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 		if templ_7745c5c3_Err != nil {
@@ -824,7 +828,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 		var templ_7745c5c3_Var37 string
 		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(promo.EndDate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 473, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 474, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 		if templ_7745c5c3_Err != nil {
@@ -837,7 +841,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 		var templ_7745c5c3_Var38 string
 		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(promo.Type.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 489, Col: 25}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 490, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 		if templ_7745c5c3_Err != nil {
@@ -850,7 +854,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 		var templ_7745c5c3_Var39 string
 		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(promo.Type.String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 491, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 492, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 		if templ_7745c5c3_Err != nil {
@@ -889,7 +893,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 			var templ_7745c5c3_Var40 string
 			templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(promo.MediaURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 513, Col: 27}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 514, Col: 27}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 			if templ_7745c5c3_Err != nil {
@@ -907,7 +911,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var41 templ.SafeURL
 				templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(promo.MediaURL))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 521, Col: 39}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 522, Col: 39}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 				if templ_7745c5c3_Err != nil {
@@ -936,7 +940,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var42 string
 				templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(ps.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 546, Col: 33}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 547, Col: 33}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 				if templ_7745c5c3_Err != nil {
@@ -959,7 +963,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 				var templ_7745c5c3_Var43 string
 				templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(ps.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 546, Col: 82}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/promos.templ`, Line: 547, Col: 82}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 				if templ_7745c5c3_Err != nil {

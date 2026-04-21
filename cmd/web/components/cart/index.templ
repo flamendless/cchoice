@@ -27,6 +27,7 @@ templ CartPage(body templ.Component) {
 
 templ CartPageBody(summaryContent templ.Component) {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
+		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()
 		@header.Header()
@@ -167,6 +168,7 @@ templ CartSummaryContentEmpty() {
 
 templ CartPageBodyEmpty() {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
+		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()
 		@header.Header()

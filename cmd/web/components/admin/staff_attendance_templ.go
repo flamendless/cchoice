@@ -388,6 +388,10 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = common.DevRibbon().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = common.ErrorBanner().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -451,7 +455,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/staff/time-in"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_attendance.templ`, Line: 137, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_attendance.templ`, Line: 138, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -496,7 +500,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/staff/time-out"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_attendance.templ`, Line: 147, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_attendance.templ`, Line: 148, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
@@ -541,7 +545,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/staff/lunch-break-start"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_attendance.templ`, Line: 159, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_attendance.templ`, Line: 160, Col: 62}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -586,7 +590,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/staff/lunch-break-end"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_attendance.templ`, Line: 169, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_attendance.templ`, Line: 170, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -659,7 +663,7 @@ func StaffLocationStatus(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/admin/staff/attendance/location"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_attendance.templ`, Line: 196, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_attendance.templ`, Line: 197, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
@@ -694,7 +698,7 @@ func StaffLocationStatus(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(profile.LocationDisplay)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_attendance.templ`, Line: 209, Col: 80}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_attendance.templ`, Line: 210, Col: 80}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
@@ -707,7 +711,7 @@ func StaffLocationStatus(profile models.AdminStaffProfile) templ.Component {
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.0f", profile.DistanceMeters))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_attendance.templ`, Line: 210, Col: 103}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/staff_attendance.templ`, Line: 211, Col: 103}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {

@@ -146,6 +146,7 @@ templ OrderTrackerSearchBoxPlain() {
 
 templ OrderTrackerPageBody(orderNo string, deliveryETA string, email string, mobileNo string) {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
+		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()
 		@header.Header()
@@ -190,6 +191,7 @@ templ OrderTrackerPageBody(orderNo string, deliveryETA string, email string, mob
 
 templ OrderTrackerPageBodyError(orderNo string, email string, mobileNo string) {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
+		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()
 		@header.Header()
