@@ -167,11 +167,28 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 	specScopeOfSupply := r.FormValue("spec_scope_of_supply")
 	specWeight := r.FormValue("spec_weight")
 	specWeightUnit := r.FormValue("spec_weight_unit")
+	stocksInStr := r.FormValue("stocks_in")
+	stocksQtyStr := r.FormValue("stocks_qty")
 
 	if specColours == "" || specSizes == "" || specSegmentation == "" ||
 		specPartNumber == "" || specPower == "" || specCapacity == "" || specScopeOfSupply == "" ||
-		specWeight == "" || specWeightUnit == "" {
+		specWeight == "" || specWeightUnit == "" || stocksInStr == "" || stocksQtyStr == "" {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err), zap.Any("form", r.Form))
 		redirectHX(w, r, utils.URLWithError(page, "All product specs are required"))
+		return
+	}
+
+	stocksIn := enums.ParseStocksInToEnum(stocksInStr)
+	if stocksIn == enums.STOCKS_IN_UNDEFINED {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err), zap.String("stocks in", stocksInStr))
+		redirectHX(w, r, utils.URLWithError(page, "Invalid stocks in"))
+		return
+	}
+
+	stocksQty, err := strconv.ParseInt(stocksQtyStr, 10, 64)
+	if err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err), zap.String("stocks qty", stocksQtyStr))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 
@@ -233,28 +250,33 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		}
 	}
 
-	product, err := s.services.product.Create(ctx, services.CreateProductInput{
-		Serial:      serial,
-		Name:        name,
-		Description: description,
-		BrandID:     brandID,
-		Category:    category,
-		Subcategory: subcategory,
-		Specs: services.ProductSpecsInput{
-			Colours:       specColours,
-			Sizes:         specSizes,
-			Segmentation:  specSegmentation,
-			PartNumber:    specPartNumber,
-			Power:         specPower,
-			Capacity:      specCapacity,
-			ScopeOfSupply: specScopeOfSupply,
-			Weight:        specWeight,
-			WeightUnit:    enums.ParseWeightUnitToEnum(specWeightUnit).ToDB(),
-		},
-		ImagePath:           filename,
-		UnitPriceWithoutVat: unitPriceWithoutVat,
-		UnitPriceWithVat:    unitPriceWithVat,
-	})
+	product, err := s.services.product.Create(
+		ctx,
+		s.sessionManager.GetString(ctx, SessionStaffID),
+		services.CreateProductInput{
+			Serial:      serial,
+			Name:        name,
+			Description: description,
+			BrandID:     brandID,
+			Category:    category,
+			Subcategory: subcategory,
+			Specs: services.ProductSpecsInput{
+				Colours:       specColours,
+				Sizes:         specSizes,
+				Segmentation:  specSegmentation,
+				PartNumber:    specPartNumber,
+				Power:         specPower,
+				Capacity:      specCapacity,
+				ScopeOfSupply: specScopeOfSupply,
+				Weight:        specWeight,
+				WeightUnit:    enums.ParseWeightUnitToEnum(specWeightUnit).ToDB(),
+			},
+			ImagePath:           filename,
+			UnitPriceWithoutVat: unitPriceWithoutVat,
+			UnitPriceWithVat:    unitPriceWithVat,
+			StocksIn:            stocksIn,
+			Stocks:              stocksQty,
+		})
 	if err != nil {
 		result = err.Error()
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -545,9 +567,22 @@ func (s *Server) adminSuperuserProductsEditPageHandler(w http.ResponseWriter, r 
 	}
 
 	var imageCDNURL string
-	productImage, _ := s.dbRO.GetQueries().GetProductImageByProductID(ctx, product.ID)
+	productImage, err := s.dbRO.GetQueries().GetProductImageByProductID(ctx, product.ID)
+	if err != nil {
+		logs.Log().Warn(page, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
 	if productImage.Path != "" {
 		imageCDNURL = s.GetCDNURL(productImage.Path)
+	}
+
+	inventory, err := s.services.productInventory.GetByProductID(ctx, productID)
+	if err != nil {
+		logs.Log().Warn(page, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
 	}
 
 	formData := models.AdminProductEditForm{
@@ -571,11 +606,13 @@ func (s *Server) adminSuperuserProductsEditPageHandler(w http.ResponseWriter, r 
 			Capacity:      product.Specs.Capacity,
 			ScopeOfSupply: product.Specs.ScopeOfSupply,
 			Weight:        product.Specs.Weight,
-			WeightUnit:    product.Specs.WeightUnit,
+			WeightUnit:    enums.ParseWeightUnitToEnum(product.Specs.WeightUnit),
 		},
 		Brands:        brands,
 		Categories:    categories,
 		VATPercentage: conf.Conf().Settings.VATPercentage,
+		StocksIn:      inventory.StocksIn,
+		Stocks:        strconv.FormatInt(inventory.Stocks, 10),
 	}
 
 	if err := compadmin.AdminSuperuserProductsEditPage(formData).Render(ctx, w); err != nil {
@@ -693,6 +730,13 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 		}
 	}
 
+	qty, err := strconv.ParseInt(r.FormValue("stocks_qty"), 10, 64)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
 	input := services.UpdateProductInput{
 		ProductID:           productID,
 		BrandID:             brandID,
@@ -705,6 +749,8 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 		ImagePath:           filename,
 		UnitPriceWithoutVat: unitPriceWithoutVat,
 		UnitPriceWithVat:    unitPriceWithVat,
+		StocksIn:            enums.MustParseStocksInToEnum(r.FormValue("stocks_in")),
+		Stocks:              qty,
 	}
 
 	result := "success"
@@ -721,10 +767,14 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 		}
 	}()
 
-	if err := s.services.product.Update(ctx, input); err != nil {
+	if err := s.services.product.Update(
+		ctx,
+		s.sessionManager.GetString(ctx, SessionStaffID),
+		input,
+	); err != nil {
 		result = err.Error()
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to update product"))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 

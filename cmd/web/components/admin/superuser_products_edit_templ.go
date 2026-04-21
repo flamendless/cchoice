@@ -464,24 +464,45 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = WeightUnitDropdown(enums.ParseWeightUnitToEnum(formData.Specs.WeightUnit)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = WeightUnitDropdown(formData.Specs.WeightUnit).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</div><div class=\"md:col-span-2\"><label for=\"spec_scope_of_supply\" class=\"block text-sm font-medium text-gray-700 mb-1\">Scope of Supply <span class=\"text-red-500\">*</span></label> <textarea id=\"spec_scope_of_supply\" name=\"spec_scope_of_supply\" required rows=\"3\" maxlength=\"1000\" placeholder=\"List items included in the package\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</div><div><label for=\"stocks_in\" class=\"block text-sm font-medium text-gray-700 mb-1\">Stocks In <span class=\"text-red-500\">*</span></label>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = StocksInDropdown(formData.StocksIn).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</div><div><label for=\"stocks_qty\" class=\"block text-sm font-medium text-gray-700 mb-1\">Stocks Qty <span class=\"text-red-500\">*</span></label> <input type=\"number\" id=\"stocks_qty\" name=\"stocks_qty\" required min=\"1\" step=\"1\" max=\"999999999\" placeholder=\"e.g., 99\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var27 string
-		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Specs.ScopeOfSupply)
+		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Stocks)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 324, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 331, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</textarea></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Image</h2>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div class=\"md:col-span-2\"><label for=\"spec_scope_of_supply\" class=\"block text-sm font-medium text-gray-700 mb-1\">Scope of Supply <span class=\"text-red-500\">*</span></label> <textarea id=\"spec_scope_of_supply\" name=\"spec_scope_of_supply\" required rows=\"3\" maxlength=\"1000\" placeholder=\"List items included in the package\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var28 string
+		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(formData.Specs.ScopeOfSupply)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 347, Col: 41}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</textarea></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Image</h2>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -498,20 +519,20 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</div><div class=\"flex justify-end gap-4 pt-4 border-t\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</div><div class=\"flex justify-end gap-4 pt-4 border-t\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var28 templ.SafeURL
-		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/products"))
+		var templ_7745c5c3_Var29 templ.SafeURL
+		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/products"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 343, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 366, Col: 54}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" id=\"submit-btn\" class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice disabled:opacity-50 disabled:cursor-not-allowed\" _=\"on click call metrics_event('admin_exec', 'update product')\"><span id=\"submit-btn-content\" class=\"flex items-center gap-2\"><span class=\"submit-btn-text\">Update Product</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" id=\"submit-btn\" class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice disabled:opacity-50 disabled:cursor-not-allowed\" _=\"on click call metrics_event('admin_exec', 'update product')\"><span id=\"submit-btn-content\" class=\"flex items-center gap-2\"><span class=\"submit-btn-text\">Update Product</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -519,7 +540,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</span></button></div></form></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</span></button></div></form></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -527,7 +548,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

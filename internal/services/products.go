@@ -16,13 +16,17 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
+
+	"go.uber.org/zap"
 )
 
 type ProductService struct {
-	dbRO      database.IService
-	dbRW      database.IService
-	encoder   encode.IEncode
-	getCDNURL models.CDNURLFunc
+	dbRO             database.IService
+	dbRW             database.IService
+	encoder          encode.IEncode
+	getCDNURL        models.CDNURLFunc
+	productInventory *ProductInventoryService
+	staffLog         *StaffLogsService
 }
 
 func NewProductService(
@@ -30,17 +34,40 @@ func NewProductService(
 	dbRO database.IService,
 	dbRW database.IService,
 	cdnURLFunc models.CDNURLFunc,
+	productInventory *ProductInventoryService,
+	staffLog *StaffLogsService,
 ) *ProductService {
+	if productInventory == nil {
+		panic("ProductInventoryService is required")
+	}
+	if staffLog == nil {
+		panic("StaffLogsService is required")
+	}
 	return &ProductService{
-		dbRO:      dbRO,
-		dbRW:      dbRW,
-		encoder:   encoder,
-		getCDNURL: cdnURLFunc,
+		dbRO:             dbRO,
+		dbRW:             dbRW,
+		encoder:          encoder,
+		getCDNURL:        cdnURLFunc,
+		productInventory: productInventory,
+		staffLog:         staffLog,
 	}
 }
 
-func (s *ProductService) Create(ctx context.Context, input CreateProductInput) (*queries.TblProduct, error) {
+func (s *ProductService) Create(
+	ctx context.Context,
+	staffID string,
+	input CreateProductInput,
+) (*queries.TblProduct, error) {
+	staffDBID := s.encoder.Decode(staffID)
+	if staffDBID == encode.INVALID {
+		return nil, errs.ErrDecode
+	}
+
 	brandID := s.encoder.Decode(input.BrandID)
+	if brandID == encode.INVALID {
+		return nil, errs.ErrDecode
+	}
+
 	brand, err := s.dbRO.GetQueries().GetBrandsByID(ctx, brandID)
 	if err != nil {
 		return nil, err
@@ -100,6 +127,16 @@ func (s *ProductService) Create(ctx context.Context, input CreateProductInput) (
 		ProductID:  product.ID,
 		CategoryID: categoryRow.ID,
 	}); err != nil {
+		return nil, err
+	}
+
+	if _, err := s.productInventory.Create(
+		ctx,
+		staffID,
+		s.encoder.Encode(product.ID),
+		input.Stocks,
+		input.StocksIn,
+	); err != nil {
 		return nil, err
 	}
 
@@ -166,6 +203,13 @@ func (s *ProductService) GetForListingAdmin(
 	productList := make([]models.AdminProductListItem, 0, len(products))
 	for _, p := range products {
 		price := utils.NewMoney(p.UnitPriceWithVat, p.UnitPriceWithVatCurrency)
+		productID := s.encoder.Encode(p.ID)
+		inventory, err := s.productInventory.GetByProductID(ctx, productID)
+		if err != nil {
+			logs.Log().Warn(s.ID(), zap.String("product id", productID), zap.Error(err))
+			continue
+		}
+
 		productList = append(productList, models.AdminProductListItem{
 			ID:            s.encoder.Encode(p.ID),
 			Name:          p.Name,
@@ -191,6 +235,7 @@ func (s *ProductService) GetForListingAdmin(
 			ScopeOfSupply: p.ScopeOfSupply,
 			Weight:        utils.ToWeightDisplay(p.Weight, p.WeightUnit),
 			WeightUnit:    p.WeightUnit,
+			Stocks:        strconv.FormatInt(inventory.Stocks, 10),
 		})
 	}
 
@@ -204,6 +249,11 @@ func (s *ProductService) GetByIDForEdit(ctx context.Context, productID string) (
 	}
 
 	product, err := s.dbRO.GetQueries().GetProductsByID(ctx, decodedProductID)
+	if err != nil {
+		return nil, err
+	}
+
+	inventory, err := s.productInventory.GetByProductID(ctx, productID)
 	if err != nil {
 		return nil, err
 	}
@@ -234,10 +284,17 @@ func (s *ProductService) GetByIDForEdit(ctx context.Context, productID string) (
 			Weight:        strconv.FormatFloat(product.Weight.Float64, 'f', -1, 64),
 			WeightUnit:    product.WeightUnit.String,
 		},
+		StocksIn: inventory.StocksIn,
+		Stocks:   inventory.Stocks,
 	}, nil
 }
 
-func (s *ProductService) Update(ctx context.Context, input UpdateProductInput) error {
+func (s *ProductService) Update(ctx context.Context, staffID string, input UpdateProductInput) error {
+	staffIDDB := s.encoder.Decode(staffID)
+	if staffIDDB == encode.INVALID {
+		return errs.ErrDecode
+	}
+
 	productID := s.encoder.Decode(input.ProductID)
 	if productID == encode.INVALID {
 		return errs.ErrDecode
@@ -300,6 +357,10 @@ func (s *ProductService) Update(ctx context.Context, input UpdateProductInput) e
 			),
 		},
 	}); err != nil {
+		return err
+	}
+
+	if err := s.productInventory.SetQty(ctx, staffID, input.ProductID, input.Stocks, input.StocksIn); err != nil {
 		return err
 	}
 

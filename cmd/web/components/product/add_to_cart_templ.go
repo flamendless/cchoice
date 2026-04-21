@@ -39,7 +39,7 @@ func AddToCart(data models.ProductPageData) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(data.ProductID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 93, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 92, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -52,7 +52,7 @@ func AddToCart(data models.ProductPageData) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 94, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 93, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -65,7 +65,7 @@ func AddToCart(data models.ProductPageData) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.PriceDisplay)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 95, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 94, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -78,7 +78,7 @@ func AddToCart(data models.ProductPageData) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(data.BrandName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 96, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 95, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -91,7 +91,7 @@ func AddToCart(data models.ProductPageData) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(data.CDNURL1280)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 97, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 96, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -104,7 +104,7 @@ func AddToCart(data models.ProductPageData) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/lines"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 98, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 97, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -117,7 +117,7 @@ func AddToCart(data models.ProductPageData) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(data.ProductID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 128, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `product/add_to_cart.templ`, Line: 127, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {

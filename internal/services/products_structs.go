@@ -1,5 +1,7 @@
 package services
 
+import "cchoice/internal/enums"
+
 type ProductSpecsInput struct {
 	Colours, Sizes, Segmentation, PartNumber string
 	Power, Capacity, ScopeOfSupply           string
@@ -15,6 +17,8 @@ type CreateProductInput struct {
 	ImagePath                 string
 	UnitPriceWithoutVat       int64
 	UnitPriceWithVat          int64
+	StocksIn                  enums.StocksIn
+	Stocks                    int64
 }
 
 type UpdateProductInput struct {
@@ -27,6 +31,8 @@ type UpdateProductInput struct {
 	ImagePath             string
 	UnitPriceWithoutVat   int64
 	UnitPriceWithVat      int64
+	StocksIn              enums.StocksIn
+	Stocks                int64
 }
 
 type ProductForEdit struct {
@@ -44,4 +50,6 @@ type ProductForEdit struct {
 	UnitPriceWithVat            int64
 	UnitPriceWithVatCurrency    string
 	Specs                       ProductSpecsInput
+	StocksIn                    enums.StocksIn
+	Stocks                      int64
 }
