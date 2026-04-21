@@ -5,7 +5,7 @@ INSERT OR IGNORE INTO tbl_product_inventories(
     stocks,
     stocks_in
 )
-SELECT id, 0, 'SUPPLIER'
+SELECT id, 50, 'SUPPLIER'
 FROM tbl_products;
 -- +goose StatementEnd
 
