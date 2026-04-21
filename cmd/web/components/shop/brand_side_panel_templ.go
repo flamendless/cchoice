@@ -12,6 +12,8 @@ import "cchoice/cmd/web/models"
 import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/svg"
 
+const PrimaryBrand = "BOSCH"
+
 func BrandsSidePanelList(brands []models.BrandSidePanelText) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -37,9 +39,9 @@ func BrandsSidePanelList(brands []models.BrandSidePanelText) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for i, brand := range brands {
+		for _, brand := range brands {
 			var templ_7745c5c3_Var2 = []any{templ.KV("text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft transition-colors brand-filter-link", true),
-				templ.KV("underline bg-cchoice font-semibold text-white", i == 0),
+				templ.KV("underline bg-cchoice font-semibold text-white", brand.Label == PrimaryBrand),
 			}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 			if templ_7745c5c3_Err != nil {
@@ -52,7 +54,7 @@ func BrandsSidePanelList(brands []models.BrandSidePanelText) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("brand-link-" + brand.BrandID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_side_panel.templ`, Line: 14, Col: 38}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_side_panel.templ`, Line: 16, Col: 38}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -65,7 +67,7 @@ func BrandsSidePanelList(brands []models.BrandSidePanelText) templ.Component {
 			var templ_7745c5c3_Var4 templ.SafeURL
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(brand.URL))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_side_panel.templ`, Line: 15, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_side_panel.templ`, Line: 17, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -91,7 +93,7 @@ func BrandsSidePanelList(brands []models.BrandSidePanelText) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(brand.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_side_panel.templ`, Line: 20, Col: 33}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_side_panel.templ`, Line: 22, Col: 33}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -104,7 +106,7 @@ func BrandsSidePanelList(brands []models.BrandSidePanelText) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(brand.BrandID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_side_panel.templ`, Line: 21, Col: 33}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_side_panel.templ`, Line: 23, Col: 33}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -117,7 +119,7 @@ func BrandsSidePanelList(brands []models.BrandSidePanelText) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(brand.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_side_panel.templ`, Line: 24, Col: 18}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_side_panel.templ`, Line: 26, Col: 18}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -128,20 +130,7 @@ func BrandsSidePanelList(brands []models.BrandSidePanelText) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<p class=\"text-ellipsis text-nowrap overflow-hidden text-xs font-light ml-2 my-0.5 py-0.5\">More coming soon...</p><script type=\"text/javascript\" src=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var9 string
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(templ.URL(utils.URL("/static/js/brand_side_panel.js")))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_side_panel.templ`, Line: 36, Col: 93}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\">\n\t\t</script></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<p class=\"text-ellipsis text-nowrap overflow-hidden text-xs font-light ml-2 my-0.5 py-0.5\">More coming soon...</p><!-- <script type=\"text/javascript\" src={ templ.URL(utils.URL(\"/static/js/brand_side_panel.js\")) }></script> --></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -165,12 +154,12 @@ func BrandsSidePanel() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var10 == nil {
-			templ_7745c5c3_Var10 = templ.NopComponent
+		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var9 == nil {
+			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div id=\"brands-side-panel\" class=\"w-full flex flex-col border-b-2 border-cchoice_border\"><div class=\"flex items-center justify-between cursor-pointer p-2\" _=\"on click\n\t\t\t\tasync call metrics_event('brands_side_panel_click')\n\t\t\t\ttoggle .hidden on #brands-side-panel-content\n\t\t\t\tif #brands-side-panel-content matches .hidden\n\t\t\t\t\tset #brands-chevron's *transform to 'rotate(0deg)'\n\t\t\t\t\tset #brands-side-panel-content@data-collapsed to 'true'\n\t\t\t\telse\n\t\t\t\t\tset #brands-chevron's *transform to 'rotate(180deg)'\n\t\t\t\t\tset #brands-side-panel-content@data-collapsed to 'false'\n\t\t\t\tend\n\t\t\t\"><p class=\"text-xs font-normal text-nowrap\">Brands</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div id=\"brands-side-panel\" class=\"w-full flex flex-col border-b-2 border-cchoice_border\"><div class=\"flex items-center justify-between cursor-pointer p-2\" _=\"on click\n\t\t\t\tasync call metrics_event('brands_side_panel_click')\n\t\t\t\ttoggle .hidden on #brands-side-panel-content\n\t\t\t\tif #brands-side-panel-content matches .hidden\n\t\t\t\t\tset #brands-chevron's *transform to 'rotate(0deg)'\n\t\t\t\t\tset #brands-side-panel-content@data-collapsed to 'true'\n\t\t\t\telse\n\t\t\t\t\tset #brands-chevron's *transform to 'rotate(180deg)'\n\t\t\t\t\tset #brands-side-panel-content@data-collapsed to 'false'\n\t\t\t\tend\n\t\t\t\"><p class=\"text-xs font-normal text-nowrap\">Brands</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -178,20 +167,20 @@ func BrandsSidePanel() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div><div id=\"brands-side-panel-content\" hx-trigger=\"load once, history:restore\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div><div id=\"brands-side-panel-content\" hx-trigger=\"load once, history:restore\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var11 string
-		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/brands/side-panel/list"))
+		var templ_7745c5c3_Var10 string
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/brands/side-panel/list"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_side_panel.templ`, Line: 71, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_side_panel.templ`, Line: 72, Col: 48}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" hx-select=\"#brands-side-panel-list\" hx-target=\"find #brands-side-panel-list\" hx-swap=\"outerHTML\" class=\"pb-[8px]\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" hx-select=\"#brands-side-panel-list\" hx-target=\"find #brands-side-panel-list\" hx-swap=\"outerHTML\" class=\"pb-[8px]\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -199,7 +188,7 @@ func BrandsSidePanel() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
