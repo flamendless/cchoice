@@ -5,24 +5,91 @@ import "cchoice/internal/utils"
 
 templ AddToCart(data models.ProductPageData) {
 	<div class="flex flex-col gap-4">
-		<div class="flex items-center gap-4">
-			<div class="flex items-center border rounded-lg overflow-hidden h-full w-[20%]">
-				<input
-					type="number"
-					id="product-qty"
-					name="quantity"
-					value="1"
-					min="1"
-					max="99"
-					class="w-full h-full text-center border-none focus:outline-none focus:ring-0"
-					hx-validate="false"
-				/>
-			</div>
+		<div class="flex items-center gap-2">
+			<button
+				type="button"
+				id="btn-qty-decrease"
+				class="p-2 border rounded-l-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+				disabled="true"
+				_="
+					on click
+						set currentVal to Number(#product-qty.value)
+						if currentVal > 1
+							set #product-qty.value to String(currentVal - 1)
+							if currentVal - 1 <= 1
+								set me.disabled to true
+							end
+							if currentVal - 1 < 99
+								set #btn-qty-increase.disabled to false
+							end
+						end
+				"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+				</svg>
+			</button>
+
+			<input
+				type="text"
+				inputmode="numeric"
+				pattern="[0-9]*"
+				id="product-qty"
+				name="quantity"
+				value="1"
+				class="w-8 text-center focus:outline-none focus:ring-0"
+				hx-validate="false"
+				_="
+					on input
+						if Number(me.value) <= 1
+							set #btn-qty-decrease.disabled to true
+						else
+							set #btn-qty-decrease.disabled to false
+						end
+						if Number(me.value) >= 99
+							set #btn-qty-increase.disabled to true
+						else
+							set #btn-qty-increase.disabled to false
+						end
+					on keyup
+						if me.value is ''
+							set me.value to '1'
+						end
+						if Number(me.value) < 1
+							set me.value to '1'
+						end
+						if Number(me.value) > 99
+							set me.value to '99'
+						end
+				"
+			/>
+			<button
+				type="button"
+				id="btn-qty-increase"
+				class="p-2 border rounded-r-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors"
+				_="
+					on click
+						set currentVal to Number(#product-qty.value)
+						if currentVal < 99
+							set #product-qty.value to String(currentVal + 1)
+							if currentVal + 1 >= 99
+								set me.disabled to true
+							end
+							if currentVal + 1 > 1
+								set #btn-qty-decrease.disabled to false
+							end
+						end
+				"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+				</svg>
+			</button>
 			<button
 				type="button"
 				id="btn-add-to-cart"
 				class="bg-cchoice text-white px-6 py-3 rounded-lg font-semibold
-					hover:bg-cchoice_dark transition-colors cursor-pointer"
+					hover:bg-cchoice_dark transition-colors cursor-pointer mx-4"
 				data-product-id={ data.ProductID }
 				data-product-name={ data.Name }
 				data-product-price={ data.PriceDisplay }

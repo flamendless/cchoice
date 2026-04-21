@@ -193,7 +193,7 @@ templ btnQtyDecrease(cl models.CheckoutLine) {
 		alt="decrease quantity button"
 		aria-label="Decrease quantity"
 		title="Decrease quantity"
-		class="p-1 border rounded disabled:opacity-40 group hover:bg-cchoice cursor-pointer disabled:cursor-not-allowed"
+		class="p-1 border rounded bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
 		disabled?={ cl.Quantity <= 1 }
 		hx-patch={ utils.URL("/carts/lines/" + cl.ID + "?dec=1") }
 		hx-target={ fmt.Sprintf("[name=qty-%s]", cl.ID) }
@@ -222,7 +222,7 @@ templ btnQtyDecrease(cl models.CheckoutLine) {
 	>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
-			class="h-4 w-4 text-cchoice-600 group-hover:bg-cchoice"
+			class="h-4 w-4"
 			fill="none"
 			viewBox="0 0 24 24"
 			stroke="currentColor"
@@ -239,7 +239,7 @@ templ btnQtyIncrease(cl models.CheckoutLine) {
 		alt="increase quantity button"
 		aria-label="Increase quantity"
 		title="Increase quantity"
-		class="p-1 border rounded disabled:opacity-40 group hover:bg-cchoice cursor-pointer disabled:cursor-not-allowed"
+		class="p-1 border rounded bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
 		disabled?={ cl.Quantity >= constants.MaxCartLineQty }
 		hx-patch={ utils.URL("/carts/lines/" + cl.ID + "?inc=1") }
 		hx-target={ fmt.Sprintf("[name=qty-%s]", cl.ID) }
@@ -268,7 +268,7 @@ templ btnQtyIncrease(cl models.CheckoutLine) {
 	>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
-			class="h-4 w-4 text-cchoice-600 group-hover:bg-cchoice"
+			class="h-4 w-4"
 			fill="none"
 			viewBox="0 0 24 24"
 			stroke="currentColor"

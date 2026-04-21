@@ -91,16 +91,16 @@ WHERE checkout_id = ?
 ;
 
 -- name: CheckCheckoutLineExistsByCheckoutIDAndProductID :one
-SELECT EXISTS (
-	SELECT 1 FROM tbl_checkout_lines
-	WHERE checkout_id = ? AND product_id = ?
-);
+SELECT * FROM tbl_checkout_lines
+WHERE checkout_id = ? AND product_id = ?;
 
 -- name: CreateCheckout :one
 INSERT INTO tbl_checkouts(
-	session_id
+	session_id,
+	created_at,
+	updated_at
 ) VALUES (
-	?
+	?, datetime('now'), datetime('now')
 ) RETURNING *;
 
 

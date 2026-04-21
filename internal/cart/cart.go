@@ -8,6 +8,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"math"
 	"slices"
 
 	"go.uber.org/zap"
@@ -47,40 +48,60 @@ func CreateCart(
 	created := 0
 	for productID, qty := range productIDsCount {
 		dbProductID := encode.Decode(productID)
-		exists, err := dbq.CheckCheckoutLineExistsByCheckoutIDAndProductID(
+		checkoutLine, err := dbq.CheckCheckoutLineExistsByCheckoutIDAndProductID(
 			ctx,
 			queries.CheckCheckoutLineExistsByCheckoutIDAndProductIDParams{
 				CheckoutID: checkoutID,
 				ProductID:  dbProductID,
 			},
 		)
-		if err != nil || exists == 1 {
+
+		if errors.Is(err, sql.ErrNoRows) {
+			if _, err := dbq.CreateCheckoutLine(
+				ctx,
+				queries.CreateCheckoutLineParams{
+					CheckoutID: checkoutID,
+					ProductID:  dbProductID,
+					Quantity:   qty,
+
+					//TODO: (Brandon)
+					Name:        "",
+					Serial:      "",
+					Description: "",
+					Amount:      0,
+					Currency:    "",
+				},
+			); err != nil {
+				logs.Log().Warn(
+					"Can't create checkoutline",
+					zap.Error(err),
+					zap.Int64("checkout id", checkoutID),
+					zap.String("product id", productID),
+					zap.Int64("qty", qty),
+				)
+			}
+			created++
 			continue
 		}
 
-		if _, err := dbq.CreateCheckoutLine(
-			ctx,
-			queries.CreateCheckoutLineParams{
-				CheckoutID: checkoutID,
-				ProductID:  dbProductID,
-				Quantity:   qty,
-
-				//TODO: (Brandon)
-				Name:        "",
-				Serial:      "",
-				Description: "",
-				Amount:      0,
-				Currency:    "",
-			},
-		); err != nil {
-			logs.Log().Warn(
-				"Can't create checkoutline",
-				zap.Error(err),
-				zap.Int64("checkout id", checkoutID),
-				zap.String("product id", productID),
-			)
+		if err == nil && checkoutLine.Quantity != qty {
+			diff := int64(math.Abs(float64(checkoutLine.Quantity - qty)))
+			if _, err := dbq.UpdateCheckoutLineQtyByID(
+				ctx,
+				queries.UpdateCheckoutLineQtyByIDParams{
+					ID:       checkoutLine.ID,
+					Quantity: diff,
+				},
+			); err != nil {
+				logs.Log().Warn(
+					"Failed to update qty",
+					zap.Error(err),
+					zap.Int64("checkout id", checkoutID),
+					zap.String("product id", productID),
+					zap.Int64("diff", diff),
+				)
+			}
 		}
-		created++
 	}
 
 	logs.Log().Info(

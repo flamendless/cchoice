@@ -15,10 +15,8 @@ import (
 const checkCheckoutLineExistsByCheckoutIDAndProductID = `-- name: CheckCheckoutLineExistsByCheckoutIDAndProductID :one
 ;
 
-SELECT EXISTS (
-	SELECT 1 FROM tbl_checkout_lines
-	WHERE checkout_id = ? AND product_id = ?
-)
+SELECT id, checkout_id, product_id, name, serial, description, amount, currency, quantity, created_at, updated_at FROM tbl_checkout_lines
+WHERE checkout_id = ? AND product_id = ?
 `
 
 type CheckCheckoutLineExistsByCheckoutIDAndProductIDParams struct {
@@ -26,11 +24,23 @@ type CheckCheckoutLineExistsByCheckoutIDAndProductIDParams struct {
 	ProductID  int64
 }
 
-func (q *Queries) CheckCheckoutLineExistsByCheckoutIDAndProductID(ctx context.Context, arg CheckCheckoutLineExistsByCheckoutIDAndProductIDParams) (int64, error) {
+func (q *Queries) CheckCheckoutLineExistsByCheckoutIDAndProductID(ctx context.Context, arg CheckCheckoutLineExistsByCheckoutIDAndProductIDParams) (TblCheckoutLine, error) {
 	row := q.db.QueryRowContext(ctx, checkCheckoutLineExistsByCheckoutIDAndProductID, arg.CheckoutID, arg.ProductID)
-	var column_1 int64
-	err := row.Scan(&column_1)
-	return column_1, err
+	var i TblCheckoutLine
+	err := row.Scan(
+		&i.ID,
+		&i.CheckoutID,
+		&i.ProductID,
+		&i.Name,
+		&i.Serial,
+		&i.Description,
+		&i.Amount,
+		&i.Currency,
+		&i.Quantity,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
 
 const countCheckoutLineByCheckoutID = `-- name: CountCheckoutLineByCheckoutID :one
@@ -48,9 +58,11 @@ func (q *Queries) CountCheckoutLineByCheckoutID(ctx context.Context, checkoutID 
 
 const createCheckout = `-- name: CreateCheckout :one
 INSERT INTO tbl_checkouts(
-	session_id
+	session_id,
+	created_at,
+	updated_at
 ) VALUES (
-	?
+	?, datetime('now'), datetime('now')
 ) RETURNING id, session_id, created_at, updated_at, status
 `
 
