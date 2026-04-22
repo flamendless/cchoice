@@ -31,6 +31,10 @@ func (s *Server) handleTrackedLink(w http.ResponseWriter, r *http.Request) {
 		redirectHX(w, r, utils.URL("/"))
 		return
 	}
+	if link == nil {
+		redirectHX(w, r, utils.URL("/"))
+		return
+	}
 
 	switch link.Status {
 	case enums.TRACKED_LINK_STATUS_DRAFT, enums.TRACKED_LINK_STATUS_DELETED:
