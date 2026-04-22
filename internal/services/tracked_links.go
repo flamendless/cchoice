@@ -19,23 +19,23 @@ import (
 	"go.uber.org/zap"
 )
 
-type TrackLinkService struct {
+type TrackedLinkService struct {
 	encoder  encode.IEncode
 	dbRO     database.IService
 	dbRW     database.IService
 	staffLog *StaffLogsService
 }
 
-func NewTrackLinkService(
+func NewTrackedLinkService(
 	encoder encode.IEncode,
 	dbRO database.IService,
 	dbRW database.IService,
 	staffLog *StaffLogsService,
-) *TrackLinkService {
+) *TrackedLinkService {
 	if staffLog == nil {
 		panic("StaffLogsService is required")
 	}
-	return &TrackLinkService{
+	return &TrackedLinkService{
 		encoder:  encoder,
 		dbRO:     dbRO,
 		dbRW:     dbRW,
@@ -43,7 +43,7 @@ func NewTrackLinkService(
 	}
 }
 
-func (s *TrackLinkService) GetTrackedLinkByID(ctx context.Context, idStr string) (*TrackedLink, error) {
+func (s *TrackedLinkService) GetTrackedLinkByID(ctx context.Context, idStr string) (*TrackedLink, error) {
 	link, err := s.dbRO.GetQueries().GetTrackedLinkByID(ctx, idStr)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -55,7 +55,7 @@ func (s *TrackLinkService) GetTrackedLinkByID(ctx context.Context, idStr string)
 	return s.mapRowToTrackedLink(link), nil
 }
 
-func (s *TrackLinkService) GetTrackedLinkBySlug(ctx context.Context, slugs string) (*TrackedLink, error) {
+func (s *TrackedLinkService) GetTrackedLinkBySlug(ctx context.Context, slugs string) (*TrackedLink, error) {
 	link, err := s.dbRO.GetQueries().GetTrackedLinkBySlug(ctx, slugs)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -66,7 +66,7 @@ func (s *TrackLinkService) GetTrackedLinkBySlug(ctx context.Context, slugs strin
 	return s.mapRowToTrackedLink(link), nil
 }
 
-func (s *TrackLinkService) ListTrackedLinks(ctx context.Context) ([]TrackedLink, error) {
+func (s *TrackedLinkService) ListTrackedLinks(ctx context.Context) ([]TrackedLink, error) {
 	links, err := s.dbRO.GetQueries().ListTrackedLinks(ctx)
 	if err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func (s *TrackLinkService) ListTrackedLinks(ctx context.Context) ([]TrackedLink,
 	return result, nil
 }
 
-func (s *TrackLinkService) CreateTrackedLink(
+func (s *TrackedLinkService) CreateTrackedLink(
 	ctx context.Context,
 	staffID string,
 	name string,
@@ -126,7 +126,7 @@ func (s *TrackLinkService) CreateTrackedLink(
 	return id, nil
 }
 
-func (s *TrackLinkService) UpdateTrackedLink(
+func (s *TrackedLinkService) UpdateTrackedLink(
 	ctx context.Context,
 	staffID string,
 	id string,
@@ -170,7 +170,7 @@ func (s *TrackLinkService) UpdateTrackedLink(
 	return nil
 }
 
-func (s *TrackLinkService) DeleteTrackedLink(ctx context.Context, staffID string, id string) error {
+func (s *TrackedLinkService) DeleteTrackedLink(ctx context.Context, staffID string, id string) error {
 	result := "success"
 	defer func() {
 		if err := s.staffLog.CreateLog(
@@ -194,7 +194,7 @@ func (s *TrackLinkService) DeleteTrackedLink(ctx context.Context, staffID string
 	return nil
 }
 
-func (s *TrackLinkService) RecordClick(
+func (s *TrackedLinkService) RecordClick(
 	ctx context.Context,
 	slugs string,
 	referrer string,
@@ -230,7 +230,7 @@ func (s *TrackLinkService) RecordClick(
 	return nil
 }
 
-func (s *TrackLinkService) GetClickCount(ctx context.Context, linkID string) (int64, error) {
+func (s *TrackedLinkService) GetClickCount(ctx context.Context, linkID string) (int64, error) {
 	count, err := s.dbRO.GetQueries().CountLinkClicksByLinkID(ctx, linkID)
 	if err != nil {
 		return 0, err
@@ -239,7 +239,7 @@ func (s *TrackLinkService) GetClickCount(ctx context.Context, linkID string) (in
 	return count, nil
 }
 
-func (s *TrackLinkService) mapRowToTrackedLink(row queries.TblTrackedLink) *TrackedLink {
+func (s *TrackedLinkService) mapRowToTrackedLink(row queries.TblTrackedLink) *TrackedLink {
 	return &TrackedLink{
 		ID:             row.ID,
 		Name:           row.Name,
@@ -255,12 +255,12 @@ func (s *TrackLinkService) mapRowToTrackedLink(row queries.TblTrackedLink) *Trac
 	}
 }
 
-func (s *TrackLinkService) ID() string {
-	return "TRACKED_LINK"
+func (s *TrackedLinkService) ID() string {
+	return "TrackedLink"
 }
 
-func (s *TrackLinkService) Log() {
-	logs.Log().Info("[TrackLinkService] Loaded")
+func (s *TrackedLinkService) Log() {
+	logs.Log().Info("[TrackedLinkService] Loaded")
 }
 
-var _ IService = (*TrackLinkService)(nil)
+var _ IService = (*TrackedLinkService)(nil)

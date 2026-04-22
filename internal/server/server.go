@@ -57,7 +57,7 @@ type Services struct {
 	role             *services.RoleService
 	staff            *services.StaffService
 	staffLog         *services.StaffLogsService
-	trackedLink      *services.TrackLinkService
+	trackedLink      *services.TrackedLinkService
 	all              []services.IService
 }
 
@@ -208,7 +208,7 @@ func NewServer() *ServerInstance {
 		role:             services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staff:            services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staffLog:         staffLogService,
-		trackedLink:      services.NewTrackLinkService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
+		trackedLink:      services.NewTrackedLinkService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
 	}
 
 	newServer.services.all = []services.IService{
