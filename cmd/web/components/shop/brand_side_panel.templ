@@ -6,7 +6,10 @@ import "cchoice/cmd/web/components/svg"
 
 const PrimaryBrand = "BOSCH"
 
-templ BrandsSidePanelList(brands []models.BrandSidePanelText) {
+templ BrandsSidePanelList(selectedBrandLabel string, brands []models.BrandSidePanelText) {
+	if selectedBrandLabel == "" {
+		selectedBrandLabel = PrimaryBrand
+	}
 	<div
 		id="brands-side-panel-list"
 		class="flex flex-col overflow-y-auto scrollbar-hide max-h-64"
@@ -17,7 +20,7 @@ templ BrandsSidePanelList(brands []models.BrandSidePanelText) {
 				href={ templ.SafeURL(brand.URL) }
 				class={
 					templ.KV("text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft transition-colors brand-filter-link", true),
-					templ.KV("underline bg-cchoice font-semibold text-white", brand.Label == PrimaryBrand),
+					templ.KV("underline bg-cchoice font-semibold text-white", brand.Label == selectedBrandLabel),
 				}
 				data-brand-name={ brand.Label }
 				data-brand-id={ brand.BrandID }
@@ -75,7 +78,7 @@ templ BrandsSidePanel() {
 			hx-swap="outerHTML"
 			class="pb-[8px]"
 		>
-			@BrandsSidePanelList(nil)
+			@BrandsSidePanelList(PrimaryBrand, nil)
 		</div>
 	</div>
 }

@@ -171,7 +171,7 @@ func GetBrandsSidePanel(
 	for _, v := range res {
 		brands = append(brands, models.BrandSidePanelText{
 			Label:   strings.ToUpper(v.Name),
-			URL:     utils.URLf("?brand=%s", encoder.Encode(v.ID)),
+			URL:     utils.URLf("?brand_id=%s", encoder.Encode(v.ID)),
 			BrandID: encoder.Encode(v.ID),
 		})
 	}

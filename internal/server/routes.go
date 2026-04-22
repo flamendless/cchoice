@@ -406,16 +406,26 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	qBrandID := r.URL.Query().Get("brand_id")
+
+	filters := GetHomePageFilters(ctx, s.sessionManager)
+	if qBrandID != "" {
+		filters.BrandID = qBrandID
+		SetHomePageFilters(ctx, s.sessionManager, filters)
+	}
+
 	logs.Log().Info(
 		logtag,
 		zap.String("random sale product", randomSaleProduct.ProductID),
 		zap.Int("promo banners", len(promoBanners)),
+		zap.String("brand id", filters.BrandID),
 	)
 
 	homePageData := models.HomePageData{
 		Sections:          models.BuildPostHomeContentSections(s.GetBrandLogoCDNURL),
 		RandomSaleProduct: randomSaleProduct,
 		ActivePromos:      promoBanners,
+		Filters:           filters,
 	}
 
 	if err := compshop.HomePage(homePageData).Render(ctx, w); err != nil {

@@ -29,9 +29,6 @@ func init() {
 	if err := cmdApplyDiscount.MarkFlagRequired("input_file"); err != nil {
 		panic(err)
 	}
-	if err := cmdApplyDiscount.MarkFlagRequired("dry-run"); err != nil {
-		panic(err)
-	}
 	rootCmd.AddCommand(cmdApplyDiscount)
 }
 
