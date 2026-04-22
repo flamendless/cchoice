@@ -183,17 +183,26 @@ SELECT
 	tbl_product_categories.subcategory,
 	COUNT(tbl_products_categories.product_id) AS products_count
 FROM tbl_product_categories
+INNER JOIN tbl_products ON tbl_products.id = tbl_products_categories.product_id
 INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE
+	(
+		?1 IS NULL
+		OR ?1 <= 0
+		OR tbl_products.brand_id = ?1
+	)
 GROUP BY tbl_products_categories.category_id
 HAVING tbl_products_categories.product_id
 ORDER BY tbl_product_categories.category ASC
-LIMIT ?
-OFFSET ?
+LIMIT ?3
+OFFSET ?2
 `
 
 type GetProductCategoriesForSectionsPaginationParams struct {
-	Limit  int64
-	Offset int64
+	BrandID interface{}
+	Offset  int64
+	Limit   int64
 }
 
 type GetProductCategoriesForSectionsPaginationRow struct {
@@ -204,7 +213,7 @@ type GetProductCategoriesForSectionsPaginationRow struct {
 }
 
 func (q *Queries) GetProductCategoriesForSectionsPagination(ctx context.Context, arg GetProductCategoriesForSectionsPaginationParams) ([]GetProductCategoriesForSectionsPaginationRow, error) {
-	rows, err := q.db.QueryContext(ctx, getProductCategoriesForSectionsPagination, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, getProductCategoriesForSectionsPagination, arg.BrandID, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
@@ -318,12 +327,9 @@ SELECT
 	tbl_product_images.cdn_url,
 	tbl_product_images.cdn_url_thumbnail
 FROM tbl_products
-INNER JOIN
-	tbl_brands ON tbl_brands.id = tbl_products.brand_id
-INNER JOIN
-	tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
-LEFT JOIN
-	tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+INNER JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 LEFT JOIN tbl_product_sales
 	ON tbl_product_sales.product_id = tbl_products.id
 	AND tbl_product_sales.is_active = 1
@@ -332,13 +338,19 @@ LEFT JOIN tbl_product_sales
 WHERE
 	tbl_products.status = 'ACTIVE'
 	AND thumbnail_path != 'static/images/empty_96x96.webp'
-	AND tbl_products_categories.category_id = ?
+	AND tbl_products_categories.category_id = ?1
+	AND (
+		?2 IS NULL
+		OR ?2 <= 0
+		OR tbl_products.brand_id = ?2
+	)
 ORDER BY is_on_sale DESC, tbl_products.created_at DESC
-LIMIT ?
+LIMIT ?3
 `
 
 type GetProductsByCategoryIDParams struct {
 	CategoryID int64
+	BrandID    interface{}
 	Limit      int64
 }
 
@@ -362,7 +374,7 @@ type GetProductsByCategoryIDRow struct {
 }
 
 func (q *Queries) GetProductsByCategoryID(ctx context.Context, arg GetProductsByCategoryIDParams) ([]GetProductsByCategoryIDRow, error) {
-	rows, err := q.db.QueryContext(ctx, getProductsByCategoryID, arg.CategoryID, arg.Limit)
+	rows, err := q.db.QueryContext(ctx, getProductsByCategoryID, arg.CategoryID, arg.BrandID, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
