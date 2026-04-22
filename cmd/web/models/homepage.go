@@ -32,10 +32,15 @@ type PromoItem struct {
 	Type        enums.PromoType
 }
 
+type HomePageFilters struct {
+	BrandID string
+}
+
 type HomePageData struct {
 	RandomSaleProduct RandomSaleProduct
 	Sections          []PostHomeContentSection
 	ActivePromos      []PromoItem
+	Filters           HomePageFilters
 }
 
 type RandomSaleProduct struct {

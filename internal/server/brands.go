@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"strings"
 
 	compshop "cchoice/cmd/web/components/shop"
 	"cchoice/internal/logs"
@@ -17,8 +18,9 @@ func AddBrandsHandlers(s *Server, r chi.Router) {
 
 func (s *Server) brandsSidePanelHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Brands Side Panel Handler]"
+	ctx := r.Context()
 	brands, err := requests.GetBrandsSidePanel(
-		r.Context(),
+		ctx,
 		s.cache,
 		&s.SF,
 		s.dbRO,
@@ -31,7 +33,19 @@ func (s *Server) brandsSidePanelHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if err := compshop.BrandsSidePanelList(brands).Render(r.Context(), w); err != nil {
+	brandLabel := compshop.PrimaryBrand
+
+	filters := GetHomePageFilters(ctx, s.sessionManager)
+	if filters.BrandID != "" {
+		brandName, err := s.services.brand.GetNameByID(ctx, filters.BrandID)
+		if err != nil {
+			logs.Log().Warn(logtag, zap.Error(err), zap.String("brand id", filters.BrandID))
+		} else {
+			brandLabel = brandName
+		}
+	}
+
+	if err := compshop.BrandsSidePanelList(strings.ToUpper(brandLabel), brands).Render(ctx, w); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

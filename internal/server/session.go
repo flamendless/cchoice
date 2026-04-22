@@ -5,10 +5,12 @@ import (
 	"cchoice/internal/logs"
 	"context"
 	"database/sql"
+	"encoding/gob"
 	"encoding/json"
 	"slices"
 	"strconv"
 
+	"cchoice/cmd/web/models"
 	"cchoice/internal/types"
 
 	"github.com/alexedwards/scs/v2"
@@ -21,7 +23,12 @@ const (
 	skCheckedItems           = "checked_items"
 	skLocationLat            = "location_lat"
 	skLocationLng            = "location_lng"
+	skHomePageFilters        = "home_page_filters"
 )
+
+func init() {
+	gob.Register(models.HomePageFilters{})
+}
 
 func AddToCheckoutLineProductIDs(
 	ctx context.Context,
@@ -129,4 +136,21 @@ func SetLocation(
 			sm.Put(ctx, skLocationLng, nLng)
 		}
 	}
+}
+
+func GetHomePageFilters(ctx context.Context, sm *scs.SessionManager) models.HomePageFilters {
+	if !sm.Exists(ctx, skHomePageFilters) {
+		return models.HomePageFilters{}
+	}
+
+	filters, ok := sm.Get(ctx, skHomePageFilters).(models.HomePageFilters)
+	if !ok {
+		return models.HomePageFilters{}
+	}
+
+	return filters
+}
+
+func SetHomePageFilters(ctx context.Context, sm *scs.SessionManager, filters models.HomePageFilters) {
+	sm.Put(ctx, skHomePageFilters, filters)
 }
