@@ -165,6 +165,7 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 	r.NotFound(s.maintenancePageHandler)
 
 	r.Get("/changelogs", s.changelogsHandler)
+	r.Get("/platforms", s.platformsPageHandler)
 	r.Get("/health", s.healthHandler)
 	r.Get("/version", s.versionHandler)
 	r.Get("/l/{slug}", s.handleTrackedLink)
@@ -481,6 +482,30 @@ func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 			zap.Error(err),
 		)
 		http.Error(w, "render error", http.StatusInternalServerError)
+	}
+}
+
+func (s *Server) platformsPageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Platforms Handler]"
+
+	ctx := r.Context()
+	cacheKey := requests.GeneratePlatformsCacheKey()
+	platforms, err := requests.GetPlatforms(
+		ctx,
+		s.cache,
+		&s.SF,
+		s.dbRO,
+		cacheKey,
+	)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("path", r.URL.Path))
+		redirectHX(w, r, utils.URL("/"))
+		return
+	}
+
+	if err := components.Platforms(platforms).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("path", r.URL.Path))
+		redirectHX(w, r, utils.URL("/"))
 	}
 }
 

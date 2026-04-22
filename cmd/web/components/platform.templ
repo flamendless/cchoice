@@ -1,0 +1,48 @@
+package components
+
+import "cchoice/cmd/web/models"
+import "cchoice/cmd/web/components/common"
+import "cchoice/internal/constants"
+
+templ Platforms(platforms []models.Platform) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden overflow-y-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("CCHOICE PLATFORMS")
+		</head>
+		<body
+			class="m-0 p-0 overflow-x-hidden overflow-y-hidden min-h-screen flex flex-col w-screen h-screen"
+			_="init call metrics_event('anon_visit', 'platforms')"
+		>
+			@common.DevRibbon()
+			<div class="h-screen w-screen overflow-hidden bg-black">
+				<div class="flex flex-col items-center justify-center h-full w-full p-4">
+					<div class="text-center mb-8 mt-4">
+						<div class="flex justify-center mb-4">
+							<img src={ constants.PathSVGLogoOnly } alt="C-Choice Logo" class="w-16 h-16 mx-auto mb-4"/>
+						</div>
+						<h1 class="text-3xl font-bold text-cchoice">
+							C-Choice Platforms
+						</h1>
+					</div>
+					<div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 w-full max-w-4xl overflow-y-auto sm:overflow-visible pb-4 sm:pb-0">
+						for _, platform := range platforms {
+							<a
+								href={ platform.Value }
+								target="_blank"
+								rel="noopener"
+								class="flex flex-col items-center justify-center p-6 sm:p-8 bg-cchoice rounded-xl hover:bg-cchoice_dark transition-colors cursor-pointer"
+							>
+								<span class="text-white mb-2">
+									@platform.Icon
+								</span>
+								<span class="text-white font-bold text-sm sm:text-lg lg:text-xl text-center leading-tight">{ platform.Label }</span>
+							</a>
+						}
+					</div>
+				</div>
+			</div>
+		</body>
+	</html>
+}
