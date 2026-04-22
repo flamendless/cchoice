@@ -20,7 +20,7 @@ func (s *Server) handleTrackedLink(w http.ResponseWriter, r *http.Request) {
 
 	slug := chi.URLParam(r, "slug")
 	if slug == "" {
-		http.NotFound(w, r)
+		redirectHX(w, r, utils.URL("/"))
 		return
 	}
 
@@ -28,7 +28,7 @@ func (s *Server) handleTrackedLink(w http.ResponseWriter, r *http.Request) {
 	link, err := s.services.trackedLink.GetTrackedLinkBySlug(ctx, slug)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.NotFound(w, r)
+		redirectHX(w, r, utils.URL("/"))
 		return
 	}
 

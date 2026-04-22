@@ -183,26 +183,17 @@ SELECT
 	tbl_product_categories.subcategory,
 	COUNT(tbl_products_categories.product_id) AS products_count
 FROM tbl_product_categories
-INNER JOIN tbl_products ON tbl_products.id = tbl_products_categories.product_id
 INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
-INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-WHERE
-	(
-		?1 IS NULL
-		OR ?1 <= 0
-		OR tbl_products.brand_id = ?1
-	)
 GROUP BY tbl_products_categories.category_id
 HAVING tbl_products_categories.product_id
 ORDER BY tbl_product_categories.category ASC
-LIMIT ?3
-OFFSET ?2
+LIMIT ?2
+OFFSET ?1
 `
 
 type GetProductCategoriesForSectionsPaginationParams struct {
-	BrandID interface{}
-	Offset  int64
-	Limit   int64
+	Offset int64
+	Limit  int64
 }
 
 type GetProductCategoriesForSectionsPaginationRow struct {
@@ -213,7 +204,7 @@ type GetProductCategoriesForSectionsPaginationRow struct {
 }
 
 func (q *Queries) GetProductCategoriesForSectionsPagination(ctx context.Context, arg GetProductCategoriesForSectionsPaginationParams) ([]GetProductCategoriesForSectionsPaginationRow, error) {
-	rows, err := q.db.QueryContext(ctx, getProductCategoriesForSectionsPagination, arg.BrandID, arg.Offset, arg.Limit)
+	rows, err := q.db.QueryContext(ctx, getProductCategoriesForSectionsPagination, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
