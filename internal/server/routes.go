@@ -159,11 +159,10 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 		http.ServeContent(w, req, info.Name(), info.ModTime(), file)
 	})))
 
+	r.NotFound(s.notPageHandler)
 	r.Get("/terms", s.termsHandler)
 	r.Get("/privacy", s.privacyHandler)
 	r.Get("/maintenance", s.maintenancePageHandler)
-	r.NotFound(s.maintenancePageHandler)
-
 	r.Get("/changelogs", s.changelogsHandler)
 	r.Get("/platforms", s.platformsPageHandler)
 	r.Get("/health", s.healthHandler)
@@ -788,8 +787,23 @@ func (s *Server) maintenancePageHandler(w http.ResponseWriter, r *http.Request) 
 	const logtag = "[Maintenance Page Handler]"
 	ctx := r.Context()
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := components.MaintenancePage().Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("path", r.URL.Path),
+			zap.String("method", r.Method),
+			zap.Error(err),
+		)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Server) notPageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Not Page Handler]"
+	ctx := r.Context()
+
+	if err := components.NotPage().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),
@@ -804,7 +818,6 @@ func (s *Server) maintenancePageHandler(w http.ResponseWriter, r *http.Request) 
 func (s *Server) termsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Terms Handler]"
 	ctx := r.Context()
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := components.TermsPage().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -815,7 +828,6 @@ func (s *Server) termsHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) privacyHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Privacy Handler]"
 	ctx := r.Context()
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := components.PrivacyPage().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
