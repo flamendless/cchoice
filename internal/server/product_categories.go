@@ -129,8 +129,15 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	var brandID int64
+	filters := GetHomePageFilters(ctx, s.sessionManager)
+	if filters.BrandID != "" {
+		brandID = s.encoder.Decode(filters.BrandID)
+	}
+
 	products, err := s.dbRO.GetQueries().GetProductsByCategoryID(ctx, queries.GetProductsByCategoryIDParams{
 		CategoryID: categoryDBID,
+		BrandID:    brandID,
 		Limit:      constants.DefaultLimitProducts,
 	})
 	if err != nil {

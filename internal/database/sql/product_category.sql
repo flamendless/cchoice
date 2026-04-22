@@ -97,12 +97,9 @@ SELECT
 	tbl_product_images.cdn_url,
 	tbl_product_images.cdn_url_thumbnail
 FROM tbl_products
-INNER JOIN
-	tbl_brands ON tbl_brands.id = tbl_products.brand_id
-INNER JOIN
-	tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
-LEFT JOIN
-	tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+INNER JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 LEFT JOIN tbl_product_sales
 	ON tbl_product_sales.product_id = tbl_products.id
 	AND tbl_product_sales.is_active = 1
@@ -111,9 +108,14 @@ LEFT JOIN tbl_product_sales
 WHERE
 	tbl_products.status = 'ACTIVE'
 	AND thumbnail_path != 'static/images/empty_96x96.webp'
-	AND tbl_products_categories.category_id = ?
+	AND tbl_products_categories.category_id = :category_id
+	AND (
+		:brand_id IS NULL
+		OR :brand_id <= 0
+		OR tbl_products.brand_id = :brand_id
+	)
 ORDER BY is_on_sale DESC, tbl_products.created_at DESC
-LIMIT ?
+LIMIT :limit
 ;
 
 -- name: GetProductCategoriesForSections :many
@@ -140,6 +142,6 @@ INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_
 GROUP BY tbl_products_categories.category_id
 HAVING tbl_products_categories.product_id
 ORDER BY tbl_product_categories.category ASC
-LIMIT ?
-OFFSET ?
+LIMIT :limit
+OFFSET :offset
 ;
