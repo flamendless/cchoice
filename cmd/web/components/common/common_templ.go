@@ -326,11 +326,19 @@ func HeadMeta() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+			templ_7745c5c3_Err = ScrAdSense().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 			templ_7745c5c3_Err = templ.JSONScript("url-prefix", utils.URL("")).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, " <script>\n\t\t\t(function(){\n\t\t\t\tif (!globalThis._G) {\n\t\t\t\t\tglobalThis._G = {};\n\t\t\t\t}\n\t\t\t\tconst urlPrefix = JSON.parse(document.getElementById(\"url-prefix\").textContent);\n\t\t\t\tObject.defineProperty(globalThis._G, \"URL_PREFIX\", {\n\t\t\t\t\tvalue: urlPrefix,\n\t\t\t\t\twritable: false,\n\t\t\t\t\tconfigurable: false\n\t\t\t\t});\n\t\t\t\tObject.defineProperty(globalThis._G, \"VERSION\", {\n\t\t\t\t\tvalue: async function() {\n\t\t\t\t\t\ttry {\n\t\t\t\t\t\t\tconst resp = await fetch(urlPrefix + \"/version\", { cache: \"no-store\" });\n\t\t\t\t\t\t\tif (!resp.ok) { return \"\"; }\n\t\t\t\t\t\t\treturn await resp.text();\n\t\t\t\t\t\t} catch (_) {\n\t\t\t\t\t\t\treturn \"\";\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\twritable: false,\n\t\t\t\t\tconfigurable: false\n\t\t\t\t});\n\t\t\t})();\n\t\t</script>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, " <script>\n\t\t\t(function(){\n\t\t\t\tif (!globalThis._G) {\n\t\t\t\t\tglobalThis._G = {};\n\t\t\t\t}\n\t\t\t\tconst urlPrefix = JSON.parse(document.getElementById(\"url-prefix\").textContent);\n\t\t\t\tObject.defineProperty(globalThis._G, \"URL_PREFIX\", {\n\t\t\t\t\tvalue: urlPrefix,\n\t\t\t\t\twritable: false,\n\t\t\t\t\tconfigurable: false\n\t\t\t\t});\n\t\t\t\tObject.defineProperty(globalThis._G, \"VERSION\", {\n\t\t\t\t\tvalue: async function() {\n\t\t\t\t\t\ttry {\n\t\t\t\t\t\t\tconst resp = await fetch(urlPrefix + \"/version\", { cache: \"no-store\" });\n\t\t\t\t\t\t\tif (!resp.ok) { return \"\"; }\n\t\t\t\t\t\t\treturn await resp.text();\n\t\t\t\t\t\t} catch (_) {\n\t\t\t\t\t\t\treturn \"\";\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\twritable: false,\n\t\t\t\t\tconfigurable: false\n\t\t\t\t});\n\t\t\t})();\n\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -369,46 +377,46 @@ func IconActionButton(
 			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<div class=\"my-2 flex flex-col place-center\"><button aria-label=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"my-2 flex flex-col place-center\"><button aria-label=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 120, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 121, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\" title=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" title=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 121, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 122, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" class=\"relative inline-block group py-2 stroke-cchoice rounded-full cursor-pointer hover:bg-cchoice_border text-nowrap items-center flex flex-col text-xs text-cchoice hover:text-white\" _=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" class=\"relative inline-block group py-2 stroke-cchoice rounded-full cursor-pointer hover:bg-cchoice_border text-nowrap items-center flex flex-col text-xs text-cchoice hover:text-white\" _=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs("on click go to url '" + utils.URL(href) + "'")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 129, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 130, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -418,7 +426,7 @@ func IconActionButton(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<!-- <span class=\"hidden md:block\">{ label }</span> --><!-- <span>{ label }</span> --></button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<!-- <span class=\"hidden md:block\">{ label }</span> --><!-- <span>{ label }</span> --></button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -451,20 +459,20 @@ func IconAction(
 			templ_7745c5c3_Var23 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<div class=\"my-2 flex flex-col place-center relative inline-block group py-2 stroke-cchoice rounded-full w-16 cursor-pointer hover:bg-cchoice_border text-nowrap items-center flex flex-col text-xs text-cchoice hover:text-white\" _=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div class=\"my-2 flex flex-col place-center relative inline-block group py-2 stroke-cchoice rounded-full w-16 cursor-pointer hover:bg-cchoice_border text-nowrap items-center flex flex-col text-xs text-cchoice hover:text-white\" _=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs("on click go to url '" + utils.URL(href) + "'")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 154, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 155, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -474,7 +482,7 @@ func IconAction(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -503,20 +511,20 @@ func ContinueShopping() templ.Component {
 			templ_7745c5c3_Var25 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var26 templ.SafeURL
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(utils.URL("/")))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 164, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 165, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" class=\"flex justify-center items-center relative inline-block px-6 py-3 bg-cchoice font-medium rounded-lg text-white cursor-pointer transition-colors rounded-full hover:bg-cchoicesoft\" title=\"Continue shopping\" alt=\"Continue shopping button\">Continue Shopping</a>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\" class=\"flex justify-center items-center relative inline-block px-6 py-3 bg-cchoice font-medium rounded-lg text-white cursor-pointer transition-colors rounded-full hover:bg-cchoicesoft\" title=\"Continue shopping\" alt=\"Continue shopping button\">Continue Shopping</a>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -545,20 +553,20 @@ func GMapsLink(url string) templ.Component {
 			templ_7745c5c3_Var27 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var28 templ.SafeURL
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinURLErrs(url)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 179, Col: 12}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 180, Col: 12}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\" target=\"_blank\" rel=\"noopener noreferrer\" aria-label=\"Open in Google Maps\" title=\"Open in Google Maps\" class=\"inline-flex items-center gap-2 p-2 rounded-md text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 transition\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\" class=\"w-6 h-6\"><path d=\"M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z\"></path></svg> <span class=\"text-sm font-medium\">Google Maps</span></a>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" target=\"_blank\" rel=\"noopener noreferrer\" aria-label=\"Open in Google Maps\" title=\"Open in Google Maps\" class=\"inline-flex items-center gap-2 p-2 rounded-md text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 transition\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\" class=\"w-6 h-6\"><path d=\"M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z\"></path></svg> <span class=\"text-sm font-medium\">Google Maps</span></a>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -587,20 +595,20 @@ func WazeLink(url string) templ.Component {
 			templ_7745c5c3_Var29 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var30 templ.SafeURL
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinURLErrs(url)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 206, Col: 12}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 207, Col: 12}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\" target=\"_blank\" rel=\"noopener noreferrer\" aria-label=\"Open in Waze\" title=\"Open in Waze\" class=\"inline-flex items-center gap-2 p-2 rounded-md text-sky-600 hover:text-sky-700 hover:bg-sky-50 transition\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\" class=\"w-6 h-6\"><path d=\"M12 2C6.48 2 2 6.03 2 11c0 3.04 1.74 5.73 4.4 7.4L6 22l4.07-2.03c.63.1 1.27.15 1.93.15 5.52 0 10-4.03 10-9s-4.48-9-10-9zm-3 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z\"></path></svg> <span class=\"text-sm font-medium\">Waze</span></a>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" target=\"_blank\" rel=\"noopener noreferrer\" aria-label=\"Open in Waze\" title=\"Open in Waze\" class=\"inline-flex items-center gap-2 p-2 rounded-md text-sky-600 hover:text-sky-700 hover:bg-sky-50 transition\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\" class=\"w-6 h-6\"><path d=\"M12 2C6.48 2 2 6.03 2 11c0 3.04 1.74 5.73 4.4 7.4L6 22l4.07-2.03c.63.1 1.27.15 1.93.15 5.52 0 10-4.03 10-9s-4.48-9-10-9zm-3 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm6 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z\"></path></svg> <span class=\"text-sm font-medium\">Waze</span></a>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -630,20 +638,20 @@ func DiscountRibbon(percentage string) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if DISCOUNT_RIBBON && percentage != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<div class=\"absolute w-full bottom-0 mb-1 bg-white/50 text-cchoice text-sm font-bold tracking-wide text-center\">-")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<div class=\"absolute w-full bottom-0 mb-1 bg-white/50 text-cchoice text-sm font-bold tracking-wide text-center\">-")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var32 string
 			templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(percentage)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 241, Col: 16}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 242, Col: 16}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -676,20 +684,20 @@ func AddToCart() templ.Component {
 			templ_7745c5c3_Var33 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<button id=\"btn-add-to-cart\" class=\"flex justify-center items-center relative inline-block w-12 h-12 bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group rounded-full hover:bg-cchoicesoft\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<button id=\"btn-add-to-cart\" class=\"flex justify-center items-center relative inline-block w-12 h-12 bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group rounded-full hover:bg-cchoicesoft\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var34 string
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/lines"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 258, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 259, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" hx-include=\"#selected-product-id\" hx-swap=\"none\" _=\"\n\t\t\ton click\n\t\t\t\tasync call metrics_event('add_to_cart', #selected-product-id.value)\n\t\t\t\tlog 'Added to cart: ' + #selected-product-id.value\n\t\t\t\thalt\n\t\t\tend\n\t\t\ton htmx:afterRequest\n\t\t\t\ttrigger get on #cart-count-desktop\n\t\t\t\ttrigger get on #cart-count-mobile\n\t\t\t\tif #cart-icon-desktop\n\t\t\t\t\tadd .cart-icon-animate to #cart-icon-desktop\n\t\t\t\t\twait 400ms\n\t\t\t\t\tremove .cart-icon-animate from #cart-icon-desktop\n\t\t\t\tend\n\t\t\t\tif #cart-icon-mobile\n\t\t\t\t\tadd .cart-icon-animate to #cart-icon-mobile\n\t\t\t\t\twait 400ms\n\t\t\t\t\tremove .cart-icon-animate from #cart-icon-mobile\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" hx-include=\"#selected-product-id\" hx-swap=\"none\" _=\"\n\t\t\ton click\n\t\t\t\tasync call metrics_event('add_to_cart', #selected-product-id.value)\n\t\t\t\tlog 'Added to cart: ' + #selected-product-id.value\n\t\t\t\thalt\n\t\t\tend\n\t\t\ton htmx:afterRequest\n\t\t\t\ttrigger get on #cart-count-desktop\n\t\t\t\ttrigger get on #cart-count-mobile\n\t\t\t\tif #cart-icon-desktop\n\t\t\t\t\tadd .cart-icon-animate to #cart-icon-desktop\n\t\t\t\t\twait 400ms\n\t\t\t\t\tremove .cart-icon-animate from #cart-icon-desktop\n\t\t\t\tend\n\t\t\t\tif #cart-icon-mobile\n\t\t\t\t\tadd .cart-icon-animate to #cart-icon-mobile\n\t\t\t\t\twait 400ms\n\t\t\t\t\tremove .cart-icon-animate from #cart-icon-mobile\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -697,7 +705,7 @@ func AddToCart() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<span class=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow\">+1</span></button> <input type=\"hidden\" id=\"selected-product-id\" name=\"product_id\" value=\"\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<span class=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow\">+1</span></button> <input type=\"hidden\" id=\"selected-product-id\" name=\"product_id\" value=\"\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -727,7 +735,7 @@ func DevRibbon() templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if !conf.Conf().IsProd() {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<div class=\"fixed top-0 right-0 w-24 h-24 -mr-12 -mt-12 bg-red-600/80 rotate-45 flex items-center justify-center z-999 shadow-lg\"><span class=\"text-white font-bold text-sm tracking-wider mt-16\">DEV</span></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"fixed top-0 right-0 w-24 h-24 -mr-12 -mt-12 bg-red-600/80 rotate-45 flex items-center justify-center z-999 shadow-lg\"><span class=\"text-white font-bold text-sm tracking-wider mt-16\">DEV</span></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -757,20 +765,20 @@ func AddToCartPromoProduct() templ.Component {
 			templ_7745c5c3_Var36 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<button id=\"btn-add-to-cart\" class=\"flex justify-center items-center relative inline-block w-12 h-12 bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group rounded-full hover:bg-cchoicesoft\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<button id=\"btn-add-to-cart\" class=\"flex justify-center items-center relative inline-block w-12 h-12 bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group rounded-full hover:bg-cchoicesoft\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var37 string
 		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/lines"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 326, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 327, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" hx-include=\"#promo-product-id\" hx-swap=\"none\" _=\"\n\t\t\ton click\n\t\t\t\tasync call metrics_event('add_to_cart', #promo-product-id.value)\n\t\t\t\tlog 'Added to cart: ' + #promo-product-id.value\n\t\t\t\thalt\n\t\t\tend\n\t\t\ton htmx:afterRequest\n\t\t\t\ttrigger get on #cart-count-desktop\n\t\t\t\ttrigger get on #cart-count-mobile\n\t\t\t\tif #cart-icon-desktop\n\t\t\t\t\tadd .cart-icon-animate to #cart-icon-desktop\n\t\t\t\t\twait 400ms\n\t\t\t\t\tremove .cart-icon-animate from #cart-icon-desktop\n\t\t\t\tend\n\t\t\t\tif #cart-icon-mobile\n\t\t\t\t\tadd .cart-icon-animate to #cart-icon-mobile\n\t\t\t\t\twait 400ms\n\t\t\t\t\tremove .cart-icon-animate from #cart-icon-mobile\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" hx-include=\"#promo-product-id\" hx-swap=\"none\" _=\"\n\t\t\ton click\n\t\t\t\tasync call metrics_event('add_to_cart', #promo-product-id.value)\n\t\t\t\tlog 'Added to cart: ' + #promo-product-id.value\n\t\t\t\thalt\n\t\t\tend\n\t\t\ton htmx:afterRequest\n\t\t\t\ttrigger get on #cart-count-desktop\n\t\t\t\ttrigger get on #cart-count-mobile\n\t\t\t\tif #cart-icon-desktop\n\t\t\t\t\tadd .cart-icon-animate to #cart-icon-desktop\n\t\t\t\t\twait 400ms\n\t\t\t\t\tremove .cart-icon-animate from #cart-icon-desktop\n\t\t\t\tend\n\t\t\t\tif #cart-icon-mobile\n\t\t\t\t\tadd .cart-icon-animate to #cart-icon-mobile\n\t\t\t\t\twait 400ms\n\t\t\t\t\tremove .cart-icon-animate from #cart-icon-mobile\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -778,7 +786,7 @@ func AddToCartPromoProduct() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<span class=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow\">+1</span></button>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<span class=\"absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow\">+1</span></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
