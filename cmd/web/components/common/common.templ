@@ -80,6 +80,7 @@ templ HeadMeta() {
 		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/htmx.min.js")) }></script>
 		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/hyperscript.min.js")) }></script>
 		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/metrics.js")) }></script>
+		@ScrAdSense()
 		@templ.JSONScript("url-prefix", utils.URL(""))
 		<script>
 			(function(){

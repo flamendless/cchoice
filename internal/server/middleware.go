@@ -23,15 +23,16 @@ func SecurityHeadersMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("X-XSS-Protection", "1; mode=block")
 		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
 		w.Header().Set("X-Download-Options", "noopen")
+
 		csp := "default-src 'self'; " +
-			"script-src 'self' 'unsafe-eval' 'unsafe-inline' https://unpkg.com ajax.cloudflare.com static.cloudflareinsights.com; " +
+			"script-src 'self' 'unsafe-eval' 'unsafe-inline' https://unpkg.com https://ajax.cloudflare.com https://static.cloudflareinsights.com https://pagead2.googlesyndication.com https://www.googletagservices.com https://ep2.adtrafficquality.google; " +
 			"style-src 'self' 'unsafe-inline'; " +
 			"img-src 'self' data: https:; " +
-			"connect-src 'self' cloudflareinsights.com; " +
-			"font-src 'self' data: fonts.googleapis.com fonts.gstatic.com; " +
+			"connect-src 'self' https://cloudflareinsights.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google; " +
+			"font-src 'self' data: https://fonts.googleapis.com https://fonts.gstatic.com; " +
 			"object-src 'none'; " +
 			"media-src 'self'; " +
-			"frame-src https://www.youtube.com https://www.youtube-nocookie.com; " +
+			"frame-src https://www.youtube.com https://www.youtube-nocookie.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://ep2.adtrafficquality.google https://www.google.com; " +
 			"frame-ancestors 'none'; " +
 			"base-uri 'self'; " +
 			"form-action 'self'; " +
