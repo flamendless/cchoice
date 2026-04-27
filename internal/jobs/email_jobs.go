@@ -161,7 +161,8 @@ func (ejr *EmailJobRunner) QueueEmailJob(ctx context.Context, params EmailJobPar
 		zap.Int64("email_job_id", emailJob.ID),
 		zap.String("queue_id", queueID),
 		zap.String("recipient", params.Recipient),
-		zap.String("template", params.TemplateName.String()),
+		zap.String("cc", params.CC),
+		zap.Stringer("template", params.TemplateName),
 	)
 
 	return nil
