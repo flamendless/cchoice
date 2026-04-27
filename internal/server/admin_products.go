@@ -518,7 +518,7 @@ func (s *Server) adminSuperuserProductsDeleteHandler(w http.ResponseWriter, r *h
 
 func (s *Server) adminSuperuserProductsEditPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Superuser Products Edit Page Handler]"
-	const page = "/superuser/admin/products"
+	const page = "/admin/superuser/products"
 	ctx := r.Context()
 
 	productID := chi.URLParam(r, "id")
@@ -577,7 +577,7 @@ func (s *Server) adminSuperuserProductsEditPageHandler(w http.ResponseWriter, r 
 	var imageCDNURL string
 	productImage, err := s.dbRO.GetQueries().GetProductImageByProductID(ctx, product.ID)
 	if err != nil {
-		logs.Log().Warn(page, zap.Error(err))
+		logs.Log().Warn(page, zap.String("product id", productID), zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
@@ -588,7 +588,7 @@ func (s *Server) adminSuperuserProductsEditPageHandler(w http.ResponseWriter, r 
 
 	inventory, err := s.services.productInventory.GetByProductID(ctx, productID)
 	if err != nil {
-		logs.Log().Warn(page, zap.Error(err))
+		logs.Log().Warn(page, zap.String("product id", productID), zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
