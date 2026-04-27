@@ -785,6 +785,7 @@ const getProductsBySearchQuery = `-- name: GetProductsBySearchQuery :many
 SELECT
 	tbl_products.id,
 	tbl_products.name,
+	tbl_products.slug,
 	tbl_products.unit_price_with_vat,
 	tbl_products.unit_price_with_vat_currency,
 	tbl_brands.name AS brand_name,
@@ -813,6 +814,7 @@ type GetProductsBySearchQueryParams struct {
 type GetProductsBySearchQueryRow struct {
 	ID                       int64
 	Name                     string
+	Slug                     sql.NullString
 	UnitPriceWithVat         int64
 	UnitPriceWithVatCurrency string
 	BrandName                string
@@ -836,6 +838,7 @@ func (q *Queries) GetProductsBySearchQuery(ctx context.Context, arg GetProductsB
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
+			&i.Slug,
 			&i.UnitPriceWithVat,
 			&i.UnitPriceWithVatCurrency,
 			&i.BrandName,
