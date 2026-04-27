@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"cchoice/cmd/web/models"
@@ -270,6 +271,7 @@ func (s *AttendanceService) ApproveTimeOff(
 		return err
 	}
 
+	result = fmt.Sprintf("success. ID '%s'", timeOffID)
 	return nil
 }
 
@@ -296,6 +298,8 @@ func (s *AttendanceService) CancelTimeOff(
 		result = err.Error()
 		return err
 	}
+
+	result = fmt.Sprintf("success. ID '%s'", timeOffID)
 	return nil
 }
 
