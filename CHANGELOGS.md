@@ -2,6 +2,73 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.21"></a>
+## [release-v1.1.21] - 2026-04-27
+### Bugfix
+- Add CC for admin password reset and add updated_at
+- Add updated_at to tbl_staff_roles
+- Fix pages not rendering and add dedicated not found page
+- Fix quantity
+- Cart quantity
+- Handle case if product has no image yet during update
+- Remove product status filter for slug
+- Add meta dates to product categories
+- Product price saving
+- Promo edit image upload and status
+- Validate promo start/end dates
+- Promo edit and delete
+- Add missing patch
+
+### Docs
+- Add LICENSE
+- Release v1.1.20
+
+### Feature
+- WIP Product Inventory
+- Tracked links
+- Product page
+- Show promo banners in shop page
+- WIP promos
+
+### Maintenance
+- Update tracked link name
+- Add services in envvars
+- Create image upload and preview component
+- Little fixes
+- use encoded brand id
+
+### Server
+- Implement homepage filters
+- Handle redirection
+- Fix product images
+- Fix duplicating products due to product images
+- Update CDN keys
+- Implement product slugs
+- Implement product edit
+- Update image max file size upload to 3MB
+- More fixes for promos
+- Fix some bugs and update password length
+- Allow unchanged image in brand update
+- Brand management system image upload
+
+### Web
+- Test adsense
+- Add platforms page
+- Implement brand filtering in homepage
+- Add manage product inventories
+- Hardcode bosch in brand side panel
+- Add dev ribbon
+- Fix cart number
+- Fix add to cart
+- Improve product page SEO and design
+- Update product listing columns and fix shop product image size
+- Add dates validation
+- Fix confirm password show/hide
+- Refactor admin cards
+- Embed youtube video in shop page
+- Remove extra confirm password
+
+
 <a name="release-v1.1.20"></a>
 ## [release-v1.1.20] - 2026-04-15
 ### AI
