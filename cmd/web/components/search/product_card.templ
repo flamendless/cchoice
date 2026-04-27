@@ -32,7 +32,7 @@ templ SearchResultsMobile() {
 templ SearchMore(query string) {
 	<li class="flex items-center justify-center">
 		<a
-			href={ templ.SafeURL(utils.URL("/search?query=" + query)) }
+			href={ utils.URL("/") }
 			class="
 				text-center w-full border-t-2 border-cchoice_border p-2
 				hover:bg-cchoice hover:text-white transition-colors
@@ -45,27 +45,9 @@ templ SearchMore(query string) {
 
 templ SearchResultProductCard(product models.SearchResultProduct) {
 	<li>
-		<div
-			class="group flex flex-row items-center py-2 bg-white hover:bg-cchoicesoft transition-colors cursor-pointer"
-			data-product-id={ product.ProductID }
-			data-product-thumbnail-path={ product.CDNURL1280 }
-			data-product-name={ product.Name }
-			data-product-brand={ product.BrandName }
-			data-product-price={ product.PriceDisplay }
-			_="
-			on click
-				async call metrics_event('search_result_click', #selected-product-id.value)
-				set #selected-product-id.value to my @data-product-id
-				set #selected-product-thumbnail-path.value to my @data-product-thumbnail-path
-				set #selected-product-name.value to my @data-product-name
-				set #selected-product-brand.value to my @data-product-brand
-				set #selected-product-price.value to my @data-product-price
-				log 'selected product-id: ' + #selected-product-id.value
-				log 'selected thumbnail image path: ' + #selected-product-thumbnail-path.value
-				trigger get on #modal_image_viewer_image
-				trigger openModal on #modal_image_viewer
-			end
-			"
+		<a
+			href={ utils.URL("/product/" + product.Slug.String) }
+			class="flex flex-row items-center py-2 bg-white hover:bg-cchoicesoft transition-colors"
 		>
 			<img
 				class="w-16 max-w-16 h-16 mx-4"
@@ -75,10 +57,10 @@ templ SearchResultProductCard(product models.SearchResultProduct) {
 			/>
 			<p
 				title={ product.Name }
-				class="text-base font-normal text-ellipsis text-wrap overflow-hidden cursor-pointer"
+				class="text-base font-normal text-ellipsis text-wrap overflow-hidden"
 			>
 				{ product.Name }
 			</p>
-		</div>
+		</a>
 	</li>
 }
