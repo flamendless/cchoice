@@ -90,6 +90,14 @@ CPOINT_HMAC_SECRET="your-generated-secret"
 
 ---
 
+# METRICS:
+
+- In `.env`, provide values for `BASIC_AUTH_USERNAME` and `BASIC_AUTH_PASSWORD_HASH`
+- Use `gen_basic_auth` to hash value for `BASIC_AUTH_PASSWORD_HASH`
+- You can now access `/metrics`
+
+---
+
 # NOTES:
 
 - For GH workflow, comment out `[ -z "$PS1" ] && return` in server's .bashrc.
