@@ -212,6 +212,15 @@ func (s *ProductService) GetForListingAdmin(
 			continue
 		}
 
+		cdnURL := p.CdnUrl.String
+		if cdnURL == "" {
+			cdnURL = s.getCDNURL(p.ThumbnailPath)
+		}
+		cdnURL1280 := p.CdnUrlThumbnail.String
+		if cdnURL1280 == "" {
+			cdnURL1280 = s.getCDNURL(constants.ToPath1280(p.ThumbnailPath))
+		}
+
 		productList = append(productList, models.AdminProductListItem{
 			ID:            s.encoder.Encode(p.ID),
 			Name:          p.Name,
@@ -224,8 +233,8 @@ func (s *ProductService) GetForListingAdmin(
 			Subcategory:   p.Subcategory,
 			Status:        enums.ParseProductStatusToEnum(p.Status),
 			ThumbnailPath: p.ThumbnailPath,
-			CDNURL:        s.getCDNURL(p.ThumbnailPath),
-			CDNURL1280:    s.getCDNURL(constants.ToPath1280(p.ThumbnailPath)),
+			CDNURL:        cdnURL,
+			CDNURL1280:    cdnURL1280,
 			CreatedAt:     p.CreatedAt.Format(constants.DateTimeLayoutISO),
 			UpdatedAt:     p.UpdatedAt.Format(constants.DateTimeLayoutISO),
 			Colours:       p.Colours,

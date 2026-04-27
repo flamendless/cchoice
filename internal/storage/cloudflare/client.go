@@ -173,10 +173,6 @@ func (c *Client) normalizeKey(key string) string {
 	return key
 }
 
-func (c *Client) ProviderEnum() storage.StorageProvider {
-	return storage.STORAGE_PROVIDER_CLOUDFLARE_IMAGES
-}
-
 func (c *Client) GetPublicURL(key string) string {
 	if cachedURL, ok := c.urlCache.Load(key); ok {
 		return cachedURL.(string)
@@ -409,6 +405,10 @@ func (c *Client) GetAccountHash() string {
 
 func (c *Client) GetVariant() string {
 	return c.variant
+}
+
+func (c *Client) ProviderEnum() storage.StorageProvider {
+	return storage.STORAGE_PROVIDER_CLOUDFLARE_IMAGES
 }
 
 var _ storage.IObjectStorage = (*Client)(nil)

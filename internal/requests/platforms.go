@@ -22,8 +22,8 @@ import (
 )
 
 type platformData struct {
-	Label string
 	Icon  templ.Component
+	Label string
 	Order int
 }
 

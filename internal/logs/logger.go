@@ -33,6 +33,8 @@ func InitLog() {
 		config.Level.SetLevel(zapcore.Level(configLevel - 1))
 	case cfg.IsProd():
 		config = zap.NewProductionConfig()
+		configLevel := conf.Conf().LogMinLevel
+		config.Level.SetLevel(zapcore.Level(configLevel - 1))
 	default:
 		panic(fmt.Errorf("%w. APP_ENV. Got '%s'", errs.ErrEnvVarRequired, cfg.AppEnv.String()))
 	}

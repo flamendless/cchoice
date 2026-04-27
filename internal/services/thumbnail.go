@@ -126,11 +126,10 @@ func (s *ThumbnailService) ProcessImageVariants(ctx context.Context, sourcePath,
 			}
 			logs.LogCtx(ctx).Info(logtag, zap.String("stored", "cloud"), zap.String("key", originalKey))
 		}
-		originalURL := s.objectStorage.GetPublicURL(originalKey)
 		variants = append(variants, types.ThumbnailVariant{
 			Size:       "original",
 			Path:       originalKey,
-			URL:        originalURL,
+			URL:        originalKey,
 			IsOriginal: true,
 		})
 	}
@@ -202,11 +201,10 @@ func (s *ThumbnailService) ProcessImageVariants(ctx context.Context, sourcePath,
 				}
 				logs.LogCtx(ctx).Info(logtag, zap.String("stored", "cloud"), zap.String("size", folderName), zap.String("key", storageKey))
 			}
-			webpURL := s.objectStorage.GetPublicURL(storageKey)
 			variants = append(variants, types.ThumbnailVariant{
 				Size: folderName,
 				Path: storageKey,
-				URL:  webpURL,
+				URL:  storageKey,
 			})
 		}
 	}
@@ -218,7 +216,7 @@ func (s *ThumbnailService) buildStorageKey(brand, sizeFolder, filename, ext stri
 	if isLocal {
 		return filepath.Join(LocalImageBasePath, brand, sizeFolder, filename+ext)
 	}
-	return fmt.Sprintf("product_images/%s/%s/%s%s", brand, sizeFolder, filename, ext)
+	return filename + ext
 }
 
 func (s *ThumbnailService) ID() string {
