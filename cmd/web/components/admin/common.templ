@@ -408,13 +408,23 @@ templ ProductSearchToolbar(url string) {
 		<div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
 			<input
 				type="text"
-				name="search"
+				name="search_serial"
 				placeholder="Search by serial..."
 				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
 				hx-get={ url }
-				hx-trigger="change, search delay:300ms"
+				hx-trigger="change, search_serial delay:300ms"
 				hx-target="#products-table"
-				hx-include="[name='search'],[name='status']"
+				hx-include="[name='search_serial'],[name='search_brand'],[name='status']"
+			/>
+			<input
+				type="text"
+				name="search_brand"
+				placeholder="Search by brand..."
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				hx-get={ url }
+				hx-trigger="change, search_brand delay:300ms"
+				hx-target="#products-table"
+				hx-include="[name='search_serial'],[name='search_brand'],[name='status']"
 			/>
 			<select
 				name="status"
@@ -422,12 +432,12 @@ templ ProductSearchToolbar(url string) {
 				hx-get={ url }
 				hx-trigger="change"
 				hx-target="#products-table"
-				hx-include="[name='search'],[name='status']"
+				hx-include="[name='search'],[name='search_brand'],[name='status']"
 			>
 				<option value="">All</option>
-				<option value="DRAFT">Draft</option>
-				<option value="ACTIVE">Active</option>
-				<option value="DELETED">Deleted</option>
+				for _, ps := range enums.AllProductStatuses {
+					<option value={ ps.String() }>{ ps.String() }</option>
+				}
 			</select>
 		</div>
 	</div>

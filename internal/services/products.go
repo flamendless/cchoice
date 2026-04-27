@@ -189,12 +189,14 @@ func (s *ProductService) Delete(ctx context.Context, productID string) error {
 
 func (s *ProductService) GetForListingAdmin(
 	ctx context.Context,
-	search string,
+	searchSerial string,
+	searchBrand string,
 	status enums.ProductStatus,
 ) ([]models.AdminProductListItem, error) {
 	products, err := s.dbRO.GetQueries().AdminGetProductsForListing(ctx, queries.AdminGetProductsForListingParams{
-		Search: sql.NullString{String: search, Valid: search != ""},
-		Status: sql.NullString{String: status.String(), Valid: status != enums.PRODUCT_STATUS_UNDEFINED},
+		SearchSerial: sql.NullString{String: searchSerial, Valid: searchSerial != ""},
+		SearchBrand:  sql.NullString{String: searchBrand, Valid: searchBrand != ""},
+		Status:       sql.NullString{String: status.String(), Valid: status != enums.PRODUCT_STATUS_UNDEFINED},
 	})
 	if err != nil {
 		return nil, err

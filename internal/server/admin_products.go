@@ -377,13 +377,16 @@ func (s *Server) adminSuperuserProductsListTableHandler(w http.ResponseWriter, r
 	const logtag = "[Admin Superuser Products List Table Handler]"
 	ctx := r.Context()
 
-	search := r.URL.Query().Get("search")
+	searchSerial := r.URL.Query().Get("search_serial")
+	searchBrand := r.URL.Query().Get("search_brand")
+
 	statusStr := r.URL.Query().Get("status")
 	status := enums.ParseProductStatusToEnum(statusStr)
 	if statusStr != "" && status == enums.PRODUCT_STATUS_UNDEFINED {
 		logs.LogCtx(ctx).Error(
 			logtag,
-			zap.String("search", search),
+			zap.String("search serial", searchSerial),
+			zap.String("search brand", searchBrand),
 			zap.String("status", statusStr),
 			zap.Error(errs.ErrEnumInvalid),
 		)
@@ -391,7 +394,12 @@ func (s *Server) adminSuperuserProductsListTableHandler(w http.ResponseWriter, r
 		return
 	}
 
-	productList, err := s.services.product.GetForListingAdmin(ctx, search, status)
+	productList, err := s.services.product.GetForListingAdmin(
+		ctx,
+		searchSerial,
+		searchBrand,
+		status,
+	)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		productList = []models.AdminProductListItem{}
@@ -400,7 +408,7 @@ func (s *Server) adminSuperuserProductsListTableHandler(w http.ResponseWriter, r
 	if err := compadmin.AdminSuperuserProductsListTable(productList).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
-			zap.String("search", search),
+			zap.String("search", searchSerial),
 			zap.String("status", statusStr),
 			zap.Error(err),
 		)
