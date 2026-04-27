@@ -59,7 +59,8 @@ LEFT JOIN (
 ) AS categories ON categories.product_id = tbl_products.id
 WHERE
 	(?1 IS NULL OR ?1 = '' OR LOWER(tbl_products.serial) LIKE '%' || LOWER(?1) || '%')
-	AND (?2 IS NULL OR ?2 = '' OR tbl_products.status = ?2)
+	AND (?2 IS NULL OR ?2 = '' OR LOWER(tbl_brands.name) LIKE '%' || LOWER(?2) || '%')
+	AND (?3 IS NULL OR ?3 = '' OR tbl_products.status = ?3)
 ORDER BY
 	CASE tbl_products.status
 		WHEN 'DRAFT' THEN 1
@@ -71,8 +72,9 @@ ORDER BY
 `
 
 type AdminGetProductsForListingParams struct {
-	Search interface{}
-	Status interface{}
+	SearchSerial interface{}
+	SearchBrand  interface{}
+	Status       interface{}
 }
 
 type AdminGetProductsForListingRow struct {
@@ -104,7 +106,7 @@ type AdminGetProductsForListingRow struct {
 }
 
 func (q *Queries) AdminGetProductsForListing(ctx context.Context, arg AdminGetProductsForListingParams) ([]AdminGetProductsForListingRow, error) {
-	rows, err := q.db.QueryContext(ctx, adminGetProductsForListing, arg.Search, arg.Status)
+	rows, err := q.db.QueryContext(ctx, adminGetProductsForListing, arg.SearchSerial, arg.SearchBrand, arg.Status)
 	if err != nil {
 		return nil, err
 	}

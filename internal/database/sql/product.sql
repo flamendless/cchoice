@@ -233,7 +233,8 @@ LEFT JOIN (
 	GROUP BY tbl_products_categories.product_id
 ) AS categories ON categories.product_id = tbl_products.id
 WHERE
-	(@search IS NULL OR @search = '' OR LOWER(tbl_products.serial) LIKE '%' || LOWER(@search) || '%')
+	(@search_serial IS NULL OR @search_serial = '' OR LOWER(tbl_products.serial) LIKE '%' || LOWER(@search_serial) || '%')
+	AND (@search_brand IS NULL OR @search_brand = '' OR LOWER(tbl_brands.name) LIKE '%' || LOWER(@search_brand) || '%')
 	AND (@status IS NULL OR @status = '' OR tbl_products.status = @status)
 ORDER BY
 	CASE tbl_products.status

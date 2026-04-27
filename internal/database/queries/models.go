@@ -265,6 +265,7 @@ type TblPasswordResetToken struct {
 	ExpiresAt string
 	UsedAt    sql.NullString
 	CreatedAt string
+	UpdatedAt sql.NullTime
 }
 
 type TblProduct struct {
@@ -447,6 +448,7 @@ type TblStaffRole struct {
 	StaffID   int64
 	Role      string
 	CreatedAt sql.NullTime
+	UpdatedAt sql.NullTime
 }
 
 type TblStaffTimeOff struct {
