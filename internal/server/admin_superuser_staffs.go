@@ -130,13 +130,14 @@ func (s *Server) adminSuperuserStaffsRoleHandler(w http.ResponseWriter, r *http.
 	switch action {
 	case "ADD":
 		if err := s.services.role.AddRole(ctx, staffID, role); err != nil {
-			redirectHX(w, r, utils.URLWithError(page, "failed to add role"))
+			logs.LogCtx(ctx).Error(logtag, zap.Stringer("role", role), zap.String("action", action), zap.Error(err))
+			redirectHX(w, r, utils.URLWithError(page, err.Error()))
 			return
 		}
 
 		roles, err := s.services.role.GetByStaffID(ctx, staffID)
 		if err != nil {
-			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			logs.LogCtx(ctx).Error(logtag, zap.Stringer("role", role), zap.String("action", action), zap.Error(err))
 			roles = []enums.StaffRole{}
 		}
 
@@ -152,12 +153,14 @@ func (s *Server) adminSuperuserStaffsRoleHandler(w http.ResponseWriter, r *http.
 		}
 
 		if err := compadmin.StaffRolesCell(staffID, userType, roles).Render(ctx, w); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Stringer("role", role), zap.String("action", action), zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, err.Error()))
 			return
 		}
 
 	case "REMOVE":
 		if err := s.services.role.RemoveRole(ctx, staffID, role); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Stringer("role", role), zap.String("action", action), zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, err.Error()))
 			return
 		}
