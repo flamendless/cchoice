@@ -66,6 +66,7 @@ func (s *PasswordResetService) RequestReset(ctx context.Context, email string, u
 
 	var userID int64
 	var userEmail string
+	var cc string
 
 	result := "request reset success"
 	defer func() {
@@ -107,6 +108,7 @@ func (s *PasswordResetService) RequestReset(ctx context.Context, email string, u
 		}
 		userID = staff.ID
 		userEmail = staff.Email
+		cc = conf.Conf().MailerooConfig.CC
 	default:
 		result = errs.ErrEnumInvalid.Error()
 		return errs.ErrEnumInvalid
@@ -148,6 +150,7 @@ func (s *PasswordResetService) RequestReset(ctx context.Context, email string, u
 	if conf.Conf().IsProd() || conf.Conf().Test.LocalForgotPassword {
 		if err = s.emailRunner.QueueEmailJob(ctx, jobs.EmailJobParams{
 			Recipient:    userEmail,
+			CC:           cc,
 			Subject:      "Reset Your Password - C-Choice",
 			TemplateName: enums.EMAIL_TEMPLATE_PASSWORD_RESET,
 			OTPCode:      resetLink,
