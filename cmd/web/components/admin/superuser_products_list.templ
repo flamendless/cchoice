@@ -70,6 +70,7 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 			<thead class="bg-gray-50">
 				<tr>
 					@TableHeader("3%", "ID")
+					@TableHeader("6%", "Thumbnail (click image to view full image)")
 					@TableHeader("5%", "Serial")
 					@TableHeader("5%", "Name")
 					<!-- @TableHeader("6%", "Description") -->
@@ -88,9 +89,9 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 					<!-- @TableHeader("6%", "Scope of Supply") -->
 					@TableHeader("5%", "Weight")
 					<!-- @TableHeader("4%", "Created At") -->
-					@TableHeader("4%", "Updated At")
 					@TableHeader("4%", "Status")
 					@TableHeader("8%", "Actions")
+					@TableHeader("4%", "Updated At")
 				</tr>
 			</thead>
 			<tbody class="bg-white divide-y divide-gray-200">
@@ -98,6 +99,19 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 					<tr id={ fmt.Sprintf("product-row-%s", p.ID) }>
 						@TableCell("3%", "text-gray-900") {
 							{ p.ID }
+						}
+						@TableCell("3%", "text-gray-900") {
+							<a
+								href={ p.CDNURL1280 }
+								target="_blank"
+								class="h-10 w-10"
+							>
+								<img
+									src={ p.CDNURL }
+									alt={ p.Serial }
+									class="h-10 w-10 object-contain rounded"
+								/>
+							</a>
 						}
 						@TableCell("5%", "text-gray-900") {
 							{ p.Serial }
@@ -153,42 +167,11 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 						<!-- @TableCell("4%", "text-gray-900") { -->
 						<!-- 	{ p.CreatedAt } -->
 						<!-- } -->
-						@TableCell("4%", "text-gray-900") {
-							{ p.UpdatedAt }
-						}
 						@TableCell("4%", "") {
 							@ProductStatus(p.Status)
 						}
 						@TableCell("8%", "") {
 							<div class="flex flex-col items-center gap-2">
-								if p.CDNURL != "" {
-									<a
-										href={ p.CDNURL }
-										target="_blank"
-										class="
-										inline-block px-3 py-1 text-xs font-medium rounded
-										bg-cchoice text-white
-										hover:bg-cchoice_dark
-										border border-cchoice_dark
-									"
-									>
-										View Thumbnail
-									</a>
-								}
-								if p.CDNURL1280 != "" {
-									<a
-										href={ p.CDNURL1280 }
-										target="_blank"
-										class="
-										inline-block px-3 py-1 text-xs font-medium rounded
-										bg-cchoice text-white
-										hover:bg-cchoice_dark
-										border border-cchoice_dark
-									"
-									>
-										View Full Image
-									</a>
-								}
 								switch p.Status {
 									case enums.PRODUCT_STATUS_ACTIVE:
 										@ProductActionDraft(p.ID)
@@ -200,6 +183,9 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem) {
 										@ProductActionDraft(p.ID)
 								}
 							</div>
+						}
+						@TableCell("4%", "text-gray-900") {
+							{ p.UpdatedAt }
 						}
 					</tr>
 				}
