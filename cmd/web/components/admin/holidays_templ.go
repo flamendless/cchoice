@@ -67,7 +67,7 @@ func AdminHolidaysListPage(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"flex-grow p-4\"><div class=\"max-w-7xl mx-auto\"><div class=\"bg-white rounded-lg shadow-md p-6\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"flex-grow p-4\"><div class=\"max-w-8xl mx-auto\"><div class=\"bg-white rounded-lg shadow-md p-6\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
