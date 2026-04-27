@@ -159,6 +159,13 @@ func BuildPostHomeContentSections(getBrandLogoURL BrandLogoURLFunc) []PostHomeCo
 				},
 				{
 					BrandImage: &BrandImage{
+						Filename: "INGCO.webp",
+						Alt:      "Ingco image",
+						CDNURL:   getBrandLogoURL("INGCO.webp"),
+					},
+				},
+				{
+					BrandImage: &BrandImage{
 						Filename:     "TAILIN.webp",
 						Alt:          "Tailin image",
 						CDNURL:       getBrandLogoURL("TAILIN.webp"),
