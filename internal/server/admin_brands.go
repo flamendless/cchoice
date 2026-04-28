@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"net/http"
 	"path/filepath"
@@ -11,8 +12,10 @@ import (
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/encode"
+	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -49,25 +52,21 @@ func (s *Server) adminBrandsListTableHandler(w http.ResponseWriter, r *http.Requ
 	var brands []models.AdminBrandListItem
 
 	searchQuery := r.URL.Query().Get("search")
+	status := enums.ParseBrandStatusToEnum(r.URL.Query().Get("status"))
+
 	if searchQuery != "" {
-		serviceBrands, err := s.services.brand.SearchBrandsByName(ctx, searchQuery)
+		serviceBrands, err := s.services.brand.SearchBrandsByFilter(
+			ctx,
+			searchQuery,
+			status,
+		)
 		if err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, err.Error()))
 			return
 		}
 
-		brands = make([]models.AdminBrandListItem, 0, len(serviceBrands))
-		for _, b := range serviceBrands {
-			brands = append(brands, models.AdminBrandListItem{
-				ID:           s.encoder.Encode(b.ID),
-				Name:         b.Name,
-				LogoS3URL:    b.LogoS3URL,
-				BrandImageID: s.encoder.Encode(b.BrandImageID),
-				ProductCount: b.ProductCount,
-				CreatedAt:    b.CreatedAt.Format(constants.DateTimeLayoutISO),
-			})
-		}
+		brands = s.filterAndConvertBrands(ctx, serviceBrands)
 	} else {
 		serviceBrands, err := s.services.brand.GetAllBrands(ctx)
 		if err != nil {
@@ -75,17 +74,7 @@ func (s *Server) adminBrandsListTableHandler(w http.ResponseWriter, r *http.Requ
 			redirectHX(w, r, utils.URLWithError(page, err.Error()))
 			return
 		}
-		brands = make([]models.AdminBrandListItem, 0, len(serviceBrands))
-		for _, b := range serviceBrands {
-			brands = append(brands, models.AdminBrandListItem{
-				ID:           s.encoder.Encode(b.ID),
-				Name:         b.Name,
-				LogoS3URL:    b.LogoS3URL,
-				BrandImageID: s.encoder.Encode(b.BrandImageID),
-				ProductCount: b.ProductCount,
-				CreatedAt:    b.CreatedAt.Format(constants.DateTimeLayoutISO),
-			})
-		}
+		brands = s.filterAndConvertBrands(ctx, serviceBrands)
 	}
 
 	if err := compadmin.AdminBrandsListTable(brands, searchQuery).Render(ctx, w); err != nil {
@@ -93,6 +82,22 @@ func (s *Server) adminBrandsListTableHandler(w http.ResponseWriter, r *http.Requ
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
+}
+
+func (s *Server) filterAndConvertBrands(ctx context.Context, serviceBrands []services.Brand) []models.AdminBrandListItem {
+	brands := make([]models.AdminBrandListItem, 0, len(serviceBrands))
+	for _, b := range serviceBrands {
+		brands = append(brands, models.AdminBrandListItem{
+			ID:           s.encoder.Encode(b.ID),
+			Name:         b.Name,
+			LogoS3URL:    b.LogoS3URL,
+			BrandImageID: s.encoder.Encode(b.BrandImageID),
+			ProductCount: b.ProductCount,
+			CreatedAt:    b.CreatedAt.Format(constants.DateTimeLayoutISO),
+			Status:       b.Status,
+		})
+	}
+	return brands
 }
 
 func (s *Server) adminBrandsCreateHandler(w http.ResponseWriter, r *http.Request) {
@@ -273,6 +278,7 @@ func (s *Server) adminBrandsEditPageHandler(w http.ResponseWriter, r *http.Reque
 				BrandImageID: s.encoder.Encode(b.BrandImageID),
 				ProductCount: b.ProductCount,
 				CreatedAt:    b.CreatedAt.Format("2006-01-02"),
+				Status:       b.Status,
 			}
 			break
 		}
@@ -288,4 +294,25 @@ func (s *Server) adminBrandsEditPageHandler(w http.ResponseWriter, r *http.Reque
 		redirectHX(w, r, utils.URLWithError("/admin/brands", "Failed to render edit form"))
 		return
 	}
+}
+
+func (s *Server) adminBrandsUpdateStatusHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Brands Update Status Handler]"
+	const page = "/admin/brands"
+	ctx := r.Context()
+
+	brandID := chi.URLParam(r, "id")
+	statusStr := r.FormValue("status")
+	status := enums.ParseBrandStatusToEnum(statusStr)
+	if status == enums.BRAND_STATUS_UNDEFINED {
+		redirectHX(w, r, utils.URLWithError(page, "Can't use undefined value"))
+	}
+
+	if err := s.services.brand.UpdateStatus(ctx, s.sessionManager.GetString(ctx, SessionStaffID), brandID, status); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	redirectHX(w, r, utils.URLWithSuccess(page, "Brand status updated"))
 }

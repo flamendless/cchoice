@@ -26,6 +26,7 @@ type TblBrand struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time
+	Status    string
 }
 
 type TblBrandImage struct {
