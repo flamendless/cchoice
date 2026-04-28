@@ -350,6 +350,7 @@ type AdminBrandListItem struct {
 	BrandImageID string
 	ProductCount int64
 	CreatedAt    string
+	Status       enums.BrandStatus
 }
 
 type StaffLog struct {

@@ -1,6 +1,10 @@
 package services
 
-import "time"
+import (
+	"time"
+
+	"cchoice/internal/enums"
+)
 
 type Brand struct {
 	CreatedAt    time.Time
@@ -9,4 +13,5 @@ type Brand struct {
 	ID           int64
 	BrandImageID int64
 	ProductCount int64
+	Status       enums.BrandStatus
 }

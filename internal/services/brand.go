@@ -10,6 +10,7 @@ import (
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
+	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 
@@ -68,13 +69,25 @@ func (s *BrandService) GetAllBrands(ctx context.Context) ([]Brand, error) {
 			BrandImageID: brandImageID,
 			ProductCount: b.ProductCount,
 			CreatedAt:    b.CreatedAt,
+			Status:       enums.ParseBrandStatusToEnum(b.Status),
 		})
 	}
 	return result, nil
 }
 
-func (s *BrandService) SearchBrandsByName(ctx context.Context, name string) ([]Brand, error) {
-	brands, err := s.dbRO.GetQueries().SearchBrandsByName(ctx, "%"+name+"%")
+func (s *BrandService) SearchBrandsByFilter(
+	ctx context.Context,
+	name string,
+	status enums.BrandStatus,
+) ([]Brand, error) {
+	var statusStr string
+	if status != enums.BRAND_STATUS_UNDEFINED {
+		statusStr = status.String()
+	}
+	brands, err := s.dbRO.GetQueries().SearchBrandsByFilter(ctx, queries.SearchBrandsByFilterParams{
+		SearchName: name,
+		Status:     statusStr,
+	})
 	if err != nil {
 		return nil, errors.Join(errs.ErrBrand, err)
 	}
@@ -199,6 +212,38 @@ func (s *BrandService) DeleteBrand(ctx context.Context, staffID string, id strin
 		return errors.Join(errs.ErrBrand, err)
 	}
 
+	return nil
+}
+
+func (s *BrandService) UpdateStatus(ctx context.Context, staffID string, brandID string, status enums.BrandStatus) error {
+	result := "success"
+	defer func() {
+		if err := s.staffLog.CreateLog(
+			ctx,
+			staffID,
+			constants.ActionUpdate,
+			constants.ModuleBrands,
+			result,
+			nil,
+		); err != nil {
+			logs.Log().Warn("[BrandService] update status log", zap.Error(err))
+		}
+	}()
+
+	decodedID := s.encoder.Decode(brandID)
+	if decodedID == encode.INVALID {
+		return errs.ErrDecode
+	}
+
+	if err := s.dbRW.GetQueries().UpdateBrandStatus(ctx, queries.UpdateBrandStatusParams{
+		ID:     decodedID,
+		Status: status.String(),
+	}); err != nil {
+		result = err.Error()
+		return errors.Join(errs.ErrBrand, err)
+	}
+
+	result = fmt.Sprintf("success. ID '%s'", brandID)
 	return nil
 }
 

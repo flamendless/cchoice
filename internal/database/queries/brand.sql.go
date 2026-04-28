@@ -68,6 +68,7 @@ const getAllBrands = `-- name: GetAllBrands :many
 SELECT
 	tbl_brands.id AS id,
 	tbl_brands.name AS name,
+	tbl_brands.status AS status,
 	tbl_brand_images.id AS brand_image_id,
 	tbl_brand_images.path AS path,
 	tbl_brand_images.s3_url AS s3_url,
@@ -76,7 +77,6 @@ SELECT
 FROM tbl_brands
 LEFT JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id AND tbl_brand_images.is_main = true
 LEFT JOIN tbl_products ON tbl_products.brand_id = tbl_brands.id AND tbl_products.deleted_at = '1970-01-01 00:00:00+00:00'
-WHERE tbl_brands.deleted_at = '1970-01-01 00:00:00+00:00'
 GROUP BY tbl_brands.id, tbl_brand_images.id
 ORDER BY tbl_brands.name ASC
 `
@@ -84,6 +84,7 @@ ORDER BY tbl_brands.name ASC
 type GetAllBrandsRow struct {
 	ID           int64
 	Name         string
+	Status       string
 	BrandImageID sql.NullInt64
 	Path         sql.NullString
 	S3Url        sql.NullString
@@ -103,6 +104,7 @@ func (q *Queries) GetAllBrands(ctx context.Context) ([]GetAllBrandsRow, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
+			&i.Status,
 			&i.BrandImageID,
 			&i.Path,
 			&i.S3Url,
@@ -139,7 +141,7 @@ func (q *Queries) GetBrandImageS3URLByPath(ctx context.Context, path string) (sq
 
 const getBrandsByID = `-- name: GetBrandsByID :one
 SELECT
-	tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at,
+	tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
 	tbl_brand_images.id AS brand_image_id,
 	tbl_brand_images.path AS path,
 	tbl_brand_images.s3_url AS s3_url
@@ -156,6 +158,7 @@ type GetBrandsByIDRow struct {
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	DeletedAt    time.Time
+	Status       string
 	BrandImageID int64
 	Path         string
 	S3Url        sql.NullString
@@ -170,6 +173,7 @@ func (q *Queries) GetBrandsByID(ctx context.Context, id int64) (GetBrandsByIDRow
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.Status,
 		&i.BrandImageID,
 		&i.Path,
 		&i.S3Url,
@@ -180,16 +184,18 @@ func (q *Queries) GetBrandsByID(ctx context.Context, id int64) (GetBrandsByIDRow
 const getBrandsForSidePanel = `-- name: GetBrandsForSidePanel :many
 SELECT
 	id,
-	name
+	name,
+	status
 FROM tbl_brands
-WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+WHERE status = 'ACTIVE'
 ORDER BY name ASC
 LIMIT ?
 `
 
 type GetBrandsForSidePanelRow struct {
-	ID   int64
-	Name string
+	ID     int64
+	Name   string
+	Status string
 }
 
 func (q *Queries) GetBrandsForSidePanel(ctx context.Context, limit int64) ([]GetBrandsForSidePanelRow, error) {
@@ -201,7 +207,7 @@ func (q *Queries) GetBrandsForSidePanel(ctx context.Context, limit int64) ([]Get
 	var items []GetBrandsForSidePanelRow
 	for rows.Next() {
 		var i GetBrandsForSidePanelRow
-		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+		if err := rows.Scan(&i.ID, &i.Name, &i.Status); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -282,7 +288,7 @@ func (q *Queries) GetBrandsLogos(ctx context.Context, limit int64) ([]GetBrandsL
 	return items, nil
 }
 
-const searchBrandsByName = `-- name: SearchBrandsByName :many
+const searchBrandsByFilter = `-- name: SearchBrandsByFilter :many
 SELECT
 	tbl_brands.id AS id,
 	tbl_brands.name AS name,
@@ -296,12 +302,18 @@ LEFT JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id AND tbl_
 LEFT JOIN tbl_products ON tbl_products.brand_id = tbl_brands.id AND tbl_products.deleted_at = '1970-01-01 00:00:00+00:00'
 WHERE
 	tbl_brands.deleted_at = '1970-01-01 00:00:00+00:00'
-	AND LOWER(tbl_brands.name) LIKE LOWER(?)
+	AND (?1 IS NULL OR ?1 = '' OR LOWER(tbl_brands.name) LIKE '%' || LOWER(?1) || '%')
+	AND (?2 IS NULL OR ?2 = '' OR tbl_brands.status = ?2)
 GROUP BY tbl_brands.id, tbl_brand_images.id
-ORDER BY tbl_brands.name ASC
+ORDER BY tbl_brands.status ASC
 `
 
-type SearchBrandsByNameRow struct {
+type SearchBrandsByFilterParams struct {
+	SearchName interface{}
+	Status     interface{}
+}
+
+type SearchBrandsByFilterRow struct {
 	ID           int64
 	Name         string
 	BrandImageID sql.NullInt64
@@ -311,15 +323,15 @@ type SearchBrandsByNameRow struct {
 	ProductCount int64
 }
 
-func (q *Queries) SearchBrandsByName(ctx context.Context, lower string) ([]SearchBrandsByNameRow, error) {
-	rows, err := q.db.QueryContext(ctx, searchBrandsByName, lower)
+func (q *Queries) SearchBrandsByFilter(ctx context.Context, arg SearchBrandsByFilterParams) ([]SearchBrandsByFilterRow, error) {
+	rows, err := q.db.QueryContext(ctx, searchBrandsByFilter, arg.SearchName, arg.Status)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []SearchBrandsByNameRow
+	var items []SearchBrandsByFilterRow
 	for rows.Next() {
-		var i SearchBrandsByNameRow
+		var i SearchBrandsByFilterRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
@@ -345,6 +357,7 @@ func (q *Queries) SearchBrandsByName(ctx context.Context, lower string) ([]Searc
 const softDeleteBrand = `-- name: SoftDeleteBrand :exec
 UPDATE tbl_brands
 SET
+	status = 'DELETED',
 	deleted_at = DATETIME('now')
 WHERE
 	id = ?
@@ -394,5 +407,25 @@ type UpdateBrandImageParams struct {
 
 func (q *Queries) UpdateBrandImage(ctx context.Context, arg UpdateBrandImageParams) error {
 	_, err := q.db.ExecContext(ctx, updateBrandImage, arg.S3Url, arg.BrandID)
+	return err
+}
+
+const updateBrandStatus = `-- name: UpdateBrandStatus :exec
+UPDATE tbl_brands
+SET
+	status = ?,
+	updated_at = DATETIME('now')
+WHERE
+	id = ?
+	AND deleted_at = '1970-01-01 00:00:00+00:00'
+`
+
+type UpdateBrandStatusParams struct {
+	Status string
+	ID     int64
+}
+
+func (q *Queries) UpdateBrandStatus(ctx context.Context, arg UpdateBrandStatusParams) error {
+	_, err := q.db.ExecContext(ctx, updateBrandStatus, arg.Status, arg.ID)
 	return err
 }
