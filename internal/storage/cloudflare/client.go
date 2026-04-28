@@ -7,6 +7,7 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/storage"
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
@@ -232,8 +233,8 @@ func (c *Client) PutObjectFromBytes(ctx context.Context, key string, data []byte
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 
 	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return errors.Join(errs.ErrCloudflareUpload, err)
+	if err != nil || resp == nil {
+		return errors.Join(errs.ErrCloudflareUpload, cmp.Or(err, errs.ErrRespNil))
 	}
 	defer resp.Body.Close()
 
@@ -262,8 +263,8 @@ func (c *Client) GetObject(ctx context.Context, key string) (io.ReadCloser, erro
 	}
 
 	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, errors.Join(errs.ErrCloudflareGet, err)
+	if err != nil || resp == nil {
+		return nil, errors.Join(errs.ErrCloudflareGet, cmp.Or(err, errs.ErrRespNil))
 	}
 
 	if resp.StatusCode != http.StatusOK {
@@ -296,8 +297,8 @@ func (c *Client) DeleteObject(ctx context.Context, key string) error {
 	req.Header.Set("Authorization", "Bearer "+c.apiToken)
 
 	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return errors.Join(errs.ErrCloudflareDelete, err)
+	if err != nil || resp == nil {
+		return errors.Join(errs.ErrCloudflareDelete, cmp.Or(err, errs.ErrRespNil))
 	}
 	defer resp.Body.Close()
 
@@ -329,8 +330,8 @@ func (c *Client) ObjectExists(ctx context.Context, key string) (bool, error) {
 	req.Header.Set("Authorization", "Bearer "+c.apiToken)
 
 	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return false, errors.Join(errs.ErrCloudflareAPI, err)
+	if err != nil || resp == nil {
+		return false, errors.Join(errs.ErrCloudflareAPI, cmp.Or(err, errs.ErrRespNil))
 	}
 	defer resp.Body.Close()
 
@@ -353,8 +354,8 @@ func (c *Client) HeadBucket(ctx context.Context) error {
 	req.Header.Set("Authorization", "Bearer "+c.apiToken)
 
 	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return errors.Join(errs.ErrCloudflareVerifyAccess, err)
+	if err != nil || resp == nil {
+		return errors.Join(errs.ErrCloudflareVerifyAccess, cmp.Or(err, errs.ErrRespNil))
 	}
 	defer resp.Body.Close()
 

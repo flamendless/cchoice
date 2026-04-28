@@ -274,6 +274,10 @@ func (g *GoogleMapsGeocoder) geocodeAPI(ctx context.Context, req geocoding.Geoco
 		return nil, err
 	}
 
+	if result == nil {
+		return nil, errs.ErrGMapsNoResults
+	}
+
 	return result, nil
 }
 
@@ -295,6 +299,9 @@ func (g *GoogleMapsGeocoder) GeocodeWithContext(ctx context.Context, req geocodi
 	response, err := g.geocodeAPI(ctx, req)
 	if err != nil {
 		return nil, err
+	}
+	if response == nil {
+		return nil, errs.ErrGMapsNoResults
 	}
 
 	logs.Log().Info("Storing geocoding result in DB", zap.String("address", req.Address))
@@ -369,6 +376,10 @@ func (g *GoogleMapsGeocoder) ReverseGeocodeWithContext(ctx context.Context, req 
 		return nil, err
 	}
 
+	if result == nil {
+		return nil, errs.ErrGMapsNoResults
+	}
+
 	return result, nil
 }
 
@@ -383,6 +394,9 @@ func (g *GoogleMapsGeocoder) GeocodeShippingAddress(address string) (*geocoding.
 	result, err := g.Geocode(req)
 	if err != nil {
 		return nil, err
+	}
+	if result == nil {
+		return nil, errs.ErrGMapsNoResults
 	}
 
 	return &result.Coordinates, nil

@@ -166,6 +166,10 @@ func (s *PromoService) UpdatePromo(
 		result = err.Error()
 		return err
 	}
+	if promo == nil {
+		result = errs.ErrPromo.Error()
+		return errs.ErrPromo
+	}
 
 	if startDate.After(endDate) {
 		result = errs.ErrValidationStartEndDates.Error()
