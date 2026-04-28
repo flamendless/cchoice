@@ -3,6 +3,7 @@ package shipping
 import (
 	"cchoice/internal/errs"
 	"cchoice/internal/geocoding"
+	"cmp"
 	"fmt"
 )
 
@@ -71,8 +72,8 @@ func (gh *GeocodingHelper) ReverseGeocode(coordinates Coordinates) (string, erro
 	}
 
 	result, err := gh.geocoder.ReverseGeocode(req)
-	if err != nil {
-		return "", fmt.Errorf("failed to reverse geocode coordinates: %w", err)
+	if err != nil || result == nil {
+		return "", fmt.Errorf("failed to reverse geocode coordinates: %w", cmp.Or(err, errs.ErrRespNil))
 	}
 
 	return result.FormattedAddress, nil

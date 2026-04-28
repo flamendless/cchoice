@@ -10,6 +10,7 @@ import (
 	"cchoice/internal/logs"
 	"cchoice/internal/mail"
 	"cchoice/internal/utils"
+	"cmp"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -100,9 +101,9 @@ func (ejr *EmailJobRunner) QueueEmailJob(ctx context.Context, params EmailJobPar
 	}
 
 	msg, err := ejr.queue.Receive(ctx)
-	if err != nil {
+	if err != nil || msg == nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		return errors.Join(errs.ErrJobsCreateFailed, err)
+		return errors.Join(errs.ErrJobsCreateFailed, cmp.Or(err, errs.ErrJobsNilMessage))
 	}
 
 	queueID := string(msg.ID)

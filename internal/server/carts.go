@@ -1,6 +1,7 @@
 package server
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
@@ -710,7 +711,7 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 			deliveryETA = s.shippingService.GetDeliveryETA(ctx, shippingReq.DeliveryLocation.OriginalAddress.State)
 		}
 
-		if shippingQuotation.Fee != 0 {
+		if shippingQuotation != nil && shippingQuotation.Fee != 0 {
 			lineItems = append(lineItems, payments.LineItem{
 				Amount:      int32(shippingQuotation.Fee * 100),
 				Currency:    money.PHP,
@@ -759,11 +760,9 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		order, checkoutURL, err := orders.CreateOrderFromCheckout(ctx, s.dbRW, orderParams)
-		if err != nil {
-			logs.LogCtx(ctx).Error(
-				logtag,
-				zap.Error(err),
-			)
+		if err != nil || order == nil {
+			err = cmp.Or(err, errs.ErrCartNilOrder)
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

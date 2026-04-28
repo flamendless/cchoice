@@ -105,9 +105,12 @@ func Parse(r io.Reader, appenv enums.AppEnv, limit int) ([]ChangeLog, error) {
 }
 
 func parseHeader(line string) (version, date string) {
-	// ## [release-v1.0.3] - 2025-12-17
 	line = strings.TrimPrefix(line, "## ")
 	parts := strings.SplitN(line, " - ", 2)
+
+	if len(parts) == 0 {
+		return "", ""
+	}
 
 	version = strings.Trim(parts[0], "[]")
 	if len(parts) == 2 {

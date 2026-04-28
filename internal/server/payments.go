@@ -1,6 +1,7 @@
 package server
 
 import (
+	"cmp"
 	"net/http"
 
 	comppayment "cchoice/cmd/web/components/payment"
@@ -181,7 +182,8 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 		DBRW:            s.dbRW,
 		EmailJobRunner:  s.mailJobRunner,
 	})
-	if err != nil {
+	if err != nil || result == nil {
+		err = cmp.Or(err, errs.ErrRespNil)
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, "Failed to process payment", http.StatusInternalServerError)
 		return

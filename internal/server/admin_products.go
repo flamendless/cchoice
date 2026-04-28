@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"fmt"
 	"io"
@@ -282,7 +283,8 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 			StocksIn:            stocksIn,
 			Stocks:              stocksQty,
 		})
-	if err != nil {
+	if err != nil || product == nil {
+		err = cmp.Or(err, errs.ErrServerProductNil)
 		result = err.Error()
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, "Failed to create product"))

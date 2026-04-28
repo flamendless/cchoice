@@ -134,7 +134,7 @@ func testCChoiceService(ctx context.Context) {
 				Error:       err,
 			}
 
-			if err == nil {
+			if err == nil && quotation != nil {
 				result.Fee = quotation.Fee
 				result.Distance = quotation.DistanceKm
 				result.ETA = quotation.EstimatedETA
@@ -224,7 +224,7 @@ func testLalamoveService(ctx context.Context) {
 				Error:       err,
 			}
 
-			if err == nil {
+			if err == nil && quotation != nil {
 				result.Fee = quotation.Fee
 				result.Distance = quotation.DistanceKm
 				result.ETA = quotation.EstimatedETA

@@ -50,4 +50,5 @@ var (
 	ErrValidationStartEndDates        = errors.New("[VALIDATION]: Start date must not be greater than end date")
 
 	ErrNotFound = errors.New("[NOTFOUND]: Resource not found")
+	ErrRespNil  = errors.New("[GENERIC]: nil response returned")
 )

@@ -2,6 +2,7 @@ package paymongo
 
 import (
 	"bytes"
+	"cmp"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -190,9 +191,9 @@ func (p *PayMongo) CreateWebhook(webhookURL string, events []string) (*CreateWeb
 	req.Header.Set("Authorization", p.GetAuth())
 
 	resp, err := p.client.Do(req)
-	if err != nil {
+	if err != nil || resp == nil {
 		logs.JSONResponse(logTag, resp)
-		return nil, errors.Join(errs.ErrPaymentClient, err)
+		return nil, errors.Join(errs.ErrPaymentClient, cmp.Or(err, errs.ErrPaymongoNilResponse))
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
