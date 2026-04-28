@@ -1,6 +1,8 @@
 package lalamove
 
 import (
+	"cmp"
+
 	"bytes"
 	"cchoice/internal/conf"
 	"cchoice/internal/errs"
@@ -119,7 +121,7 @@ func (c *Lalamove) doRequest(method, path string, body []byte) (*http.Response, 
 
 	resp, err := c.client.Do(req)
 	if err != nil || resp == nil {
-		return nil, errors.Join(errs.ErrLalamoveHTTPRequest, errs.ErrHTTPDoRequest, err)
+		return nil, errors.Join(errs.ErrLalamoveHTTPRequest, errs.ErrHTTPDoRequest, cmp.Or(err, errs.ErrRespNil))
 	}
 
 	if resp.ContentLength != 0 {
