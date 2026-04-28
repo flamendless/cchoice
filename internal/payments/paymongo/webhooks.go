@@ -194,6 +194,10 @@ func (p *PayMongo) CreateWebhook(webhookURL string, events []string) (*CreateWeb
 		logs.JSONResponse(logTag, resp)
 		return nil, errors.Join(errs.ErrPaymentClient, err)
 	}
+	if resp == nil {
+		logs.JSONResponse(logTag, nil)
+		return nil, errors.Join(errs.ErrPaymentClient, errors.New("nil response received"))
+	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
 			logs.Log().Error("Deferred", zap.Error(err))

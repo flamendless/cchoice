@@ -106,6 +106,9 @@ func (tjr *ThumbnailJobRunner) QueueThumbnailJob(ctx context.Context, params Thu
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		return errors.Join(errs.ErrJobsCreateFailed, err)
 	}
+	if msg == nil {
+		return errors.Join(errs.ErrJobsCreateFailed, errors.New("received nil message"))
+	}
 
 	queueID := string(msg.ID)
 

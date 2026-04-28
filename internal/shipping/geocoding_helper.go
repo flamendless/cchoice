@@ -74,6 +74,9 @@ func (gh *GeocodingHelper) ReverseGeocode(coordinates Coordinates) (string, erro
 	if err != nil {
 		return "", fmt.Errorf("failed to reverse geocode coordinates: %w", err)
 	}
+	if result == nil {
+		return "", fmt.Errorf("nil result from reverse geocode")
+	}
 
 	return result.FormattedAddress, nil
 }

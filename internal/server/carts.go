@@ -707,7 +707,7 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 			deliveryETA = s.shippingService.GetDeliveryETA(ctx, shippingReq.DeliveryLocation.OriginalAddress.State)
 		}
 
-		if shippingQuotation.Fee != 0 {
+		if shippingQuotation != nil && shippingQuotation.Fee != 0 {
 			lineItems = append(lineItems, payments.LineItem{
 				Amount:      int32(shippingQuotation.Fee * 100),
 				Currency:    money.PHP,
@@ -762,6 +762,14 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 				zap.Error(err),
 			)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if order == nil {
+			logs.LogCtx(ctx).Error(
+				logtag,
+				zap.Error(errors.New("order is nil")),
+			)
+			http.Error(w, "Failed to create order", http.StatusInternalServerError)
 			return
 		}
 

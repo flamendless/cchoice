@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"net/http"
 
 	comppayment "cchoice/cmd/web/components/payment"
@@ -183,6 +184,11 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, "Failed to process payment", http.StatusInternalServerError)
+		return
+	}
+	if result == nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(errors.New("nil result from OnOrderPaid")))
 		http.Error(w, "Failed to process payment", http.StatusInternalServerError)
 		return
 	}
