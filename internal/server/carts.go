@@ -322,11 +322,50 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 			cl.WeightDisplay = fmt.Sprintf("%.2f kg", weightKg)
 		}
 
+		// Wrap both mobile and desktop versions in a container div
+		if _, err := fmt.Fprintf(w, `<div id="cart-checkout-line-item-%s">`, cl.ID); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			continue
+		}
+
+		// Mobile version (visible on < lg screens) -->
+		if _, err := fmt.Fprintf(w, `<div class="lg:hidden">`); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			continue
+		}
+		if err := compcart.CartCheckoutLineItemMobile(cl).Render(ctx, w); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			continue
+		}
+		if _, err := fmt.Fprintf(w, `</div>`); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			continue
+		}
+
+		// Desktop version (visible on lg+ screens) -->
+		if _, err := fmt.Fprintf(w, `<div class="max-lg:hidden lg:block">`); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			continue
+		}
 		if err := compcart.CartCheckoutLineItem(cl).Render(ctx, w); err != nil {
-			logs.LogCtx(ctx).Error(
-				logtag,
-				zap.Error(err),
-			)
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			continue
+		}
+		if _, err := fmt.Fprintf(w, `</div>`); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			continue
+		}
+
+		// Close container div
+		if _, err := fmt.Fprintf(w, `</div>`); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			continue
 		}
@@ -570,7 +609,7 @@ func (s *Server) updateCartLinesQtyHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if _, err := w.Write(fmt.Appendf(nil, "Qty: %d", newQty)); err != nil {
+	if _, err := w.Write(fmt.Appendf(nil, "%d", newQty)); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
