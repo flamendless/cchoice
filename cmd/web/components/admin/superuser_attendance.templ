@@ -17,7 +17,7 @@ templ AdminSuperuserAttendancePage(title string, selectedDate string) {
 		</head>
 		<body
 			class="bg-cchoicesoft min-h-screen flex flex-col"
-			_="init call metrics_event('admin_visit', 'attendance')"
+			_="init call metrics_event('admin_visit', 'superuser attendance')"
 		>
 			@common.DevRibbon()
 			@common.ErrorBanner()
