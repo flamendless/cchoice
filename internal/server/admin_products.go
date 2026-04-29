@@ -226,7 +226,12 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 			return
 		}
 
-		filename = s.services.image.GenerateFilename(filepath.Ext(header.Filename), brandName, name)
+		filename = s.services.image.GenerateFilename(
+			enums.IMAGE_PREFIX_PRODUCT_IMAGE,
+			filepath.Ext(header.Filename),
+			brandName,
+			name,
+		)
 		buf := bytes.Buffer{}
 		if _, err := io.Copy(&buf, file); err != nil {
 			result = err.Error()
@@ -715,7 +720,12 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 				return
 			}
 
-			filename = s.services.image.GenerateFilename(filepath.Ext(header.Filename), brandName, name)
+			filename = s.services.image.GenerateFilename(
+				enums.IMAGE_PREFIX_PRODUCT_IMAGE,
+				filepath.Ext(header.Filename),
+				brandName,
+				name,
+			)
 			buf := bytes.Buffer{}
 			if _, err := io.Copy(&buf, file); err != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
