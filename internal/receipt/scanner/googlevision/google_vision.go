@@ -219,7 +219,7 @@ func (g *GoogleVisionScanner) organizeIntoRows(words []WordInfo) []Row {
 
 func (g *GoogleVisionScanner) parseReceiptWithStructuredData(text string, structuredData *StructuredData) *scanner.ReceiptData {
 	lines := strings.Split(text, "\n")
-	if lines == nil {
+	if len(lines) == 0 {
 		lines = []string{}
 	}
 

@@ -756,20 +756,14 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		order, checkoutURL, err := orders.CreateOrderFromCheckout(ctx, s.dbRW, orderParams)
-		if err != nil {
-			logs.LogCtx(ctx).Error(
-				logtag,
-				zap.Error(err),
-			)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if order == nil {
-			logs.LogCtx(ctx).Error(
-				logtag,
-				zap.Error(errors.New("order is nil")),
-			)
-			http.Error(w, "Failed to create order", http.StatusInternalServerError)
+		if err != nil || order == nil {
+			if err != nil {
+				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			} else {
+				logs.LogCtx(ctx).Error(logtag, zap.Error(fmt.Errorf("nil order")))
+				http.Error(w, "Failed to create order", http.StatusInternalServerError)
+			}
 			return
 		}
 

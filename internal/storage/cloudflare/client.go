@@ -232,11 +232,8 @@ func (c *Client) PutObjectFromBytes(ctx context.Context, key string, data []byte
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 
 	resp, err := c.httpClient.Do(req)
-	if err != nil {
+	if err != nil || resp == nil {
 		return errors.Join(errs.ErrCloudflareUpload, err)
-	}
-	if resp == nil {
-		return errors.Join(errs.ErrCloudflareUpload, errors.New("nil response received"))
 	}
 	defer resp.Body.Close()
 
@@ -265,11 +262,8 @@ func (c *Client) GetObject(ctx context.Context, key string) (io.ReadCloser, erro
 	}
 
 	resp, err := c.httpClient.Do(req)
-	if err != nil {
+	if err != nil || resp == nil {
 		return nil, errors.Join(errs.ErrCloudflareGet, err)
-	}
-	if resp == nil {
-		return nil, errors.Join(errs.ErrCloudflareGet, errors.New("nil response received"))
 	}
 
 	if resp.StatusCode != http.StatusOK {
@@ -302,11 +296,8 @@ func (c *Client) DeleteObject(ctx context.Context, key string) error {
 	req.Header.Set("Authorization", "Bearer "+c.apiToken)
 
 	resp, err := c.httpClient.Do(req)
-	if err != nil {
+	if err != nil || resp == nil {
 		return errors.Join(errs.ErrCloudflareDelete, err)
-	}
-	if resp == nil {
-		return errors.Join(errs.ErrCloudflareDelete, errors.New("nil response received"))
 	}
 	defer resp.Body.Close()
 
@@ -338,11 +329,8 @@ func (c *Client) ObjectExists(ctx context.Context, key string) (bool, error) {
 	req.Header.Set("Authorization", "Bearer "+c.apiToken)
 
 	resp, err := c.httpClient.Do(req)
-	if err != nil {
+	if err != nil || resp == nil {
 		return false, errors.Join(errs.ErrCloudflareAPI, err)
-	}
-	if resp == nil {
-		return false, errors.Join(errs.ErrCloudflareAPI, errors.New("nil response received"))
 	}
 	defer resp.Body.Close()
 
@@ -365,11 +353,8 @@ func (c *Client) HeadBucket(ctx context.Context) error {
 	req.Header.Set("Authorization", "Bearer "+c.apiToken)
 
 	resp, err := c.httpClient.Do(req)
-	if err != nil {
+	if err != nil || resp == nil {
 		return errors.Join(errs.ErrCloudflareVerifyAccess, err)
-	}
-	if resp == nil {
-		return errors.Join(errs.ErrCloudflareVerifyAccess, errors.New("nil response received"))
 	}
 	defer resp.Body.Close()
 
