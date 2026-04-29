@@ -129,7 +129,11 @@ func (s *Server) adminPromosCreateHandler(w http.ResponseWriter, r *http.Request
 		}
 		defer file.Close()
 
-		filename := s.services.image.GenerateFilename(filepath.Ext(header.Filename), title)
+		filename := s.services.image.GenerateFilename(
+			enums.IMAGE_PREFIX_PROMO_IMAGE,
+			filepath.Ext(header.Filename),
+			title,
+		)
 		buf := bytes.Buffer{}
 		if _, err := io.Copy(&buf, file); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -268,7 +272,11 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 		if err == nil {
 			defer file.Close()
 
-			filename := s.services.image.GenerateFilename(filepath.Ext(header.Filename), title)
+			filename := s.services.image.GenerateFilename(
+				enums.IMAGE_PREFIX_PROMO_IMAGE,
+				filepath.Ext(header.Filename),
+				title,
+			)
 			buf := bytes.Buffer{}
 			if _, err := io.Copy(&buf, file); err != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(err))

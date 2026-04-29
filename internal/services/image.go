@@ -13,6 +13,7 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/encode"
+	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 	"cchoice/internal/storage"
 	"cchoice/internal/utils"
@@ -42,18 +43,22 @@ func NewImageService(
 }
 
 func (s *ImageService) GenerateFilename(
+	ip enums.ImagePrefix,
 	ext string,
 	paths ...string,
 ) string {
-	uuid := utils.GenString(16)
-	sanitizedName := strings.ReplaceAll(strings.Join(paths, "_"), " ", "_")
-	var id string
+	if ip == enums.IMAGE_PREFIX_UNDEFINED {
+		panic("RUNTIME. You must not pass undefined kind")
+	}
+	var dp string
 	if !conf.Conf().IsProd() {
-		if !strings.HasPrefix(id, "DEV_") {
-			id = "DEV_"
+		if !strings.HasPrefix(dp, "DEV_") {
+			dp = "DEV_"
 		}
 	}
-	return fmt.Sprintf("%s%s_%s%s", id, sanitizedName, uuid, ext)
+	uuid := utils.GenString(16)
+	sanitizedName := strings.ReplaceAll(strings.Join(paths, "_"), " ", "_")
+	return fmt.Sprintf("%s%s_%s_%s%s", dp, ip.String(), sanitizedName, uuid, ext)
 }
 
 func (s *ImageService) ValidateContentType(contentType string) error {
@@ -165,7 +170,7 @@ func (s *ImageService) UploadBrandImage(
 		if err := os.WriteFile(localPath, data, 0644); err != nil {
 			return "", err
 		}
-		return filename, nil
+		return s.objectStorage.GetPublicURL(filename), nil
 	}
 
 	if err := s.objectStorage.PutObject(ctx, filename, file, contentType); err != nil {

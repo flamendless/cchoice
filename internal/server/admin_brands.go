@@ -126,7 +126,11 @@ func (s *Server) adminBrandsCreateHandler(w http.ResponseWriter, r *http.Request
 		}
 		defer file.Close()
 
-		filename := s.services.image.GenerateFilename(filepath.Ext(header.Filename), brandName)
+		filename := s.services.image.GenerateFilename(
+			enums.IMAGE_PREFIX_BRAND_IMAGE,
+			filepath.Ext(header.Filename),
+			brandName,
+		)
 		buf := bytes.Buffer{}
 		if _, err := io.Copy(&buf, file); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -194,7 +198,11 @@ func (s *Server) adminBrandsUpdateHandler(w http.ResponseWriter, r *http.Request
 		if err == nil {
 			defer file.Close()
 
-			filename := s.services.image.GenerateFilename(filepath.Ext(header.Filename), brandName)
+			filename := s.services.image.GenerateFilename(
+				enums.IMAGE_PREFIX_BRAND_IMAGE,
+				filepath.Ext(header.Filename),
+				brandName,
+			)
 			buf := bytes.Buffer{}
 			if _, err := io.Copy(&buf, file); err != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
