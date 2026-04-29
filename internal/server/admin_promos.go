@@ -142,7 +142,7 @@ func (s *Server) adminPromosCreateHandler(w http.ResponseWriter, r *http.Request
 		}
 
 		contentType := header.Header.Get("Content-Type")
-		url, err := s.services.image.UploadBrandImage(ctx, title, filename, &buf, contentType)
+		url, err := s.services.image.UploadPromoBannerImage(ctx, title, filename, &buf, contentType)
 		if err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, err.Error()))
@@ -285,7 +285,7 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 			}
 
 			contentType := header.Header.Get("Content-Type")
-			url, err := s.services.image.UploadBrandImage(ctx, title, filename, &buf, contentType)
+			url, err := s.services.image.UploadPromoBannerImage(ctx, title, filename, &buf, contentType)
 			if err != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 				redirectHX(w, r, utils.URLWithError(page, err.Error()))
