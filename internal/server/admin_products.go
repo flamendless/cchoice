@@ -320,7 +320,7 @@ func (s *Server) adminSuperuserProductsCreatePageHandler(w http.ResponseWriter, 
 	)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		brandsRes = []queries.GetBrandsForSidePanelRow{}
+		brandsRes = []queries.GetBrandsForProductCreateRow{}
 	}
 
 	brands := make([]models.AdminBrand, 0, len(brandsRes))
@@ -548,7 +548,7 @@ func (s *Server) adminSuperuserProductsEditPageHandler(w http.ResponseWriter, r 
 	)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		brandsRes = []queries.GetBrandsForSidePanelRow{}
+		brandsRes = []queries.GetBrandsForProductCreateRow{}
 	}
 
 	brands := make([]models.AdminBrand, 0, len(brandsRes))

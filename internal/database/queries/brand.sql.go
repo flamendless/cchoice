@@ -181,6 +181,46 @@ func (q *Queries) GetBrandsByID(ctx context.Context, id int64) (GetBrandsByIDRow
 	return i, err
 }
 
+const getBrandsForProductCreate = `-- name: GetBrandsForProductCreate :many
+SELECT
+	id,
+	name,
+	status
+FROM tbl_brands
+WHERE status != 'DELETED'
+ORDER BY name ASC
+LIMIT ?
+`
+
+type GetBrandsForProductCreateRow struct {
+	ID     int64
+	Name   string
+	Status string
+}
+
+func (q *Queries) GetBrandsForProductCreate(ctx context.Context, limit int64) ([]GetBrandsForProductCreateRow, error) {
+	rows, err := q.db.QueryContext(ctx, getBrandsForProductCreate, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetBrandsForProductCreateRow
+	for rows.Next() {
+		var i GetBrandsForProductCreateRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.Status); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getBrandsForSidePanel = `-- name: GetBrandsForSidePanel :many
 SELECT
 	id,
