@@ -371,16 +371,17 @@ func GenerateRandomSaleProductCacheKey(requestID string) []byte {
 	return fmt.Appendf(nil, "hp_rsp_%s", hex.EncodeToString(hash[:])[:16])
 }
 
+//TODO: Move to requests/admin.go
 func GetBrandsForAdmin(
 	ctx context.Context,
 	cache *fastcache.Cache,
 	sf *singleflight.Group,
 	dbRO database.IService,
 	cacheKey []byte,
-) ([]queries.GetBrandsForSidePanelRow, error) {
+) ([]queries.GetBrandsForProductCreateRow, error) {
 	if data, ok := cache.HasGet(nil, cacheKey); ok {
 		buf := bytes.NewBuffer(data)
-		var res []queries.GetBrandsForSidePanelRow
+		var res []queries.GetBrandsForProductCreateRow
 		if err := gob.NewDecoder(buf).Decode(&res); err != nil {
 			logs.GobError(cacheKey, err)
 			return nil, err
@@ -393,7 +394,7 @@ func GetBrandsForAdmin(
 
 	const limit = 500
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
-		res, err := dbRO.GetQueries().GetBrandsForSidePanel(ctx, limit)
+		res, err := dbRO.GetQueries().GetBrandsForProductCreate(ctx, limit)
 		if err != nil {
 			return nil, err
 		}
@@ -403,7 +404,7 @@ func GetBrandsForAdmin(
 		return nil, err
 	}
 	logs.SF(cacheKey, shared)
-	res := sfRes.([]queries.GetBrandsForSidePanelRow)
+	res := sfRes.([]queries.GetBrandsForProductCreateRow)
 
 	buf := new(bytes.Buffer)
 	if err := gob.NewEncoder(buf).Encode(res); err == nil {
