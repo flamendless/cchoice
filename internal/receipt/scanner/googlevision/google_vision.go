@@ -220,7 +220,10 @@ func (g *GoogleVisionScanner) organizeIntoRows(words []WordInfo) []Row {
 func (g *GoogleVisionScanner) parseReceiptWithStructuredData(text string, structuredData *StructuredData) *scanner.ReceiptData {
 	lines := strings.Split(text, "\n")
 	if len(lines) == 0 {
-		lines = []string{}
+		return &scanner.ReceiptData{
+			Items:    []scanner.LineItem{},
+			Currency: constants.PHP,
+		}
 	}
 
 	for i, line := range lines {

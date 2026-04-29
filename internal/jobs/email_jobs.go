@@ -100,12 +100,9 @@ func (ejr *EmailJobRunner) QueueEmailJob(ctx context.Context, params EmailJobPar
 	}
 
 	msg, err := ejr.queue.Receive(ctx)
-	if err != nil {
+	if err != nil || msg == nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		return errors.Join(errs.ErrJobsCreateFailed, err)
-	}
-	if msg == nil {
-		return errors.Join(errs.ErrJobsCreateFailed, errors.New("received nil message"))
+		return errors.Join(errs.ErrJobsCreateFailed, errs.ErrJobsNilMessage, err)
 	}
 
 	queueID := string(msg.ID)

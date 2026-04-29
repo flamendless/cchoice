@@ -190,13 +190,9 @@ func (p *PayMongo) CreateWebhook(webhookURL string, events []string) (*CreateWeb
 	req.Header.Set("Authorization", p.GetAuth())
 
 	resp, err := p.client.Do(req)
-	if err != nil {
+	if err != nil || resp == nil {
 		logs.JSONResponse(logTag, resp)
-		return nil, errors.Join(errs.ErrPaymentClient, err)
-	}
-	if resp == nil {
-		logs.JSONResponse(logTag, nil)
-		return nil, errors.Join(errs.ErrPaymentClient, errors.New("nil response received"))
+		return nil, errors.Join(errs.ErrPaymentClient, errs.ErrPaymongoNilResponse, err)
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {

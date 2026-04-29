@@ -755,19 +755,20 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 			Encoder:                 s.encoder,
 		}
 
-		order, checkoutURL, err := orders.CreateOrderFromCheckout(ctx, s.dbRW, orderParams)
-		if err != nil || order == nil {
-			if err != nil {
-				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			} else {
-				logs.LogCtx(ctx).Error(logtag, zap.Error(fmt.Errorf("nil order")))
-				http.Error(w, "Failed to create order", http.StatusInternalServerError)
-			}
-			return
+order, checkoutURL, err := orders.CreateOrderFromCheckout(ctx, s.dbRW, orderParams)
+	if err != nil || order == nil {
+		errMsg := ""
+		if err != nil {
+			errMsg = err.Error()
+		} else {
+			errMsg = "nil order"
 		}
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, errMsg, http.StatusInternalServerError)
+		return
+	}
 
-		logs.LogCtx(ctx).Info(
+	logs.LogCtx(ctx).Info(
 			logtag,
 			zap.String("token", token),
 			zap.Int64("order_id", order.ID),
