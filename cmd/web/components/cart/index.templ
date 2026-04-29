@@ -298,7 +298,7 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 			<img
 				class="m-2 w-20 max-w-20 h-20 sm:w-32 sm:max-w-32 sm:h-32"
 				title={ "product image of " + cl.Name }
-				src={ cl.CDNURL1280 }
+				src={ cl.CDNURL }
 				alt={ cl.Name + " thumbnail" }
 				data-product-id={ cl.ProductID }
 			/>

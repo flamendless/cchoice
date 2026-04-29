@@ -251,8 +251,11 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 	for i := range checkoutLines {
 		g.Go(func() error {
 			var imgData string
-			if !strings.HasSuffix(checkoutLines[i].ThumbnailPath, constants.EmptyImageFilename) {
-				if imgDataB64, err := images.GetImageDataB64(s.cache, s.productImageFS, checkoutLines[i].ThumbnailPath, enums.IMAGE_FORMAT_WEBP); err == nil {
+			cl := checkoutLines[i]
+			if cl.CdnUrlThumbnail.Valid {
+				imgData = cl.CdnUrlThumbnail.String
+			} else if !strings.HasSuffix(cl.ThumbnailPath, constants.EmptyImageFilename) {
+				if imgDataB64, err := images.GetImageDataB64(s.cache, s.productImageFS, cl.ThumbnailPath, enums.IMAGE_FORMAT_WEBP); err == nil {
 					imgData = imgDataB64
 				} else {
 					logs.LogCtx(gctx).Error(
@@ -264,7 +267,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 
 			mu.Lock()
 			lineResults = append(lineResults, checkoutLineWithImage{
-				line:    checkoutLines[i],
+				line:    cl,
 				imgData: imgData,
 				index:   i,
 			})
@@ -300,6 +303,15 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 		encodedID := s.encoder.Encode(checkoutLine.ID)
 		isChecked := slices.Contains(checkedItems, encodedID)
 
+		cdnURL := checkoutLine.CdnUrl.String
+		if cdnURL == "" {
+			cdnURL = s.GetCDNURL(checkoutLine.ThumbnailPath)
+		}
+		cdnURL1280 := checkoutLine.CdnUrlThumbnail.String
+		if cdnURL1280 == "" {
+			cdnURL1280 = s.GetCDNURL(constants.ToPath1280(checkoutLine.ThumbnailPath))
+		}
+
 		cl := models.CheckoutLine{
 			ID:                 encodedID,
 			CheckoutID:         s.encoder.Encode(checkoutLine.CheckoutID),
@@ -308,8 +320,8 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 			BrandName:          checkoutLine.BrandName,
 			Quantity:           checkoutLine.Quantity,
 			ThumbnailPath:      checkoutLine.ThumbnailPath,
-			CDNURL:             s.GetCDNURL(checkoutLine.ThumbnailPath),
-			CDNURL1280:         s.GetCDNURL(constants.ToPath1280(checkoutLine.ThumbnailPath)),
+			CDNURL:             cdnURL,
+			CDNURL1280:         cdnURL1280,
 			OrigPrice:          *origPrice,
 			Price:              *discountedPrice,
 			Total:              *discountedPrice.Multiply(checkoutLine.Quantity),
@@ -668,15 +680,6 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 
 		lineItems := make([]payments.LineItem, 0, len(cartCheckout.CheckoutIDs))
 		for _, checkoutLine := range checkoutLines {
-			imageURL, err := s.GetProductImageProxyURL(ctx, checkoutLine.ThumbnailPath, "256x256")
-			if err != nil {
-				logs.LogCtx(ctx).Warn(
-					logtag,
-					zap.String("thumbnail_path", checkoutLine.ThumbnailPath),
-					zap.Error(err),
-				)
-			}
-
 			_, discountedPrice, _ := utils.GetOrigAndDiscounted(
 				checkoutLine.IsOnSale,
 				checkoutLine.UnitPriceWithVat,
@@ -689,7 +692,7 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 				Amount:      int32(discountedPrice.Amount()),
 				Currency:    money.PHP,
 				Description: checkoutLine.Description.String,
-				Images:      []string{imageURL},
+				Images:      []string{checkoutLine.CdnUrl.String},
 				Name:        checkoutLine.Name,
 				Quantity:    int32(checkoutLine.Quantity),
 			})
@@ -712,7 +715,7 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 				Amount:      int32(shippingQuotation.Fee * 100),
 				Currency:    money.PHP,
 				Description: "Shipping Fee",
-				// Images:      []string{imageURL}, //TODO: (Brandon)
+				// Images:      []string{}, //TODO: Shipping fee image
 				Name:     "Shipping Fee",
 				Quantity: 1,
 			})

@@ -825,9 +825,9 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var36 string
-		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(cl.CDNURL1280)
+		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(cl.CDNURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/index.templ`, Line: 301, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/index.templ`, Line: 301, Col: 19}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 		if templ_7745c5c3_Err != nil {
