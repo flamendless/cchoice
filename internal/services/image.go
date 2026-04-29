@@ -111,7 +111,7 @@ func (s *ImageService) UploadProductImage(
 		zap.Bool("local storage", isLocalStorage),
 	)
 
-	if !conf.Conf().Test.LocalUploadImage || isLocalStorage {
+	if !conf.Conf().IsProd() && !conf.Conf().Test.LocalUploadImage || isLocalStorage {
 		sourceName := filepath.Base(filename)
 		localPath := filepath.Join("cmd/web/static/images/product_images", strings.ToLower(brand), "original", sourceName)
 		if err := os.MkdirAll(filepath.Dir(localPath), 0755); err != nil {
@@ -157,9 +157,60 @@ func (s *ImageService) UploadBrandImage(
 		zap.Bool("local storage", isLocalStorage),
 	)
 
-	if !conf.Conf().Test.LocalUploadImage || isLocalStorage {
+	if !conf.Conf().IsProd() && !conf.Conf().Test.LocalUploadImage || isLocalStorage {
 		sourceName := filepath.Base(filename)
 		localPath := filepath.Join("cmd/web/static/images/brand_images", strings.ToLower(brand), sourceName)
+		if err := os.MkdirAll(filepath.Dir(localPath), 0755); err != nil {
+			return "", err
+		}
+		data, err := io.ReadAll(file)
+		if err != nil {
+			return "", err
+		}
+		if err := os.WriteFile(localPath, data, 0644); err != nil {
+			return "", err
+		}
+		return s.objectStorage.GetPublicURL(filename), nil
+	}
+
+	if err := s.objectStorage.PutObject(ctx, filename, file, contentType); err != nil {
+		return "", err
+	}
+
+	key := s.objectStorage.GetPublicURL(filename)
+	return key, nil
+}
+
+func (s *ImageService) UploadPromoBannerImage(
+	ctx context.Context,
+	promoTitle string,
+	filename string,
+	file io.Reader,
+	contentType string,
+) (string, error) {
+	const logtag = "[ImageService] Promo Banner"
+	if err := s.ValidateContentType(contentType); err != nil {
+		return "", err
+	}
+	data, err := s.ValidateSize(file)
+	if err != nil {
+		return "", err
+	}
+
+	file = bytes.NewReader(data)
+	isLocalStorage := s.objectStorage.ProviderEnum() == storage.STORAGE_PROVIDER_LOCAL
+
+	logs.Log().Info(
+		logtag,
+		zap.String("storing promo banner image", filename),
+		zap.Stringer("using", s.objectStorage.ProviderEnum()),
+		zap.String("promo title", promoTitle),
+		zap.Bool("local storage", isLocalStorage),
+	)
+
+	if !conf.Conf().IsProd() && !conf.Conf().Test.LocalUploadImage || isLocalStorage {
+		sourceName := filepath.Base(filename)
+		localPath := filepath.Join("cmd/web/static/images/promo_images", strings.ToLower(promoTitle), sourceName)
 		if err := os.MkdirAll(filepath.Dir(localPath), 0755); err != nil {
 			return "", err
 		}
