@@ -41,10 +41,8 @@ templ ActivePromosSection(promos []models.PromoItem) {
 							/>
 					}
 					<div class="p-4">
-						if promo.Title != "" {
+						if !promo.BannerOnly {
 							<h3 class="text-lg font-semibold text-cchoice">{ promo.Title }</h3>
-						}
-						if promo.Description != "" {
 							<p class="mt-1 text-sm text-gray-600">{ promo.Description }</p>
 						}
 					</div>

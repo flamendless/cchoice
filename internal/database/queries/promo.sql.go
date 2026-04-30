@@ -7,6 +7,7 @@ package queries
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createPromo = `-- name: CreatePromo :one
@@ -18,12 +19,14 @@ INSERT INTO tbl_promos (
     end_date,
     type,
     status,
+    banner_only,
+    priority,
     created_at,
     updated_at,
     deleted_at
 ) VALUES (
     ?, ?, ?, ?, ?, ?,
-    'DRAFT',
+    'DRAFT', ?, ?,
     datetime('now'),
     datetime('now'),
     '1970-01-01 00:00:00+00:00'
@@ -37,6 +40,8 @@ type CreatePromoParams struct {
 	StartDate   string
 	EndDate     string
 	Type        string
+	BannerOnly  sql.NullBool
+	Priority    sql.NullInt64
 }
 
 func (q *Queries) CreatePromo(ctx context.Context, arg CreatePromoParams) (int64, error) {
@@ -47,6 +52,8 @@ func (q *Queries) CreatePromo(ctx context.Context, arg CreatePromoParams) (int64
 		arg.StartDate,
 		arg.EndDate,
 		arg.Type,
+		arg.BannerOnly,
+		arg.Priority,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -54,47 +61,42 @@ func (q *Queries) CreatePromo(ctx context.Context, arg CreatePromoParams) (int64
 }
 
 const getActivePromos = `-- name: GetActivePromos :many
-SELECT
-    id,
-    title,
-    description,
-    media_url,
-    start_date,
-    end_date,
-    type,
-    status,
-    created_at,
-    updated_at,
-    deleted_at
+SELECT tbl_promos.id, tbl_promos.title, tbl_promos.description, tbl_promos.media_url, tbl_promos.start_date, tbl_promos.end_date, tbl_promos.type, tbl_promos.status, tbl_promos.created_at, tbl_promos.updated_at, tbl_promos.deleted_at, tbl_promos.banner_only, tbl_promos.priority
 FROM tbl_promos
 WHERE deleted_at = '1970-01-01 00:00:00+00:00'
 AND status = 'PUBLISHED'
 AND start_date <= datetime('now')
 AND end_date >= datetime('now')
-ORDER BY updated_at DESC
+ORDER BY priority ASC
 `
 
-func (q *Queries) GetActivePromos(ctx context.Context) ([]TblPromo, error) {
+type GetActivePromosRow struct {
+	TblPromo TblPromo
+}
+
+func (q *Queries) GetActivePromos(ctx context.Context) ([]GetActivePromosRow, error) {
 	rows, err := q.db.QueryContext(ctx, getActivePromos)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblPromo
+	var items []GetActivePromosRow
 	for rows.Next() {
-		var i TblPromo
+		var i GetActivePromosRow
 		if err := rows.Scan(
-			&i.ID,
-			&i.Title,
-			&i.Description,
-			&i.MediaUrl,
-			&i.StartDate,
-			&i.EndDate,
-			&i.Type,
-			&i.Status,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.DeletedAt,
+			&i.TblPromo.ID,
+			&i.TblPromo.Title,
+			&i.TblPromo.Description,
+			&i.TblPromo.MediaUrl,
+			&i.TblPromo.StartDate,
+			&i.TblPromo.EndDate,
+			&i.TblPromo.Type,
+			&i.TblPromo.Status,
+			&i.TblPromo.CreatedAt,
+			&i.TblPromo.UpdatedAt,
+			&i.TblPromo.DeletedAt,
+			&i.TblPromo.BannerOnly,
+			&i.TblPromo.Priority,
 		); err != nil {
 			return nil, err
 		}
@@ -110,44 +112,39 @@ func (q *Queries) GetActivePromos(ctx context.Context) ([]TblPromo, error) {
 }
 
 const getAllPromos = `-- name: GetAllPromos :many
-SELECT
-    id,
-    title,
-    description,
-    media_url,
-    start_date,
-    end_date,
-    type,
-    status,
-    created_at,
-    updated_at,
-    deleted_at
+SELECT tbl_promos.id, tbl_promos.title, tbl_promos.description, tbl_promos.media_url, tbl_promos.start_date, tbl_promos.end_date, tbl_promos.type, tbl_promos.status, tbl_promos.created_at, tbl_promos.updated_at, tbl_promos.deleted_at, tbl_promos.banner_only, tbl_promos.priority
 FROM tbl_promos
 WHERE deleted_at = '1970-01-01 00:00:00+00:00'
-ORDER BY updated_at DESC
+ORDER BY priority ASC, updated_at DESC
 `
 
-func (q *Queries) GetAllPromos(ctx context.Context) ([]TblPromo, error) {
+type GetAllPromosRow struct {
+	TblPromo TblPromo
+}
+
+func (q *Queries) GetAllPromos(ctx context.Context) ([]GetAllPromosRow, error) {
 	rows, err := q.db.QueryContext(ctx, getAllPromos)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblPromo
+	var items []GetAllPromosRow
 	for rows.Next() {
-		var i TblPromo
+		var i GetAllPromosRow
 		if err := rows.Scan(
-			&i.ID,
-			&i.Title,
-			&i.Description,
-			&i.MediaUrl,
-			&i.StartDate,
-			&i.EndDate,
-			&i.Type,
-			&i.Status,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.DeletedAt,
+			&i.TblPromo.ID,
+			&i.TblPromo.Title,
+			&i.TblPromo.Description,
+			&i.TblPromo.MediaUrl,
+			&i.TblPromo.StartDate,
+			&i.TblPromo.EndDate,
+			&i.TblPromo.Type,
+			&i.TblPromo.Status,
+			&i.TblPromo.CreatedAt,
+			&i.TblPromo.UpdatedAt,
+			&i.TblPromo.DeletedAt,
+			&i.TblPromo.BannerOnly,
+			&i.TblPromo.Priority,
 		); err != nil {
 			return nil, err
 		}
@@ -163,39 +160,34 @@ func (q *Queries) GetAllPromos(ctx context.Context) ([]TblPromo, error) {
 }
 
 const getPromoByID = `-- name: GetPromoByID :one
-SELECT
-    id,
-    title,
-    description,
-    media_url,
-    start_date,
-    end_date,
-    type,
-    status,
-    created_at,
-    updated_at,
-    deleted_at
+SELECT tbl_promos.id, tbl_promos.title, tbl_promos.description, tbl_promos.media_url, tbl_promos.start_date, tbl_promos.end_date, tbl_promos.type, tbl_promos.status, tbl_promos.created_at, tbl_promos.updated_at, tbl_promos.deleted_at, tbl_promos.banner_only, tbl_promos.priority
 FROM tbl_promos
 WHERE id = ?
 AND deleted_at = '1970-01-01 00:00:00+00:00'
 LIMIT 1
 `
 
-func (q *Queries) GetPromoByID(ctx context.Context, id int64) (TblPromo, error) {
+type GetPromoByIDRow struct {
+	TblPromo TblPromo
+}
+
+func (q *Queries) GetPromoByID(ctx context.Context, id int64) (GetPromoByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getPromoByID, id)
-	var i TblPromo
+	var i GetPromoByIDRow
 	err := row.Scan(
-		&i.ID,
-		&i.Title,
-		&i.Description,
-		&i.MediaUrl,
-		&i.StartDate,
-		&i.EndDate,
-		&i.Type,
-		&i.Status,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
+		&i.TblPromo.ID,
+		&i.TblPromo.Title,
+		&i.TblPromo.Description,
+		&i.TblPromo.MediaUrl,
+		&i.TblPromo.StartDate,
+		&i.TblPromo.EndDate,
+		&i.TblPromo.Type,
+		&i.TblPromo.Status,
+		&i.TblPromo.CreatedAt,
+		&i.TblPromo.UpdatedAt,
+		&i.TblPromo.DeletedAt,
+		&i.TblPromo.BannerOnly,
+		&i.TblPromo.Priority,
 	)
 	return i, err
 }
@@ -224,6 +216,8 @@ SET
     end_date = ?,
     type = ?,
     status = ?,
+    banner_only = ?,
+    priority = ?,
     updated_at = datetime('now')
 WHERE id = ?
 AND deleted_at = '1970-01-01 00:00:00+00:00'
@@ -237,6 +231,8 @@ type UpdatePromoParams struct {
 	EndDate     string
 	Type        string
 	Status      string
+	BannerOnly  sql.NullBool
+	Priority    sql.NullInt64
 	ID          int64
 }
 
@@ -249,6 +245,8 @@ func (q *Queries) UpdatePromo(ctx context.Context, arg UpdatePromoParams) error 
 		arg.EndDate,
 		arg.Type,
 		arg.Status,
+		arg.BannerOnly,
+		arg.Priority,
 		arg.ID,
 	)
 	return err

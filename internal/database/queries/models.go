@@ -372,6 +372,8 @@ type TblPromo struct {
 	CreatedAt   string
 	UpdatedAt   string
 	DeletedAt   string
+	BannerOnly  sql.NullBool
+	Priority    sql.NullInt64
 }
 
 type TblSetting struct {

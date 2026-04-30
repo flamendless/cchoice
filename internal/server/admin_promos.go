@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	compadmin "cchoice/cmd/web/components/admin"
@@ -57,14 +58,16 @@ func (s *Server) adminPromosListTableHandler(w http.ResponseWriter, r *http.Requ
 	promos := make([]models.AdminPromoListItem, 0, len(servicePromos))
 	for _, p := range servicePromos {
 		promos = append(promos, models.AdminPromoListItem{
-			ID:        s.encoder.Encode(p.ID),
-			Title:     p.Title,
-			MediaURL:  p.MediaURL,
-			StartDate: p.StartDate,
-			EndDate:   p.EndDate,
-			Type:      p.Type,
-			Status:    p.Status,
-			CreatedAt: p.CreatedAt.Format(constants.DateTimeLayoutISO),
+			ID:         s.encoder.Encode(p.ID),
+			Title:      p.Title,
+			MediaURL:   p.MediaURL,
+			StartDate:  p.StartDate,
+			EndDate:    p.EndDate,
+			Type:       p.Type,
+			Status:     p.Status,
+			BannerOnly: p.BannerOnly.Bool,
+			Priority:   p.Priority.Int64,
+			CreatedAt:  p.CreatedAt.Format(constants.DateTimeLayoutISO),
 		})
 	}
 
@@ -121,6 +124,18 @@ func (s *Server) adminPromosCreateHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	bannerOnly := r.FormValue("banner_only") == "on"
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	priority, err := strconv.ParseInt(r.FormValue("priority"), 10, 64)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
 	if promoType == enums.PROMO_TYPE_BANNER_IMAGE {
 		file, header, err := r.FormFile("media_file")
 		if err != nil {
@@ -160,6 +175,8 @@ func (s *Server) adminPromosCreateHandler(w http.ResponseWriter, r *http.Request
 		startDate,
 		endDate,
 		promoType,
+		bannerOnly,
+		priority,
 	); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
@@ -202,6 +219,8 @@ func (s *Server) adminPromosEditPageHandler(w http.ResponseWriter, r *http.Reque
 		EndDate:     promo.EndDate,
 		Type:        promo.Type,
 		Status:      promo.Status,
+		BannerOnly:  promo.BannerOnly.Bool,
+		Priority:    promo.Priority.Int64,
 		CreatedAt:   promo.CreatedAt.Format(constants.DateTimeLayoutISO),
 	}
 
@@ -267,6 +286,13 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	bannerOnly := r.FormValue("banner_only") == "on"
+	priority, err := strconv.ParseInt(r.FormValue("priority"), 10, 64)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
 	if promoType == enums.PROMO_TYPE_BANNER_IMAGE {
 		file, header, err := r.FormFile("media_file")
 		if err == nil {
@@ -306,6 +332,8 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 		endDate,
 		promoType,
 		promoStatus,
+		bannerOnly,
+		priority,
 	); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
