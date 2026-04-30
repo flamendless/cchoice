@@ -4,12 +4,9 @@ import (
 	"cchoice/cmd/web/components/common"
 	"cchoice/cmd/web/components/svg"
 	"cchoice/cmd/web/models"
-	"cchoice/internal/constants"
 	"cchoice/internal/utils"
-	"fmt"
 )
 
-// Mobile/Tablet layout - Properly aligned with checkbox/trash at bottom-left
 templ CartCheckoutLineItemMobile(cl models.CheckoutLine) {
 	<div
 		id={ "cart-checkout-line-item-" + cl.ID }
@@ -79,85 +76,14 @@ templ CartCheckoutLineItemMobile(cl models.CheckoutLine) {
 		<div class="flex flex-col justify-end gap-1 flex-shrink-0">
 			<!-- Qty Controls Row -->
 			<div class="cart-line flex items-center justify-center gap-1">
-				<button
-					type="button"
-					id={ "btn-minus-" + cl.ID }
-alt="decrease quantity button"
-					aria-label="Decrease quantity"
-					title="Decrease quantity"
-					class="p-1 border rounded bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-					disabled?={ cl.Quantity <= 1 }
-					hx-patch={ utils.URL("/carts/lines/" + cl.ID + "?dec=1") }
-					hx-target={ fmt.Sprintf("[name=qty-%s]", cl.ID) }
-					hx-swap="textContent"
-					_="
-						on htmx:afterRequest
-							put me.closest('.cart-line').querySelector('[name^=qty-]').textContent into txtQty
-							put txtQty.trim() into qty
-							set qty to Number(qty)
-
-							if qty <= 1
-								set me.disabled to true
-							else
-								set me.disabled to false
-							end
-
-							put me.id.replace('btn-minus-', 'btn-plus-') into plusID
-							put document.querySelector('#' + plusID) into btnPlus
-							if btnPlus is not null
-								trigger htmx:afterRequest on btnPlus
-							end
-
-							trigger cartUpdated on the body
-						end
-					"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-					</svg>
-				</button>
+				@btnQtyDecrease(cl)
 				<p
 					name={ "qty-" + cl.ID }
 					class="text-sm md:text-base font-semibold text-gray-700 min-w-5 text-center"
 				>
 					{ cl.Quantity }
 				</p>
-<button
-					type="button"
-					id={ "btn-plus-" + cl.ID }
-					alt="increase quantity button"
-					aria-label="Increase quantity"
-					title="Increase quantity"
-					class="p-1 border rounded bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-					disabled?={ cl.Quantity >= constants.MaxCartLineQty }
-					hx-patch={ utils.URL("/carts/lines/" + cl.ID + "?inc=1") }
-					hx-target={ fmt.Sprintf("[name=qty-%s]", cl.ID) }
-					hx-swap="textContent"
-					_="
-						on htmx:afterRequest
-							put me.closest('.cart-line').querySelector('[name^=qty-]').textContent into txtQty
-							put txtQty.trim() into qty
-							set qty to Number(qty)
-							if qty >= 99
-								set me.disabled to true
-							else
-								set me.disabled to false
-							end
-
-							put me.id.replace('btn-plus-', 'btn-minus-') into minusID
-							put document.querySelector('#' + minusID) into btnMinus
-							if btnMinus is not null
-								trigger htmx:afterRequest on btnMinus
-							end
-
-							trigger cartUpdated on the body
-						end
-					"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-					</svg>
-				</button>
+				@btnQtyIncrease(cl)
 			</div>
 			<!-- Total Price -->
 			<p class="text-sm md:text-base font-bold text-cchoice text-center">

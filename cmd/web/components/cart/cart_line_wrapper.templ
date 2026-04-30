@@ -1,0 +1,16 @@
+package cart
+
+import (
+	"cchoice/cmd/web/models"
+)
+
+templ CartLineWrapper(cl models.CheckoutLine) {
+	<div id={ "cart-checkout-line-item-" + cl.ID }>
+		<div class="lg:hidden">
+			@CartCheckoutLineItemMobile(cl)
+		</div>
+		<div class="max-lg:hidden lg:block">
+			@CartCheckoutLineItem(cl)
+		</div>
+	</div>
+}
