@@ -12,7 +12,6 @@ templ CartCheckoutLineItemMobile(cl models.CheckoutLine) {
 		id={ "cart-checkout-line-item-" + cl.ID }
 		class="flex flex-row items-stretch gap-2 xs:gap-3 border rounded h-auto p-2"
 	>
-		<!-- Section 1: Checkbox (center-left) + Trash (bottom-left) -->
 		<div class="flex flex-col justify-between">
 			<input
 				type="checkbox"
@@ -39,7 +38,6 @@ templ CartCheckoutLineItemMobile(cl models.CheckoutLine) {
 			</button>
 		</div>
 
-		<!-- Section 2: Product Image -->
 		<div class="flex items-center relative flex-shrink-0">
 			<img
 				class="w-20 h-20 xs:w-24 xs:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded"
@@ -51,7 +49,6 @@ templ CartCheckoutLineItemMobile(cl models.CheckoutLine) {
 			@common.DiscountRibbon(cl.DiscountPercentage)
 		</div>
 
-		<!-- Section 3: Product Info -->
 		<div class="flex flex-col gap-1 flex-1 justify-center">
 			<h2 class="text-sm md:text-base lg:text-lg font-semibold leading-tight">{ cl.Name }</h2>
 			<p class="text-xs md:text-sm text-gray-500 leading-tight">{ cl.BrandName }</p>
@@ -72,9 +69,7 @@ templ CartCheckoutLineItemMobile(cl models.CheckoutLine) {
 			</span>
 		</div>
 
-		<!-- Section 4: Qty Controls & Total (bottom-right) -->
 		<div class="flex flex-col justify-end gap-1 flex-shrink-0">
-			<!-- Qty Controls Row -->
 			<div class="cart-line flex items-center justify-center gap-1">
 				@btnQtyDecrease(cl)
 				<p
@@ -85,7 +80,6 @@ templ CartCheckoutLineItemMobile(cl models.CheckoutLine) {
 				</p>
 				@btnQtyIncrease(cl)
 			</div>
-			<!-- Total Price -->
 			<p class="text-sm md:text-base font-bold text-cchoice text-center">
 				{ cl.Total.Display() }
 			</p>

@@ -39,7 +39,6 @@ templ CartPageBody(summaryContent templ.Component) {
 				class="w-full"
 			>
 				<div class="flex flex-col lg:flex-row w-full gap-4 justify-center px-2 lg:px-8 my-4">
-					<!-- Column 1: Line Items (full width on mobile, 1/2 on desktop) -->
 					<div
 						id="cart-lines"
 						class="flex flex-col gap-[8px] w-full lg:w-1/2"
@@ -47,9 +46,7 @@ templ CartPageBody(summaryContent templ.Component) {
 						hx-trigger="load"
 						hx-swap="beforeend"
 					>
-						//CartCheckoutLineItem
 					</div>
-					<!-- Column 2: Shipping Address (full width on mobile, 1/4 on desktop) -->
 					<div class="flex flex-col gap-[8px] w-full lg:w-1/4">
 						<div
 							id="cart-shipping"
@@ -63,7 +60,6 @@ templ CartPageBody(summaryContent templ.Component) {
 							</div>
 						</div>
 					</div>
-					<!-- Column 3: Payment & Summary (full width on mobile, 1/4 on desktop) -->
 					<div class="flex flex-col gap-[8px] w-full lg:w-1/4">
 						<div
 							id="cart-payments"
@@ -87,7 +83,6 @@ templ CartPageBody(summaryContent templ.Component) {
 									}
 								</div>
 								@CartSubcard("payment-methods", "Payment Method")
-								//CartPaymentMethod
 							</div>
 						</div>
 						<div
