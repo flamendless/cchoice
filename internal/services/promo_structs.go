@@ -19,4 +19,6 @@ type Promo struct {
 	CreatedAt   time.Time
 	UpdatedAt   sql.NullString
 	DeletedAt   string
+	BannerOnly  sql.NullBool
+	Priority    sql.NullInt64
 }

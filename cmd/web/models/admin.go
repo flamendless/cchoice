@@ -22,5 +22,7 @@ type AdminPromoListItem struct {
 	EndDate     string
 	Type        enums.PromoType
 	Status      enums.PromoStatus
+	BannerOnly  bool
+	Priority    int64
 	CreatedAt   string
 }

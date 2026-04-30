@@ -402,6 +402,7 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 				Description: p.Description,
 				MediaURL:    p.MediaURL,
 				Type:        p.Type,
+				BannerOnly:  p.BannerOnly.Bool,
 			})
 		}
 	}

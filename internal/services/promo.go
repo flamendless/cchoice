@@ -52,7 +52,7 @@ func (s *PromoService) GetPromoByID(ctx context.Context, id int64) (*Promo, erro
 		return nil, errors.Join(errs.ErrPromo, err)
 	}
 
-	return s.mapRowToPromo(p), nil
+	return s.mapRowToPromo(p.TblPromo), nil
 }
 
 func (s *PromoService) GetAllPromos(ctx context.Context) ([]Promo, error) {
@@ -63,7 +63,7 @@ func (s *PromoService) GetAllPromos(ctx context.Context) ([]Promo, error) {
 
 	result := make([]Promo, 0, len(promos))
 	for _, p := range promos {
-		result = append(result, *s.mapRowToPromo(p))
+		result = append(result, *s.mapRowToPromo(p.TblPromo))
 	}
 	return result, nil
 }
@@ -76,7 +76,7 @@ func (s *PromoService) GetActivePromos(ctx context.Context) ([]Promo, error) {
 
 	result := make([]Promo, 0, len(promos))
 	for _, p := range promos {
-		result = append(result, *s.mapRowToPromo(p))
+		result = append(result, *s.mapRowToPromo(p.TblPromo))
 	}
 	return result, nil
 }
@@ -90,6 +90,8 @@ func (s *PromoService) CreatePromo(
 	startDate time.Time,
 	endDate time.Time,
 	promoType enums.PromoType,
+	bannerOnly bool,
+	priority int64,
 ) (string, error) {
 	result := "success"
 	defer func() {
@@ -117,6 +119,8 @@ func (s *PromoService) CreatePromo(
 		StartDate:   startDate.Format(constants.DateLayoutISO),
 		EndDate:     endDate.Format(constants.DateLayoutISO),
 		Type:        promoType.String(),
+		BannerOnly:  sql.NullBool{Valid: true, Bool: bannerOnly},
+		Priority:    sql.NullInt64{Valid: true, Int64: priority},
 	})
 	if err != nil {
 		result = err.Error()
@@ -139,6 +143,8 @@ func (s *PromoService) UpdatePromo(
 	endDate time.Time,
 	promoType enums.PromoType,
 	promoStatus enums.PromoStatus,
+	bannerOnly bool,
+	priority int64,
 ) error {
 	result := "success"
 	defer func() {
@@ -175,6 +181,8 @@ func (s *PromoService) UpdatePromo(
 		EndDate:     endDate.Format(constants.DateLayoutISO),
 		Type:        promoType.String(),
 		Status:      promoStatus.String(),
+		BannerOnly:  sql.NullBool{Valid: true, Bool: bannerOnly},
+		Priority:    sql.NullInt64{Valid: true, Int64: priority},
 	}); err != nil {
 		result = err.Error()
 		return errors.Join(errs.ErrPromo, err)
@@ -228,6 +236,8 @@ func (s *PromoService) mapRowToPromo(p queries.TblPromo) *Promo {
 		EndDate:     p.EndDate,
 		Type:        enums.ParsePromoTypeToEnum(p.Type),
 		Status:      enums.ParsePromoStatusToEnum(p.Status),
+		BannerOnly:  p.BannerOnly,
+		Priority:    p.Priority,
 		CreatedAt:   createdAt,
 		UpdatedAt:   updatedAt,
 		DeletedAt:   p.DeletedAt,
