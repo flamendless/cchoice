@@ -32,6 +32,12 @@ type BrandSidePanelText struct {
 	BrandID string
 }
 
+type Brand struct {
+	ID     string
+	Name   string
+	Status enums.BrandStatus
+}
+
 type CategorySection struct {
 	ID    string
 	Label string
@@ -390,4 +396,37 @@ type AdminTrackedLinkListItem struct {
 	Campaign       string
 	Clicks         int64
 	Status         enums.TrackedLinkStatus
+}
+
+type QuotationLine struct {
+	ID                    string
+	ProductSerial         string
+	ProductName           string
+	BrandName             string
+	Quantity              int64
+	TotalPrice            string
+	TotalDiscount         string
+	OriginalPriceSnapshot string
+	SalePriceSnapshot     string
+}
+
+type QuotationSummary struct {
+	TotalItems     int64
+	TotalPrice     string
+	TotalDiscounts string
+	Total          string
+}
+
+type QuotationProduct struct {
+	ID                 string
+	Slug               string
+	Serial             string
+	Name               string
+	BrandName          string
+	Category           string
+	Subcategory        string
+	Quantity           int64
+	OrigPriceDisplay   string
+	PriceDisplay       string
+	DiscountPercentage string
 }

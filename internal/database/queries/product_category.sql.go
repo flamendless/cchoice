@@ -80,6 +80,63 @@ func (q *Queries) DeleteProductsCategories(ctx context.Context, productID int64)
 	return err
 }
 
+const getAllCategoryNames = `-- name: GetAllCategoryNames :many
+SELECT DISTINCT category FROM tbl_product_categories
+ORDER BY category ASC
+`
+
+func (q *Queries) GetAllCategoryNames(ctx context.Context) ([]sql.NullString, error) {
+	rows, err := q.db.QueryContext(ctx, getAllCategoryNames)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []sql.NullString
+	for rows.Next() {
+		var category sql.NullString
+		if err := rows.Scan(&category); err != nil {
+			return nil, err
+		}
+		items = append(items, category)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllSubcategoryNames = `-- name: GetAllSubcategoryNames :many
+SELECT DISTINCT subcategory FROM tbl_product_categories
+WHERE subcategory != ''
+ORDER BY subcategory ASC
+`
+
+func (q *Queries) GetAllSubcategoryNames(ctx context.Context) ([]sql.NullString, error) {
+	rows, err := q.db.QueryContext(ctx, getAllSubcategoryNames)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []sql.NullString
+	for rows.Next() {
+		var subcategory sql.NullString
+		if err := rows.Scan(&subcategory); err != nil {
+			return nil, err
+		}
+		items = append(items, subcategory)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProductCategoriesByPromoted = `-- name: GetProductCategoriesByPromoted :many
 ;
 

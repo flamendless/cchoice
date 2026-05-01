@@ -46,7 +46,7 @@ func (s *BrandService) GetNameByID(ctx context.Context, brandID string) (string,
 	return brand.Name, nil
 }
 
-func (s *BrandService) GetAllBrands(ctx context.Context) ([]Brand, error) {
+func (s *BrandService) GetAll(ctx context.Context) ([]Brand, error) {
 	brands, err := s.dbRO.GetQueries().GetAllBrands(ctx)
 	if err != nil {
 		return nil, errors.Join(errs.ErrBrand, err)
@@ -74,6 +74,26 @@ func (s *BrandService) GetAllBrands(ctx context.Context) ([]Brand, error) {
 	}
 	return result, nil
 }
+
+func (s *BrandService) GetAllActive(ctx context.Context) ([]Brand, error) {
+	brands, err := s.dbRO.GetQueries().GetAllActiveBrands(ctx, 100)
+	if err != nil {
+		return nil, errors.Join(errs.ErrBrand, err)
+	}
+
+	result := make([]Brand, 0, len(brands))
+	for _, b := range brands {
+		s3URL := ""
+		result = append(result, Brand{
+			ID:           b.ID,
+			Name:         b.Name,
+			LogoS3URL:    s3URL,
+			Status:       enums.ParseBrandStatusToEnum(b.Status),
+		})
+	}
+	return result, nil
+}
+
 
 func (s *BrandService) SearchBrandsByFilter(
 	ctx context.Context,

@@ -2,9 +2,11 @@ package server
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	compcustomer "cchoice/cmd/web/components/customers"
+	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
@@ -32,6 +34,12 @@ func AddCustomerHandlers(s *Server, r chi.Router) {
 	r.Get("/customer/register", s.customerRegisterPageHandler)
 	r.With(s.requireCustomerAuth).Post("/customer/logout", s.customerLogoutHandler)
 	r.With(s.requireCustomerAuth).Get("/customer/portal", s.customerPortalHandler)
+
+	r.With(s.requireCustomerAuth).Get("/customer/quotation", s.customerQuotationPageHandler)
+	r.With(s.requireCustomerAuth).Post("/customer/quotation/product/{productID}/add", s.customerQuotationAddToHandler)
+	r.With(s.requireCustomerAuth).Delete("/customer/quotation/line/{lineID}/remove", s.customerQuotationRemoveFromDraftHandler)
+	r.With(s.requireCustomerAuth).Post("/customer/quotation/submit", s.customerQuotationSubmitDraftHandler)
+
 	r.With(s.requireCustomerAuth).Get("/customer/profile", s.customerProfileHandler)
 	r.With(s.requireCustomerAuth).Get("/customer/profile/edit", s.customerProfileEditFormHandler)
 	r.With(s.requireCustomerAuth).Patch("/customer/profile", s.customerProfileUpdateHandler)
@@ -413,4 +421,214 @@ func (s *Server) customerVerifyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	redirectHX(w, r, utils.URLWithSuccess(page, "Email verified successfully!"))
+}
+
+func (s *Server) customerQuotationPageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Customer Portal Page Handler]"
+	const page = "/customer"
+	ctx := r.Context()
+
+	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
+	if _, err := s.services.customer.BuildProfile(ctx, customerIDStr); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	quotation, err := s.services.quotation.GetOrCreateActive(ctx, customerIDStr)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	quotationID := s.encoder.Encode(quotation.ID)
+
+	draftLines, err := s.services.quotation.GetLines(ctx, quotationID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
+
+	summary, err := s.services.quotation.GetSummary(ctx, quotationID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
+
+	products, err := s.services.product.ListForQuotations(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
+
+	brands, err := s.services.brand.GetAllActive(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
+	activeBrands := make([]models.Brand, 0, len(brands))
+	for _, brand := range brands {
+		activeBrands = append(activeBrands, models.Brand{
+			ID:     s.encoder.Encode(brand.ID),
+			Name:   brand.Name,
+			Status: brand.Status,
+		})
+	}
+
+	categories, err := s.services.product.GetAllCategoryNames(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
+
+	subcategories, err := s.services.product.GetAllSubcategoryNames(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
+
+	draftLinesModel := make([]models.QuotationLine, 0, len(draftLines))
+	for _, line := range draftLines {
+		orig := utils.NewMoney(line.OriginalPriceSnapshot.Int64*line.Quantity, line.Currency)
+		sale := utils.NewMoney(line.SalePriceSnapshot.Int64*line.Quantity, line.Currency)
+		td, _ := orig.Subtract(sale)
+
+		draftLinesModel = append(draftLinesModel, models.QuotationLine{
+			ID:            s.encoder.Encode(line.ID),
+			ProductSerial: line.ProductSerial,
+			ProductName:   line.ProductName,
+			BrandName:     line.BrandName,
+			Quantity:      line.Quantity,
+			TotalPrice:    orig.Display(),
+			TotalDiscount: td.Display(),
+		})
+	}
+
+	summaryModel := models.QuotationSummary{}
+	if summary.TotalItems > 0 {
+		summaryModel.TotalItems = summary.TotalItems
+
+		var orig, discount int64
+		if originalPrice, ok := summary.TotalOriginalPrice.(int64); ok {
+			orig = originalPrice
+		}
+		if discounts, ok := summary.TotalSalePrice.(int64); ok {
+			discount = discounts
+		}
+
+		origM := utils.NewMoney(orig, summary.Currency)
+		discountM := utils.NewMoney(discount, summary.Currency)
+		total, _ := origM.Subtract(discountM)
+		summaryModel.TotalPrice = origM.Display()
+		summaryModel.TotalDiscounts = discountM.Display()
+		summaryModel.Total = total.Display()
+	}
+
+	productsModel := make([]models.QuotationProduct, 0, len(products))
+	for _, p := range products {
+		origPrice, discountedPrice, discountPercentage := utils.GetOrigAndDiscounted(
+			p.IsOnSale,
+			p.UnitPriceWithVat,
+			p.UnitPriceWithVatCurrency,
+			p.SalePriceWithVat,
+			p.SalePriceWithVatCurrency,
+		)
+
+		productsModel = append(productsModel, models.QuotationProduct{
+			ID:                 s.encoder.Encode(p.ID),
+			Slug:               p.Slug.String,
+			Serial:             p.Serial,
+			Name:               p.Name,
+			BrandName:          p.BrandName,
+			Category:           p.Category.String,
+			Subcategory:        p.Subcategory.String,
+			DiscountPercentage: discountPercentage,
+			OrigPriceDisplay:   origPrice.Display(),
+			PriceDisplay:       discountedPrice.Display(),
+			Quantity:           1,
+		})
+	}
+
+	if err := compcustomer.QuotationPage(
+		draftLinesModel,
+		summaryModel,
+		productsModel,
+		activeBrands,
+		categories,
+		subcategories,
+		"",
+		"",
+		"",
+		"",
+	).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("path", r.URL.Path),
+			zap.Error(err),
+		)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (s *Server) customerQuotationAddToHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Customer Portal Add To Handler]"
+	const page = "/customer/quotation"
+	ctx := r.Context()
+
+	if err := r.ParseForm(); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
+	productID := chi.URLParam(r, "productID")
+	var qty int64 = 1
+	if qtyStr := r.FormValue("quantity"); qtyStr != "" {
+		n, err := strconv.ParseInt(qtyStr, 10, 64)
+		if err == nil {
+			qty = n
+		}
+	}
+
+	if err := s.services.quotation.AddLineToQuotation(ctx, customerIDStr, productID, qty); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	redirectHX(w, r, utils.URL(page))
+}
+
+func (s *Server) customerQuotationRemoveFromDraftHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Customer Portal Remove From Quotation Handler]"
+	const page = "/customer/quotation"
+	ctx := r.Context()
+
+	lineID := chi.URLParam(r, "lineID")
+
+	if err := s.services.quotation.RemoveLine(ctx, lineID); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	redirectHX(w, r, utils.URL(page))
+}
+
+func (s *Server) customerQuotationSubmitDraftHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Customer Portal Submit Quotation Handler]"
+	const page = "/customer/quotation"
+	ctx := r.Context()
+
+	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
+	quotation, err := s.services.quotation.GetOrCreateActive(ctx, customerIDStr)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	if err := s.services.quotation.SubmitForReview(ctx, s.encoder.Encode(quotation.ID)); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	redirectHX(w, r, utils.URLWithSuccess(page, "Quotation submitted for review!"))
 }

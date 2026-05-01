@@ -1,0 +1,314 @@
+package components
+
+import "cchoice/internal/utils"
+import "cchoice/cmd/web/components/header"
+import "cchoice/cmd/web/components/common"
+import "cchoice/cmd/web/models"
+import "strings"
+
+templ QuotationPage(
+	draftLines []models.QuotationLine,
+	summary models.QuotationSummary,
+	products []models.QuotationProduct,
+	brands []models.Brand,
+	categories []string,
+	subcategories []string,
+	searchQuery string,
+	selectedBrand string,
+	selectedCategory string,
+	selectedSubcategory string,
+) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("[Quotation] C-Choice Customer Portal")
+		</head>
+		<body class="bg-cchoicesoft min-h-screen flex flex-col">
+			@common.DevRibbon()
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-8xl mx-auto">
+					@header.CustomerPortalHeaderWithBackLink(utils.URL("/customer/portal"), "Back to Customer Portal")
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-cchoice mb-4">Quotation Draft</h2>
+						if len(draftLines) > 0 {
+							<div class="bg-white rounded-lg shadow-md p-6 mb-6">
+								<table class="w-full text-left">
+									<thead>
+										<tr class="border-b">
+											<th class="py-2">Brand</th>
+											<th class="py-2">Serial</th>
+											<th class="py-2">Quantity</th>
+											<th class="py-2">Total Price</th>
+											<th class="py-2">Total Discount</th>
+											<th class="py-2">Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+										for _, line := range draftLines {
+											<tr class="border-b">
+												<td class="py-2">{ line.BrandName }</td>
+												<td class="py-2">{ line.ProductSerial }</td>
+												<td class="py-2">{ line.Quantity }</td>
+												<td class="py-2">{ line.TotalPrice }</td>
+												<td class="py-2">{ line.TotalDiscount }</td>
+												<td class="py-2">
+													<button
+														class="text-red-500 hover:text-red-700 text-sm"
+														hx-delete={ utils.URLf("/customer/quotation/line/%s/remove", line.ID) }
+														hx-confirm="Remove this item from quotation?"
+													>
+														Remove
+													</button>
+												</td>
+											</tr>
+										}
+									</tbody>
+								</table>
+								<div class="mt-6 pt-4 border-t">
+									<h3 class="text-lg font-semibold mb-2">Summary</h3>
+									<div class="grid grid-cols-3 gap-4">
+										<div>
+											<span class="text-gray-600">Total Items:</span>
+											<span class="font-semibold ml-2">{ summary.TotalItems }</span>
+										</div>
+										<div>
+											<span class="text-gray-600">Total Price:</span>
+											<span class="font-semibold ml-2">{ summary.TotalPrice }</span>
+										</div>
+										<div>
+											<span class="text-gray-600">Total Discounts:</span>
+											<span class="font-semibold ml-2">{ summary.TotalDiscounts }</span>
+										</div>
+										<div>
+											<span class="text-gray-600">Total:</span>
+											<span class="font-semibold ml-2">{ summary.Total }</span>
+										</div>
+									</div>
+								</div>
+								<div class="mt-4">
+									<button
+										class="px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark"
+										hx-post={ utils.URL("/customer/quotation/submit") }
+										hx-confirm="Submit this quotation draft for review?"
+									>
+										Submit for Review
+									</button>
+								</div>
+							</div>
+						} else {
+							<div class="bg-white rounded-lg shadow-md p-6 mb-6 text-center text-gray-500">
+								No items in your quotation draft yet. Browse products below to add items.
+							</div>
+						}
+					</div>
+					<div class="mb-8">
+						<h2 class="text-2xl font-bold text-cchoice mb-4">Products</h2>
+						<form
+							id="quotation-search-form"
+							hx-get={ utils.URL("/customer/quotation/products") }
+							hx-target="#products-table"
+							hx-swap="innerHTML"
+							class="bg-white rounded-lg shadow-md p-4 mb-6"
+						>
+							<div class="flex flex-wrap gap-4 mb-4">
+								<input
+									type="text"
+									name="search"
+									placeholder="Search by serial or name"
+									value={ searchQuery }
+									class="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+								/>
+								<select
+									name="brand"
+									class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+								>
+									<option value="">All Brands</option>
+									for _, brand := range brands {
+										<option value={ brand.ID } selected?={ brand.Name == selectedBrand }>{ brand.Name }</option>
+									}
+								</select>
+								<select
+									name="category"
+									class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+								>
+									<option value="">All Categories</option>
+									for _, cat := range categories {
+										<option value={ cat } selected?={ cat == selectedCategory }>{ cat }</option>
+									}
+								</select>
+								<select
+									name="subcategory"
+									class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+								>
+									<option value="">All Subcategories</option>
+									for _, sub := range subcategories {
+										<option value={ sub } selected?={ sub == selectedSubcategory }>{ sub }</option>
+									}
+								</select>
+								<button
+									type="submit"
+									class="px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark"
+								>
+									Search
+								</button>
+							</div>
+						</form>
+						<div id="products-table">
+							@QuotationProductsTable(products)
+						</div>
+					</div>
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+templ QuotationProductsTable(products []models.QuotationProduct) {
+	<div class="bg-white rounded-lg shadow-md overflow-hidden">
+		<table class="w-full text-left">
+			<thead class="bg-gray-50">
+				<tr class="border-b">
+					<th class="py-3 px-4">Brand</th>
+					<th class="py-3 px-4">Serial</th>
+					<th class="py-3 px-4">Category</th>
+					<th class="py-3 px-4">Price</th>
+					<th class="py-3 px-4">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				if len(products) == 0 {
+					<tr>
+						<td colspan="7" class="py-8 text-center text-gray-500">
+							No products found. Try adjusting your filters.
+						</td>
+					</tr>
+				}
+				for _, p := range products {
+					<tr class="border-b hover:bg-gray-50">
+						<td class="py-3 px-4">{ p.BrandName }</td>
+						<td class="py-3 px-4">
+							{{
+								serial := strings.ToUpper(p.Serial)
+								brandName := strings.ToUpper(p.BrandName)
+							}}
+							{ strings.TrimPrefix(serial, brandName+"-") }
+						</td>
+						<td class="py-3 px-4">{ p.Category } { p.Subcategory }</td>
+						<td class="py-3 px-4">
+							if p.DiscountPercentage != "" {
+								<p class="text-sm font-semibold text-cchoice text-center">
+									{ p.PriceDisplay }
+								</p>
+								<p class="text-xs font-semibold text-black line-through text-center">
+									{ p.OrigPriceDisplay }
+								</p>
+							} else {
+								<p class="text-xs font-semibold text-cchoice">
+									{ p.OrigPriceDisplay }
+								</p>
+							}
+						</td>
+						<td class="py-3 px-4">
+							@Actions(p.ID, p.Slug)
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ Actions(productID string, productSlug string) {
+	<div class="flex flex-col gap-4">
+		<div class="flex items-center gap-2" data-actions>
+			<button
+				type="button"
+				name="btn-qty-decrease"
+				class="p-1 border rounded-l-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+				disabled="true"
+				_="
+					on click
+						set container to the closest <div[data-actions]/> to me
+						set qtyInput to container.querySelector('input[name=\'quantity\']')
+						set increaseBtn to container.querySelector('button[name=\'btn-qty-increase\']')
+
+						if currentVal > 1
+							set qtyInput.value to String(currentVal - 1)
+							if currentVal - 1 <= 1
+								set me.disabled to true
+							end
+
+							if currentVal - 1 < 99
+								set increaseBtn.disabled to false
+							end
+						end
+					end
+				"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+				</svg>
+			</button>
+			<input
+				type="text"
+				inputmode="numeric"
+				pattern="[0-9]*"
+				name="quantity"
+				value="1"
+				class="w-8 text-center focus:outline-none focus:ring-0"
+				hx-validate="false"
+			/>
+			<button
+				type="button"
+				name="btn-qty-increase"
+				class="p-1 border rounded-r-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors"
+				_="
+					on click
+						set container to the closest <div[data-actions]/> to me
+						set qtyInput to container.querySelector('input[name=\'quantity\']')
+						set decreaseBtn to container.querySelector('button[name=\'btn-qty-decrease\']')
+						set currentVal to Number(qtyInput.value)
+
+						if currentVal < 99
+							set qtyInput.value to String(currentVal + 1)
+
+							if currentVal + 1 >= 99
+								set me.disabled to true
+							end
+
+							if currentVal + 1 > 1
+								set decreaseBtn.disabled to false
+							end
+						end
+					end
+				"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+				</svg>
+			</button>
+
+			<button
+				type="button"
+				id="btn-add-to-cart"
+				class="bg-cchoice text-white px-2 py-1 rounded-lg font-semibold hover:bg-cchoice_dark transition-colors cursor-pointer mx-2"
+				hx-include="closest [data-actions]"
+				hx-post={ utils.URLf("/customer/quotation/product/%s/add", productID) }
+				hx-swap="none"
+			>
+				Add to Draft Quotation
+			</button>
+
+			<a
+				class="bg-cchoice text-white px-2 py-1 rounded-lg font-semibold hover:bg-cchoice_dark transition-colors cursor-pointer mx-2"
+				href={ utils.URLf("/product/%s", productSlug) }
+				target="_blank"
+			>
+				View Product Page
+			</a>
+		</div>
+	</div>
+}

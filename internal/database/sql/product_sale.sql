@@ -14,8 +14,15 @@ INSERT INTO tbl_product_sales (
 	updated_at
 ) VALUES (
 	?, ?, ?, ?, ?,
-	?, ?, ?, ?, ?,
+	?, ?, ?, ?,
+	?,
 	datetime('now'),
 	datetime('now')
 ) RETURNING *;
+
+-- name: GetActiveSaleByProductID :one
+SELECT *
+FROM tbl_product_sales
+WHERE product_id = ? AND is_active = 1
+LIMIT 1;
 

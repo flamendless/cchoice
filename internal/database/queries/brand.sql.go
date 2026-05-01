@@ -64,6 +64,46 @@ func (q *Queries) CreateBrands(ctx context.Context, name string) (int64, error) 
 	return id, err
 }
 
+const getAllActiveBrands = `-- name: GetAllActiveBrands :many
+SELECT
+	id,
+	name,
+	status
+FROM tbl_brands
+WHERE status = 'ACTIVE'
+ORDER BY name ASC
+LIMIT ?
+`
+
+type GetAllActiveBrandsRow struct {
+	ID     int64
+	Name   string
+	Status string
+}
+
+func (q *Queries) GetAllActiveBrands(ctx context.Context, limit int64) ([]GetAllActiveBrandsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllActiveBrands, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllActiveBrandsRow
+	for rows.Next() {
+		var i GetAllActiveBrandsRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.Status); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAllBrands = `-- name: GetAllBrands :many
 SELECT
 	tbl_brands.id AS id,

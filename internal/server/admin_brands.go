@@ -68,7 +68,7 @@ func (s *Server) adminBrandsListTableHandler(w http.ResponseWriter, r *http.Requ
 
 		brands = s.filterAndConvertBrands(ctx, serviceBrands)
 	} else {
-		serviceBrands, err := s.services.brand.GetAllBrands(ctx)
+		serviceBrands, err := s.services.brand.GetAll(ctx)
 		if err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, err.Error()))
@@ -269,7 +269,7 @@ func (s *Server) adminBrandsEditPageHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	serviceBrands, err := s.services.brand.GetAllBrands(ctx)
+	serviceBrands, err := s.services.brand.GetAll(ctx)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError("/admin/brands", "Internal server error"))

@@ -526,6 +526,42 @@ func (s *ProductService) GenerateMeta(product *queries.GetProductPageRow) models
 	}
 }
 
+func (s *ProductService) ListForQuotations(ctx context.Context) ([]queries.ListProductsForQuotationsRow, error) {
+	products, err := s.dbRO.GetQueries().ListProductsForQuotations(ctx) // TODO: paginations
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
+}
+
+func (s *ProductService) GetAllCategoryNames(ctx context.Context) ([]string, error) {
+	categories, err := s.dbRO.GetQueries().GetAllCategoryNames(ctx)
+	if err != nil {
+		return nil, err
+	}
+	names := make([]string, 0, len(categories))
+	for _, c := range categories {
+		if c.Valid {
+			names = append(names, c.String)
+		}
+	}
+	return names, nil
+}
+
+func (s *ProductService) GetAllSubcategoryNames(ctx context.Context) ([]string, error) {
+	subcategories, err := s.dbRO.GetQueries().GetAllSubcategoryNames(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get all subcategory names: %w", err)
+	}
+	names := make([]string, 0, len(subcategories))
+	for _, s := range subcategories {
+		if s.Valid {
+			names = append(names, s.String)
+		}
+	}
+	return names, nil
+}
+
 func (s *ProductService) ID() string {
 	return "Product"
 }

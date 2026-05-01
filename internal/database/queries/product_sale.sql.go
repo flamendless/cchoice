@@ -26,7 +26,8 @@ INSERT INTO tbl_product_sales (
 	updated_at
 ) VALUES (
 	?, ?, ?, ?, ?,
-	?, ?, ?, ?, ?,
+	?, ?, ?, ?,
+	?,
 	datetime('now'),
 	datetime('now')
 ) RETURNING id, product_id, sale_price_without_vat, sale_price_with_vat, sale_price_without_vat_currency, sale_price_with_vat_currency, discount_type, discount_value, starts_at, ends_at, is_active, created_at, updated_at, deleted_at
@@ -58,6 +59,35 @@ func (q *Queries) CreateProductSale(ctx context.Context, arg CreateProductSalePa
 		arg.EndsAt,
 		arg.IsActive,
 	)
+	var i TblProductSale
+	err := row.Scan(
+		&i.ID,
+		&i.ProductID,
+		&i.SalePriceWithoutVat,
+		&i.SalePriceWithVat,
+		&i.SalePriceWithoutVatCurrency,
+		&i.SalePriceWithVatCurrency,
+		&i.DiscountType,
+		&i.DiscountValue,
+		&i.StartsAt,
+		&i.EndsAt,
+		&i.IsActive,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getActiveSaleByProductID = `-- name: GetActiveSaleByProductID :one
+SELECT id, product_id, sale_price_without_vat, sale_price_with_vat, sale_price_without_vat_currency, sale_price_with_vat_currency, discount_type, discount_value, starts_at, ends_at, is_active, created_at, updated_at, deleted_at
+FROM tbl_product_sales
+WHERE product_id = ? AND is_active = 1
+LIMIT 1
+`
+
+func (q *Queries) GetActiveSaleByProductID(ctx context.Context, productID int64) (TblProductSale, error) {
+	row := q.db.QueryRowContext(ctx, getActiveSaleByProductID, productID)
 	var i TblProductSale
 	err := row.Scan(
 		&i.ID,
