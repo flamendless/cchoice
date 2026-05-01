@@ -277,8 +277,6 @@ func (q *Queries) GetProductByName(ctx context.Context, name string) (TblProduct
 }
 
 const getProductIDBySerial = `-- name: GetProductIDBySerial :one
-;
-
 SELECT id
 FROM tbl_products
 WHERE tbl_products.serial = ?
@@ -448,10 +446,10 @@ func (q *Queries) GetProductPage(ctx context.Context, slug sql.NullString) (GetP
 
 const getProducts = `-- name: GetProducts :many
 SELECT
-	tbl_products.id, serial, tbl_products.name, description, brand_id, tbl_products.status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, slug, tbl_product_categories.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_product_specs.created_at, tbl_product_specs.updated_at, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
+	tbl_products.id, serial, tbl_products.name, description, brand_id, tbl_products.status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, slug, tbl_products_categories.id, category_id, product_id, tbl_products_categories.created_at, tbl_products_categories.updated_at, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_product_specs.created_at, tbl_product_specs.updated_at, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
 	tbl_brands.name AS brand_name
 FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
+INNER JOIN tbl_products_categories ON tbl_products.id = tbl_products_categories.product_id
 INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 ORDER BY created_at DESC
@@ -474,9 +472,10 @@ type GetProductsRow struct {
 	DeletedAt                   time.Time
 	Slug                        sql.NullString
 	ID_2                        int64
-	Category                    sql.NullString
-	Subcategory                 sql.NullString
-	PromotedAtHomepage          sql.NullBool
+	CategoryID                  int64
+	ProductID                   int64
+	CreatedAt_2                 sql.NullTime
+	UpdatedAt_2                 sql.NullTime
 	ID_3                        int64
 	Colours                     sql.NullString
 	Sizes                       sql.NullString
@@ -487,12 +486,12 @@ type GetProductsRow struct {
 	ScopeOfSupply               sql.NullString
 	WeightUnit                  sql.NullString
 	Weight                      sql.NullFloat64
-	CreatedAt_2                 sql.NullTime
-	UpdatedAt_2                 sql.NullTime
+	CreatedAt_3                 sql.NullTime
+	UpdatedAt_3                 sql.NullTime
 	ID_4                        int64
 	Name_2                      string
-	CreatedAt_3                 time.Time
-	UpdatedAt_3                 time.Time
+	CreatedAt_4                 time.Time
+	UpdatedAt_4                 time.Time
 	DeletedAt_2                 time.Time
 	Status_2                    string
 	BrandName                   string
@@ -524,9 +523,10 @@ func (q *Queries) GetProducts(ctx context.Context) ([]GetProductsRow, error) {
 			&i.DeletedAt,
 			&i.Slug,
 			&i.ID_2,
-			&i.Category,
-			&i.Subcategory,
-			&i.PromotedAtHomepage,
+			&i.CategoryID,
+			&i.ProductID,
+			&i.CreatedAt_2,
+			&i.UpdatedAt_2,
 			&i.ID_3,
 			&i.Colours,
 			&i.Sizes,
@@ -537,134 +537,12 @@ func (q *Queries) GetProducts(ctx context.Context) ([]GetProductsRow, error) {
 			&i.ScopeOfSupply,
 			&i.WeightUnit,
 			&i.Weight,
-			&i.CreatedAt_2,
-			&i.UpdatedAt_2,
-			&i.ID_4,
-			&i.Name_2,
 			&i.CreatedAt_3,
 			&i.UpdatedAt_3,
-			&i.DeletedAt_2,
-			&i.Status_2,
-			&i.BrandName,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getProductsByFilter = `-- name: GetProductsByFilter :many
-SELECT
-	tbl_products.id, serial, tbl_products.name, description, brand_id, tbl_products.status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, slug, tbl_product_categories.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_product_specs.created_at, tbl_product_specs.updated_at, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
-	tbl_brands.name AS brand_name
-FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
-INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-WHERE
-	(tbl_products.status = ?1 OR ?1 IS NULL) OR
-	(tbl_brands.name = ?2 OR ?2 IS NULL)
-ORDER BY tbl_products.updated_at DESC
-`
-
-type GetProductsByFilterParams struct {
-	Status string
-	Brand  string
-}
-
-type GetProductsByFilterRow struct {
-	ID                          int64
-	Serial                      string
-	Name                        string
-	Description                 sql.NullString
-	BrandID                     int64
-	Status                      string
-	ProductSpecsID              sql.NullInt64
-	UnitPriceWithoutVat         int64
-	UnitPriceWithVat            int64
-	UnitPriceWithoutVatCurrency string
-	UnitPriceWithVatCurrency    string
-	CreatedAt                   time.Time
-	UpdatedAt                   time.Time
-	DeletedAt                   time.Time
-	Slug                        sql.NullString
-	ID_2                        int64
-	Category                    sql.NullString
-	Subcategory                 sql.NullString
-	PromotedAtHomepage          sql.NullBool
-	ID_3                        int64
-	Colours                     sql.NullString
-	Sizes                       sql.NullString
-	Segmentation                sql.NullString
-	PartNumber                  sql.NullString
-	Power                       sql.NullString
-	Capacity                    sql.NullString
-	ScopeOfSupply               sql.NullString
-	WeightUnit                  sql.NullString
-	Weight                      sql.NullFloat64
-	CreatedAt_2                 sql.NullTime
-	UpdatedAt_2                 sql.NullTime
-	ID_4                        int64
-	Name_2                      string
-	CreatedAt_3                 time.Time
-	UpdatedAt_3                 time.Time
-	DeletedAt_2                 time.Time
-	Status_2                    string
-	BrandName                   string
-}
-
-func (q *Queries) GetProductsByFilter(ctx context.Context, arg GetProductsByFilterParams) ([]GetProductsByFilterRow, error) {
-	rows, err := q.db.QueryContext(ctx, getProductsByFilter, arg.Status, arg.Brand)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetProductsByFilterRow
-	for rows.Next() {
-		var i GetProductsByFilterRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Serial,
-			&i.Name,
-			&i.Description,
-			&i.BrandID,
-			&i.Status,
-			&i.ProductSpecsID,
-			&i.UnitPriceWithoutVat,
-			&i.UnitPriceWithVat,
-			&i.UnitPriceWithoutVatCurrency,
-			&i.UnitPriceWithVatCurrency,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.DeletedAt,
-			&i.Slug,
-			&i.ID_2,
-			&i.Category,
-			&i.Subcategory,
-			&i.PromotedAtHomepage,
-			&i.ID_3,
-			&i.Colours,
-			&i.Sizes,
-			&i.Segmentation,
-			&i.PartNumber,
-			&i.Power,
-			&i.Capacity,
-			&i.ScopeOfSupply,
-			&i.WeightUnit,
-			&i.Weight,
-			&i.CreatedAt_2,
-			&i.UpdatedAt_2,
 			&i.ID_4,
 			&i.Name_2,
-			&i.CreatedAt_3,
-			&i.UpdatedAt_3,
+			&i.CreatedAt_4,
+			&i.UpdatedAt_4,
 			&i.DeletedAt_2,
 			&i.Status_2,
 			&i.BrandName,
@@ -692,13 +570,27 @@ SELECT
 	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
 	tbl_product_images.id AS product_image_id,
 	tbl_product_images.cdn_url,
-	tbl_product_images.cdn_url_thumbnail
+	tbl_product_images.cdn_url_thumbnail,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value
 FROM tbl_products
 INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
 LEFT JOIN tbl_product_categories AS pc ON pc.id = tbl_products_categories.category_id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN tbl_product_sales.starts_at AND tbl_product_sales.ends_at
 WHERE tbl_products.id = ?
 LIMIT 1
 `
@@ -738,6 +630,13 @@ type GetProductsByIDRow struct {
 	ProductImageID              sql.NullInt64
 	CdnUrl                      sql.NullString
 	CdnUrlThumbnail             sql.NullString
+	UnitPriceWithVat_2          int64
+	UnitPriceWithVatCurrency_2  string
+	SalePriceWithVat            sql.NullInt64
+	SalePriceWithVatCurrency    sql.NullString
+	IsOnSale                    int64
+	DiscountType                sql.NullString
+	DiscountValue               sql.NullInt64
 }
 
 func (q *Queries) GetProductsByID(ctx context.Context, id int64) (GetProductsByIDRow, error) {
@@ -778,6 +677,13 @@ func (q *Queries) GetProductsByID(ctx context.Context, id int64) (GetProductsByI
 		&i.ProductImageID,
 		&i.CdnUrl,
 		&i.CdnUrlThumbnail,
+		&i.UnitPriceWithVat_2,
+		&i.UnitPriceWithVatCurrency_2,
+		&i.SalePriceWithVat,
+		&i.SalePriceWithVatCurrency,
+		&i.IsOnSale,
+		&i.DiscountType,
+		&i.DiscountValue,
 	)
 	return i, err
 }
@@ -960,630 +866,6 @@ func (q *Queries) GetProductsBySerial(ctx context.Context, serial string) (GetPr
 		&i.BrandName,
 	)
 	return i, err
-}
-
-const getProductsByStatus = `-- name: GetProductsByStatus :many
-SELECT
-	tbl_products.id, serial, tbl_products.name, description, brand_id, tbl_products.status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, slug, tbl_product_categories.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_product_specs.created_at, tbl_product_specs.updated_at, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
-	tbl_brands.name AS brand_name
-FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
-INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-WHERE tbl_products.status = ?
-ORDER BY created_at DESC
-`
-
-type GetProductsByStatusRow struct {
-	ID                          int64
-	Serial                      string
-	Name                        string
-	Description                 sql.NullString
-	BrandID                     int64
-	Status                      string
-	ProductSpecsID              sql.NullInt64
-	UnitPriceWithoutVat         int64
-	UnitPriceWithVat            int64
-	UnitPriceWithoutVatCurrency string
-	UnitPriceWithVatCurrency    string
-	CreatedAt                   time.Time
-	UpdatedAt                   time.Time
-	DeletedAt                   time.Time
-	Slug                        sql.NullString
-	ID_2                        int64
-	Category                    sql.NullString
-	Subcategory                 sql.NullString
-	PromotedAtHomepage          sql.NullBool
-	ID_3                        int64
-	Colours                     sql.NullString
-	Sizes                       sql.NullString
-	Segmentation                sql.NullString
-	PartNumber                  sql.NullString
-	Power                       sql.NullString
-	Capacity                    sql.NullString
-	ScopeOfSupply               sql.NullString
-	WeightUnit                  sql.NullString
-	Weight                      sql.NullFloat64
-	CreatedAt_2                 sql.NullTime
-	UpdatedAt_2                 sql.NullTime
-	ID_4                        int64
-	Name_2                      string
-	CreatedAt_3                 time.Time
-	UpdatedAt_3                 time.Time
-	DeletedAt_2                 time.Time
-	Status_2                    string
-	BrandName                   string
-}
-
-func (q *Queries) GetProductsByStatus(ctx context.Context, status string) ([]GetProductsByStatusRow, error) {
-	rows, err := q.db.QueryContext(ctx, getProductsByStatus, status)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetProductsByStatusRow
-	for rows.Next() {
-		var i GetProductsByStatusRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Serial,
-			&i.Name,
-			&i.Description,
-			&i.BrandID,
-			&i.Status,
-			&i.ProductSpecsID,
-			&i.UnitPriceWithoutVat,
-			&i.UnitPriceWithVat,
-			&i.UnitPriceWithoutVatCurrency,
-			&i.UnitPriceWithVatCurrency,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.DeletedAt,
-			&i.Slug,
-			&i.ID_2,
-			&i.Category,
-			&i.Subcategory,
-			&i.PromotedAtHomepage,
-			&i.ID_3,
-			&i.Colours,
-			&i.Sizes,
-			&i.Segmentation,
-			&i.PartNumber,
-			&i.Power,
-			&i.Capacity,
-			&i.ScopeOfSupply,
-			&i.WeightUnit,
-			&i.Weight,
-			&i.CreatedAt_2,
-			&i.UpdatedAt_2,
-			&i.ID_4,
-			&i.Name_2,
-			&i.CreatedAt_3,
-			&i.UpdatedAt_3,
-			&i.DeletedAt_2,
-			&i.Status_2,
-			&i.BrandName,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getProductsByStatusSortByCreationDateAsc = `-- name: GetProductsByStatusSortByCreationDateAsc :many
-SELECT
-	tbl_products.id, serial, tbl_products.name, description, brand_id, tbl_products.status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, slug, tbl_product_categories.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_product_specs.created_at, tbl_product_specs.updated_at, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
-	tbl_brands.name AS brand_name
-FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
-INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-WHERE tbl_products.status = ?
-ORDER BY tbl_products.created_at ASC
-`
-
-type GetProductsByStatusSortByCreationDateAscRow struct {
-	ID                          int64
-	Serial                      string
-	Name                        string
-	Description                 sql.NullString
-	BrandID                     int64
-	Status                      string
-	ProductSpecsID              sql.NullInt64
-	UnitPriceWithoutVat         int64
-	UnitPriceWithVat            int64
-	UnitPriceWithoutVatCurrency string
-	UnitPriceWithVatCurrency    string
-	CreatedAt                   time.Time
-	UpdatedAt                   time.Time
-	DeletedAt                   time.Time
-	Slug                        sql.NullString
-	ID_2                        int64
-	Category                    sql.NullString
-	Subcategory                 sql.NullString
-	PromotedAtHomepage          sql.NullBool
-	ID_3                        int64
-	Colours                     sql.NullString
-	Sizes                       sql.NullString
-	Segmentation                sql.NullString
-	PartNumber                  sql.NullString
-	Power                       sql.NullString
-	Capacity                    sql.NullString
-	ScopeOfSupply               sql.NullString
-	WeightUnit                  sql.NullString
-	Weight                      sql.NullFloat64
-	CreatedAt_2                 sql.NullTime
-	UpdatedAt_2                 sql.NullTime
-	ID_4                        int64
-	Name_2                      string
-	CreatedAt_3                 time.Time
-	UpdatedAt_3                 time.Time
-	DeletedAt_2                 time.Time
-	Status_2                    string
-	BrandName                   string
-}
-
-func (q *Queries) GetProductsByStatusSortByCreationDateAsc(ctx context.Context, status string) ([]GetProductsByStatusSortByCreationDateAscRow, error) {
-	rows, err := q.db.QueryContext(ctx, getProductsByStatusSortByCreationDateAsc, status)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetProductsByStatusSortByCreationDateAscRow
-	for rows.Next() {
-		var i GetProductsByStatusSortByCreationDateAscRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Serial,
-			&i.Name,
-			&i.Description,
-			&i.BrandID,
-			&i.Status,
-			&i.ProductSpecsID,
-			&i.UnitPriceWithoutVat,
-			&i.UnitPriceWithVat,
-			&i.UnitPriceWithoutVatCurrency,
-			&i.UnitPriceWithVatCurrency,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.DeletedAt,
-			&i.Slug,
-			&i.ID_2,
-			&i.Category,
-			&i.Subcategory,
-			&i.PromotedAtHomepage,
-			&i.ID_3,
-			&i.Colours,
-			&i.Sizes,
-			&i.Segmentation,
-			&i.PartNumber,
-			&i.Power,
-			&i.Capacity,
-			&i.ScopeOfSupply,
-			&i.WeightUnit,
-			&i.Weight,
-			&i.CreatedAt_2,
-			&i.UpdatedAt_2,
-			&i.ID_4,
-			&i.Name_2,
-			&i.CreatedAt_3,
-			&i.UpdatedAt_3,
-			&i.DeletedAt_2,
-			&i.Status_2,
-			&i.BrandName,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getProductsByStatusSortByCreationDateDesc = `-- name: GetProductsByStatusSortByCreationDateDesc :many
-SELECT
-	tbl_products.id, serial, tbl_products.name, description, brand_id, tbl_products.status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, slug, tbl_product_categories.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_product_specs.created_at, tbl_product_specs.updated_at, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
-	tbl_brands.name AS brand_name
-FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
-INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-WHERE tbl_products.status = ?
-ORDER BY tbl_products.created_at DESC
-`
-
-type GetProductsByStatusSortByCreationDateDescRow struct {
-	ID                          int64
-	Serial                      string
-	Name                        string
-	Description                 sql.NullString
-	BrandID                     int64
-	Status                      string
-	ProductSpecsID              sql.NullInt64
-	UnitPriceWithoutVat         int64
-	UnitPriceWithVat            int64
-	UnitPriceWithoutVatCurrency string
-	UnitPriceWithVatCurrency    string
-	CreatedAt                   time.Time
-	UpdatedAt                   time.Time
-	DeletedAt                   time.Time
-	Slug                        sql.NullString
-	ID_2                        int64
-	Category                    sql.NullString
-	Subcategory                 sql.NullString
-	PromotedAtHomepage          sql.NullBool
-	ID_3                        int64
-	Colours                     sql.NullString
-	Sizes                       sql.NullString
-	Segmentation                sql.NullString
-	PartNumber                  sql.NullString
-	Power                       sql.NullString
-	Capacity                    sql.NullString
-	ScopeOfSupply               sql.NullString
-	WeightUnit                  sql.NullString
-	Weight                      sql.NullFloat64
-	CreatedAt_2                 sql.NullTime
-	UpdatedAt_2                 sql.NullTime
-	ID_4                        int64
-	Name_2                      string
-	CreatedAt_3                 time.Time
-	UpdatedAt_3                 time.Time
-	DeletedAt_2                 time.Time
-	Status_2                    string
-	BrandName                   string
-}
-
-func (q *Queries) GetProductsByStatusSortByCreationDateDesc(ctx context.Context, status string) ([]GetProductsByStatusSortByCreationDateDescRow, error) {
-	rows, err := q.db.QueryContext(ctx, getProductsByStatusSortByCreationDateDesc, status)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetProductsByStatusSortByCreationDateDescRow
-	for rows.Next() {
-		var i GetProductsByStatusSortByCreationDateDescRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Serial,
-			&i.Name,
-			&i.Description,
-			&i.BrandID,
-			&i.Status,
-			&i.ProductSpecsID,
-			&i.UnitPriceWithoutVat,
-			&i.UnitPriceWithVat,
-			&i.UnitPriceWithoutVatCurrency,
-			&i.UnitPriceWithVatCurrency,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.DeletedAt,
-			&i.Slug,
-			&i.ID_2,
-			&i.Category,
-			&i.Subcategory,
-			&i.PromotedAtHomepage,
-			&i.ID_3,
-			&i.Colours,
-			&i.Sizes,
-			&i.Segmentation,
-			&i.PartNumber,
-			&i.Power,
-			&i.Capacity,
-			&i.ScopeOfSupply,
-			&i.WeightUnit,
-			&i.Weight,
-			&i.CreatedAt_2,
-			&i.UpdatedAt_2,
-			&i.ID_4,
-			&i.Name_2,
-			&i.CreatedAt_3,
-			&i.UpdatedAt_3,
-			&i.DeletedAt_2,
-			&i.Status_2,
-			&i.BrandName,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getProductsByStatusSortByNameAsc = `-- name: GetProductsByStatusSortByNameAsc :many
-SELECT
-	tbl_products.id, serial, tbl_products.name, description, brand_id, tbl_products.status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, slug, tbl_product_categories.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_product_specs.created_at, tbl_product_specs.updated_at, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
-	tbl_brands.name AS brand_name
-FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
-INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-WHERE tbl_products.status = ?
-ORDER BY LOWER(tbl_products.name) ASC
-`
-
-type GetProductsByStatusSortByNameAscRow struct {
-	ID                          int64
-	Serial                      string
-	Name                        string
-	Description                 sql.NullString
-	BrandID                     int64
-	Status                      string
-	ProductSpecsID              sql.NullInt64
-	UnitPriceWithoutVat         int64
-	UnitPriceWithVat            int64
-	UnitPriceWithoutVatCurrency string
-	UnitPriceWithVatCurrency    string
-	CreatedAt                   time.Time
-	UpdatedAt                   time.Time
-	DeletedAt                   time.Time
-	Slug                        sql.NullString
-	ID_2                        int64
-	Category                    sql.NullString
-	Subcategory                 sql.NullString
-	PromotedAtHomepage          sql.NullBool
-	ID_3                        int64
-	Colours                     sql.NullString
-	Sizes                       sql.NullString
-	Segmentation                sql.NullString
-	PartNumber                  sql.NullString
-	Power                       sql.NullString
-	Capacity                    sql.NullString
-	ScopeOfSupply               sql.NullString
-	WeightUnit                  sql.NullString
-	Weight                      sql.NullFloat64
-	CreatedAt_2                 sql.NullTime
-	UpdatedAt_2                 sql.NullTime
-	ID_4                        int64
-	Name_2                      string
-	CreatedAt_3                 time.Time
-	UpdatedAt_3                 time.Time
-	DeletedAt_2                 time.Time
-	Status_2                    string
-	BrandName                   string
-}
-
-func (q *Queries) GetProductsByStatusSortByNameAsc(ctx context.Context, status string) ([]GetProductsByStatusSortByNameAscRow, error) {
-	rows, err := q.db.QueryContext(ctx, getProductsByStatusSortByNameAsc, status)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetProductsByStatusSortByNameAscRow
-	for rows.Next() {
-		var i GetProductsByStatusSortByNameAscRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Serial,
-			&i.Name,
-			&i.Description,
-			&i.BrandID,
-			&i.Status,
-			&i.ProductSpecsID,
-			&i.UnitPriceWithoutVat,
-			&i.UnitPriceWithVat,
-			&i.UnitPriceWithoutVatCurrency,
-			&i.UnitPriceWithVatCurrency,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.DeletedAt,
-			&i.Slug,
-			&i.ID_2,
-			&i.Category,
-			&i.Subcategory,
-			&i.PromotedAtHomepage,
-			&i.ID_3,
-			&i.Colours,
-			&i.Sizes,
-			&i.Segmentation,
-			&i.PartNumber,
-			&i.Power,
-			&i.Capacity,
-			&i.ScopeOfSupply,
-			&i.WeightUnit,
-			&i.Weight,
-			&i.CreatedAt_2,
-			&i.UpdatedAt_2,
-			&i.ID_4,
-			&i.Name_2,
-			&i.CreatedAt_3,
-			&i.UpdatedAt_3,
-			&i.DeletedAt_2,
-			&i.Status_2,
-			&i.BrandName,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getProductsByStatusSortByNameDesc = `-- name: GetProductsByStatusSortByNameDesc :many
-SELECT
-	tbl_products.id, serial, tbl_products.name, description, brand_id, tbl_products.status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, slug, tbl_product_categories.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_product_specs.created_at, tbl_product_specs.updated_at, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
-	tbl_brands.name AS brand_name
-FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
-INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-WHERE tbl_products.status = ?
-ORDER BY LOWER(tbl_products.name) DESC
-`
-
-type GetProductsByStatusSortByNameDescRow struct {
-	ID                          int64
-	Serial                      string
-	Name                        string
-	Description                 sql.NullString
-	BrandID                     int64
-	Status                      string
-	ProductSpecsID              sql.NullInt64
-	UnitPriceWithoutVat         int64
-	UnitPriceWithVat            int64
-	UnitPriceWithoutVatCurrency string
-	UnitPriceWithVatCurrency    string
-	CreatedAt                   time.Time
-	UpdatedAt                   time.Time
-	DeletedAt                   time.Time
-	Slug                        sql.NullString
-	ID_2                        int64
-	Category                    sql.NullString
-	Subcategory                 sql.NullString
-	PromotedAtHomepage          sql.NullBool
-	ID_3                        int64
-	Colours                     sql.NullString
-	Sizes                       sql.NullString
-	Segmentation                sql.NullString
-	PartNumber                  sql.NullString
-	Power                       sql.NullString
-	Capacity                    sql.NullString
-	ScopeOfSupply               sql.NullString
-	WeightUnit                  sql.NullString
-	Weight                      sql.NullFloat64
-	CreatedAt_2                 sql.NullTime
-	UpdatedAt_2                 sql.NullTime
-	ID_4                        int64
-	Name_2                      string
-	CreatedAt_3                 time.Time
-	UpdatedAt_3                 time.Time
-	DeletedAt_2                 time.Time
-	Status_2                    string
-	BrandName                   string
-}
-
-func (q *Queries) GetProductsByStatusSortByNameDesc(ctx context.Context, status string) ([]GetProductsByStatusSortByNameDescRow, error) {
-	rows, err := q.db.QueryContext(ctx, getProductsByStatusSortByNameDesc, status)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetProductsByStatusSortByNameDescRow
-	for rows.Next() {
-		var i GetProductsByStatusSortByNameDescRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Serial,
-			&i.Name,
-			&i.Description,
-			&i.BrandID,
-			&i.Status,
-			&i.ProductSpecsID,
-			&i.UnitPriceWithoutVat,
-			&i.UnitPriceWithVat,
-			&i.UnitPriceWithoutVatCurrency,
-			&i.UnitPriceWithVatCurrency,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.DeletedAt,
-			&i.Slug,
-			&i.ID_2,
-			&i.Category,
-			&i.Subcategory,
-			&i.PromotedAtHomepage,
-			&i.ID_3,
-			&i.Colours,
-			&i.Sizes,
-			&i.Segmentation,
-			&i.PartNumber,
-			&i.Power,
-			&i.Capacity,
-			&i.ScopeOfSupply,
-			&i.WeightUnit,
-			&i.Weight,
-			&i.CreatedAt_2,
-			&i.UpdatedAt_2,
-			&i.ID_4,
-			&i.Name_2,
-			&i.CreatedAt_3,
-			&i.UpdatedAt_3,
-			&i.DeletedAt_2,
-			&i.Status_2,
-			&i.BrandName,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getProductsWithSort = `-- name: GetProductsWithSort :many
-SELECT id, serial, name, description, brand_id, status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, created_at, updated_at, deleted_at, slug
-FROM tbl_products
-ORDER BY
-	(CASE WHEN @sort = 'sku' AND @dir = 'ASC' THEN  tbl_products.sku END) ASC,
-	(CASE WHEN @sort = 'sku' AND @dir = 'DESC' THEN tbl_products.sku END) DESC,
-	(CASE WHEN @sort = 'created_at' AND @dir = 'ASC' THEN tbl_products.created_at END) ASC,
-	(CASE WHEN @sort = 'created_at' AND @dir = 'DESC' THEN tbl_products.created_at END) DESC
-`
-
-func (q *Queries) GetProductsWithSort(ctx context.Context) ([]TblProduct, error) {
-	rows, err := q.db.QueryContext(ctx, getProductsWithSort)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []TblProduct
-	for rows.Next() {
-		var i TblProduct
-		if err := rows.Scan(
-			&i.ID,
-			&i.Serial,
-			&i.Name,
-			&i.Description,
-			&i.BrandID,
-			&i.Status,
-			&i.ProductSpecsID,
-			&i.UnitPriceWithoutVat,
-			&i.UnitPriceWithVat,
-			&i.UnitPriceWithoutVatCurrency,
-			&i.UnitPriceWithVatCurrency,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.DeletedAt,
-			&i.Slug,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }
 
 const getProductsWithoutSlugs = `-- name: GetProductsWithoutSlugs :many
@@ -1804,6 +1086,93 @@ func (q *Queries) GetRelatedProductsByCategory(ctx context.Context, arg GetRelat
 			&i.IsOnSale,
 			&i.SalePriceWithVat,
 			&i.SalePriceWithVatCurrency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listProductsForQuotations = `-- name: ListProductsForQuotations :many
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	tbl_product_categories.category,
+	tbl_product_categories.subcategory
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_categories ON tbl_product_categories.id = tbl_products_categories.category_id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE tbl_products.status = 'ACTIVE'
+ORDER BY is_on_sale DESC
+`
+
+type ListProductsForQuotationsRow struct {
+	ID                       int64
+	Serial                   string
+	Slug                     sql.NullString
+	Name                     string
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	SalePriceWithVat         sql.NullInt64
+	SalePriceWithVatCurrency sql.NullString
+	IsOnSale                 int64
+	DiscountType             sql.NullString
+	DiscountValue            sql.NullInt64
+	BrandName                string
+	Category                 sql.NullString
+	Subcategory              sql.NullString
+}
+
+func (q *Queries) ListProductsForQuotations(ctx context.Context) ([]ListProductsForQuotationsRow, error) {
+	rows, err := q.db.QueryContext(ctx, listProductsForQuotations)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListProductsForQuotationsRow
+	for rows.Next() {
+		var i ListProductsForQuotationsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Serial,
+			&i.Slug,
+			&i.Name,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
+			&i.SalePriceWithVat,
+			&i.SalePriceWithVatCurrency,
+			&i.IsOnSale,
+			&i.DiscountType,
+			&i.DiscountValue,
+			&i.BrandName,
+			&i.Category,
+			&i.Subcategory,
 		); err != nil {
 			return nil, err
 		}

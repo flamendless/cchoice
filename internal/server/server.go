@@ -53,6 +53,7 @@ type Services struct {
 	image            *services.ImageService
 	promo            *services.PromoService
 	qr               *services.QRService
+	quotation        *services.QuotationService
 	report           *services.ReportService
 	role             *services.RoleService
 	staff            *services.StaffService
@@ -204,6 +205,7 @@ func NewServer() *ServerInstance {
 		image:            services.NewImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
 		promo:            services.NewPromoService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
 		qr:               services.NewQRService(newServer.cache),
+		quotation:        services.NewQuotationService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
 		report:           services.NewReportService(newServer.encoder, newServer.dbRO, attendanceService, holidayService, staffLogService),
 		role:             services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staff:            services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
@@ -226,6 +228,7 @@ func NewServer() *ServerInstance {
 		newServer.services.productInventory,
 		newServer.services.promo,
 		newServer.services.qr,
+		newServer.services.quotation,
 		newServer.services.report,
 		newServer.services.role,
 		newServer.services.staff,

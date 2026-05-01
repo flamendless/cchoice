@@ -8,13 +8,27 @@ SELECT
 	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
 	tbl_product_images.id AS product_image_id,
 	tbl_product_images.cdn_url,
-	tbl_product_images.cdn_url_thumbnail
+	tbl_product_images.cdn_url_thumbnail,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value
 FROM tbl_products
 INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
 LEFT JOIN tbl_product_categories AS pc ON pc.id = tbl_products_categories.category_id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN tbl_product_sales.starts_at AND tbl_product_sales.ends_at
 WHERE tbl_products.id = ?
 LIMIT 1;
 
@@ -52,88 +66,41 @@ SELECT
 	*,
 	tbl_brands.name AS brand_name
 FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
+INNER JOIN tbl_products_categories ON tbl_products.id = tbl_products_categories.product_id
 INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 ORDER BY created_at DESC;
 
--- name: GetProductsByStatus :many
+-- name: ListProductsForQuotations :many
 SELECT
-	*,
-	tbl_brands.name AS brand_name
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	tbl_product_categories.category,
+	tbl_product_categories.subcategory
 FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
-INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-WHERE tbl_products.status = ?
-ORDER BY created_at DESC;
-
--- name: GetProductsByStatusSortByNameAsc :many
-SELECT
-	*,
-	tbl_brands.name AS brand_name
-FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
-INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-WHERE tbl_products.status = ?
-ORDER BY LOWER(tbl_products.name) ASC;
-
--- name: GetProductsByStatusSortByNameDesc :many
-SELECT
-	*,
-	tbl_brands.name AS brand_name
-FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
-INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-WHERE tbl_products.status = ?
-ORDER BY LOWER(tbl_products.name) DESC;
-
--- name: GetProductsByStatusSortByCreationDateAsc :many
-SELECT
-	*,
-	tbl_brands.name AS brand_name
-FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
-INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-WHERE tbl_products.status = ?
-ORDER BY tbl_products.created_at ASC;
-
--- name: GetProductsByStatusSortByCreationDateDesc :many
-SELECT
-	*,
-	tbl_brands.name AS brand_name
-FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
-INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-WHERE tbl_products.status = ?
-ORDER BY tbl_products.created_at DESC;
-
--- name: GetProductsByFilter :many
-SELECT
-	*,
-	tbl_brands.name AS brand_name
-FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
-INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
-INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
-WHERE
-	(tbl_products.status = @status OR @status IS NULL) OR
-	(tbl_brands.name = @brand OR @brand IS NULL)
-ORDER BY tbl_products.updated_at DESC;
-
--- name: GetProductsWithSort :many
-SELECT *
-FROM tbl_products
-ORDER BY
-	(CASE WHEN @sort = 'sku' AND @dir = 'ASC' THEN  tbl_products.sku END) ASC,
-	(CASE WHEN @sort = 'sku' AND @dir = 'DESC' THEN tbl_products.sku END) DESC,
-	(CASE WHEN @sort = 'created_at' AND @dir = 'ASC' THEN tbl_products.created_at END) ASC,
-	(CASE WHEN @sort = 'created_at' AND @dir = 'DESC' THEN tbl_products.created_at END) DESC
-;
+LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_categories ON tbl_product_categories.id = tbl_products_categories.category_id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE tbl_products.status = 'ACTIVE'
+ORDER BY is_on_sale DESC;
 
 -- name: GetProductIDBySerial :one
 SELECT id

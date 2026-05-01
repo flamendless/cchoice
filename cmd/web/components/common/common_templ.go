@@ -140,14 +140,14 @@ func HeadMeta() templ.Component {
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<base href=\"/\"><meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\"><meta name=\"description\" content=\"Your Partner in Progress\"><meta name=\"google\" content=\"nositelinkssearchbox\"><meta name=\"robots\" content=\"noarchive, noimageindex\"><meta name=\"keywords\" content=\"cchoice, c-choice, construction, power tools\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><!--<link rel=\"dns-prefetch\" href=\"https://images1.cchoice.com\"/>--><link rel=\"preload\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<base href=\"/\"><link rel=\"canonical\" href=\"https://cchoice.shop/\"><meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\"><meta name=\"description\" content=\"Your Partner in Progress\"><meta name=\"google\" content=\"nositelinkssearchbox\"><meta name=\"robots\" content=\"noarchive, noimageindex\"><meta name=\"keywords\" content=\"cchoice, c-choice, construction, power tools\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><!--<link rel=\"dns-prefetch\" href=\"https://images1.cchoice.com\"/>--><link rel=\"preload\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 templ.SafeURL
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(constants.PathSVGLogoWithCompleteText)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 44, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 45, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -160,7 +160,7 @@ func HeadMeta() templ.Component {
 		var templ_7745c5c3_Var7 templ.SafeURL
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(constants.PathEmptyImageCDN)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 47, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 48, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -173,7 +173,7 @@ func HeadMeta() templ.Component {
 		var templ_7745c5c3_Var8 templ.SafeURL
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(constants.PathStoreImageCDN)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 53, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 54, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -186,7 +186,7 @@ func HeadMeta() templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/static/images/favicons/192x192.png"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 70, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 71, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -215,7 +215,7 @@ func HeadMeta() templ.Component {
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(constants.DefaultThumbnailSize)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 75, Col: 77}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 76, Col: 77}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -228,7 +228,7 @@ func HeadMeta() templ.Component {
 			var templ_7745c5c3_Var12 templ.SafeURL
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/images/favicons/favicon.ico"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 75, Col: 135}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 76, Col: 135}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -246,7 +246,7 @@ func HeadMeta() templ.Component {
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(size)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 77, Col: 49}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 78, Col: 49}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
@@ -259,7 +259,7 @@ func HeadMeta() templ.Component {
 				var templ_7745c5c3_Var14 templ.SafeURL
 				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(fmt.Sprintf("https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-%s/public", size))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 77, Col: 147}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 78, Col: 147}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
@@ -277,7 +277,7 @@ func HeadMeta() templ.Component {
 			var templ_7745c5c3_Var15 templ.SafeURL
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/css/tailwind.css"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 79, Col: 52}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 80, Col: 52}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -290,7 +290,7 @@ func HeadMeta() templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(templ.URL(utils.URL("/static/js/htmx.min.js")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 80, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 81, Col: 85}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -303,7 +303,7 @@ func HeadMeta() templ.Component {
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(templ.URL(utils.URL("/static/js/hyperscript.min.js")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 81, Col: 98}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 82, Col: 98}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -316,7 +316,7 @@ func HeadMeta() templ.Component {
 			var templ_7745c5c3_Var18 string
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(templ.URL(utils.URL("/static/js/metrics.js")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 82, Col: 90}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 83, Col: 90}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
@@ -384,7 +384,7 @@ func IconActionButton(
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 121, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 122, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -397,7 +397,7 @@ func IconActionButton(
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 122, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 123, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -410,7 +410,7 @@ func IconActionButton(
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs("on click go to url '" + utils.URL(href) + "'")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 130, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 131, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
@@ -466,7 +466,7 @@ func IconAction(
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs("on click go to url '" + utils.URL(href) + "'")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 155, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 156, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
@@ -518,7 +518,7 @@ func ContinueShopping() templ.Component {
 		var templ_7745c5c3_Var26 templ.SafeURL
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(utils.URL("/")))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 165, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 166, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
@@ -560,7 +560,7 @@ func GMapsLink(url string) templ.Component {
 		var templ_7745c5c3_Var28 templ.SafeURL
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinURLErrs(url)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 180, Col: 12}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 181, Col: 12}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {
@@ -602,7 +602,7 @@ func WazeLink(url string) templ.Component {
 		var templ_7745c5c3_Var30 templ.SafeURL
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinURLErrs(url)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 207, Col: 12}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 208, Col: 12}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
@@ -645,7 +645,7 @@ func DiscountRibbon(percentage string) templ.Component {
 			var templ_7745c5c3_Var32 string
 			templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(percentage)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 242, Col: 16}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 243, Col: 16}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 			if templ_7745c5c3_Err != nil {
@@ -691,7 +691,7 @@ func AddToCart() templ.Component {
 		var templ_7745c5c3_Var34 string
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/lines"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 259, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 260, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
@@ -772,7 +772,7 @@ func AddToCartPromoProduct() templ.Component {
 		var templ_7745c5c3_Var37 string
 		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/carts/lines"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 327, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 328, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 		if templ_7745c5c3_Err != nil {

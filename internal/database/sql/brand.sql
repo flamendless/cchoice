@@ -92,6 +92,16 @@ WHERE status != 'DELETED'
 ORDER BY name ASC
 LIMIT ?;
 
+-- name: GetAllActiveBrands :many
+SELECT
+	id,
+	name,
+	status
+FROM tbl_brands
+WHERE status = 'ACTIVE'
+ORDER BY name ASC
+LIMIT ?;
+
 -- name: GetAllBrands :many
 SELECT
 	tbl_brands.id AS id,

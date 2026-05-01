@@ -1,3 +1,12 @@
+-- name: GetAllCategoryNames :many
+SELECT DISTINCT category FROM tbl_product_categories
+ORDER BY category ASC;
+
+-- name: GetAllSubcategoryNames :many
+SELECT DISTINCT subcategory FROM tbl_product_categories
+WHERE subcategory != ''
+ORDER BY subcategory ASC;
+
 -- name: GetProductCategoryByID :one
 SELECT *
 FROM tbl_product_categories

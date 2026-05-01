@@ -376,6 +376,27 @@ type TblPromo struct {
 	Priority    sql.NullInt64
 }
 
+type TblQuotation struct {
+	ID                    int64
+	CustomerID            int64
+	AcknowledgedByStaffID sql.NullInt64
+	Status                string
+	CreatedAt             time.Time
+	UpdatedAt             time.Time
+}
+
+type TblQuotationLine struct {
+	ID                    int64
+	QuotationID           int64
+	ProductID             int64
+	Quantity              int64
+	OriginalPriceSnapshot sql.NullInt64
+	SalePriceSnapshot     sql.NullInt64
+	Currency              string
+	CreatedAt             time.Time
+	UpdatedAt             time.Time
+}
+
 type TblSetting struct {
 	ID    int64
 	Name  string
