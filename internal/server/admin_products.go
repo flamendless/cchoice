@@ -279,7 +279,7 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 			Stocks:              stocksQty,
 		})
 	if err != nil || product == nil {
-		result = errors.Join(err, errors.New("nil product returned")).Error()
+		result = errors.Join(err, errs.ErrServerProductNil).Error()
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, "Failed to create product"))
 		return

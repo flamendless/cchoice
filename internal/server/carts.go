@@ -757,23 +757,18 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 
 order, checkoutURL, err := orders.CreateOrderFromCheckout(ctx, s.dbRW, orderParams)
 	if err != nil || order == nil {
-		errMsg := ""
-		if err != nil {
-			errMsg = err.Error()
-		} else {
-			errMsg = "nil order"
-		}
+		errMsg := errors.Join(err, errs.ErrCartNilOrder).Error()
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, errMsg, http.StatusInternalServerError)
 		return
 	}
 
-	logs.LogCtx(ctx).Info(
-			logtag,
-			zap.String("token", token),
-			zap.Int64("order_id", order.ID),
-			zap.String("order_number", order.OrderNumber),
-		)
+logs.LogCtx(ctx).Info(
+		logtag,
+		zap.String("token", token),
+		zap.Int64("order_id", order.ID),
+		zap.String("order_number", order.OrderNumber),
+	)
 
 		metrics.ClientEvent.ClientEventHit("checked_payment_method", cartCheckout.PaymentMethod)
 
