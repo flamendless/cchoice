@@ -12,14 +12,14 @@ templ BrandsSidePanelList(selectedBrandLabel string, brands []models.BrandSidePa
 	}
 	<div
 		id="brands-side-panel-list"
-		class="flex flex-col overflow-y-auto scrollbar-hide max-h-64"
+		class="flex flex-col overflow-y-auto scrollbar-hide"
 	>
 		for _, brand := range brands {
 			<a
 				id={ "brand-link-" + brand.BrandID }
 				href={ templ.SafeURL(brand.URL) }
 				class={
-					templ.KV("text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft transition-colors brand-filter-link", true),
+					templ.KV("text-sm font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft transition-colors brand-filter-link", true),
 					templ.KV("underline bg-cchoice font-semibold text-white", brand.Label == selectedBrandLabel),
 				}
 				data-brand-name={ brand.Label }

@@ -41,12 +41,12 @@ func BrandsSidePanelList(selectedBrandLabel string, brands []models.BrandSidePan
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div id=\"brands-side-panel-list\" class=\"flex flex-col overflow-y-auto scrollbar-hide max-h-64\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div id=\"brands-side-panel-list\" class=\"flex flex-col overflow-y-auto scrollbar-hide\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, brand := range brands {
-			var templ_7745c5c3_Var2 = []any{templ.KV("text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft transition-colors brand-filter-link", true),
+			var templ_7745c5c3_Var2 = []any{templ.KV("text-sm font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft transition-colors brand-filter-link", true),
 				templ.KV("underline bg-cchoice font-semibold text-white", brand.Label == selectedBrandLabel),
 			}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
