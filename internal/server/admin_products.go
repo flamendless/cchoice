@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -282,8 +283,8 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 			StocksIn:            stocksIn,
 			Stocks:              stocksQty,
 		})
-	if err != nil {
-		result = err.Error()
+	if err != nil || product == nil {
+		result = errors.Join(err, errs.ErrServerProductNil).Error()
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, "Failed to create product"))
 		return

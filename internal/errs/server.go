@@ -7,4 +7,5 @@ var (
 	ErrServerUnimplementedGateway = errors.New("[SERVER]: Unimplemented gateway")
 	ErrServerNoMapsFound          = errors.New("[SERVER]: No maps found")
 	ErrServerFSNotSetup           = errors.New("[SERVER]: Filesystem not setup")
+	ErrServerProductNil          = errors.New("[SERVER]: nil product returned")
 )

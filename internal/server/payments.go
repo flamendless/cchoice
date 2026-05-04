@@ -181,7 +181,7 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 		DBRW:            s.dbRW,
 		EmailJobRunner:  s.mailJobRunner,
 	})
-	if err != nil {
+	if err != nil || result == nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, "Failed to process payment", http.StatusInternalServerError)
 		return
