@@ -7,7 +7,7 @@ import "cchoice/cmd/web/components/footer"
 
 templ HomePage(data models.HomePageData) {
 	<!DOCTYPE html>
-	<html lang="en" class="overflow-x-hidden">
+	<html lang="en" style="overflow-x: clip;">
 		<head>
 			@common.HeadMeta()
 			@common.TabTitle("Home")
@@ -17,7 +17,7 @@ templ HomePage(data models.HomePageData) {
 }
 
 templ HomePageBody(data models.HomePageData) {
-	<body class="m-0 p-0 overflow-x-hidden custom-scrollbar">
+	<body class="m-0 p-0 custom-scrollbar" style="overflow-x: clip;">
 		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()
@@ -25,31 +25,33 @@ templ HomePageBody(data models.HomePageData) {
 			@SaleBanner(data.RandomSaleProduct)
 		}
 		@header.Header()
-		if len(data.ActivePromos) > 0 {
-			@ActivePromosSection(data.ActivePromos)
-		}
 		@MobileSidebar()
 		<style>
+			#sidebar-content-wrapper {
+				display: flex;
+				align-items: flex-start;
+				width: 100%;
+			}
 			#desktop-sidebar {
-				position: fixed;
-				top: 0;
+				position: sticky;
+				top: 80px;
 				left: 0;
 				z-index: 45;
 				width: 15%;
-				height: 100vh;
+				height: calc(100vh - 80px);
 				overflow-y: auto;
-				padding-top: 130px;
-				padding-right: 1rem;
-				padding-bottom: 0;
-				padding-left: 0.25rem;
+				padding: 0.5rem 1rem 0 0.25rem;
 				background: white;
-				padding: 130px 1rem 0 0.25rem;
+				flex-shrink: 0;
+			}
+			#promo-section {
+				width: 100%;
+				z-index: 40;
 			}
 			#main-content {
 				display: flex;
 				align-items: flex-start;
-				width: 100%;
-				margin-left: 15%;
+				width: 85%;
 				border-left: 2px solid #F6b08A;
 			}
 			@media (max-width: 1023px) {
@@ -59,21 +61,26 @@ templ HomePageBody(data models.HomePageData) {
 				#main-content {
 					width: 100% !important;
 					border-left: none !important;
-					margin-left: 0 !important;
+				}
+				#sidebar-content-wrapper {
+					width: 100% !important;
 				}
 			}
 		</style>
-		<div class="flex flex-col">
-			<div class="flex items-start">
-				<div id="desktop-sidebar">
-					@BrandsSidePanel()
-					@CategoriesSidePanel()
-				</div>
-				<div id="main-content" name="right-panel">
-					<div class="w-full">
-						@AllCategorySections()
-						@PostHomeContentSections(data)
-					</div>
+		if len(data.ActivePromos) > 0 {
+			<div id="promo-section">
+				@ActivePromosSection(data.ActivePromos)
+			</div>
+		}
+		<div id="sidebar-content-wrapper">
+			<div id="desktop-sidebar">
+				@BrandsSidePanel()
+				@CategoriesSidePanel()
+			</div>
+			<div id="main-content" name="right-panel">
+				<div class="w-full">
+					@AllCategorySections()
+					@PostHomeContentSections(data)
 				</div>
 			</div>
 		</div>
