@@ -13,7 +13,8 @@ func FormToStruct(r *http.Request, dst any) error {
 		return err
 	}
 
-	if reflect.TypeOf(dst).Kind() != reflect.Ptr {
+	v := reflect.ValueOf(dst)
+	if v.Kind() != reflect.Ptr || v.IsNil() {
 		return errs.ErrValidationTargetMustBeAPointer
 	}
 	elem := reflect.TypeOf(dst).Elem()
