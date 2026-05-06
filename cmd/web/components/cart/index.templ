@@ -213,10 +213,12 @@ templ btnQtyDecrease(cl models.CheckoutLine) {
 				put me.id.replace('btn-minus-', 'btn-plus-') into plusID
 				put document.querySelector('#' + plusID) into btnPlus
 				if btnPlus is not null
-					trigger htmx:afterRequest on btnPlus
+					if qty >= 1
+						set btnPlus.disabled to false
+					else
+						set btnPlus.disabled to true
+					end
 				end
-
-				trigger cartUpdated on the body
 			end
 		"
 	>
@@ -250,7 +252,7 @@ templ btnQtyIncrease(cl models.CheckoutLine) {
 				put txtQty.split(':')[1].trim() into qty
 				set qty to Number(qty)
 
-				if qty >= 99
+				if qty <= 1
 					set me.disabled to true
 				else
 					set me.disabled to false
@@ -259,10 +261,12 @@ templ btnQtyIncrease(cl models.CheckoutLine) {
 				put me.id.replace('btn-plus-', 'btn-minus-') into minusID
 				put document.querySelector('#' + minusID) into btnMinus
 				if btnMinus is not null
-					trigger htmx:afterRequest on btnMinus
+					if qty > 1
+						set btnMinus.disabled to false
+					else
+						set btnMinus.disabled to true
+					end
 				end
-
-				trigger cartUpdated on the body
 			end
 		"
 	>
