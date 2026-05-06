@@ -1,6 +1,7 @@
 package server
 
 import (
+	"cmp"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -8,6 +9,7 @@ import (
 	"net/http"
 
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 
@@ -82,7 +84,8 @@ func (s *Server) handleTrackedLinkQR(w http.ResponseWriter, r *http.Request) {
 	}
 
 	link, err := s.services.trackedLink.GetTrackedLinkByID(ctx, id)
-	if err != nil {
+	if err != nil || link == nil {
+		err = cmp.Or(err, errs.ErrDBNil)
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return

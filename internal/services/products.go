@@ -1,6 +1,7 @@
 package services
 
 import (
+	"cmp"
 	"context"
 	"database/sql"
 	"fmt"
@@ -207,7 +208,8 @@ func (s *ProductService) GetForListingAdmin(
 		price := utils.NewMoney(p.UnitPriceWithVat, p.UnitPriceWithVatCurrency)
 		productID := s.encoder.Encode(p.ID)
 		inventory, err := s.productInventory.GetByProductID(ctx, productID)
-		if err != nil {
+		if err != nil || inventory == nil {
+			err = cmp.Or(err, errs.ErrDBNil)
 			logs.Log().Warn(s.ID(), zap.String("product id", productID), zap.Error(err))
 			continue
 		}
@@ -265,8 +267,8 @@ func (s *ProductService) GetByIDForEdit(ctx context.Context, productID string) (
 	}
 
 	inventory, err := s.productInventory.GetByProductID(ctx, productID)
-	if err != nil {
-		return nil, err
+	if err != nil || inventory == nil {
+		return nil, cmp.Or(err, errs.ErrDBNil)
 	}
 
 	return &ProductForEdit{

@@ -121,7 +121,8 @@ func (c *Lalamove) doRequest(method, path string, body []byte) (*http.Response, 
 
 	resp, err := c.client.Do(req)
 	if err != nil || resp == nil {
-		return nil, errors.Join(errs.ErrLalamoveHTTPRequest, errs.ErrHTTPDoRequest, cmp.Or(err, errs.ErrRespNil))
+		err = cmp.Or(err, errs.ErrRespNil)
+		return nil, errors.Join(errs.ErrLalamoveHTTPRequest, errs.ErrHTTPDoRequest, err)
 	}
 
 	if resp.ContentLength != 0 {
