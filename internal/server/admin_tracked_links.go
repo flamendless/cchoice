@@ -1,6 +1,7 @@
 package server
 
 import (
+	"cmp"
 	"net/http"
 	"strings"
 
@@ -8,6 +9,7 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 
@@ -27,7 +29,8 @@ func (s *Server) adminTrackedLinksEditPageHandler(w http.ResponseWriter, r *http
 	}
 
 	link, err := s.services.trackedLink.GetTrackedLinkByID(ctx, idStr)
-	if err != nil {
+	if err != nil || link == nil {
+		err = cmp.Or(err, errs.ErrDBNil)
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return

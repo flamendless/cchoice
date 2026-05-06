@@ -51,4 +51,5 @@ var (
 
 	ErrNotFound = errors.New("[NOTFOUND]: Resource not found")
 	ErrRespNil  = errors.New("[GENERIC]: nil response returned")
+	ErrDBNil    = errors.New("[DB]: nil data from database")
 )

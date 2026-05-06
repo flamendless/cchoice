@@ -287,7 +287,7 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		err = cmp.Or(err, errs.ErrServerProductNil)
 		result = err.Error()
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to create product"))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 
@@ -594,7 +594,8 @@ func (s *Server) adminSuperuserProductsEditPageHandler(w http.ResponseWriter, r 
 	}
 
 	inventory, err := s.services.productInventory.GetByProductID(ctx, productID)
-	if err != nil {
+	if err != nil || inventory == nil {
+		err = cmp.Or(err, errs.ErrDBNil)
 		logs.Log().Warn(page, zap.String("product id", productID), zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return

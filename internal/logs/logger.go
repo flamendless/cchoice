@@ -96,7 +96,7 @@ func LogHTTPHandler(logger *zap.Logger, r *http.Request, err error) {
 
 func JSONResponse(id string, resp *http.Response) {
 	if resp == nil {
-		logger.Error("Passed a nil *https.Response")
+		logger.Warn("Passed a nil *https.Response")
 		return
 	}
 

@@ -85,15 +85,14 @@ func (s *BrandService) GetAllActive(ctx context.Context) ([]Brand, error) {
 	for _, b := range brands {
 		s3URL := ""
 		result = append(result, Brand{
-			ID:           b.ID,
-			Name:         b.Name,
-			LogoS3URL:    s3URL,
-			Status:       enums.ParseBrandStatusToEnum(b.Status),
+			ID:        b.ID,
+			Name:      b.Name,
+			LogoS3URL: s3URL,
+			Status:    enums.ParseBrandStatusToEnum(b.Status),
 		})
 	}
 	return result, nil
 }
-
 
 func (s *BrandService) SearchBrandsByFilter(
 	ctx context.Context,

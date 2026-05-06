@@ -234,7 +234,8 @@ func (c *Client) PutObjectFromBytes(ctx context.Context, key string, data []byte
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil || resp == nil {
-		return errors.Join(errs.ErrCloudflareUpload, cmp.Or(err, errs.ErrRespNil))
+		err = cmp.Or(err, errs.ErrRespNil)
+		return errors.Join(errs.ErrCloudflareUpload, err)
 	}
 	defer resp.Body.Close()
 
@@ -264,7 +265,8 @@ func (c *Client) GetObject(ctx context.Context, key string) (io.ReadCloser, erro
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil || resp == nil {
-		return nil, errors.Join(errs.ErrCloudflareGet, cmp.Or(err, errs.ErrRespNil))
+		err = cmp.Or(err, errs.ErrRespNil)
+		return nil, errors.Join(errs.ErrCloudflareGet, err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
@@ -298,7 +300,8 @@ func (c *Client) DeleteObject(ctx context.Context, key string) error {
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil || resp == nil {
-		return errors.Join(errs.ErrCloudflareDelete, cmp.Or(err, errs.ErrRespNil))
+		err = cmp.Or(err, errs.ErrRespNil)
+		return errors.Join(errs.ErrCloudflareDelete, err)
 	}
 	defer resp.Body.Close()
 
@@ -331,7 +334,8 @@ func (c *Client) ObjectExists(ctx context.Context, key string) (bool, error) {
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil || resp == nil {
-		return false, errors.Join(errs.ErrCloudflareAPI, cmp.Or(err, errs.ErrRespNil))
+		err = cmp.Or(err, errs.ErrRespNil)
+		return false, errors.Join(errs.ErrCloudflareAPI, err)
 	}
 	defer resp.Body.Close()
 
@@ -355,7 +359,8 @@ func (c *Client) HeadBucket(ctx context.Context) error {
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil || resp == nil {
-		return errors.Join(errs.ErrCloudflareVerifyAccess, cmp.Or(err, errs.ErrRespNil))
+		err = cmp.Or(err, errs.ErrRespNil)
+		return errors.Join(errs.ErrCloudflareVerifyAccess, err)
 	}
 	defer resp.Body.Close()
 
