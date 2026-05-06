@@ -8,7 +8,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"math"
 	"slices"
 
 	"go.uber.org/zap"
@@ -85,12 +84,12 @@ func CreateCart(
 		}
 
 		if err == nil && checkoutLine.Quantity != qty {
-			diff := int64(math.Abs(float64(checkoutLine.Quantity - qty)))
+			delta := qty - checkoutLine.Quantity
 			if _, err := dbq.UpdateCheckoutLineQtyByID(
 				ctx,
 				queries.UpdateCheckoutLineQtyByIDParams{
 					ID:       checkoutLine.ID,
-					Quantity: diff,
+					Quantity: delta,
 				},
 			); err != nil {
 				logs.Log().Warn(
@@ -98,7 +97,7 @@ func CreateCart(
 					zap.Error(err),
 					zap.Int64("checkout id", checkoutID),
 					zap.String("product id", productID),
-					zap.Int64("diff", diff),
+					zap.Int64("delta", delta),
 				)
 			}
 		}
