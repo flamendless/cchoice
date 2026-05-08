@@ -3,6 +3,7 @@ package server
 import (
 	"cmp"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -37,6 +38,11 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 )
+
+type qtyUpdateResponse struct {
+	Total string `json:"total"`
+	Qty   int64  `json:"qty"`
+}
 
 func AddCartsHandlers(s *Server, r chi.Router) {
 	r.Get("/carts", s.cartsPageHandler)
@@ -335,7 +341,7 @@ func (s *Server) cartLinesHandler(w http.ResponseWriter, r *http.Request) {
 			cl.WeightDisplay = fmt.Sprintf("%.2f kg", weightKg)
 		}
 
-		if err := compcart.CartCheckoutLineItem(cl).Render(ctx, w); err != nil {
+		if err := compcart.CartLineWrapper(cl).Render(ctx, w); err != nil {
 			logs.LogCtx(ctx).Error(
 				logtag,
 				zap.Error(err),
@@ -583,7 +589,49 @@ func (s *Server) updateCartLinesQtyHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if _, err := w.Write(fmt.Appendf(nil, "Qty: %d", newQty)); err != nil {
+	token := s.sessionManager.Token(ctx)
+	checkoutLines, err := cart.GetCheckoutLines(ctx, s.dbRO, token)
+	if err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var matchedLine queries.GetCheckoutLinesByCheckoutIDRow
+	var found bool
+	for _, cl := range checkoutLines {
+		if cl.ID == dbCheckoutLineID {
+			matchedLine = cl
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		http.Error(w, "checkout line not found", http.StatusNotFound)
+		return
+	}
+
+	_, discountedPrice, _ := utils.GetOrigAndDiscounted(
+		matchedLine.IsOnSale,
+		matchedLine.UnitPriceWithVat,
+		matchedLine.UnitPriceWithVatCurrency,
+		matchedLine.SalePriceWithVat,
+		matchedLine.SalePriceWithVatCurrency,
+	)
+
+	newTotal := discountedPrice.Multiply(newQty)
+	totalDisplay := newTotal.Display()
+
+	w.Header().Set("Content-Type", "application/json")
+	resp := qtyUpdateResponse{
+		Qty:   newQty,
+		Total: totalDisplay,
+	}
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),

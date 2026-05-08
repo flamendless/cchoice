@@ -1,0 +1,164 @@
+package cart
+
+import (
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/svg"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/utils"
+)
+
+templ CartLineWrapper(cl models.CheckoutLine) {
+	<div id={ "cart-checkout-line-item-" + cl.ID }>
+		<div class="lg:hidden">
+			@CartCheckoutLineItemMobile(cl)
+		</div>
+		<div class="hidden lg:block">
+			@CartCheckoutLineItemDesktop(cl)
+		</div>
+	</div>
+}
+
+templ CartCheckoutLineItemDesktop(cl models.CheckoutLine) {
+	<div
+		class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 border rounded h-auto p-2 sm:p-0"
+	>
+		<div class="flex items-center gap-2 pl-0 sm:pl-3">
+			<input
+				type="checkbox"
+				class="w-5 h-5 accent-cchoice_border hover:accent-cchoice"
+				aria-label="Select item"
+				name="checked_item"
+				value={ cl.ID }
+				checked?={ cl.Checked }
+				hx-patch={ utils.URL("/carts/lines/" + cl.ID + "/toggle") }
+				hx-swap="none"
+				_="on htmx:afterRequest trigger cartUpdated on the body"
+			/>
+			<img
+				class="m-2 w-20 max-w-20 h-20 sm:w-32 sm:max-w-32 sm:h-32"
+				title={ "product image of " + cl.Name }
+				src={ cl.CDNURL1280 }
+				alt={ cl.Name + " thumbnail" }
+				data-product-id={ cl.ProductID }
+			/>
+			@common.DiscountRibbon(cl.DiscountPercentage)
+		</div>
+		<div class="flex flex-row grow w-full">
+			<div class="flex-1">
+				<h2 class="text-sm sm:text-base font-semibold">{ cl.Name }</h2>
+				<p class="text-xs text-gray-600">{ cl.BrandName }</p>
+				<p class="text-xs text-gray-600">{ cl.WeightDisplay }</p>
+				<span class="flex gap-[4px]">
+					if cl.DiscountPercentage != "" {
+						<p class="text-sm font-semibold text-cchoice text-center">
+							{ cl.Price.Display() }
+						</p>
+						<p class="text-xs font-semibold text-black line-through text-center">
+							{ cl.OrigPrice.Display() }
+						</p>
+					} else {
+						<p class="text-xs font-semibold text-cchoice">
+							{ cl.OrigPrice.Display() }
+						</p>
+					}
+				</span>
+				<div class="cart-line flex items-center gap-2 my-1">
+					@btnQtyDecrease(cl, "desktop")
+					<p class="text-sm text-gray-500">Qty: <span id={ "qty-desktop-" + cl.ID }>{ cl.Quantity }</span></p>
+					@btnQtyIncrease(cl, "desktop")
+				</div>
+				<p id={ "total-desktop-" + cl.ID } class="text-sm text-gray-700">
+					Total: { cl.Total.Display() }
+				</p>
+			</div>
+			<div class="place-content-end mr-2">
+				<button
+					alt="Remove item from cart button"
+					aria-label="Remove item in cart"
+					title="Remove item from cart"
+					hx-delete={ utils.URL("/carts/lines/" + cl.ID) }
+					hx-target={ "#cart-checkout-line-item-" + cl.ID }
+					hx-swap="outerHTML"
+					hx-push-url="false"
+					class="
+						group stroke-cchoice rounded-full p-2
+						cursor-pointer hover:bg-cchoice_border
+					"
+				>
+					@svg.Trash("stroke-cchoice group-hover:stroke-white cursor-pointer")
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+templ CartCheckoutLineItemMobile(cl models.CheckoutLine) {
+	<div
+		class="flex flex-row items-stretch gap-2 xs:gap-3 border rounded h-auto p-2"
+	>
+		<div class="flex flex-col justify-between">
+			<input
+				type="checkbox"
+				class="w-3.5 h-3.5 accent-cchoice_border hover:accent-cchoice self-center"
+				aria-label="Select item"
+				name="checked_item"
+				value={ cl.ID }
+				checked?={ cl.Checked }
+				hx-patch={ utils.URL("/carts/lines/" + cl.ID + "/toggle") }
+				hx-swap="none"
+				_="on htmx:afterRequest trigger cartUpdated on the body"
+			/>
+			<button
+				alt="Remove item from cart button"
+				aria-label="Remove item in cart"
+				title="Remove item from cart"
+				hx-delete={ utils.URL("/carts/lines/" + cl.ID) }
+				hx-target={ "#cart-checkout-line-item-" + cl.ID }
+				hx-swap="outerHTML"
+				hx-push-url="false"
+				class="group stroke-cchoice rounded-full p-1 cursor-pointer hover:bg-cchoice_border"
+			>
+				@svg.Trash("stroke-cchoice group-hover:stroke-cchoice_dark cursor-pointer w-4 h-4")
+			</button>
+		</div>
+		<div class="flex items-center relative flex-shrink-0">
+			<img
+				class="w-20 h-20 xs:w-24 xs:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded"
+				title={ "product image of " + cl.Name }
+				src={ cl.CDNURL1280 }
+				alt={ cl.Name + " thumbnail" }
+				data-product-id={ cl.ProductID }
+			/>
+			@common.DiscountRibbon(cl.DiscountPercentage)
+		</div>
+		<div class="flex flex-col gap-1 flex-1 justify-center">
+			<h2 class="text-sm md:text-base lg:text-lg font-semibold leading-tight">{ cl.Name }</h2>
+			<p class="text-xs md:text-sm text-gray-500 leading-tight">{ cl.BrandName }</p>
+			<p class="text-xs md:text-sm text-gray-500 leading-tight">{ cl.WeightDisplay }</p>
+			<span class="flex gap-1 flex-wrap">
+				if cl.DiscountPercentage != "" {
+					<p class="text-sm md:text-base lg:text-lg font-semibold text-cchoice">
+						{ cl.Price.Display() }
+					</p>
+					<p class="text-xs font-semibold text-black line-through">
+						{ cl.OrigPrice.Display() }
+					</p>
+				} else {
+					<p class="text-sm md:text-base lg:text-lg font-semibold text-cchoice">
+						{ cl.OrigPrice.Display() }
+					</p>
+				}
+			</span>
+		</div>
+		<div class="flex flex-col justify-end gap-1 flex-shrink-0">
+			<div class="cart-line flex items-center justify-center gap-1">
+				@btnQtyDecrease(cl, "mobile")
+				<span id={ "qty-mobile-" + cl.ID } class="text-sm md:text-base font-semibold text-gray-700 min-w-5 text-center">{ cl.Quantity }</span>
+				@btnQtyIncrease(cl, "mobile")
+			</div>
+			<p id={ "total-mobile-" + cl.ID } class="text-sm md:text-base font-bold text-cchoice text-center">
+				{ cl.Total.Display() }
+			</p>
+		</div>
+	</div>
+}
