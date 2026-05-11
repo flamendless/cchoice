@@ -290,7 +290,7 @@ func AdminProductInventoriesTable(inventories []models.AdminProductInventoryList
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(inv.UpdatedAt)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 109, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 109, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -303,7 +303,7 @@ func AdminProductInventoriesTable(inventories []models.AdminProductInventoryList
 			var templ_7745c5c3_Var13 templ.SafeURL
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URLf("/product/%s", inv.ProductSlug))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 113, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 113, Col: 57}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
