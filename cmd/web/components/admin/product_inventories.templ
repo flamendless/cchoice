@@ -76,10 +76,13 @@ templ AdminProductInventoriesTable(inventories []models.AdminProductInventoryLis
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
 						Stocks
 					</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
-						Updated At
-					</th>
-				</tr>
+				<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+					Updated At
+				</th>
+				<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
+					Actions
+				</th>
+			</tr>
 			</thead>
 			<tbody class="bg-white divide-y divide-gray-200">
 				for _, inv := range inventories {
@@ -102,10 +105,19 @@ templ AdminProductInventoriesTable(inventories []models.AdminProductInventoryLis
 								<span class="text-green-600">{ fmt.Sprintf("%d", inv.Stocks) }</span>
 							}
 						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-							{ inv.UpdatedAt }
-						</td>
-					</tr>
+					<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+						{ inv.UpdatedAt }
+					</td>
+					<td class="px-6 py-4 whitespace-nowrap text-sm">
+						<a
+							href={ utils.URLf("/product/%s", inv.ProductSlug) }
+							target="_blank"
+							class="inline-block px-3 py-1 text-xs font-medium rounded text-center text-white bg-blue-600 hover:bg-blue-700"
+						>
+							View Product
+						</a>
+					</td>
+				</tr>
 				}
 			</tbody>
 		</table>

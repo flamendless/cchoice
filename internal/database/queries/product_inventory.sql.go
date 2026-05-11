@@ -16,7 +16,8 @@ SELECT
     tbl_product_inventories.stocks,
     tbl_product_inventories.stocks_in,
     tbl_product_inventories.updated_at,
-    tbl_products.serial AS product_serial
+    tbl_products.serial AS product_serial,
+    tbl_products.slug AS product_slug
 FROM tbl_product_inventories
 INNER JOIN tbl_products ON tbl_products.id = tbl_product_inventories.product_id
 ORDER BY
@@ -35,6 +36,7 @@ type AdminGetProductInventoriesListingRow struct {
 	StocksIn      string
 	UpdatedAt     string
 	ProductSerial string
+	ProductSlug   sql.NullString
 }
 
 func (q *Queries) AdminGetProductInventoriesListing(ctx context.Context) ([]AdminGetProductInventoriesListingRow, error) {
@@ -52,6 +54,7 @@ func (q *Queries) AdminGetProductInventoriesListing(ctx context.Context) ([]Admi
 			&i.StocksIn,
 			&i.UpdatedAt,
 			&i.ProductSerial,
+			&i.ProductSlug,
 		); err != nil {
 			return nil, err
 		}
