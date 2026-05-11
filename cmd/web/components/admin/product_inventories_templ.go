@@ -193,7 +193,7 @@ func AdminProductInventoriesTable(inventories []models.AdminProductInventoryList
 			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"overflow-x-auto\"><table class=\"min-w-full divide-y divide-gray-200\"><thead class=\"bg-gray-50\"><tr><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]\">ID</th><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]\">Serial</th><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]\">Stocks In</th><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]\">Stocks</th><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]\">Updated At</th></tr></thead> <tbody class=\"bg-white divide-y divide-gray-200\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"overflow-x-auto\"><table class=\"min-w-full divide-y divide-gray-200\"><thead class=\"bg-gray-50\"><tr><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]\">ID</th><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]\">Serial</th><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]\">Stocks In</th><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]\">Stocks</th><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]\">Updated At</th><th class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]\">Actions</th></tr></thead> <tbody class=\"bg-white divide-y divide-gray-200\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -205,7 +205,7 @@ func AdminProductInventoriesTable(inventories []models.AdminProductInventoryList
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(inv.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 88, Col: 15}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 91, Col: 15}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -218,7 +218,7 @@ func AdminProductInventoriesTable(inventories []models.AdminProductInventoryList
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(inv.ProductSerial)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 91, Col: 26}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 94, Col: 26}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -231,7 +231,7 @@ func AdminProductInventoriesTable(inventories []models.AdminProductInventoryList
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(inv.StocksIn.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 94, Col: 30}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 97, Col: 30}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -254,7 +254,7 @@ func AdminProductInventoriesTable(inventories []models.AdminProductInventoryList
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", inv.Stocks))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 100, Col: 74}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 103, Col: 74}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -272,7 +272,7 @@ func AdminProductInventoriesTable(inventories []models.AdminProductInventoryList
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", inv.Stocks))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 102, Col: 68}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 105, Col: 68}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -290,28 +290,41 @@ func AdminProductInventoriesTable(inventories []models.AdminProductInventoryList
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(inv.UpdatedAt)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 106, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 109, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</td></tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</td><td class=\"px-6 py-4 whitespace-nowrap text-sm\"><a href=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var13 templ.SafeURL
+			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URLf("/product/%s", inv.ProductSlug))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 113, Col: 56}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" target=\"_blank\" class=\"inline-block px-3 py-1 text-xs font-medium rounded text-center text-white bg-blue-600 hover:bg-blue-700\">View Product</a></td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</tbody></table>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</tbody></table>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(inventories) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<div class=\"text-center py-8 text-gray-500\">No inventories found.</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"text-center py-8 text-gray-500\">No inventories found.</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
