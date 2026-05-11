@@ -70,6 +70,7 @@ func (s *ProductInventoryService) GetListingForAdmin(ctx context.Context) ([]mod
 		items = append(items, models.AdminProductInventoryListItem{
 			ID:            s.encoder.Encode(inv.ID),
 			ProductSerial: inv.ProductSerial,
+			ProductSlug:   inv.ProductSlug.String,
 			StocksIn:      enums.ParseStocksInToEnum(inv.StocksIn),
 			Stocks:        inv.Stocks,
 			UpdatedAt:     inv.UpdatedAt,

@@ -65,7 +65,8 @@ SELECT
     tbl_product_inventories.stocks,
     tbl_product_inventories.stocks_in,
     tbl_product_inventories.updated_at,
-    tbl_products.serial AS product_serial
+    tbl_products.serial AS product_serial,
+    tbl_products.slug AS product_slug
 FROM tbl_product_inventories
 INNER JOIN tbl_products ON tbl_products.id = tbl_product_inventories.product_id
 ORDER BY
