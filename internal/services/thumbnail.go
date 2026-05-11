@@ -31,7 +31,7 @@ type ThumbnailService struct {
 
 func NewThumbnailService(objectStorage storage.IObjectStorage) *ThumbnailService {
 	if objectStorage == nil || reflect.ValueOf(objectStorage).IsNil() {
-		panic("implementor of IObjectStorage is required")
+		panic("implementor of IObjectStorage is required. Potential issue is lack of internet.")
 	}
 	return &ThumbnailService{
 		objectStorage: objectStorage,
