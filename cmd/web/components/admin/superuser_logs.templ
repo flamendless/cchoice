@@ -1,9 +1,12 @@
 package components
 
-import "cchoice/cmd/web/models"
-import "cchoice/internal/utils"
-import "cchoice/cmd/web/components/common"
-import "cchoice/cmd/web/components/header"
+import (
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/utils"
+	"strings"
+)
 
 templ AdminSuperuserLogsPage() {
 	<!DOCTYPE html>
@@ -38,14 +41,104 @@ templ AdminSuperuserLogsSection() {
 	<div
 		class="bg-white rounded-lg shadow-md p-6"
 		hx-get={ utils.URL("/admin/superuser/logs/table") }
-		hx-trigger="load"
+		hx-trigger="load, filter-submit from:#logs-filter-form"
 		hx-target="#logs-table"
 		hx-swap="innerHTML"
+		hx-include="#logs-filter-form"
 	>
+		@LogsFilterForm()
 		<div id="logs-table">
 			<p class="text-gray-500 text-center py-4">Loading...</p>
 		</div>
 	</div>
+}
+
+templ LogsFilterForm() {
+	<form
+		id="logs-filter-form"
+		class="mb-6 p-4 bg-gray-50 rounded-lg"
+		hx-get={ utils.URL("/admin/superuser/logs/table") }
+		hx-trigger="submit"
+		hx-target="#logs-table"
+		hx-swap="innerHTML"
+		hx-include="this"
+	>
+		<div class="flex flex-wrap gap-3 items-end">
+			<div>
+				<label for="staff-id" class="block text-sm font-medium text-gray-700 mb-1">Staff</label>
+				<select
+					id="staff-id"
+					name="staff-id"
+					class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					hx-get={ utils.URL("/admin/staff/list") }
+					hx-trigger="load"
+					hx-swap="innerHTML"
+					hx-target="this"
+				>
+					<option value="">All Staff</option>
+				</select>
+			</div>
+			<div>
+				<label for="action" class="block text-sm font-medium text-gray-700 mb-1">Action</label>
+				<select
+					id="action"
+					name="action"
+					class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					hx-get={ utils.URL("/admin/superuser/logs/actions") }
+					hx-trigger="load"
+					hx-swap="innerHTML"
+					hx-target="this"
+				>
+					<option value="">All Actions</option>
+				</select>
+			</div>
+			<div>
+				<label for="module" class="block text-sm font-medium text-gray-700 mb-1">Module</label>
+				<select
+					id="module"
+					name="module"
+					class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					hx-get={ utils.URL("/admin/superuser/logs/modules") }
+					hx-trigger="load"
+					hx-swap="innerHTML"
+					hx-target="this"
+				>
+					<option value="">All Modules</option>
+				</select>
+			</div>
+			<button
+				type="submit"
+				class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2"
+			>
+				Filter
+			</button>
+			<button
+				type="button"
+				class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+				hx-get={ utils.URL("/admin/superuser/logs/table") }
+				hx-vals='{"staff-id": "", "action": "", "module": ""}'
+				hx-target="#logs-table"
+				hx-swap="innerHTML"
+				onclick="document.getElementById('logs-filter-form').reset()"
+			>
+				Clear
+			</button>
+		</div>
+	</form>
+}
+
+templ ActionOptions(actions []string) {
+	<option value="">All Actions</option>
+	for _, a := range actions {
+		<option value={ a }>{ a }</option>
+	}
+}
+
+templ ModuleOptions(modules []string) {
+	<option value="">All Modules</option>
+	for _, m := range modules {
+		<option value={ m }>{ m }</option>
+	}
 }
 
 templ AdminSuperuserLogsTable(logs []models.StaffLog) {
@@ -62,29 +155,45 @@ templ AdminSuperuserLogsTable(logs []models.StaffLog) {
 				</tr>
 			</thead>
 			<tbody class="bg-white divide-y divide-gray-200">
-				for _, log := range logs {
+				if len(logs) == 0 {
 					<tr>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-							{ log.ID }
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-							{ log.FirstName } { log.MiddleName } { log.LastName }
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-							{ log.Action }
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-							{ log.Module }
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-							{ log.Result }
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-							{ log.CreatedAt }
+						<td colspan="6" class="px-6 py-4 text-center text-gray-500">
+							No logs found.
 						</td>
 					</tr>
+				} else {
+					for _, log := range logs {
+						<tr>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+								{ log.ID }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+								{ log.FirstName } { log.MiddleName } { log.LastName }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+								{ log.Action }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+								{ log.Module }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm">
+								@ResultCell(log.Result)
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+								{ log.CreatedAt }
+							</td>
+						</tr>
+					}
 				}
 			</tbody>
 		</table>
 	</div>
+}
+
+templ ResultCell(result string) {
+	if strings.Contains(strings.ToLower(result), "success") {
+		<span class="text-green-600 font-medium">{ result }</span>
+	} else {
+		<span class="text-red-600 font-medium">{ result }</span>
+	}
 }

@@ -113,6 +113,138 @@ func (q *Queries) GetAllStaffLogs(ctx context.Context) ([]GetAllStaffLogsRow, er
 	return items, nil
 }
 
+const getDistinctStaffLogActions = `-- name: GetDistinctStaffLogActions :many
+SELECT DISTINCT action
+FROM tbl_staff_logs
+ORDER BY action
+`
+
+func (q *Queries) GetDistinctStaffLogActions(ctx context.Context) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, getDistinctStaffLogActions)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var action string
+		if err := rows.Scan(&action); err != nil {
+			return nil, err
+		}
+		items = append(items, action)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getDistinctStaffLogModules = `-- name: GetDistinctStaffLogModules :many
+SELECT DISTINCT module
+FROM tbl_staff_logs
+ORDER BY module
+`
+
+func (q *Queries) GetDistinctStaffLogModules(ctx context.Context) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, getDistinctStaffLogModules)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var module string
+		if err := rows.Scan(&module); err != nil {
+			return nil, err
+		}
+		items = append(items, module)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getFilteredStaffLogs = `-- name: GetFilteredStaffLogs :many
+SELECT
+    sl.id,
+    sl.staff_id,
+    sl.created_at,
+    sl.action,
+    sl.module,
+    sl.result,
+    sl.useragent_id,
+    s.first_name,
+    s.middle_name,
+    s.last_name
+FROM tbl_staff_logs sl
+LEFT JOIN tbl_staffs s ON sl.staff_id = s.id
+WHERE
+    (?1 = '' OR sl.action = ?1)
+    AND (?2 = '' OR sl.module = ?2)
+    AND (?3 = 0 OR sl.staff_id = ?3)
+ORDER BY sl.created_at DESC
+`
+
+type GetFilteredStaffLogsParams struct {
+	Action  interface{}
+	Module  interface{}
+	StaffID interface{}
+}
+
+type GetFilteredStaffLogsRow struct {
+	ID          int64
+	StaffID     int64
+	CreatedAt   string
+	Action      string
+	Module      string
+	Result      string
+	UseragentID sql.NullInt64
+	FirstName   sql.NullString
+	MiddleName  sql.NullString
+	LastName    sql.NullString
+}
+
+func (q *Queries) GetFilteredStaffLogs(ctx context.Context, arg GetFilteredStaffLogsParams) ([]GetFilteredStaffLogsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getFilteredStaffLogs, arg.Action, arg.Module, arg.StaffID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetFilteredStaffLogsRow
+	for rows.Next() {
+		var i GetFilteredStaffLogsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.StaffID,
+			&i.CreatedAt,
+			&i.Action,
+			&i.Module,
+			&i.Result,
+			&i.UseragentID,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getStaffLogByID = `-- name: GetStaffLogByID :one
 SELECT
     sl.id,
