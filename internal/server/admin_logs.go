@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	compadmin "cchoice/cmd/web/components/admin"
+	"cchoice/internal/encode"
 	"cchoice/internal/logs"
 
 	"go.uber.org/zap"
@@ -27,7 +28,19 @@ func (s *Server) adminSuperuserLogsTableHandler(w http.ResponseWriter, r *http.R
 	const logtag = "[Admin Superuser Logs Table Handler]"
 	ctx := r.Context()
 
-	logsList, err := s.services.staffLog.GetAllAsModel(ctx)
+	staffIDStr := r.URL.Query().Get("staff-id")
+	action := r.URL.Query().Get("action")
+	module := r.URL.Query().Get("module")
+
+	var staffID int64
+	if staffIDStr != "" {
+		decoded := s.encoder.Decode(staffIDStr)
+		if decoded != encode.INVALID {
+			staffID = decoded
+		}
+	}
+
+	logsList, err := s.services.staffLog.GetFilteredAsModel(ctx, staffID, action, module)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -38,5 +51,39 @@ func (s *Server) adminSuperuserLogsTableHandler(w http.ResponseWriter, r *http.R
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
+	}
+}
+
+func (s *Server) adminSuperuserLogsActionsHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Logs Actions Handler]"
+	ctx := r.Context()
+
+	actions, err := s.services.staffLog.GetDistinctActions(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	if err := compadmin.ActionOptions(actions).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	}
+}
+
+func (s *Server) adminSuperuserLogsModulesHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Logs Modules Handler]"
+	ctx := r.Context()
+
+	modules, err := s.services.staffLog.GetDistinctModules(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	if err := compadmin.ModuleOptions(modules).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
 }
