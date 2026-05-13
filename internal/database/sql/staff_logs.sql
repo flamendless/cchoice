@@ -53,11 +53,6 @@ SELECT DISTINCT action
 FROM tbl_staff_logs
 ORDER BY action;
 
--- name: GetDistinctStaffLogModules :many
-SELECT DISTINCT module
-FROM tbl_staff_logs
-ORDER BY module;
-
 -- name: GetFilteredStaffLogs :many
 SELECT
     sl.id,

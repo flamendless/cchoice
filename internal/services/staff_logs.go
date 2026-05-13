@@ -67,9 +67,6 @@ func (s *StaffLogsService) GetDistinctActions(ctx context.Context) ([]string, er
 	return s.dbRO.GetQueries().GetDistinctStaffLogActions(ctx)
 }
 
-func (s *StaffLogsService) GetDistinctModules(ctx context.Context) ([]string, error) {
-	return s.dbRO.GetQueries().GetDistinctStaffLogModules(ctx)
-}
 
 func (s *StaffLogsService) GetFiltered(ctx context.Context, staffID int64, action, module string) ([]queries.GetFilteredStaffLogsRow, error) {
 	return s.dbRO.GetQueries().GetFilteredStaffLogs(ctx, queries.GetFilteredStaffLogsParams{

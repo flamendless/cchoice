@@ -71,19 +71,4 @@ func (s *Server) adminSuperuserLogsActionsHandler(w http.ResponseWriter, r *http
 	}
 }
 
-func (s *Server) adminSuperuserLogsModulesHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Admin Superuser Logs Modules Handler]"
-	ctx := r.Context()
 
-	modules, err := s.services.staffLog.GetDistinctModules(ctx)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
-	if err := compadmin.ModuleOptions(modules).Render(ctx, w); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-	}
-}
