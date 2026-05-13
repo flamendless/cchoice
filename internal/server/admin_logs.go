@@ -67,7 +67,7 @@ func (s *Server) adminSuperuserLogsActionsHandler(w http.ResponseWriter, r *http
 
 	if err := compadmin.ActionOptions(actions).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
