@@ -64,7 +64,7 @@ func CustomerLoginPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"w-full max-w-lg p-8 bg-white rounded-lg shadow-md\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"w-full max-w-lg p-8 bg-white rounded-lg shadow-md mx-4\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -225,46 +225,59 @@ func CustomerRegisterPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"w-full max-w-2xl p-8 bg-white rounded-lg shadow-md\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"w-full max-w-2xl p-8 bg-white rounded-lg shadow-md mx-4\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var11 string
-		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathSVGLogoOnly)
+		var templ_7745c5c3_Var11 templ.SafeURL
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 143, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 143, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20 mx-auto mb-4\"><h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">C-Choice Customer Registration</h1><form class=\"space-y-4\" id=\"customer-register-form\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" class=\"inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10 19l-7-7m0 0l7-7m-7 7h18\"></path></svg> Back to Shop</a> <img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var12 string
-		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/customer/register"))
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathSVGLogoOnly)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 153, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 152, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" hx-trigger=\"submit\"><div><label for=\"customer_type\" class=\"block text-sm font-medium text-gray-700\">Account Type</label> <select id=\"customer_type\" name=\"customer_type\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"on change\n\t\t\t\t\t\t\t\tif my.value == ''\n\t\t\t\t\t\t\t\t\tadd .hidden to #register-form-fields\n\t\t\t\t\t\t\t\t\tadd .hidden to #register-button-group\n\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\tremove .hidden from #register-form-fields\n\t\t\t\t\t\t\t\t\tremove .hidden from #register-button-group\n\t\t\t\t\t\t\t\t\tif my.value == 'company'\n\t\t\t\t\t\t\t\t\t\tremove .hidden from #company-name-group\n\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\tadd .hidden to #company-name-group\n\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\tend\"><option value=\"\">Select account type</option> <option value=\"customer\">Individual Customer</option> <option value=\"company\">Company</option></select></div><div id=\"register-form-fields\" class=\"hidden space-y-4\"><div id=\"company-name-group\" class=\"hidden\"><label for=\"company_name\" class=\"block text-sm font-medium text-gray-700\">Company Name</label> <input type=\"text\" id=\"company_name\" name=\"company_name\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div class=\"grid grid-cols-1 md:grid-cols-3 gap-4\"><div><label for=\"first_name\" class=\"block text-sm font-medium text-gray-700\">First Name</label> <input type=\"text\" id=\"first_name\" name=\"first_name\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"middle_name\" class=\"block text-sm font-medium text-gray-700\">Middle Name</label> <input type=\"text\" id=\"middle_name\" name=\"middle_name\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"last_name\" class=\"block text-sm font-medium text-gray-700\">Last Name</label> <input type=\"text\" id=\"last_name\" name=\"last_name\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\"><div><label for=\"birthdate\" class=\"block text-sm font-medium text-gray-700\">Birthdate</label> <input type=\"date\" id=\"birthdate\" name=\"birthdate\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"sex\" class=\"block text-sm font-medium text-gray-700\">Sex</label> <select id=\"sex\" name=\"sex\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select sex</option> <option value=\"male\">Male</option> <option value=\"female\">Female</option></select></div></div><div><label for=\"email\" class=\"block text-sm font-medium text-gray-700\">Email</label> <input type=\"email\" id=\"email\" name=\"email\" required pattern=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20 mx-auto mb-4\"><h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">C-Choice Customer Registration</h1><form class=\"space-y-4\" id=\"customer-register-form\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var13 string
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternEmail)
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/customer/register"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 271, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 162, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" hx-trigger=\"submit\"><div><label for=\"customer_type\" class=\"block text-sm font-medium text-gray-700\">Account Type</label> <select id=\"customer_type\" name=\"customer_type\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"on change\n\t\t\t\t\t\t\t\tif my.value == ''\n\t\t\t\t\t\t\t\t\tadd .hidden to #register-form-fields\n\t\t\t\t\t\t\t\t\tadd .hidden to #register-button-group\n\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\tremove .hidden from #register-form-fields\n\t\t\t\t\t\t\t\t\tremove .hidden from #register-button-group\n\t\t\t\t\t\t\t\t\tif my.value == 'company'\n\t\t\t\t\t\t\t\t\t\tremove .hidden from #company-name-group\n\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\tadd .hidden to #company-name-group\n\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\tend\"><option value=\"\">Select account type</option> <option value=\"customer\">Individual Customer</option> <option value=\"company\">Company</option></select></div><div id=\"register-form-fields\" class=\"hidden space-y-4\"><div id=\"company-name-group\" class=\"hidden\"><label for=\"company_name\" class=\"block text-sm font-medium text-gray-700\">Company Name</label> <input type=\"text\" id=\"company_name\" name=\"company_name\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div class=\"grid grid-cols-1 md:grid-cols-3 gap-4\"><div><label for=\"first_name\" class=\"block text-sm font-medium text-gray-700\">First Name</label> <input type=\"text\" id=\"first_name\" name=\"first_name\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"middle_name\" class=\"block text-sm font-medium text-gray-700\">Middle Name</label> <input type=\"text\" id=\"middle_name\" name=\"middle_name\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"last_name\" class=\"block text-sm font-medium text-gray-700\">Last Name</label> <input type=\"text\" id=\"last_name\" name=\"last_name\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\"><div><label for=\"birthdate\" class=\"block text-sm font-medium text-gray-700\">Birthdate</label> <input type=\"date\" id=\"birthdate\" name=\"birthdate\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"sex\" class=\"block text-sm font-medium text-gray-700\">Sex</label> <select id=\"sex\" name=\"sex\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select sex</option> <option value=\"male\">Male</option> <option value=\"female\">Female</option></select></div></div><div><label for=\"email\" class=\"block text-sm font-medium text-gray-700\">Email</label> <input type=\"email\" id=\"email\" name=\"email\" required pattern=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var14 string
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternEmail)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 280, Col: 40}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -272,46 +285,46 @@ func CustomerRegisterPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div><div><label for=\"password\" class=\"block text-sm font-medium text-gray-700\">Password (8-32 length)</label><div class=\"relative mt-1\"><input type=\"password\" id=\"password\" name=\"password\" required minlength=\"8\" maxlength=\"64\" pattern=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var14 string
-		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternPassword)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 290, Col: 44}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" class=\"block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click\n\t\t\t\t\t\t\t\t\tif #password.type == 'password' then\n\t\t\t\t\t\t\t\t\t\tset #password.type to 'text'\n\t\t\t\t\t\t\t\t\t\tset my.innerText to 'Hide'\n\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\tset #password.type to 'password'\n\t\t\t\t\t\t\t\t\t\tset my.innerText to 'Show'\n\t\t\t\t\t\t\t\t\tend\">Show</button></div></div><div><label for=\"confirm_password\" class=\"block text-sm font-medium text-gray-700\">Confirm Password</label><div class=\"relative mt-1\"><input type=\"password\" id=\"confirm_password\" name=\"confirm_password\" required minlength=\"8\" maxlength=\"64\" pattern=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div><div><label for=\"password\" class=\"block text-sm font-medium text-gray-700\">Password (8-32 length)</label><div class=\"relative mt-1\"><input type=\"password\" id=\"password\" name=\"password\" required minlength=\"8\" maxlength=\"64\" pattern=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternPassword)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 321, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 299, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" class=\"block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"\n\t\t\t\t\t\t\t\t\t\ton input or change\n\t\t\t\t\t\t\t\t\t\t\tif #password.value != my.value\n\t\t\t\t\t\t\t\t\t\t\t\tcall me.setCustomValidity('Passwords do not match')\n\t\t\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\t\t\tcall me.setCustomValidity('')\n\t\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click\n\t\t\t\t\t\t\t\t\t\tif #confirm_password.type == 'password' then set #confirm_password.type to 'text'\n\t\t\t\t\t\t\t\t\t\t\tset my innerText to 'Hide'\n\t\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\t\tset #confirm_password.type to 'password'\n\t\t\t\t\t\t\t\t\t\t\tset my innerText to 'Show'\n\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\">Show</button></div></div></div><div id=\"register-button-group\" class=\"hidden\"><button type=\"submit\" class=\"w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Register</button></div></form><div class=\"mt-4 text-center\"><p class=\"text-sm text-gray-600\">Already have an account? <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" class=\"block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click\n\t\t\t\t\t\t\t\t\tif #password.type == 'password' then\n\t\t\t\t\t\t\t\t\t\tset #password.type to 'text'\n\t\t\t\t\t\t\t\t\t\tset my.innerText to 'Hide'\n\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\tset #password.type to 'password'\n\t\t\t\t\t\t\t\t\t\tset my.innerText to 'Show'\n\t\t\t\t\t\t\t\t\tend\">Show</button></div></div><div><label for=\"confirm_password\" class=\"block text-sm font-medium text-gray-700\">Confirm Password</label><div class=\"relative mt-1\"><input type=\"password\" id=\"confirm_password\" name=\"confirm_password\" required minlength=\"8\" maxlength=\"64\" pattern=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var16 templ.SafeURL
-		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer"))
+		var templ_7745c5c3_Var16 string
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PatternPassword)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 363, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 330, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"text-cchoice hover:text-cchoice_dark font-medium\">Login here</a></p></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"\n\t\t\t\t\t\t\t\t\t\ton input or change\n\t\t\t\t\t\t\t\t\t\t\tif #password.value != my.value\n\t\t\t\t\t\t\t\t\t\t\t\tcall me.setCustomValidity('Passwords do not match')\n\t\t\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\t\t\tcall me.setCustomValidity('')\n\t\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click\n\t\t\t\t\t\t\t\t\t\tif #confirm_password.type == 'password' then set #confirm_password.type to 'text'\n\t\t\t\t\t\t\t\t\t\t\tset my innerText to 'Hide'\n\t\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\t\tset #confirm_password.type to 'password'\n\t\t\t\t\t\t\t\t\t\t\tset my innerText to 'Show'\n\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\">Show</button></div></div></div><div id=\"register-button-group\" class=\"hidden\"><button type=\"submit\" class=\"w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Register</button></div></form><div class=\"mt-4 text-center\"><p class=\"text-sm text-gray-600\">Already have an account? <a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var17 templ.SafeURL
+		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 372, Col: 38}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" class=\"text-cchoice hover:text-cchoice_dark font-medium\">Login here</a></p></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -335,12 +348,12 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var17 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var17 == nil {
-			templ_7745c5c3_Var17 = templ.NopComponent
+		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var18 == nil {
+			templ_7745c5c3_Var18 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<!doctype html><html lang=\"en\" class=\"overflow-x-hidden\"><head>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<!doctype html><html lang=\"en\" class=\"overflow-x-hidden\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -352,7 +365,7 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('customer_visit', 'portal')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('customer_visit', 'portal')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -368,7 +381,7 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"flex-grow p-4\"><div class=\"max-w-8xl mx-auto\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div class=\"flex-grow p-4\"><div class=\"max-w-8xl mx-auto\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -376,100 +389,100 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div class=\"text-center mb-6 flex justify-center items-center gap-4\"><a href=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var18 templ.SafeURL
-		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 392, Col: 28}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" class=\"py-2 px-6 border border-cchoice rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Back to Shop</a><form action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div class=\"text-center mb-6 flex justify-center items-center gap-4\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var19 templ.SafeURL
-		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/logout"))
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 397, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 401, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" method=\"POST\"><button type=\"submit\" class=\"py-2 px-6 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Log Out</button></form></div><div class=\"flex flex-wrap justify-center gap-6 max-w-4xl mx-auto\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" class=\"py-2 px-6 border border-cchoice rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Back to Shop</a><form action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 templ.SafeURL
-		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/profile"))
+		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/logout"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 408, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 406, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Profile</h2></a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\" method=\"POST\"><button type=\"submit\" class=\"py-2 px-6 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Log Out</button></form></div><div class=\"flex flex-wrap justify-center gap-6 max-w-4xl mx-auto\"><a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var21 templ.SafeURL
+		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/profile"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 417, Col: 44}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Profile</h2></a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if profile.Status == enums.CUSTOMER_STATUS_VERIFIED {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var21 templ.SafeURL
-			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/cpoints"))
+			var templ_7745c5c3_Var22 templ.SafeURL
+			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/cpoints"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 420, Col: 36}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">C-Points</h2></a> ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center cursor-not-allowed relative\" _=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var22 string
-			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(`on click call showErrorBanner('You must verify your account first')`)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 433, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 429, Col: 36}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\"><div class=\"absolute top-2 right-2 bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded\">Must be verified</div><div class=\"flex justify-center mb-4 mt-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">C-Points</h2></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">C-Points</h2></a> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<div class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center cursor-not-allowed relative\" _=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var23 string
+			templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(`on click call showErrorBanner('You must verify your account first')`)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 442, Col: 81}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\"><div class=\"absolute top-2 right-2 bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded\">Must be verified</div><div class=\"flex justify-center mb-4 mt-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">C-Points</h2></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var23 templ.SafeURL
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/quotation"))
+		var templ_7745c5c3_Var24 templ.SafeURL
+		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/quotation"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 447, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 456, Col: 46}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Portal</h2><p class=\"text-sm text-gray-600\">Browse products, add to cart, request quotation!</p></a></div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Portal</h2><p class=\"text-sm text-gray-600\">Browse products, add to cart, request quotation!</p></a></div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -493,12 +506,12 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var24 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var24 == nil {
-			templ_7745c5c3_Var24 = templ.NopComponent
+		templ_7745c5c3_Var25 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var25 == nil {
+			templ_7745c5c3_Var25 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<!doctype html><html lang=\"en\" class=\"overflow-x-hidden\"><head>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<!doctype html><html lang=\"en\" class=\"overflow-x-hidden\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -510,7 +523,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('customer_visit', 'profile')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('customer_visit', 'profile')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -526,7 +539,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<div class=\"flex-grow p-4\"><div class=\"max-w-2xl mx-auto\"><div class=\"bg-white rounded-lg shadow-md p-6 mb-6\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<div class=\"flex-grow p-4\"><div class=\"max-w-2xl mx-auto\"><div class=\"bg-white rounded-lg shadow-md p-6 mb-6\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -534,186 +547,186 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<h1 class=\"text-2xl font-bold text-cchoice text-center mb-6\">My Profile</h1><div class=\"mb-8 p-4 bg-gray-50 rounded-lg\"><div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\"><div><p class=\"text-sm text-gray-500\">Full Name</p><p class=\"font-medium text-gray-900\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<h1 class=\"text-2xl font-bold text-cchoice text-center mb-6\">My Profile</h1><div class=\"mb-8 p-4 bg-gray-50 rounded-lg\"><div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\"><div><p class=\"text-sm text-gray-500\">Full Name</p><p class=\"font-medium text-gray-900\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var25 string
-		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(profile.FullName)
+		var templ_7745c5c3_Var26 string
+		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(profile.FullName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 488, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 497, Col: 64}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</p></div><div><p class=\"text-sm text-gray-500\">Status</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</p></div><div><p class=\"text-sm text-gray-500\">Status</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		switch profile.Status {
 		case enums.CUSTOMER_STATUS_UNVERIFIED:
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<span class=\"bg-yellow-100 text-yellow-800\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var26 string
-			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Status.String())
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 494, Col: 80}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</span>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		case enums.CUSTOMER_STATUS_VERIFIED:
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<span class=\"bg-green-100 text-green-800\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<span class=\"bg-yellow-100 text-yellow-800\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var27 string
 			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Status.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 496, Col: 78}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 503, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</span>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		case enums.CUSTOMER_STATUS_VERIFIED:
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<span class=\"bg-green-100 text-green-800\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var28 string
+			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Status.String())
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 505, Col: 78}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</div><div><p class=\"text-sm text-gray-500\">E-Mail</p><p class=\"font-medium text-gray-900\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var28 string
-		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Email)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 501, Col: 61}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</p></div><div><p class=\"text-sm text-gray-500\">Mobile No.</p><p class=\"font-medium text-gray-900\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</div><div><p class=\"text-sm text-gray-500\">E-Mail</p><p class=\"font-medium text-gray-900\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var29 string
-		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(profile.MobileNo)
+		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 505, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 510, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</p></div><div><p class=\"text-sm text-gray-500\">Birthdate</p><p class=\"font-medium text-gray-900\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</p></div><div><p class=\"text-sm text-gray-500\">Mobile No.</p><p class=\"font-medium text-gray-900\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var30 string
-		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Birthdate)
+		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(profile.MobileNo)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 509, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 514, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</p></div><div><p class=\"text-sm text-gray-500\">Sex</p><p class=\"font-medium text-gray-900 capitalize\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</p></div><div><p class=\"text-sm text-gray-500\">Birthdate</p><p class=\"font-medium text-gray-900\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var31 string
-		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Sex)
+		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Birthdate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 513, Col: 70}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 518, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</p></div><div><p class=\"text-sm text-gray-500\">Account Type</p><p class=\"font-medium text-gray-900 capitalize\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</p></div><div><p class=\"text-sm text-gray-500\">Sex</p><p class=\"font-medium text-gray-900 capitalize\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var32 string
-		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(profile.CustomerType.String())
+		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Sex)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 517, Col: 88}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 522, Col: 70}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</p></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</p></div><div><p class=\"text-sm text-gray-500\">Account Type</p><p class=\"font-medium text-gray-900 capitalize\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var33 string
+		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(profile.CustomerType.String())
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 526, Col: 88}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if profile.CompanyName != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<div><p class=\"text-sm text-gray-500\">Company Name</p><p class=\"font-medium text-gray-900\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var33 string
-			templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(profile.CompanyName)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 522, Col: 68}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</p></div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</div></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if profile.Status == enums.CUSTOMER_STATUS_UNVERIFIED {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<div class=\"mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg\"><p class=\"text-sm text-yellow-800 mb-4\">Your email is not verified. Please verify to access all features.</p><div id=\"verify-container\"><form hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "<div><p class=\"text-sm text-gray-500\">Company Name</p><p class=\"font-medium text-gray-900\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var34 string
-			templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/customer/verify/send"))
+			templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(profile.CompanyName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 532, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 531, Col: 68}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\" hx-target=\"#verify-container\" hx-swap=\"outerHTML\"><button type=\"submit\" class=\"bg-cchoice text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors\">Send Verification Code</button></form></div><div id=\"otp-input-container\" class=\"mt-4\"><form hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</p></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "</div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if profile.Status == enums.CUSTOMER_STATUS_UNVERIFIED {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "<div class=\"mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg\"><p class=\"text-sm text-yellow-800 mb-4\">Your email is not verified. Please verify to access all features.</p><div id=\"verify-container\"><form hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var35 string
-			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/customer/verify"))
+			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/customer/verify/send"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 546, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 541, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\" hx-target=\"body\" hx-swap=\"beforeend\" class=\"flex gap-2\"><input type=\"text\" name=\"otp_code\" placeholder=\"Enter 6-digit code\" maxlength=\"6\" pattern=\"[0-9]{6}\" class=\"border border-gray-300 px-3 py-2 rounded w-32 text-center tracking-widest\" required> <button type=\"submit\" class=\"bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors\">Verify Now</button></form></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\" hx-target=\"#verify-container\" hx-swap=\"outerHTML\"><button type=\"submit\" class=\"bg-cchoice text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors\">Send Verification Code</button></form></div><div id=\"otp-input-container\" class=\"mt-4\"><form hx-post=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var36 string
+			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/customer/verify"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 555, Col: 49}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\" hx-target=\"body\" hx-swap=\"beforeend\" class=\"flex gap-2\"><input type=\"text\" name=\"otp_code\" placeholder=\"Enter 6-digit code\" maxlength=\"6\" pattern=\"[0-9]{6}\" class=\"border border-gray-300 px-3 py-2 rounded w-32 text-center tracking-widest\" required> <button type=\"submit\" class=\"bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors\">Verify Now</button></form></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -737,12 +750,12 @@ func CustomerProfileEditPage(profile models.CustomerProfile) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var36 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var36 == nil {
-			templ_7745c5c3_Var36 = templ.NopComponent
+		templ_7745c5c3_Var37 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var37 == nil {
+			templ_7745c5c3_Var37 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<!doctype html><html lang=\"en\" class=\"overflow-x-hidden\"><head>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<!doctype html><html lang=\"en\" class=\"overflow-x-hidden\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -754,7 +767,7 @@ func CustomerProfileEditPage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -770,7 +783,7 @@ func CustomerProfileEditPage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "<div class=\"flex-grow p-4\"><div class=\"max-w-4xl mx-auto\"><div class=\"bg-white rounded-lg shadow-md p-6\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "<div class=\"flex-grow p-4\"><div class=\"max-w-4xl mx-auto\"><div class=\"bg-white rounded-lg shadow-md p-6\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -778,7 +791,7 @@ func CustomerProfileEditPage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "<h2 class=\"text-2xl font-bold text-cchoice mb-6\">Edit Profile</h2>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "<h2 class=\"text-2xl font-bold text-cchoice mb-6\">Edit Profile</h2>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -786,7 +799,7 @@ func CustomerProfileEditPage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -810,110 +823,110 @@ func CustomerProfileEditForm(profile models.CustomerProfile) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var37 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var37 == nil {
-			templ_7745c5c3_Var37 = templ.NopComponent
+		templ_7745c5c3_Var38 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var38 == nil {
+			templ_7745c5c3_Var38 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<form action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<form action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var38 templ.SafeURL
-		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/profile"))
+		var templ_7745c5c3_Var39 templ.SafeURL
+		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/profile"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 605, Col: 41}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "\" method=\"POST\" class=\"space-y-4\" hx-patch=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var39 string
-		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/customer/profile"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 608, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 614, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "\" hx-trigger=\"submit\"><input type=\"hidden\" name=\"_method\" value=\"PATCH\"><div class=\"grid grid-cols-1 md:grid-cols-3 gap-4\"><div><label for=\"first_name\" class=\"block text-sm font-medium text-gray-700\">First Name</label> <input type=\"text\" id=\"first_name\" name=\"first_name\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "\" method=\"POST\" class=\"space-y-4\" hx-patch=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var40 string
-		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(profile.FirstName)
+		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/customer/profile"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 622, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 617, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"middle_name\" class=\"block text-sm font-medium text-gray-700\">Middle Name</label> <input type=\"text\" id=\"middle_name\" name=\"middle_name\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "\" hx-trigger=\"submit\"><input type=\"hidden\" name=\"_method\" value=\"PATCH\"><div class=\"grid grid-cols-1 md:grid-cols-3 gap-4\"><div><label for=\"first_name\" class=\"block text-sm font-medium text-gray-700\">First Name</label> <input type=\"text\" id=\"first_name\" name=\"first_name\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var41 string
-		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(profile.MiddleName)
+		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(profile.FirstName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 634, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 631, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"last_name\" class=\"block text-sm font-medium text-gray-700\">Last Name</label> <input type=\"text\" id=\"last_name\" name=\"last_name\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"middle_name\" class=\"block text-sm font-medium text-gray-700\">Middle Name</label> <input type=\"text\" id=\"middle_name\" name=\"middle_name\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var42 string
-		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(profile.LastName)
+		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(profile.MiddleName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 647, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 643, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\"><div><label for=\"birthdate\" class=\"block text-sm font-medium text-gray-700\">Birthdate</label> <input type=\"date\" id=\"birthdate\" name=\"birthdate\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"last_name\" class=\"block text-sm font-medium text-gray-700\">Last Name</label> <input type=\"text\" id=\"last_name\" name=\"last_name\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var43 string
-		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Birthdate)
+		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(profile.LastName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 662, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 656, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"sex\" class=\"block text-sm font-medium text-gray-700\">Sex</label> <select id=\"sex\" name=\"sex\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"male\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\"><div><label for=\"birthdate\" class=\"block text-sm font-medium text-gray-700\">Birthdate</label> <input type=\"date\" id=\"birthdate\" name=\"birthdate\" required value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var44 string
+		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(profile.Birthdate)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 671, Col: 30}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"sex\" class=\"block text-sm font-medium text-gray-700\">Sex</label> <select id=\"sex\" name=\"sex\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"male\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if profile.Sex == "male" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, " selected")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, ">Male</option> <option value=\"female\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, ">Male</option> <option value=\"female\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if profile.Sex == "female" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, " selected")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, ">Female</option></select></div></div><div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, ">Female</option></select></div></div><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -921,20 +934,20 @@ func CustomerProfileEditForm(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "</div><div class=\"flex justify-end gap-4\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "</div><div class=\"flex justify-end gap-4\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var44 templ.SafeURL
-		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/profile"))
+		var templ_7745c5c3_Var45 templ.SafeURL
+		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/customer/profile"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 686, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/common.templ`, Line: 695, Col: 41}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "\" class=\"px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Cancel</a> <button type=\"submit\" class=\"px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Save Changes</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "\" class=\"px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Cancel</a> <button type=\"submit\" class=\"px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Save Changes</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
