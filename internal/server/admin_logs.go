@@ -7,7 +7,6 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
-	"strings"
 
 	"go.uber.org/zap"
 )
@@ -42,7 +41,7 @@ func (s *Server) adminSuperuserLogsTableHandler(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	module := enums.ParseModuleToEnum(strings.ToUpper(moduleStr))
+	module := enums.ParseModuleToEnum(moduleStr)
 
 	logsList, err := s.services.staffLog.GetFilteredAsModel(ctx, staffID, action, module)
 	if err != nil {
@@ -65,7 +64,7 @@ func (s *Server) adminSuperuserLogsActionsHandler(w http.ResponseWriter, r *http
 	actions, err := s.services.staffLog.GetDistinctActions(ctx)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
