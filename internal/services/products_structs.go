@@ -17,6 +17,10 @@ type CreateProductInput struct {
 	ImagePath                 string
 	UnitPriceWithoutVat       int64
 	UnitPriceWithVat          int64
+	SalePriceWithoutVat       int64
+	SalePriceWithVat          int64
+	SaleStartDate             string
+	SaleEndDate               string
 	StocksIn                  enums.StocksIn
 	Stocks                    int64
 }

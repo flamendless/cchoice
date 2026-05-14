@@ -476,7 +476,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</div><div><label for=\"stocks_qty\" class=\"block text-sm font-medium text-gray-700 mb-1\">Stocks Qty <span class=\"text-red-500\">*</span></label> <input type=\"number\" id=\"stocks_qty\" name=\"stocks_qty\" required min=\"1\" step=\"1\" max=\"999999999\" placeholder=\"e.g., 99\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</div><div><label for=\"stocks_qty\" class=\"block text-sm font-medium text-gray-700 mb-1\">Stocks Qty <span class=\"text-red-500\">*</span></label> <input type=\"number\" id=\"stocks_qty\" name=\"stocks_qty\" required min=\"0\" step=\"1\" max=\"999999999\" placeholder=\"e.g., 99\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

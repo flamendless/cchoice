@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
@@ -139,6 +140,37 @@ func (s *ProductService) Create(
 		input.StocksIn,
 	); err != nil {
 		return nil, err
+	}
+
+	if input.SalePriceWithVat > 0 {
+		startsAt, startErr := time.Parse(constants.DateLayoutISO, input.SaleStartDate)
+		if startErr != nil {
+			return nil, fmt.Errorf("invalid sale start date: %w", startErr)
+		}
+		endsAt, endErr := time.Parse(constants.DateLayoutISO, input.SaleEndDate)
+		if endErr != nil {
+			return nil, fmt.Errorf("invalid sale end date: %w", endErr)
+		}
+
+		discountValue := input.UnitPriceWithVat*100 - input.SalePriceWithVat*100
+		if discountValue < 0 {
+			discountValue = 0
+		}
+
+		if _, err = s.dbRW.GetQueries().CreateProductSale(ctx, queries.CreateProductSaleParams{
+			ProductID:                   product.ID,
+			SalePriceWithoutVat:         input.SalePriceWithoutVat * 100,
+			SalePriceWithVat:            input.SalePriceWithVat * 100,
+			SalePriceWithoutVatCurrency: constants.PHP,
+			SalePriceWithVatCurrency:    constants.PHP,
+			DiscountType:                "fixed",
+			DiscountValue:               discountValue,
+			StartsAt:                    startsAt,
+			EndsAt:                      endsAt,
+			IsActive:                    true,
+		}); err != nil {
+			return nil, err
+		}
 	}
 
 	if input.ImagePath != "" {
