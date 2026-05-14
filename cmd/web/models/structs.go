@@ -287,6 +287,9 @@ type AdminProductInventoryListItem struct {
 	ID            string
 	ProductSerial string
 	ProductSlug   string
+	ProductName   string
+	BrandName     string
+	Status        enums.ProductStatus
 	StocksIn      enums.StocksIn
 	Stocks        int64
 	UpdatedAt     string

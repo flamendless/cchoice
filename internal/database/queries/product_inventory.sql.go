@@ -17,9 +17,18 @@ SELECT
     tbl_product_inventories.stocks_in,
     tbl_product_inventories.updated_at,
     tbl_products.serial AS product_serial,
-    tbl_products.slug AS product_slug
+    tbl_products.slug AS product_slug,
+    tbl_products.status AS product_status,
+    tbl_products.name AS product_name,
+    tbl_brands.name AS brand_name
 FROM tbl_product_inventories
 INNER JOIN tbl_products ON tbl_products.id = tbl_product_inventories.product_id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE
+    (?1 IS NULL OR ?1 = '' OR LOWER(tbl_products.serial) LIKE '%' || LOWER(?1) || '%')
+    AND (?2 IS NULL OR ?2 = '' OR LOWER(tbl_brands.name) LIKE '%' || LOWER(?2) || '%')
+    AND (?3 IS NULL OR ?3 = '' OR tbl_products.status = ?3)
+    AND (?4 IS NULL OR ?4 = '' OR tbl_product_inventories.stocks_in = ?4)
 ORDER BY
     CASE
         WHEN tbl_product_inventories.stocks = 0 THEN 0
@@ -30,6 +39,13 @@ ORDER BY
     tbl_product_inventories.updated_at DESC
 `
 
+type AdminGetProductInventoriesListingParams struct {
+	SearchSerial  interface{}
+	SearchBrand   interface{}
+	ProductStatus interface{}
+	StocksIn      interface{}
+}
+
 type AdminGetProductInventoriesListingRow struct {
 	ID            int64
 	Stocks        int64
@@ -37,10 +53,18 @@ type AdminGetProductInventoriesListingRow struct {
 	UpdatedAt     string
 	ProductSerial string
 	ProductSlug   sql.NullString
+	ProductStatus string
+	ProductName   string
+	BrandName     string
 }
 
-func (q *Queries) AdminGetProductInventoriesListing(ctx context.Context) ([]AdminGetProductInventoriesListingRow, error) {
-	rows, err := q.db.QueryContext(ctx, adminGetProductInventoriesListing)
+func (q *Queries) AdminGetProductInventoriesListing(ctx context.Context, arg AdminGetProductInventoriesListingParams) ([]AdminGetProductInventoriesListingRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetProductInventoriesListing,
+		arg.SearchSerial,
+		arg.SearchBrand,
+		arg.ProductStatus,
+		arg.StocksIn,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -55,6 +79,9 @@ func (q *Queries) AdminGetProductInventoriesListing(ctx context.Context) ([]Admi
 			&i.UpdatedAt,
 			&i.ProductSerial,
 			&i.ProductSlug,
+			&i.ProductStatus,
+			&i.ProductName,
+			&i.BrandName,
 		); err != nil {
 			return nil, err
 		}

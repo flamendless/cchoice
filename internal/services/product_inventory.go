@@ -59,8 +59,24 @@ func (s *ProductInventoryService) GetByProductID(ctx context.Context, productID 
 	return s.mapRowToProductInventory(inv), nil
 }
 
-func (s *ProductInventoryService) GetListingForAdmin(ctx context.Context) ([]models.AdminProductInventoryListItem, error) {
-	inventories, err := s.dbRO.GetQueries().AdminGetProductInventoriesListing(ctx)
+func (s *ProductInventoryService) GetListingForAdmin(
+	ctx context.Context,
+	searchSerial string,
+	searchBrand string,
+	productStatus enums.ProductStatus,
+	stocksIn enums.StocksIn,
+) ([]models.AdminProductInventoryListItem, error) {
+	statusStr := ""
+	if productStatus != enums.PRODUCT_STATUS_UNDEFINED {
+		statusStr = productStatus.String()
+	}
+
+	inventories, err := s.dbRO.GetQueries().AdminGetProductInventoriesListing(ctx, queries.AdminGetProductInventoriesListingParams{
+		SearchSerial:   sql.NullString{String: searchSerial, Valid: searchSerial != ""},
+		SearchBrand:    sql.NullString{String: searchBrand, Valid: searchBrand != ""},
+		ProductStatus:  sql.NullString{String: statusStr, Valid: statusStr != ""},
+		StocksIn:       sql.NullString{String: stocksIn.String(), Valid: stocksIn.IsValid()},
+	})
 	if err != nil {
 		return nil, errors.Join(errs.ErrProductInventory, err)
 	}
@@ -71,6 +87,9 @@ func (s *ProductInventoryService) GetListingForAdmin(ctx context.Context) ([]mod
 			ID:            s.encoder.Encode(inv.ID),
 			ProductSerial: inv.ProductSerial,
 			ProductSlug:   inv.ProductSlug.String,
+			ProductName:   inv.ProductName,
+			BrandName:     inv.BrandName,
+			Status:        enums.ParseProductStatusToEnum(inv.ProductStatus),
 			StocksIn:      enums.ParseStocksInToEnum(inv.StocksIn),
 			Stocks:        inv.Stocks,
 			UpdatedAt:     inv.UpdatedAt,
