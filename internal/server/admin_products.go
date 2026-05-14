@@ -193,6 +193,28 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		return
 	}
 
+	salePriceStr := r.FormValue("sale_price")
+	saleStartDate := r.FormValue("sale_start_date")
+	saleEndDate := r.FormValue("sale_end_date")
+
+	var salePriceWithoutVat, salePriceWithVat int64
+	if salePriceStr != "" {
+		salePrice, parseErr := strconv.ParseFloat(salePriceStr, 64)
+		if parseErr != nil || salePrice <= 0 {
+			logs.LogCtx(ctx).Warn(logtag, zap.Error(parseErr), zap.String("sale price", salePriceStr))
+			redirectHX(w, r, utils.URLWithError(page, "Invalid sale price"))
+			return
+		}
+
+		if saleStartDate == "" || saleEndDate == "" {
+			redirectHX(w, r, utils.URLWithError(page, "Sale start and end dates are required when sale price is set"))
+			return
+		}
+
+		salePriceWithoutVat = int64(math.Round(salePrice / (1 + vatPercentage/100)))
+		salePriceWithVat = int64(math.Round(salePrice))
+	}
+
 	result := "success"
 	defer func() {
 		if err := s.services.staffLog.CreateLog(
@@ -280,6 +302,10 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 			ImagePath:           filename,
 			UnitPriceWithoutVat: unitPriceWithoutVat,
 			UnitPriceWithVat:    unitPriceWithVat,
+			SalePriceWithoutVat: salePriceWithoutVat,
+			SalePriceWithVat:    salePriceWithVat,
+			SaleStartDate:       saleStartDate,
+			SaleEndDate:         saleEndDate,
 			StocksIn:            stocksIn,
 			Stocks:              stocksQty,
 		})
