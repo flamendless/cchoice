@@ -4,11 +4,12 @@ import "fmt"
 import "strconv"
 
 import "cchoice/cmd/web/models"
+import "cchoice/internal/enums"
 import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/components/header"
 
-templ AdminProductInventoriesPage(title string) {
+templ AdminProductInventoriesPage(brands []models.AdminBrand) {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
@@ -29,7 +30,7 @@ templ AdminProductInventoriesPage(title string) {
 						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
 							Manage Product Inventories
 						</h1>
-						@ProductInventoriesSection()
+						@ProductInventoriesSection(brands)
 					</div>
 				</div>
 			</div>
@@ -49,7 +50,63 @@ templ ProductInventoriesHeader() {
 	</div>
 }
 
-templ ProductInventoriesSection() {
+templ InventoryFilterToolbar(url string, brands []models.AdminBrand) {
+	<div class="flex flex-col sm:flex-row sm:flex-wrap justify-between items-start sm:items-center gap-4 mb-4">
+		<div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+			<input
+				type="text"
+				name="search_serial"
+				placeholder="Search by serial..."
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				hx-get={ url }
+				hx-trigger="change, search_serial delay:300ms"
+				hx-target="#inventories-table"
+				hx-include="[name='search_serial'],[name='search_brand'],[name='product_status'],[name='stocks_in']"
+			/>
+			<select
+				name="search_brand"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				hx-get={ url }
+				hx-trigger="change"
+				hx-target="#inventories-table"
+				hx-include="[name='search_serial'],[name='search_brand'],[name='product_status'],[name='stocks_in']"
+			>
+				<option value="">All Brands</option>
+				for _, brand := range brands {
+					<option value={ brand.Name }>{ brand.Name }</option>
+				}
+			</select>
+			<select
+				name="product_status"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				hx-get={ url }
+				hx-trigger="change"
+				hx-target="#inventories-table"
+				hx-include="[name='search_serial'],[name='search_brand'],[name='product_status'],[name='stocks_in']"
+			>
+				<option value="">All Status</option>
+				for _, ps := range enums.AllProductStatuses {
+					<option value={ ps.String() }>{ ps.String() }</option>
+				}
+			</select>
+			<select
+				name="stocks_in"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				hx-get={ url }
+				hx-trigger="change"
+				hx-target="#inventories-table"
+				hx-include="[name='search_serial'],[name='search_brand'],[name='product_status'],[name='stocks_in']"
+			>
+				<option value="">All Stocks In</option>
+				for _, si := range enums.AllStocksIn {
+					<option value={ si.String() }>{ si.String() }</option>
+				}
+			</select>
+		</div>
+	</div>
+}
+
+templ ProductInventoriesSection(brands []models.AdminBrand) {
 	<div
 		class="bg-white rounded-lg shadow-md p-6"
 		hx-get={ utils.URL("/admin/product-inventories/table") }
@@ -57,7 +114,9 @@ templ ProductInventoriesSection() {
 		hx-target="#inventories-table"
 		hx-swap="innerHTML"
 	>
-		<div id="inventories-table"></div>
+		@InventoryFilterToolbar(utils.URL("/admin/product-inventories/table"), brands)
+		<div id="inventories-table">
+		</div>
 	</div>
 }
 
@@ -66,19 +125,28 @@ templ AdminProductInventoriesTable(inventories []models.AdminProductInventoryLis
 		<table class="min-w-full divide-y divide-gray-200">
 			<thead class="bg-gray-50">
 				<tr>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[8%]">
 						ID
 					</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">
 						Serial
 					</th>
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+						Product Name
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
+						Brand
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
+						Status
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
 						Stocks In
 					</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
 						Stocks
 					</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
 						Updated At
 					</th>
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
@@ -94,6 +162,15 @@ templ AdminProductInventoriesTable(inventories []models.AdminProductInventoryLis
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 							{ inv.ProductSerial }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+							{ inv.ProductName }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+							{ inv.BrandName }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm">
+							@ProductStatus(inv.Status)
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 							{ inv.StocksIn.String() }
