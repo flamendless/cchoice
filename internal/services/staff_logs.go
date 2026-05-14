@@ -8,7 +8,9 @@ import (
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
+	"cchoice/internal/enums"
 	"cchoice/internal/logs"
+	"strings"
 
 	"go.uber.org/zap"
 )
@@ -68,10 +70,14 @@ func (s *StaffLogsService) GetDistinctActions(ctx context.Context) ([]string, er
 }
 
 
-func (s *StaffLogsService) GetFiltered(ctx context.Context, staffID int64, action, module string) ([]queries.GetFilteredStaffLogsRow, error) {
+func (s *StaffLogsService) GetFiltered(ctx context.Context, staffID int64, action string, module enums.Module) ([]queries.GetFilteredStaffLogsRow, error) {
+	var moduleStr string
+	if module.IsValid() {
+		moduleStr = strings.ToLower(module.String())
+	}
 	return s.dbRO.GetQueries().GetFilteredStaffLogs(ctx, queries.GetFilteredStaffLogsParams{
 		Action:  action,
-		Module:  module,
+		Module:  moduleStr,
 		StaffID: staffID,
 	})
 }
@@ -103,7 +109,7 @@ func (s *StaffLogsService) GetAllAsModel(ctx context.Context) ([]models.StaffLog
 	return logsList, nil
 }
 
-func (s *StaffLogsService) GetFilteredAsModel(ctx context.Context, staffID int64, action, module string) ([]models.StaffLog, error) {
+func (s *StaffLogsService) GetFilteredAsModel(ctx context.Context, staffID int64, action string, module enums.Module) ([]models.StaffLog, error) {
 	logsData, err := s.GetFiltered(ctx, staffID, action, module)
 	if err != nil {
 		return nil, err
