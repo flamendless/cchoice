@@ -186,41 +186,49 @@ templ EmptyCart() {
 	</div>
 }
 
-templ btnQtyDecrease(cl models.CheckoutLine) {
+templ btnQtyDecrease(cl models.CheckoutLine, prefix string) {
 	<button
 		type="button"
-		id={ "btn-minus-" + cl.ID }
+		id={ "btn-minus-" + prefix + "-" + cl.ID }
 		alt="decrease quantity button"
 		aria-label="Decrease quantity"
 		title="Decrease quantity"
 		class="p-1 border rounded bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
 		disabled?={ cl.Quantity <= 1 }
 		hx-patch={ utils.URL("/carts/lines/" + cl.ID + "?dec=1") }
-		hx-target={ fmt.Sprintf("[name=qty-%s]", cl.ID) }
-		hx-swap="textContent"
-		_="
+		hx-swap="none"
+		_={ fmt.Sprintf(`
 			on htmx:afterRequest
-				put me.closest('.cart-line').querySelector('[name^=qty-]').textContent into txtQty
-				put txtQty.split(':')[1].trim() into qty
-				set qty to Number(qty)
+				set resp to event.detail.xhr.responseText as Object
+				set qty to resp.qty
+				set total to resp.total
+
+				set el1 to document.getElementById('qty-desktop-%s')
+				set el2 to document.getElementById('qty-mobile-%s')
+				set el3 to document.getElementById('total-desktop-%s')
+				set el4 to document.getElementById('total-mobile-%s')
+				put qty into el1.textContent
+				put qty into el2.textContent
+				put 'Total: ' + total into el3.textContent
+				put total into el4.textContent
 
 				if qty <= 1
-					set me.disabled to true
+					set my.disabled to true
 				else
-					set me.disabled to false
+					set my.disabled to false
 				end
 
-				put me.id.replace('btn-minus-', 'btn-plus-') into plusID
-				put document.querySelector('#' + plusID) into btnPlus
-				if btnPlus is not null
-					if qty >= 1
-						set btnPlus.disabled to false
-					else
-						set btnPlus.disabled to true
-					end
+				set btnPlus to document.getElementById('btn-plus-desktop-%s')
+				set btnPlusMobile to document.getElementById('btn-plus-mobile-%s')
+				if qty < 99
+					set btnPlus.disabled to false
+					set btnPlusMobile.disabled to false
+				else
+					set btnPlus.disabled to true
+					set btnPlusMobile.disabled to true
 				end
 			end
-		"
+		`, cl.ID, cl.ID, cl.ID, cl.ID, cl.ID, cl.ID) }
 	>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -234,41 +242,49 @@ templ btnQtyDecrease(cl models.CheckoutLine) {
 	</button>
 }
 
-templ btnQtyIncrease(cl models.CheckoutLine) {
+templ btnQtyIncrease(cl models.CheckoutLine, prefix string) {
 	<button
 		type="button"
-		id={ "btn-plus-" + cl.ID }
+		id={ "btn-plus-" + prefix + "-" + cl.ID }
 		alt="increase quantity button"
 		aria-label="Increase quantity"
 		title="Increase quantity"
 		class="p-1 border rounded bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
 		disabled?={ cl.Quantity >= constants.MaxCartLineQty }
 		hx-patch={ utils.URL("/carts/lines/" + cl.ID + "?inc=1") }
-		hx-target={ fmt.Sprintf("[name=qty-%s]", cl.ID) }
-		hx-swap="textContent"
-		_="
+		hx-swap="none"
+		_={ fmt.Sprintf(`
 			on htmx:afterRequest
-				put me.closest('.cart-line').querySelector('[name^=qty-]').textContent into txtQty
-				put txtQty.split(':')[1].trim() into qty
-				set qty to Number(qty)
+				set resp to event.detail.xhr.responseText as Object
+				set qty to resp.qty
+				set total to resp.total
 
-				if qty <= 1
-					set me.disabled to true
+				set el1 to document.getElementById('qty-desktop-%s')
+				set el2 to document.getElementById('qty-mobile-%s')
+				set el3 to document.getElementById('total-desktop-%s')
+				set el4 to document.getElementById('total-mobile-%s')
+				put qty into el1.textContent
+				put qty into el2.textContent
+				put 'Total: ' + total into el3.textContent
+				put total into el4.textContent
+
+				if qty >= 99
+					set my.disabled to true
 				else
-					set me.disabled to false
+					set my.disabled to false
 				end
 
-				put me.id.replace('btn-plus-', 'btn-minus-') into minusID
-				put document.querySelector('#' + minusID) into btnMinus
-				if btnMinus is not null
-					if qty > 1
-						set btnMinus.disabled to false
-					else
-						set btnMinus.disabled to true
-					end
+				set btnMinus to document.getElementById('btn-minus-desktop-%s')
+				set btnMinusMobile to document.getElementById('btn-minus-mobile-%s')
+				if qty > 1
+					set btnMinus.disabled to false
+					set btnMinusMobile.disabled to false
+				else
+					set btnMinus.disabled to true
+					set btnMinusMobile.disabled to true
 				end
 			end
-		"
+		`, cl.ID, cl.ID, cl.ID, cl.ID, cl.ID, cl.ID) }
 	>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -328,14 +344,14 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 					}
 				</span>
 				<div class="cart-line flex items-center gap-2 my-1">
-					@btnQtyDecrease(cl)
+					@btnQtyDecrease(cl, "desktop")
 					<p
 						name={ "qty-" + cl.ID }
 						class="text-sm text-gray-500"
 					>
 						Qty: { cl.Quantity }
 					</p>
-					@btnQtyIncrease(cl)
+					@btnQtyIncrease(cl, "desktop-")
 				</div>
 				<p class="text-sm text-gray-700">
 					Total: { cl.Total.Display() }
