@@ -285,6 +285,7 @@ type AdminProductListItem struct {
 
 type AdminProductInventoryListItem struct {
 	ID            string
+	ProductID     string
 	ProductSerial string
 	ProductSlug   string
 	StocksIn      enums.StocksIn
