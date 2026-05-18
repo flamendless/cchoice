@@ -1,12 +1,20 @@
 package server
 
 import (
+	"database/sql"
+	"errors"
 	"net/http"
+	"strconv"
 
+	"cchoice/cmd/web/models"
 	compadmin "cchoice/cmd/web/components/admin"
+	"cchoice/internal/encode"
+	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 
+	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
@@ -36,4 +44,86 @@ func (s *Server) adminProductInventoriesTableHandler(w http.ResponseWriter, r *h
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 	}
+}
+
+func (s *Server) adminProductInventoryUpdateModalHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Product Inventory Update Modal Handler]"
+	const page = "/admin/product-inventories"
+	ctx := r.Context()
+
+	inventoryID := chi.URLParam(r, "id")
+	decoded := s.encoder.Decode(inventoryID)
+	if decoded == encode.INVALID {
+		logs.LogCtx(ctx).Error(logtag, zap.String("inventory_id", inventoryID), zap.Error(errs.ErrDecode))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrDecode.Error()))
+		return
+	}
+
+	inv, err := s.dbRO.GetQueries().GetProductInventoryByID(ctx, decoded)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			logs.LogCtx(ctx).Error(logtag, zap.Int64("decoded", decoded), zap.Error(err))
+			redirectHX(w, r, utils.URLWithError(page, "Inventory not found"))
+			return
+		}
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	data := models.AdminProductInventoryListItem{
+		ID:        inventoryID,
+		ProductID: s.encoder.Encode(inv.ProductID),
+		StocksIn:  enums.ParseStocksInToEnum(inv.StocksIn),
+		Stocks:    inv.Stocks,
+	}
+
+	if err := compadmin.InventoryUpdateModal(data).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+	}
+}
+
+func (s *Server) adminProductInventoryUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Product Inventory Update Handler]"
+	const page = "/admin/product-inventories"
+	ctx := r.Context()
+
+	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
+	if staffID == "" {
+		redirectHX(w, r, utils.URLWithError(page, "Unauthorized"))
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+		return
+	}
+
+	productID := r.PostFormValue("product_id")
+	qtyStr := r.PostFormValue("qty")
+	stocksInStr := r.PostFormValue("stocks_in")
+
+	qty, err := strconv.ParseInt(qtyStr, 10, 64)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("qty", qtyStr), zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, "Invalid quantity"))
+		return
+	}
+
+	stocksIn := enums.ParseStocksInToEnum(stocksInStr)
+	if stocksIn == enums.STOCKS_IN_UNDEFINED {
+		logs.LogCtx(ctx).Error(logtag, zap.String("stocks_in", stocksInStr), zap.Error(errs.ErrInvalidInput))
+		redirectHX(w, r, utils.URLWithError(page, "Invalid stock location"))
+		return
+	}
+
+	if err := s.services.productInventory.SetQty(ctx, staffID, productID, qty, stocksIn); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	redirectHX(w, r, utils.URLWithSuccess(page, "Inventory updated successfully"))
 }

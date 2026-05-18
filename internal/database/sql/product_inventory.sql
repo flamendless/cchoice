@@ -62,6 +62,7 @@ LIMIT ?;
 -- name: AdminGetProductInventoriesListing :many
 SELECT
     tbl_product_inventories.id,
+    tbl_product_inventories.product_id,
     tbl_product_inventories.stocks,
     tbl_product_inventories.stocks_in,
     tbl_product_inventories.updated_at,
