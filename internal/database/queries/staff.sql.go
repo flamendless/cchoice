@@ -302,7 +302,7 @@ SELECT
     created_at,
     updated_at
 FROM tbl_staffs
-WHERE deleted_at = '1970-01-01 00:00:00+00:00' AND user_type = 'STAFF'
+WHERE deleted_at = '1970-01-01 00:00:00+00:00'
 ORDER BY last_name ASC, first_name ASC
 LIMIT ?
 `
