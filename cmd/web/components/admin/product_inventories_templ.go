@@ -309,7 +309,7 @@ func AdminProductInventoriesTable(inventories []models.AdminProductInventoryList
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" target=\"_blank\" class=\"inline-block px-3 py-1 text-xs font-medium rounded text-center text-white bg-blue-600 hover:bg-blue-700\">View Product</a></td></tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" target=\"_blank\" class=\"bg-cchoice text-white px-2 py-1 rounded-lg font-semibold hover:bg-cchoice_dark transition-colors cursor-pointer mx-2\">View Product</a></td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
