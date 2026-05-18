@@ -13,6 +13,7 @@ import (
 const adminGetProductInventoriesListing = `-- name: AdminGetProductInventoriesListing :many
 SELECT
     tbl_product_inventories.id,
+    tbl_product_inventories.product_id,
     tbl_product_inventories.stocks,
     tbl_product_inventories.stocks_in,
     tbl_product_inventories.updated_at,
@@ -32,6 +33,7 @@ ORDER BY
 
 type AdminGetProductInventoriesListingRow struct {
 	ID            int64
+	ProductID     int64
 	Stocks        int64
 	StocksIn      string
 	UpdatedAt     string
@@ -50,6 +52,7 @@ func (q *Queries) AdminGetProductInventoriesListing(ctx context.Context) ([]Admi
 		var i AdminGetProductInventoriesListingRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.ProductID,
 			&i.Stocks,
 			&i.StocksIn,
 			&i.UpdatedAt,
