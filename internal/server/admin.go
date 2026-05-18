@@ -126,6 +126,8 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 
 	r.With(s.requireSuperuserAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES)).Get("/admin/product-inventories", s.adminProductInventoriesPageHandler)
 	r.With(s.requireSuperuserAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES)).Get("/admin/product-inventories/table", s.adminProductInventoriesTableHandler)
+	r.With(s.requireSuperuserAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES)).Get("/admin/product-inventories/{id}/update", s.adminProductInventoryUpdateModalHandler)
+	r.With(s.requireSuperuserAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES)).Patch("/admin/product-inventories/{id}/update", s.adminProductInventoryUpdateHandler)
 
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PROMOS)).Get("/admin/promos", s.adminPromosListPageHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PROMOS)).Get("/admin/promos/table", s.adminPromosListTableHandler)
