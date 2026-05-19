@@ -105,17 +105,17 @@ func (s *Server) adminProductInventoryUpdateHandler(w http.ResponseWriter, r *ht
 	qtyStr := r.PostFormValue("qty")
 	stocksInStr := r.PostFormValue("stocks_in")
 
-	qty, err := strconv.ParseInt(qtyStr, 10, 64)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.String("qty", qtyStr), zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid quantity"))
-		return
-	}
-
 	stocksIn := enums.ParseStocksInToEnum(stocksInStr)
 	if stocksIn == enums.STOCKS_IN_UNDEFINED {
 		logs.LogCtx(ctx).Error(logtag, zap.String("stocks_in", stocksInStr), zap.Error(errs.ErrInvalidInput))
 		redirectHX(w, r, utils.URLWithError(page, "Invalid stock location"))
+		return
+	}
+
+	qty, err := strconv.ParseInt(qtyStr, 10, 64)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("qty", qtyStr), zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, "Invalid quantity"))
 		return
 	}
 
