@@ -101,7 +101,7 @@ func (s *Server) adminProductInventoryUpdateHandler(w http.ResponseWriter, r *ht
 		return
 	}
 
-	productID := r.PostFormValue("product_id")
+	inventoryID := chi.URLParam(r, "id")
 	qtyStr := r.PostFormValue("qty")
 	stocksInStr := r.PostFormValue("stocks_in")
 
@@ -119,7 +119,7 @@ func (s *Server) adminProductInventoryUpdateHandler(w http.ResponseWriter, r *ht
 		return
 	}
 
-	if err := s.services.productInventory.SetQty(ctx, staffID, productID, qty, stocksIn); err != nil {
+	if err := s.services.productInventory.UpdateByID(ctx, staffID, inventoryID, qty, stocksIn); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return

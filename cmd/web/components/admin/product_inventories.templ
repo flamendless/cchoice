@@ -181,7 +181,6 @@ templ InventoryUpdateForm(inv models.AdminProductInventoryListItem) {
 		class="flex flex-col gap-4"
 		hx-on::after-request="if(event.detail.successful) { document.getElementById('inventory-update-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/product-inventories/table', { target: '#inventories-table', swap: 'innerHTML' }) }"
 	>
-		<input type="hidden" name="product_id" value={ inv.ProductID } />
 		<div>
 			<label class="block text-sm font-medium text-gray-700 mb-1">
 				Quantity

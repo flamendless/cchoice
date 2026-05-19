@@ -173,6 +173,46 @@ func (s *ProductInventoryService) SetQty(
 	return nil
 }
 
+func (s *ProductInventoryService) UpdateByID(
+	ctx context.Context,
+	staffID string,
+	inventoryID string,
+	qty int64,
+	stocksIn enums.StocksIn,
+) error {
+	result := "success"
+	defer func() {
+		if err := s.staffLog.CreateLog(
+			ctx,
+			staffID,
+			constants.ActionUpdate,
+			constants.ModuleProductInventories,
+			result,
+			nil,
+		); err != nil {
+			logs.Log().Warn("[ProductInventoryService] update by id log", zap.Error(err))
+		}
+	}()
+
+	decoded := s.encoder.Decode(inventoryID)
+	if decoded == encode.INVALID {
+		result = errs.ErrDecode.Error()
+		return errs.ErrDecode
+	}
+
+	if err := s.dbRW.GetQueries().UpdateProductInventoryByID(ctx, queries.UpdateProductInventoryByIDParams{
+		ID:       decoded,
+		Stocks:   qty,
+		StocksIn: stocksIn.String(),
+	}); err != nil {
+		result = err.Error()
+		return errors.Join(errs.ErrProductInventory, err)
+	}
+
+	result = fmt.Sprintf("success. inventory ID '%s'", inventoryID)
+	return nil
+}
+
 func (s *ProductInventoryService) mapRowToProductInventory(p queries.TblProductInventory) *ProductInventory {
 	return &ProductInventory{
 		ID:        s.encoder.Encode(p.ID),
