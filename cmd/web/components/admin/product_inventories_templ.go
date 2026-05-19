@@ -430,33 +430,20 @@ func InventoryUpdateForm(inv models.AdminProductInventoryListItem) templ.Compone
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Product Serial</label> <input type=\"text\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Quantity</label><div class=\"flex items-center gap-2\"><button type=\"button\" id=\"inv-qty-decrease\" class=\"p-2 border rounded-l-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\" _=\"\n\t\t\t\t\t\ton click\n\t\t\t\t\t\t\tset currentVal to Number(#inv-qty.value)\n\t\t\t\t\t\t\tif currentVal > 0\n\t\t\t\t\t\t\t\tset #inv-qty.value to String(currentVal - 1)\n\t\t\t\t\t\t\t\tif currentVal - 1 <= 0\n\t\t\t\t\t\t\t\t\tset me.disabled to true\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\tif currentVal - 1 < 99999\n\t\t\t\t\t\t\t\t\tset #inv-qty-increase.disabled to false\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M20 12H4\"></path></svg></button> <input type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]*\" id=\"inv-qty\" name=\"qty\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var19 string
-		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(inv.ProductSerial)
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatInt(inv.Stocks, 10))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 191, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 218, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" disabled class=\"w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Quantity</label><div class=\"flex items-center gap-2\"><button type=\"button\" id=\"inv-qty-decrease\" class=\"p-2 border rounded-l-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\" _=\"\n\t\t\t\t\t\ton click\n\t\t\t\t\t\t\tset currentVal to Number(#inv-qty.value)\n\t\t\t\t\t\t\tif currentVal > 0\n\t\t\t\t\t\t\t\tset #inv-qty.value to String(currentVal - 1)\n\t\t\t\t\t\t\t\tif currentVal - 1 <= 0\n\t\t\t\t\t\t\t\t\tset me.disabled to true\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\tif currentVal - 1 < 99999\n\t\t\t\t\t\t\t\t\tset #inv-qty-increase.disabled to false\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M20 12H4\"></path></svg></button> <input type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]*\" id=\"inv-qty\" name=\"qty\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var20 string
-		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatInt(inv.Stocks, 10))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/product_inventories.templ`, Line: 229, Col: 46}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\" class=\"w-20 text-center border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"\n\t\t\t\t\t\ton input\n\t\t\t\t\t\t\tif Number(me.value) <= 0\n\t\t\t\t\t\t\t\tset #inv-qty-decrease.disabled to true\n\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\tset #inv-qty-decrease.disabled to false\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif Number(me.value) >= 99999\n\t\t\t\t\t\t\t\tset #inv-qty-increase.disabled to true\n\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\tset #inv-qty-increase.disabled to false\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\ton keyup\n\t\t\t\t\t\t\tif me.value is ''\n\t\t\t\t\t\t\t\tset me.value to '0'\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif Number(me.value) < 0\n\t\t\t\t\t\t\t\tset me.value to '0'\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif Number(me.value) > 99999\n\t\t\t\t\t\t\t\tset me.value to '99999'\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\"> <button type=\"button\" id=\"inv-qty-increase\" class=\"p-2 border rounded-r-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\" _=\"\n\t\t\t\t\t\ton click\n\t\t\t\t\t\t\tset currentVal to Number(#inv-qty.value)\n\t\t\t\t\t\t\tif currentVal < 99999\n\t\t\t\t\t\t\t\tset #inv-qty.value to String(currentVal + 1)\n\t\t\t\t\t\t\t\tif currentVal + 1 >= 99999\n\t\t\t\t\t\t\t\t\tset me.disabled to true\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\tif currentVal + 1 > 0\n\t\t\t\t\t\t\t\t\tset #inv-qty-decrease.disabled to false\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg></button></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Stocks In</label>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" class=\"w-20 text-center border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"\n\t\t\t\t\t\ton input\n\t\t\t\t\t\t\tif Number(me.value) <= 0\n\t\t\t\t\t\t\t\tset #inv-qty-decrease.disabled to true\n\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\tset #inv-qty-decrease.disabled to false\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif Number(me.value) >= 99999\n\t\t\t\t\t\t\t\tset #inv-qty-increase.disabled to true\n\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\tset #inv-qty-increase.disabled to false\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\ton keyup\n\t\t\t\t\t\t\tif me.value is ''\n\t\t\t\t\t\t\t\tset me.value to '0'\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif Number(me.value) < 0\n\t\t\t\t\t\t\t\tset me.value to '0'\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif Number(me.value) > 99999\n\t\t\t\t\t\t\t\tset me.value to '99999'\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\"> <button type=\"button\" id=\"inv-qty-increase\" class=\"p-2 border rounded-r-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\" _=\"\n\t\t\t\t\t\ton click\n\t\t\t\t\t\t\tset currentVal to Number(#inv-qty.value)\n\t\t\t\t\t\t\tif currentVal < 99999\n\t\t\t\t\t\t\t\tset #inv-qty.value to String(currentVal + 1)\n\t\t\t\t\t\t\t\tif currentVal + 1 >= 99999\n\t\t\t\t\t\t\t\t\tset me.disabled to true\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\tif currentVal + 1 > 0\n\t\t\t\t\t\t\t\t\tset #inv-qty-decrease.disabled to false\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg></button></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Stocks In</label>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -464,7 +451,7 @@ func InventoryUpdateForm(inv models.AdminProductInventoryListItem) templ.Compone
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</div><div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm\">Update</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div><div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm\">Update</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
