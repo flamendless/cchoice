@@ -44,6 +44,14 @@ SET
     updated_at = DATETIME('now')
 WHERE product_id = ? AND stocks_in = ?;
 
+-- name: UpdateProductInventoryByID :exec
+UPDATE tbl_product_inventories
+SET
+    stocks = ?,
+    stocks_in = ?,
+    updated_at = DATETIME('now')
+WHERE id = ?;
+
 -- name: ListProductInventories :many
 SELECT
     tbl_product_inventories.id,
