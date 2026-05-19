@@ -232,3 +232,23 @@ func (q *Queries) UpdateProductInventory(ctx context.Context, arg UpdateProductI
 	_, err := q.db.ExecContext(ctx, updateProductInventory, arg.Stocks, arg.ProductID, arg.StocksIn)
 	return err
 }
+
+const updateProductInventoryByID = `-- name: UpdateProductInventoryByID :exec
+UPDATE tbl_product_inventories
+SET
+    stocks = ?,
+    stocks_in = ?,
+    updated_at = DATETIME('now')
+WHERE id = ?
+`
+
+type UpdateProductInventoryByIDParams struct {
+	Stocks   int64
+	StocksIn string
+	ID       int64
+}
+
+func (q *Queries) UpdateProductInventoryByID(ctx context.Context, arg UpdateProductInventoryByIDParams) error {
+	_, err := q.db.ExecContext(ctx, updateProductInventoryByID, arg.Stocks, arg.StocksIn, arg.ID)
+	return err
+}
