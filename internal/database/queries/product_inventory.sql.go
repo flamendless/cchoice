@@ -106,17 +106,16 @@ UPDATE tbl_product_inventories
 SET
     stocks = stocks - ?,
     updated_at = DATETIME('now')
-WHERE product_id = ? AND stocks >= ?
+WHERE product_id = ?
 `
 
 type DecrementProductInventoryStockParams struct {
 	Stocks    int64
 	ProductID int64
-	Stocks_2  int64
 }
 
 func (q *Queries) DecrementProductInventoryStock(ctx context.Context, arg DecrementProductInventoryStockParams) error {
-	_, err := q.db.ExecContext(ctx, decrementProductInventoryStock, arg.Stocks, arg.ProductID, arg.Stocks_2)
+	_, err := q.db.ExecContext(ctx, decrementProductInventoryStock, arg.Stocks, arg.ProductID)
 	return err
 }
 
