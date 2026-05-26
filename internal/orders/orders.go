@@ -270,6 +270,20 @@ func CreateOrderFromCheckout(
 		}
 	}
 
+	for _, checkoutLine := range params.CheckoutLines {
+		if !dbCheckoutLineIDs[checkoutLine.ID] {
+			continue
+		}
+
+		if err := dbRW.GetQueries().DecrementProductInventoryStock(ctx, queries.DecrementProductInventoryStockParams{
+			Stocks:    checkoutLine.Quantity,
+			ProductID: checkoutLine.ProductID,
+			Stocks_2:  checkoutLine.Quantity,
+		}); err != nil {
+			return nil, "", fmt.Errorf("failed to decrement stock for product %d: %w", checkoutLine.ProductID, err)
+		}
+	}
+
 	logs.Log().Info(
 		"Created order from checkout",
 		zap.Int64("order_id", order.ID),
