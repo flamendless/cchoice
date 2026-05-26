@@ -46,6 +46,7 @@ type HomePageData struct {
 
 type RandomSaleProduct struct {
 	ProductID          string
+	Slug               string
 	CDNURL             string
 	CDNURL1280         string
 	OrigPriceDisplay   string
