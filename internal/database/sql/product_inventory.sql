@@ -57,7 +57,7 @@ UPDATE tbl_product_inventories
 SET
     stocks = stocks - ?,
     updated_at = DATETIME('now')
-WHERE product_id = ? AND stocks >= ?;
+WHERE product_id = ?;
 -- name: ListProductInventories :many
 SELECT
     tbl_product_inventories.id,

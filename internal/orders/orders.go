@@ -278,7 +278,6 @@ func CreateOrderFromCheckout(
 		if err := dbRW.GetQueries().DecrementProductInventoryStock(ctx, queries.DecrementProductInventoryStockParams{
 			Stocks:    checkoutLine.Quantity,
 			ProductID: checkoutLine.ProductID,
-			Stocks_2:  checkoutLine.Quantity,
 		}); err != nil {
 			return nil, "", fmt.Errorf("failed to decrement stock for product %d: %w", checkoutLine.ProductID, err)
 		}
