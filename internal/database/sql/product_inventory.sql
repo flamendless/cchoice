@@ -58,6 +58,7 @@ SET
     stocks = stocks - ?,
     updated_at = DATETIME('now')
 WHERE product_id = ?;
+
 -- name: ListProductInventories :many
 SELECT
     tbl_product_inventories.id,
