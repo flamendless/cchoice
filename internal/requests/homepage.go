@@ -344,6 +344,7 @@ func GetRandomSaleProduct(
 	saleProduct := &models.RandomSaleProduct{
 		GetRandomProductOnSaleRow: product,
 		ProductID:                 encoder.Encode(product.ID),
+		Slug:                      product.Slug.String,
 		CDNURL:                    getCDNURL(product.ThumbnailPath),
 		CDNURL1280:                getCDNURL(constants.ToPath1280(product.ThumbnailPath)),
 		OrigPriceDisplay:          origPrice.Display(),

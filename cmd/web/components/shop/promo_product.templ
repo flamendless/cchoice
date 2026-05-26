@@ -2,7 +2,6 @@ package shop
 
 import "cchoice/cmd/web/models"
 import "cchoice/internal/utils"
-import "fmt"
 import "cchoice/cmd/web/components/common"
 
 templ SaleBanner(product models.RandomSaleProduct) {
@@ -32,23 +31,19 @@ templ SaleBanner(product models.RandomSaleProduct) {
 				end
 			"
 	>
-		<div
+		<a
 			id="sale-banner-content"
+			href={ utils.URL("/product/"+product.Slug) }
+			data-promo-product-id={ product.ProductID }
 			class="
 				relative w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto
 				bg-white rounded-2xl shadow-2xl
 				overflow-hidden cursor-pointer
-				transform transition-transform hover:scale-105
+				transform transition-transform hover:scale-105 block
 			"
-			_={ fmt.Sprintf(`
-						on click
-							async call metrics_event('promo_product_click', '%s')
-							go to url '%s'
-						end
-						`,
-						product.ProductID,
-						utils.URL("/product/"+product.ProductID),
-					) }
+			_="on click
+					call metrics_event('promo_product_click', my @data-promo-product-id)
+				end"
 		>
 			<!-- Product Image -->
 			<img
@@ -113,6 +108,6 @@ templ SaleBanner(product models.RandomSaleProduct) {
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
 				</svg>
 			</button>
-		</div>
+		</a>
 	</div>
 }

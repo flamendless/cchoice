@@ -932,6 +932,7 @@ func (q *Queries) GetProductsWithoutSlugs(ctx context.Context) ([]GetProductsWit
 const getRandomProductOnSale = `-- name: GetRandomProductOnSale :one
 SELECT
 	tbl_products.id,
+	tbl_products.slug,
 	tbl_products.name,
 	tbl_products.description,
 	tbl_products.unit_price_with_vat,
@@ -969,6 +970,7 @@ LIMIT 1
 
 type GetRandomProductOnSaleRow struct {
 	ID                       int64
+	Slug                     sql.NullString
 	Name                     string
 	Description              sql.NullString
 	UnitPriceWithVat         int64
@@ -989,6 +991,7 @@ func (q *Queries) GetRandomProductOnSale(ctx context.Context) (GetRandomProductO
 	var i GetRandomProductOnSaleRow
 	err := row.Scan(
 		&i.ID,
+		&i.Slug,
 		&i.Name,
 		&i.Description,
 		&i.UnitPriceWithVat,
