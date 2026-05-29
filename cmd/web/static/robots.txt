@@ -22,3 +22,12 @@ Allow: /assets/image
 
 # Optional (add when ready)
 # Sitemap: https://cchoice.shop/sitemap.xml
+
+User-agent: Googlebot
+Disallow:
+
+User-agent: AdsBot-Google
+Disallow:
+
+User-agent: Googlebot-Image
+Disallow:
