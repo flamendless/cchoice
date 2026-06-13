@@ -15,6 +15,7 @@ tmp_dir = "tmp"
     "cmd/web/static/thumbnails",
     "cmd/web/static/svg",
     "cmd/goose",
+    "internal/receipt",
   ]
   exclude_file = []
   exclude_regex = [".*_templ.go", ".*.sql.go", ".*_test.go"]
