@@ -12,7 +12,8 @@ tmp_dir = "tmp"
     "cmd/web/static/images",
     "cmd/web/static/thumbnails",
     "cmd/web/static/svg",
-    "cmd/goose"
+    "cmd/goose",
+    "internal/receipt",
   ]
   exclude_file = ["internal/conf/version_gen.go"]
   exclude_regex = [".*_test.go", ".*.sql.go", ".*_templ.go", ".*_string.go"]
