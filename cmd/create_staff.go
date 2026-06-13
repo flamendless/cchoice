@@ -86,7 +86,7 @@ var cmdCreateStaff = &cobra.Command{
 
 		password := prompt(reader, "Password: ", true)
 		if !constants.RePassword.MatchString(password) {
-			panic("must be alphanumeric [a-z A-Z 0-9 - _ . ? # @]")
+			panic("passwords must match and must be alphanumeric [a-z A-Z 0-9 - _ . ? # @]")
 		}
 
 		requireInShopInput := prompt(reader, "Require in shop for time in/out (Y/N): ", true)
