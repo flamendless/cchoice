@@ -1,12 +1,17 @@
 package server
 
 import (
+	"context"
+	"errors"
 	"net/http"
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -171,4 +176,91 @@ func (s *Server) adminSuperuserStaffsRoleHandler(w http.ResponseWriter, r *http.
 	}
 
 	redirectHX(w, r, utils.URLWithSuccess(page, "successfully updated roles of staff"))
+}
+
+func (s *Server) adminSuperuserStaffsCreatePageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Staffs Create Page Handler]"
+	ctx := r.Context()
+
+	if err := compadmin.AdminSuperuserStaffsCreatePage().Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Server) adminSuperuserStaffsCreatePostHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Staffs Create Post Handler]"
+	const page = "/admin/superuser/staffs/create"
+	ctx := r.Context()
+
+	if err := r.ParseForm(); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+		return
+	}
+
+	password := r.FormValue("password")
+	confirmPassword := r.FormValue("confirm_password")
+	if password != confirmPassword {
+		redirectHX(w, r, utils.URLWithError(page, "Passwords do not match"))
+		return
+	}
+
+	userType := enums.ParseStaffUserTypeToEnum(r.FormValue("user_type"))
+	if userType == enums.STAFF_USER_TYPE_UNDEFINED {
+		redirectHX(w, r, utils.URLWithError(page, "Invalid user type"))
+		return
+	}
+
+	result := "success"
+	defer func() {
+		if err := s.services.staffLog.CreateLog(
+			context.Background(),
+			s.sessionManager.GetString(ctx, SessionStaffID),
+			constants.ActionCreate,
+			constants.ModuleStaff,
+			result,
+			nil,
+		); err != nil {
+			logs.Log().Error(logtag, zap.Error(err))
+		}
+	}()
+
+	_, err := s.services.staff.Create(ctx, services.CreateStaffParams{
+		FirstName:       r.FormValue("first_name"),
+		MiddleName:      r.FormValue("middle_name"),
+		LastName:        r.FormValue("last_name"),
+		Birthdate:       r.FormValue("birthdate"),
+		Sex:             r.FormValue("sex"),
+		DateHired:       r.FormValue("date_hired"),
+		Position:        r.FormValue("position"),
+		UserType:        userType,
+		Email:           r.FormValue("email"),
+		MobileNo:        r.FormValue("mobile_no"),
+		TimeInSchedule:  r.FormValue("time_in_schedule"),
+		TimeOutSchedule: r.FormValue("time_out_schedule"),
+		Password:        password,
+		RequireInShop:   r.FormValue("require_in_shop") == "true",
+	})
+	if err != nil {
+		result = err.Error()
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		msg := "Failed to create employee"
+		switch {
+		case errors.Is(err, errs.ErrDuplicateEmail):
+			msg = "Email already exists"
+		case errors.Is(err, errs.ErrMissingField):
+			msg = "All required fields must be filled"
+		case errors.Is(err, errs.ErrInvalidFormat):
+			msg = "Invalid format for one or more fields"
+		case errors.Is(err, errs.ErrInvalidInput):
+			msg = "Invalid input for one or more fields"
+		case errors.Is(err, errs.ErrValidationInvalidMobileNumber):
+			msg = "Invalid mobile number format"
+		}
+		redirectHX(w, r, utils.URLWithError(page, msg))
+		return
+	}
+
+	redirectHX(w, r, utils.URLWithSuccess("/admin/superuser/staffs", "Employee created successfully"))
 }

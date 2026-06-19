@@ -1,6 +1,10 @@
 package services
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"cchoice/internal/enums"
+)
 
 type StaffRowBase struct {
 	ID              int64
@@ -68,4 +72,21 @@ type UpdateProfileParams struct {
 	MobileNo   string
 	Birthdate  string
 	DateHired  string
+}
+
+type CreateStaffParams struct {
+	FirstName       string
+	MiddleName      string
+	LastName        string
+	Birthdate       string
+	Sex             string
+	DateHired       string
+	Position        string
+	UserType        enums.StaffUserType
+	Email           string
+	MobileNo        string
+	TimeInSchedule  string
+	TimeOutSchedule string
+	Password        string
+	RequireInShop   bool
 }

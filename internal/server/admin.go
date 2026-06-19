@@ -104,6 +104,8 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/customers", s.adminCustomersListPageHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/customers/table", s.adminCustomersListTableHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/staffs", s.adminSuperuserStaffsListPageHandler)
+	r.With(s.requireSuperuserAuth).Get("/admin/superuser/staffs/create", s.adminSuperuserStaffsCreatePageHandler)
+	r.With(s.requireSuperuserAuth).Post("/admin/superuser/staffs/create", s.adminSuperuserStaffsCreatePostHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/staffs/table", s.adminSuperuserStaffsListTableHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/staffs/roles", s.adminSuperuserStaffsRolesOptionsHandler)
 	r.With(s.requireSuperuserAuth).Patch("/admin/superuser/staffs/{id}/role", s.adminSuperuserStaffsRoleHandler)

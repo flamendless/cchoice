@@ -22,6 +22,7 @@ const (
 	ModulePasswordReset        = "password_reset"
 	ModuleProducts             = "products"
 	ModulePromos               = "promos"
+	ModuleStaff                = "staffs"
 	ModuleTimeOff              = "time_off"
 	ModuleTrackedLinks         = "tracked_links"
 )

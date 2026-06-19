@@ -3,7 +3,9 @@ package services
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"strings"
+	"time"
 
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
@@ -89,6 +91,90 @@ func (s *StaffService) UpdateProfile(ctx context.Context, params UpdateProfilePa
 		ID:         decodedID,
 	})
 	return err
+}
+
+func (s *StaffService) Create(ctx context.Context, params CreateStaffParams) (string, error) {
+	if params.FirstName == "" || params.LastName == "" || params.Position == "" ||
+		params.Birthdate == "" || params.DateHired == "" || params.Email == "" ||
+		params.MobileNo == "" || params.TimeInSchedule == "" || params.TimeOutSchedule == "" ||
+		params.Password == "" {
+		return "", errs.ErrMissingField
+	}
+
+	if _, err := time.Parse(constants.DateLayoutISO, params.Birthdate); err != nil {
+		return "", errs.ErrInvalidFormat
+	}
+
+	if _, err := time.Parse(constants.DateLayoutISO, params.DateHired); err != nil {
+		return "", errs.ErrInvalidFormat
+	}
+
+	sex := strings.ToUpper(params.Sex)
+	if sex != "M" && sex != "F" {
+		return "", errs.ErrInvalidInput
+	}
+
+	if params.UserType != enums.STAFF_USER_TYPE_STAFF && params.UserType != enums.STAFF_USER_TYPE_SUPERUSER {
+		return "", errs.ErrInvalidInput
+	}
+
+	if !constants.ReEmail.MatchString(params.Email) {
+		return "", errs.ErrInvalidFormat
+	}
+
+	mobileNo := params.MobileNo
+	if !strings.HasPrefix(mobileNo, constants.PHMobilePrefix) {
+		mobileNo = constants.PHMobilePrefix + mobileNo
+	}
+	if !constants.ReMobileNumber.MatchString(mobileNo) {
+		return "", errs.ErrValidationInvalidMobileNumber
+	}
+
+	if _, err := time.Parse(constants.TimeLayoutHHMM, params.TimeInSchedule); err != nil {
+		return "", errs.ErrInvalidFormat
+	}
+
+	if _, err := time.Parse(constants.TimeLayoutHHMM, params.TimeOutSchedule); err != nil {
+		return "", errs.ErrInvalidFormat
+	}
+
+	if !constants.RePassword.MatchString(params.Password) {
+		return "", errs.ErrInvalidFormat
+	}
+
+	if _, err := s.dbRO.GetQueries().GetStaffByEmail(ctx, params.Email); err == nil {
+		return "", errs.ErrDuplicateEmail
+	} else if !errors.Is(err, sql.ErrNoRows) {
+		return "", err
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(params.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+
+	middleNameNull := sql.NullString{String: params.MiddleName, Valid: params.MiddleName != ""}
+	id, err := s.dbRW.GetQueries().CreateStaff(ctx, queries.CreateStaffParams{
+		FirstName:       params.FirstName,
+		MiddleName:      middleNameNull,
+		LastName:        params.LastName,
+		Birthdate:       params.Birthdate,
+		Sex:             sex,
+		DateHired:       params.DateHired,
+		TimeInSchedule:  sql.NullString{Valid: true, String: params.TimeInSchedule},
+		TimeOutSchedule: sql.NullString{Valid: true, String: params.TimeOutSchedule},
+		Position:        params.Position,
+		UserType:        params.UserType.String(),
+		Email:           params.Email,
+		MobileNo:        mobileNo,
+		Password:        string(hash),
+		RequireInShop:   params.RequireInShop,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return s.encoder.Encode(id), nil
 }
 
 func (s *StaffService) GetAll(ctx context.Context, limit int64) ([]models.Staff, error) {

@@ -48,6 +48,7 @@ var (
 	ErrValidationTargetMustBeAStruct  = errors.New("[VALIDATION]: Target must be a struct")
 	ErrValidationInvalidMobileNumber  = errors.New("[VALIDATION]: Invalid mobile number format")
 	ErrValidationStartEndDates        = errors.New("[VALIDATION]: Start date must not be greater than end date")
+	ErrDuplicateEmail                 = errors.New("[VALIDATION]: Email already exists")
 
 	ErrNotFound = errors.New("[NOTFOUND]: Resource not found")
 	ErrRespNil  = errors.New("[GENERIC]: nil response returned")

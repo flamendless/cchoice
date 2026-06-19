@@ -88,15 +88,14 @@ var cmdCreateStaff = &cobra.Command{
 		if !constants.RePassword.MatchString(password) {
 			panic("passwords must match and must be alphanumeric [a-z A-Z 0-9 - _ . ? # @]")
 		}
-
-		requireInShopInput := prompt(reader, "Require in shop for time in/out (Y/N): ", true)
-		requireInShop := strings.ToUpper(requireInShopInput) == "Y"
-
 		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to hash password: %v\n", err)
 			os.Exit(1)
 		}
+
+		requireInShopInput := prompt(reader, "Require in shop for time in/out (Y/N): ", true)
+		requireInShop := strings.ToUpper(requireInShopInput) == "Y"
 
 		db := database.New(database.DB_MODE_RW)
 		defer db.Close()
