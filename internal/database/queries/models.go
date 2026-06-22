@@ -197,6 +197,39 @@ type TblLinkClick struct {
 	UtmCampaign sql.NullString
 }
 
+type TblMemo struct {
+	ID        int64
+	Title     string
+	Message   string
+	Status    string
+	StartDate string
+	EndDate   string
+	CreatedBy int64
+	CreatedAt string
+	UpdatedAt string
+	DeletedAt string
+	FileUrl   sql.NullString
+}
+
+type TblMemoRecipient struct {
+	ID        int64
+	MemoID    int64
+	StaffID   int64
+	CreatedAt string
+}
+
+type TblMemoStaffAction struct {
+	ID           int64
+	MemoID       int64
+	StaffID      int64
+	Status       string
+	RejectReason sql.NullString
+	CreatedAt    string
+	UpdatedAt    string
+	AcceptedAt   sql.NullString
+	RejectedAt   sql.NullString
+}
+
 type TblOrder struct {
 	ID                       int64
 	CheckoutID               int64

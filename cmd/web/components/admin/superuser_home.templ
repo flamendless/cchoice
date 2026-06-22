@@ -26,13 +26,15 @@ var staffCards = []models.StaffCard{
 
 	{Link: "/admin/cpoints/generate", Title: "Generate C-Points", Description: "Generate C-Points for a customer", Icon: svg.Lightning("text-cchoice")},
 
+	{Link: "/admin/memos", Title: "Manage Memos", Description: "Create and manage staff memorandums", Icon: svg.Document("text-cchoice")},
+
 	{Link: "/admin/superuser/customers", Title: "Customers", Description: "View all registered customers", Icon: svg.Group("text-cchoice")},
 
 	{Link: "/admin/superuser/logs", Title: "Staff Logs", Description: "View staff action logs", Icon: svg.Document("text-cchoice")},
 	{Link: "/admin/superuser/envs", Title: "Envs", Description: "View application configuration", Icon: svg.Gear("text-cchoice")},
 }
 
-templ AdminSuperuserHomePage(fullName string) {
+templ AdminSuperuserHomePage(fullName string, memos []models.StaffMemoCard) {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
@@ -49,6 +51,7 @@ templ AdminSuperuserHomePage(fullName string) {
 			<div class="flex-grow p-4">
 				<div class="max-w-6xl mx-auto">
 					@header.AdminStaffHeaderWithSubtitle(fullName)
+					@StaffMemoCards(memos)
 					<div class="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
 						for _, card := range staffCards {
 							<a
@@ -65,6 +68,7 @@ templ AdminSuperuserHomePage(fullName string) {
 					</div>
 				</div>
 			</div>
+			<div id="memo-reject-modal-container"></div>
 		</body>
 	</html>
 }

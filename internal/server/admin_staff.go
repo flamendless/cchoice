@@ -37,7 +37,23 @@ func (s *Server) adminStaffHomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	currentUserFullName := utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName)
-	if err := compadmin.AdminStaffHomePage(currentUserFullName, roles).Render(ctx, w); err != nil {
+
+	pendingMemos, err := s.services.memo.GetPendingForStaff(ctx, staffIDStr)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_id", staff.ID), zap.Error(err))
+	}
+
+	memoCards := make([]models.StaffMemoCard, 0, len(pendingMemos))
+	for _, m := range pendingMemos {
+		memoCards = append(memoCards, models.StaffMemoCard{
+			ID:      m.ID,
+			Title:   m.Title,
+			Message: m.Message,
+			FileURL: m.FileURL,
+		})
+	}
+
+	if err := compadmin.AdminStaffHomePage(currentUserFullName, roles, memoCards).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),

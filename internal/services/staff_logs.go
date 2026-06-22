@@ -69,7 +69,6 @@ func (s *StaffLogsService) GetDistinctActions(ctx context.Context) ([]string, er
 	return s.dbRO.GetQueries().GetDistinctStaffLogActions(ctx)
 }
 
-
 func (s *StaffLogsService) GetFiltered(ctx context.Context, staffID int64, action string, module enums.Module) ([]queries.GetFilteredStaffLogsRow, error) {
 	var moduleStr string
 	if module.IsValid() {
