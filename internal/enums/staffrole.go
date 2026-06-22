@@ -13,6 +13,7 @@ const (
 	STAFF_ROLE_MANAGE_PROMOS
 	STAFF_ROLE_MANAGE_TRACKED_LINKS
 	STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES
+	STAFF_ROLE_MANAGE_MEMO
 )
 
 func ParseStaffRoleToEnum(e string) StaffRole {
@@ -31,6 +32,8 @@ func ParseStaffRoleToEnum(e string) StaffRole {
 		return STAFF_ROLE_MANAGE_TRACKED_LINKS
 	case STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES.String():
 		return STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES
+	case STAFF_ROLE_MANAGE_MEMO.String():
+		return STAFF_ROLE_MANAGE_MEMO
 	default:
 		return STAFF_ROLE_UNDEFINED
 	}
@@ -52,6 +55,8 @@ func MustParseStaffRoleToEnum(e string) StaffRole {
 		return STAFF_ROLE_MANAGE_TRACKED_LINKS
 	case STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES.String():
 		return STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES
+	case STAFF_ROLE_MANAGE_MEMO.String():
+		return STAFF_ROLE_MANAGE_MEMO
 	default:
 		panic("Invalid StaffRole. Got '" + e + "'")
 	}
@@ -70,6 +75,7 @@ func GetAllStaffRoles() []StaffRole {
 		STAFF_ROLE_MANAGE_PROMOS,
 		STAFF_ROLE_MANAGE_TRACKED_LINKS,
 		STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES,
+		STAFF_ROLE_MANAGE_MEMO,
 	}
 }
 

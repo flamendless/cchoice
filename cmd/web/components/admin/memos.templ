@@ -1,0 +1,384 @@
+package components
+
+import (
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/enums"
+	"cchoice/internal/utils"
+)
+
+templ AdminMemosListPage() {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("Memos - C-Choice Admin")
+		</head>
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-col"
+			_="init call metrics_event('admin_visit', 'memos list')"
+		>
+			@common.DevRibbon()
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-8xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.AdminStaffHeaderWithBack()
+						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+							Manage Memos
+						</h1>
+						@MemosListSection()
+					</div>
+				</div>
+			</div>
+			<div id="memo-create-modal-container"></div>
+			<div id="memo-edit-modal-container"></div>
+		</body>
+	</html>
+}
+
+templ MemosListSection() {
+	<div
+		class="bg-white rounded-lg shadow-md p-6"
+		hx-get={ utils.URL("/admin/memos/table") }
+		hx-trigger="load"
+		hx-target="#memos-table"
+		hx-swap="innerHTML"
+	>
+		@MemosToolbar()
+		<div id="memos-table"></div>
+	</div>
+}
+
+templ MemosToolbar() {
+	<div class="mb-6 flex flex-wrap gap-3 items-center justify-end">
+		<button
+			type="button"
+			class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2"
+			hx-get={ utils.URL("/admin/memos/create") }
+			hx-target="#memo-create-modal-container"
+			hx-swap="innerHTML"
+		>
+			Create Memo
+		</button>
+	</div>
+}
+
+templ AdminMemosListTable(memos []models.AdminMemoListItem) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-50">
+				<tr>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[5%]"></th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[16%]">Title</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">File URL</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">Date Range</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[8%]">Status</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[13%]">Created By</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[13%]">Created At</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[17%]">Actions</th>
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				if len(memos) == 0 {
+					<tr>
+						<td colspan="8" class="px-6 py-4 text-center text-gray-500">
+							No memos found.
+						</td>
+					</tr>
+				} else {
+					for _, memo := range memos {
+						@MemoTableRow(memo)
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ MemoTableRow(memo models.AdminMemoListItem) {
+	<tr id={ "memo-row-" + memo.ID }>
+		<td class="px-4 py-4 whitespace-nowrap text-sm">
+			<button
+				type="button"
+				class="px-2 py-1 text-cchoice hover:bg-cchoicesoft rounded"
+				hx-get={ utils.URLf("/admin/memos/%s/staff", memo.ID) }
+				hx-target={ "#memo-staff-cell-" + memo.ID }
+				hx-swap="innerHTML"
+				_={ "on click toggle .hidden on #memo-staff-" + memo.ID }
+			>
+				+
+			</button>
+		</td>
+		<td class="px-6 py-4 text-sm text-gray-900">{ memo.Title }</td>
+		<td class="px-6 py-4 text-sm text-gray-900">
+			@MemoFileURLCell(memo.FileURL)
+		</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ memo.StartDate } - { memo.EndDate }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ memo.Status.String() }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ memo.CreatedByName }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ memo.CreatedAt }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm">
+			<button
+				type="button"
+				class="px-3 py-1 bg-cchoice text-white rounded-md hover:bg-cchoicedark text-sm"
+				hx-get={ utils.URLf("/admin/memos/%s/edit", memo.ID) }
+				hx-target="#memo-edit-modal-container"
+				hx-swap="innerHTML"
+			>
+				Edit
+			</button>
+		</td>
+	</tr>
+	<tr id={ "memo-staff-" + memo.ID } class="hidden">
+		<td id={ "memo-staff-cell-" + memo.ID } colspan="8" class="px-6 py-2"></td>
+	</tr>
+}
+
+templ MemoFileURLCell(url string) {
+	if url != "" {
+		<div class="flex items-center gap-2 max-w-xs">
+			<span class="truncate" title={ url }>{ url }</span>
+			<a
+				href={ templ.URL(url) }
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-cchoice hover:text-cchoicedark shrink-0"
+				title="Open file"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+				</svg>
+			</a>
+		</div>
+	} else {
+		<span class="text-gray-400">—</span>
+	}
+}
+
+templ MemoStaffRows(memoID string, rows []models.AdminMemoRecipientRow, currentStaffID string) {
+	<div class="pl-8 pr-4 py-2">
+		<table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-md">
+			<thead class="bg-gray-100">
+				<tr>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Staff</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Reject Reason</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Accepted At</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Rejected At</th>
+				</tr>
+			</thead>
+			<tbody class="divide-y divide-gray-200">
+				if len(rows) == 0 {
+					<tr>
+						<td colspan="5" class="px-4 py-3 text-center text-sm text-gray-500">No staff assigned.</td>
+					</tr>
+				} else {
+					for _, row := range rows {
+						<tr class={ memoRecipientRowClass(row.ActionStatus) }>
+							<td class="px-4 py-2 text-sm text-gray-900">{ memoStaffDisplayName(row.StaffName, row.StaffID, currentStaffID) }</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ memoRecipientStatusLabel(row.ActionStatus) }</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ row.RejectReason }</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ row.AcceptedAt }</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ row.RejectedAt }</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ MemoCreateModal(allStaff []models.Staff, selectedIDs []string, currentStaffID string) {
+	@MemoFormModal("Create Memo", "/admin/memos", "post", allStaff, selectedIDs, currentStaffID, models.AdminMemoListItem{
+		Status: enums.MEMO_STATUS_DRAFT,
+	})
+}
+
+templ MemoEditModal(memo models.AdminMemoListItem, allStaff []models.Staff, currentStaffID string) {
+	@MemoFormModal("Edit Memo", utils.URLf("/admin/memos/%s", memo.ID), "patch", allStaff, memo.RecipientIDs, currentStaffID, memo)
+}
+
+templ MemoFormModal(title string, action string, method string, allStaff []models.Staff, selectedIDs []string, currentStaffID string, memo models.AdminMemoListItem) {
+	<div
+		id="memo-form-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="
+			on closeModal
+				set #memo-create-modal-container.innerHTML to ''
+				set #memo-edit-modal-container.innerHTML to ''
+		"
+	>
+		<div class="absolute inset-0 bg-black/50" _="on click trigger closeModal"></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl mx-4 overflow-y-auto max-h-[90vh]">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">{ title }</h2>
+				<button type="button" class="text-gray-400 hover:text-gray-600" _="on click trigger closeModal">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			if method == "post" {
+				<form
+					hx-post={ utils.URL(action) }
+					hx-swap="none"
+					class="flex flex-col gap-4"
+					hx-on::after-request="if(event.detail.successful) { document.getElementById('memo-create-modal-container').innerHTML = ''; document.getElementById('memo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/memos/table', { target: '#memos-table', swap: 'innerHTML' }) }"
+				>
+					@MemoFormFields(memo, allStaff, selectedIDs, currentStaffID)
+				</form>
+			} else {
+				<form
+					hx-patch={ utils.URL(action) }
+					hx-swap="none"
+					class="flex flex-col gap-4"
+					hx-on::after-request="if(event.detail.successful) { document.getElementById('memo-create-modal-container').innerHTML = ''; document.getElementById('memo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/memos/table', { target: '#memos-table', swap: 'innerHTML' }) }"
+				>
+					@MemoFormFields(memo, allStaff, selectedIDs, currentStaffID)
+				</form>
+			}
+		</div>
+	</div>
+}
+
+templ MemoFormFields(memo models.AdminMemoListItem, allStaff []models.Staff, selectedIDs []string, currentStaffID string) {
+	<div>
+		<label class="block text-sm font-medium text-gray-700 mb-1">Title <span class="text-red-500">*</span></label>
+		<input
+			type="text"
+			name="title"
+			value={ memo.Title }
+			required
+			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+		/>
+	</div>
+	<div>
+		<label class="block text-sm font-medium text-gray-700 mb-1">Message <span class="text-red-500">*</span></label>
+		<textarea
+			name="message"
+			required
+			rows="4"
+			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+		>{ memo.Message }</textarea>
+	</div>
+	<div>
+		<label class="block text-sm font-medium text-gray-700 mb-1">File URL (optional)</label>
+		<input
+			type="url"
+			name="file_url"
+			value={ memo.FileURL }
+			placeholder="https://drive.google.com/..."
+			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+		/>
+	</div>
+	<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-red-500">*</span></label>
+			<select name="status" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice">
+				for _, st := range enums.AllMemoStatuses {
+					<option value={ st.String() } selected?={ memo.Status == st }>{ st.String() }</option>
+				}
+			</select>
+		</div>
+		<div>
+			@MemoStartDateField(memo.StartDate)
+		</div>
+		<div>
+			@MemoEndDateField(memo.StartDate, memo.EndDate)
+		</div>
+	</div>
+	@MemoStaffChecklist(allStaff, selectedIDs, currentStaffID)
+	<div class="flex w-full gap-2 justify-end">
+		<button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm" _="on click trigger closeModal">Cancel</button>
+		<button type="submit" class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark text-sm">Save</button>
+	</div>
+}
+
+templ MemoStartDateField(value string) {
+	<div class="flex flex-col items-center">
+		<label for="start_date" class="block text-sm font-medium text-gray-700">
+			Start Date <span class="text-red-500">*</span>
+		</label>
+		<input
+			id="start_date"
+			type="date"
+			name="start_date"
+			value={ value }
+			min={ memoTodayISO() }
+			required
+			class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+			_="on change
+				set #end_date.min to my.value
+				if #end_date.value < my.value
+					set #end_date.value to ''
+				end
+			"
+		/>
+	</div>
+}
+
+templ MemoEndDateField(startDate string, value string) {
+	<div class="flex flex-col items-center">
+		<label for="end_date" class="block text-sm font-medium text-gray-700">
+			End Date <span class="text-red-500">*</span>
+		</label>
+		<input
+			id="end_date"
+			type="date"
+			name="end_date"
+			value={ value }
+			min={ memoEndDateMin(startDate) }
+			required
+			class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+		/>
+	</div>
+}
+
+templ MemoStaffChecklist(allStaff []models.Staff, selectedIDs []string, currentStaffID string) {
+	<div>
+		<div class="flex items-center justify-between mb-2">
+			<label class="block text-sm font-medium text-gray-700">Staff Recipients <span class="text-red-500">*</span></label>
+			<button
+				type="button"
+				class="text-sm text-cchoice hover:underline"
+				_="
+					on click
+						for cb in <.memo-staff-checkbox/> in #memo-staff-checklist
+							set cb.checked to true
+						end
+				"
+			>
+				Select All
+			</button>
+		</div>
+		<div class="border border-gray-200 rounded-md max-h-48 overflow-y-auto" id="memo-staff-checklist">
+			<table class="min-w-full divide-y divide-gray-200">
+				<thead class="bg-gray-50 sticky top-0">
+					<tr>
+						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase w-12"></th>
+						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+					</tr>
+				</thead>
+				<tbody class="divide-y divide-gray-200">
+					for _, staff := range allStaff {
+						<tr>
+							<td class="px-4 py-2">
+								<input
+									type="checkbox"
+									class="memo-staff-checkbox rounded border-gray-300 text-cchoice focus:ring-cchoice"
+									name="staff_ids"
+									value={ staff.ID }
+									checked?={ isMemoStaffSelected(selectedIDs, staff.ID) }
+								/>
+							</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ memoStaffDisplayName(staff.FullName, staff.ID, currentStaffID) }</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+}

@@ -3,11 +3,12 @@ package components
 import (
 	"cchoice/cmd/web/components/common"
 	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
 	"cchoice/internal/enums"
 	"cchoice/internal/utils"
 )
 
-templ AdminStaffHomePage(fullName string, roles []enums.StaffRole) {
+templ AdminStaffHomePage(fullName string, roles []enums.StaffRole, memos []models.StaffMemoCard) {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
@@ -24,6 +25,7 @@ templ AdminStaffHomePage(fullName string, roles []enums.StaffRole) {
 			<div class="flex-grow p-4">
 				<div class="max-w-6xl mx-auto">
 					@header.AdminStaffHeaderWithSubtitle(fullName)
+					@StaffMemoCards(memos)
 					<div class="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
 						for _, card := range getAllStaffCards(roles) {
 							<a
@@ -40,6 +42,7 @@ templ AdminStaffHomePage(fullName string, roles []enums.StaffRole) {
 					</div>
 				</div>
 			</div>
+			<div id="memo-reject-modal-container"></div>
 		</body>
 	</html>
 }

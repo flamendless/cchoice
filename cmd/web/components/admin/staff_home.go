@@ -47,6 +47,10 @@ var staffCardsWithRoles = []struct {
 		Icon:        svg.Link("text-cchoice"),
 	}, AllowedRole: enums.STAFF_ROLE_MANAGE_TRACKED_LINKS},
 	{
+		Card:        models.StaffCard{Link: "/admin/memos", Title: "Manage Memos", Description: "Create and manage staff memorandums", Icon: svg.Document("text-cchoice")},
+		AllowedRole: enums.STAFF_ROLE_MANAGE_MEMO,
+	},
+	{
 		Card:        models.StaffCard{Link: "/admin/product-inventories", Title: "Manage Product Inventories", Description: "Manage product inventory stocks", Icon: svg.Box("text-cchoice")},
 		AllowedRole: enums.STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES,
 	},

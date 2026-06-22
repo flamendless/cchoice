@@ -26,3 +26,32 @@ type AdminPromoListItem struct {
 	Priority    int64
 	CreatedAt   string
 }
+
+type AdminMemoListItem struct {
+	ID            string
+	Title         string
+	Message       string
+	FileURL       string
+	Status        enums.MemoStatus
+	StartDate     string
+	EndDate       string
+	CreatedByName string
+	CreatedAt     string
+	RecipientIDs  []string
+}
+
+type AdminMemoRecipientRow struct {
+	StaffID      string
+	StaffName    string
+	ActionStatus enums.MemoStaffActionStatus
+	RejectReason string
+	AcceptedAt   string
+	RejectedAt   string
+}
+
+type StaffMemoCard struct {
+	ID      string
+	Title   string
+	Message string
+	FileURL string
+}

@@ -72,10 +72,10 @@ func (s *ProductInventoryService) GetListingForAdmin(
 	}
 
 	inventories, err := s.dbRO.GetQueries().AdminGetProductInventoriesListing(ctx, queries.AdminGetProductInventoriesListingParams{
-		SearchSerial:   sql.NullString{String: searchSerial, Valid: searchSerial != ""},
-		SearchBrand:    sql.NullString{String: searchBrand, Valid: searchBrand != ""},
-		ProductStatus:  sql.NullString{String: statusStr, Valid: statusStr != ""},
-		StocksIn:       sql.NullString{String: stocksIn.String(), Valid: stocksIn.IsValid()},
+		SearchSerial:  sql.NullString{String: searchSerial, Valid: searchSerial != ""},
+		SearchBrand:   sql.NullString{String: searchBrand, Valid: searchBrand != ""},
+		ProductStatus: sql.NullString{String: statusStr, Valid: statusStr != ""},
+		StocksIn:      sql.NullString{String: stocksIn.String(), Valid: stocksIn.IsValid()},
 	})
 	if err != nil {
 		return nil, errors.Join(errs.ErrProductInventory, err)

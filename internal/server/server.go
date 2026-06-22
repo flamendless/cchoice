@@ -48,6 +48,7 @@ type Services struct {
 	passwordReset    *services.PasswordResetService
 	holiday          *services.HolidayService
 	location         *services.LocationService
+	memo             *services.MemoService
 	product          *services.ProductService
 	productInventory *services.ProductInventoryService
 	image            *services.ImageService
@@ -200,6 +201,7 @@ func NewServer() *ServerInstance {
 		cpointToken:      cpointTokenService,
 		holiday:          holidayService,
 		location:         services.NewLocationService(cfg.Settings.ShopLocation),
+		memo:             services.NewMemoService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
 		product:          productService,
 		productInventory: productInventoryService,
 		image:            services.NewImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
@@ -223,6 +225,7 @@ func NewServer() *ServerInstance {
 		newServer.services.holiday,
 		newServer.services.image,
 		newServer.services.location,
+		newServer.services.memo,
 		newServer.services.passwordReset,
 		newServer.services.product,
 		newServer.services.productInventory,

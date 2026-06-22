@@ -2,6 +2,8 @@ package constants
 
 const (
 	ActionApprove      = "approve"
+	ActionAccept       = "accept"
+	ActionReject       = "reject"
 	ActionCancel       = "cancel"
 	ActionCreate       = "create"
 	ActionDelete       = "delete"
@@ -18,6 +20,7 @@ const (
 	ModuleBrands               = "brands"
 	ModuleCPoints              = "cpoints"
 	ModuleHolidays             = "holidays"
+	ModuleMemos                = "memos"
 	ModuleProductInventories   = "product_inventories"
 	ModulePasswordReset        = "password_reset"
 	ModuleProducts             = "products"
