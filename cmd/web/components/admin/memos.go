@@ -2,7 +2,10 @@ package components
 
 import (
 	"slices"
+	"strings"
+	"time"
 
+	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/utils"
@@ -51,4 +54,32 @@ func memoRecipientStatusLabel(status enums.MemoStaffActionStatus) string {
 	default:
 		return "Pending"
 	}
+}
+
+func memoCanSendEmails(memo models.AdminMemoListItem, currentStaffID string, isSuperuser bool) bool {
+	if memo.Status != enums.MEMO_STATUS_PUBLISHED {
+		return false
+	}
+	return isSuperuser || memo.CreatedByID == currentStaffID
+}
+
+func memoEmailOnCooldown(emailsSentAt string) bool {
+	if emailsSentAt == "" || strings.HasPrefix(emailsSentAt, "1970-01-01") {
+		return false
+	}
+	sentAt, err := time.Parse(constants.DateTimeLayoutISO, emailsSentAt)
+	if err != nil {
+		sentAt, err = time.Parse(constants.DateTimeLayoutTZISO, emailsSentAt)
+		if err != nil {
+			return false
+		}
+	}
+	return time.Since(sentAt) < 24*time.Hour
+}
+
+func memoSendEmailsTooltip(onCooldown bool) string {
+	if onCooldown {
+		return "Emails sent recently"
+	}
+	return "Send emails"
 }

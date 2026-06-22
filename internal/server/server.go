@@ -201,7 +201,7 @@ func NewServer() *ServerInstance {
 		cpointToken:      cpointTokenService,
 		holiday:          holidayService,
 		location:         services.NewLocationService(cfg.Settings.ShopLocation),
-		memo:             services.NewMemoService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
+		memo:             services.NewMemoService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, emailJobRunner),
 		product:          productService,
 		productInventory: productInventoryService,
 		image:            services.NewImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),

@@ -39,6 +39,12 @@ func (s *Server) adminMemosListTableHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	currentStaffID := s.sessionManager.GetString(ctx, SessionStaffID)
+	isSuperuser := false
+	if staff, staffErr := s.services.staff.GetCurrentStaff(ctx, currentStaffID); staffErr == nil {
+		isSuperuser = staff.UserType == enums.STAFF_USER_TYPE_SUPERUSER.String()
+	}
+
 	memos := make([]models.AdminMemoListItem, 0, len(serviceMemos))
 	for _, m := range serviceMemos {
 		memos = append(memos, models.AdminMemoListItem{
@@ -49,12 +55,14 @@ func (s *Server) adminMemosListTableHandler(w http.ResponseWriter, r *http.Reque
 			Status:        m.Status,
 			StartDate:     m.StartDate,
 			EndDate:       m.EndDate,
+			CreatedByID:   s.encoder.Encode(m.CreatedBy),
 			CreatedByName: m.CreatedByName,
 			CreatedAt:     m.CreatedAt.Format(constants.DateTimeLayoutISO),
+			EmailsSentAt:  m.EmailsSentAt,
 		})
 	}
 
-	if err := compadmin.AdminMemosListTable(memos).Render(ctx, w); err != nil {
+	if err := compadmin.AdminMemosListTable(memos, currentStaffID, isSuperuser).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 	}
@@ -311,4 +319,26 @@ func (s *Server) adminMemosDeleteHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	redirectHX(w, r, utils.URLWithSuccess(page, "Memo deleted successfully"))
+}
+
+func (s *Server) adminMemosSendEmailsHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Memos Send Emails Handler]"
+	const page = "/admin/memos"
+	ctx := r.Context()
+
+	idStr := chi.URLParam(r, "id")
+	currentStaffID := s.sessionManager.GetString(ctx, SessionStaffID)
+
+	isSuperuser := false
+	if staff, err := s.services.staff.GetCurrentStaff(ctx, currentStaffID); err == nil {
+		isSuperuser = staff.UserType == enums.STAFF_USER_TYPE_SUPERUSER.String()
+	}
+
+	if err := s.services.memo.SendMemoEmails(ctx, currentStaffID, idStr, isSuperuser); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	redirectHX(w, r, utils.URLWithSuccess(page, "Notification emails sent successfully"))
 }

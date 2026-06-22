@@ -143,6 +143,7 @@ type TblEmailJob struct {
 	CheckoutPaymentID sql.NullString
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
+	MemoID            sql.NullInt64
 }
 
 type TblExternalApiLog struct {
@@ -198,17 +199,18 @@ type TblLinkClick struct {
 }
 
 type TblMemo struct {
-	ID        int64
-	Title     string
-	Message   string
-	Status    string
-	StartDate string
-	EndDate   string
-	CreatedBy int64
-	CreatedAt string
-	UpdatedAt string
-	DeletedAt string
-	FileUrl   sql.NullString
+	ID           int64
+	Title        string
+	Message      string
+	Status       string
+	StartDate    string
+	EndDate      string
+	CreatedBy    int64
+	CreatedAt    string
+	UpdatedAt    string
+	DeletedAt    string
+	FileUrl      sql.NullString
+	EmailsSentAt string
 }
 
 type TblMemoRecipient struct {

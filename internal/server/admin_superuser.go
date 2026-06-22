@@ -96,6 +96,7 @@ func (s *Server) adminSuperuserEnvsHandler(w http.ResponseWriter, r *http.Reques
 		{Key: "Test.LocalUploadImage", Value: strconv.FormatBool(cfg.Test.LocalUploadImage)},
 		{Key: "Test.LocalOTP", Value: strconv.FormatBool(cfg.Test.LocalOTP)},
 		{Key: "Test.LocalForgotPassword", Value: strconv.FormatBool(cfg.Test.LocalForgotPassword)},
+		{Key: "Test.LocalMemoEmailSend", Value: strconv.FormatBool(cfg.Test.LocalMemoEmailSend)},
 	}...)
 
 	for _, s := range s.services.all {

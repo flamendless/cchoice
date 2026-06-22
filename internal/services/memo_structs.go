@@ -8,22 +8,24 @@ import (
 )
 
 type Memo struct {
-	ID        int64
-	Title     string
-	Message   string
-	FileURL   string
-	Status    enums.MemoStatus
-	StartDate string
-	EndDate   string
-	CreatedBy int64
-	CreatedAt time.Time
-	UpdatedAt sql.NullString
-	DeletedAt string
+	ID           int64
+	Title        string
+	Message      string
+	FileURL      string
+	Status       enums.MemoStatus
+	StartDate    string
+	EndDate      string
+	CreatedBy    int64
+	CreatedAt    time.Time
+	UpdatedAt    sql.NullString
+	DeletedAt    string
+	EmailsSentAt string
 }
 
 type MemoListItem struct {
 	Memo
-	CreatedByName string
+	CreatedByName     string
+	CreatorPosition   string
 }
 
 type MemoRecipientRow struct {

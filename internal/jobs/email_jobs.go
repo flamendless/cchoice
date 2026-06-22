@@ -37,6 +37,7 @@ type EmailJobPayload struct {
 type EmailJobParams struct {
 	OrderID           *int64
 	CheckoutPaymentID *string
+	MemoID            *int64
 	Recipient         string
 	CC                string
 	Subject           string
@@ -137,6 +138,9 @@ func (ejr *EmailJobRunner) QueueEmailJob(ctx context.Context, params EmailJobPar
 	if params.OTPCode != "" {
 		insertParams.OtpCode = sql.NullString{String: params.OTPCode, Valid: true}
 	}
+	if params.MemoID != nil {
+		insertParams.MemoID = sql.NullInt64{Int64: *params.MemoID, Valid: true}
+	}
 
 	emailJob, err := ejr.dbRW.GetQueries().InsertEmailJob(ctx, insertParams)
 	if err != nil {
@@ -211,6 +215,8 @@ func (ejr *EmailJobRunner) handleSendEmail(ctx context.Context, m []byte) error 
 		return ejr.sendCustomerVerificationEmail(ctx, emailJob, recipient, cc, emailJob.Subject)
 	case enums.EMAIL_TEMPLATE_PASSWORD_RESET:
 		return ejr.sendPasswordResetEmail(ctx, emailJob, recipient, cc, emailJob.Subject)
+	case enums.EMAIL_TEMPLATE_MEMO_NOTIFICATION:
+		return ejr.sendMemoNotificationEmail(ctx, emailJob, recipient, cc, emailJob.Subject)
 	default:
 		err := fmt.Errorf("unknown template: %s", emailJob.TemplateName)
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -375,6 +381,66 @@ func (ejr *EmailJobRunner) sendPasswordResetEmail(ctx context.Context, emailJob 
 	logs.LogCtx(ctx).Info(
 		logtag,
 		zap.String("result", "success"),
+		zap.String("recipient", recipient),
+		zap.Strings("cc", cc),
+	)
+
+	return nil
+}
+
+func (ejr *EmailJobRunner) sendMemoNotificationEmail(ctx context.Context, emailJob queries.TblEmailJob, recipient string, cc []string, subject string) error {
+	const logtag = "[EmailJobRunner sendMemoNotificationEmail]"
+
+	if !emailJob.MemoID.Valid {
+		return errs.ErrMemoNotFound
+	}
+
+	row, err := ejr.dbRO.GetQueries().GetMemoWithCreatorByID(ctx, emailJob.MemoID.Int64)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Int64("memo_id", emailJob.MemoID.Int64), zap.Error(err))
+		return errors.Join(errs.ErrMemoNotFound, err)
+	}
+
+	startDate, err := time.Parse(constants.DateLayoutISO, row.TblMemo.StartDate)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		return err
+	}
+	endDate, err := time.Parse(constants.DateLayoutISO, row.TblMemo.EndDate)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		return err
+	}
+
+	portalMessage := "Access your portal to reject or accept the memo."
+	if row.TblMemo.FileUrl.Valid && row.TblMemo.FileUrl.String != "" {
+		portalMessage = "Access your portal to view the attached file, reject, or accept the memo."
+	}
+
+	cfg := conf.Conf()
+	templateData := mail.TemplateData{
+		"LogoURL":         constants.PathEmailLogoCDN,
+		"CreatorName":     utils.BuildFullName(row.CreatorFirstName, row.CreatorMiddleName.String, row.CreatorLastName),
+		"CreatorPosition": row.CreatorPosition,
+		"Title":           row.TblMemo.Title,
+		"Message":         row.TblMemo.Message,
+		"StartDate":       startDate.Format(constants.DateLayoutDisplay),
+		"EndDate":         endDate.Format(constants.DateLayoutDisplay),
+		"PortalMessage":   portalMessage,
+		"PortalURL":       utils.FullURL("/admin/staff"),
+		"MobileNo":        cfg.Settings.MobileNo,
+		"EMail":           cfg.Settings.EMail,
+	}
+
+	if err := ejr.mailService.SendTemplateEmail(recipient, cc, subject, enums.EMAIL_TEMPLATE_MEMO_NOTIFICATION.FileName(), templateData); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		return errors.Join(errs.ErrJobsSendEmail, err)
+	}
+
+	logs.LogCtx(ctx).Info(
+		logtag,
+		zap.String("result", "success"),
+		zap.Int64("memo_id", emailJob.MemoID.Int64),
 		zap.String("recipient", recipient),
 		zap.Strings("cc", cc),
 	)

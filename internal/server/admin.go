@@ -150,6 +150,7 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_MEMO)).Post("/admin/memos", s.adminMemosCreateHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_MEMO)).Patch("/admin/memos/{id}", s.adminMemosUpdateHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_MEMO)).Delete("/admin/memos/{id}", s.adminMemosDeleteHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_MEMO)).Post("/admin/memos/{id}/send-emails", s.adminMemosSendEmailsHandler)
 
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Get("/admin/tracked-links", s.adminTrackedLinksListPageHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Get("/admin/tracked-links/table", s.adminTrackedLinksListTableHandler)

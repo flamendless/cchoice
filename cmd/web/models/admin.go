@@ -35,8 +35,10 @@ type AdminMemoListItem struct {
 	Status        enums.MemoStatus
 	StartDate     string
 	EndDate       string
+	CreatedByID   string
 	CreatedByName string
 	CreatedAt     string
+	EmailsSentAt  string
 	RecipientIDs  []string
 }
 

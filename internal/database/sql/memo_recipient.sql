@@ -17,6 +17,16 @@ SELECT COUNT(*) AS count
 FROM tbl_memo_recipients
 WHERE memo_id = ? AND staff_id = ?;
 
+-- name: GetMemoRecipientEmails :many
+SELECT
+    r.staff_id,
+    s.email
+FROM tbl_memo_recipients r
+JOIN tbl_staffs s ON s.id = r.staff_id
+WHERE r.memo_id = ?
+AND s.email != ''
+ORDER BY s.last_name ASC, s.first_name ASC;
+
 -- name: GetMemoRecipientsWithActions :many
 SELECT
     r.staff_id,
