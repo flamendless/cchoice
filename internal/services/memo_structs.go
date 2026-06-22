@@ -31,6 +31,9 @@ type MemoListItem struct {
 type MemoRecipientRow struct {
 	StaffID      string
 	StaffName    string
+	Email        string
+	Position     string
+	UserType     enums.StaffUserType
 	ActionStatus enums.MemoStaffActionStatus
 	RejectReason string
 	AcceptedAt   string

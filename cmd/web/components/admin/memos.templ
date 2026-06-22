@@ -196,6 +196,9 @@ templ MemoStaffRows(memoID string, rows []models.AdminMemoRecipientRow, currentS
 			<thead class="bg-gray-100">
 				<tr>
 					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Staff</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Position</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">User Type</th>
 					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
 					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Reject Reason</th>
 					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Accepted At</th>
@@ -205,12 +208,15 @@ templ MemoStaffRows(memoID string, rows []models.AdminMemoRecipientRow, currentS
 			<tbody class="divide-y divide-gray-200">
 				if len(rows) == 0 {
 					<tr>
-						<td colspan="5" class="px-4 py-3 text-center text-sm text-gray-500">No staff assigned.</td>
+						<td colspan="8" class="px-4 py-3 text-center text-sm text-gray-500">No staff assigned.</td>
 					</tr>
 				} else {
 					for _, row := range rows {
 						<tr class={ memoRecipientRowClass(row.ActionStatus) }>
 							<td class="px-4 py-2 text-sm text-gray-900">{ memoStaffDisplayName(row.StaffName, row.StaffID, currentStaffID) }</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ row.Email }</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ row.Position }</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ row.UserType.String() }</td>
 							<td class="px-4 py-2 text-sm text-gray-900">{ memoRecipientStatusLabel(row.ActionStatus) }</td>
 							<td class="px-4 py-2 text-sm text-gray-900">{ row.RejectReason }</td>
 							<td class="px-4 py-2 text-sm text-gray-900">{ row.AcceptedAt }</td>
@@ -392,6 +398,9 @@ templ MemoStaffChecklist(allStaff []models.Staff, selectedIDs []string, currentS
 					<tr>
 						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase w-12"></th>
 						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Position</th>
+						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">User Type</th>
 					</tr>
 				</thead>
 				<tbody class="divide-y divide-gray-200">
@@ -407,6 +416,9 @@ templ MemoStaffChecklist(allStaff []models.Staff, selectedIDs []string, currentS
 								/>
 							</td>
 							<td class="px-4 py-2 text-sm text-gray-900">{ memoStaffDisplayName(staff.FullName, staff.ID, currentStaffID) }</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ staff.Email }</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ staff.Position }</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ staff.UserType.String() }</td>
 						</tr>
 					}
 				</tbody>

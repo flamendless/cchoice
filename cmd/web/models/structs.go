@@ -335,6 +335,9 @@ type StaffTimeOff struct {
 type Staff struct {
 	ID       string
 	FullName string
+	Email    string
+	Position string
+	UserType enums.StaffUserType
 }
 
 type AdminStaffListItem struct {
