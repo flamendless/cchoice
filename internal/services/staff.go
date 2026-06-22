@@ -188,6 +188,9 @@ func (s *StaffService) GetAll(ctx context.Context, limit int64) ([]models.Staff,
 		list = append(list, models.Staff{
 			ID:       s.encoder.Encode(staff.ID),
 			FullName: utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
+			Email:    staff.Email,
+			Position: staff.Position,
+			UserType: enums.ParseStaffUserTypeToEnum(staff.UserType),
 		})
 	}
 	return list, nil

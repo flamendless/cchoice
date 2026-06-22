@@ -112,6 +112,9 @@ SELECT
     s.first_name,
     s.middle_name,
     s.last_name,
+    s.email,
+    s.position,
+    s.user_type,
     a.status AS action_status,
     a.reject_reason,
     a.accepted_at,
@@ -129,6 +132,9 @@ type GetMemoRecipientsWithActionsRow struct {
 	FirstName       string
 	MiddleName      sql.NullString
 	LastName        string
+	Email           string
+	Position        string
+	UserType        string
 	ActionStatus    sql.NullString
 	RejectReason    sql.NullString
 	AcceptedAt      sql.NullString
@@ -150,6 +156,9 @@ func (q *Queries) GetMemoRecipientsWithActions(ctx context.Context, memoID int64
 			&i.FirstName,
 			&i.MiddleName,
 			&i.LastName,
+			&i.Email,
+			&i.Position,
+			&i.UserType,
 			&i.ActionStatus,
 			&i.RejectReason,
 			&i.AcceptedAt,

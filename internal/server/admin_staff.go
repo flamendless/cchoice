@@ -240,6 +240,9 @@ func (s *Server) adminStaffListHandler(w http.ResponseWriter, r *http.Request) {
 		list = append(list, models.Staff{
 			ID:       s.encoder.Encode(staff.ID),
 			FullName: utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
+			Email:    staff.Email,
+			Position: staff.Position,
+			UserType: enums.ParseStaffUserTypeToEnum(staff.UserType),
 		})
 	case enums.STAFF_USER_TYPE_SUPERUSER:
 		list, err = s.services.staff.GetAll(ctx, 100)

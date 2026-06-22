@@ -88,6 +88,9 @@ func (s *Server) adminMemosStaffRowsHandler(w http.ResponseWriter, r *http.Reque
 		recipientRows = append(recipientRows, models.AdminMemoRecipientRow{
 			StaffID:      row.StaffID,
 			StaffName:    row.StaffName,
+			Email:        row.Email,
+			Position:     row.Position,
+			UserType:     row.UserType,
 			ActionStatus: row.ActionStatus,
 			RejectReason: row.RejectReason,
 			AcceptedAt:   row.AcceptedAt,
