@@ -5,25 +5,31 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
+	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/jobs"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
 )
 
+const MemoEmailCooldown = 24 * time.Hour
+
 type MemoService struct {
-	encoder  encode.IEncode
-	dbRO     database.IService
-	dbRW     database.IService
-	staffLog *StaffLogsService
+	encoder     encode.IEncode
+	dbRO        database.IService
+	dbRW        database.IService
+	staffLog    *StaffLogsService
+	emailRunner *jobs.EmailJobRunner
 }
 
 func NewMemoService(
@@ -31,15 +37,20 @@ func NewMemoService(
 	dbRO database.IService,
 	dbRW database.IService,
 	staffLog *StaffLogsService,
+	emailRunner *jobs.EmailJobRunner,
 ) *MemoService {
 	if staffLog == nil {
 		panic("StaffLogsService is required")
 	}
+	if (conf.Conf().IsProd() || (conf.Conf().IsLocal() && conf.Conf().Test.LocalMemoEmailSend)) && emailRunner == nil {
+		panic("emailRunner is required")
+	}
 	return &MemoService{
-		encoder:  encoder,
-		dbRO:     dbRO,
-		dbRW:     dbRW,
-		staffLog: staffLog,
+		encoder:     encoder,
+		dbRO:        dbRO,
+		dbRW:        dbRW,
+		staffLog:    staffLog,
+		emailRunner: emailRunner,
 	}
 }
 
@@ -77,9 +88,123 @@ func (s *MemoService) GetAllForAdmin(ctx context.Context) ([]MemoListItem, error
 				row.CreatorMiddleName.String,
 				row.CreatorLastName,
 			),
+			CreatorPosition: row.CreatorPosition,
 		})
 	}
 	return result, nil
+}
+
+func (s *MemoService) SendMemoEmails(ctx context.Context, actorStaffID, memoID string, isSuperuser bool) error {
+	const logtag = "[MemoService SendMemoEmails]"
+
+	result := "success"
+	defer func() {
+		if err := s.staffLog.CreateLog(
+			ctx,
+			actorStaffID,
+			constants.ActionTrigger,
+			constants.ModuleMemos,
+			result,
+			nil,
+		); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		}
+	}()
+
+	decodedMemoID := s.encoder.Decode(memoID)
+	if decodedMemoID == encode.INVALID {
+		result = errs.ErrDecode.Error()
+		return errs.ErrDecode
+	}
+
+	decodedActorID := s.encoder.Decode(actorStaffID)
+	if decodedActorID == encode.INVALID {
+		result = errs.ErrDecode.Error()
+		return errs.ErrDecode
+	}
+
+	memo, err := s.dbRO.GetQueries().GetMemoByID(ctx, decodedMemoID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			result = errs.ErrMemoNotFound.Error()
+			return errs.ErrMemoNotFound
+		}
+		result = err.Error()
+		return errors.Join(errs.ErrMemo, err)
+	}
+
+	if memo.TblMemo.Status != enums.MEMO_STATUS_PUBLISHED.String() {
+		result = errs.ErrMemoNotPublished.Error()
+		return errs.ErrMemoNotPublished
+	}
+
+	if !isSuperuser && memo.TblMemo.CreatedBy != decodedActorID {
+		result = errs.ErrMemoSendNotAllowed.Error()
+		return errs.ErrMemoSendNotAllowed
+	}
+
+	if err := s.checkMemoEmailCooldown(memo.TblMemo.EmailsSentAt); err != nil {
+		result = err.Error()
+		return err
+	}
+
+	recipients, err := s.dbRO.GetQueries().GetMemoRecipientEmails(ctx, decodedMemoID)
+	if err != nil {
+		result = err.Error()
+		return errors.Join(errs.ErrMemo, err)
+	}
+	if len(recipients) == 0 {
+		result = errs.ErrMemoNoRecipientEmails.Error()
+		return errs.ErrMemoNoRecipientEmails
+	}
+
+	if err := s.dbRW.GetQueries().UpdateMemoEmailsSentAt(ctx, decodedMemoID); err != nil {
+		result = err.Error()
+		return errors.Join(errs.ErrMemo, err)
+	}
+
+	if conf.Conf().IsProd() || (conf.Conf().IsLocal() && conf.Conf().Test.LocalMemoEmailSend) {
+		memoIDCopy := decodedMemoID
+		subject := fmt.Sprintf("New Memo: %s - C-Choice", memo.TblMemo.Title)
+		cc := conf.Conf().MailerooConfig.CC
+		for _, recipient := range recipients {
+			if err := s.emailRunner.QueueEmailJob(ctx, jobs.EmailJobParams{
+				MemoID:       &memoIDCopy,
+				Recipient:    recipient.Email,
+				CC:           cc,
+				Subject:      subject,
+				TemplateName: enums.EMAIL_TEMPLATE_MEMO_NOTIFICATION,
+			}); err != nil {
+				result = err.Error()
+				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+				return err
+			}
+		}
+	} else {
+		logs.LogCtx(ctx).Info(logtag, zap.String("result", "skipped (non-prod)"), zap.Int("recipient_count", len(recipients)))
+	}
+
+	result = fmt.Sprintf("success. memo ID '%s', recipients %d", memoID, len(recipients))
+	return nil
+}
+
+func (s *MemoService) checkMemoEmailCooldown(emailsSentAt string) error {
+	if emailsSentAt == "" || strings.HasPrefix(emailsSentAt, "1970-01-01") {
+		return nil
+	}
+
+	sentAt, err := time.Parse(constants.DateTimeLayoutISO, emailsSentAt)
+	if err != nil {
+		sentAt, err = time.Parse(constants.DateTimeLayoutTZISO, emailsSentAt)
+		if err != nil {
+			return nil
+		}
+	}
+
+	if time.Since(sentAt) < MemoEmailCooldown {
+		return errs.ErrMemoEmailRateLimited
+	}
+	return nil
 }
 
 func (s *MemoService) GetRecipientStaffIDs(ctx context.Context, memoID string) ([]string, error) {
@@ -519,17 +644,18 @@ func (s *MemoService) mapRowToMemo(m queries.TblMemo) Memo {
 		updatedAt = sql.NullString{String: m.UpdatedAt, Valid: true}
 	}
 	return Memo{
-		ID:        m.ID,
-		Title:     m.Title,
-		Message:   m.Message,
-		FileURL:   m.FileUrl.String,
-		Status:    enums.ParseMemoStatusToEnum(m.Status),
-		StartDate: m.StartDate,
-		EndDate:   m.EndDate,
-		CreatedBy: m.CreatedBy,
-		CreatedAt: createdAt,
-		UpdatedAt: updatedAt,
-		DeletedAt: m.DeletedAt,
+		ID:           m.ID,
+		Title:        m.Title,
+		Message:      m.Message,
+		FileURL:      m.FileUrl.String,
+		Status:       enums.ParseMemoStatusToEnum(m.Status),
+		StartDate:    m.StartDate,
+		EndDate:      m.EndDate,
+		CreatedBy:    m.CreatedBy,
+		CreatedAt:    createdAt,
+		UpdatedAt:    updatedAt,
+		DeletedAt:    m.DeletedAt,
+		EmailsSentAt: m.EmailsSentAt,
 	}
 }
 

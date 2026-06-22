@@ -8,10 +8,11 @@ INSERT INTO tbl_email_jobs(
 	order_id,
 	checkout_payment_id,
 	otp_code,
+	memo_id,
 	created_at,
 	updated_at
 ) VALUES (
-	?, ?, ?, ?, ?, ?, ?, ?,
+	?, ?, ?, ?, ?, ?, ?, ?, ?,
 	datetime('now'),
 	datetime('now')
 ) RETURNING *;

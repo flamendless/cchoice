@@ -38,6 +38,45 @@ func (q *Queries) DeleteMemoRecipientsByMemoID(ctx context.Context, memoID int64
 	return err
 }
 
+const getMemoRecipientEmails = `-- name: GetMemoRecipientEmails :many
+SELECT
+    r.staff_id,
+    s.email
+FROM tbl_memo_recipients r
+JOIN tbl_staffs s ON s.id = r.staff_id
+WHERE r.memo_id = ?
+AND s.email != ''
+ORDER BY s.last_name ASC, s.first_name ASC
+`
+
+type GetMemoRecipientEmailsRow struct {
+	StaffID int64
+	Email   string
+}
+
+func (q *Queries) GetMemoRecipientEmails(ctx context.Context, memoID int64) ([]GetMemoRecipientEmailsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMemoRecipientEmails, memoID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetMemoRecipientEmailsRow
+	for rows.Next() {
+		var i GetMemoRecipientEmailsRow
+		if err := rows.Scan(&i.StaffID, &i.Email); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getMemoRecipientStaffIDs = `-- name: GetMemoRecipientStaffIDs :many
 SELECT staff_id
 FROM tbl_memo_recipients

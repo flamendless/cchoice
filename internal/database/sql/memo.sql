@@ -10,11 +10,25 @@ SELECT
     sqlc.embed(m),
     s.first_name AS creator_first_name,
     s.middle_name AS creator_middle_name,
-    s.last_name AS creator_last_name
+    s.last_name AS creator_last_name,
+    s.position AS creator_position
 FROM tbl_memos m
 JOIN tbl_staffs s ON s.id = m.created_by
 WHERE m.deleted_at = '1970-01-01 00:00:00+00:00'
 ORDER BY m.updated_at DESC;
+
+-- name: GetMemoWithCreatorByID :one
+SELECT
+    sqlc.embed(m),
+    s.first_name AS creator_first_name,
+    s.middle_name AS creator_middle_name,
+    s.last_name AS creator_last_name,
+    s.position AS creator_position
+FROM tbl_memos m
+JOIN tbl_staffs s ON s.id = m.created_by
+WHERE m.id = ?
+AND m.deleted_at = '1970-01-01 00:00:00+00:00'
+LIMIT 1;
 
 -- name: GetPendingMemosForStaff :many
 SELECT sqlc.embed(m)
@@ -65,6 +79,14 @@ UPDATE tbl_memos
 SET
     status = 'DELETED',
     deleted_at = datetime('now'),
+    updated_at = datetime('now')
+WHERE id = ?
+AND deleted_at = '1970-01-01 00:00:00+00:00';
+
+-- name: UpdateMemoEmailsSentAt :exec
+UPDATE tbl_memos
+SET
+    emails_sent_at = datetime('now'),
     updated_at = datetime('now')
 WHERE id = ?
 AND deleted_at = '1970-01-01 00:00:00+00:00';

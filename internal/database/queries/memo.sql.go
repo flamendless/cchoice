@@ -57,10 +57,11 @@ func (q *Queries) CreateMemo(ctx context.Context, arg CreateMemoParams) (int64, 
 
 const getAllMemos = `-- name: GetAllMemos :many
 SELECT
-    m.id, m.title, m.message, m.status, m.start_date, m.end_date, m.created_by, m.created_at, m.updated_at, m.deleted_at, m.file_url,
+    m.id, m.title, m.message, m.status, m.start_date, m.end_date, m.created_by, m.created_at, m.updated_at, m.deleted_at, m.file_url, m.emails_sent_at,
     s.first_name AS creator_first_name,
     s.middle_name AS creator_middle_name,
-    s.last_name AS creator_last_name
+    s.last_name AS creator_last_name,
+    s.position AS creator_position
 FROM tbl_memos m
 JOIN tbl_staffs s ON s.id = m.created_by
 WHERE m.deleted_at = '1970-01-01 00:00:00+00:00'
@@ -72,6 +73,7 @@ type GetAllMemosRow struct {
 	CreatorFirstName  string
 	CreatorMiddleName sql.NullString
 	CreatorLastName   string
+	CreatorPosition   string
 }
 
 func (q *Queries) GetAllMemos(ctx context.Context) ([]GetAllMemosRow, error) {
@@ -95,9 +97,11 @@ func (q *Queries) GetAllMemos(ctx context.Context) ([]GetAllMemosRow, error) {
 			&i.TblMemo.UpdatedAt,
 			&i.TblMemo.DeletedAt,
 			&i.TblMemo.FileUrl,
+			&i.TblMemo.EmailsSentAt,
 			&i.CreatorFirstName,
 			&i.CreatorMiddleName,
 			&i.CreatorLastName,
+			&i.CreatorPosition,
 		); err != nil {
 			return nil, err
 		}
@@ -113,7 +117,7 @@ func (q *Queries) GetAllMemos(ctx context.Context) ([]GetAllMemosRow, error) {
 }
 
 const getMemoByID = `-- name: GetMemoByID :one
-SELECT tbl_memos.id, tbl_memos.title, tbl_memos.message, tbl_memos.status, tbl_memos.start_date, tbl_memos.end_date, tbl_memos.created_by, tbl_memos.created_at, tbl_memos.updated_at, tbl_memos.deleted_at, tbl_memos.file_url
+SELECT tbl_memos.id, tbl_memos.title, tbl_memos.message, tbl_memos.status, tbl_memos.start_date, tbl_memos.end_date, tbl_memos.created_by, tbl_memos.created_at, tbl_memos.updated_at, tbl_memos.deleted_at, tbl_memos.file_url, tbl_memos.emails_sent_at
 FROM tbl_memos
 WHERE id = ?
 AND deleted_at = '1970-01-01 00:00:00+00:00'
@@ -139,12 +143,59 @@ func (q *Queries) GetMemoByID(ctx context.Context, id int64) (GetMemoByIDRow, er
 		&i.TblMemo.UpdatedAt,
 		&i.TblMemo.DeletedAt,
 		&i.TblMemo.FileUrl,
+		&i.TblMemo.EmailsSentAt,
+	)
+	return i, err
+}
+
+const getMemoWithCreatorByID = `-- name: GetMemoWithCreatorByID :one
+SELECT
+    m.id, m.title, m.message, m.status, m.start_date, m.end_date, m.created_by, m.created_at, m.updated_at, m.deleted_at, m.file_url, m.emails_sent_at,
+    s.first_name AS creator_first_name,
+    s.middle_name AS creator_middle_name,
+    s.last_name AS creator_last_name,
+    s.position AS creator_position
+FROM tbl_memos m
+JOIN tbl_staffs s ON s.id = m.created_by
+WHERE m.id = ?
+AND m.deleted_at = '1970-01-01 00:00:00+00:00'
+LIMIT 1
+`
+
+type GetMemoWithCreatorByIDRow struct {
+	TblMemo           TblMemo
+	CreatorFirstName  string
+	CreatorMiddleName sql.NullString
+	CreatorLastName   string
+	CreatorPosition   string
+}
+
+func (q *Queries) GetMemoWithCreatorByID(ctx context.Context, id int64) (GetMemoWithCreatorByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getMemoWithCreatorByID, id)
+	var i GetMemoWithCreatorByIDRow
+	err := row.Scan(
+		&i.TblMemo.ID,
+		&i.TblMemo.Title,
+		&i.TblMemo.Message,
+		&i.TblMemo.Status,
+		&i.TblMemo.StartDate,
+		&i.TblMemo.EndDate,
+		&i.TblMemo.CreatedBy,
+		&i.TblMemo.CreatedAt,
+		&i.TblMemo.UpdatedAt,
+		&i.TblMemo.DeletedAt,
+		&i.TblMemo.FileUrl,
+		&i.TblMemo.EmailsSentAt,
+		&i.CreatorFirstName,
+		&i.CreatorMiddleName,
+		&i.CreatorLastName,
+		&i.CreatorPosition,
 	)
 	return i, err
 }
 
 const getPendingMemosForStaff = `-- name: GetPendingMemosForStaff :many
-SELECT m.id, m.title, m.message, m.status, m.start_date, m.end_date, m.created_by, m.created_at, m.updated_at, m.deleted_at, m.file_url
+SELECT m.id, m.title, m.message, m.status, m.start_date, m.end_date, m.created_by, m.created_at, m.updated_at, m.deleted_at, m.file_url, m.emails_sent_at
 FROM tbl_memos m
 JOIN tbl_memo_recipients r ON r.memo_id = m.id AND r.staff_id = ?
 LEFT JOIN tbl_memo_staff_actions a ON a.memo_id = m.id AND a.staff_id = ?
@@ -186,6 +237,7 @@ func (q *Queries) GetPendingMemosForStaff(ctx context.Context, arg GetPendingMem
 			&i.TblMemo.UpdatedAt,
 			&i.TblMemo.DeletedAt,
 			&i.TblMemo.FileUrl,
+			&i.TblMemo.EmailsSentAt,
 		); err != nil {
 			return nil, err
 		}
@@ -249,5 +301,19 @@ func (q *Queries) UpdateMemo(ctx context.Context, arg UpdateMemoParams) error {
 		arg.EndDate,
 		arg.ID,
 	)
+	return err
+}
+
+const updateMemoEmailsSentAt = `-- name: UpdateMemoEmailsSentAt :exec
+UPDATE tbl_memos
+SET
+    emails_sent_at = datetime('now'),
+    updated_at = datetime('now')
+WHERE id = ?
+AND deleted_at = '1970-01-01 00:00:00+00:00'
+`
+
+func (q *Queries) UpdateMemoEmailsSentAt(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, updateMemoEmailsSentAt, id)
 	return err
 }

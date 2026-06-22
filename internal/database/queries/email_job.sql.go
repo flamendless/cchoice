@@ -11,7 +11,7 @@ import (
 )
 
 const getEmailJobByID = `-- name: GetEmailJobByID :one
-SELECT id, queue_id, recipient, cc, subject, template_name, order_id, otp_code, checkout_payment_id, created_at, updated_at FROM tbl_email_jobs
+SELECT id, queue_id, recipient, cc, subject, template_name, order_id, otp_code, checkout_payment_id, created_at, updated_at, memo_id FROM tbl_email_jobs
 WHERE id = ?
 LIMIT 1
 `
@@ -31,12 +31,13 @@ func (q *Queries) GetEmailJobByID(ctx context.Context, id int64) (TblEmailJob, e
 		&i.CheckoutPaymentID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.MemoID,
 	)
 	return i, err
 }
 
 const getEmailJobByQueueID = `-- name: GetEmailJobByQueueID :one
-SELECT id, queue_id, recipient, cc, subject, template_name, order_id, otp_code, checkout_payment_id, created_at, updated_at FROM tbl_email_jobs
+SELECT id, queue_id, recipient, cc, subject, template_name, order_id, otp_code, checkout_payment_id, created_at, updated_at, memo_id FROM tbl_email_jobs
 WHERE queue_id = ?
 LIMIT 1
 `
@@ -56,12 +57,13 @@ func (q *Queries) GetEmailJobByQueueID(ctx context.Context, queueID string) (Tbl
 		&i.CheckoutPaymentID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.MemoID,
 	)
 	return i, err
 }
 
 const getEmailJobsByCheckoutPaymentID = `-- name: GetEmailJobsByCheckoutPaymentID :many
-SELECT id, queue_id, recipient, cc, subject, template_name, order_id, otp_code, checkout_payment_id, created_at, updated_at FROM tbl_email_jobs
+SELECT id, queue_id, recipient, cc, subject, template_name, order_id, otp_code, checkout_payment_id, created_at, updated_at, memo_id FROM tbl_email_jobs
 WHERE checkout_payment_id = ?
 ORDER BY created_at DESC
 `
@@ -87,6 +89,7 @@ func (q *Queries) GetEmailJobsByCheckoutPaymentID(ctx context.Context, checkoutP
 			&i.CheckoutPaymentID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.MemoID,
 		); err != nil {
 			return nil, err
 		}
@@ -102,7 +105,7 @@ func (q *Queries) GetEmailJobsByCheckoutPaymentID(ctx context.Context, checkoutP
 }
 
 const getEmailJobsByOrderID = `-- name: GetEmailJobsByOrderID :many
-SELECT id, queue_id, recipient, cc, subject, template_name, order_id, otp_code, checkout_payment_id, created_at, updated_at FROM tbl_email_jobs
+SELECT id, queue_id, recipient, cc, subject, template_name, order_id, otp_code, checkout_payment_id, created_at, updated_at, memo_id FROM tbl_email_jobs
 WHERE order_id = ?
 ORDER BY created_at DESC
 `
@@ -128,6 +131,7 @@ func (q *Queries) GetEmailJobsByOrderID(ctx context.Context, orderID sql.NullInt
 			&i.CheckoutPaymentID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.MemoID,
 		); err != nil {
 			return nil, err
 		}
@@ -152,13 +156,14 @@ INSERT INTO tbl_email_jobs(
 	order_id,
 	checkout_payment_id,
 	otp_code,
+	memo_id,
 	created_at,
 	updated_at
 ) VALUES (
-	?, ?, ?, ?, ?, ?, ?, ?,
+	?, ?, ?, ?, ?, ?, ?, ?, ?,
 	datetime('now'),
 	datetime('now')
-) RETURNING id, queue_id, recipient, cc, subject, template_name, order_id, otp_code, checkout_payment_id, created_at, updated_at
+) RETURNING id, queue_id, recipient, cc, subject, template_name, order_id, otp_code, checkout_payment_id, created_at, updated_at, memo_id
 `
 
 type InsertEmailJobParams struct {
@@ -170,6 +175,7 @@ type InsertEmailJobParams struct {
 	OrderID           sql.NullInt64
 	CheckoutPaymentID sql.NullString
 	OtpCode           sql.NullString
+	MemoID            sql.NullInt64
 }
 
 func (q *Queries) InsertEmailJob(ctx context.Context, arg InsertEmailJobParams) (TblEmailJob, error) {
@@ -182,6 +188,7 @@ func (q *Queries) InsertEmailJob(ctx context.Context, arg InsertEmailJobParams) 
 		arg.OrderID,
 		arg.CheckoutPaymentID,
 		arg.OtpCode,
+		arg.MemoID,
 	)
 	var i TblEmailJob
 	err := row.Scan(
@@ -196,6 +203,7 @@ func (q *Queries) InsertEmailJob(ctx context.Context, arg InsertEmailJobParams) 
 		&i.CheckoutPaymentID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.MemoID,
 	)
 	return i, err
 }

@@ -66,7 +66,7 @@ templ MemosToolbar() {
 	</div>
 }
 
-templ AdminMemosListTable(memos []models.AdminMemoListItem) {
+templ AdminMemosListTable(memos []models.AdminMemoListItem, currentStaffID string, isSuperuser bool) {
 	<div class="overflow-x-auto">
 		<table class="min-w-full divide-y divide-gray-200">
 			<thead class="bg-gray-50">
@@ -90,7 +90,7 @@ templ AdminMemosListTable(memos []models.AdminMemoListItem) {
 					</tr>
 				} else {
 					for _, memo := range memos {
-						@MemoTableRow(memo)
+						@MemoTableRow(memo, currentStaffID, isSuperuser)
 					}
 				}
 			</tbody>
@@ -98,7 +98,7 @@ templ AdminMemosListTable(memos []models.AdminMemoListItem) {
 	</div>
 }
 
-templ MemoTableRow(memo models.AdminMemoListItem) {
+templ MemoTableRow(memo models.AdminMemoListItem, currentStaffID string, isSuperuser bool) {
 	<tr id={ "memo-row-" + memo.ID }>
 		<td class="px-4 py-4 whitespace-nowrap text-sm">
 			<button
@@ -121,20 +121,52 @@ templ MemoTableRow(memo models.AdminMemoListItem) {
 		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ memo.CreatedByName }</td>
 		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ memo.CreatedAt }</td>
 		<td class="px-6 py-4 whitespace-nowrap text-sm">
-			<button
-				type="button"
-				class="px-3 py-1 bg-cchoice text-white rounded-md hover:bg-cchoicedark text-sm"
-				hx-get={ utils.URLf("/admin/memos/%s/edit", memo.ID) }
-				hx-target="#memo-edit-modal-container"
-				hx-swap="innerHTML"
-			>
-				Edit
-			</button>
+			@MemoActionsCell(memo, currentStaffID, isSuperuser)
 		</td>
 	</tr>
 	<tr id={ "memo-staff-" + memo.ID } class="hidden">
 		<td id={ "memo-staff-cell-" + memo.ID } colspan="8" class="px-6 py-2"></td>
 	</tr>
+}
+
+templ MemoActionsCell(memo models.AdminMemoListItem, currentStaffID string, isSuperuser bool) {
+	<div class="flex items-center gap-2">
+		<button
+			type="button"
+			class="px-3 py-1 bg-cchoice text-white rounded-md hover:bg-cchoicedark text-sm cursor-pointer"
+			hx-get={ utils.URLf("/admin/memos/%s/edit", memo.ID) }
+			hx-target="#memo-edit-modal-container"
+			hx-swap="innerHTML"
+		>
+			Edit
+		</button>
+		if memoCanSendEmails(memo, currentStaffID, isSuperuser) {
+			if memoEmailOnCooldown(memo.EmailsSentAt) {
+				<button
+					type="button"
+					class="px-2 py-1 bg-gray-300 text-gray-500 rounded-md cursor-not-allowed"
+					title={ memoSendEmailsTooltip(true) }
+					disabled
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+					</svg>
+				</button>
+			} else {
+				<button
+					type="button"
+					class="px-2 py-1 bg-cchoice text-white rounded-md hover:bg-cchoicedark cursor-pointer"
+					title={ memoSendEmailsTooltip(false) }
+					hx-post={ utils.URLf("/admin/memos/%s/send-emails", memo.ID) }
+					hx-confirm="Send notification emails to all recipients?"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+					</svg>
+				</button>
+			}
+		}
+	</div>
 }
 
 templ MemoFileURLCell(url string) {
