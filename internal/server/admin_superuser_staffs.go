@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"net/http"
 
@@ -57,6 +58,7 @@ func (s *Server) adminSuperuserStaffsListTableHandler(w http.ResponseWriter, r *
 			Email:    staff.Email,
 			MobileNo: staff.MobileNo,
 			UserType: enums.ParseStaffUserTypeToEnum(staff.UserType),
+			Status:   enums.ParseStaffStatusToEnum(staff.Status),
 			Roles:    roles,
 		})
 	}
@@ -263,4 +265,97 @@ func (s *Server) adminSuperuserStaffsCreatePostHandler(w http.ResponseWriter, r 
 	}
 
 	redirectHX(w, r, utils.URLWithSuccess("/admin/superuser/staffs", "Employee created successfully"))
+}
+
+func (s *Server) adminSuperuserStaffsEditPageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Staffs Edit Page Handler]"
+	const page = "/admin/superuser/staffs"
+	ctx := r.Context()
+
+	staffID := chi.URLParam(r, "id")
+	if staffID == "" {
+		redirectHX(w, r, utils.URLWithError(page, "staff id is required"))
+		return
+	}
+
+	staff, err := s.services.staff.GetForEdit(ctx, staffID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		if errors.Is(err, sql.ErrNoRows) {
+			redirectHX(w, r, utils.URLWithError(page, "Employee not found"))
+			return
+		}
+		redirectHX(w, r, utils.URLWithError(page, "Failed to load employee"))
+		return
+	}
+
+	if err := compadmin.StaffEditModal(staff).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, "Failed to render edit form"))
+		return
+	}
+}
+
+func (s *Server) adminSuperuserStaffsUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Superuser Staffs Update Handler]"
+	const page = "/admin/superuser/staffs"
+	ctx := r.Context()
+
+	staffID := chi.URLParam(r, "id")
+	if staffID == "" {
+		redirectHX(w, r, utils.URLWithError(page, "staff id is required"))
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+		return
+	}
+
+	status := enums.ParseStaffStatusToEnum(r.FormValue("status"))
+	if !status.IsValid() {
+		redirectHX(w, r, utils.URLWithError(page, "Invalid status"))
+		return
+	}
+
+	result := "success"
+	defer func() {
+		if err := s.services.staffLog.CreateLog(
+			context.Background(),
+			s.sessionManager.GetString(ctx, SessionStaffID),
+			constants.ActionUpdate,
+			constants.ModuleStaff,
+			result,
+			nil,
+		); err != nil {
+			logs.Log().Error(logtag, zap.Error(err))
+		}
+	}()
+
+	if err := s.services.staff.UpdateEmployment(ctx, services.UpdateEmploymentParams{
+		ID:              staffID,
+		Status:          status,
+		Position:        r.FormValue("position"),
+		TimeInSchedule:  r.FormValue("time_in_schedule"),
+		TimeOutSchedule: r.FormValue("time_out_schedule"),
+		RequireInShop:   r.FormValue("require_in_shop") == "true",
+	}); err != nil {
+		result = err.Error()
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		msg := "Failed to update employee"
+		switch {
+		case errors.Is(err, errs.ErrMissingField):
+			msg = "All required fields must be filled"
+		case errors.Is(err, errs.ErrInvalidFormat):
+			msg = "Invalid format for one or more fields"
+		case errors.Is(err, errs.ErrInvalidInput):
+			msg = "Invalid input for one or more fields"
+		case errors.Is(err, errs.ErrDecode):
+			msg = "Invalid employee id"
+		}
+		redirectHX(w, r, utils.URLWithError(page, msg))
+		return
+	}
+
+	redirectHX(w, r, utils.URLWithSuccess(page, "Employee updated successfully"))
 }

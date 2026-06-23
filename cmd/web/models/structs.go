@@ -348,6 +348,17 @@ type AdminStaffListItem struct {
 	MobileNo string
 	Roles    []enums.StaffRole
 	UserType enums.StaffUserType
+	Status   enums.StaffStatus
+}
+
+type AdminStaffEditItem struct {
+	ID              string
+	FullName        string
+	Status          enums.StaffStatus
+	Position        string
+	TimeInSchedule  string
+	TimeOutSchedule string
+	RequireInShop   bool
 }
 
 type AdminHolidayListItem struct {

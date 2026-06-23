@@ -21,6 +21,8 @@ type StaffRowBase struct {
 	Email           string
 	MobileNo        string
 	RequireInShop   bool
+	Status          string
+	ResignedAt      sql.NullString
 	CreatedAt       string
 	UpdatedAt       string
 }
@@ -88,5 +90,14 @@ type CreateStaffParams struct {
 	TimeInSchedule  string
 	TimeOutSchedule string
 	Password        string
+	RequireInShop   bool
+}
+
+type UpdateEmploymentParams struct {
+	ID              string
+	Status          enums.StaffStatus
+	Position        string
+	TimeInSchedule  string
+	TimeOutSchedule string
 	RequireInShop   bool
 }

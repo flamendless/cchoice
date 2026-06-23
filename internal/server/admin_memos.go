@@ -108,7 +108,7 @@ func (s *Server) adminMemosCreatePageHandler(w http.ResponseWriter, r *http.Requ
 	const logtag = "[Admin Memos Create Page Handler]"
 	ctx := r.Context()
 
-	staffList, err := s.services.staff.GetAll(ctx, 100)
+	staffList, err := s.services.staff.GetAllForMemo(ctx, 100)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError("/admin/memos", err.Error()))
@@ -146,7 +146,7 @@ func (s *Server) adminMemosEditPageHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	staffList, err := s.services.staff.GetAll(ctx, maxStaffListSize)
+	staffList, err := s.services.staff.GetAllForMemo(ctx, maxStaffListSize)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))

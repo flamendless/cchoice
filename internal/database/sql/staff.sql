@@ -15,6 +15,8 @@ SELECT
     mobile_no,
     password,
     require_in_shop,
+    status,
+    resigned_at,
     created_at,
     updated_at
 FROM tbl_staffs
@@ -39,6 +41,8 @@ SELECT
     email,
     mobile_no,
     require_in_shop,
+    status,
+    resigned_at,
     created_at,
     updated_at
 FROM tbl_staffs
@@ -63,10 +67,38 @@ SELECT
     email,
     mobile_no,
     require_in_shop,
+    status,
+    resigned_at,
     created_at,
     updated_at
 FROM tbl_staffs
 WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+ORDER BY last_name ASC, first_name ASC
+LIMIT ?;
+
+-- name: GetAllStaffsForMemo :many
+SELECT
+    id,
+    first_name,
+    middle_name,
+    last_name,
+    birthdate,
+    sex,
+    date_hired,
+    time_in_schedule,
+    time_out_schedule,
+    position,
+    user_type,
+    email,
+    mobile_no,
+    require_in_shop,
+    status,
+    resigned_at,
+    created_at,
+    updated_at
+FROM tbl_staffs
+WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+AND status != 'RESIGNED'
 ORDER BY last_name ASC, first_name ASC
 LIMIT ?;
 
@@ -86,6 +118,8 @@ SELECT
     email,
     mobile_no,
     require_in_shop,
+    status,
+    resigned_at,
     created_at,
     updated_at
 FROM tbl_staffs
@@ -467,4 +501,22 @@ SET
     updated_at = datetime('now')
 WHERE
     id = ?
+RETURNING id;
+
+-- name: UpdateStaffEmployment :one
+UPDATE tbl_staffs
+SET
+    status = sqlc.arg('status'),
+    position = sqlc.arg('position'),
+    time_in_schedule = sqlc.arg('time_in_schedule'),
+    time_out_schedule = sqlc.arg('time_out_schedule'),
+    require_in_shop = sqlc.arg('require_in_shop'),
+    resigned_at = CASE
+        WHEN sqlc.arg('status') = 'RESIGNED' AND resigned_at IS NOT NULL THEN resigned_at
+        WHEN sqlc.arg('status') = 'RESIGNED' THEN datetime('now')
+        ELSE NULL
+    END,
+    updated_at = datetime('now')
+WHERE
+    id = sqlc.arg('id')
 RETURNING id;

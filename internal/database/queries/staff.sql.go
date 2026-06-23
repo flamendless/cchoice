@@ -299,6 +299,8 @@ SELECT
     email,
     mobile_no,
     require_in_shop,
+    status,
+    resigned_at,
     created_at,
     updated_at
 FROM tbl_staffs
@@ -322,6 +324,8 @@ type GetAllStaffsRow struct {
 	Email           string
 	MobileNo        string
 	RequireInShop   bool
+	Status          string
+	ResignedAt      sql.NullString
 	CreatedAt       string
 	UpdatedAt       string
 }
@@ -350,6 +354,8 @@ func (q *Queries) GetAllStaffs(ctx context.Context, limit int64) ([]GetAllStaffs
 			&i.Email,
 			&i.MobileNo,
 			&i.RequireInShop,
+			&i.Status,
+			&i.ResignedAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -382,6 +388,8 @@ SELECT
     email,
     mobile_no,
     require_in_shop,
+    status,
+    resigned_at,
     created_at,
     updated_at
 FROM tbl_staffs
@@ -410,6 +418,8 @@ type GetAllStaffsForAdminRow struct {
 	Email           string
 	MobileNo        string
 	RequireInShop   bool
+	Status          string
+	ResignedAt      sql.NullString
 	CreatedAt       string
 	UpdatedAt       string
 }
@@ -438,6 +448,98 @@ func (q *Queries) GetAllStaffsForAdmin(ctx context.Context, search interface{}) 
 			&i.Email,
 			&i.MobileNo,
 			&i.RequireInShop,
+			&i.Status,
+			&i.ResignedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllStaffsForMemo = `-- name: GetAllStaffsForMemo :many
+SELECT
+    id,
+    first_name,
+    middle_name,
+    last_name,
+    birthdate,
+    sex,
+    date_hired,
+    time_in_schedule,
+    time_out_schedule,
+    position,
+    user_type,
+    email,
+    mobile_no,
+    require_in_shop,
+    status,
+    resigned_at,
+    created_at,
+    updated_at
+FROM tbl_staffs
+WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+AND status != 'RESIGNED'
+ORDER BY last_name ASC, first_name ASC
+LIMIT ?
+`
+
+type GetAllStaffsForMemoRow struct {
+	ID              int64
+	FirstName       string
+	MiddleName      sql.NullString
+	LastName        string
+	Birthdate       string
+	Sex             string
+	DateHired       string
+	TimeInSchedule  sql.NullString
+	TimeOutSchedule sql.NullString
+	Position        string
+	UserType        string
+	Email           string
+	MobileNo        string
+	RequireInShop   bool
+	Status          string
+	ResignedAt      sql.NullString
+	CreatedAt       string
+	UpdatedAt       string
+}
+
+func (q *Queries) GetAllStaffsForMemo(ctx context.Context, limit int64) ([]GetAllStaffsForMemoRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllStaffsForMemo, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllStaffsForMemoRow
+	for rows.Next() {
+		var i GetAllStaffsForMemoRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
+			&i.Birthdate,
+			&i.Sex,
+			&i.DateHired,
+			&i.TimeInSchedule,
+			&i.TimeOutSchedule,
+			&i.Position,
+			&i.UserType,
+			&i.Email,
+			&i.MobileNo,
+			&i.RequireInShop,
+			&i.Status,
+			&i.ResignedAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -1006,6 +1108,8 @@ SELECT
     mobile_no,
     password,
     require_in_shop,
+    status,
+    resigned_at,
     created_at,
     updated_at
 FROM tbl_staffs
@@ -1031,6 +1135,8 @@ type GetStaffByEmailRow struct {
 	MobileNo        string
 	Password        string
 	RequireInShop   bool
+	Status          string
+	ResignedAt      sql.NullString
 	CreatedAt       string
 	UpdatedAt       string
 }
@@ -1054,6 +1160,8 @@ func (q *Queries) GetStaffByEmail(ctx context.Context, email string) (GetStaffBy
 		&i.MobileNo,
 		&i.Password,
 		&i.RequireInShop,
+		&i.Status,
+		&i.ResignedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -1076,6 +1184,8 @@ SELECT
     email,
     mobile_no,
     require_in_shop,
+    status,
+    resigned_at,
     created_at,
     updated_at
 FROM tbl_staffs
@@ -1100,6 +1210,8 @@ type GetStaffByIDRow struct {
 	Email           string
 	MobileNo        string
 	RequireInShop   bool
+	Status          string
+	ResignedAt      sql.NullString
 	CreatedAt       string
 	UpdatedAt       string
 }
@@ -1122,6 +1234,8 @@ func (q *Queries) GetStaffByID(ctx context.Context, id int64) (GetStaffByIDRow, 
 		&i.Email,
 		&i.MobileNo,
 		&i.RequireInShop,
+		&i.Status,
+		&i.ResignedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -1356,6 +1470,48 @@ func (q *Queries) UpdateStaffAttendanceTimeOut(ctx context.Context, arg UpdateSt
 		arg.OutUseragentID,
 		arg.StaffID,
 		arg.ForDate,
+	)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const updateStaffEmployment = `-- name: UpdateStaffEmployment :one
+UPDATE tbl_staffs
+SET
+    status = ?1,
+    position = ?2,
+    time_in_schedule = ?3,
+    time_out_schedule = ?4,
+    require_in_shop = ?5,
+    resigned_at = CASE
+        WHEN ?1 = 'RESIGNED' AND resigned_at IS NOT NULL THEN resigned_at
+        WHEN ?1 = 'RESIGNED' THEN datetime('now')
+        ELSE NULL
+    END,
+    updated_at = datetime('now')
+WHERE
+    id = ?6
+RETURNING id
+`
+
+type UpdateStaffEmploymentParams struct {
+	Status          string
+	Position        string
+	TimeInSchedule  sql.NullString
+	TimeOutSchedule sql.NullString
+	RequireInShop   bool
+	ID              int64
+}
+
+func (q *Queries) UpdateStaffEmployment(ctx context.Context, arg UpdateStaffEmploymentParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, updateStaffEmployment,
+		arg.Status,
+		arg.Position,
+		arg.TimeInSchedule,
+		arg.TimeOutSchedule,
+		arg.RequireInShop,
+		arg.ID,
 	)
 	var id int64
 	err := row.Scan(&id)

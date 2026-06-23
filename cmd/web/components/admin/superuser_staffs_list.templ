@@ -35,6 +35,7 @@ templ AdminSuperuserStaffsListPage(title string) {
 					</div>
 				</div>
 			</div>
+			<div id="staff-edit-modal-container"></div>
 		</body>
 	</html>
 }
@@ -92,8 +93,14 @@ templ AdminSuperuserStaffsListTable(staffs []models.AdminStaffListItem) {
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
 						User Type
 					</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[35%]">
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[8%]">
+						Status
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[27%]">
 						Roles
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[8%]">
+						Actions
 					</th>
 				</tr>
 			</thead>
@@ -118,8 +125,22 @@ templ AdminSuperuserStaffsListTable(staffs []models.AdminStaffListItem) {
 						<td class="px-6 py-4 whitespace-nowrap text-sm w-[10%] text-gray-900">
 							{ staff.UserType.String() }
 						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm w-[35%]">
+						<td class="px-6 py-4 whitespace-nowrap text-sm w-[8%] text-gray-900">
+							{ staff.Status.String() }
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm w-[27%]">
 							@StaffRolesCell(staff.ID, staff.UserType, staff.Roles)
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-sm w-[8%]">
+							<button
+								type="button"
+								class="px-3 py-1 text-xs font-medium rounded-md bg-cchoice text-white hover:bg-cchoicedark"
+								hx-get={ utils.URLf("/admin/superuser/staffs/%s/edit", staff.ID) }
+								hx-target="#staff-edit-modal-container"
+								hx-swap="innerHTML"
+							>
+								Edit
+							</button>
 						</td>
 					</tr>
 				}
@@ -192,4 +213,121 @@ templ StaffRoleDropdown(staffID string, roles []enums.StaffRole) {
 			<option value={ role.String() }>{ role.String() }</option>
 		}
 	</select>
+}
+
+templ StaffEditModal(staff models.AdminStaffEditItem) {
+	<div
+		id="staff-edit-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="
+			on closeModal
+				set #staff-edit-modal-container.innerHTML to ''
+			end
+		"
+	>
+		<div
+			class="absolute inset-0 bg-black/50"
+			_="on click trigger closeModal"
+		></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 overflow-y-auto max-h-[90vh]">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">Edit Employee</h2>
+				<button
+					type="button"
+					class="text-gray-400 hover:text-gray-600"
+					_="on click trigger closeModal"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			<p class="text-sm text-gray-600 mb-4">{ staff.FullName }</p>
+			@StaffEditForm(staff)
+		</div>
+	</div>
+}
+
+templ StaffEditForm(staff models.AdminStaffEditItem) {
+	<form
+		hx-patch={ utils.URLf("/admin/superuser/staffs/%s", staff.ID) }
+		hx-swap="outerHTML"
+		class="flex flex-col gap-3 w-full"
+		hx-on::after-request="if(event.detail.successful) { document.getElementById('staff-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/superuser/staffs/table', { target: '#staffs-table', swap: 'innerHTML' }) }"
+	>
+		<div>
+			<label class="block text-sm font-medium text-gray-700">Status</label>
+			<select
+				name="status"
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			>
+				for _, status := range enums.AllStaffStatuses {
+					<option
+						value={ status.String() }
+						selected?={ staff.Status == status }
+					>
+						{ status.String() }
+					</option>
+				}
+			</select>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700">Position</label>
+			<input
+				type="text"
+				name="position"
+				value={ staff.Position }
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			/>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700">Time In Schedule</label>
+			<input
+				type="time"
+				name="time_in_schedule"
+				value={ staff.TimeInSchedule }
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			/>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700">Time Out Schedule</label>
+			<input
+				type="time"
+				name="time_out_schedule"
+				value={ staff.TimeOutSchedule }
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full"
+			/>
+		</div>
+		<div>
+			<label class="flex items-center gap-2 cursor-pointer">
+				<input
+					type="checkbox"
+					name="require_in_shop"
+					value="true"
+					checked?={ staff.RequireInShop }
+					class="rounded border-gray-300 text-cchoice focus:ring-cchoice"
+				/>
+				<span class="text-sm font-medium text-gray-700">Require in shop for time in/out</span>
+			</label>
+		</div>
+		<div class="flex w-full gap-1 justify-center mt-2">
+			<button
+				type="submit"
+				class="px-3 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm"
+			>
+				Save
+			</button>
+			<button
+				type="button"
+				class="px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm"
+				_="on click trigger closeModal"
+			>
+				Cancel
+			</button>
+		</div>
+	</form>
 }
