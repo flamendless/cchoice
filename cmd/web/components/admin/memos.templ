@@ -6,6 +6,7 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/enums"
 	"cchoice/internal/utils"
+	"fmt"
 )
 
 templ AdminMemosListPage() {
@@ -236,7 +237,7 @@ templ MemoCreateModal(allStaff []models.Staff, selectedIDs []string, currentStaf
 }
 
 templ MemoEditModal(memo models.AdminMemoListItem, allStaff []models.Staff, currentStaffID string) {
-	@MemoFormModal("Edit Memo", utils.URLf("/admin/memos/%s", memo.ID), "patch", allStaff, memo.RecipientIDs, currentStaffID, memo)
+	@MemoFormModal("Edit Memo", fmt.Sprintf("/admin/memos/%s", memo.ID), "patch", allStaff, memo.RecipientIDs, currentStaffID, memo)
 }
 
 templ MemoFormModal(title string, action string, method string, allStaff []models.Staff, selectedIDs []string, currentStaffID string, memo models.AdminMemoListItem) {
@@ -264,25 +265,27 @@ templ MemoFormModal(title string, action string, method string, allStaff []model
 					hx-post={ utils.URL(action) }
 					hx-swap="none"
 					class="flex flex-col gap-4"
-					hx-on::after-request="if(event.detail.successful) { document.getElementById('memo-create-modal-container').innerHTML = ''; document.getElementById('memo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/memos/table', { target: '#memos-table', swap: 'innerHTML' }) }"
+					data-memos-table-url={ utils.URL("/admin/memos/table") }
+					hx-on::after-request="if(event.detail.successful) { document.getElementById('memo-create-modal-container').innerHTML = ''; document.getElementById('memo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', event.target.dataset.memosTableUrl, { target: '#memos-table', swap: 'innerHTML' }) }"
 				>
-					@MemoFormFields(memo, allStaff, selectedIDs, currentStaffID)
+					@MemoFormFields(memo, allStaff, selectedIDs, currentStaffID, false)
 				</form>
 			} else {
 				<form
 					hx-patch={ utils.URL(action) }
 					hx-swap="none"
 					class="flex flex-col gap-4"
-					hx-on::after-request="if(event.detail.successful) { document.getElementById('memo-create-modal-container').innerHTML = ''; document.getElementById('memo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/memos/table', { target: '#memos-table', swap: 'innerHTML' }) }"
+					data-memos-table-url={ utils.URL("/admin/memos/table") }
+					hx-on::after-request="if(event.detail.successful) { document.getElementById('memo-create-modal-container').innerHTML = ''; document.getElementById('memo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', event.target.dataset.memosTableUrl, { target: '#memos-table', swap: 'innerHTML' }) }"
 				>
-					@MemoFormFields(memo, allStaff, selectedIDs, currentStaffID)
+					@MemoFormFields(memo, allStaff, selectedIDs, currentStaffID, true)
 				</form>
 			}
 		</div>
 	</div>
 }
 
-templ MemoFormFields(memo models.AdminMemoListItem, allStaff []models.Staff, selectedIDs []string, currentStaffID string) {
+templ MemoFormFields(memo models.AdminMemoListItem, allStaff []models.Staff, selectedIDs []string, currentStaffID string, isEdit bool) {
 	<div>
 		<label class="block text-sm font-medium text-gray-700 mb-1">Title <span class="text-red-500">*</span></label>
 		<input
@@ -322,10 +325,10 @@ templ MemoFormFields(memo models.AdminMemoListItem, allStaff []models.Staff, sel
 			</select>
 		</div>
 		<div>
-			@MemoStartDateField(memo.StartDate)
+			@MemoStartDateField(memo.StartDate, isEdit)
 		</div>
 		<div>
-			@MemoEndDateField(memo.StartDate, memo.EndDate)
+			@MemoEndDateField(memo.StartDate, memo.EndDate, isEdit)
 		</div>
 	</div>
 	@MemoStaffChecklist(allStaff, selectedIDs, currentStaffID)
@@ -335,7 +338,7 @@ templ MemoFormFields(memo models.AdminMemoListItem, allStaff []models.Staff, sel
 	</div>
 }
 
-templ MemoStartDateField(value string) {
+templ MemoStartDateField(value string, isEdit bool) {
 	<div class="flex flex-col items-center">
 		<label for="start_date" class="block text-sm font-medium text-gray-700">
 			Start Date <span class="text-red-500">*</span>
@@ -345,7 +348,7 @@ templ MemoStartDateField(value string) {
 			type="date"
 			name="start_date"
 			value={ value }
-			min={ memoTodayISO() }
+			min={ memoStartDateMin(value, isEdit) }
 			required
 			class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
 			_="on change
@@ -358,7 +361,7 @@ templ MemoStartDateField(value string) {
 	</div>
 }
 
-templ MemoEndDateField(startDate string, value string) {
+templ MemoEndDateField(startDate string, value string, isEdit bool) {
 	<div class="flex flex-col items-center">
 		<label for="end_date" class="block text-sm font-medium text-gray-700">
 			End Date <span class="text-red-500">*</span>
@@ -368,7 +371,7 @@ templ MemoEndDateField(startDate string, value string) {
 			type="date"
 			name="end_date"
 			value={ value }
-			min={ memoEndDateMin(startDate) }
+			min={ memoEndDateMin(startDate, isEdit) }
 			required
 			class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
 		/>
@@ -376,21 +379,42 @@ templ MemoEndDateField(startDate string, value string) {
 }
 
 templ MemoStaffChecklist(allStaff []models.Staff, selectedIDs []string, currentStaffID string) {
-	<div>
+	<div
+		id="memo-staff-recipients"
+		data-total={ fmt.Sprintf("%d", len(allStaff)) }
+		_="
+			def updateMemoStaffCount()
+				set selected to 0
+				for cb in <.memo-staff-checkbox/> in #memo-staff-checklist
+					if cb.checked
+						set selected to selected + 1
+					end
+				end
+				set #memo-staff-selected-count.textContent to selected + '/' + me.dataset.total + ' selected'
+			end
+			on change from .memo-staff-checkbox in #memo-staff-checklist
+				call updateMemoStaffCount()
+			end
+		"
+	>
 		<div class="flex items-center justify-between mb-2">
 			<label class="block text-sm font-medium text-gray-700">Staff Recipients <span class="text-red-500">*</span></label>
-			<button
-				type="button"
-				class="text-sm text-cchoice hover:underline"
-				_="
-					on click
-						for cb in <.memo-staff-checkbox/> in #memo-staff-checklist
-							set cb.checked to true
-						end
-				"
-			>
-				Select All
-			</button>
+			<div class="flex items-center gap-3">
+				<span id="memo-staff-selected-count" class="text-sm text-gray-500">{ memoStaffSelectedLabel(allStaff, selectedIDs) }</span>
+				<button
+					type="button"
+					class="text-sm text-cchoice hover:underline"
+					_="
+						on click
+							for cb in <.memo-staff-checkbox/> in #memo-staff-checklist
+								set cb.checked to true
+							end
+							call updateMemoStaffCount() on #memo-staff-recipients
+					"
+				>
+					Select All
+				</button>
+			</div>
 		</div>
 		<div class="border border-gray-200 rounded-md max-h-48 overflow-y-auto" id="memo-staff-checklist">
 			<table class="min-w-full divide-y divide-gray-200">

@@ -385,11 +385,6 @@ func (s *MemoService) UpdateMemo(
 		}
 	}()
 
-	if err := ValidateMemoDates(startDate, endDate); err != nil {
-		result = err.Error()
-		return err
-	}
-
 	if len(recipientStaffIDs) == 0 {
 		result = errs.ErrMemoRecipientsRequired.Error()
 		return errs.ErrMemoRecipientsRequired
@@ -409,6 +404,11 @@ func (s *MemoService) UpdateMemo(
 	if memo == nil {
 		result = errs.ErrMemoNotFound.Error()
 		return errs.ErrMemoNotFound
+	}
+
+	if err := ValidateMemoDatesForUpdate(memo.StartDate, memo.EndDate, startDate, endDate); err != nil {
+		result = err.Error()
+		return err
 	}
 
 	decodedRecipients, err := s.decodeStaffIDs(recipientStaffIDs)
@@ -615,6 +615,23 @@ func ValidateMemoDates(startDate, endDate time.Time) error {
 		return errs.ErrMemoDateBeforeToday
 	}
 	if startDate.After(endDate) {
+		return errs.ErrValidationStartEndDates
+	}
+	return nil
+}
+
+func ValidateMemoDatesForUpdate(originalStart, originalEnd string, newStart, newEnd time.Time) error {
+	today := utils.NowPH().Format(constants.DateLayoutISO)
+	newStartStr := newStart.Format(constants.DateLayoutISO)
+	newEndStr := newEnd.Format(constants.DateLayoutISO)
+
+	if newStartStr != originalStart && newStartStr < today {
+		return errs.ErrMemoDateBeforeToday
+	}
+	if newEndStr != originalEnd && newEndStr < today {
+		return errs.ErrMemoDateBeforeToday
+	}
+	if newStart.After(newEnd) {
 		return errs.ErrValidationStartEndDates
 	}
 	return nil

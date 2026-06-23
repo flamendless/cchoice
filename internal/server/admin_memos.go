@@ -146,7 +146,7 @@ func (s *Server) adminMemosEditPageHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	staffList, err := s.services.staff.GetAll(ctx, 0)
+	staffList, err := s.services.staff.GetAll(ctx, maxStaffListSize)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
@@ -281,11 +281,6 @@ func (s *Server) adminMemosUpdateHandler(w http.ResponseWriter, r *http.Request)
 	endDate, err := time.Parse(constants.DateLayoutISO, endDateStr)
 	if err != nil {
 		redirectHX(w, r, utils.URLWithError(page, "Invalid end date format"))
-		return
-	}
-
-	if err := services.ValidateMemoDates(startDate, endDate); err != nil {
-		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 

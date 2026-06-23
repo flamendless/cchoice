@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"slices"
 	"strings"
 	"time"
@@ -15,7 +16,10 @@ func memoTodayISO() string {
 	return utils.NowPH().Format(constants.DateLayoutISO)
 }
 
-func memoEndDateMin(startDate string) string {
+func memoEndDateMin(startDate string, isEdit bool) string {
+	if isEdit && startDate != "" {
+		return startDate
+	}
 	today := memoTodayISO()
 	if startDate > today {
 		return startDate
@@ -23,8 +27,29 @@ func memoEndDateMin(startDate string) string {
 	return today
 }
 
+func memoStartDateMin(value string, isEdit bool) string {
+	if isEdit && value != "" && value < memoTodayISO() {
+		return value
+	}
+	return memoTodayISO()
+}
+
 func isMemoStaffSelected(selectedIDs []string, staffID string) bool {
 	return slices.Contains(selectedIDs, staffID)
+}
+
+func memoStaffSelectedCount(allStaff []models.Staff, selectedIDs []string) int {
+	n := 0
+	for _, staff := range allStaff {
+		if slices.Contains(selectedIDs, staff.ID) {
+			n++
+		}
+	}
+	return n
+}
+
+func memoStaffSelectedLabel(allStaff []models.Staff, selectedIDs []string) string {
+	return fmt.Sprintf("%d/%d selected", memoStaffSelectedCount(allStaff, selectedIDs), len(allStaff))
 }
 
 func memoStaffDisplayName(name, staffID, currentStaffID string) string {
