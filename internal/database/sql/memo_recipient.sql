@@ -25,6 +25,8 @@ FROM tbl_memo_recipients r
 JOIN tbl_staffs s ON s.id = r.staff_id
 WHERE r.memo_id = ?
 AND s.email != ''
+AND s.deleted_at = '1970-01-01 00:00:00+00:00'
+AND s.status != 'RESIGNED'
 ORDER BY s.last_name ASC, s.first_name ASC;
 
 -- name: GetMemoRecipientsWithActions :many
@@ -45,4 +47,6 @@ FROM tbl_memo_recipients r
 JOIN tbl_staffs s ON s.id = r.staff_id
 LEFT JOIN tbl_memo_staff_actions a ON a.memo_id = r.memo_id AND a.staff_id = r.staff_id
 WHERE r.memo_id = ?
+AND s.deleted_at = '1970-01-01 00:00:00+00:00'
+AND s.status != 'RESIGNED'
 ORDER BY s.last_name ASC, s.first_name ASC;

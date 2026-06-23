@@ -457,6 +457,8 @@ type TblStaff struct {
 	UpdatedAt       string
 	DeletedAt       string
 	RequireInShop   bool
+	Status          string
+	ResignedAt      sql.NullString
 }
 
 type TblStaffAccess struct {

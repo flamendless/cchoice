@@ -10,6 +10,7 @@ import (
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 
@@ -110,6 +111,8 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/staffs/create", s.adminSuperuserStaffsCreatePageHandler)
 	r.With(s.requireSuperuserAuth).Post("/admin/superuser/staffs/create", s.adminSuperuserStaffsCreatePostHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/staffs/table", s.adminSuperuserStaffsListTableHandler)
+	r.With(s.requireSuperuserAuth).Get("/admin/superuser/staffs/{id}/edit", s.adminSuperuserStaffsEditPageHandler)
+	r.With(s.requireSuperuserAuth).Patch("/admin/superuser/staffs/{id}", s.adminSuperuserStaffsUpdateHandler)
 	r.With(s.requireSuperuserAuth).Get("/admin/superuser/staffs/roles", s.adminSuperuserStaffsRolesOptionsHandler)
 	r.With(s.requireSuperuserAuth).Patch("/admin/superuser/staffs/{id}/role", s.adminSuperuserStaffsRoleHandler)
 
@@ -172,6 +175,12 @@ func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 		if staffID != 0 {
 			staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
 			if err == nil {
+				if enums.ParseStaffStatusToEnum(staff.Status) == enums.STAFF_STATUS_RESIGNED {
+					s.sessionManager.Remove(ctx, SessionStaffID)
+					s.sessionManager.Remove(ctx, SessionStaffAccessID)
+					redirectHX(w, r, utils.URLWithError("/admin", errs.ErrStaffResigned.Error()))
+					return
+				}
 				switch enums.ParseStaffUserTypeToEnum(staff.UserType) {
 				case enums.STAFF_USER_TYPE_SUPERUSER:
 					redirectHX(w, r, utils.URL("/admin/superuser"))
@@ -231,6 +240,11 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := bcrypt.CompareHashAndPassword([]byte(staff.Password), []byte(password)); err != nil {
 		redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password"))
+		return
+	}
+
+	if enums.ParseStaffStatusToEnum(staff.Status) == enums.STAFF_STATUS_RESIGNED {
+		redirectHX(w, r, utils.URLWithError("/admin", errs.ErrStaffResigned.Error()))
 		return
 	}
 

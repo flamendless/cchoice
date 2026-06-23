@@ -4,6 +4,7 @@ import (
 	"cchoice/internal/conf"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/metrics"
 	"cchoice/internal/utils"
 	"context"
@@ -124,11 +125,22 @@ func PrometheusMiddleware(next http.Handler) http.Handler {
 
 func (s *Server) requireStaffAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		staffID := s.encoder.Decode(s.sessionManager.GetString(r.Context(), SessionStaffID))
+		ctx := r.Context()
+		staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
+		staffID := s.encoder.Decode(staffIDStr)
 		if staffID == 0 {
 			redirectHX(w, r, utils.URLWithError("/admin", "Login to access page"))
 			return
 		}
+
+		staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
+		if err != nil || enums.ParseStaffStatusToEnum(staff.Status) == enums.STAFF_STATUS_RESIGNED {
+			s.sessionManager.Remove(ctx, SessionStaffID)
+			s.sessionManager.Remove(ctx, SessionStaffAccessID)
+			redirectHX(w, r, utils.URLWithError("/admin", errs.ErrStaffResigned.Error()))
+			return
+		}
+
 		next.ServeHTTP(w, r)
 	})
 }

@@ -196,6 +196,80 @@ func (s *StaffService) GetAll(ctx context.Context, limit int64) ([]models.Staff,
 	return list, nil
 }
 
+func (s *StaffService) GetAllForMemo(ctx context.Context, limit int64) ([]models.Staff, error) {
+	staffs, err := s.dbRO.GetQueries().GetAllStaffsForMemo(ctx, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	list := make([]models.Staff, 0, len(staffs))
+	for _, staff := range staffs {
+		list = append(list, models.Staff{
+			ID:       s.encoder.Encode(staff.ID),
+			FullName: utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
+			Email:    staff.Email,
+			Position: staff.Position,
+			UserType: enums.ParseStaffUserTypeToEnum(staff.UserType),
+		})
+	}
+	return list, nil
+}
+
+func (s *StaffService) GetForEdit(ctx context.Context, staffID string) (models.AdminStaffEditItem, error) {
+	decodedID := s.encoder.Decode(staffID)
+	if decodedID == encode.INVALID {
+		return models.AdminStaffEditItem{}, errs.ErrDecode
+	}
+
+	staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, decodedID)
+	if err != nil {
+		return models.AdminStaffEditItem{}, err
+	}
+
+	return models.AdminStaffEditItem{
+		ID:              staffID,
+		FullName:        utils.BuildFullName(staff.FirstName, staff.MiddleName.String, staff.LastName),
+		Status:          enums.ParseStaffStatusToEnum(staff.Status),
+		Position:        staff.Position,
+		TimeInSchedule:  staff.TimeInSchedule.String,
+		TimeOutSchedule: staff.TimeOutSchedule.String,
+		RequireInShop:   staff.RequireInShop,
+	}, nil
+}
+
+func (s *StaffService) UpdateEmployment(ctx context.Context, params UpdateEmploymentParams) error {
+	if !params.Status.IsValid() {
+		return errs.ErrInvalidInput
+	}
+
+	if params.Position == "" || params.TimeInSchedule == "" || params.TimeOutSchedule == "" {
+		return errs.ErrMissingField
+	}
+
+	if _, err := time.Parse(constants.TimeLayoutHHMM, params.TimeInSchedule); err != nil {
+		return errs.ErrInvalidFormat
+	}
+
+	if _, err := time.Parse(constants.TimeLayoutHHMM, params.TimeOutSchedule); err != nil {
+		return errs.ErrInvalidFormat
+	}
+
+	decodedID := s.encoder.Decode(params.ID)
+	if decodedID == encode.INVALID {
+		return errs.ErrDecode
+	}
+
+	_, err := s.dbRW.GetQueries().UpdateStaffEmployment(ctx, queries.UpdateStaffEmploymentParams{
+		Status:          params.Status.String(),
+		Position:        params.Position,
+		TimeInSchedule:  sql.NullString{Valid: true, String: params.TimeInSchedule},
+		TimeOutSchedule: sql.NullString{Valid: true, String: params.TimeOutSchedule},
+		RequireInShop:   params.RequireInShop,
+		ID:              decodedID,
+	})
+	return err
+}
+
 func (s *StaffService) GetAllForAdmin(ctx context.Context, search string) ([]queries.GetAllStaffsForAdminRow, error) {
 	return s.dbRO.GetQueries().GetAllStaffsForAdmin(ctx, search)
 }
