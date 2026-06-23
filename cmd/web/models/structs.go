@@ -161,6 +161,7 @@ type AdminStaffProfile struct {
 	Lat              float64
 	Lng              float64
 	UserType         enums.StaffUserType
+	Status           enums.StaffStatus
 	HasTimeIn        bool
 	HasTimeOut       bool
 	CanTimeIn        bool

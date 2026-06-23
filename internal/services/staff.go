@@ -56,6 +56,7 @@ func (s *StaffService) GetByID(ctx context.Context, staffID string) (models.Admi
 		ScheduledTimeOut: staff.TimeOutSchedule.String,
 		RequireInShop:    staff.RequireInShop,
 		UserType:         enums.ParseStaffUserTypeToEnum(staff.UserType),
+		Status:           enums.ParseStaffStatusToEnum(staff.Status),
 	}, nil
 }
 
@@ -295,6 +296,7 @@ func (s *StaffService) BuildProfile(staff queries.GetStaffByIDRow) models.AdminS
 		ScheduledTimeOut: staff.TimeOutSchedule.String,
 		RequireInShop:    staff.RequireInShop,
 		UserType:         enums.ParseStaffUserTypeToEnum(staff.UserType),
+		Status:           enums.ParseStaffStatusToEnum(staff.Status),
 	}
 }
 

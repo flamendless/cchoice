@@ -152,6 +152,7 @@ templ AdminProfilePersonalInfo(profile models.AdminStaffProfile) {
 			@profileText("Birthdate", profile.Birthdate)
 			@profileText("Date Hired", profile.DateHired)
 			@profileText("Position", profile.Position)
+			@profileText("Status", profile.Status.String())
 			@profileText("Scheduled Time In", profile.ScheduledTimeIn)
 			@profileText("Scheduled Time Out", profile.ScheduledTimeOut)
 			@profileText("User Type", profile.UserType.String())
