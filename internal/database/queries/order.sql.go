@@ -8,7 +8,124 @@ package queries
 import (
 	"context"
 	"database/sql"
+	"time"
 )
+
+const adminGetOrderDetailsByID = `-- name: AdminGetOrderDetailsByID :one
+SELECT
+	id,
+	order_number,
+	status,
+	customer_name,
+	customer_email,
+	customer_phone,
+	shipping_address_line1,
+	shipping_address_line2,
+	shipping_city,
+	shipping_state,
+	shipping_postal_code,
+	shipping_country,
+	paid_at,
+	created_at,
+	updated_at
+FROM tbl_orders
+WHERE id = ?
+LIMIT 1
+`
+
+type AdminGetOrderDetailsByIDRow struct {
+	ID                   int64
+	OrderNumber          string
+	Status               string
+	CustomerName         string
+	CustomerEmail        string
+	CustomerPhone        string
+	ShippingAddressLine1 string
+	ShippingAddressLine2 string
+	ShippingCity         string
+	ShippingState        string
+	ShippingPostalCode   string
+	ShippingCountry      string
+	PaidAt               sql.NullTime
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
+}
+
+func (q *Queries) AdminGetOrderDetailsByID(ctx context.Context, id int64) (AdminGetOrderDetailsByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, adminGetOrderDetailsByID, id)
+	var i AdminGetOrderDetailsByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.OrderNumber,
+		&i.Status,
+		&i.CustomerName,
+		&i.CustomerEmail,
+		&i.CustomerPhone,
+		&i.ShippingAddressLine1,
+		&i.ShippingAddressLine2,
+		&i.ShippingCity,
+		&i.ShippingState,
+		&i.ShippingPostalCode,
+		&i.ShippingCountry,
+		&i.PaidAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const adminGetOrdersForListing = `-- name: AdminGetOrdersForListing :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	updated_at
+FROM tbl_orders
+WHERE
+	(?1 IS NULL OR ?1 = '' OR LOWER(order_number) LIKE '%' || LOWER(?1) || '%')
+ORDER BY updated_at DESC
+`
+
+type AdminGetOrdersForListingRow struct {
+	ID          int64
+	OrderNumber string
+	Status      string
+	PaidAt      sql.NullTime
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+func (q *Queries) AdminGetOrdersForListing(ctx context.Context, searchOrderRef interface{}) ([]AdminGetOrdersForListingRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetOrdersForListing, searchOrderRef)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetOrdersForListingRow
+	for rows.Next() {
+		var i AdminGetOrdersForListingRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderNumber,
+			&i.Status,
+			&i.PaidAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
 
 const createOrder = `-- name: CreateOrder :one
 INSERT INTO tbl_orders(

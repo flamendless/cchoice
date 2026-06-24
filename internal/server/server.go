@@ -62,6 +62,7 @@ type Services struct {
 	staff            *services.StaffService
 	staffLog         *services.StaffLogsService
 	trackedLink      *services.TrackedLinkService
+	order            *services.OrderService
 	all              []services.IService
 }
 
@@ -219,6 +220,7 @@ func NewServer() *ServerInstance {
 		staff:            services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staffLog:         staffLogService,
 		trackedLink:      services.NewTrackedLinkService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
+		order:            services.NewOrderService(newServer.encoder, newServer.dbRO),
 	}
 
 	newServer.services.all = []services.IService{
@@ -245,6 +247,7 @@ func NewServer() *ServerInstance {
 		newServer.services.staff,
 		newServer.services.staffLog,
 		newServer.services.trackedLink,
+		newServer.services.order,
 	}
 
 	if !cfg.IsProd() {
