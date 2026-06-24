@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"encoding/csv"
+	"fmt"
 	"strconv"
 
 	"cchoice/internal/constants"
@@ -99,8 +100,9 @@ func (s *ExportService) StreamProductsCSV(
 	sortColumn enums.ProductExportSortColumn,
 	sortDirection enums.ProductExportSortDirection,
 	adminStaffID string,
+	filename string,
 ) error {
-	result := "success"
+	result := fmt.Sprintf("success. filename '%s'", filename)
 	defer func() {
 		if err := s.staffLog.CreateLog(
 			ctx,
