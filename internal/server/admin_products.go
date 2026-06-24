@@ -656,6 +656,11 @@ func (s *Server) adminSuperuserProductsEditPageHandler(w http.ResponseWriter, r 
 		StocksIn:      inventory.StocksIn,
 		Stocks:        strconv.FormatInt(inventory.Stocks, 10),
 	}
+	if product.SalePriceWithVat > 0 {
+		formData.SalePrice = strconv.FormatFloat(float64(product.SalePriceWithVat)/100, 'f', -1, 64)
+		formData.SaleStartDate = product.SaleStartDate
+		formData.SaleEndDate = product.SaleEndDate
+	}
 
 	if err := compadmin.AdminSuperuserProductsEditPage(formData).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
@@ -722,6 +727,28 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 	}
 	unitPriceWithoutVat := int64(math.Round(price / (1 + vatPercentage/100)))
 	unitPriceWithVat := int64(math.Round(price))
+
+	salePriceStr := r.FormValue("sale_price")
+	saleStartDate := r.FormValue("sale_start_date")
+	saleEndDate := r.FormValue("sale_end_date")
+
+	var salePriceWithoutVat, salePriceWithVat int64
+	if salePriceStr != "" {
+		salePrice, parseErr := strconv.ParseFloat(salePriceStr, 64)
+		if parseErr != nil || salePrice <= 0 {
+			logs.LogCtx(ctx).Warn(logtag, zap.Error(parseErr), zap.String("sale price", salePriceStr))
+			redirectHX(w, r, utils.URLWithError(page, "Invalid sale price"))
+			return
+		}
+
+		if saleStartDate == "" || saleEndDate == "" {
+			redirectHX(w, r, utils.URLWithError(page, "Sale start and end dates are required when sale price is set"))
+			return
+		}
+
+		salePriceWithoutVat = int64(math.Round(salePrice / (1 + vatPercentage/100)))
+		salePriceWithVat = int64(math.Round(salePrice))
+	}
 
 	specs := services.ProductSpecsInput{
 		Colours:       r.FormValue("spec_colours"),
@@ -796,6 +823,10 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 		ImagePath:           filename,
 		UnitPriceWithoutVat: unitPriceWithoutVat,
 		UnitPriceWithVat:    unitPriceWithVat,
+		SalePriceWithoutVat: salePriceWithoutVat,
+		SalePriceWithVat:    salePriceWithVat,
+		SaleStartDate:       saleStartDate,
+		SaleEndDate:         saleEndDate,
 		StocksIn:            enums.MustParseStocksInToEnum(r.FormValue("stocks_in")),
 		Stocks:              qty,
 	}

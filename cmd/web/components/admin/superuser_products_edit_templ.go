@@ -502,7 +502,46 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</textarea></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Image</h2>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</textarea></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Sale Settings</h2><p class=\"text-sm text-gray-500 mb-4\">Optional. Set a temporary sale price for this product.</p><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><div><label for=\"sale_price\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sale Price (with VAT)</label><div class=\"relative\"><span class=\"absolute left-3 top-1/2 -translate-y-1/2 text-gray-500\">₱</span> <input type=\"number\" id=\"sale_price\" name=\"sale_price\" min=\"0\" step=\"0.01\" max=\"999999999.99\" placeholder=\"Leave empty if no sale\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var29 string
+		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(formData.SalePrice)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 369, Col: 38}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></div><div><label for=\"sale_start_date\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sale Start Date</label> <input type=\"date\" id=\"sale_start_date\" name=\"sale_start_date\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var30 string
+		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(formData.SaleStartDate)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 382, Col: 41}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"sale_end_date\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sale End Date</label> <input type=\"date\" id=\"sale_end_date\" name=\"sale_end_date\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var31 string
+		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(formData.SaleEndDate)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 394, Col: 39}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Image</h2>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -519,20 +558,20 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</div><div class=\"flex justify-end gap-4 pt-4 border-t\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</div><div class=\"flex justify-end gap-4 pt-4 border-t\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var29 templ.SafeURL
-		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/products"))
+		var templ_7745c5c3_Var32 templ.SafeURL
+		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/superuser/products"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 366, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_products_edit.templ`, Line: 415, Col: 54}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" id=\"submit-btn\" class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice disabled:opacity-50 disabled:cursor-not-allowed\" _=\"on click call metrics_event('admin_exec', 'update product')\"><span id=\"submit-btn-content\" class=\"flex items-center gap-2\"><span class=\"submit-btn-text\">Update Product</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" id=\"submit-btn\" class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice disabled:opacity-50 disabled:cursor-not-allowed\" _=\"on click call metrics_event('admin_exec', 'update product')\"><span id=\"submit-btn-content\" class=\"flex items-center gap-2\"><span class=\"submit-btn-text\">Update Product</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -540,7 +579,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</span></button></div></form></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</span></button></div></form></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -548,7 +587,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
