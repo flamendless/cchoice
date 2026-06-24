@@ -11,6 +11,199 @@ import (
 	"time"
 )
 
+const adminCountProductsForExport = `-- name: AdminCountProductsForExport :one
+;
+
+SELECT COUNT(*) AS count
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE
+	(?1 IS NULL OR ?1 = '' OR LOWER(tbl_brands.name) = LOWER(?1))
+	AND (?2 IS NULL OR ?2 = '' OR tbl_products.status = ?2)
+`
+
+type AdminCountProductsForExportParams struct {
+	SearchBrand interface{}
+	Status      interface{}
+}
+
+func (q *Queries) AdminCountProductsForExport(ctx context.Context, arg AdminCountProductsForExportParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, adminCountProductsForExport, arg.SearchBrand, arg.Status)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const adminGetProductsForExport = `-- name: AdminGetProductsForExport :many
+;
+
+SELECT
+	tbl_products.id,
+	tbl_products.name,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.description,
+	tbl_brands.name AS brand_name,
+	tbl_products.status,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_products.created_at,
+	tbl_products.updated_at,
+	COALESCE(tbl_product_images.path, '') AS image_path,
+	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail,
+	COALESCE(tbl_product_specs.colours, '') AS colours,
+	COALESCE(tbl_product_specs.sizes, '') AS sizes,
+	COALESCE(tbl_product_specs.segmentation, '') AS segmentation,
+	COALESCE(tbl_product_specs.part_number, '') AS part_number,
+	COALESCE(tbl_product_specs.power, '') AS power,
+	COALESCE(tbl_product_specs.capacity, '') AS capacity,
+	COALESCE(tbl_product_specs.scope_of_supply, '') AS scope_of_supply,
+	COALESCE(tbl_product_specs.weight, 0) AS weight,
+	COALESCE(tbl_product_specs.weight_unit, '') AS weight_unit,
+	COALESCE(categories.category, '') AS category,
+	COALESCE(categories.subcategory, '') AS subcategory,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	tbl_product_sales.starts_at AS sale_starts_at,
+	tbl_product_sales.ends_at AS sale_ends_at,
+	tbl_product_inventories.stocks_in,
+	tbl_product_inventories.stocks
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.id = (
+	SELECT tpi.id
+	FROM tbl_product_images tpi
+	WHERE tpi.product_id = tbl_products.id
+	ORDER BY tpi.updated_at DESC
+	LIMIT 1
+)
+LEFT JOIN tbl_product_specs ON tbl_product_specs.id = tbl_products.product_specs_id
+LEFT JOIN (
+	SELECT
+		tbl_products_categories.product_id,
+		GROUP_CONCAT(tbl_product_categories.category, ', ') AS category,
+		GROUP_CONCAT(tbl_product_categories.subcategory, ', ') AS subcategory
+	FROM tbl_products_categories
+	INNER JOIN tbl_product_categories ON tbl_product_categories.id = tbl_products_categories.category_id
+	GROUP BY tbl_products_categories.product_id
+) AS categories ON categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales ON tbl_product_sales.id = (
+	SELECT tps.id
+	FROM tbl_product_sales tps
+	WHERE tps.product_id = tbl_products.id
+		AND tps.is_active = 1
+	ORDER BY tps.updated_at DESC
+	LIMIT 1
+)
+LEFT JOIN tbl_product_inventories ON tbl_product_inventories.id = (
+	SELECT tpi.id
+	FROM tbl_product_inventories tpi
+	WHERE tpi.product_id = tbl_products.id
+	LIMIT 1
+)
+WHERE
+	(?1 IS NULL OR ?1 = '' OR LOWER(tbl_brands.name) = LOWER(?1))
+	AND (?2 IS NULL OR ?2 = '' OR tbl_products.status = ?2)
+`
+
+type AdminGetProductsForExportParams struct {
+	SearchBrand interface{}
+	Status      interface{}
+}
+
+type AdminGetProductsForExportRow struct {
+	ID                       int64
+	Name                     string
+	Serial                   string
+	Slug                     sql.NullString
+	Description              sql.NullString
+	BrandName                string
+	Status                   string
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	CreatedAt                time.Time
+	UpdatedAt                time.Time
+	ImagePath                string
+	ThumbnailPath            string
+	CdnUrl                   sql.NullString
+	CdnUrlThumbnail          sql.NullString
+	Colours                  string
+	Sizes                    string
+	Segmentation             string
+	PartNumber               string
+	Power                    string
+	Capacity                 string
+	ScopeOfSupply            string
+	Weight                   float64
+	WeightUnit               string
+	Category                 string
+	Subcategory              string
+	SalePriceWithVat         sql.NullInt64
+	SalePriceWithVatCurrency sql.NullString
+	SaleStartsAt             sql.NullTime
+	SaleEndsAt               sql.NullTime
+	StocksIn                 sql.NullString
+	Stocks                   sql.NullInt64
+}
+
+func (q *Queries) AdminGetProductsForExport(ctx context.Context, arg AdminGetProductsForExportParams) ([]AdminGetProductsForExportRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetProductsForExport, arg.SearchBrand, arg.Status)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetProductsForExportRow
+	for rows.Next() {
+		var i AdminGetProductsForExportRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Serial,
+			&i.Slug,
+			&i.Description,
+			&i.BrandName,
+			&i.Status,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ImagePath,
+			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
+			&i.Colours,
+			&i.Sizes,
+			&i.Segmentation,
+			&i.PartNumber,
+			&i.Power,
+			&i.Capacity,
+			&i.ScopeOfSupply,
+			&i.Weight,
+			&i.WeightUnit,
+			&i.Category,
+			&i.Subcategory,
+			&i.SalePriceWithVat,
+			&i.SalePriceWithVatCurrency,
+			&i.SaleStartsAt,
+			&i.SaleEndsAt,
+			&i.StocksIn,
+			&i.Stocks,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const adminGetProductsForListing = `-- name: AdminGetProductsForListing :many
 SELECT
 	tbl_products.id,

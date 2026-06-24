@@ -213,6 +213,87 @@ ORDER BY
 	tbl_products.updated_at DESC
 ;
 
+-- name: AdminGetProductsForExport :many
+SELECT
+	tbl_products.id,
+	tbl_products.name,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.description,
+	tbl_brands.name AS brand_name,
+	tbl_products.status,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_products.created_at,
+	tbl_products.updated_at,
+	COALESCE(tbl_product_images.path, '') AS image_path,
+	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail,
+	COALESCE(tbl_product_specs.colours, '') AS colours,
+	COALESCE(tbl_product_specs.sizes, '') AS sizes,
+	COALESCE(tbl_product_specs.segmentation, '') AS segmentation,
+	COALESCE(tbl_product_specs.part_number, '') AS part_number,
+	COALESCE(tbl_product_specs.power, '') AS power,
+	COALESCE(tbl_product_specs.capacity, '') AS capacity,
+	COALESCE(tbl_product_specs.scope_of_supply, '') AS scope_of_supply,
+	COALESCE(tbl_product_specs.weight, 0) AS weight,
+	COALESCE(tbl_product_specs.weight_unit, '') AS weight_unit,
+	COALESCE(categories.category, '') AS category,
+	COALESCE(categories.subcategory, '') AS subcategory,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	tbl_product_sales.starts_at AS sale_starts_at,
+	tbl_product_sales.ends_at AS sale_ends_at,
+	tbl_product_inventories.stocks_in,
+	tbl_product_inventories.stocks
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.id = (
+	SELECT tpi.id
+	FROM tbl_product_images tpi
+	WHERE tpi.product_id = tbl_products.id
+	ORDER BY tpi.updated_at DESC
+	LIMIT 1
+)
+LEFT JOIN tbl_product_specs ON tbl_product_specs.id = tbl_products.product_specs_id
+LEFT JOIN (
+	SELECT
+		tbl_products_categories.product_id,
+		GROUP_CONCAT(tbl_product_categories.category, ', ') AS category,
+		GROUP_CONCAT(tbl_product_categories.subcategory, ', ') AS subcategory
+	FROM tbl_products_categories
+	INNER JOIN tbl_product_categories ON tbl_product_categories.id = tbl_products_categories.category_id
+	GROUP BY tbl_products_categories.product_id
+) AS categories ON categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales ON tbl_product_sales.id = (
+	SELECT tps.id
+	FROM tbl_product_sales tps
+	WHERE tps.product_id = tbl_products.id
+		AND tps.is_active = 1
+	ORDER BY tps.updated_at DESC
+	LIMIT 1
+)
+LEFT JOIN tbl_product_inventories ON tbl_product_inventories.id = (
+	SELECT tpi.id
+	FROM tbl_product_inventories tpi
+	WHERE tpi.product_id = tbl_products.id
+	LIMIT 1
+)
+WHERE
+	(@search_brand IS NULL OR @search_brand = '' OR LOWER(tbl_brands.name) = LOWER(@search_brand))
+	AND (@status IS NULL OR @status = '' OR tbl_products.status = @status)
+;
+
+-- name: AdminCountProductsForExport :one
+SELECT COUNT(*) AS count
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE
+	(@search_brand IS NULL OR @search_brand = '' OR LOWER(tbl_brands.name) = LOWER(@search_brand))
+	AND (@status IS NULL OR @status = '' OR tbl_products.status = @status)
+;
+
 
 --TODO: (Brandon) if sqlc releases PR #3498
 --      replace WHERE with `tbl_products_fts MATCH ?`

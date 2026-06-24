@@ -270,6 +270,124 @@ func (s *ProductService) GetForListingAdmin(
 	return productList, nil
 }
 
+func (s *ProductService) GetForExportAdmin(
+	ctx context.Context,
+	brand string,
+	status enums.ProductStatus,
+	sortColumn enums.ProductExportSortColumn,
+	sortDirection enums.ProductExportSortDirection,
+) ([]ProductExportRow, error) {
+	products, err := s.dbRO.GetQueries().AdminGetProductsForExport(ctx, queries.AdminGetProductsForExportParams{
+		SearchBrand: sql.NullString{String: brand, Valid: brand != ""},
+		Status:      sql.NullString{String: status.String(), Valid: status != enums.PRODUCT_STATUS_UNDEFINED},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	rows := make([]ProductExportRow, 0, len(products))
+	for _, p := range products {
+		imageURL := p.CdnUrl.String
+		if imageURL == "" && p.ImagePath != "" {
+			imageURL = s.getCDNURL(p.ImagePath)
+		}
+		if imageURL == "" {
+			imageURL = p.ImagePath
+		}
+
+		thumbnailURL := p.CdnUrlThumbnail.String
+		if thumbnailURL == "" && p.ThumbnailPath != "" {
+			thumbnailURL = s.getCDNURL(constants.ToPath1280(p.ThumbnailPath))
+		}
+		if thumbnailURL == "" {
+			thumbnailURL = p.ThumbnailPath
+		}
+
+		unitPrice := utils.NewMoney(p.UnitPriceWithVat, p.UnitPriceWithVatCurrency).Display()
+
+		salePrice := ""
+		if p.SalePriceWithVat.Valid {
+			currency := p.SalePriceWithVatCurrency.String
+			if currency == "" {
+				currency = p.UnitPriceWithVatCurrency
+			}
+			salePrice = utils.NewMoney(p.SalePriceWithVat.Int64, currency).Display()
+		}
+
+		saleStartDate := ""
+		if p.SaleStartsAt.Valid {
+			saleStartDate = p.SaleStartsAt.Time.Format(constants.DateTimeLayoutISO)
+		}
+		saleEndDate := ""
+		if p.SaleEndsAt.Valid {
+			saleEndDate = p.SaleEndsAt.Time.Format(constants.DateTimeLayoutISO)
+		}
+
+		stocksIn := ""
+		stocksQty := ""
+		if p.StocksIn.Valid {
+			stocksIn = p.StocksIn.String
+		}
+		if p.Stocks.Valid {
+			stocksQty = strconv.FormatInt(p.Stocks.Int64, 10)
+		}
+
+		weightStr := ""
+		if p.Weight != 0 {
+			weightStr = strconv.FormatFloat(p.Weight, 'f', -1, 64)
+		}
+
+		rows = append(rows, ProductExportRow{
+			Brand:              p.BrandName,
+			Serial:             p.Serial,
+			Slug:               p.Slug.String,
+			Status:             p.Status,
+			Category:           p.Category,
+			Subcategory:        p.Subcategory,
+			Name:               p.Name,
+			UnitPriceWithVat:   unitPrice,
+			SalePriceWithVat:   salePrice,
+			SaleStartDate:      saleStartDate,
+			SaleEndDate:        saleEndDate,
+			Description:        p.Description.String,
+			Colours:            p.Colours,
+			Sizes:              p.Sizes,
+			Segmentation:       p.Segmentation,
+			PartNumber:         p.PartNumber,
+			Power:              p.Power,
+			Capacity:           p.Capacity,
+			Weight:             weightStr,
+			WeightUnit:         p.WeightUnit,
+			ScopeOfSupply:      p.ScopeOfSupply,
+			StocksIn:           stocksIn,
+			StocksQty:          stocksQty,
+			ImageURL:     imageURL,
+			ThumbnailURL: thumbnailURL,
+			CreatedAt:    p.CreatedAt.Format(constants.DateTimeLayoutISO),
+			UpdatedAt:    p.UpdatedAt.Format(constants.DateTimeLayoutISO),
+		})
+	}
+
+	sortProductExportRows(rows, sortColumn, sortDirection)
+
+	return rows, nil
+}
+
+func (s *ProductService) CountForExportAdmin(
+	ctx context.Context,
+	brand string,
+	status enums.ProductStatus,
+) (int64, error) {
+	count, err := s.dbRO.GetQueries().AdminCountProductsForExport(ctx, queries.AdminCountProductsForExportParams{
+		SearchBrand: sql.NullString{String: brand, Valid: brand != ""},
+		Status:      sql.NullString{String: status.String(), Valid: status != enums.PRODUCT_STATUS_UNDEFINED},
+	})
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 func (s *ProductService) GetByIDForEdit(ctx context.Context, productID string) (*ProductForEdit, error) {
 	decodedProductID := s.encoder.Decode(productID)
 	if decodedProductID == encode.INVALID {
