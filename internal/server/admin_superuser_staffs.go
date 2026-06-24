@@ -243,6 +243,7 @@ func (s *Server) adminSuperuserStaffsCreatePostHandler(w http.ResponseWriter, r 
 		TimeOutSchedule: r.FormValue("time_out_schedule"),
 		Password:        password,
 		RequireInShop:   r.FormValue("require_in_shop") == "true",
+		Status:          enums.ParseStaffStatusToEnum(r.FormValue("status")),
 	})
 	if err != nil {
 		result = err.Error()

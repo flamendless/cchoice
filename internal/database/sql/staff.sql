@@ -321,11 +321,15 @@ INSERT INTO tbl_staffs (
     mobile_no,
     password,
     require_in_shop,
+    status,
+    resigned_at,
     created_at,
     updated_at,
     deleted_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), '1970-01-01 00:00:00+00:00'
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, sqlc.arg('status'),
+    CASE WHEN sqlc.arg('status') = 'RESIGNED' THEN datetime('now') ELSE NULL END,
+    datetime('now'), datetime('now'), '1970-01-01 00:00:00+00:00'
 ) RETURNING id;
 
 -- name: CreateStaffAttendance :one
