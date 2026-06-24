@@ -143,32 +143,15 @@ func (s *ProductService) Create(
 	}
 
 	if input.SalePriceWithVat > 0 {
-		startsAt, startErr := time.Parse(constants.DateLayoutISO, input.SaleStartDate)
-		if startErr != nil {
-			return nil, fmt.Errorf("invalid sale start date: %w", startErr)
-		}
-		endsAt, endErr := time.Parse(constants.DateLayoutISO, input.SaleEndDate)
-		if endErr != nil {
-			return nil, fmt.Errorf("invalid sale end date: %w", endErr)
-		}
-
-		discountValue := input.UnitPriceWithVat*100 - input.SalePriceWithVat*100
-		if discountValue < 0 {
-			discountValue = 0
-		}
-
-		if _, err = s.dbRW.GetQueries().CreateProductSale(ctx, queries.CreateProductSaleParams{
-			ProductID:                   product.ID,
-			SalePriceWithoutVat:         input.SalePriceWithoutVat * 100,
-			SalePriceWithVat:            input.SalePriceWithVat * 100,
-			SalePriceWithoutVatCurrency: constants.PHP,
-			SalePriceWithVatCurrency:    constants.PHP,
-			DiscountType:                "fixed",
-			DiscountValue:               discountValue,
-			StartsAt:                    startsAt,
-			EndsAt:                      endsAt,
-			IsActive:                    true,
-		}); err != nil {
+		if err := s.syncProductSale(
+			ctx,
+			product.ID,
+			input.UnitPriceWithVat,
+			input.SalePriceWithoutVat,
+			input.SalePriceWithVat,
+			input.SaleStartDate,
+			input.SaleEndDate,
+		); err != nil {
 			return nil, err
 		}
 	}
@@ -303,6 +286,16 @@ func (s *ProductService) GetByIDForEdit(ctx context.Context, productID string) (
 		return nil, cmp.Or(err, errs.ErrDBNil)
 	}
 
+	var salePriceWithVat int64
+	var saleStartDate, saleEndDate string
+	if sale, saleErr := s.dbRO.GetQueries().GetActiveSaleByProductID(ctx, decodedProductID); saleErr == nil {
+		salePriceWithVat = sale.SalePriceWithVat
+		saleStartDate = sale.StartsAt.Format(constants.DateLayoutISO)
+		saleEndDate = sale.EndsAt.Format(constants.DateLayoutISO)
+	} else if saleErr != sql.ErrNoRows {
+		return nil, saleErr
+	}
+
 	return &ProductForEdit{
 		ID:                          product.ID,
 		Serial:                      product.Serial,
@@ -318,6 +311,9 @@ func (s *ProductService) GetByIDForEdit(ctx context.Context, productID string) (
 		UnitPriceWithoutVatCurrency: product.UnitPriceWithoutVatCurrency,
 		UnitPriceWithVat:            product.UnitPriceWithVat,
 		UnitPriceWithVatCurrency:    product.UnitPriceWithVatCurrency,
+		SalePriceWithVat:            salePriceWithVat,
+		SaleStartDate:               saleStartDate,
+		SaleEndDate:                 saleEndDate,
 		Specs: ProductSpecsInput{
 			Colours:       product.Colours.String,
 			Sizes:         product.Sizes.String,
@@ -447,6 +443,88 @@ func (s *ProductService) Update(ctx context.Context, staffID string, input Updat
 				return err
 			}
 		}
+	}
+
+	if err := s.syncProductSale(
+		ctx,
+		productID,
+		input.UnitPriceWithVat,
+		input.SalePriceWithoutVat,
+		input.SalePriceWithVat,
+		input.SaleStartDate,
+		input.SaleEndDate,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func productSaleDiscountValue(unitPriceWithVatPesos, salePriceWithVatPesos int64) int64 {
+	discountValue := unitPriceWithVatPesos*100 - salePriceWithVatPesos*100
+	if discountValue < 0 {
+		return 0
+	}
+	return discountValue
+}
+
+func (s *ProductService) syncProductSale(
+	ctx context.Context,
+	productID int64,
+	unitPriceWithVat int64,
+	salePriceWithoutVat int64,
+	salePriceWithVat int64,
+	saleStartDate string,
+	saleEndDate string,
+) error {
+	existingSale, err := s.dbRO.GetQueries().GetActiveSaleByProductID(ctx, productID)
+	hasActiveSale := err == nil
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+
+	if salePriceWithVat > 0 {
+		startsAt, startErr := time.Parse(constants.DateLayoutISO, saleStartDate)
+		if startErr != nil {
+			return fmt.Errorf("invalid sale start date: %w", startErr)
+		}
+		endsAt, endErr := time.Parse(constants.DateLayoutISO, saleEndDate)
+		if endErr != nil {
+			return fmt.Errorf("invalid sale end date: %w", endErr)
+		}
+
+		discountValue := productSaleDiscountValue(unitPriceWithVat, salePriceWithVat)
+		if hasActiveSale {
+			return s.dbRW.GetQueries().UpdateProductSale(ctx, queries.UpdateProductSaleParams{
+				SalePriceWithoutVat:         salePriceWithoutVat * 100,
+				SalePriceWithVat:            salePriceWithVat * 100,
+				SalePriceWithoutVatCurrency: constants.PHP,
+				SalePriceWithVatCurrency:    constants.PHP,
+				DiscountType:                "fixed",
+				DiscountValue:               discountValue,
+				StartsAt:                    startsAt,
+				EndsAt:                      endsAt,
+				ID:                          existingSale.ID,
+			})
+		}
+
+		_, err := s.dbRW.GetQueries().CreateProductSale(ctx, queries.CreateProductSaleParams{
+			ProductID:                   productID,
+			SalePriceWithoutVat:         salePriceWithoutVat * 100,
+			SalePriceWithVat:            salePriceWithVat * 100,
+			SalePriceWithoutVatCurrency: constants.PHP,
+			SalePriceWithVatCurrency:    constants.PHP,
+			DiscountType:                "fixed",
+			DiscountValue:               discountValue,
+			StartsAt:                    startsAt,
+			EndsAt:                      endsAt,
+			IsActive:                    true,
+		})
+		return err
+	}
+
+	if hasActiveSale {
+		return s.dbRW.GetQueries().DeactivateProductSalesByProductID(ctx, productID)
 	}
 
 	return nil

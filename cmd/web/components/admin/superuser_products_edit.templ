@@ -349,6 +349,55 @@ templ AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) {
 								</div>
 							</div>
 							<div class="border-t pt-6">
+								<h2 class="text-lg font-semibold text-gray-800 mb-4">Sale Settings</h2>
+								<p class="text-sm text-gray-500 mb-4">Optional. Set a temporary sale price for this product.</p>
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+									<div>
+										<label for="sale_price" class="block text-sm font-medium text-gray-700 mb-1">
+											Sale Price (with VAT)
+										</label>
+										<div class="relative">
+											<span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₱</span>
+											<input
+												type="number"
+												id="sale_price"
+												name="sale_price"
+												min="0"
+												step="0.01"
+												max="999999999.99"
+												placeholder="Leave empty if no sale"
+												value={ formData.SalePrice }
+												class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+											/>
+										</div>
+									</div>
+									<div>
+										<label for="sale_start_date" class="block text-sm font-medium text-gray-700 mb-1">
+											Sale Start Date
+										</label>
+										<input
+											type="date"
+											id="sale_start_date"
+											name="sale_start_date"
+											value={ formData.SaleStartDate }
+											class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+										/>
+									</div>
+									<div>
+										<label for="sale_end_date" class="block text-sm font-medium text-gray-700 mb-1">
+											Sale End Date
+										</label>
+										<input
+											type="date"
+											id="sale_end_date"
+											name="sale_end_date"
+											value={ formData.SaleEndDate }
+											class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+										/>
+									</div>
+								</div>
+							</div>
+							<div class="border-t pt-6">
 								<h2 class="text-lg font-semibold text-gray-800 mb-4">Product Image</h2>
 								@ImageUploadField(ImageUploadParams{
 									Name:         "product_image",

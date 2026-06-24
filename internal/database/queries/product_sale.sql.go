@@ -79,6 +79,19 @@ func (q *Queries) CreateProductSale(ctx context.Context, arg CreateProductSalePa
 	return i, err
 }
 
+const deactivateProductSalesByProductID = `-- name: DeactivateProductSalesByProductID :exec
+UPDATE tbl_product_sales
+SET
+	is_active = 0,
+	updated_at = datetime('now')
+WHERE product_id = ? AND is_active = 1
+`
+
+func (q *Queries) DeactivateProductSalesByProductID(ctx context.Context, productID int64) error {
+	_, err := q.db.ExecContext(ctx, deactivateProductSalesByProductID, productID)
+	return err
+}
+
 const getActiveSaleByProductID = `-- name: GetActiveSaleByProductID :one
 SELECT id, product_id, sale_price_without_vat, sale_price_with_vat, sale_price_without_vat_currency, sale_price_with_vat_currency, discount_type, discount_value, starts_at, ends_at, is_active, created_at, updated_at, deleted_at
 FROM tbl_product_sales
@@ -106,4 +119,47 @@ func (q *Queries) GetActiveSaleByProductID(ctx context.Context, productID int64)
 		&i.DeletedAt,
 	)
 	return i, err
+}
+
+const updateProductSale = `-- name: UpdateProductSale :exec
+UPDATE tbl_product_sales
+SET
+	sale_price_without_vat = ?,
+	sale_price_with_vat = ?,
+	sale_price_without_vat_currency = ?,
+	sale_price_with_vat_currency = ?,
+	discount_type = ?,
+	discount_value = ?,
+	starts_at = ?,
+	ends_at = ?,
+	is_active = 1,
+	updated_at = datetime('now')
+WHERE id = ?
+`
+
+type UpdateProductSaleParams struct {
+	SalePriceWithoutVat         int64
+	SalePriceWithVat            int64
+	SalePriceWithoutVatCurrency string
+	SalePriceWithVatCurrency    string
+	DiscountType                string
+	DiscountValue               int64
+	StartsAt                    time.Time
+	EndsAt                      time.Time
+	ID                          int64
+}
+
+func (q *Queries) UpdateProductSale(ctx context.Context, arg UpdateProductSaleParams) error {
+	_, err := q.db.ExecContext(ctx, updateProductSale,
+		arg.SalePriceWithoutVat,
+		arg.SalePriceWithVat,
+		arg.SalePriceWithoutVatCurrency,
+		arg.SalePriceWithVatCurrency,
+		arg.DiscountType,
+		arg.DiscountValue,
+		arg.StartsAt,
+		arg.EndsAt,
+		arg.ID,
+	)
+	return err
 }

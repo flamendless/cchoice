@@ -317,6 +317,9 @@ type AdminProductEditForm struct {
 	Categories     []AdminCategory
 	StocksIn       enums.StocksIn
 	Stocks         string
+	SalePrice      string
+	SaleStartDate  string
+	SaleEndDate    string
 }
 
 type StaffTimeOff struct {

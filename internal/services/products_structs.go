@@ -35,6 +35,10 @@ type UpdateProductInput struct {
 	ImagePath             string
 	UnitPriceWithoutVat   int64
 	UnitPriceWithVat      int64
+	SalePriceWithoutVat   int64
+	SalePriceWithVat      int64
+	SaleStartDate         string
+	SaleEndDate           string
 	StocksIn              enums.StocksIn
 	Stocks                int64
 }
@@ -53,6 +57,9 @@ type ProductForEdit struct {
 	UnitPriceWithoutVatCurrency string
 	UnitPriceWithVat            int64
 	UnitPriceWithVatCurrency    string
+	SalePriceWithVat            int64
+	SaleStartDate               string
+	SaleEndDate                 string
 	Specs                       ProductSpecsInput
 	StocksIn                    enums.StocksIn
 	Stocks                      int64
