@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 
 	compadmin "cchoice/cmd/web/components/admin"
@@ -228,7 +229,7 @@ func (s *Server) adminSuperuserStaffsCreatePostHandler(w http.ResponseWriter, r 
 		}
 	}()
 
-	_, err := s.services.staff.Create(ctx, services.CreateStaffParams{
+	createdStaffID, err := s.services.staff.Create(ctx, services.CreateStaffParams{
 		FirstName:       r.FormValue("first_name"),
 		MiddleName:      r.FormValue("middle_name"),
 		LastName:        r.FormValue("last_name"),
@@ -265,6 +266,7 @@ func (s *Server) adminSuperuserStaffsCreatePostHandler(w http.ResponseWriter, r 
 		return
 	}
 
+	result = fmt.Sprintf("success. ID '%s'", createdStaffID)
 	redirectHX(w, r, utils.URLWithSuccess("/admin/superuser/staffs", "Employee created successfully"))
 }
 
@@ -358,5 +360,6 @@ func (s *Server) adminSuperuserStaffsUpdateHandler(w http.ResponseWriter, r *htt
 		return
 	}
 
+	result = fmt.Sprintf("success. ID '%s'", staffID)
 	redirectHX(w, r, utils.URLWithSuccess(page, "Employee updated successfully"))
 }
