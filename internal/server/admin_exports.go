@@ -134,7 +134,7 @@ func (s *Server) adminExportsProductsHandler(w http.ResponseWriter, r *http.Requ
 
 	var buf bytes.Buffer
 	writer := csv.NewWriter(&buf)
-	if err := s.services.export.StreamProductsCSV(ctx, writer, brand, status, sortColumn, sortDirection, adminStaffID); err != nil {
+	if err := s.services.export.StreamProductsCSV(ctx, writer, brand, status, sortColumn, sortDirection, adminStaffID, reportName); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		writeExportError(w, http.StatusInternalServerError, err.Error())
 		return
