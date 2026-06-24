@@ -119,6 +119,10 @@ func (s *StaffService) Create(ctx context.Context, params CreateStaffParams) (st
 		return "", errs.ErrInvalidInput
 	}
 
+	if !params.Status.IsValid() {
+		return "", errs.ErrInvalidInput
+	}
+
 	if !constants.ReEmail.MatchString(params.Email) {
 		return "", errs.ErrInvalidFormat
 	}
@@ -170,6 +174,7 @@ func (s *StaffService) Create(ctx context.Context, params CreateStaffParams) (st
 		MobileNo:        mobileNo,
 		Password:        string(hash),
 		RequireInShop:   params.RequireInShop,
+		Status:          params.Status.String(),
 	})
 	if err != nil {
 		return "", err

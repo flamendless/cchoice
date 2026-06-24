@@ -68,11 +68,15 @@ INSERT INTO tbl_staffs (
     mobile_no,
     password,
     require_in_shop,
+    status,
+    resigned_at,
     created_at,
     updated_at,
     deleted_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), '1970-01-01 00:00:00+00:00'
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?15,
+    CASE WHEN ?15 = 'RESIGNED' THEN datetime('now') ELSE NULL END,
+    datetime('now'), datetime('now'), '1970-01-01 00:00:00+00:00'
 ) RETURNING id
 `
 
@@ -91,6 +95,7 @@ type CreateStaffParams struct {
 	MobileNo        string
 	Password        string
 	RequireInShop   bool
+	Status          string
 }
 
 func (q *Queries) CreateStaff(ctx context.Context, arg CreateStaffParams) (int64, error) {
@@ -109,6 +114,7 @@ func (q *Queries) CreateStaff(ctx context.Context, arg CreateStaffParams) (int64
 		arg.MobileNo,
 		arg.Password,
 		arg.RequireInShop,
+		arg.Status,
 	)
 	var id int64
 	err := row.Scan(&id)

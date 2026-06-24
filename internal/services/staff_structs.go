@@ -91,6 +91,7 @@ type CreateStaffParams struct {
 	TimeOutSchedule string
 	Password        string
 	RequireInShop   bool
+	Status          enums.StaffStatus
 }
 
 type UpdateEmploymentParams struct {
