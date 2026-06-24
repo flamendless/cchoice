@@ -72,3 +72,33 @@ type AdminSubcategoryRow struct {
 	Subcategory string
 	Promoted    bool
 }
+
+type AdminOrderListItem struct {
+	ID             string
+	OrderReference string
+	Status         enums.OrderStatus
+	IsPaid         bool
+	CreatedAt      string
+	UpdatedAt      string
+}
+
+type AdminOrderLineItem struct {
+	Name        string
+	Serial      string
+	Description string
+	UnitPrice   string
+	Quantity    int64
+	TotalPrice  string
+}
+
+type AdminOrderCustomerInfo struct {
+	Name    string
+	Email   string
+	Phone   string
+	Address string
+}
+
+type AdminOrderDetails struct {
+	Customer AdminOrderCustomerInfo
+	Lines    []AdminOrderLineItem
+}

@@ -129,3 +129,37 @@ SELECT * FROM tbl_order_lines
 WHERE id = ?
 LIMIT 1;
 
+-- name: AdminGetOrdersForListing :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	updated_at
+FROM tbl_orders
+WHERE
+	(sqlc.narg('search_order_ref') IS NULL OR sqlc.narg('search_order_ref') = '' OR LOWER(order_number) LIKE '%' || LOWER(sqlc.narg('search_order_ref')) || '%')
+ORDER BY updated_at DESC;
+
+-- name: AdminGetOrderDetailsByID :one
+SELECT
+	id,
+	order_number,
+	status,
+	customer_name,
+	customer_email,
+	customer_phone,
+	shipping_address_line1,
+	shipping_address_line2,
+	shipping_city,
+	shipping_state,
+	shipping_postal_code,
+	shipping_country,
+	paid_at,
+	created_at,
+	updated_at
+FROM tbl_orders
+WHERE id = ?
+LIMIT 1;
+

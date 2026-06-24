@@ -1,0 +1,229 @@
+package components
+
+import (
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/enums"
+	"cchoice/internal/utils"
+	"fmt"
+)
+
+templ AdminOrdersListPage() {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("Orders - C-Choice Admin")
+		</head>
+		<body
+			class="bg-cchoicesoft min-h-screen flex flex-col"
+			_="init call metrics_event('admin_visit', 'orders list')"
+		>
+			@common.DevRibbon()
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-8xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.AdminStaffHeaderWithBack()
+						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+							Manage Orders
+						</h1>
+						@OrdersListSection()
+					</div>
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+templ OrdersListSection() {
+	<div
+		class="bg-white rounded-lg shadow-md p-6"
+		hx-get={ utils.URL("/admin/orders/table") }
+		hx-trigger="load"
+		hx-target="#orders-table"
+		hx-swap="innerHTML"
+	>
+		@OrdersSearchToolbar(utils.URL("/admin/orders/table"))
+		<div id="orders-table"></div>
+	</div>
+}
+
+templ OrdersSearchToolbar(url string) {
+	<div class="flex flex-col sm:flex-row sm:flex-wrap justify-between items-start sm:items-center gap-4 mb-4">
+		<div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+			<input
+				type="text"
+				name="search_order_ref"
+				placeholder="Search by order reference..."
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				hx-get={ url }
+				hx-trigger="change, search_order_ref delay:300ms"
+				hx-target="#orders-table"
+				hx-include="[name='search_order_ref'],[name='sort_by'],[name='sort_dir']"
+			/>
+			<select
+				name="sort_by"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				hx-get={ url }
+				hx-trigger="change"
+				hx-target="#orders-table"
+				hx-include="[name='search_order_ref'],[name='sort_by'],[name='sort_dir']"
+			>
+				<option value="UPDATED_AT">Sort By: Updated At</option>
+				<option value="CREATED_AT">Sort By: Created At</option>
+				<option value="STATUS">Sort By: Status</option>
+			</select>
+			<select
+				name="sort_dir"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				hx-get={ url }
+				hx-trigger="change"
+				hx-target="#orders-table"
+				hx-include="[name='search_order_ref'],[name='sort_by'],[name='sort_dir']"
+			>
+				<option value="DESC">Sort: Descending</option>
+				<option value="ASC">Sort: Ascending</option>
+			</select>
+		</div>
+	</div>
+}
+
+templ AdminOrdersListTable(orders []models.AdminOrderListItem) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-50">
+				<tr>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[5%]"></th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">ID</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">Order Reference</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">Status</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">Is Paid</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%]">Created At</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%]">Updated At</th>
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				if len(orders) == 0 {
+					<tr>
+						<td colspan="7" class="px-6 py-4 text-center text-gray-500">
+							No orders found.
+						</td>
+					</tr>
+				} else {
+					for _, order := range orders {
+						@OrderTableRow(order)
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ OrderTableRow(order models.AdminOrderListItem) {
+	<tr id={ "order-row-" + order.ID }>
+		<td class="px-4 py-4 whitespace-nowrap text-sm">
+			<button
+				type="button"
+				class="px-2 py-1 text-cchoice hover:bg-cchoicesoft rounded"
+				hx-get={ utils.URLf("/admin/orders/%s/details", order.ID) }
+				hx-target={ "#order-details-cell-" + order.ID }
+				hx-swap="innerHTML"
+				_={ "on click toggle .hidden on #order-details-" + order.ID }
+			>
+				+
+			</button>
+		</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ order.ID }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ order.OrderReference }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm">
+			@OrderStatus(order.Status)
+		</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+			@OrderIsPaid(order.IsPaid)
+		</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ order.CreatedAt }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ order.UpdatedAt }</td>
+	</tr>
+	<tr id={ "order-details-" + order.ID } class="hidden">
+		<td id={ "order-details-cell-" + order.ID } colspan="7" class="px-6 py-2"></td>
+	</tr>
+}
+
+templ OrderStatus(status enums.OrderStatus) {
+	switch status {
+		case enums.ORDER_STATUS_PENDING:
+			<span class="text-yellow-600 font-medium">{ status.String() }</span>
+		case enums.ORDER_STATUS_CONFIRMED:
+			<span class="text-blue-600 font-medium">{ status.String() }</span>
+		case enums.ORDER_STATUS_PROCESSING:
+			<span class="text-indigo-600 font-medium">{ status.String() }</span>
+		case enums.ORDER_STATUS_SHIPPED:
+			<span class="text-purple-600 font-medium">{ status.String() }</span>
+		case enums.ORDER_STATUS_DELIVERED:
+			<span class="text-green-600 font-medium">{ status.String() }</span>
+		case enums.ORDER_STATUS_CANCELLED:
+			<span class="text-red-600 font-medium">{ status.String() }</span>
+		case enums.ORDER_STATUS_REFUNDED:
+			<span class="text-gray-600 font-medium">{ status.String() }</span>
+		default:
+			<span class="text-gray-900">{ status.String() }</span>
+	}
+}
+
+templ OrderIsPaid(isPaid bool) {
+	if isPaid {
+		<span class="text-green-600 font-medium">Yes</span>
+	} else {
+		<span class="text-red-600 font-medium">No</span>
+	}
+}
+
+templ OrderDetailsRows(details models.AdminOrderDetails) {
+	<div class="pl-8 pr-4 py-2 space-y-4">
+		<div>
+			<h3 class="text-sm font-semibold text-gray-700 mb-2">Customer Info</h3>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-900">
+				<div><span class="font-medium text-gray-600">Name:</span> { details.Customer.Name }</div>
+				<div><span class="font-medium text-gray-600">Email:</span> { details.Customer.Email }</div>
+				<div><span class="font-medium text-gray-600">Phone:</span> { details.Customer.Phone }</div>
+				<div class="sm:col-span-2"><span class="font-medium text-gray-600">Address:</span> { details.Customer.Address }</div>
+			</div>
+		</div>
+		<div>
+			<h3 class="text-sm font-semibold text-gray-700 mb-2">Order Lines</h3>
+			<table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-md">
+				<thead class="bg-gray-100">
+					<tr>
+						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Serial</th>
+						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Unit Price</th>
+						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
+						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+					</tr>
+				</thead>
+				<tbody class="divide-y divide-gray-200">
+					if len(details.Lines) == 0 {
+						<tr>
+							<td colspan="6" class="px-4 py-3 text-center text-sm text-gray-500">No order lines.</td>
+						</tr>
+					} else {
+						for _, line := range details.Lines {
+							<tr>
+								<td class="px-4 py-2 text-sm text-gray-900">{ line.Name }</td>
+								<td class="px-4 py-2 text-sm text-gray-900">{ line.Serial }</td>
+								<td class="px-4 py-2 text-sm text-gray-900">{ line.Description }</td>
+								<td class="px-4 py-2 text-sm text-gray-900">{ line.UnitPrice }</td>
+								<td class="px-4 py-2 text-sm text-gray-900">{ fmt.Sprintf("%d", line.Quantity) }</td>
+								<td class="px-4 py-2 text-sm text-gray-900">{ line.TotalPrice }</td>
+							</tr>
+						}
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+}
