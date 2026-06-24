@@ -24,6 +24,7 @@ const (
 	ModuleProductInventories   = "product_inventories"
 	ModulePasswordReset        = "password_reset"
 	ModuleProducts             = "products"
+	ModuleProductsExportCSV    = "products_export_csv"
 	ModulePromos               = "promos"
 	ModuleStaff                = "staffs"
 	ModuleTimeOff              = "time_off"

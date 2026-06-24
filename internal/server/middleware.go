@@ -134,10 +134,15 @@ func (s *Server) requireStaffAuth(next http.Handler) http.Handler {
 		}
 
 		staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
-		if err != nil || enums.ParseStaffStatusToEnum(staff.Status) == enums.STAFF_STATUS_RESIGNED {
-			s.sessionManager.Remove(ctx, SessionStaffID)
-			s.sessionManager.Remove(ctx, SessionStaffAccessID)
-			redirectHX(w, r, utils.URLWithError("/admin", errs.ErrStaffResigned.Error()))
+		if err != nil {
+			if enums.ParseStaffStatusToEnum(staff.Status) == enums.STAFF_STATUS_RESIGNED {
+				s.sessionManager.Remove(ctx, SessionStaffID)
+				s.sessionManager.Remove(ctx, SessionStaffAccessID)
+				redirectHX(w, r, utils.URLWithError("/admin", errs.ErrStaffResigned.Error()))
+				return
+			}
+
+			redirectHX(w, r, utils.URLWithError("/admin", "Login to access page"))
 			return
 		}
 
