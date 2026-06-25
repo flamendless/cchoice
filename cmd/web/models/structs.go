@@ -320,6 +320,10 @@ type AdminProductEditForm struct {
 	SalePrice      string
 	SaleStartDate  string
 	SaleEndDate    string
+	StatusReadOnly bool
+	DraftPriceOnly bool
+	UpdateURL      string
+	ListPageURL    string
 }
 
 type StaffTimeOff struct {
