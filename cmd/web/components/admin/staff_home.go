@@ -58,6 +58,10 @@ var staffCardsWithRoles = []struct {
 		Card:        models.StaffCard{Link: "/admin/exports", Title: "Exports", Description: "Export data", Icon: svg.Document("text-cchoice")},
 		AllowedRole: enums.STAFF_ROLE_EXPORTS,
 	},
+	{
+		Card:        models.StaffCard{Link: "/admin/products", Title: "Edit Products", Description: "Edit draft products", Icon: svg.MenuLines("text-cchoice")},
+		AllowedRole: enums.STAFF_ROLE_EDIT_PRODUCTS,
+	},
 }
 
 func filterStaffCardsByRole(roles []enums.StaffRole) []models.StaffCard {

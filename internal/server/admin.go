@@ -78,8 +78,13 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_PRODUCT)).Get("/admin/superuser/products/create", s.adminSuperuserProductsCreatePageHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_PRODUCT)).Post("/admin/superuser/products/create", s.adminSuperuserProductsCreatePostHandler)
-	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_PRODUCT)).Get("/admin/superuser/products/subcategories", s.adminSuperuserProductsSubcategoriesHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_PRODUCT, enums.STAFF_ROLE_EDIT_PRODUCTS)).Get("/admin/superuser/products/subcategories", s.adminSuperuserProductsSubcategoriesHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_PRODUCT)).Get("/admin/superuser/products/validate-serial", s.adminSuperuserProductsValidateSerialHandler)
+
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_EDIT_PRODUCTS)).Get("/admin/products", s.adminStaffProductsListPageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_EDIT_PRODUCTS)).Get("/admin/products/table", s.adminStaffProductsListTableHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_EDIT_PRODUCTS)).Get("/admin/products/{id}/edit", s.adminStaffProductsEditPageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_EDIT_PRODUCTS)).Patch("/admin/products/{id}", s.adminStaffProductsUpdateHandler)
 
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_CPOINTS)).Get("/admin/cpoints/generate", s.adminCPointsGeneratePageHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_CREATE_CPOINTS)).Post("/admin/cpoints/generate", s.adminCPointsGeneratePostHandler)

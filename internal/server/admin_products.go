@@ -438,7 +438,7 @@ func (s *Server) adminSuperuserProductsListTableHandler(w http.ResponseWriter, r
 		productList = []models.AdminProductListItem{}
 	}
 
-	if err := compadmin.AdminSuperuserProductsListTable(productList).Render(ctx, w); err != nil {
+	if err := compadmin.AdminSuperuserProductsListTable(productList, false, "/admin/superuser/products").Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("search", searchSerial),
@@ -655,6 +655,8 @@ func (s *Server) adminSuperuserProductsEditPageHandler(w http.ResponseWriter, r 
 		VATPercentage: conf.Conf().Settings.VATPercentage,
 		StocksIn:      inventory.StocksIn,
 		Stocks:        strconv.FormatInt(inventory.Stocks, 10),
+		UpdateURL:     "/admin/superuser/products/" + productID,
+		ListPageURL:   "/admin/superuser/products",
 	}
 	if product.SalePriceWithVat > 0 {
 		formData.SalePrice = strconv.FormatFloat(float64(product.SalePriceWithVat)/100, 'f', -1, 64)
@@ -829,6 +831,362 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 		SaleEndDate:         saleEndDate,
 		StocksIn:            enums.MustParseStocksInToEnum(r.FormValue("stocks_in")),
 		Stocks:              qty,
+	}
+
+	result := "success"
+	defer func() {
+		if err := s.services.staffLog.CreateLog(
+			context.Background(),
+			s.sessionManager.GetString(ctx, SessionStaffID),
+			constants.ActionUpdate,
+			constants.ModuleProducts,
+			result,
+			nil,
+		); err != nil {
+			logs.Log().Error(logtag, zap.Error(err))
+		}
+	}()
+
+	if err := s.services.product.Update(
+		ctx,
+		s.sessionManager.GetString(ctx, SessionStaffID),
+		input,
+	); err != nil {
+		result = err.Error()
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	if filename != "" && s.thumbnailJobRunner != nil {
+		decodedProductID := s.encoder.Decode(productID)
+		if err := s.thumbnailJobRunner.QueueThumbnailJob(ctx, jobs.ThumbnailJobParams{
+			ProductID:  decodedProductID,
+			Brand:      brandName,
+			SourcePath: filename,
+			Filename:   filepath.Base(filename),
+		}); err != nil {
+			result = err.Error()
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		}
+	}
+
+	result = fmt.Sprintf("success. ID '%s'", productID)
+	redirectHX(w, r, utils.URLWithSuccess(page, "Product updated successfully"))
+}
+
+func (s *Server) adminStaffProductsListPageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff Products List Page Handler]"
+	ctx := r.Context()
+
+	if err := compadmin.AdminStaffProductsListPage().Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Server) adminStaffProductsListTableHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff Products List Table Handler]"
+	const page = "/admin/products"
+	ctx := r.Context()
+
+	searchSerial := r.URL.Query().Get("search_serial")
+	searchBrand := r.URL.Query().Get("search_brand")
+
+	statusStr := r.URL.Query().Get("status")
+	status := enums.ParseProductStatusToEnum(statusStr)
+	if statusStr != "" && status == enums.PRODUCT_STATUS_UNDEFINED {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("search serial", searchSerial),
+			zap.String("search brand", searchBrand),
+			zap.String("status", statusStr),
+			zap.Error(errs.ErrEnumInvalid),
+		)
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrEnumInvalid.Error()))
+		return
+	}
+
+	productList, err := s.services.product.GetForListingAdmin(
+		ctx,
+		searchSerial,
+		searchBrand,
+		status,
+	)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		productList = []models.AdminProductListItem{}
+	}
+
+	if err := compadmin.AdminSuperuserProductsListTable(productList, true, "/admin/products").Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("search", searchSerial),
+			zap.String("status", statusStr),
+			zap.Error(err),
+		)
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+}
+
+func (s *Server) adminStaffProductsEditPageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff Products Edit Page Handler]"
+	const page = "/admin/products"
+	ctx := r.Context()
+
+	productID := chi.URLParam(r, "id")
+	if productID == "" {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
+		return
+	}
+
+	product, err := s.services.product.GetByIDForEdit(ctx, productID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("product_id", productID), zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	if product.Status != enums.PRODUCT_STATUS_DRAFT.String() {
+		redirectHX(w, r, utils.URLWithError(page, "Only draft products can be edited"))
+		return
+	}
+
+	categoriesRes, err := requests.GetCategoriesForAdmin(
+		ctx,
+		s.cache,
+		&s.SF,
+		s.dbRO,
+		requests.GenerateAdminCategoriesCacheKey(),
+	)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		categoriesRes = map[string][]string{}
+	}
+
+	categories := make([]models.AdminCategory, 0, len(categoriesRes))
+	for cat, subcats := range categoriesRes {
+		categories = append(categories, models.AdminCategory{
+			Category:      cat,
+			Subcategories: subcats,
+		})
+	}
+
+	var imageCDNURL string
+	productImage, err := s.dbRO.GetQueries().GetProductImageByProductID(ctx, product.ID)
+	if err != nil {
+		logs.Log().Warn(logtag, zap.String("product id", productID), zap.Error(err))
+	} else if productImage.Path != "" {
+		imageCDNURL = s.GetCDNURL(productImage.Path)
+	}
+
+	formData := models.AdminProductEditForm{
+		ProductID:   productID,
+		Serial:      product.Serial,
+		Name:        product.Name,
+		Description: product.Description,
+		BrandID:     s.encoder.Encode(product.BrandID),
+		BrandName:   product.BrandName,
+		Category:    product.Category,
+		Subcategory: product.Subcategory,
+		Price:       strconv.FormatInt(product.UnitPriceWithVat/100, 10),
+		Status:      enums.ParseProductStatusToEnum(product.Status),
+		ImageCDNURL: imageCDNURL,
+		Specs: models.AdminProductSpecsForm{
+			Colours:       product.Specs.Colours,
+			Sizes:         product.Specs.Sizes,
+			Segmentation:  product.Specs.Segmentation,
+			PartNumber:    product.Specs.PartNumber,
+			Power:         product.Specs.Power,
+			Capacity:      product.Specs.Capacity,
+			ScopeOfSupply: product.Specs.ScopeOfSupply,
+			Weight:        product.Specs.Weight,
+			WeightUnit:    enums.ParseWeightUnitToEnum(product.Specs.WeightUnit),
+		},
+		Categories:     categories,
+		VATPercentage:  conf.Conf().Settings.VATPercentage,
+		StocksIn:       product.StocksIn,
+		Stocks:         strconv.FormatInt(product.Stocks, 10),
+		StatusReadOnly: true,
+		DraftPriceOnly: true,
+		UpdateURL:      "/admin/products/" + productID,
+		ListPageURL:    page,
+	}
+	if product.SalePriceWithVat > 0 {
+		formData.SalePrice = strconv.FormatFloat(float64(product.SalePriceWithVat)/100, 'f', -1, 64)
+		formData.SaleStartDate = product.SaleStartDate
+		formData.SaleEndDate = product.SaleEndDate
+	}
+
+	if err := compadmin.AdminSuperuserProductsEditPage(formData).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+	}
+}
+
+func (s *Server) adminStaffProductsUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Staff Products Update Handler]"
+	const page = "/admin/products"
+	ctx := r.Context()
+
+	productID := chi.URLParam(r, "id")
+	if productID == "" {
+		redirectHX(w, r, utils.URLWithError(page, "Invalid product ID"))
+		return
+	}
+
+	product, err := s.services.product.GetByIDForEdit(ctx, productID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("product_id", productID), zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	if product.Status != enums.PRODUCT_STATUS_DRAFT.String() {
+		redirectHX(w, r, utils.URLWithError(page, "Only draft products can be edited"))
+		return
+	}
+
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
+		return
+	}
+
+	category := r.FormValue("category")
+	subcategory := r.FormValue("subcategory")
+	if category == "" || subcategory == "" {
+		redirectHX(w, r, utils.URLWithError(page, "Category and subcategory are required"))
+		return
+	}
+
+	name := r.FormValue("name")
+	description := r.FormValue("description")
+	priceStr := r.FormValue("price")
+	if name == "" || description == "" || priceStr == "" {
+		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
+		return
+	}
+
+	price, err := strconv.ParseFloat(priceStr, 64)
+	if err != nil || price <= 0 {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, "Invalid price"))
+		return
+	}
+
+	vatPercentage, err := strconv.ParseFloat(conf.Conf().Settings.VATPercentage, 64)
+	if err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+		vatPercentage = 0
+	}
+	unitPriceWithoutVat := int64(math.Round(price / (1 + vatPercentage/100)))
+	unitPriceWithVat := int64(math.Round(price))
+
+	salePriceStr := r.FormValue("sale_price")
+	saleStartDate := r.FormValue("sale_start_date")
+	saleEndDate := r.FormValue("sale_end_date")
+
+	var salePriceWithoutVat, salePriceWithVat int64
+	if salePriceStr != "" {
+		salePrice, parseErr := strconv.ParseFloat(salePriceStr, 64)
+		if parseErr != nil || salePrice <= 0 {
+			logs.LogCtx(ctx).Warn(logtag, zap.Error(parseErr), zap.String("sale price", salePriceStr))
+			redirectHX(w, r, utils.URLWithError(page, "Invalid sale price"))
+			return
+		}
+
+		if saleStartDate == "" || saleEndDate == "" {
+			redirectHX(w, r, utils.URLWithError(page, "Sale start and end dates are required when sale price is set"))
+			return
+		}
+
+		salePriceWithoutVat = int64(math.Round(salePrice / (1 + vatPercentage/100)))
+		salePriceWithVat = int64(math.Round(salePrice))
+	}
+
+	specs := services.ProductSpecsInput{
+		Colours:       r.FormValue("spec_colours"),
+		Sizes:         r.FormValue("spec_sizes"),
+		Segmentation:  r.FormValue("spec_segmentation"),
+		PartNumber:    r.FormValue("spec_part_number"),
+		Power:         r.FormValue("spec_power"),
+		Capacity:      r.FormValue("spec_capacity"),
+		ScopeOfSupply: r.FormValue("spec_scope_of_supply"),
+		Weight:        r.FormValue("spec_weight"),
+		WeightUnit:    enums.ParseWeightUnitToEnum(r.FormValue("spec_weight_unit")).ToDB(),
+	}
+
+	if specs.Colours == "" || specs.Sizes == "" || specs.Segmentation == "" ||
+		specs.PartNumber == "" || specs.Power == "" || specs.Capacity == "" ||
+		specs.ScopeOfSupply == "" || specs.Weight == "" || specs.WeightUnit == "" {
+		redirectHX(w, r, utils.URLWithError(page, "All product specs are required"))
+		return
+	}
+
+	brandID := s.encoder.Encode(product.BrandID)
+	var filename string
+	var brandName string
+	if conf.Conf().Test.LocalUploadImage || conf.Conf().IsProd() {
+		file, header, err := r.FormFile("product_image")
+		if err == nil {
+			defer file.Close()
+
+			brandName, err = s.services.brand.GetNameByID(ctx, brandID)
+			if err != nil {
+				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+				redirectHX(w, r, utils.URLWithError(page, "Brand not found"))
+				return
+			}
+
+			filename = s.services.image.GenerateFilename(
+				enums.IMAGE_PREFIX_PRODUCT_IMAGE,
+				filepath.Ext(header.Filename),
+				brandName,
+				name,
+			)
+			buf := bytes.Buffer{}
+			if _, err := io.Copy(&buf, file); err != nil {
+				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+				redirectHX(w, r, utils.URLWithError(page, "Failed to read image"))
+				return
+			}
+
+			contentType := header.Header.Get("Content-Type")
+			if err := s.services.image.UploadProductImage(
+				ctx,
+				brandName,
+				filename,
+				&buf,
+				contentType,
+			); err != nil {
+				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+				redirectHX(w, r, utils.URLWithError(page, "Failed to upload image"))
+				return
+			}
+		}
+	}
+
+	input := services.UpdateProductInput{
+		ProductID:           productID,
+		BrandID:             brandID,
+		Category:            category,
+		Subcategory:         subcategory,
+		Name:                name,
+		Description:         description,
+		Specs:               specs,
+		Status:              product.Status,
+		ImagePath:           filename,
+		UnitPriceWithoutVat: unitPriceWithoutVat,
+		UnitPriceWithVat:    unitPriceWithVat,
+		SalePriceWithoutVat: salePriceWithoutVat,
+		SalePriceWithVat:    salePriceWithVat,
+		SaleStartDate:       saleStartDate,
+		SaleEndDate:         saleEndDate,
+		StocksIn:            product.StocksIn,
+		Stocks:              product.Stocks,
 	}
 
 	result := "success"

@@ -16,6 +16,7 @@ const (
 	STAFF_ROLE_MANAGE_MEMO
 	STAFF_ROLE_EXPORTS
 	STAFF_ROLE_EXPORTS_PRODUCTS
+	STAFF_ROLE_EDIT_PRODUCTS
 )
 
 func ParseStaffRoleToEnum(e string) StaffRole {
@@ -40,6 +41,8 @@ func ParseStaffRoleToEnum(e string) StaffRole {
 		return STAFF_ROLE_EXPORTS
 	case STAFF_ROLE_EXPORTS_PRODUCTS.String():
 		return STAFF_ROLE_EXPORTS_PRODUCTS
+	case STAFF_ROLE_EDIT_PRODUCTS.String():
+		return STAFF_ROLE_EDIT_PRODUCTS
 	default:
 		return STAFF_ROLE_UNDEFINED
 	}
@@ -67,6 +70,8 @@ func MustParseStaffRoleToEnum(e string) StaffRole {
 		return STAFF_ROLE_EXPORTS
 	case STAFF_ROLE_EXPORTS_PRODUCTS.String():
 		return STAFF_ROLE_EXPORTS_PRODUCTS
+	case STAFF_ROLE_EDIT_PRODUCTS.String():
+		return STAFF_ROLE_EDIT_PRODUCTS
 	default:
 		panic("Invalid StaffRole. Got '" + e + "'")
 	}
@@ -79,6 +84,7 @@ func (r StaffRole) IsValid() bool {
 func GetAllStaffRoles() []StaffRole {
 	return []StaffRole{
 		STAFF_ROLE_CREATE_PRODUCT,
+		STAFF_ROLE_EDIT_PRODUCTS,
 		STAFF_ROLE_CREATE_CPOINTS,
 		STAFF_ROLE_MANAGE_HOLIDAYS,
 		STAFF_ROLE_MANAGE_BRANDS,
