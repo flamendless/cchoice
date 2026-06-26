@@ -42,7 +42,7 @@ func ProductVariants(data models.ProductPageData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			for _, colour := range data.Colours {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<button type=\"button\" class=\"px-4 py-2 border rounded-lg text-sm font-medium text-gray-700 hover:border-cchoice hover:text-cchoice transition-colors cursor-pointer\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<button type=\"button\" class=\"px-4 py-2 border rounded-lg text-sm font-medium text-gray-700 hover:border-primary hover:text-primary transition-colors cursor-pointer\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -71,7 +71,7 @@ func ProductVariants(data models.ProductPageData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			for _, size := range data.Sizes {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<button type=\"button\" class=\"px-4 py-2 border rounded-lg text-sm font-medium text-gray-700 hover:border-cchoice hover:text-cchoice transition-colors cursor-pointer\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<button type=\"button\" class=\"px-4 py-2 border rounded-lg text-sm font-medium text-gray-700 hover:border-primary hover:text-primary transition-colors cursor-pointer\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

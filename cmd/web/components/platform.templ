@@ -22,7 +22,7 @@ templ Platforms(platforms []models.Platform) {
 						<div class="flex justify-center mb-4">
 							<img src={ constants.PathSVGLogoOnly } alt="C-Choice Logo" class="w-16 h-16 mx-auto mb-4"/>
 						</div>
-						<h1 class="text-3xl font-bold text-cchoice">
+						<h1 class="text-3xl font-bold text-primary">
 							C-Choice Platforms
 						</h1>
 					</div>
@@ -32,7 +32,7 @@ templ Platforms(platforms []models.Platform) {
 								href={ platform.Value }
 								target="_blank"
 								rel="noopener"
-								class="flex flex-col items-center justify-center p-6 sm:p-8 bg-cchoice rounded-xl hover:bg-cchoice_dark transition-colors cursor-pointer"
+								class="flex flex-col items-center justify-center p-6 sm:p-8 bg-primary rounded-xl hover:bg-primary-dark transition-colors cursor-pointer"
 							>
 								<span class="text-white mb-2">
 									@platform.Icon

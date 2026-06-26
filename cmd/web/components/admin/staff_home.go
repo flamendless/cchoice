@@ -9,9 +9,9 @@ import (
 )
 
 var baseStaffCards = []models.StaffCard{
-	{Link: "/admin/staff/attendance", Title: "Attendance", Description: "View your attendance", Icon: svg.Clock("text-cchoice")},
-	{Link: "/admin/staff/time-off", Title: "Time Off", Description: "Request a time off", Icon: svg.Box("text-cchoice")},
-	{Link: "/admin/profile", Title: "Profile", Description: "View and manage your profile", Icon: svg.User("text-cchoice")},
+	{Link: "/admin/staff/attendance", Title: "Attendance", Description: "View your attendance", Icon: svg.Clock("text-primary")},
+	{Link: "/admin/staff/time-off", Title: "Time Off", Description: "Request a time off", Icon: svg.Box("text-primary")},
+	{Link: "/admin/profile", Title: "Profile", Description: "View and manage your profile", Icon: svg.User("text-primary")},
 }
 
 var staffCardsWithRoles = []struct {
@@ -22,44 +22,44 @@ var staffCardsWithRoles = []struct {
 		Link:        "/admin/superuser/products/create",
 		Title:       "Create Product",
 		Description: "Create a product",
-		Icon:        svg.Box("text-cchoice"),
+		Icon:        svg.Box("text-primary"),
 	}, AllowedRole: enums.STAFF_ROLE_CREATE_PRODUCT},
 	{Card: models.StaffCard{
 		Link:        "/admin/cpoints/generate",
 		Title:       "Generate C-Points",
 		Description: "Generate C-Points for a customer",
-		Icon:        svg.Lightning("text-cchoice"),
+		Icon:        svg.Lightning("text-primary"),
 	}, AllowedRole: enums.STAFF_ROLE_CREATE_CPOINTS},
 	{Card: models.StaffCard{
 		Link:        "/admin/holidays",
 		Title:       "Holidays",
 		Description: "Manage Philippines holidays",
-		Icon:        svg.Calendar("text-cchoice"),
+		Icon:        svg.Calendar("text-primary"),
 	}, AllowedRole: enums.STAFF_ROLE_MANAGE_HOLIDAYS},
 	{
-		Card:        models.StaffCard{Link: "/admin/promos", Title: "Manage Promos", Description: "Manage promos", Icon: svg.Box("text-cchoice")},
+		Card:        models.StaffCard{Link: "/admin/promos", Title: "Manage Promos", Description: "Manage promos", Icon: svg.Box("text-primary")},
 		AllowedRole: enums.STAFF_ROLE_MANAGE_PROMOS,
 	},
 	{Card: models.StaffCard{
 		Link:        "/admin/tracked-links",
 		Title:       "Tracked Links",
 		Description: "Manage tracked links",
-		Icon:        svg.Link("text-cchoice"),
+		Icon:        svg.Link("text-primary"),
 	}, AllowedRole: enums.STAFF_ROLE_MANAGE_TRACKED_LINKS},
 	{
-		Card:        models.StaffCard{Link: "/admin/memos", Title: "Manage Memos", Description: "Create and manage staff memorandums", Icon: svg.Document("text-cchoice")},
+		Card:        models.StaffCard{Link: "/admin/memos", Title: "Manage Memos", Description: "Create and manage staff memorandums", Icon: svg.Document("text-primary")},
 		AllowedRole: enums.STAFF_ROLE_MANAGE_MEMO,
 	},
 	{
-		Card:        models.StaffCard{Link: "/admin/product-inventories", Title: "Manage Product Inventories", Description: "Manage product inventory stocks", Icon: svg.Box("text-cchoice")},
+		Card:        models.StaffCard{Link: "/admin/product-inventories", Title: "Manage Product Inventories", Description: "Manage product inventory stocks", Icon: svg.Box("text-primary")},
 		AllowedRole: enums.STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES,
 	},
 	{
-		Card:        models.StaffCard{Link: "/admin/exports", Title: "Exports", Description: "Export data", Icon: svg.Document("text-cchoice")},
+		Card:        models.StaffCard{Link: "/admin/exports", Title: "Exports", Description: "Export data", Icon: svg.Document("text-primary")},
 		AllowedRole: enums.STAFF_ROLE_EXPORTS,
 	},
 	{
-		Card:        models.StaffCard{Link: "/admin/products", Title: "Edit Products", Description: "Edit draft products", Icon: svg.MenuLines("text-cchoice")},
+		Card:        models.StaffCard{Link: "/admin/products", Title: "Edit Products", Description: "Edit draft products", Icon: svg.MenuLines("text-primary")},
 		AllowedRole: enums.STAFF_ROLE_EDIT_PRODUCTS,
 	},
 }

@@ -32,7 +32,7 @@ func MobileSearchToggle() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<button type=\"button\" aria-label=\"Open search\" class=\"text-cchoice p-2 rounded-full lg:hidden hover:bg-cchoice_border\" _=\"\n\t\t\ton click\n\t\t\t\ttoggle .hidden on #mobile-search-panel\n\t\t\t\tif #mobile-search-panel does not match .hidden\n\t\t\t\t\twait 0.05s\n\t\t\t\t\tfocus() on #search-mobile\n\t\t\t\tend\n\t\t\t\tasync call metrics_event('mobile_search_toggle')\n\t\t\tend\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<button type=\"button\" aria-label=\"Open search\" class=\"text-primary p-2 rounded-full lg:hidden hover:bg-primary-dark\" _=\"\n\t\t\ton click\n\t\t\t\ttoggle .hidden on #mobile-search-panel\n\t\t\t\tif #mobile-search-panel does not match .hidden\n\t\t\t\t\twait 0.05s\n\t\t\t\t\tfocus() on #search-mobile\n\t\t\t\tend\n\t\t\t\tasync call metrics_event('mobile_search_toggle')\n\t\t\tend\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -69,7 +69,7 @@ func MobileSearchPanel() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div id=\"mobile-search-panel\" class=\"absolute top-full left-0 right-0 w-full z-[60] shadow-md hidden lg:hidden border-b border-searchbar bg-white px-3 py-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div id=\"mobile-search-panel\" class=\"absolute top-full left-0 right-0 w-full z-[60] shadow-md hidden lg:hidden border-b border-surface bg-white px-3 py-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -106,7 +106,7 @@ func SearchBarMobile() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form class=\"w-full\" _=\"\n\t\t\ton submit\n\t\t\t\tasync call metrics_event('search_mobile', #search-mobile.value)\n\t\t\tend\n\t\t\"><div class=\"relative\"><input id=\"search-mobile\" type=\"search\" name=\"search\" placeholder=\"Search products…\" autocomplete=\"off\" class=\"w-full p-2.5 text-xs border border-searchbar rounded-lg bg-searchbar focus:ring-cchoice focus:border-cchoice\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form class=\"w-full\" _=\"\n\t\t\ton submit\n\t\t\t\tasync call metrics_event('search_mobile', #search-mobile.value)\n\t\t\tend\n\t\t\"><div class=\"relative\"><input id=\"search-mobile\" type=\"search\" name=\"search\" placeholder=\"Search products…\" autocomplete=\"off\" class=\"w-full p-2.5 text-xs border border-surface rounded-lg bg-surface focus:ring-primary focus:border-primary\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -119,7 +119,7 @@ func SearchBarMobile() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" hx-trigger=\"input[this.value.length >= 3] delay:300ms, keyup[key=='Enter']\" hx-target=\"#search-mobile-results > ul\" hx-swap=\"innerHTML\" hx-indicator=\"#icon-spinner-search-mobile\" _=\"\n\t\t\t\t\ton htmx:beforeRequest from #search-mobile\n\t\t\t\t\t\tlog 'search-mobile is triggered'\n\t\t\t\t\t\tadd .hidden to #search-mobile-results\n\t\t\t\t\t\tremove .hidden from #icon-spinner-search-mobile\n\t\t\t\t\tend\n\n\t\t\t\t\ton htmx:afterRequest from #search-mobile\n\t\t\t\t\t\tlog 'search-mobile is done'\n\t\t\t\t\t\twait 0.25s\n\t\t\t\t\t\tremove .hidden from #search-mobile-results\n\t\t\t\t\t\tadd .hidden to #icon-spinner-search-mobile\n\t\t\t\t\tend\n\n\t\t\t\t\ton focus\n\t\t\t\t\t\tif my value != '' and #search-mobile-results.children.length > 0\n\t\t\t\t\t\tthen remove .hidden from #search-mobile-results\n\t\t\t\t\tend\n\t\t\t\t\"><!-- <button --><!-- \ttype=\"submit\" --><!-- \tclass=\" --><!-- \t\tabsolute end-2 top-1/2 -translate-y-1/2 --><!-- \t\tbg-cchoice text-white --><!-- \t\ttext-xs px-2 py-1 rounded-md --><!-- \t\" --><!-- > --><!-- \t@svgSearch(\"\", \"\") --><!-- </button> --><svg id=\"icon-spinner-search-mobile\" class=\"htmx-indicator hidden absolute end-14 top-1/2 -translate-y-1/2 w-4 text-cchoice\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\"><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-dasharray=\"300 385\" d=\"M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z\"><animate attributeName=\"stroke-dashoffset\" dur=\"2s\" values=\"685;-685\" repeatCount=\"indefinite\"></animate></path></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" hx-trigger=\"input[this.value.length >= 3] delay:300ms, keyup[key=='Enter']\" hx-target=\"#search-mobile-results > ul\" hx-swap=\"innerHTML\" hx-indicator=\"#icon-spinner-search-mobile\" _=\"\n\t\t\t\t\ton htmx:beforeRequest from #search-mobile\n\t\t\t\t\t\tlog 'search-mobile is triggered'\n\t\t\t\t\t\tadd .hidden to #search-mobile-results\n\t\t\t\t\t\tremove .hidden from #icon-spinner-search-mobile\n\t\t\t\t\tend\n\n\t\t\t\t\ton htmx:afterRequest from #search-mobile\n\t\t\t\t\t\tlog 'search-mobile is done'\n\t\t\t\t\t\twait 0.25s\n\t\t\t\t\t\tremove .hidden from #search-mobile-results\n\t\t\t\t\t\tadd .hidden to #icon-spinner-search-mobile\n\t\t\t\t\tend\n\n\t\t\t\t\ton focus\n\t\t\t\t\t\tif my value != '' and #search-mobile-results.children.length > 0\n\t\t\t\t\t\tthen remove .hidden from #search-mobile-results\n\t\t\t\t\tend\n\t\t\t\t\"><!-- <button --><!-- \ttype=\"submit\" --><!-- \tclass=\" --><!-- \t\tabsolute end-2 top-1/2 -translate-y-1/2 --><!-- \t\tbg-primary text-white --><!-- \t\ttext-xs px-2 py-1 rounded-md --><!-- \t\" --><!-- > --><!-- \t@svgSearch(\"\", \"\") --><!-- </button> --><svg id=\"icon-spinner-search-mobile\" class=\"htmx-indicator hidden absolute end-14 top-1/2 -translate-y-1/2 w-4 text-primary\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\"><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-dasharray=\"300 385\" d=\"M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z\"><animate attributeName=\"stroke-dashoffset\" dur=\"2s\" values=\"685;-685\" repeatCount=\"indefinite\"></animate></path></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

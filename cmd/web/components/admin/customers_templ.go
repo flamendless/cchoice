@@ -49,7 +49,7 @@ func AdminCustomersListPage(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'customers list')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'customers list')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -73,7 +73,7 @@ func AdminCustomersListPage(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">Customer List</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-primary mb-6\">Customer List</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -173,7 +173,7 @@ func CustomersFilterForm() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-trigger=\"submit\" hx-target=\"#customers-table\" hx-swap=\"innerHTML\" hx-include=\"this\"><div class=\"flex flex-wrap gap-3 items-end\"><div class=\"flex-1 min-w-[200px]\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Search Email</label> <input type=\"text\" name=\"email\" placeholder=\"Search by email...\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Customer Type</label> <select name=\"type\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">All Types</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-trigger=\"submit\" hx-target=\"#customers-table\" hx-swap=\"innerHTML\" hx-include=\"this\"><div class=\"flex flex-wrap gap-3 items-end\"><div class=\"flex-1 min-w-[200px]\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Search Email</label> <input type=\"text\" name=\"email\" placeholder=\"Search by email...\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Customer Type</label> <select name=\"type\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"\">All Types</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -209,7 +209,7 @@ func CustomersFilterForm() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Status</label> <select name=\"status\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">All Statuses</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Status</label> <select name=\"status\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"\">All Statuses</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -245,7 +245,7 @@ func CustomersFilterForm() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</select></div><button type=\"submit\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2\">Filter</button> <button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</select></div><button type=\"submit\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2\">Filter</button> <button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

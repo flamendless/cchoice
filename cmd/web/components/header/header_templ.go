@@ -17,7 +17,7 @@ import "cchoice/cmd/web/components/search"
 
 var logoStyleOnce = templ.NewOnceHandle()
 
-const clsHeaderIconButton = "w-full stroke-cchoice group-hover:stroke-white"
+const clsHeaderIconButton = "w-full stroke-primary group-hover:stroke-white"
 
 func headerLogo(platform string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -93,7 +93,7 @@ func headerLogo(platform string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" alt=\"cchoice logo and text\" class=\"object-contain logo-responsive\" loading=\"lazy\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" alt=\"primary logo and text\" class=\"object-contain logo-responsive\" loading=\"lazy\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -111,7 +111,7 @@ func headerLogo(platform string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" alt=\"cchoice logo\" class=\"object-contain logo-responsive\" loading=\"lazy\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" alt=\"primary logo\" class=\"object-contain logo-responsive\" loading=\"lazy\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -255,7 +255,7 @@ func HeaderRow1Texts(texts []models.HeaderRowText) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" class=\"font-light mx-2 cursor-pointer hover:underline hover:bg-cchoicesoft transition-colors\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" class=\"font-light mx-2 cursor-pointer hover:underline hover:bg-surface transition-colors\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -390,7 +390,7 @@ func HeaderMobile() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div><div class=\"flex w-full justify-end\"><div id=\"search-mobile-wrapper\" class=\"flex flex-col items-center place-center place-content-center group py-2 stroke-cchoice rounded-full cursor-pointer hover:bg-cchoice_border text-nowrap text-xs text-cchoice hover:text-white\" _=\"\n\t\t\t\t\ton click from document\n\t\t\t\t\t\tif event.target.closest('#search-mobile-wrapper') == null\n\t\t\t\t\t\t\tadd .hidden to #search-mobile-results\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div><div class=\"flex w-full justify-end\"><div id=\"search-mobile-wrapper\" class=\"flex flex-col items-center place-center place-content-center group py-2 stroke-primary rounded-full cursor-pointer hover:bg-primary-dark text-nowrap text-xs text-primary hover:text-white\" _=\"\n\t\t\t\t\ton click from document\n\t\t\t\t\t\tif event.target.closest('#search-mobile-wrapper') == null\n\t\t\t\t\t\t\tadd .hidden to #search-mobile-results\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -431,11 +431,11 @@ func HeaderMobile() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<button id=\"btn-hamburger\" type=\"button\" class=\"flex-shrink-0 p-2 rounded-lg hover:bg-cchoicesoft focus:outline-none focus:ring-2 focus:ring-cchoice cursor-pointer\" aria-label=\"Toggle navigation menu\" title=\"Toggle navigation menu\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\ttoggle .hidden on #mobile-sidebar\n\t\t\t\t\t\ttoggle .hidden on #mobile-sidebar-overlay\n\t\t\t\t\tend\n\t\t\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<button id=\"btn-hamburger\" type=\"button\" class=\"flex-shrink-0 p-2 rounded-lg hover:bg-surface focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer\" aria-label=\"Toggle navigation menu\" title=\"Toggle navigation menu\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\ttoggle .hidden on #mobile-sidebar\n\t\t\t\t\t\ttoggle .hidden on #mobile-sidebar-overlay\n\t\t\t\t\tend\n\t\t\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = svg.Hamburger("text-cchoice").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = svg.Hamburger("text-primary").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -551,7 +551,7 @@ func CustomerPortalHeader() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20\"></div><h1 class=\"text-3xl font-bold text-cchoice\">C-Choice Customer Portal</h1></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20\"></div><h1 class=\"text-3xl font-bold text-primary\">C-Choice Customer Portal</h1></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -593,7 +593,7 @@ func CustomerPortalHeaderWithSubtitle(subtitle string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20\"></div><h1 class=\"text-3xl font-bold text-cchoice\">C-Choice Customer Portal</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20\"></div><h1 class=\"text-3xl font-bold text-primary\">C-Choice Customer Portal</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -658,7 +658,7 @@ func CustomerPortalHeaderWithBack() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\" class=\"inline-flex items-center text-cchoice hover:text-cchoice_dark transition-colors\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-5 h-5 mr-1\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10 19l-7-7m0 0l7-7m-7 7h18\"></path></svg> Back to Portal</a></div><div class=\"text-center mb-8 mt-4\"><div class=\"flex justify-center mb-4\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\" class=\"inline-flex items-center text-primary hover:text-primary-dark transition-colors\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-5 h-5 mr-1\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10 19l-7-7m0 0l7-7m-7 7h18\"></path></svg> Back to Portal</a></div><div class=\"text-center mb-8 mt-4\"><div class=\"flex justify-center mb-4\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -671,7 +671,7 @@ func CustomerPortalHeaderWithBack() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20\"></div><h1 class=\"text-3xl font-bold text-cchoice\">C-Choice Customer Portal</h1></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20\"></div><h1 class=\"text-3xl font-bold text-primary\">C-Choice Customer Portal</h1></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -713,7 +713,7 @@ func CustomerPortalHeaderWithBackLink(backURL string, backLabel string) templ.Co
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" class=\"inline-flex items-center text-cchoice hover:text-cchoice_dark transition-colors\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-5 h-5 mr-1\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10 19l-7-7m0 0l7-7m-7 7h18\"></path></svg> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" class=\"inline-flex items-center text-primary hover:text-primary-dark transition-colors\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-5 h-5 mr-1\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10 19l-7-7m0 0l7-7m-7 7h18\"></path></svg> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -739,7 +739,7 @@ func CustomerPortalHeaderWithBackLink(backURL string, backLabel string) templ.Co
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20\"></div><h1 class=\"text-3xl font-bold text-cchoice\">C-Choice Customer Portal</h1></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20\"></div><h1 class=\"text-3xl font-bold text-primary\">C-Choice Customer Portal</h1></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -781,7 +781,7 @@ func AdminStaffHeaderWithLogout() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20\"></div><h1 class=\"text-3xl font-bold text-cchoice\">C-Choice Admin Portal</h1></div><div class=\"text-center mb-6\"><form action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20\"></div><h1 class=\"text-3xl font-bold text-primary\">C-Choice Admin Portal</h1></div><div class=\"text-center mb-6\"><form action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -794,7 +794,7 @@ func AdminStaffHeaderWithLogout() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\" method=\"POST\"><button type=\"submit\" class=\"py-2 px-6 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Log Out</button></form></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\" method=\"POST\"><button type=\"submit\" class=\"py-2 px-6 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary\">Log Out</button></form></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -836,7 +836,7 @@ func AdminStaffHeaderWithSubtitle(fullName string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20\"></div><h1 class=\"text-3xl font-bold text-cchoice\">C-Choice Admin Portal</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20\"></div><h1 class=\"text-3xl font-bold text-primary\">C-Choice Admin Portal</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -872,7 +872,7 @@ func AdminStaffHeaderWithSubtitle(fullName string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\" method=\"POST\"><button type=\"submit\" class=\"py-2 px-6 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Log Out</button></form></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\" method=\"POST\"><button type=\"submit\" class=\"py-2 px-6 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary\">Log Out</button></form></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -914,7 +914,7 @@ func AdminStaffHeaderWithBack() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "\" class=\"inline-flex items-center text-cchoice hover:text-cchoice_dark transition-colors\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-5 h-5 mr-1\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10 19l-7-7m0 0l7-7m-7 7h18\"></path></svg> Back to Home</a></div><div class=\"text-center mb-8 mt-4\"><div class=\"flex justify-center mb-4\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "\" class=\"inline-flex items-center text-primary hover:text-primary-dark transition-colors\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-5 h-5 mr-1\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10 19l-7-7m0 0l7-7m-7 7h18\"></path></svg> Back to Home</a></div><div class=\"text-center mb-8 mt-4\"><div class=\"flex justify-center mb-4\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -927,7 +927,7 @@ func AdminStaffHeaderWithBack() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "\" alt=\"C-Choice Logo\" class=\"w-16 h-16 mx-auto mb-4\"></div><h1 class=\"text-3xl font-bold text-cchoice\">C-Choice Admin Portal</h1></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "\" alt=\"C-Choice Logo\" class=\"w-16 h-16 mx-auto mb-4\"></div><h1 class=\"text-3xl font-bold text-primary\">C-Choice Admin Portal</h1></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -969,7 +969,7 @@ func AdminStaffHeaderWithBackLink(backURL string, backLabel string) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "\" class=\"inline-flex items-center text-cchoice hover:text-cchoice_dark transition-colors\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-5 h-5 mr-1\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10 19l-7-7m0 0l7-7m-7 7h18\"></path></svg> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "\" class=\"inline-flex items-center text-primary hover:text-primary-dark transition-colors\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-5 h-5 mr-1\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10 19l-7-7m0 0l7-7m-7 7h18\"></path></svg> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -995,7 +995,7 @@ func AdminStaffHeaderWithBackLink(backURL string, backLabel string) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "\" alt=\"C-Choice Logo\" class=\"w-16 h-16 mx-auto mb-4\"></div><h1 class=\"text-3xl font-bold text-cchoice\">C-Choice Admin Portal</h1></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "\" alt=\"C-Choice Logo\" class=\"w-16 h-16 mx-auto mb-4\"></div><h1 class=\"text-3xl font-bold text-primary\">C-Choice Admin Portal</h1></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1037,7 +1037,7 @@ func AdminStaffHeaderWithBackLinkSimple(backURL string, backLabel string) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "\" class=\"inline-flex items-center text-cchoice hover:text-cchoice_dark transition-colors\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-5 h-5 mr-1\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10 19l-7-7m0 0l7-7m-7 7h18\"></path></svg> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "\" class=\"inline-flex items-center text-primary hover:text-primary-dark transition-colors\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-5 h-5 mr-1\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M10 19l-7-7m0 0l7-7m-7 7h18\"></path></svg> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

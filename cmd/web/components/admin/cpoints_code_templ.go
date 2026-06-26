@@ -45,7 +45,7 @@ func AdminCPointsCodePage(code string, redemptionURL string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<script>\n\t\t\t\tfunction copyToClipboard(elementId) {\n\t\t\t\t\tvar copyText = document.getElementById(elementId);\n\t\t\t\t\tcopyText.select();\n\t\t\t\t\tcopyText.setSelectionRange(0, 99999);\n\t\t\t\t\tnavigator.clipboard.writeText(copyText.value);\n\t\t\t\t}\n\t\t\t</script></head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<script>\n\t\t\t\tfunction copyToClipboard(elementId) {\n\t\t\t\t\tvar copyText = document.getElementById(elementId);\n\t\t\t\t\tcopyText.select();\n\t\t\t\t\tcopyText.setSelectionRange(0, 99999);\n\t\t\t\t\tnavigator.clipboard.writeText(copyText.value);\n\t\t\t\t}\n\t\t\t</script></head><body class=\"bg-surface min-h-screen flex flex-col\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -95,7 +95,7 @@ func AdminCPointsCodePage(code string, redemptionURL string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" id=\"cpoint-code\" class=\"flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900 font-mono\"> <button type=\"button\" class=\"px-3 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice/90\" onclick=\"copyToClipboard('cpoint-code')\">Copy</button></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Redemption URL</label><div class=\"flex gap-2\"><input type=\"text\" readonly value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" id=\"cpoint-code\" class=\"flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900 font-mono\"> <button type=\"button\" class=\"px-3 py-2 bg-primary text-white rounded-md hover:bg-primary/90\" onclick=\"copyToClipboard('cpoint-code')\">Copy</button></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Redemption URL</label><div class=\"flex gap-2\"><input type=\"text\" readonly value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -108,7 +108,7 @@ func AdminCPointsCodePage(code string, redemptionURL string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" id=\"redemption-url\" class=\"flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900 text-sm\"> <button type=\"button\" class=\"px-3 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice/90\" onclick=\"copyToClipboard('redemption-url')\">Copy</button></div></div><div class=\"flex justify-center gap-4 pt-4\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" id=\"redemption-url\" class=\"flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900 text-sm\"> <button type=\"button\" class=\"px-3 py-2 bg-primary text-white rounded-md hover:bg-primary/90\" onclick=\"copyToClipboard('redemption-url')\">Copy</button></div></div><div class=\"flex justify-center gap-4 pt-4\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -121,7 +121,7 @@ func AdminCPointsCodePage(code string, redemptionURL string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice/90\">Generate Another</a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90\">Generate Another</a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

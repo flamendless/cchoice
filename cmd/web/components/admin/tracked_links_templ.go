@@ -51,7 +51,7 @@ func AdminTrackedLinksListPage(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'tracked links list')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'tracked links list')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -75,7 +75,7 @@ func AdminTrackedLinksListPage(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">Manage Tracked Links</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-primary mb-6\">Manage Tracked Links</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -125,7 +125,7 @@ func TrackedLinksListSection() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-trigger=\"load\" hx-target=\"#tracked-links-table\" hx-swap=\"innerHTML\"><div class=\"mb-4 flex justify-between items-center\"><h2 class=\"text-lg font-semibold\">All Tracked Links</h2><button type=\"button\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-trigger=\"load\" hx-target=\"#tracked-links-table\" hx-swap=\"innerHTML\"><div class=\"mb-4 flex justify-between items-center\"><h2 class=\"text-lg font-semibold\">All Tracked Links</h2><button type=\"button\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -180,7 +180,7 @@ func TrackedLinksCreateForm() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-target=\"#tracked-links-table\" hx-swap=\"innerHTML\" class=\"flex flex-wrap gap-3 items-end\"><div><label class=\"block text-sm font-medium text-gray-700\">Name</label> <input type=\"text\" name=\"name\" placeholder=\"Link name\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label class=\"block text-sm font-medium text-gray-700\">Slug</label> <input type=\"text\" name=\"slug\" placeholder=\"e.g. ig-bio\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label class=\"block text-sm font-medium text-gray-700\">Destination URL</label> <input type=\"url\" name=\"destination_url\" placeholder=\"https://example.com\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label class=\"block text-sm font-medium text-gray-700\">Source</label> <select name=\"source\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select source</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-target=\"#tracked-links-table\" hx-swap=\"innerHTML\" class=\"flex flex-wrap gap-3 items-end\"><div><label class=\"block text-sm font-medium text-gray-700\">Name</label> <input type=\"text\" name=\"name\" placeholder=\"Link name\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label class=\"block text-sm font-medium text-gray-700\">Slug</label> <input type=\"text\" name=\"slug\" placeholder=\"e.g. ig-bio\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label class=\"block text-sm font-medium text-gray-700\">Destination URL</label> <input type=\"url\" name=\"destination_url\" placeholder=\"https://example.com\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label class=\"block text-sm font-medium text-gray-700\">Source</label> <select name=\"source\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"\">Select source</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -216,7 +216,7 @@ func TrackedLinksCreateForm() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</select></div><div><label class=\"block text-sm font-medium text-gray-700\">Medium</label> <select name=\"medium\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select medium</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</select></div><div><label class=\"block text-sm font-medium text-gray-700\">Medium</label> <select name=\"medium\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"\">Select medium</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -252,7 +252,7 @@ func TrackedLinksCreateForm() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</select></div><div><label class=\"block text-sm font-medium text-gray-700\">Campaign</label> <input type=\"text\" name=\"campaign\" placeholder=\"Campaign name\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><button type=\"submit\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2\">Add Link</button></form></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</select></div><div><label class=\"block text-sm font-medium text-gray-700\">Campaign</label> <input type=\"text\" name=\"campaign\" placeholder=\"Campaign name\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><button type=\"submit\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2\">Add Link</button></form></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -331,7 +331,7 @@ func AdminTrackedLinksListTable(links []models.AdminTrackedLinkListItem) templ.C
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</span> <button type=\"button\" class=\"text-cchoice hover:text-cchoicedark cursor-pointer\" title=\"Copy slug\" _=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</span> <button type=\"button\" class=\"text-primary hover:text-primary-dark cursor-pointer\" title=\"Copy slug\" _=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -599,7 +599,7 @@ func TrackedLinkActionsCell(link models.AdminTrackedLinkListItem) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\" class=\"w-full sm:w-auto\"><button type=\"submit\" class=\"text-cchoice bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium\" title=\"Generate QR\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tcall metrics_event('admin_exec', 'generate tracked link qr')\n\t\t\t\t\tend\n\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z\"></path></svg></button></form><button type=\"button\" class=\"text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\" class=\"w-full sm:w-auto\"><button type=\"submit\" class=\"text-primary bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium\" title=\"Generate QR\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tcall metrics_event('admin_exec', 'generate tracked link qr')\n\t\t\t\t\tend\n\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z\"></path></svg></button></form><button type=\"button\" class=\"text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -730,7 +730,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700\">Slug</label> <input type=\"text\" name=\"slug\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700\">Slug</label> <input type=\"text\" name=\"slug\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -743,7 +743,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700\">Destination URL</label> <input type=\"url\" name=\"destination_url\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700\">Destination URL</label> <input type=\"url\" name=\"destination_url\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -756,7 +756,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700\">Source</label> <select name=\"source\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"><option value=\"\">Select source</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700\">Source</label> <select name=\"source\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"><option value=\"\">Select source</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -802,7 +802,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</select></div><div><label class=\"block text-sm font-medium text-gray-700\">Medium</label> <select name=\"medium\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"><option value=\"\">Select medium</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</select></div><div><label class=\"block text-sm font-medium text-gray-700\">Medium</label> <select name=\"medium\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"><option value=\"\">Select medium</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -861,7 +861,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700\">Status</label> <select name=\"status\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700\">Status</label> <select name=\"status\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -909,7 +909,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "</select></div><div class=\"flex w-full gap-1 justify-center\"><button type=\"submit\" class=\"px-3 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm\">Save</button> <button type=\"button\" class=\"px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "</select></div><div class=\"flex w-full gap-1 justify-center\"><button type=\"submit\" class=\"px-3 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm\">Save</button> <button type=\"button\" class=\"px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -988,7 +988,7 @@ func TrackedLinksCreateFormModal() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "\" hx-swap=\"outerHTML\" class=\"flex flex-col gap-3\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('tracked-links-create-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/tracked-links/table', { target: '#tracked-links-table', swap: 'innerHTML' }) }\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Name <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"name\" placeholder=\"Link name\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Slug <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"slug\" placeholder=\"e.g. ig-bio\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Destination URL <span class=\"text-red-500\">*</span></label> <input type=\"url\" name=\"destination_url\" placeholder=\"https://example.com\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Source</label> <select name=\"source\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"><option value=\"\">Select source</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "\" hx-swap=\"outerHTML\" class=\"flex flex-col gap-3\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('tracked-links-create-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/tracked-links/table', { target: '#tracked-links-table', swap: 'innerHTML' }) }\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Name <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"name\" placeholder=\"Link name\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Slug <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"slug\" placeholder=\"e.g. ig-bio\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Destination URL <span class=\"text-red-500\">*</span></label> <input type=\"url\" name=\"destination_url\" placeholder=\"https://example.com\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Source</label> <select name=\"source\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"><option value=\"\">Select source</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1024,7 +1024,7 @@ func TrackedLinksCreateFormModal() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Medium</label> <select name=\"medium\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"><option value=\"\">Select medium</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Medium</label> <select name=\"medium\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"><option value=\"\">Select medium</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1060,7 +1060,7 @@ func TrackedLinksCreateFormModal() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Campaign</label> <input type=\"text\" name=\"campaign\" placeholder=\"Campaign name\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"></div><div class=\"flex w-full gap-1 justify-center\"><button type=\"submit\" class=\"px-3 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm\">Create</button> <button type=\"button\" class=\"px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Campaign</label> <input type=\"text\" name=\"campaign\" placeholder=\"Campaign name\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div class=\"flex w-full gap-1 justify-center\"><button type=\"submit\" class=\"px-3 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm\">Create</button> <button type=\"button\" class=\"px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1133,7 +1133,7 @@ func AdminTrackedLinksQRModal(qr QRData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2\">Download QR</a></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2\">Download QR</a></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

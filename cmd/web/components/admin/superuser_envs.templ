@@ -12,7 +12,7 @@ templ AdminSuperuserEnvsPage(vars []models.EnvVar) {
 			@common.TabTitle("[SUPERUSER] Envs - C-Choice Admin")
 		</head>
 		<body
-			class="bg-cchoicesoft min-h-screen flex flex-col"
+			class="bg-surface min-h-screen flex flex-col"
 			_="init call metrics_event('admin_visit', 'envs')"
 		>
 			@common.DevRibbon()
@@ -22,7 +22,7 @@ templ AdminSuperuserEnvsPage(vars []models.EnvVar) {
 				<div class="max-w-8xl mx-auto">
 					<div class="bg-white rounded-lg shadow-md p-6">
 						@header.AdminStaffHeaderWithBack()
-						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+						<h1 class="text-2xl font-bold text-center text-primary mb-6">
 							Environment Configuration
 						</h1>
 						@AdminSuperuserEnvsSection(vars)

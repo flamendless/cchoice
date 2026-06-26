@@ -12,15 +12,21 @@ module.exports = {
     },
     extend: {
       colors: {
-        cchoice: "#d9480f",
-        cchoice_c: "#2FB1F6",
-        cchoice_border: "#EE531B",
-        searchbar: "#F7EFEA",
-        cchoicesoft: "#F7EFEA",
-        cchoice_dark: "#EE531B",
+        primary: {
+          DEFAULT: '#d9480f',
+          dark: '#EE531B',
+          emphasis: '#F6742F',
+          hover: '#F46133',
+          muted: '#F6b08A',
+        },
+        surface: {
+          DEFAULT: '#F7EFEA',
+        },
+        accent: {
+          DEFAULT: '#2FB1F6',
+        },
       }
     },
   },
   plugins: [],
 }
-

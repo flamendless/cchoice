@@ -26,11 +26,11 @@ templ RelatedProducts(products []models.RelatedProduct) {
 							<p class="text-sm font-medium text-gray-900 line-clamp-2">{ p.Name }</p>
 							if p.DiscountPercentage != "" {
 								<div class="flex items-center gap-1">
-									<span class="text-sm font-bold text-cchoice">{ p.PriceDisplay }</span>
+									<span class="text-sm font-bold text-primary">{ p.PriceDisplay }</span>
 									<span class="text-xs text-gray-500 line-through">{ p.OrigPriceDisplay }</span>
 								</div>
 							} else {
-								<span class="text-sm font-bold text-cchoice">{ p.PriceDisplay }</span>
+								<span class="text-sm font-bold text-primary">{ p.PriceDisplay }</span>
 							}
 						</div>
 					</a>

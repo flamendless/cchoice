@@ -29,19 +29,19 @@ templ TabTitle(page string) {
 }
 
 templ HR() {
-	<hr class="border-2 border-cchoice_border mx-1 my-0.5"/>
+	<hr class="border-2 border-primary-dark mx-1 my-0.5"/>
 }
 
 templ HeadMeta() {
 	<base href="/"/>
-	<link rel="canonical" href="https://cchoice.shop/"/>
+	<link rel="canonical" href="https://primary.shop/"/>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 	<meta name="description" content="Your Partner in Progress"/>
 	<meta name="google" content="nositelinkssearchbox"/>
 	<meta name="robots" content="noarchive, noimageindex"/>
-	<meta name="keywords" content="cchoice, c-choice, construction, power tools"/>
+	<meta name="keywords" content="primary, c-choice, construction, power tools"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-	<!--<link rel="dns-prefetch" href="https://images1.cchoice.com"/>-->
+	<!--<link rel="dns-prefetch" href="https://images1.primary.com"/>-->
 	<link rel="preload" href={ constants.PathSVGLogoWithCompleteText } as="image" type="image/svg+xml"/>
 	<link
 		rel="preload"
@@ -64,7 +64,7 @@ templ HeadMeta() {
 		content="Your Partner in Progress"
 	/>
 	<meta property="og:type" content="website"/>
-	<!--<meta property="og:url" content="https://www.cchoice.com/"/>-->
+	<!--<meta property="og:url" content="https://www.primary.com/"/>-->
 	<meta property="og:image" content="https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-192x192/public"/>
 	<meta
 		property="og:image:secure_url"
@@ -123,9 +123,9 @@ templ IconActionButton(
 			title={ label }
 			class="
 				relative inline-block
-				group py-2 stroke-cchoice rounded-full
-				cursor-pointer hover:bg-cchoice_border
-				text-nowrap items-center flex flex-col text-xs text-cchoice
+				group py-2 stroke-primary rounded-full
+				cursor-pointer hover:bg-primary-dark
+				text-nowrap items-center flex flex-col text-xs text-primary
 				hover:text-white
 			"
 			_={ "on click go to url '" + utils.URL(href) + "'" }
@@ -148,9 +148,9 @@ templ IconAction(
 		class="
 			my-2 flex flex-col place-center
 			relative inline-block
-			group py-2 stroke-cchoice rounded-full w-16
-			cursor-pointer hover:bg-cchoice_border
-			text-nowrap items-center flex flex-col text-xs text-cchoice
+			group py-2 stroke-primary rounded-full w-16
+			cursor-pointer hover:bg-primary-dark
+			text-nowrap items-center flex flex-col text-xs text-primary
 			hover:text-white
 		"
 		_={ "on click go to url '" + utils.URL(href) + "'" }
@@ -166,8 +166,8 @@ templ ContinueShopping() {
 		href={ templ.SafeURL(utils.URL("/")) }
 		class="
 			flex justify-center items-center relative inline-block px-6 py-3
-			bg-cchoice font-medium rounded-lg text-white cursor-pointer
-			transition-colors rounded-full hover:bg-cchoicesoft
+			bg-primary font-medium rounded-lg text-white cursor-pointer
+			transition-colors rounded-full hover:bg-surface
 		"
 		title="Continue shopping"
 		alt="Continue shopping button"
@@ -236,7 +236,7 @@ templ DiscountRibbon(percentage string) {
 			class="
 				absolute w-full bottom-0
 				mb-1 bg-white/50
-				text-cchoice text-sm font-bold tracking-wide
+				text-primary text-sm font-bold tracking-wide
 				text-center
 			"
 		>
@@ -252,8 +252,8 @@ templ AddToCart() {
 		id="btn-add-to-cart"
 		class="
 			flex justify-center items-center relative inline-block w-12 h-12
-			bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors
-			group rounded-full hover:bg-cchoicesoft
+			bg-primary font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors
+			group rounded-full hover:bg-surface
 		"
 		title="add to cart"
 		alt="add to cart button"
@@ -282,7 +282,7 @@ templ AddToCart() {
 			end
 		"
 	>
-		@svg.Cart("", "stroke-white group-hover:stroke-cchoice_border w-full h-full p-2")
+		@svg.Cart("", "stroke-white group-hover:stroke-primary-dark w-full h-full p-2")
 		<span
 			class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow"
 		>
@@ -332,8 +332,8 @@ templ AddToCartPromoProduct() {
 		id="btn-add-to-cart"
 		class="
 			flex justify-center items-center relative inline-block w-12 h-12
-			bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors
-			group rounded-full hover:bg-cchoicesoft
+			bg-primary font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors
+			group rounded-full hover:bg-surface
 		"
 		title="add to cart"
 		alt="add to cart button"
@@ -362,7 +362,7 @@ templ AddToCartPromoProduct() {
 			end
 		"
 	>
-		@svgCart("", "stroke-white group-hover:stroke-cchoice_border w-full h-full p-2")
+		@svgCart("", "stroke-white group-hover:stroke-primary-dark w-full h-full p-2")
 		<span
 			class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 shadow"
 		>
