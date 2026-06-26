@@ -48,7 +48,7 @@ func CustomerLoginPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t#login-btn-content #login-spinner { display: none; }\n\t\t\t\t#login-btn-content.htmx-request #login-spinner { display: inline-block; }\n\t\t\t\t#login-btn-content.htmx-request .login-btn-text { display: none; }\n\t\t\t</style></head><body class=\"bg-cchoicesoft min-h-screen flex items-center justify-center py-4\" _=\"init call metrics_event('customer_visit', 'login')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t#login-btn-content #login-spinner { display: none; }\n\t\t\t\t#login-btn-content.htmx-request #login-spinner { display: inline-block; }\n\t\t\t\t#login-btn-content.htmx-request .login-btn-text { display: none; }\n\t\t\t</style></head><body class=\"bg-surface min-h-screen flex items-center justify-center py-4\" _=\"init call metrics_event('customer_visit', 'login')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -85,7 +85,7 @@ func CustomerLoginPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20 mx-auto mb-4\"><h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">C-Choice Customer Portal</h1><form action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20 mx-auto mb-4\"><h1 class=\"text-2xl font-bold text-center text-primary mb-6\">C-Choice Customer Portal</h1><form action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -124,7 +124,7 @@ func CustomerLoginPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"password\" class=\"block text-sm font-medium text-gray-700\">Password</label><div class=\"relative mt-1\"><input type=\"password\" id=\"password\" name=\"password\" required maxlength=\"64\" pattern=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"password\" class=\"block text-sm font-medium text-gray-700\">Password</label><div class=\"relative mt-1\"><input type=\"password\" id=\"password\" name=\"password\" required maxlength=\"64\" pattern=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -137,7 +137,7 @@ func CustomerLoginPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click\n\t\t\t\t\t\t\t\t\tif #password.type == 'password' then set #password.type to 'text'\n\t\t\t\t\t\t\t\t\t\tset my innerText to 'Hide'\n\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\tset #password.type to 'password'\n\t\t\t\t\t\t\t\t\t\tset my innerText to 'Show'\n\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\">Show</button></div></div><button type=\"submit\" class=\"w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\"><span id=\"login-btn-content\" class=\"inline-flex items-center gap-2\"><span id=\"login-spinner\" class=\"w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0\" aria-hidden=\"true\"></span> <span class=\"login-btn-text\">Log In</span></span></button></form><div class=\"mt-4 text-center\"><p class=\"text-sm text-gray-600\">Don't have an account? <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click\n\t\t\t\t\t\t\t\t\tif #password.type == 'password' then set #password.type to 'text'\n\t\t\t\t\t\t\t\t\t\tset my innerText to 'Hide'\n\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\tset #password.type to 'password'\n\t\t\t\t\t\t\t\t\t\tset my innerText to 'Show'\n\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\">Show</button></div></div><button type=\"submit\" class=\"w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary\"><span id=\"login-btn-content\" class=\"inline-flex items-center gap-2\"><span id=\"login-spinner\" class=\"w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0\" aria-hidden=\"true\"></span> <span class=\"login-btn-text\">Log In</span></span></button></form><div class=\"mt-4 text-center\"><p class=\"text-sm text-gray-600\">Don't have an account? <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -150,7 +150,7 @@ func CustomerLoginPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"text-cchoice hover:text-cchoice_dark font-medium\">Register here</a></p></div><div class=\"mt-2 text-center\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"text-primary hover:text-primary-dark font-medium\">Register here</a></p></div><div class=\"mt-2 text-center\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -163,7 +163,7 @@ func CustomerLoginPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" class=\"text-sm text-cchoice hover:text-cchoice_dark\">Forgot password?</a></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" class=\"text-sm text-primary hover:text-primary-dark\">Forgot password?</a></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -204,7 +204,7 @@ func CustomerRegisterPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</head><body class=\"bg-cchoicesoft min-h-screen flex items-center justify-center py-4\" _=\"init call metrics_event('customer_visit', 'register')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</head><body class=\"bg-surface min-h-screen flex items-center justify-center py-4\" _=\"init call metrics_event('customer_visit', 'register')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -241,7 +241,7 @@ func CustomerRegisterPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20 mx-auto mb-4\"><h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">C-Choice Customer Registration</h1><form class=\"space-y-4\" id=\"customer-register-form\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20 mx-auto mb-4\"><h1 class=\"text-2xl font-bold text-center text-primary mb-6\">C-Choice Customer Registration</h1><form class=\"space-y-4\" id=\"customer-register-form\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -254,7 +254,7 @@ func CustomerRegisterPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" hx-trigger=\"submit\"><div><label for=\"customer_type\" class=\"block text-sm font-medium text-gray-700\">Account Type</label> <select id=\"customer_type\" name=\"customer_type\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"on change\n\t\t\t\t\t\t\t\tif my.value == ''\n\t\t\t\t\t\t\t\t\tadd .hidden to #register-form-fields\n\t\t\t\t\t\t\t\t\tadd .hidden to #register-button-group\n\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\tremove .hidden from #register-form-fields\n\t\t\t\t\t\t\t\t\tremove .hidden from #register-button-group\n\t\t\t\t\t\t\t\t\tif my.value == 'company'\n\t\t\t\t\t\t\t\t\t\tremove .hidden from #company-name-group\n\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\tadd .hidden to #company-name-group\n\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\tend\"><option value=\"\">Select account type</option> <option value=\"customer\">Individual Customer</option> <option value=\"company\">Company</option></select></div><div id=\"register-form-fields\" class=\"hidden space-y-4\"><div id=\"company-name-group\" class=\"hidden\"><label for=\"company_name\" class=\"block text-sm font-medium text-gray-700\">Company Name</label> <input type=\"text\" id=\"company_name\" name=\"company_name\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div class=\"grid grid-cols-1 md:grid-cols-3 gap-4\"><div><label for=\"first_name\" class=\"block text-sm font-medium text-gray-700\">First Name</label> <input type=\"text\" id=\"first_name\" name=\"first_name\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"middle_name\" class=\"block text-sm font-medium text-gray-700\">Middle Name</label> <input type=\"text\" id=\"middle_name\" name=\"middle_name\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"last_name\" class=\"block text-sm font-medium text-gray-700\">Last Name</label> <input type=\"text\" id=\"last_name\" name=\"last_name\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\"><div><label for=\"birthdate\" class=\"block text-sm font-medium text-gray-700\">Birthdate</label> <input type=\"date\" id=\"birthdate\" name=\"birthdate\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"sex\" class=\"block text-sm font-medium text-gray-700\">Sex</label> <select id=\"sex\" name=\"sex\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select sex</option> <option value=\"male\">Male</option> <option value=\"female\">Female</option></select></div></div><div><label for=\"email\" class=\"block text-sm font-medium text-gray-700\">Email</label> <input type=\"email\" id=\"email\" name=\"email\" required pattern=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" hx-trigger=\"submit\"><div><label for=\"customer_type\" class=\"block text-sm font-medium text-gray-700\">Account Type</label> <select id=\"customer_type\" name=\"customer_type\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\" _=\"on change\n\t\t\t\t\t\t\t\tif my.value == ''\n\t\t\t\t\t\t\t\t\tadd .hidden to #register-form-fields\n\t\t\t\t\t\t\t\t\tadd .hidden to #register-button-group\n\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\tremove .hidden from #register-form-fields\n\t\t\t\t\t\t\t\t\tremove .hidden from #register-button-group\n\t\t\t\t\t\t\t\t\tif my.value == 'company'\n\t\t\t\t\t\t\t\t\t\tremove .hidden from #company-name-group\n\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\tadd .hidden to #company-name-group\n\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\tend\"><option value=\"\">Select account type</option> <option value=\"customer\">Individual Customer</option> <option value=\"company\">Company</option></select></div><div id=\"register-form-fields\" class=\"hidden space-y-4\"><div id=\"company-name-group\" class=\"hidden\"><label for=\"company_name\" class=\"block text-sm font-medium text-gray-700\">Company Name</label> <input type=\"text\" id=\"company_name\" name=\"company_name\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"></div><div class=\"grid grid-cols-1 md:grid-cols-3 gap-4\"><div><label for=\"first_name\" class=\"block text-sm font-medium text-gray-700\">First Name</label> <input type=\"text\" id=\"first_name\" name=\"first_name\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"middle_name\" class=\"block text-sm font-medium text-gray-700\">Middle Name</label> <input type=\"text\" id=\"middle_name\" name=\"middle_name\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"last_name\" class=\"block text-sm font-medium text-gray-700\">Last Name</label> <input type=\"text\" id=\"last_name\" name=\"last_name\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\"><div><label for=\"birthdate\" class=\"block text-sm font-medium text-gray-700\">Birthdate</label> <input type=\"date\" id=\"birthdate\" name=\"birthdate\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"sex\" class=\"block text-sm font-medium text-gray-700\">Sex</label> <select id=\"sex\" name=\"sex\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"\">Select sex</option> <option value=\"male\">Male</option> <option value=\"female\">Female</option></select></div></div><div><label for=\"email\" class=\"block text-sm font-medium text-gray-700\">Email</label> <input type=\"email\" id=\"email\" name=\"email\" required pattern=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -267,7 +267,7 @@ func CustomerRegisterPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"></div><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -288,7 +288,7 @@ func CustomerRegisterPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" class=\"block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click\n\t\t\t\t\t\t\t\t\tif #password.type == 'password' then\n\t\t\t\t\t\t\t\t\t\tset #password.type to 'text'\n\t\t\t\t\t\t\t\t\t\tset my.innerText to 'Hide'\n\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\tset #password.type to 'password'\n\t\t\t\t\t\t\t\t\t\tset my.innerText to 'Show'\n\t\t\t\t\t\t\t\t\tend\">Show</button></div></div><div><label for=\"confirm_password\" class=\"block text-sm font-medium text-gray-700\">Confirm Password</label><div class=\"relative mt-1\"><input type=\"password\" id=\"confirm_password\" name=\"confirm_password\" required minlength=\"8\" maxlength=\"64\" pattern=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" class=\"block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click\n\t\t\t\t\t\t\t\t\tif #password.type == 'password' then\n\t\t\t\t\t\t\t\t\t\tset #password.type to 'text'\n\t\t\t\t\t\t\t\t\t\tset my.innerText to 'Hide'\n\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\tset #password.type to 'password'\n\t\t\t\t\t\t\t\t\t\tset my.innerText to 'Show'\n\t\t\t\t\t\t\t\t\tend\">Show</button></div></div><div><label for=\"confirm_password\" class=\"block text-sm font-medium text-gray-700\">Confirm Password</label><div class=\"relative mt-1\"><input type=\"password\" id=\"confirm_password\" name=\"confirm_password\" required minlength=\"8\" maxlength=\"64\" pattern=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -301,7 +301,7 @@ func CustomerRegisterPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"\n\t\t\t\t\t\t\t\t\t\ton input or change\n\t\t\t\t\t\t\t\t\t\t\tif #password.value != my.value\n\t\t\t\t\t\t\t\t\t\t\t\tcall me.setCustomValidity('Passwords do not match')\n\t\t\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\t\t\tcall me.setCustomValidity('')\n\t\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click\n\t\t\t\t\t\t\t\t\t\tif #confirm_password.type == 'password' then set #confirm_password.type to 'text'\n\t\t\t\t\t\t\t\t\t\t\tset my innerText to 'Hide'\n\t\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\t\tset #confirm_password.type to 'password'\n\t\t\t\t\t\t\t\t\t\t\tset my innerText to 'Show'\n\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\">Show</button></div></div></div><div id=\"register-button-group\" class=\"hidden\"><button type=\"submit\" class=\"w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Register</button></div></form><div class=\"mt-4 text-center\"><p class=\"text-sm text-gray-600\">Already have an account? <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\" _=\"\n\t\t\t\t\t\t\t\t\t\ton input or change\n\t\t\t\t\t\t\t\t\t\t\tif #password.value != my.value\n\t\t\t\t\t\t\t\t\t\t\t\tcall me.setCustomValidity('Passwords do not match')\n\t\t\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\t\t\tcall me.setCustomValidity('')\n\t\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click\n\t\t\t\t\t\t\t\t\t\tif #confirm_password.type == 'password' then set #confirm_password.type to 'text'\n\t\t\t\t\t\t\t\t\t\t\tset my innerText to 'Hide'\n\t\t\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t\t\t\tset #confirm_password.type to 'password'\n\t\t\t\t\t\t\t\t\t\t\tset my innerText to 'Show'\n\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\">Show</button></div></div></div><div id=\"register-button-group\" class=\"hidden\"><button type=\"submit\" class=\"w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary\">Register</button></div></form><div class=\"mt-4 text-center\"><p class=\"text-sm text-gray-600\">Already have an account? <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -314,7 +314,7 @@ func CustomerRegisterPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" class=\"text-cchoice hover:text-cchoice_dark font-medium\">Login here</a></p></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" class=\"text-primary hover:text-primary-dark font-medium\">Login here</a></p></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -355,7 +355,7 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('customer_visit', 'portal')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('customer_visit', 'portal')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -392,7 +392,7 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" class=\"py-2 px-6 border border-cchoice rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Back to Shop</a><form action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" class=\"py-2 px-6 border border-primary rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary\">Back to Shop</a><form action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -405,7 +405,7 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\" method=\"POST\"><button type=\"submit\" class=\"py-2 px-6 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Log Out</button></form></div><div class=\"flex flex-wrap justify-center gap-6 max-w-4xl mx-auto\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\" method=\"POST\"><button type=\"submit\" class=\"py-2 px-6 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary\">Log Out</button></form></div><div class=\"flex flex-wrap justify-center gap-6 max-w-4xl mx-auto\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -418,7 +418,7 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Profile</h2></a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-primary\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-primary\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Profile</h2></a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -436,7 +436,7 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">C-Points</h2></a> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-primary\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-primary\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">C-Points</h2></a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -454,7 +454,7 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\"><div class=\"absolute top-2 right-2 bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded\">Must be verified</div><div class=\"flex justify-center mb-4 mt-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">C-Points</h2></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\"><div class=\"absolute top-2 right-2 bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded\">Must be verified</div><div class=\"flex justify-center mb-4 mt-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-primary\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">C-Points</h2></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -472,7 +472,7 @@ func CustomerPortalPage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-cchoice\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Portal</h2><p class=\"text-sm text-gray-600\">Browse products, add to cart, request quotation!</p></a></div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-primary\"><div class=\"flex justify-center mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"w-12 h-12 text-primary\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z\"></path></svg></div><h2 class=\"text-xl font-semibold text-gray-800 mb-2\">Portal</h2><p class=\"text-sm text-gray-600\">Browse products, add to cart, request quotation!</p></a></div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -513,7 +513,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('customer_visit', 'profile')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('customer_visit', 'profile')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -537,7 +537,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<h1 class=\"text-2xl font-bold text-cchoice text-center mb-6\">My Profile</h1><div class=\"mb-8 p-4 bg-gray-50 rounded-lg\"><div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\"><div><p class=\"text-sm text-gray-500\">Full Name</p><p class=\"font-medium text-gray-900\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<h1 class=\"text-2xl font-bold text-primary text-center mb-6\">My Profile</h1><div class=\"mb-8 p-4 bg-gray-50 rounded-lg\"><div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\"><div><p class=\"text-sm text-gray-500\">Full Name</p><p class=\"font-medium text-gray-900\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -698,7 +698,7 @@ func CustomerProfilePage(profile models.CustomerProfile) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\" hx-target=\"#verify-container\" hx-swap=\"outerHTML\"><button type=\"submit\" class=\"bg-cchoice text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors\">Send Verification Code</button></form></div><div id=\"otp-input-container\" class=\"mt-4\"><form hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\" hx-target=\"#verify-container\" hx-swap=\"outerHTML\"><button type=\"submit\" class=\"bg-primary text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors\">Send Verification Code</button></form></div><div id=\"otp-input-container\" class=\"mt-4\"><form hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -757,7 +757,7 @@ func CustomerProfileEditPage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</head><body class=\"bg-surface min-h-screen flex flex-col\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -781,7 +781,7 @@ func CustomerProfileEditPage(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "<h2 class=\"text-2xl font-bold text-cchoice mb-6\">Edit Profile</h2>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "<h2 class=\"text-2xl font-bold text-primary mb-6\">Edit Profile</h2>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -857,7 +857,7 @@ func CustomerProfileEditForm(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"middle_name\" class=\"block text-sm font-medium text-gray-700\">Middle Name</label> <input type=\"text\" id=\"middle_name\" name=\"middle_name\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"middle_name\" class=\"block text-sm font-medium text-gray-700\">Middle Name</label> <input type=\"text\" id=\"middle_name\" name=\"middle_name\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -870,7 +870,7 @@ func CustomerProfileEditForm(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"last_name\" class=\"block text-sm font-medium text-gray-700\">Last Name</label> <input type=\"text\" id=\"last_name\" name=\"last_name\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"last_name\" class=\"block text-sm font-medium text-gray-700\">Last Name</label> <input type=\"text\" id=\"last_name\" name=\"last_name\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -883,7 +883,7 @@ func CustomerProfileEditForm(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\"><div><label for=\"birthdate\" class=\"block text-sm font-medium text-gray-700\">Birthdate</label> <input type=\"date\" id=\"birthdate\" name=\"birthdate\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\"><div><label for=\"birthdate\" class=\"block text-sm font-medium text-gray-700\">Birthdate</label> <input type=\"date\" id=\"birthdate\" name=\"birthdate\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -896,7 +896,7 @@ func CustomerProfileEditForm(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"sex\" class=\"block text-sm font-medium text-gray-700\">Sex</label> <select id=\"sex\" name=\"sex\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"male\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"sex\" class=\"block text-sm font-medium text-gray-700\">Sex</label> <select id=\"sex\" name=\"sex\" required class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"male\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -937,7 +937,7 @@ func CustomerProfileEditForm(profile models.CustomerProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "\" class=\"px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Cancel</a> <button type=\"submit\" class=\"px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Save Changes</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "\" class=\"px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary\">Cancel</a> <button type=\"submit\" class=\"px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary\">Save Changes</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

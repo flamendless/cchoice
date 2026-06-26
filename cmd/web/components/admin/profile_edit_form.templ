@@ -13,7 +13,7 @@ templ AdminProfileEditForm(profile models.AdminStaffProfile) {
 				<button
 					type="submit"
 					form="profile-edit-form"
-					class="px-3 py-1.5 text-sm bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-cchoice"
+					class="px-3 py-1.5 text-sm bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary"
 					_="on click call metrics_event('admin_exec', 'save edit profile')"
 				>
 					Save Changes
@@ -49,7 +49,7 @@ templ AdminProfileEditForm(profile models.AdminStaffProfile) {
 					minlength="1"
 					maxlength="50"
 					pattern={ constants.PatternName }
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
 				/>
 			</div>
 			<div>
@@ -63,7 +63,7 @@ templ AdminProfileEditForm(profile models.AdminStaffProfile) {
 					value={ profile.MiddleName }
 					maxlength="50"
 					pattern={ constants.PatternName }
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
 				/>
 			</div>
 			<div>
@@ -79,7 +79,7 @@ templ AdminProfileEditForm(profile models.AdminStaffProfile) {
 					minlength="1"
 					maxlength="50"
 					pattern={ constants.PatternName }
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
 				/>
 			</div>
 			<div>
@@ -95,7 +95,7 @@ templ AdminProfileEditForm(profile models.AdminStaffProfile) {
 					name="birthdate"
 					value={ profile.Birthdate }
 					required
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
 				/>
 			</div>
 			<div>
@@ -108,7 +108,7 @@ templ AdminProfileEditForm(profile models.AdminStaffProfile) {
 					name="date_hired"
 					value={ profile.DateHired }
 					required
-					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
 				/>
 			</div>
 		</form>

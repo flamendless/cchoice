@@ -40,7 +40,7 @@ func ActivePromosSection(promos []models.PromoItem) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, promo := range promos {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"flex flex-col justify-center w-full lg:w-1/2 overflow-hidden rounded-lg shadow-md bg-cchoicesoft\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"flex flex-col justify-center w-full lg:w-1/2 overflow-hidden rounded-lg shadow-md bg-surface\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -133,7 +133,7 @@ func ActivePromosSection(promos []models.PromoItem) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if !promo.BannerOnly {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<h3 class=\"text-lg font-semibold text-cchoice\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<h3 class=\"text-lg font-semibold text-primary\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

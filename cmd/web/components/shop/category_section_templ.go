@@ -64,7 +64,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 			return templ_7745c5c3_Err
 		}
 		if data.Subcategory != data.Category {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<p class=\"text-sm font-normal text-cchoice_dark m-2 ml-4 my-0\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<p class=\"text-sm font-normal text-primary-dark m-2 ml-4 my-0\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -87,7 +87,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 			return templ_7745c5c3_Err
 		}
 		for _, product := range data.Products {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<a class=\"group flex flex-col items-center m-1 sm:m-2 ml-2 sm:ml-4 p-2 rounded-lg hover:bg-cchoicesoft transition-colors cursor-pointer\" href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<a class=\"group flex flex-col items-center m-1 sm:m-2 ml-2 sm:ml-4 p-2 rounded-lg hover:bg-surface transition-colors cursor-pointer\" href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -274,7 +274,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 				return templ_7745c5c3_Err
 			}
 			if product.DiscountPercentage != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<p class=\"text-sm font-semibold text-cchoice text-center\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<p class=\"text-sm font-semibold text-primary text-center\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -305,7 +305,7 @@ func CategorySectionProducts(data models.CategorySectionProducts) templ.Componen
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<p class=\"text-xs font-semibold text-cchoice\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<p class=\"text-xs font-semibold text-primary\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -371,7 +371,7 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "\" class=\"text-base font-medium text-cchoice_dark m-2 my-0 scroll-mt-20\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "\" class=\"text-base font-medium text-primary-dark m-2 my-0 scroll-mt-20\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -389,7 +389,7 @@ func CategorySection(page int, categories []models.GroupedCategorySection) templ
 				return templ_7745c5c3_Err
 			}
 			for _, subcategory := range category.Subcategories {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"w-full max-w-full ml-0.5 pr-2 lg:pr-6 border-cchoice_border\" hx-trigger=\"load once, history:restore\" hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"w-full max-w-full ml-0.5 pr-2 lg:pr-6 border-primary-dark\" hx-trigger=\"load once, history:restore\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

@@ -98,7 +98,7 @@ func SaleBanner(product models.RandomSaleProduct) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"w-full h-64 object-cover\" loading=\"lazy\"><!-- Product Info --><div class=\"p-6 bg-gradient-to-r from-cchoicesoft to-white\"><div class=\"flex items-center justify-between mb-3\"><div><h3 class=\"text-xl font-bold text-gray-900 truncate\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"w-full h-64 object-cover\" loading=\"lazy\"><!-- Product Info --><div class=\"p-6 bg-gradient-to-r from-surface to-white\"><div class=\"flex items-center justify-between mb-3\"><div><h3 class=\"text-xl font-bold text-gray-900 truncate\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -124,7 +124,7 @@ func SaleBanner(product models.RandomSaleProduct) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</p></div><div class=\"bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold text-center\">Limited Offer</div></div><div class=\"flex items-center justify-between\"><div><p class=\"text-2xl font-bold text-cchoice\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</p></div><div class=\"bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold text-center\">Limited Offer</div></div><div class=\"flex items-center justify-between\"><div><p class=\"text-2xl font-bold text-primary\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

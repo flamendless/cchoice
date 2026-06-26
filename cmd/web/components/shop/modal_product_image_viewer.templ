@@ -57,7 +57,7 @@ templ ModalProductImageViewer(productID string, imageData string) {
 				<span
 					class="absolute top-0 right-0 size-8
 						rounded-full flex items-center justify-center transform translate-x-1/2 -translate-y-1/2
-						text-white bg-cchoice hover:bg-cchoice_dark font-medium text-xs cursor-pointer transition-colors"
+						text-white bg-primary hover:bg-primary-dark font-medium text-xs cursor-pointer transition-colors"
 					title="close image viewer"
 					_="on click trigger closeModal"
 				>
@@ -67,7 +67,7 @@ templ ModalProductImageViewer(productID string, imageData string) {
 			<div class="flex flex-col items-center bg-white w-full px-4 pt-4">
 				<p id="modal-product-name" class="text-base font-semibold text-center"></p>
 				<p id="modal-product-brand" class="text-sm font-light text-gray-600"></p>
-				<p id="modal-product-price" class="text-sm font-semibold text-cchoice"></p>
+				<p id="modal-product-price" class="text-sm font-semibold text-primary"></p>
 			</div>
 			<div
 				class="flex flex-row h-auto justify-center w-full bg-white p-2"
@@ -75,14 +75,14 @@ templ ModalProductImageViewer(productID string, imageData string) {
 				// <button
 				// 	class="
 				// 		flex justify-center items-center w-12 h-12
-				// 		bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group
-				// 		rounded-full hover:bg-cchoicesoft
+				// 		bg-primary font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group
+				// 		rounded-full hover:bg-surface
 				// 	"
 				// 	title="go to product page"
 				// 	alt="go to product page button"
 				// 	_="on click log 'TODO'"
 				// >
-				// 	@svgOpen("stroke-white group-hover:stroke-cchoice_border w-full h-full p-2")
+				// 	@svgOpen("stroke-white group-hover:stroke-primary-dark w-full h-full p-2")
 				// </button>
 				@common.AddToCart()
 			</div>

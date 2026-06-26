@@ -7,10 +7,10 @@
 			link.dataset.clickListenerAdded = "true";
 			link.addEventListener("click", function(e) {
 				document.querySelectorAll(".brand-filter-link").forEach(function(l) {
-					l.classList.remove("underline", "bg-cchoice", "font-semibold", "text-white");
+					l.classList.remove("underline", "bg-primary", "font-semibold", "text-white");
 				});
 
-				this.classList.add("underline", "bg-cchoice", "font-semibold", "text-white");
+				this.classList.add("underline", "bg-primary", "font-semibold", "text-white");
 
 				// TODO: (Brandon): Implement brand filtering logic. For now, just navigate to the URL
 				const brandName = this.getAttribute("data-brand-name");

@@ -103,7 +103,7 @@ func CancelPaymentPageBody(orderRefNumber string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"flex flex-col items-center content-center px-2 pb-32 pt-[128px] gap-4\"><div class=\"flex flex-col items-center justify-center gap-4 max-w-2xl mx-auto px-8\"><h1 class=\"text-3xl font-semibold text-cchoice-800\">Payment Cancelled</h1><p class=\"text-lg text-gray-600 text-center\">Your payment has been cancelled. No charges have been made to your account.</p><div class=\"bg-gray-50 border border-gray-200 rounded-lg p-4 mt-2\"><p class=\"text-sm text-gray-600 mb-1\">Order Reference Number:</p><p class=\"text-base font-mono font-semibold text-red-800\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"flex flex-col items-center content-center px-2 pb-32 pt-[128px] gap-4\"><div class=\"flex flex-col items-center justify-center gap-4 max-w-2xl mx-auto px-8\"><h1 class=\"text-3xl font-semibold text-primary-dark\">Payment Cancelled</h1><p class=\"text-lg text-gray-600 text-center\">Your payment has been cancelled. No charges have been made to your account.</p><div class=\"bg-gray-50 border border-gray-200 rounded-lg p-4 mt-2\"><p class=\"text-sm text-gray-600 mb-1\">Order Reference Number:</p><p class=\"text-base font-mono font-semibold text-red-800\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -129,7 +129,7 @@ func CancelPaymentPageBody(orderRefNumber string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"flex justify-center items-center relative inline-block px-6 py-3 bg-cchoice font-medium rounded-lg text-white cursor-pointer transition-colors rounded-full hover:bg-cchoicesoft\" title=\"Return to cart\" alt=\"Return to cart button\">Return to Cart</a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"flex justify-center items-center relative inline-block px-6 py-3 bg-primary font-medium rounded-lg text-white cursor-pointer transition-colors rounded-full hover:bg-surface\" title=\"Return to cart\" alt=\"Return to cart button\">Return to Cart</a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -38,7 +38,7 @@ templ ImageUploadField(params ImageUploadParams) {
 			type="file"
 			name={ params.Name }
 			accept={ params.Accept }
-			class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-cchoice file:text-white hover:file:bg-cchoicedark"
+			class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark"
 			data-upload-preview
 			data-max-size={ strconv.FormatInt(params.MaxSize, 10) }
 		/>

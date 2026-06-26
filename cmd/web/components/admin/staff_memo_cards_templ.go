@@ -88,7 +88,7 @@ func StaffMemoCard(memo models.StaffMemoCard) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"bg-white rounded-lg shadow-md border-2 border-cchoice p-6\"><h2 class=\"text-xl font-semibold text-cchoice mb-3\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"bg-white rounded-lg shadow-md border-2 border-primary p-6\"><h2 class=\"text-xl font-semibold text-primary mb-3\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -132,7 +132,7 @@ func StaffMemoCard(memo models.StaffMemoCard) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"inline-flex items-center gap-2 text-cchoice hover:text-cchoicedark hover:underline text-sm font-medium\" _=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"inline-flex items-center gap-2 text-primary hover:text-primary-dark hover:underline text-sm font-medium\" _=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -199,7 +199,7 @@ func StaffMemoCard(memo models.StaffMemoCard) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" type=\"button\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark text-sm disabled:opacity-50 disabled:cursor-not-allowed\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" type=\"button\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm disabled:opacity-50 disabled:cursor-not-allowed\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -264,7 +264,7 @@ func StaffMemoRejectModal(memoID string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" hx-swap=\"none\" class=\"flex flex-col gap-4\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('memo-reject-modal-container').innerHTML = '' }\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Reason for rejection <span class=\"text-red-500\">*</span></label> <textarea name=\"reject_reason\" required rows=\"4\" placeholder=\"Please explain why you are rejecting this memo...\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></textarea></div><div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm\" _=\"on click trigger closeRejectModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm\">Submit Rejection</button></div></form></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" hx-swap=\"none\" class=\"flex flex-col gap-4\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('memo-reject-modal-container').innerHTML = '' }\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Reason for rejection <span class=\"text-red-500\">*</span></label> <textarea name=\"reject_reason\" required rows=\"4\" placeholder=\"Please explain why you are rejecting this memo...\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></textarea></div><div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm\" _=\"on click trigger closeRejectModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm\">Submit Rejection</button></div></form></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

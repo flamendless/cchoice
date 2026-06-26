@@ -19,8 +19,8 @@ templ BrandsSidePanelList(selectedBrandLabel string, brands []models.BrandSidePa
 				id={ "brand-link-" + brand.BrandID }
 				href={ templ.SafeURL(brand.URL) }
 				class={
-					templ.KV("text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft transition-colors brand-filter-link", true),
-					templ.KV("underline bg-cchoice font-semibold text-white", brand.Label == selectedBrandLabel),
+					templ.KV("text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-surface transition-colors brand-filter-link", true),
+					templ.KV("underline bg-primary font-semibold text-white", brand.Label == selectedBrandLabel),
 				}
 				data-brand-name={ brand.Label }
 				data-brand-id={ brand.BrandID }
@@ -47,7 +47,7 @@ templ BrandsSidePanel() {
 		id="brands-side-panel"
 		class="
 			w-full flex flex-col
-			border-b-2 border-cchoice_border
+			border-b-2 border-primary-dark
 		"
 	>
 		<div

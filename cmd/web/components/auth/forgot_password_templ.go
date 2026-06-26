@@ -48,7 +48,7 @@ func ForgotPasswordPage(userType enums.UserType) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t#forgot-btn-content #forgot-spinner { display: none; }\n\t\t\t\t#forgot-btn-content.htmx-request #forgot-spinner { display: inline-block; }\n\t\t\t\t#forgot-btn-content.htmx-request .forgot-btn-text { display: none; }\n\t\t\t</style></head><body class=\"bg-cchoicesoft min-h-screen flex items-center justify-center\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t#forgot-btn-content #forgot-spinner { display: none; }\n\t\t\t\t#forgot-btn-content.htmx-request #forgot-spinner { display: inline-block; }\n\t\t\t\t#forgot-btn-content.htmx-request .forgot-btn-text { display: none; }\n\t\t\t</style></head><body class=\"bg-surface min-h-screen flex items-center justify-center\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -85,7 +85,7 @@ func ForgotPasswordPage(userType enums.UserType) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20 mx-auto mb-4\"><h1 class=\"text-2xl font-bold text-center text-cchoice mb-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" alt=\"C-Choice Logo\" class=\"w-20 h-20 mx-auto mb-4\"><h1 class=\"text-2xl font-bold text-center text-primary mb-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -152,7 +152,7 @@ func ForgotPasswordPage(userType enums.UserType) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><button type=\"submit\" class=\"w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\"><span id=\"forgot-btn-content\" class=\"inline-flex items-center gap-2\"><span id=\"forgot-spinner\" class=\"w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0\" aria-hidden=\"true\"></span> <span class=\"forgot-btn-text\">Send Reset Link</span></span></button></form><div class=\"mt-6 text-center text-sm\"><p class=\"text-gray-600\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary\"></div><button type=\"submit\" class=\"w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary\"><span id=\"forgot-btn-content\" class=\"inline-flex items-center gap-2\"><span id=\"forgot-spinner\" class=\"w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0\" aria-hidden=\"true\"></span> <span class=\"forgot-btn-text\">Send Reset Link</span></span></button></form><div class=\"mt-6 text-center text-sm\"><p class=\"text-gray-600\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -171,7 +171,7 @@ func ForgotPasswordPage(userType enums.UserType) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"text-cchoice hover:text-cchoice_dark font-medium\">Login here</a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"text-primary hover:text-primary-dark font-medium\">Login here</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -189,7 +189,7 @@ func ForgotPasswordPage(userType enums.UserType) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" class=\"text-cchoice hover:text-cchoice_dark font-medium\">Login here</a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" class=\"text-primary hover:text-primary-dark font-medium\">Login here</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

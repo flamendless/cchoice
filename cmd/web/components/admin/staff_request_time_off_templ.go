@@ -48,7 +48,7 @@ func AdminStaffRequestTimeOffPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'request time off')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'request time off')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -122,7 +122,7 @@ func RequestTimeOffForm() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<form class=\"space-y-4\"><div><label for=\"type\" class=\"block text-sm font-medium text-gray-700 mb-1\">Type</label> <select id=\"type\" name=\"type\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cchoice focus:border-cchoice\"><option value=\"\">-- Select Type --</option> <option value=\"VL\">Vacation Leave</option> <option value=\"SL\">Sick Leave</option> <option value=\"ABSENT\">Absent</option></select></div><div class=\"flex flex-row gap-4\"><div><label for=\"start-date\" class=\"block text-sm font-medium text-gray-700 mb-1\">Start Date</label>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<form class=\"space-y-4\"><div><label for=\"type\" class=\"block text-sm font-medium text-gray-700 mb-1\">Type</label> <select id=\"type\" name=\"type\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary\"><option value=\"\">-- Select Type --</option> <option value=\"VL\">Vacation Leave</option> <option value=\"SL\">Sick Leave</option> <option value=\"ABSENT\">Absent</option></select></div><div class=\"flex flex-row gap-4\"><div><label for=\"start-date\" class=\"block text-sm font-medium text-gray-700 mb-1\">Start Date</label>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -138,7 +138,7 @@ func RequestTimeOffForm() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div><div><label for=\"description\" class=\"block text-sm font-medium text-gray-700 mb-1\">Description</label> <input type=\"text\" id=\"description\" name=\"description\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-cchoice focus:border-cchoice\" placeholder=\"Enter description\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div><div><label for=\"description\" class=\"block text-sm font-medium text-gray-700 mb-1\">Description</label> <input type=\"text\" id=\"description\" name=\"description\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary\" placeholder=\"Enter description\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

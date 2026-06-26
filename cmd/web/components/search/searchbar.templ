@@ -33,15 +33,15 @@ templ SearchBarDesktop() {
 					end
 				"
 			>
-				@svg.Search("icon-search", "text-cchoice")
+				@svg.Search("icon-search", "text-primary")
 				<svg
 					id="icon-spinner-search"
-					class="w-7 text-cchoice hidden"
+					class="w-7 text-primary-emphasis hidden"
 					aria-hidden="true"
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 300 150"
 				>
-					<path fill="none" stroke="#F6742F" stroke-width="15" stroke-linecap="round" stroke-dasharray="300 385" stroke-dashoffset="0" d="M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z">
+					<path fill="none" stroke="currentColor" stroke-width="15" stroke-linecap="round" stroke-dasharray="300 385" stroke-dashoffset="0" d="M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z">
 						<animate attributeName="stroke-dashoffset" calcMode="spline" dur="2" values="685;-685" keySplines="0 0 1 1" repeatCount="indefinite"></animate>
 					</path>
 				</svg>
@@ -52,8 +52,8 @@ templ SearchBarDesktop() {
 				name="search"
 				autocomplete="off"
 				placeholder="Search by product name..."
-				class="block w-full p-3 ps-10 text-sm text-black border border-searchbar rounded-lg bg-searchbar
-						focus:ring-cchoice focus:border-cchoice"
+				class="block w-full p-3 ps-10 text-sm text-black border border-surface rounded-lg bg-surface
+						focus:ring-primary focus:border-primary"
 				hx-post={ utils.URL("/search") }
 				hx-trigger="
 					input[this.value.length >= 3] delay:300ms,
@@ -75,9 +75,9 @@ templ SearchBarDesktop() {
 			<!-- 	type="submit" -->
 			<!-- 	class=" -->
 			<!-- 		flex items-center justify-center gap-1 -->
-			<!-- 		text-white absolute end-2.5 bottom-2 bg-cchoice -->
+			<!-- 		text-white absolute end-2.5 bottom-2 bg-primary -->
 			<!-- 		font-medium rounded-lg text-sm px-2 py-1 -->
-			<!-- 		hover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice transition-colors -->
+			<!-- 		hover:bg-primary-dark focus:ring-4 focus:outline-hidden focus:ring-primary transition-colors -->
 			<!-- 	" -->
 			<!-- 	alt="search button" -->
 			<!-- 	aria-label="Search" -->

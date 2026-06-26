@@ -50,7 +50,7 @@ func AdminMemosListPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'memos list')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'memos list')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -74,7 +74,7 @@ func AdminMemosListPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">Manage Memos</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-primary mb-6\">Manage Memos</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -161,7 +161,7 @@ func MemosToolbar() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"mb-6 flex flex-wrap gap-3 items-center justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"mb-6 flex flex-wrap gap-3 items-center justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -262,7 +262,7 @@ func MemoTableRow(memo models.AdminMemoListItem, currentStaffID string, isSuperu
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\"><td class=\"px-4 py-4 whitespace-nowrap text-sm\"><button type=\"button\" class=\"px-2 py-1 text-cchoice hover:bg-cchoicesoft rounded\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\"><td class=\"px-4 py-4 whitespace-nowrap text-sm\"><button type=\"button\" class=\"px-2 py-1 text-primary hover:bg-surface rounded\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -450,7 +450,7 @@ func MemoActionsCell(memo models.AdminMemoListItem, currentStaffID string, isSup
 			templ_7745c5c3_Var20 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div class=\"flex items-center gap-2\"><button type=\"button\" class=\"px-3 py-1 bg-cchoice text-white rounded-md hover:bg-cchoicedark text-sm cursor-pointer\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div class=\"flex items-center gap-2\"><button type=\"button\" class=\"px-3 py-1 bg-primary text-white rounded-md hover:bg-primary-dark text-sm cursor-pointer\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -487,7 +487,7 @@ func MemoActionsCell(memo models.AdminMemoListItem, currentStaffID string, isSup
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<button type=\"button\" class=\"px-2 py-1 bg-cchoice text-white rounded-md hover:bg-cchoicedark cursor-pointer\" title=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<button type=\"button\" class=\"px-2 py-1 bg-primary text-white rounded-md hover:bg-primary-dark cursor-pointer\" title=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -588,7 +588,7 @@ func MemoFileURLCell(url string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-cchoice hover:text-cchoicedark shrink-0\" title=\"Open file\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14\"></path></svg></a></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-primary hover:text-primary-dark shrink-0\" title=\"Open file\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14\"></path></svg></a></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -989,7 +989,7 @@ func MemoFormFields(memo models.AdminMemoListItem, allStaff []models.Staff, sele
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Message <span class=\"text-red-500\">*</span></label> <textarea name=\"message\" required rows=\"4\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Message <span class=\"text-red-500\">*</span></label> <textarea name=\"message\" required rows=\"4\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1015,7 +1015,7 @@ func MemoFormFields(memo models.AdminMemoListItem, allStaff []models.Staff, sele
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" placeholder=\"https://drive.google.com/...\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div class=\"grid grid-cols-1 sm:grid-cols-3 gap-4\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Status <span class=\"text-red-500\">*</span></label> <select name=\"status\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" placeholder=\"https://drive.google.com/...\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div class=\"grid grid-cols-1 sm:grid-cols-3 gap-4\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Status <span class=\"text-red-500\">*</span></label> <select name=\"status\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1085,7 +1085,7 @@ func MemoFormFields(memo models.AdminMemoListItem, allStaff []models.Staff, sele
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "<div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark text-sm\">Save</button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "<div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm\">Save</button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1140,7 +1140,7 @@ func MemoStartDateField(value string, isEdit bool) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "\" required class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"on change\n\t\t\t\tset #end_date.min to my.value\n\t\t\t\tif #end_date.value < my.value\n\t\t\t\t\tset #end_date.value to ''\n\t\t\t\tend\n\t\t\t\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "\" required class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\" _=\"on change\n\t\t\t\tset #end_date.min to my.value\n\t\t\t\tif #end_date.value < my.value\n\t\t\t\t\tset #end_date.value to ''\n\t\t\t\tend\n\t\t\t\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1195,7 +1195,7 @@ func MemoEndDateField(startDate string, value string, isEdit bool) templ.Compone
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "\" required class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "\" required class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1250,12 +1250,12 @@ func MemoStaffChecklist(allStaff []models.Staff, selectedIDs []string, currentSt
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "</span> <button type=\"button\" class=\"text-sm text-cchoice hover:underline\" _=\"\n\t\t\t\t\t\ton click\n\t\t\t\t\t\t\tfor cb in <.memo-staff-checkbox/> in #memo-staff-checklist\n\t\t\t\t\t\t\t\tset cb.checked to true\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tcall updateMemoStaffCount() on #memo-staff-recipients\n\t\t\t\t\t\">Select All</button></div></div><div class=\"border border-gray-200 rounded-md max-h-48 overflow-y-auto\" id=\"memo-staff-checklist\"><table class=\"min-w-full divide-y divide-gray-200\"><thead class=\"bg-gray-50 sticky top-0\"><tr><th class=\"px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase w-12\"></th><th class=\"px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase\">Name</th><th class=\"px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase\">Email</th><th class=\"px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase\">Position</th><th class=\"px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase\">User Type</th></tr></thead> <tbody class=\"divide-y divide-gray-200\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "</span> <button type=\"button\" class=\"text-sm text-primary hover:underline\" _=\"\n\t\t\t\t\t\ton click\n\t\t\t\t\t\t\tfor cb in <.memo-staff-checkbox/> in #memo-staff-checklist\n\t\t\t\t\t\t\t\tset cb.checked to true\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tcall updateMemoStaffCount() on #memo-staff-recipients\n\t\t\t\t\t\">Select All</button></div></div><div class=\"border border-gray-200 rounded-md max-h-48 overflow-y-auto\" id=\"memo-staff-checklist\"><table class=\"min-w-full divide-y divide-gray-200\"><thead class=\"bg-gray-50 sticky top-0\"><tr><th class=\"px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase w-12\"></th><th class=\"px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase\">Name</th><th class=\"px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase\">Email</th><th class=\"px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase\">Position</th><th class=\"px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase\">User Type</th></tr></thead> <tbody class=\"divide-y divide-gray-200\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, staff := range allStaff {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "<tr><td class=\"px-4 py-2\"><input type=\"checkbox\" class=\"memo-staff-checkbox rounded border-gray-300 text-cchoice focus:ring-cchoice\" name=\"staff_ids\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "<tr><td class=\"px-4 py-2\"><input type=\"checkbox\" class=\"memo-staff-checkbox rounded border-gray-300 text-primary focus:ring-primary\" name=\"staff_ids\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

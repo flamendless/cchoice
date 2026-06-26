@@ -16,7 +16,7 @@ templ AdminStaffHomePage(fullName string, roles []enums.StaffRole, memos []model
 			@common.TabTitle("[STAFF] C-Choice Admin")
 		</head>
 		<body
-			class="bg-cchoicesoft min-h-screen flex flex-col"
+			class="bg-surface min-h-screen flex flex-col"
 			_="init call metrics_event('admin_visit', 'staff home')"
 		>
 			@common.DevRibbon()
@@ -30,7 +30,7 @@ templ AdminStaffHomePage(fullName string, roles []enums.StaffRole, memos []model
 						for _, card := range getAllStaffCards(roles) {
 							<a
 								href={ utils.URL(card.Link) }
-								class="block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice"
+								class="block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-primary"
 							>
 								<div class="flex justify-center mb-4">
 									@card.Icon

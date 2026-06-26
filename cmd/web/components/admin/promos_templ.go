@@ -50,7 +50,7 @@ func AdminPromosListPage(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'promos list')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'promos list')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -74,7 +74,7 @@ func AdminPromosListPage(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">Manage Promos</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-primary mb-6\">Manage Promos</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -169,7 +169,7 @@ func PromosToolbar() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"mb-6 flex flex-wrap gap-3 items-center justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"mb-6 flex flex-wrap gap-3 items-center justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -441,7 +441,7 @@ func PromoMediaLink(url string, mediaType enums.PromoType) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-cchoice hover:underline flex items-center gap-1\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M14.752 14.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z\"></path> <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg> View Video</a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-primary hover:underline flex items-center gap-1\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M14.752 14.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z\"></path> <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg> View Video</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -459,7 +459,7 @@ func PromoMediaLink(url string, mediaType enums.PromoType) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-cchoice hover:underline flex items-center gap-1\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z\"></path></svg> View Image</a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-primary hover:underline flex items-center gap-1\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z\"></path></svg> View Image</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -638,7 +638,7 @@ func PromoCreateForm() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" hx-swap=\"outerHTML\" class=\"flex flex-col gap-4\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('promo-create-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/promos/table', { target: '#promos-table', swap: 'innerHTML' }) }\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Title <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"title\" placeholder=\"Enter promo title\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Description <span class=\"text-red-500\">*</span></label> <textarea name=\"description\" placeholder=\"Enter promo description\" required rows=\"3\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"></textarea></div><div class=\"flex items-center gap-2\"><input type=\"checkbox\" name=\"banner_only\" id=\"banner_only\" class=\"w-5 h-5 accent-cchoice rounded focus:ring-cchoice focus:border-cchoice\"> <label for=\"banner_only_edit\" class=\"text-sm font-medium text-gray-700 cursor-pointer\">Banner Image Only</label></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Priority (lower number > more priority)</label> <input type=\"number\" id=\"priority\" name=\"priority\" min=\"0\" step=\"1\" max=\"100\" value=\"1\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div class=\"grid grid-cols-2 gap-4\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Start Date <span class=\"text-red-500\">*</span></label> <input id=\"start_date\" type=\"date\" name=\"start_date\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\" _=\"on change\n\t\t\t\t\t\tset #end_date.min to my.value\n\t\t\t\t\t\tif #end_date.value < my.value\n\t\t\t\t\t\t\tset #end_date.value to ''\n\t\t\t\t\t\tend\n\t\t\t\t\t\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">End Date <span class=\"text-red-500\">*</span></label> <input id=\"end_date\" type=\"date\" name=\"end_date\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\" _=\"on change\n\t\t\t\t\t\tset #start_date.max to my.value\n\t\t\t\t\t\tif #start_date.value > my.value\n\t\t\t\t\t\t\tset #start_date.value to ''\n\t\t\t\t\t\tend\n\t\t\t\t\t\"></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Type <span class=\"text-red-500\">*</span></label> <select name=\"type\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\" onchange=\"toggleMediaInput(this.value)\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" hx-swap=\"outerHTML\" class=\"flex flex-col gap-4\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('promo-create-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/promos/table', { target: '#promos-table', swap: 'innerHTML' }) }\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Title <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"title\" placeholder=\"Enter promo title\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Description <span class=\"text-red-500\">*</span></label> <textarea name=\"description\" placeholder=\"Enter promo description\" required rows=\"3\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></textarea></div><div class=\"flex items-center gap-2\"><input type=\"checkbox\" name=\"banner_only\" id=\"banner_only\" class=\"w-5 h-5 accent-primary rounded focus:ring-primary focus:border-primary\"> <label for=\"banner_only_edit\" class=\"text-sm font-medium text-gray-700 cursor-pointer\">Banner Image Only</label></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Priority (lower number > more priority)</label> <input type=\"number\" id=\"priority\" name=\"priority\" min=\"0\" step=\"1\" max=\"100\" value=\"1\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div class=\"grid grid-cols-2 gap-4\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Start Date <span class=\"text-red-500\">*</span></label> <input id=\"start_date\" type=\"date\" name=\"start_date\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\" _=\"on change\n\t\t\t\t\t\tset #end_date.min to my.value\n\t\t\t\t\t\tif #end_date.value < my.value\n\t\t\t\t\t\t\tset #end_date.value to ''\n\t\t\t\t\t\tend\n\t\t\t\t\t\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">End Date <span class=\"text-red-500\">*</span></label> <input id=\"end_date\" type=\"date\" name=\"end_date\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\" _=\"on change\n\t\t\t\t\t\tset #start_date.max to my.value\n\t\t\t\t\t\tif #start_date.value > my.value\n\t\t\t\t\t\t\tset #start_date.value to ''\n\t\t\t\t\t\tend\n\t\t\t\t\t\"></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Type <span class=\"text-red-500\">*</span></label> <select name=\"type\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\" onchange=\"toggleMediaInput(this.value)\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -690,7 +690,7 @@ func PromoCreateForm() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</div><div id=\"media_url_field\" class=\"hidden\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Media URL <span class=\"text-red-500\">*</span></label> <input type=\"url\" name=\"media_url\" placeholder=\"https://youtube.com/watch?v=...\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"><p class=\"mt-1 text-xs text-gray-500\">Provide video URL or YouTube link</p></div><script>\n\t\t\tfunction toggleMediaInput(promoType) {\n\t\t\t\tconst urlField = document.getElementById('media_url_field');\n\t\t\t\tconst uploadField = document.getElementById('media_upload_field');\n\t\t\t\tif (promoType === 'BANNER_VIDEO') {\n\t\t\t\t\turlField.classList.remove('hidden');\n\t\t\t\t\tuploadField.classList.add('hidden');\n\t\t\t\t\turlField.querySelector('input').setAttribute('required', 'true');\n\t\t\t\t\tuploadField.querySelector('input').removeAttribute('required');\n\t\t\t\t} else {\n\t\t\t\t\turlField.classList.add('hidden');\n\t\t\t\t\tuploadField.classList.remove('hidden');\n\t\t\t\t\turlField.querySelector('input').removeAttribute('required');\n\t\t\t\t\tuploadField.querySelector('input').setAttribute('required', 'true');\n\t\t\t\t}\n\t\t\t}\n\t\t</script><div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm\">Create</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</div><div id=\"media_url_field\" class=\"hidden\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Media URL <span class=\"text-red-500\">*</span></label> <input type=\"url\" name=\"media_url\" placeholder=\"https://youtube.com/watch?v=...\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"><p class=\"mt-1 text-xs text-gray-500\">Provide video URL or YouTube link</p></div><script>\n\t\t\tfunction toggleMediaInput(promoType) {\n\t\t\t\tconst urlField = document.getElementById('media_url_field');\n\t\t\t\tconst uploadField = document.getElementById('media_upload_field');\n\t\t\t\tif (promoType === 'BANNER_VIDEO') {\n\t\t\t\t\turlField.classList.remove('hidden');\n\t\t\t\t\tuploadField.classList.add('hidden');\n\t\t\t\t\turlField.querySelector('input').setAttribute('required', 'true');\n\t\t\t\t\tuploadField.querySelector('input').removeAttribute('required');\n\t\t\t\t} else {\n\t\t\t\t\turlField.classList.add('hidden');\n\t\t\t\t\tuploadField.classList.remove('hidden');\n\t\t\t\t\turlField.querySelector('input').removeAttribute('required');\n\t\t\t\t\tuploadField.querySelector('input').setAttribute('required', 'true');\n\t\t\t\t}\n\t\t\t}\n\t\t</script><div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm\">Create</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -795,7 +795,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Description <span class=\"text-red-500\">*</span></label> <textarea name=\"description\" required rows=\"3\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Description <span class=\"text-red-500\">*</span></label> <textarea name=\"description\" required rows=\"3\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -808,7 +808,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</textarea></div><div class=\"flex items-center gap-2\"><input type=\"checkbox\" name=\"banner_only\" id=\"banner_only\" class=\"w-5 h-5 accent-cchoice rounded focus:ring-cchoice focus:border-cchoice\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</textarea></div><div class=\"flex items-center gap-2\"><input type=\"checkbox\" name=\"banner_only\" id=\"banner_only\" class=\"w-5 h-5 accent-primary rounded focus:ring-primary focus:border-primary\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -831,7 +831,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div class=\"grid grid-cols-2 gap-4\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Start Date <span class=\"text-red-500\">*</span></label> <input id=\"start_date\" type=\"date\" name=\"start_date\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div class=\"grid grid-cols-2 gap-4\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Start Date <span class=\"text-red-500\">*</span></label> <input id=\"start_date\" type=\"date\" name=\"start_date\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -844,7 +844,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\" _=\"on change\n\t\t\t\t\t\tset #end_date.min to my.value\n\t\t\t\t\t\tif #end_date.value < my.value\n\t\t\t\t\t\t\tset #end_date.value to ''\n\t\t\t\t\t\tend\n\t\t\t\t\t\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">End Date <span class=\"text-red-500\">*</span></label> <input id=\"end_date\" type=\"date\" name=\"end_date\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\" _=\"on change\n\t\t\t\t\t\tset #end_date.min to my.value\n\t\t\t\t\t\tif #end_date.value < my.value\n\t\t\t\t\t\t\tset #end_date.value to ''\n\t\t\t\t\t\tend\n\t\t\t\t\t\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">End Date <span class=\"text-red-500\">*</span></label> <input id=\"end_date\" type=\"date\" name=\"end_date\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -857,7 +857,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\" _=\"on change\n\t\t\t\t\t\tset #start_date.max to my.value\n\t\t\t\t\t\tif #start_date.value > my.value\n\t\t\t\t\t\t\tset #start_date.value to ''\n\t\t\t\t\t\tend\n\t\t\t\t\t\"></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Type</label><p class=\"mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-700\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\" _=\"on change\n\t\t\t\t\t\tset #start_date.max to my.value\n\t\t\t\t\t\tif #start_date.value > my.value\n\t\t\t\t\t\t\tset #start_date.value to ''\n\t\t\t\t\t\tend\n\t\t\t\t\t\"></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Type</label><p class=\"mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-700\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -922,7 +922,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"><p class=\"mt-1 text-xs text-gray-500\">Provide video URL or YouTube link</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"><p class=\"mt-1 text-xs text-gray-500\">Provide video URL or YouTube link</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -940,7 +940,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"inline-flex items-center gap-2 px-3 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14\"></path></svg> Open Video</a></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"inline-flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-md hover:bg-primary-dark\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14\"></path></svg> Open Video</a></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -950,7 +950,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "<div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Status <span class=\"text-red-500\">*</span></label> <select name=\"status\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "<div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Status <span class=\"text-red-500\">*</span></label> <select name=\"status\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -998,7 +998,7 @@ func PromoEditForm(promo models.AdminPromoListItem) templ.Component {
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "</select></div><div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm\">Save</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "</select></div><div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm\">Save</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
