@@ -25,7 +25,7 @@ templ AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) {
 			</style>
 		</head>
 		<body
-			class="bg-cchoicesoft min-h-screen flex flex-col"
+			class="bg-surface min-h-screen flex flex-col"
 			_="init call metrics_event('admin_visit', 'products_edit')"
 		>
 			@common.DevRibbon()
@@ -35,7 +35,7 @@ templ AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) {
 				<div class="max-w-4xl mx-auto">
 					<div class="bg-white rounded-lg shadow-md p-6">
 						@header.AdminStaffHeaderWithBack()
-						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+						<h1 class="text-2xl font-bold text-center text-primary mb-6">
 							Edit Product
 						</h1>
 						if formData.DraftPriceOnly {
@@ -86,7 +86,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 					id="category"
 					name="category"
 					required
-					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					_="on change
 						if my.value
 							trigger get on #subcategory
@@ -112,7 +112,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 				<select
 					id="subcategory"
 					name="subcategory"
-					class="disabled:opacity-50 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="disabled:opacity-50 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					required
 					hx-get={ utils.URL("/admin/superuser/products/subcategories") }
 					hx-trigger="get"
@@ -136,7 +136,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 					maxlength="255"
 					pattern={ constants.PatternProductName }
 					value={ formData.Name }
-					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				/>
 			</div>
 			<div>
@@ -154,7 +154,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 						step="0.01"
 						max="999999999.99"
 						value={ formData.Price }
-						class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<p class="text-xs text-gray-500 mt-1">
@@ -171,7 +171,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 					required
 					rows="4"
 					maxlength="2000"
-					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				>{ formData.Description }</textarea>
 			</div>
 		</div>
@@ -190,7 +190,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 						maxlength="500"
 						placeholder="e.g., Red, Blue, Green"
 						value={ formData.Specs.Colours }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -205,7 +205,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 						maxlength="500"
 						placeholder="e.g., S, M, L, XL"
 						value={ formData.Specs.Sizes }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -220,7 +220,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 						maxlength="255"
 						placeholder="e.g., Industrial, Commercial, Residential"
 						value={ formData.Specs.Segmentation }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -235,7 +235,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 						maxlength="100"
 						pattern={ constants.PatternSerialNumber }
 						value={ formData.Specs.PartNumber }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -250,7 +250,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 						maxlength="100"
 						placeholder="e.g., 500W, 1.5HP"
 						value={ formData.Specs.Power }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -265,7 +265,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 						maxlength="100"
 						placeholder="e.g., 20L, 100kg"
 						value={ formData.Specs.Capacity }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -282,7 +282,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 						max="999999999.99"
 						placeholder="e.g., 10.5"
 						value={ formData.Specs.Weight }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -314,7 +314,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 						rows="3"
 						maxlength="1000"
 						placeholder="List items included in the package"
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					>{ formData.Specs.ScopeOfSupply }</textarea>
 				</div>
 			</div>
@@ -338,7 +338,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 							max="999999999.99"
 							placeholder="Leave empty if no sale"
 							value={ formData.SalePrice }
-							class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+							class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 						/>
 					</div>
 				</div>
@@ -351,7 +351,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 						id="sale_start_date"
 						name="sale_start_date"
 						value={ formData.SaleStartDate }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -363,7 +363,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 						id="sale_end_date"
 						name="sale_end_date"
 						value={ formData.SaleEndDate }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 			</div>
@@ -391,7 +391,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 			<button
 				type="submit"
 				id="submit-btn"
-				class="px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice disabled:opacity-50 disabled:cursor-not-allowed"
+				class="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
 				_="on click call metrics_event('admin_exec', 'update product')"
 			>
 				<span id="submit-btn-content" class="flex items-center gap-2">
@@ -422,7 +422,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 					id="brand"
 					name="brand_id"
 					required
-					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				>
 					<option value="">Select a brand</option>
 					for _, brand := range formData.Brands {
@@ -459,7 +459,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 						id="status"
 						name="status"
 						required
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					>
 						for _, ps := range enums.AllProductStatuses {
 							<option
@@ -480,7 +480,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 					id="category"
 					name="category"
 					required
-					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					_="on change
 						if my.value
 							trigger get on #subcategory
@@ -506,7 +506,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 				<select
 					id="subcategory"
 					name="subcategory"
-					class="disabled:opacity-50 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="disabled:opacity-50 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					required
 					hx-get={ utils.URL("/admin/superuser/products/subcategories") }
 					hx-trigger="get"
@@ -530,7 +530,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 					maxlength="255"
 					pattern={ constants.PatternProductName }
 					value={ formData.Name }
-					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				/>
 			</div>
 			<div>
@@ -548,7 +548,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 						step="0.01"
 						max="999999999.99"
 						value={ formData.Price }
-						class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<p class="text-xs text-gray-500 mt-1">
@@ -565,7 +565,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 					required
 					rows="4"
 					maxlength="2000"
-					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				>{ formData.Description }</textarea>
 			</div>
 		</div>
@@ -584,7 +584,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 						maxlength="500"
 						placeholder="e.g., Red, Blue, Green"
 						value={ formData.Specs.Colours }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -599,7 +599,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 						maxlength="500"
 						placeholder="e.g., S, M, L, XL"
 						value={ formData.Specs.Sizes }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -614,7 +614,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 						maxlength="255"
 						placeholder="e.g., Industrial, Commercial, Residential"
 						value={ formData.Specs.Segmentation }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -629,7 +629,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 						maxlength="100"
 						pattern={ constants.PatternSerialNumber }
 						value={ formData.Specs.PartNumber }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -644,7 +644,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 						maxlength="100"
 						placeholder="e.g., 500W, 1.5HP"
 						value={ formData.Specs.Power }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -659,7 +659,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 						maxlength="100"
 						placeholder="e.g., 20L, 100kg"
 						value={ formData.Specs.Capacity }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -676,7 +676,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 						max="999999999.99"
 						placeholder="e.g., 10.5"
 						value={ formData.Specs.Weight }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -705,7 +705,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 						max="999999999"
 						placeholder="e.g., 99"
 						value={ formData.Stocks }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div class="md:col-span-2">
@@ -719,7 +719,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 						rows="3"
 						maxlength="1000"
 						placeholder="List items included in the package"
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					>{ formData.Specs.ScopeOfSupply }</textarea>
 				</div>
 			</div>
@@ -743,7 +743,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 							max="999999999.99"
 							placeholder="Leave empty if no sale"
 							value={ formData.SalePrice }
-							class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+							class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 						/>
 					</div>
 				</div>
@@ -756,7 +756,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 						id="sale_start_date"
 						name="sale_start_date"
 						value={ formData.SaleStartDate }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 				<div>
@@ -768,7 +768,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 						id="sale_end_date"
 						name="sale_end_date"
 						value={ formData.SaleEndDate }
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					/>
 				</div>
 			</div>
@@ -796,7 +796,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 			<button
 				type="submit"
 				id="submit-btn"
-				class="px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice disabled:opacity-50 disabled:cursor-not-allowed"
+				class="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
 				_="on click call metrics_event('admin_exec', 'update product')"
 			>
 				<span id="submit-btn-content" class="flex items-center gap-2">

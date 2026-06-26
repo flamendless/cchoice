@@ -32,7 +32,7 @@ func SearchResults() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"search-results\" class=\"absolute flex flex-col w-full max-w-full hidden transform scale-y-100 origin-top transition-transform duration-200 left-0 top-full bg-white shadow-xl border-cchoice_border z-10\"><ul></ul></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"search-results\" class=\"absolute flex flex-col w-full max-w-full hidden transform scale-y-100 origin-top transition-transform duration-200 left-0 top-full bg-white shadow-xl border-primary-dark z-10\"><ul></ul></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -61,7 +61,7 @@ func SearchResultsMobile() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div id=\"search-mobile-results\" class=\"absolute flex flex-col w-full max-w-full hidden transform scale-y-100 origin-top transition-transform duration-200 left-0 top-full bg-white shadow-xl border-cchoice_border z-10\"><ul></ul></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div id=\"search-mobile-results\" class=\"absolute flex flex-col w-full max-w-full hidden transform scale-y-100 origin-top transition-transform duration-200 left-0 top-full bg-white shadow-xl border-primary-dark z-10\"><ul></ul></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -103,7 +103,7 @@ func SearchMore(query string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"text-center w-full border-t-2 border-cchoice_border p-2 hover:bg-cchoice hover:text-white transition-colors\">See All Results</a></li>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"text-center w-full border-t-2 border-primary-dark p-2 hover:bg-primary hover:text-white transition-colors\">See All Results</a></li>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -145,7 +145,7 @@ func SearchResultProductCard(product models.SearchResultProduct) templ.Component
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"flex flex-row items-center py-2 bg-white hover:bg-cchoicesoft transition-colors\"><img class=\"w-16 max-w-16 h-16 mx-4\" src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"flex flex-row items-center py-2 bg-white hover:bg-surface transition-colors\"><img class=\"w-16 max-w-16 h-16 mx-4\" src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

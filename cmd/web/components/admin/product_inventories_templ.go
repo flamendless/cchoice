@@ -50,7 +50,7 @@ func AdminProductInventoriesPage(brands []models.AdminBrand) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'product inventories')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'product inventories')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -74,7 +74,7 @@ func AdminProductInventoriesPage(brands []models.AdminBrand) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">Manage Product Inventories</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-primary mb-6\">Manage Product Inventories</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -124,7 +124,7 @@ func ProductInventoriesHeader() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"text-cchoice hover:text-cchoice_dark font-medium\">← Back</a></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"text-primary hover:text-primary-dark font-medium\">← Back</a></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -153,7 +153,7 @@ func InventoryFilterToolbar(url string, brands []models.AdminBrand) templ.Compon
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"flex flex-col sm:flex-row sm:flex-wrap justify-between items-start sm:items-center gap-4 mb-4\"><div class=\"flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto\"><input type=\"text\" name=\"search_serial\" placeholder=\"Search by serial...\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"flex flex-col sm:flex-row sm:flex-wrap justify-between items-start sm:items-center gap-4 mb-4\"><div class=\"flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto\"><input type=\"text\" name=\"search_serial\" placeholder=\"Search by serial...\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -166,7 +166,7 @@ func InventoryFilterToolbar(url string, brands []models.AdminBrand) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-trigger=\"change, search_serial delay:300ms\" hx-target=\"#inventories-table\" hx-include=\"[name='search_serial'],[name='search_brand'],[name='product_status'],[name='stocks_in']\"> <select name=\"search_brand\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-trigger=\"change, search_serial delay:300ms\" hx-target=\"#inventories-table\" hx-include=\"[name='search_serial'],[name='search_brand'],[name='product_status'],[name='stocks_in']\"> <select name=\"search_brand\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -215,7 +215,7 @@ func InventoryFilterToolbar(url string, brands []models.AdminBrand) templ.Compon
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</select> <select name=\"product_status\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</select> <select name=\"product_status\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -264,7 +264,7 @@ func InventoryFilterToolbar(url string, brands []models.AdminBrand) templ.Compon
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</select> <select name=\"stocks_in\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</select> <select name=\"stocks_in\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -542,7 +542,7 @@ func AdminProductInventoriesTable(inventories []models.AdminProductInventoryList
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\" target=\"_blank\" class=\"bg-cchoice text-white px-2 py-1 rounded-lg font-semibold hover:bg-cchoice_dark transition-colors cursor-pointer\">View Product</a> <button type=\"button\" class=\"bg-yellow-500 text-white px-3 py-1 rounded text-xs font-medium hover:bg-yellow-600 transition-colors\" hx-get=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\" target=\"_blank\" class=\"bg-primary text-white px-2 py-1 rounded-lg font-semibold hover:bg-primary-dark transition-colors cursor-pointer\">View Product</a> <button type=\"button\" class=\"bg-yellow-500 text-white px-3 py-1 rounded text-xs font-medium hover:bg-yellow-600 transition-colors\" hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -649,7 +649,7 @@ func InventoryUpdateForm(inv models.AdminProductInventoryListItem) templ.Compone
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\" hx-swap=\"none\" class=\"flex flex-col gap-4\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('inventory-update-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/product-inventories/table', { target: '#inventories-table', swap: 'innerHTML' }) }\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Quantity</label><div class=\"flex items-center gap-2\"><button type=\"button\" id=\"inv-qty-decrease\" class=\"p-2 border rounded-l-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\" _=\"\n\t\t\t\t\t\ton click\n\t\t\t\t\t\t\tset currentVal to Number(#inv-qty.value)\n\t\t\t\t\t\t\tif currentVal > 0\n\t\t\t\t\t\t\t\tset #inv-qty.value to String(currentVal - 1)\n\t\t\t\t\t\t\t\tif currentVal - 1 <= 0\n\t\t\t\t\t\t\t\t\tset me.disabled to true\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\tif currentVal - 1 < 99999\n\t\t\t\t\t\t\t\t\tset #inv-qty-increase.disabled to false\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M20 12H4\"></path></svg></button> <input type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]*\" id=\"inv-qty\" name=\"qty\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\" hx-swap=\"none\" class=\"flex flex-col gap-4\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('inventory-update-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/product-inventories/table', { target: '#inventories-table', swap: 'innerHTML' }) }\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Quantity</label><div class=\"flex items-center gap-2\"><button type=\"button\" id=\"inv-qty-decrease\" class=\"p-2 border rounded-l-lg bg-primary text-white hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\" _=\"\n\t\t\t\t\t\ton click\n\t\t\t\t\t\t\tset currentVal to Number(#inv-qty.value)\n\t\t\t\t\t\t\tif currentVal > 0\n\t\t\t\t\t\t\t\tset #inv-qty.value to String(currentVal - 1)\n\t\t\t\t\t\t\t\tif currentVal - 1 <= 0\n\t\t\t\t\t\t\t\t\tset me.disabled to true\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\tif currentVal - 1 < 99999\n\t\t\t\t\t\t\t\t\tset #inv-qty-increase.disabled to false\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M20 12H4\"></path></svg></button> <input type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]*\" id=\"inv-qty\" name=\"qty\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -662,7 +662,7 @@ func InventoryUpdateForm(inv models.AdminProductInventoryListItem) templ.Compone
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\" class=\"w-20 text-center border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"\n\t\t\t\t\t\ton input\n\t\t\t\t\t\t\tif Number(me.value) <= 0\n\t\t\t\t\t\t\t\tset #inv-qty-decrease.disabled to true\n\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\tset #inv-qty-decrease.disabled to false\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif Number(me.value) >= 99999\n\t\t\t\t\t\t\t\tset #inv-qty-increase.disabled to true\n\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\tset #inv-qty-increase.disabled to false\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\ton keyup\n\t\t\t\t\t\t\tif me.value is ''\n\t\t\t\t\t\t\t\tset me.value to '0'\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif Number(me.value) < 0\n\t\t\t\t\t\t\t\tset me.value to '0'\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif Number(me.value) > 99999\n\t\t\t\t\t\t\t\tset me.value to '99999'\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\"> <button type=\"button\" id=\"inv-qty-increase\" class=\"p-2 border rounded-r-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\" _=\"\n\t\t\t\t\t\ton click\n\t\t\t\t\t\t\tset currentVal to Number(#inv-qty.value)\n\t\t\t\t\t\t\tif currentVal < 99999\n\t\t\t\t\t\t\t\tset #inv-qty.value to String(currentVal + 1)\n\t\t\t\t\t\t\t\tif currentVal + 1 >= 99999\n\t\t\t\t\t\t\t\t\tset me.disabled to true\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\tif currentVal + 1 > 0\n\t\t\t\t\t\t\t\t\tset #inv-qty-decrease.disabled to false\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg></button></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Stocks In</label>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\" class=\"w-20 text-center border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary\" _=\"\n\t\t\t\t\t\ton input\n\t\t\t\t\t\t\tif Number(me.value) <= 0\n\t\t\t\t\t\t\t\tset #inv-qty-decrease.disabled to true\n\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\tset #inv-qty-decrease.disabled to false\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif Number(me.value) >= 99999\n\t\t\t\t\t\t\t\tset #inv-qty-increase.disabled to true\n\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\tset #inv-qty-increase.disabled to false\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\ton keyup\n\t\t\t\t\t\t\tif me.value is ''\n\t\t\t\t\t\t\t\tset me.value to '0'\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif Number(me.value) < 0\n\t\t\t\t\t\t\t\tset me.value to '0'\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif Number(me.value) > 99999\n\t\t\t\t\t\t\t\tset me.value to '99999'\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\"> <button type=\"button\" id=\"inv-qty-increase\" class=\"p-2 border rounded-r-lg bg-primary text-white hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\" _=\"\n\t\t\t\t\t\ton click\n\t\t\t\t\t\t\tset currentVal to Number(#inv-qty.value)\n\t\t\t\t\t\t\tif currentVal < 99999\n\t\t\t\t\t\t\t\tset #inv-qty.value to String(currentVal + 1)\n\t\t\t\t\t\t\t\tif currentVal + 1 >= 99999\n\t\t\t\t\t\t\t\t\tset me.disabled to true\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\tif currentVal + 1 > 0\n\t\t\t\t\t\t\t\t\tset #inv-qty-decrease.disabled to false\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg></button></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Stocks In</label>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -670,7 +670,7 @@ func InventoryUpdateForm(inv models.AdminProductInventoryListItem) templ.Compone
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "</div><div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm\">Update</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "</div><div class=\"flex w-full gap-2 justify-end\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm\">Update</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

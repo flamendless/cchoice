@@ -111,7 +111,7 @@ func HR() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<hr class=\"border-2 border-cchoice_border mx-1 my-0.5\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<hr class=\"border-2 border-primary-dark mx-1 my-0.5\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -140,7 +140,7 @@ func HeadMeta() templ.Component {
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<base href=\"/\"><link rel=\"canonical\" href=\"https://cchoice.shop/\"><meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\"><meta name=\"description\" content=\"Your Partner in Progress\"><meta name=\"google\" content=\"nositelinkssearchbox\"><meta name=\"robots\" content=\"noarchive, noimageindex\"><meta name=\"keywords\" content=\"cchoice, c-choice, construction, power tools\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><!--<link rel=\"dns-prefetch\" href=\"https://images1.cchoice.com\"/>--><link rel=\"preload\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<base href=\"/\"><link rel=\"canonical\" href=\"https://primary.shop/\"><meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\"><meta name=\"description\" content=\"Your Partner in Progress\"><meta name=\"google\" content=\"nositelinkssearchbox\"><meta name=\"robots\" content=\"noarchive, noimageindex\"><meta name=\"keywords\" content=\"primary, c-choice, construction, power tools\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><!--<link rel=\"dns-prefetch\" href=\"https://images1.primary.com\"/>--><link rel=\"preload\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -179,7 +179,7 @@ func HeadMeta() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" as=\"image\"><!--\n\t\tTODO: (Brandon) - preload product images here\n\t\t<link rel=\"preload\" href={ utils.URL(\"/static/images/product_images/bosch/\") } as=\"image\" type=\"image/png\"/>\n\t--><meta property=\"og:title\" content=\"C-Choice Construction Supplies\"><meta property=\"og:description\" content=\"Your Partner in Progress\"><meta property=\"og:type\" content=\"website\"><!--<meta property=\"og:url\" content=\"https://www.cchoice.com/\"/>--><meta property=\"og:image\" content=\"https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-192x192/public\"><meta property=\"og:image:secure_url\" content=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" as=\"image\"><!--\n\t\tTODO: (Brandon) - preload product images here\n\t\t<link rel=\"preload\" href={ utils.URL(\"/static/images/product_images/bosch/\") } as=\"image\" type=\"image/png\"/>\n\t--><meta property=\"og:title\" content=\"C-Choice Construction Supplies\"><meta property=\"og:description\" content=\"Your Partner in Progress\"><meta property=\"og:type\" content=\"website\"><!--<meta property=\"og:url\" content=\"https://www.primary.com/\"/>--><meta property=\"og:image\" content=\"https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-192x192/public\"><meta property=\"og:image:secure_url\" content=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -403,7 +403,7 @@ func IconActionButton(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" class=\"relative inline-block group py-2 stroke-cchoice rounded-full cursor-pointer hover:bg-cchoice_border text-nowrap items-center flex flex-col text-xs text-cchoice hover:text-white\" _=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" class=\"relative inline-block group py-2 stroke-primary rounded-full cursor-pointer hover:bg-primary-dark text-nowrap items-center flex flex-col text-xs text-primary hover:text-white\" _=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -459,7 +459,7 @@ func IconAction(
 			templ_7745c5c3_Var23 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div class=\"my-2 flex flex-col place-center relative inline-block group py-2 stroke-cchoice rounded-full w-16 cursor-pointer hover:bg-cchoice_border text-nowrap items-center flex flex-col text-xs text-cchoice hover:text-white\" _=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div class=\"my-2 flex flex-col place-center relative inline-block group py-2 stroke-primary rounded-full w-16 cursor-pointer hover:bg-primary-dark text-nowrap items-center flex flex-col text-xs text-primary hover:text-white\" _=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -524,7 +524,7 @@ func ContinueShopping() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\" class=\"flex justify-center items-center relative inline-block px-6 py-3 bg-cchoice font-medium rounded-lg text-white cursor-pointer transition-colors rounded-full hover:bg-cchoicesoft\" title=\"Continue shopping\" alt=\"Continue shopping button\">Continue Shopping</a>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\" class=\"flex justify-center items-center relative inline-block px-6 py-3 bg-primary font-medium rounded-lg text-white cursor-pointer transition-colors rounded-full hover:bg-surface\" title=\"Continue shopping\" alt=\"Continue shopping button\">Continue Shopping</a>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -638,7 +638,7 @@ func DiscountRibbon(percentage string) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if DISCOUNT_RIBBON && percentage != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<div class=\"absolute w-full bottom-0 mb-1 bg-white/50 text-cchoice text-sm font-bold tracking-wide text-center\">-")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<div class=\"absolute w-full bottom-0 mb-1 bg-white/50 text-primary text-sm font-bold tracking-wide text-center\">-")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -684,7 +684,7 @@ func AddToCart() templ.Component {
 			templ_7745c5c3_Var33 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<button id=\"btn-add-to-cart\" class=\"flex justify-center items-center relative inline-block w-12 h-12 bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group rounded-full hover:bg-cchoicesoft\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<button id=\"btn-add-to-cart\" class=\"flex justify-center items-center relative inline-block w-12 h-12 bg-primary font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group rounded-full hover:bg-surface\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -701,7 +701,7 @@ func AddToCart() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = svg.Cart("", "stroke-white group-hover:stroke-cchoice_border w-full h-full p-2").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = svg.Cart("", "stroke-white group-hover:stroke-primary-dark w-full h-full p-2").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -807,7 +807,7 @@ func AddToCartPromoProduct() templ.Component {
 			templ_7745c5c3_Var38 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<button id=\"btn-add-to-cart\" class=\"flex justify-center items-center relative inline-block w-12 h-12 bg-cchoice font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group rounded-full hover:bg-cchoicesoft\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<button id=\"btn-add-to-cart\" class=\"flex justify-center items-center relative inline-block w-12 h-12 bg-primary font-medium rounded-lg text-sm p-1 cursor-pointer m-2 transition-colors group rounded-full hover:bg-surface\" title=\"add to cart\" alt=\"add to cart button\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -824,7 +824,7 @@ func AddToCartPromoProduct() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = svgCart("", "stroke-white group-hover:stroke-cchoice_border w-full h-full p-2").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = svgCart("", "stroke-white group-hover:stroke-primary-dark w-full h-full p-2").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

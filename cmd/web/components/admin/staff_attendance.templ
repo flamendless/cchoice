@@ -97,7 +97,7 @@ templ AttendanceSectionForStaff(
 
 func getButtonClass(enabled bool) string {
 	if enabled {
-		return "w-full py-3 px-4 rounded-md font-medium text-white transition-colors bg-cchoice hover:bg-cchoice_dark cursor-pointer"
+		return "w-full py-3 px-4 rounded-md font-medium text-white transition-colors bg-primary hover:bg-primary-dark cursor-pointer"
 	}
 	return "w-full py-3 px-4 rounded-md font-medium text-white transition-colors bg-gray-400 cursor-not-allowed"
 }
@@ -114,7 +114,7 @@ templ AdminStaffPage(profile models.AdminStaffProfile) {
 			@common.TabTitle("[STAFF] C-Choice Admin")
 		</head>
 		<body
-			class="bg-cchoicesoft min-h-screen flex flex-col"
+			class="bg-surface min-h-screen flex flex-col"
 			_="init call metrics_event('admin_visit', 'staff attendance')"
 		>
 			@common.DevRibbon()

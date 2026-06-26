@@ -291,7 +291,7 @@ func AttendanceSectionForStaff(
 
 func getButtonClass(enabled bool) string {
 	if enabled {
-		return "w-full py-3 px-4 rounded-md font-medium text-white transition-colors bg-cchoice hover:bg-cchoice_dark cursor-pointer"
+		return "w-full py-3 px-4 rounded-md font-medium text-white transition-colors bg-primary hover:bg-primary-dark cursor-pointer"
 	}
 	return "w-full py-3 px-4 rounded-md font-medium text-white transition-colors bg-gray-400 cursor-not-allowed"
 }
@@ -384,7 +384,7 @@ func AdminStaffPage(profile models.AdminStaffProfile) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'staff attendance')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'staff attendance')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -56,7 +56,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t#submit-btn-content #submit-spinner { display: none; }\n\t\t\t\t#submit-btn-content.htmx-request #submit-spinner { display: inline-block; }\n\t\t\t\t#submit-btn-content.htmx-request .submit-btn-text { display: none; }\n\t\t\t</style></head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'products_edit')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t#submit-btn-content #submit-spinner { display: none; }\n\t\t\t\t#submit-btn-content.htmx-request #submit-spinner { display: inline-block; }\n\t\t\t\t#submit-btn-content.htmx-request .submit-btn-text { display: none; }\n\t\t\t</style></head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'products_edit')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -80,7 +80,7 @@ func AdminSuperuserProductsEditPage(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">Edit Product</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-primary mb-6\">Edit Product</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -171,7 +171,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div><div><label for=\"category\" class=\"block text-sm font-medium text-gray-700 mb-1\">Category <span class=\"text-red-500\">*</span></label> <select id=\"category\" name=\"category\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"on change\n\t\t\t\t\t\tif my.value\n\t\t\t\t\t\t\ttrigger get on #subcategory\n\t\t\t\t\t\t\tremove @disabled from #subcategory\n\t\t\t\t\t\tend\n\t\t\t\t\t\"><option value=\"\">Select a category</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div><div><label for=\"category\" class=\"block text-sm font-medium text-gray-700 mb-1\">Category <span class=\"text-red-500\">*</span></label> <select id=\"category\" name=\"category\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\" _=\"on change\n\t\t\t\t\t\tif my.value\n\t\t\t\t\t\t\ttrigger get on #subcategory\n\t\t\t\t\t\t\tremove @disabled from #subcategory\n\t\t\t\t\t\tend\n\t\t\t\t\t\"><option value=\"\">Select a category</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -217,7 +217,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</select></div><div><label for=\"subcategory\" class=\"block text-sm font-medium text-gray-700 mb-1\">Subcategory <span class=\"text-red-500\">*</span></label> <select id=\"subcategory\" name=\"subcategory\" class=\"disabled:opacity-50 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" required hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</select></div><div><label for=\"subcategory\" class=\"block text-sm font-medium text-gray-700 mb-1\">Subcategory <span class=\"text-red-500\">*</span></label> <select id=\"subcategory\" name=\"subcategory\" class=\"disabled:opacity-50 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\" required hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -282,7 +282,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"price\" class=\"block text-sm font-medium text-gray-700 mb-1\">Unit Price (with VAT) <span class=\"text-red-500\">*</span></label><div class=\"relative\"><span class=\"absolute left-3 top-1/2 -translate-y-1/2 text-gray-500\">₱</span> <input type=\"number\" id=\"price\" name=\"price\" required min=\"0.01\" step=\"0.01\" max=\"999999999.99\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"price\" class=\"block text-sm font-medium text-gray-700 mb-1\">Unit Price (with VAT) <span class=\"text-red-500\">*</span></label><div class=\"relative\"><span class=\"absolute left-3 top-1/2 -translate-y-1/2 text-gray-500\">₱</span> <input type=\"number\" id=\"price\" name=\"price\" required min=\"0.01\" step=\"0.01\" max=\"999999999.99\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -295,7 +295,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><p class=\"text-xs text-gray-500 mt-1\">Price includes ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><p class=\"text-xs text-gray-500 mt-1\">Price includes ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -308,7 +308,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "% VAT</p></div><div class=\"md:col-span-2\"><label for=\"description\" class=\"block text-sm font-medium text-gray-700 mb-1\">Description <span class=\"text-red-500\">*</span></label> <textarea id=\"description\" name=\"description\" required rows=\"4\" maxlength=\"2000\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "% VAT</p></div><div class=\"md:col-span-2\"><label for=\"description\" class=\"block text-sm font-medium text-gray-700 mb-1\">Description <span class=\"text-red-500\">*</span></label> <textarea id=\"description\" name=\"description\" required rows=\"4\" maxlength=\"2000\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -334,7 +334,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_sizes\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sizes <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_sizes\" name=\"spec_sizes\" required maxlength=\"500\" placeholder=\"e.g., S, M, L, XL\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"spec_sizes\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sizes <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_sizes\" name=\"spec_sizes\" required maxlength=\"500\" placeholder=\"e.g., S, M, L, XL\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -347,7 +347,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_segmentation\" class=\"block text-sm font-medium text-gray-700 mb-1\">Segmentation <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_segmentation\" name=\"spec_segmentation\" required maxlength=\"255\" placeholder=\"e.g., Industrial, Commercial, Residential\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"spec_segmentation\" class=\"block text-sm font-medium text-gray-700 mb-1\">Segmentation <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_segmentation\" name=\"spec_segmentation\" required maxlength=\"255\" placeholder=\"e.g., Industrial, Commercial, Residential\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -360,7 +360,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_part_number\" class=\"block text-sm font-medium text-gray-700 mb-1\">Part Number <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_part_number\" name=\"spec_part_number\" required maxlength=\"100\" pattern=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"spec_part_number\" class=\"block text-sm font-medium text-gray-700 mb-1\">Part Number <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_part_number\" name=\"spec_part_number\" required maxlength=\"100\" pattern=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -386,7 +386,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_power\" class=\"block text-sm font-medium text-gray-700 mb-1\">Power <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_power\" name=\"spec_power\" required maxlength=\"100\" placeholder=\"e.g., 500W, 1.5HP\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"spec_power\" class=\"block text-sm font-medium text-gray-700 mb-1\">Power <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_power\" name=\"spec_power\" required maxlength=\"100\" placeholder=\"e.g., 500W, 1.5HP\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -399,7 +399,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_capacity\" class=\"block text-sm font-medium text-gray-700 mb-1\">Capacity <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_capacity\" name=\"spec_capacity\" required maxlength=\"100\" placeholder=\"e.g., 20L, 100kg\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"spec_capacity\" class=\"block text-sm font-medium text-gray-700 mb-1\">Capacity <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_capacity\" name=\"spec_capacity\" required maxlength=\"100\" placeholder=\"e.g., 20L, 100kg\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -412,7 +412,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_weight\" class=\"block text-sm font-medium text-gray-700 mb-1\">Weight <span class=\"text-red-500\">*</span></label> <input type=\"number\" id=\"spec_weight\" name=\"spec_weight\" required min=\"0.01\" step=\"0.01\" max=\"999999999.99\" placeholder=\"e.g., 10.5\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"spec_weight\" class=\"block text-sm font-medium text-gray-700 mb-1\">Weight <span class=\"text-red-500\">*</span></label> <input type=\"number\" id=\"spec_weight\" name=\"spec_weight\" required min=\"0.01\" step=\"0.01\" max=\"999999999.99\" placeholder=\"e.g., 10.5\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -425,7 +425,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_weight_unit\" class=\"block text-sm font-medium text-gray-700 mb-1\">Weight Unit <span class=\"text-red-500\">*</span></label>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"spec_weight_unit\" class=\"block text-sm font-medium text-gray-700 mb-1\">Weight Unit <span class=\"text-red-500\">*</span></label>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -459,7 +459,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</div></div><div class=\"md:col-span-2\"><label for=\"spec_scope_of_supply\" class=\"block text-sm font-medium text-gray-700 mb-1\">Scope of Supply <span class=\"text-red-500\">*</span></label> <textarea id=\"spec_scope_of_supply\" name=\"spec_scope_of_supply\" required rows=\"3\" maxlength=\"1000\" placeholder=\"List items included in the package\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</div></div><div class=\"md:col-span-2\"><label for=\"spec_scope_of_supply\" class=\"block text-sm font-medium text-gray-700 mb-1\">Scope of Supply <span class=\"text-red-500\">*</span></label> <textarea id=\"spec_scope_of_supply\" name=\"spec_scope_of_supply\" required rows=\"3\" maxlength=\"1000\" placeholder=\"List items included in the package\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -485,7 +485,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></div><div><label for=\"sale_start_date\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sale Start Date</label> <input type=\"date\" id=\"sale_start_date\" name=\"sale_start_date\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div></div><div><label for=\"sale_start_date\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sale Start Date</label> <input type=\"date\" id=\"sale_start_date\" name=\"sale_start_date\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -498,7 +498,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"sale_end_date\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sale End Date</label> <input type=\"date\" id=\"sale_end_date\" name=\"sale_end_date\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"sale_end_date\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sale End Date</label> <input type=\"date\" id=\"sale_end_date\" name=\"sale_end_date\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -511,7 +511,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Image</h2>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Image</h2>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -541,7 +541,7 @@ func staffDraftProductPriceEditForm(formData models.AdminProductEditForm) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" id=\"submit-btn\" class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice disabled:opacity-50 disabled:cursor-not-allowed\" _=\"on click call metrics_event('admin_exec', 'update product')\"><span id=\"submit-btn-content\" class=\"flex items-center gap-2\"><span class=\"submit-btn-text\">Update Product</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" id=\"submit-btn\" class=\"px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed\" _=\"on click call metrics_event('admin_exec', 'update product')\"><span id=\"submit-btn-content\" class=\"flex items-center gap-2\"><span class=\"submit-btn-text\">Update Product</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -595,7 +595,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" hx-swap=\"outerHTML\" hx-target=\"body\" hx-indicator=\"#submit-btn-content\" enctype=\"multipart/form-data\" class=\"space-y-6\"><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><div><label for=\"brand\" class=\"block text-sm font-medium text-gray-700 mb-1\">Brand <span class=\"text-red-500\">*</span></label> <select id=\"brand\" name=\"brand_id\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select a brand</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" hx-swap=\"outerHTML\" hx-target=\"body\" hx-indicator=\"#submit-btn-content\" enctype=\"multipart/form-data\" class=\"space-y-6\"><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><div><label for=\"brand\" class=\"block text-sm font-medium text-gray-700 mb-1\">Brand <span class=\"text-red-500\">*</span></label> <select id=\"brand\" name=\"brand_id\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"\">Select a brand</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -685,7 +685,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<label for=\"status\" class=\"block text-sm font-medium text-gray-700 mb-1\">Status <span class=\"text-red-500\">*</span></label> <select id=\"status\" name=\"status\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<label for=\"status\" class=\"block text-sm font-medium text-gray-700 mb-1\">Status <span class=\"text-red-500\">*</span></label> <select id=\"status\" name=\"status\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -736,7 +736,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</div><div><label for=\"category\" class=\"block text-sm font-medium text-gray-700 mb-1\">Category <span class=\"text-red-500\">*</span></label> <select id=\"category\" name=\"category\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" _=\"on change\n\t\t\t\t\t\tif my.value\n\t\t\t\t\t\t\ttrigger get on #subcategory\n\t\t\t\t\t\t\tremove @disabled from #subcategory\n\t\t\t\t\t\tend\n\t\t\t\t\t\"><option value=\"\">Select a category</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</div><div><label for=\"category\" class=\"block text-sm font-medium text-gray-700 mb-1\">Category <span class=\"text-red-500\">*</span></label> <select id=\"category\" name=\"category\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\" _=\"on change\n\t\t\t\t\t\tif my.value\n\t\t\t\t\t\t\ttrigger get on #subcategory\n\t\t\t\t\t\t\tremove @disabled from #subcategory\n\t\t\t\t\t\tend\n\t\t\t\t\t\"><option value=\"\">Select a category</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -782,7 +782,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "</select></div><div><label for=\"subcategory\" class=\"block text-sm font-medium text-gray-700 mb-1\">Subcategory <span class=\"text-red-500\">*</span></label> <select id=\"subcategory\" name=\"subcategory\" class=\"disabled:opacity-50 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" required hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "</select></div><div><label for=\"subcategory\" class=\"block text-sm font-medium text-gray-700 mb-1\">Subcategory <span class=\"text-red-500\">*</span></label> <select id=\"subcategory\" name=\"subcategory\" class=\"disabled:opacity-50 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\" required hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -847,7 +847,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"price\" class=\"block text-sm font-medium text-gray-700 mb-1\">Unit Price (with VAT) <span class=\"text-red-500\">*</span></label><div class=\"relative\"><span class=\"absolute left-3 top-1/2 -translate-y-1/2 text-gray-500\">₱</span> <input type=\"number\" id=\"price\" name=\"price\" required min=\"0.01\" step=\"0.01\" max=\"999999999.99\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"price\" class=\"block text-sm font-medium text-gray-700 mb-1\">Unit Price (with VAT) <span class=\"text-red-500\">*</span></label><div class=\"relative\"><span class=\"absolute left-3 top-1/2 -translate-y-1/2 text-gray-500\">₱</span> <input type=\"number\" id=\"price\" name=\"price\" required min=\"0.01\" step=\"0.01\" max=\"999999999.99\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -860,7 +860,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><p class=\"text-xs text-gray-500 mt-1\">Price includes ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><p class=\"text-xs text-gray-500 mt-1\">Price includes ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -873,7 +873,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "% VAT</p></div><div class=\"md:col-span-2\"><label for=\"description\" class=\"block text-sm font-medium text-gray-700 mb-1\">Description <span class=\"text-red-500\">*</span></label> <textarea id=\"description\" name=\"description\" required rows=\"4\" maxlength=\"2000\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "% VAT</p></div><div class=\"md:col-span-2\"><label for=\"description\" class=\"block text-sm font-medium text-gray-700 mb-1\">Description <span class=\"text-red-500\">*</span></label> <textarea id=\"description\" name=\"description\" required rows=\"4\" maxlength=\"2000\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -899,7 +899,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_sizes\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sizes <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_sizes\" name=\"spec_sizes\" required maxlength=\"500\" placeholder=\"e.g., S, M, L, XL\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"spec_sizes\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sizes <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_sizes\" name=\"spec_sizes\" required maxlength=\"500\" placeholder=\"e.g., S, M, L, XL\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -912,7 +912,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_segmentation\" class=\"block text-sm font-medium text-gray-700 mb-1\">Segmentation <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_segmentation\" name=\"spec_segmentation\" required maxlength=\"255\" placeholder=\"e.g., Industrial, Commercial, Residential\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"spec_segmentation\" class=\"block text-sm font-medium text-gray-700 mb-1\">Segmentation <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_segmentation\" name=\"spec_segmentation\" required maxlength=\"255\" placeholder=\"e.g., Industrial, Commercial, Residential\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -925,7 +925,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_part_number\" class=\"block text-sm font-medium text-gray-700 mb-1\">Part Number <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_part_number\" name=\"spec_part_number\" required maxlength=\"100\" pattern=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"spec_part_number\" class=\"block text-sm font-medium text-gray-700 mb-1\">Part Number <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_part_number\" name=\"spec_part_number\" required maxlength=\"100\" pattern=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -951,7 +951,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_power\" class=\"block text-sm font-medium text-gray-700 mb-1\">Power <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_power\" name=\"spec_power\" required maxlength=\"100\" placeholder=\"e.g., 500W, 1.5HP\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"spec_power\" class=\"block text-sm font-medium text-gray-700 mb-1\">Power <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_power\" name=\"spec_power\" required maxlength=\"100\" placeholder=\"e.g., 500W, 1.5HP\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -964,7 +964,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_capacity\" class=\"block text-sm font-medium text-gray-700 mb-1\">Capacity <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_capacity\" name=\"spec_capacity\" required maxlength=\"100\" placeholder=\"e.g., 20L, 100kg\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"spec_capacity\" class=\"block text-sm font-medium text-gray-700 mb-1\">Capacity <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"spec_capacity\" name=\"spec_capacity\" required maxlength=\"100\" placeholder=\"e.g., 20L, 100kg\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -977,7 +977,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_weight\" class=\"block text-sm font-medium text-gray-700 mb-1\">Weight <span class=\"text-red-500\">*</span></label> <input type=\"number\" id=\"spec_weight\" name=\"spec_weight\" required min=\"0.01\" step=\"0.01\" max=\"999999999.99\" placeholder=\"e.g., 10.5\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"spec_weight\" class=\"block text-sm font-medium text-gray-700 mb-1\">Weight <span class=\"text-red-500\">*</span></label> <input type=\"number\" id=\"spec_weight\" name=\"spec_weight\" required min=\"0.01\" step=\"0.01\" max=\"999999999.99\" placeholder=\"e.g., 10.5\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -990,7 +990,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"spec_weight_unit\" class=\"block text-sm font-medium text-gray-700 mb-1\">Weight Unit <span class=\"text-red-500\">*</span></label>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"spec_weight_unit\" class=\"block text-sm font-medium text-gray-700 mb-1\">Weight Unit <span class=\"text-red-500\">*</span></label>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1019,7 +1019,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div class=\"md:col-span-2\"><label for=\"spec_scope_of_supply\" class=\"block text-sm font-medium text-gray-700 mb-1\">Scope of Supply <span class=\"text-red-500\">*</span></label> <textarea id=\"spec_scope_of_supply\" name=\"spec_scope_of_supply\" required rows=\"3\" maxlength=\"1000\" placeholder=\"List items included in the package\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div class=\"md:col-span-2\"><label for=\"spec_scope_of_supply\" class=\"block text-sm font-medium text-gray-700 mb-1\">Scope of Supply <span class=\"text-red-500\">*</span></label> <textarea id=\"spec_scope_of_supply\" name=\"spec_scope_of_supply\" required rows=\"3\" maxlength=\"1000\" placeholder=\"List items included in the package\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1045,7 +1045,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></div><div><label for=\"sale_start_date\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sale Start Date</label> <input type=\"date\" id=\"sale_start_date\" name=\"sale_start_date\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "\" class=\"w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div></div><div><label for=\"sale_start_date\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sale Start Date</label> <input type=\"date\" id=\"sale_start_date\" name=\"sale_start_date\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1058,7 +1058,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"sale_end_date\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sale End Date</label> <input type=\"date\" id=\"sale_end_date\" name=\"sale_end_date\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"sale_end_date\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sale End Date</label> <input type=\"date\" id=\"sale_end_date\" name=\"sale_end_date\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1071,7 +1071,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Image</h2>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Product Image</h2>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1101,7 +1101,7 @@ func superuserProductEditForm(formData models.AdminProductEditForm) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" id=\"submit-btn\" class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice disabled:opacity-50 disabled:cursor-not-allowed\" _=\"on click call metrics_event('admin_exec', 'update product')\"><span id=\"submit-btn-content\" class=\"flex items-center gap-2\"><span class=\"submit-btn-text\">Update Product</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" id=\"submit-btn\" class=\"px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed\" _=\"on click call metrics_event('admin_exec', 'update product')\"><span id=\"submit-btn-content\" class=\"flex items-center gap-2\"><span class=\"submit-btn-text\">Update Product</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -44,7 +44,7 @@ func ChangeLogs(logs []changelogs.ChangeLog, limit int) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><div class=\"flex flex-col justify-center items-center max-w-5xl mx-auto px-4 py-4 space-y-4\"><div class=\"w-[50vw] my-2 py-4 flex flex-col justify-center items-center p-4 border border-cchoice\"><h1 class=\"text-2xl font-semibold tracking-tight text-cchoice\">C-Choice Changelogs</h1><h2><a href=\"https://github.com/flamendless\" class=\"px-2 bg-cchoice font-medium rounded-lg text-white cursor-pointer transition-colors rounded-full hover:bg-cchoicesoft\">Made by @flamendless</a><br>Displaying up to ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><div class=\"flex flex-col justify-center items-center max-w-5xl mx-auto px-4 py-4 space-y-4\"><div class=\"w-[50vw] my-2 py-4 flex flex-col justify-center items-center p-4 border border-primary\"><h1 class=\"text-2xl font-semibold tracking-tight text-primary\">C-Choice Changelogs</h1><h2><a href=\"https://github.com/flamendless\" class=\"px-2 bg-primary font-medium rounded-lg text-white cursor-pointer transition-colors rounded-full hover:bg-surface\">Made by @flamendless</a><br>Displaying up to ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -75,7 +75,7 @@ func ChangeLogs(logs []changelogs.ChangeLog, limit int) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"w-[50vw] border border-cchoice rounded-xl\"><header class=\"px-5 py-4 bg-cchoice rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1\"><div class=\"flex items-center gap-3\"><span class=\"text-lg font-bold\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"w-[50vw] border border-primary rounded-xl\"><header class=\"px-5 py-4 bg-primary rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1\"><div class=\"flex items-center gap-3\"><span class=\"text-lg font-bold\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -116,7 +116,7 @@ func ChangeLogs(logs []changelogs.ChangeLog, limit int) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			for _, section := range log.Sections {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div><div class=\"flex items-center gap-2 mb-2\"><span class=\"inline-flex items-center rounded-md bg-cchoice px-2 py-0.5 text-xs font-medium text-slate-700\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div><div class=\"flex items-center gap-2 mb-2\"><span class=\"inline-flex items-center rounded-md bg-primary px-2 py-0.5 text-xs font-medium text-slate-700\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

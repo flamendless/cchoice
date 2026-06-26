@@ -34,7 +34,7 @@ func PostHomeContentSections(data models.HomePageData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"others\" class=\"absolute flex flex-col left-0 px-4 lg:px-8 pt-4 pb-16 w-full max-w-full border-t-4 border-cchoice_border z-999 bg-white\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"others\" class=\"absolute flex flex-col left-0 px-4 lg:px-8 pt-4 pb-16 w-full max-w-full border-t-4 border-primary-dark z-999 bg-white\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -121,7 +121,7 @@ func CommonSection(section models.PostHomeContentSection) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, content := range section.Others {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"w-full lg:w-1/4 border-t-4 border-cchoice_border\"><div class=\"my-2 text-center font-medium text-base\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"w-full lg:w-1/4 border-t-4 border-primary-dark\"><div class=\"my-2 text-center font-medium text-base\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -279,7 +279,7 @@ func StoreSection(section models.PostHomeContentSection) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, content := range section.Others {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"w-full lg:w-1/4 border-t-4 border-cchoice_border\"><div class=\"my-2 text-center font-medium text-base\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"w-full lg:w-1/4 border-t-4 border-primary-dark\"><div class=\"my-2 text-center font-medium text-base\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

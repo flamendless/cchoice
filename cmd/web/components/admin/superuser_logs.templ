@@ -17,7 +17,7 @@ templ AdminSuperuserLogsPage() {
 			@common.TabTitle("[SUPERUSER] Logs - C-Choice Admin")
 		</head>
 		<body
-			class="bg-cchoicesoft min-h-screen flex flex-col"
+			class="bg-surface min-h-screen flex flex-col"
 			_="init call metrics_event('admin_visit', 'logs')"
 		>
 			@common.DevRibbon()
@@ -27,7 +27,7 @@ templ AdminSuperuserLogsPage() {
 				<div class="max-w-8xl mx-auto">
 					<div class="bg-white rounded-lg shadow-md p-6">
 						@header.AdminStaffHeaderWithBack()
-						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+						<h1 class="text-2xl font-bold text-center text-primary mb-6">
 							Staff Action Logs
 						</h1>
 						@AdminSuperuserLogsSection()
@@ -70,7 +70,7 @@ templ LogsFilterForm() {
 				<select
 					id="staff-id"
 					name="staff-id"
-					class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					hx-get={ utils.URL("/admin/staff/list") }
 					hx-trigger="load"
 					hx-swap="innerHTML"
@@ -84,7 +84,7 @@ templ LogsFilterForm() {
 				<select
 					id="action"
 					name="action"
-					class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					hx-get={ utils.URL("/admin/superuser/logs/actions") }
 					hx-trigger="load"
 					hx-swap="innerHTML"
@@ -98,14 +98,14 @@ templ LogsFilterForm() {
 				<select
 					id="module"
 					name="module"
-					class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				>
 					@ModuleOptions(enums.AllModules)
 				</select>
 			</div>
 			<button
 				type="submit"
-				class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2"
+				class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
 			>
 				Filter
 			</button>

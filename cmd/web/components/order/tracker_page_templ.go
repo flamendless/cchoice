@@ -105,7 +105,7 @@ func OrderTrackerSearchBox() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<!-- Spinner --><svg id=\"order-track-icon-spinner\" class=\"w-7 text-cchoice hidden\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\"><path fill=\"none\" stroke=\"#F6742F\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-dasharray=\"300 385\" stroke-dashoffset=\"0\" d=\"M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z\"><animate attributeName=\"stroke-dashoffset\" calcMode=\"spline\" dur=\"2\" values=\"685;-685\" keySplines=\"0 0 1 1\" repeatCount=\"indefinite\"></animate></path></svg></div><input type=\"search\" id=\"order-track-input\" name=\"order_no\" required autocomplete=\"off\" placeholder=\"Enter Order Reference No.\" class=\"block w-full p-3 ps-10 pe-20 text-sm text-black border border-searchbar rounded-lg bg-searchbar focus:ring-cchoice focus:border-cchoice\"> <button type=\"submit\" class=\"flex items-center justify-center gap-1 text-white absolute end-2.5 bottom-2 bg-cchoice font-medium rounded-lg text-sm px-2 py-1 hover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice transition-colors\" aria-label=\"Track order\" title=\"Track order\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<!-- Spinner --><svg id=\"order-track-icon-spinner\" class=\"w-7 text-primary-emphasis hidden\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\"><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-dasharray=\"300 385\" stroke-dashoffset=\"0\" d=\"M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z\"><animate attributeName=\"stroke-dashoffset\" calcMode=\"spline\" dur=\"2\" values=\"685;-685\" keySplines=\"0 0 1 1\" repeatCount=\"indefinite\"></animate></path></svg></div><input type=\"search\" id=\"order-track-input\" name=\"order_no\" required autocomplete=\"off\" placeholder=\"Enter Order Reference No.\" class=\"block w-full p-3 ps-10 pe-20 text-sm text-black border border-surface rounded-lg bg-surface focus:ring-primary focus:border-primary\"> <button type=\"submit\" class=\"flex items-center justify-center gap-1 text-white absolute end-2.5 bottom-2 bg-primary font-medium rounded-lg text-sm px-2 py-1 hover:bg-primary-dark focus:ring-4 focus:outline-hidden focus:ring-primary transition-colors\" aria-label=\"Track order\" title=\"Track order\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -155,7 +155,7 @@ func OrderTrackerSearchBoxPlain() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-target=\"#order-result\" hx-push-url=\"true\" hx-trigger=\"submit\" class=\"w-full max-w-md mx-auto flex gap-2 mt-4\"><input type=\"text\" name=\"order_no\" required placeholder=\"Enter Order Reference No.\" class=\"flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500\"> <button type=\"submit\" class=\"flex items-center justify-center gap-1 text-cchoice absolute end-2.5 bottom-2 bg-cchoice_border font-medium rounded-lg text-sm px-2 py-1 hover:bg-cchoice_dark focus:ring-4 focus:outline-hidden focus:ring-cchoice transition-colors\">Search</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-target=\"#order-result\" hx-push-url=\"true\" hx-trigger=\"submit\" class=\"w-full max-w-md mx-auto flex gap-2 mt-4\"><input type=\"text\" name=\"order_no\" required placeholder=\"Enter Order Reference No.\" class=\"flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500\"> <button type=\"submit\" class=\"flex items-center justify-center gap-1 text-primary absolute end-2.5 bottom-2 bg-primary-dark font-medium rounded-lg text-sm px-2 py-1 hover:bg-primary-dark focus:ring-4 focus:outline-hidden focus:ring-primary transition-colors\">Search</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -225,7 +225,7 @@ func OrderTrackerPageBody(orderNo string, deliveryETA string, email string, mobi
 			return templ_7745c5c3_Err
 		}
 		if orderNo != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<h1 class=\"text-3xl font-semibold text-cchoice-800\">Order Tracker:</h1><p class=\"text-lg text-gray-600 text-center\">Here is your order delivery detail</p><div class=\"bg-green-50 border border-green-200 rounded-lg p-4 mt-2 flex flex-col items-center\"><p class=\"text-sm text-gray-600 mb-1\">Order Reference Number:</p><p class=\"text-base font-mono font-semibold text-green-800\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<h1 class=\"text-3xl font-semibold text-primary-dark\">Order Tracker:</h1><p class=\"text-lg text-gray-600 text-center\">Here is your order delivery detail</p><div class=\"bg-green-50 border border-green-200 rounded-lg p-4 mt-2 flex flex-col items-center\"><p class=\"text-sm text-gray-600 mb-1\">Order Reference Number:</p><p class=\"text-base font-mono font-semibold text-green-800\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -363,7 +363,7 @@ func OrderTrackerPageBodyError(orderNo string, email string, mobileNo string) te
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div><h1 class=\"text-3xl font-semibold text-cchoice-800\">Order Tracker:</h1><p class=\"text-lg text-gray-600 text-center\">Here is your order delivery detail</p><div class=\"bg-red-50 border border-red-200 rounded-lg p-4 mt-2 flex flex-col items-center\"><p class=\"text-sm text-gray-600 mb-1\">Order Reference Number:</p><p class=\"text-base font-mono font-semibold text-red-800\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div><h1 class=\"text-3xl font-semibold text-primary-dark\">Order Tracker:</h1><p class=\"text-lg text-gray-600 text-center\">Here is your order delivery detail</p><div class=\"bg-red-50 border border-red-200 rounded-lg p-4 mt-2 flex flex-col items-center\"><p class=\"text-sm text-gray-600 mb-1\">Order Reference Number:</p><p class=\"text-base font-mono font-semibold text-red-800\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

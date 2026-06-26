@@ -15,33 +15,33 @@ import "cchoice/cmd/web/components/svg"
 import "cchoice/cmd/web/models"
 
 var staffCards = []models.StaffCard{
-	{Link: "/admin/profile", Title: "Profile", Description: "View and manage your profile", Icon: svg.User("text-cchoice")},
-	{Link: "/admin/superuser/attendance", Title: "Attendance", Description: "View and manage employee attendance records", Icon: svg.Clock("text-cchoice")},
-	{Link: "/admin/superuser/time-off", Title: "Time Off", Description: "View and manage staff time off records", Icon: svg.Box("text-cchoice")},
-	{Link: "/admin/holidays", Title: "Holidays", Description: "Manage Philippines holidays", Icon: svg.Calendar("text-cchoice")},
-	{Link: "/admin/superuser/staffs", Title: "Employees", Description: "View and manage employees", Icon: svg.People("text-cchoice")},
-	{Link: "/admin/superuser/staffs/create", Title: "Add Employee", Description: "Add a new staff member", Icon: svg.User("text-cchoice")},
+	{Link: "/admin/profile", Title: "Profile", Description: "View and manage your profile", Icon: svg.User("text-primary")},
+	{Link: "/admin/superuser/attendance", Title: "Attendance", Description: "View and manage employee attendance records", Icon: svg.Clock("text-primary")},
+	{Link: "/admin/superuser/time-off", Title: "Time Off", Description: "View and manage staff time off records", Icon: svg.Box("text-primary")},
+	{Link: "/admin/holidays", Title: "Holidays", Description: "Manage Philippines holidays", Icon: svg.Calendar("text-primary")},
+	{Link: "/admin/superuser/staffs", Title: "Employees", Description: "View and manage employees", Icon: svg.People("text-primary")},
+	{Link: "/admin/superuser/staffs/create", Title: "Add Employee", Description: "Add a new staff member", Icon: svg.User("text-primary")},
 
-	{Link: "/admin/superuser/products", Title: "Manage Products", Description: "View and manage all products", Icon: svg.MenuLines("text-cchoice")},
-	{Link: "/admin/superuser/products/create", Title: "Create Product", Description: "Create a product", Icon: svg.Box("text-cchoice")},
-	{Link: "/admin/product-inventories", Title: "Manage Product Inventories", Description: "Manage product inventory stocks", Icon: svg.Box("text-cchoice")},
+	{Link: "/admin/superuser/products", Title: "Manage Products", Description: "View and manage all products", Icon: svg.MenuLines("text-primary")},
+	{Link: "/admin/superuser/products/create", Title: "Create Product", Description: "Create a product", Icon: svg.Box("text-primary")},
+	{Link: "/admin/product-inventories", Title: "Manage Product Inventories", Description: "Manage product inventory stocks", Icon: svg.Box("text-primary")},
 
-	{Link: "/admin/brands", Title: "Manage Brands", Description: "View and manage product brands", Icon: svg.Building("text-cchoice")},
+	{Link: "/admin/brands", Title: "Manage Brands", Description: "View and manage product brands", Icon: svg.Building("text-primary")},
 
-	{Link: "/admin/promos", Title: "Manage Promos", Description: "View and manage promos", Icon: svg.Box("text-cchoice")},
+	{Link: "/admin/promos", Title: "Manage Promos", Description: "View and manage promos", Icon: svg.Box("text-primary")},
 
-	{Link: "/admin/tracked-links", Title: "Tracked Links", Description: "Manage tracked links", Icon: svg.Link("text-cchoice")},
+	{Link: "/admin/tracked-links", Title: "Tracked Links", Description: "Manage tracked links", Icon: svg.Link("text-primary")},
 
-	{Link: "/admin/cpoints/generate", Title: "Generate C-Points", Description: "Generate C-Points for a customer", Icon: svg.Lightning("text-cchoice")},
+	{Link: "/admin/cpoints/generate", Title: "Generate C-Points", Description: "Generate C-Points for a customer", Icon: svg.Lightning("text-primary")},
 
-	{Link: "/admin/memos", Title: "Manage Memos", Description: "Create and manage staff memorandums", Icon: svg.Document("text-cchoice")},
+	{Link: "/admin/memos", Title: "Manage Memos", Description: "Create and manage staff memorandums", Icon: svg.Document("text-primary")},
 
-	{Link: "/admin/exports", Title: "Exports", Description: "Export data", Icon: svg.Document("text-cchoice")},
+	{Link: "/admin/exports", Title: "Exports", Description: "Export data", Icon: svg.Document("text-primary")},
 
-	{Link: "/admin/superuser/customers", Title: "Customers", Description: "View all registered customers", Icon: svg.Group("text-cchoice")},
+	{Link: "/admin/superuser/customers", Title: "Customers", Description: "View all registered customers", Icon: svg.Group("text-primary")},
 
-	{Link: "/admin/superuser/logs", Title: "Staff Logs", Description: "View staff action logs", Icon: svg.Document("text-cchoice")},
-	{Link: "/admin/superuser/envs", Title: "Envs", Description: "View application configuration", Icon: svg.Gear("text-cchoice")},
+	{Link: "/admin/superuser/logs", Title: "Staff Logs", Description: "View staff action logs", Icon: svg.Document("text-primary")},
+	{Link: "/admin/superuser/envs", Title: "Envs", Description: "View application configuration", Icon: svg.Gear("text-primary")},
 }
 
 func AdminSuperuserHomePage(fullName string, memos []models.StaffMemoCard) templ.Component {
@@ -77,7 +77,7 @@ func AdminSuperuserHomePage(fullName string, memos []models.StaffMemoCard) templ
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'superuser home')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'superuser home')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -123,7 +123,7 @@ func AdminSuperuserHomePage(fullName string, memos []models.StaffMemoCard) templ
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice\"><div class=\"flex justify-center mb-4\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-primary\"><div class=\"flex justify-center mb-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

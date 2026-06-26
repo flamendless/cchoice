@@ -29,21 +29,21 @@
 	}
 
 	.custom-scrollbar::-webkit-scrollbar-track {
-		background: #F7EFEA;
+		background: var(--color-surface);
 		border-radius: 10px;
 	}
 
 	.custom-scrollbar::-webkit-scrollbar-thumb {
-		background-color: #F6742F;
+		background-color: var(--color-primary-emphasis);
 		border-radius: 10px;
-		border: 2px solid #F7EFEA;
+		border: 2px solid var(--color-surface);
 	}
 
 	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-		background-color: #F46133;
+		background-color: var(--color-primary-hover);
 	}
 
 	.custom-scrollbar::-webkit-scrollbar-corner {
-		background: #F7EFEA;
+		background: var(--color-surface);
 	}
 }

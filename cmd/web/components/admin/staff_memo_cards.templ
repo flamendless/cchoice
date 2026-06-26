@@ -18,9 +18,9 @@ templ StaffMemoCards(memos []models.StaffMemoCard) {
 templ StaffMemoCard(memo models.StaffMemoCard) {
 	<div
 		id={ "staff-memo-card-" + memo.ID }
-		class="bg-white rounded-lg shadow-md border-2 border-cchoice p-6"
+		class="bg-white rounded-lg shadow-md border-2 border-primary p-6"
 	>
-		<h2 class="text-xl font-semibold text-cchoice mb-3">{ memo.Title }</h2>
+		<h2 class="text-xl font-semibold text-primary mb-3">{ memo.Title }</h2>
 		<div class="text-sm text-gray-700 whitespace-pre-wrap mb-6">{ memo.Message }</div>
 		if memo.FileURL != "" {
 			<div class="mb-6">
@@ -28,7 +28,7 @@ templ StaffMemoCard(memo models.StaffMemoCard) {
 					href={ templ.URL(memo.FileURL) }
 					target="_blank"
 					rel="noopener noreferrer"
-					class="inline-flex items-center gap-2 text-cchoice hover:text-cchoicedark hover:underline text-sm font-medium"
+					class="inline-flex items-center gap-2 text-primary hover:text-primary-dark hover:underline text-sm font-medium"
 					_={ staffMemoLinkClickScript(memo.ID) }
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -54,7 +54,7 @@ templ StaffMemoCard(memo models.StaffMemoCard) {
 			<button
 				id={ "staff-memo-accept-" + memo.ID }
 				type="button"
-				class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+				class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm disabled:opacity-50 disabled:cursor-not-allowed"
 				disabled?={ memo.FileURL != "" }
 				hx-post={ utils.URLf("/admin/staff/memos/%s/accept", memo.ID) }
 				hx-trigger="click"
@@ -98,7 +98,7 @@ templ StaffMemoRejectModal(memoID string) {
 						required
 						rows="4"
 						placeholder="Please explain why you are rejecting this memo..."
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 					></textarea>
 				</div>
 				<div class="flex w-full gap-2 justify-end">

@@ -17,7 +17,7 @@ templ AdminProductInventoriesPage(brands []models.AdminBrand) {
 			@common.TabTitle("Product Inventories - C-Choice Admin")
 		</head>
 		<body
-			class="bg-cchoicesoft min-h-screen flex flex-col"
+			class="bg-surface min-h-screen flex flex-col"
 			_="init call metrics_event('admin_visit', 'product inventories')"
 		>
 			@common.DevRibbon()
@@ -27,7 +27,7 @@ templ AdminProductInventoriesPage(brands []models.AdminBrand) {
 				<div class="max-w-8xl mx-auto">
 					<div class="bg-white rounded-lg shadow-md p-6">
 						@header.AdminStaffHeaderWithBack()
-						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+						<h1 class="text-2xl font-bold text-center text-primary mb-6">
 							Manage Product Inventories
 						</h1>
 						@ProductInventoriesSection(brands)
@@ -43,7 +43,7 @@ templ ProductInventoriesHeader() {
 	<div class="flex items-center justify-between mb-4">
 		<a
 			href={ utils.URL("/admin/staff") }
-			class="text-cchoice hover:text-cchoice_dark font-medium"
+			class="text-primary hover:text-primary-dark font-medium"
 		>
 			← Back
 		</a>
@@ -57,7 +57,7 @@ templ InventoryFilterToolbar(url string, brands []models.AdminBrand) {
 				type="text"
 				name="search_serial"
 				placeholder="Search by serial..."
-				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change, search_serial delay:300ms"
 				hx-target="#inventories-table"
@@ -65,7 +65,7 @@ templ InventoryFilterToolbar(url string, brands []models.AdminBrand) {
 			/>
 			<select
 				name="search_brand"
-				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change"
 				hx-target="#inventories-table"
@@ -78,7 +78,7 @@ templ InventoryFilterToolbar(url string, brands []models.AdminBrand) {
 			</select>
 			<select
 				name="product_status"
-				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change"
 				hx-target="#inventories-table"
@@ -91,7 +91,7 @@ templ InventoryFilterToolbar(url string, brands []models.AdminBrand) {
 			</select>
 			<select
 				name="stocks_in"
-				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change"
 				hx-target="#inventories-table"
@@ -192,7 +192,7 @@ templ AdminProductInventoriesTable(inventories []models.AdminProductInventoryLis
 								<a
 									href={ utils.URLf("/product/%s", inv.ProductSlug) }
 									target="_blank"
-									class="bg-cchoice text-white px-2 py-1 rounded-lg font-semibold hover:bg-cchoice_dark transition-colors cursor-pointer"
+									class="bg-primary text-white px-2 py-1 rounded-lg font-semibold hover:bg-primary-dark transition-colors cursor-pointer"
 								>
 									View Product
 								</a>
@@ -266,7 +266,7 @@ templ InventoryUpdateForm(inv models.AdminProductInventoryListItem) {
 				<button
 					type="button"
 					id="inv-qty-decrease"
-					class="p-2 border rounded-l-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+					class="p-2 border rounded-l-lg bg-primary text-white hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
 					_="
 						on click
 							set currentVal to Number(#inv-qty.value)
@@ -292,7 +292,7 @@ templ InventoryUpdateForm(inv models.AdminProductInventoryListItem) {
 					id="inv-qty"
 					name="qty"
 					value={ strconv.FormatInt(inv.Stocks, 10) }
-					class="w-20 text-center border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-cchoice focus:border-cchoice"
+					class="w-20 text-center border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary"
 					_="
 						on input
 							if Number(me.value) <= 0
@@ -320,7 +320,7 @@ templ InventoryUpdateForm(inv models.AdminProductInventoryListItem) {
 				<button
 					type="button"
 					id="inv-qty-increase"
-					class="p-2 border rounded-r-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+					class="p-2 border rounded-r-lg bg-primary text-white hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
 					_="
 						on click
 							set currentVal to Number(#inv-qty.value)
@@ -357,7 +357,7 @@ templ InventoryUpdateForm(inv models.AdminProductInventoryListItem) {
 			</button>
 			<button
 				type="submit"
-				class="px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark focus:outline-none focus:ring-2 focus:ring-cchoice focus:ring-offset-2 text-sm"
+				class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm"
 			>
 				Update
 			</button>

@@ -52,7 +52,7 @@ func AdminExportsPage(isSuperuser bool, roles []enums.StaffRole, backURL string)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t@keyframes export-progress {\n\t\t\t\t\t0% { width: 0%; margin-left: 0%; }\n\t\t\t\t\t50% { width: 60%; margin-left: 20%; }\n\t\t\t\t\t100% { width: 0%; margin-left: 100%; }\n\t\t\t\t}\n\t\t\t\t.export-progress-bar {\n\t\t\t\t\tanimation: export-progress 1.5s ease-in-out infinite;\n\t\t\t\t}\n\t\t\t</style></head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'exports')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t@keyframes export-progress {\n\t\t\t\t\t0% { width: 0%; margin-left: 0%; }\n\t\t\t\t\t50% { width: 60%; margin-left: 20%; }\n\t\t\t\t\t100% { width: 0%; margin-left: 100%; }\n\t\t\t\t}\n\t\t\t\t.export-progress-bar {\n\t\t\t\t\tanimation: export-progress 1.5s ease-in-out infinite;\n\t\t\t\t}\n\t\t\t</style></head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'exports')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -76,7 +76,7 @@ func AdminExportsPage(isSuperuser bool, roles []enums.StaffRole, backURL string)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">Exports</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-primary mb-6\">Exports</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -125,7 +125,7 @@ func ExportsSubcardsSection(isSuperuser bool, roles []enums.StaffRole) templ.Com
 				return templ_7745c5c3_Err
 			}
 			for _, card := range subcards {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<button type=\"button\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-cchoice cursor-pointer\" hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<button type=\"button\" class=\"block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-primary cursor-pointer\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -142,7 +142,7 @@ func ExportsSubcardsSection(isSuperuser bool, roles []enums.StaffRole) templ.Com
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = svg.Box("text-cchoice").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = svg.Box("text-primary").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -220,7 +220,7 @@ func ProductsExportModal(brands []models.AdminBrand) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" hx-trigger=\"load\" hx-include=\"[name='brand'],[name='status']\" hx-swap=\"innerHTML\"><span class=\"text-gray-400\">Loading product count...</span></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Brand</label> <select name=\"brand\" class=\"export-field px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" hx-trigger=\"load\" hx-include=\"[name='brand'],[name='status']\" hx-swap=\"innerHTML\"><span class=\"text-gray-400\">Loading product count...</span></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Brand</label> <select name=\"brand\" class=\"export-field px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -269,7 +269,7 @@ func ProductsExportModal(brands []models.AdminBrand) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Status</label> <select name=\"status\" class=\"export-field px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Status</label> <select name=\"status\" class=\"export-field px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -318,7 +318,7 @@ func ProductsExportModal(brands []models.AdminBrand) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Sort column</label> <select name=\"sort_column\" class=\"export-field px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Sort column</label> <select name=\"sort_column\" class=\"export-field px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -387,7 +387,7 @@ func ProductsExportModal(brands []models.AdminBrand) templ.Component {
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Sort direction</label> <select name=\"sort_direction\" class=\"export-field px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Sort direction</label> <select name=\"sort_direction\" class=\"export-field px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -456,7 +456,7 @@ func ProductsExportModal(brands []models.AdminBrand) templ.Component {
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Export file type</label> <select name=\"format\" class=\"export-field px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice w-full\"><option value=\"csv\" selected>CSV</option></select></div><div id=\"products-export-progress\" class=\"hidden\"><p class=\"text-sm text-amber-700 font-medium mb-2\">Export in progress. Do not reload or close this window.</p><div class=\"w-full bg-gray-200 rounded-full h-2 overflow-hidden\"><div class=\"export-progress-bar bg-cchoice h-2 rounded-full\"></div></div></div><p id=\"products-export-error\" class=\"hidden text-sm text-red-600\"></p><div class=\"flex justify-end gap-2 pt-2\"><button type=\"button\" id=\"products-export-cancel-btn\" class=\"export-field px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" id=\"products-export-submit-btn\" class=\"export-field px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoicedark\">Export</button></div></form></div></div><script>\n\t\t(function () {\n\t\t\tconst form = document.getElementById(\"products-export-form\");\n\t\t\tif (!form || form.dataset.bound === \"1\") return;\n\t\t\tform.dataset.bound = \"1\";\n\n\t\t\tconst progress = document.getElementById(\"products-export-progress\");\n\t\t\tconst errorEl = document.getElementById(\"products-export-error\");\n\t\t\tconst fields = form.querySelectorAll(\".export-field\");\n\t\t\tconst urlPrefix = JSON.parse(document.getElementById(\"url-prefix\").textContent);\n\n\t\t\tfunction setExporting(exporting) {\n\t\t\t\tfields.forEach((el) => { el.disabled = exporting; });\n\t\t\t\tprogress.classList.toggle(\"hidden\", !exporting);\n\t\t\t\tif (!exporting) {\n\t\t\t\t\terrorEl.classList.add(\"hidden\");\n\t\t\t\t\terrorEl.textContent = \"\";\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tform.addEventListener(\"submit\", async (event) => {\n\t\t\t\tevent.preventDefault();\n\t\t\t\tconst formData = new FormData(form);\n\t\t\t\tconst params = new URLSearchParams();\n\t\t\t\tfor (const [key, value] of formData.entries()) {\n\t\t\t\t\tparams.append(key, value.toString());\n\t\t\t\t}\n\t\t\t\tsetExporting(true);\n\t\t\t\ttry {\n\t\t\t\t\tconst response = await fetch(urlPrefix + \"/admin/exports/products\", {\n\t\t\t\t\t\tmethod: \"POST\",\n\t\t\t\t\t\theaders: { \"Content-Type\": \"application/x-www-form-urlencoded\" },\n\t\t\t\t\t\tbody: params.toString(),\n\t\t\t\t\t\tcredentials: \"same-origin\",\n\t\t\t\t\t});\n\n\t\t\t\t\tconst contentType = response.headers.get(\"Content-Type\") || \"\";\n\t\t\t\t\tif (!response.ok || contentType.includes(\"application/json\")) {\n\t\t\t\t\t\tlet message = \"Export failed\";\n\t\t\t\t\t\ttry {\n\t\t\t\t\t\t\tconst data = await response.json();\n\t\t\t\t\t\t\tif (data && data.error) message = data.error;\n\t\t\t\t\t\t} catch (_) {}\n\t\t\t\t\t\terrorEl.textContent = message;\n\t\t\t\t\t\terrorEl.classList.remove(\"hidden\");\n\t\t\t\t\t\tsetExporting(false);\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\n\t\t\t\t\tconst blob = await response.blob();\n\t\t\t\t\tconst disposition = response.headers.get(\"Content-Disposition\") || \"\";\n\t\t\t\t\tlet filename = \"export_products.csv\";\n\t\t\t\t\tconst match = disposition.match(/filename=([^;]+)/i);\n\t\t\t\t\tif (match && match[1]) {\n\t\t\t\t\t\tfilename = match[1].trim().replace(/^\"|\"$/g, \"\");\n\t\t\t\t\t}\n\n\t\t\t\t\tconst link = document.createElement(\"a\");\n\t\t\t\t\tlink.href = URL.createObjectURL(blob);\n\t\t\t\t\tlink.download = filename;\n\t\t\t\t\tdocument.body.appendChild(link);\n\t\t\t\t\tlink.click();\n\t\t\t\t\tlink.remove();\n\t\t\t\t\tURL.revokeObjectURL(link.href);\n\n\t\t\t\t\tdocument.getElementById(\"export-modal-container\").innerHTML = \"\";\n\t\t\t\t} catch (err) {\n\t\t\t\t\terrorEl.textContent = \"Export failed. Please try again.\";\n\t\t\t\t\terrorEl.classList.remove(\"hidden\");\n\t\t\t\t\tsetExporting(false);\n\t\t\t\t}\n\t\t\t});\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Export file type</label> <select name=\"format\" class=\"export-field px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"><option value=\"csv\" selected>CSV</option></select></div><div id=\"products-export-progress\" class=\"hidden\"><p class=\"text-sm text-amber-700 font-medium mb-2\">Export in progress. Do not reload or close this window.</p><div class=\"w-full bg-gray-200 rounded-full h-2 overflow-hidden\"><div class=\"export-progress-bar bg-primary h-2 rounded-full\"></div></div></div><p id=\"products-export-error\" class=\"hidden text-sm text-red-600\"></p><div class=\"flex justify-end gap-2 pt-2\"><button type=\"button\" id=\"products-export-cancel-btn\" class=\"export-field px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" id=\"products-export-submit-btn\" class=\"export-field px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark\">Export</button></div></form></div></div><script>\n\t\t(function () {\n\t\t\tconst form = document.getElementById(\"products-export-form\");\n\t\t\tif (!form || form.dataset.bound === \"1\") return;\n\t\t\tform.dataset.bound = \"1\";\n\n\t\t\tconst progress = document.getElementById(\"products-export-progress\");\n\t\t\tconst errorEl = document.getElementById(\"products-export-error\");\n\t\t\tconst fields = form.querySelectorAll(\".export-field\");\n\t\t\tconst urlPrefix = JSON.parse(document.getElementById(\"url-prefix\").textContent);\n\n\t\t\tfunction setExporting(exporting) {\n\t\t\t\tfields.forEach((el) => { el.disabled = exporting; });\n\t\t\t\tprogress.classList.toggle(\"hidden\", !exporting);\n\t\t\t\tif (!exporting) {\n\t\t\t\t\terrorEl.classList.add(\"hidden\");\n\t\t\t\t\terrorEl.textContent = \"\";\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tform.addEventListener(\"submit\", async (event) => {\n\t\t\t\tevent.preventDefault();\n\t\t\t\tconst formData = new FormData(form);\n\t\t\t\tconst params = new URLSearchParams();\n\t\t\t\tfor (const [key, value] of formData.entries()) {\n\t\t\t\t\tparams.append(key, value.toString());\n\t\t\t\t}\n\t\t\t\tsetExporting(true);\n\t\t\t\ttry {\n\t\t\t\t\tconst response = await fetch(urlPrefix + \"/admin/exports/products\", {\n\t\t\t\t\t\tmethod: \"POST\",\n\t\t\t\t\t\theaders: { \"Content-Type\": \"application/x-www-form-urlencoded\" },\n\t\t\t\t\t\tbody: params.toString(),\n\t\t\t\t\t\tcredentials: \"same-origin\",\n\t\t\t\t\t});\n\n\t\t\t\t\tconst contentType = response.headers.get(\"Content-Type\") || \"\";\n\t\t\t\t\tif (!response.ok || contentType.includes(\"application/json\")) {\n\t\t\t\t\t\tlet message = \"Export failed\";\n\t\t\t\t\t\ttry {\n\t\t\t\t\t\t\tconst data = await response.json();\n\t\t\t\t\t\t\tif (data && data.error) message = data.error;\n\t\t\t\t\t\t} catch (_) {}\n\t\t\t\t\t\terrorEl.textContent = message;\n\t\t\t\t\t\terrorEl.classList.remove(\"hidden\");\n\t\t\t\t\t\tsetExporting(false);\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\n\t\t\t\t\tconst blob = await response.blob();\n\t\t\t\t\tconst disposition = response.headers.get(\"Content-Disposition\") || \"\";\n\t\t\t\t\tlet filename = \"export_products.csv\";\n\t\t\t\t\tconst match = disposition.match(/filename=([^;]+)/i);\n\t\t\t\t\tif (match && match[1]) {\n\t\t\t\t\t\tfilename = match[1].trim().replace(/^\"|\"$/g, \"\");\n\t\t\t\t\t}\n\n\t\t\t\t\tconst link = document.createElement(\"a\");\n\t\t\t\t\tlink.href = URL.createObjectURL(blob);\n\t\t\t\t\tlink.download = filename;\n\t\t\t\t\tdocument.body.appendChild(link);\n\t\t\t\t\tlink.click();\n\t\t\t\t\tlink.remove();\n\t\t\t\t\tURL.revokeObjectURL(link.href);\n\n\t\t\t\t\tdocument.getElementById(\"export-modal-container\").innerHTML = \"\";\n\t\t\t\t} catch (err) {\n\t\t\t\t\terrorEl.textContent = \"Export failed. Please try again.\";\n\t\t\t\t\terrorEl.classList.remove(\"hidden\");\n\t\t\t\t\tsetExporting(false);\n\t\t\t\t}\n\t\t\t});\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

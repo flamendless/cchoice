@@ -57,9 +57,9 @@
 					const link = document.getElementById("category-link-" + targetId);
 					if (link) {
 						document.querySelectorAll(".category-scroll-link").forEach(function(l) {
-							l.classList.remove("underline", "bg-cchoice", "font-semibold", "text-white");
+							l.classList.remove("underline", "bg-primary", "font-semibold", "text-white");
 						});
-						link.classList.add("underline", "bg-cchoice", "font-semibold", "text-white");
+						link.classList.add("underline", "bg-primary", "font-semibold", "text-white");
 					}
 				}
 			});

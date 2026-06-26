@@ -48,7 +48,7 @@ func AdminSuperuserStaffsCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t#submit-btn-content #submit-spinner { display: none; }\n\t\t\t\t#submit-btn-content.htmx-request #submit-spinner { display: inline-block; }\n\t\t\t\t#submit-btn-content.htmx-request .submit-btn-text { display: none; }\n\t\t\t</style></head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'create staff')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t#submit-btn-content #submit-spinner { display: none; }\n\t\t\t\t#submit-btn-content.htmx-request #submit-spinner { display: inline-block; }\n\t\t\t\t#submit-btn-content.htmx-request .submit-btn-text { display: none; }\n\t\t\t</style></head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'create staff')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -72,7 +72,7 @@ func AdminSuperuserStaffsCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">Create Employee</h1><form hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-primary mb-6\">Create Employee</h1><form hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -98,7 +98,7 @@ func AdminSuperuserStaffsCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"middle_name\" class=\"block text-sm font-medium text-gray-700 mb-1\">Middle Name</label> <input type=\"text\" id=\"middle_name\" name=\"middle_name\" maxlength=\"50\" pattern=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"middle_name\" class=\"block text-sm font-medium text-gray-700 mb-1\">Middle Name</label> <input type=\"text\" id=\"middle_name\" name=\"middle_name\" maxlength=\"50\" pattern=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -111,7 +111,7 @@ func AdminSuperuserStaffsCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"last_name\" class=\"block text-sm font-medium text-gray-700 mb-1\">Last Name <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"last_name\" name=\"last_name\" required minlength=\"1\" maxlength=\"50\" pattern=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"last_name\" class=\"block text-sm font-medium text-gray-700 mb-1\">Last Name <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"last_name\" name=\"last_name\" required minlength=\"1\" maxlength=\"50\" pattern=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -124,7 +124,7 @@ func AdminSuperuserStaffsCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"birthdate\" class=\"block text-sm font-medium text-gray-700 mb-1\">Birthdate <span class=\"text-red-500\">*</span></label> <input type=\"date\" id=\"birthdate\" name=\"birthdate\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"sex\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sex <span class=\"text-red-500\">*</span></label> <select id=\"sex\" name=\"sex\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select sex</option> <option value=\"M\">Male</option> <option value=\"F\">Female</option></select></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Employment Details</h2><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><div><label for=\"date_hired\" class=\"block text-sm font-medium text-gray-700 mb-1\">Date Hired <span class=\"text-red-500\">*</span></label> <input type=\"date\" id=\"date_hired\" name=\"date_hired\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"position\" class=\"block text-sm font-medium text-gray-700 mb-1\">Position <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"position\" name=\"position\" required minlength=\"1\" maxlength=\"100\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"status\" class=\"block text-sm font-medium text-gray-700 mb-1\">Status <span class=\"text-red-500\">*</span></label> <select id=\"status\" name=\"status\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"birthdate\" class=\"block text-sm font-medium text-gray-700 mb-1\">Birthdate <span class=\"text-red-500\">*</span></label> <input type=\"date\" id=\"birthdate\" name=\"birthdate\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"sex\" class=\"block text-sm font-medium text-gray-700 mb-1\">Sex <span class=\"text-red-500\">*</span></label> <select id=\"sex\" name=\"sex\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"\">Select sex</option> <option value=\"M\">Male</option> <option value=\"F\">Female</option></select></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Employment Details</h2><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><div><label for=\"date_hired\" class=\"block text-sm font-medium text-gray-700 mb-1\">Date Hired <span class=\"text-red-500\">*</span></label> <input type=\"date\" id=\"date_hired\" name=\"date_hired\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"position\" class=\"block text-sm font-medium text-gray-700 mb-1\">Position <span class=\"text-red-500\">*</span></label> <input type=\"text\" id=\"position\" name=\"position\" required minlength=\"1\" maxlength=\"100\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"status\" class=\"block text-sm font-medium text-gray-700 mb-1\">Status <span class=\"text-red-500\">*</span></label> <select id=\"status\" name=\"status\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -170,7 +170,7 @@ func AdminSuperuserStaffsCreatePage() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</select></div><div><label for=\"user_type\" class=\"block text-sm font-medium text-gray-700 mb-1\">User Type <span class=\"text-red-500\">*</span></label> <select id=\"user_type\" name=\"user_type\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select user type</option> <option value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</select></div><div><label for=\"user_type\" class=\"block text-sm font-medium text-gray-700 mb-1\">User Type <span class=\"text-red-500\">*</span></label> <select id=\"user_type\" name=\"user_type\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"\">Select user type</option> <option value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -196,7 +196,7 @@ func AdminSuperuserStaffsCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\">Superuser</option></select></div><div><label for=\"time_in_schedule\" class=\"block text-sm font-medium text-gray-700 mb-1\">Time In Schedule <span class=\"text-red-500\">*</span></label> <input type=\"time\" id=\"time_in_schedule\" name=\"time_in_schedule\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div><label for=\"time_out_schedule\" class=\"block text-sm font-medium text-gray-700 mb-1\">Time Out Schedule <span class=\"text-red-500\">*</span></label> <input type=\"time\" id=\"time_out_schedule\" name=\"time_out_schedule\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div class=\"md:col-span-2\"><label class=\"flex items-center gap-2 cursor-pointer\"><input type=\"checkbox\" id=\"require_in_shop\" name=\"require_in_shop\" value=\"true\" class=\"rounded border-gray-300 text-cchoice focus:ring-cchoice\"> <span class=\"text-sm font-medium text-gray-700\">Require in shop for time in/out</span></label></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Account</h2><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><div><label for=\"email\" class=\"block text-sm font-medium text-gray-700 mb-1\">Email <span class=\"text-red-500\">*</span></label> <input type=\"email\" id=\"email\" name=\"email\" required maxlength=\"255\" pattern=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\">Superuser</option></select></div><div><label for=\"time_in_schedule\" class=\"block text-sm font-medium text-gray-700 mb-1\">Time In Schedule <span class=\"text-red-500\">*</span></label> <input type=\"time\" id=\"time_in_schedule\" name=\"time_in_schedule\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div><label for=\"time_out_schedule\" class=\"block text-sm font-medium text-gray-700 mb-1\">Time Out Schedule <span class=\"text-red-500\">*</span></label> <input type=\"time\" id=\"time_out_schedule\" name=\"time_out_schedule\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div class=\"md:col-span-2\"><label class=\"flex items-center gap-2 cursor-pointer\"><input type=\"checkbox\" id=\"require_in_shop\" name=\"require_in_shop\" value=\"true\" class=\"rounded border-gray-300 text-primary focus:ring-primary\"> <span class=\"text-sm font-medium text-gray-700\">Require in shop for time in/out</span></label></div></div></div><div class=\"border-t pt-6\"><h2 class=\"text-lg font-semibold text-gray-800 mb-4\">Account</h2><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><div><label for=\"email\" class=\"block text-sm font-medium text-gray-700 mb-1\">Email <span class=\"text-red-500\">*</span></label> <input type=\"email\" id=\"email\" name=\"email\" required maxlength=\"255\" pattern=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -209,7 +209,7 @@ func AdminSuperuserStaffsCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div><div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -230,7 +230,7 @@ func AdminSuperuserStaffsCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" class=\"w-full pr-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click if #password.type == 'password' then set #password.type to 'text' set my.innerText to 'Hide' else set #password.type to 'password' set my.innerText to 'Show' end\">Show</button></div><p class=\"text-xs text-gray-500 mt-1\">8-32 characters, alphanumeric and - _ . ? # @</p></div><div><label for=\"confirm_password\" class=\"block text-sm font-medium text-gray-700 mb-1\">Confirm Password <span class=\"text-red-500\">*</span></label><div class=\"relative\"><input type=\"password\" id=\"confirm_password\" name=\"confirm_password\" required minlength=\"8\" maxlength=\"32\" pattern=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" class=\"w-full pr-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click if #password.type == 'password' then set #password.type to 'text' set my.innerText to 'Hide' else set #password.type to 'password' set my.innerText to 'Show' end\">Show</button></div><p class=\"text-xs text-gray-500 mt-1\">8-32 characters, alphanumeric and - _ . ? # @</p></div><div><label for=\"confirm_password\" class=\"block text-sm font-medium text-gray-700 mb-1\">Confirm Password <span class=\"text-red-500\">*</span></label><div class=\"relative\"><input type=\"password\" id=\"confirm_password\" name=\"confirm_password\" required minlength=\"8\" maxlength=\"32\" pattern=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -243,7 +243,7 @@ func AdminSuperuserStaffsCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" class=\"w-full pr-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click if #confirm_password.type == 'password' then set #confirm_password.type to 'text' set my.innerText to 'Hide' else set #confirm_password.type to 'password' set my.innerText to 'Show' end\">Show</button></div></div></div></div><div class=\"flex justify-end gap-4 pt-4 border-t\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" class=\"w-full pr-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"> <button type=\"button\" class=\"absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none\" _=\"on click if #confirm_password.type == 'password' then set #confirm_password.type to 'text' set my.innerText to 'Hide' else set #confirm_password.type to 'password' set my.innerText to 'Show' end\">Show</button></div></div></div></div><div class=\"flex justify-end gap-4 pt-4 border-t\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -256,7 +256,7 @@ func AdminSuperuserStaffsCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" id=\"submit-btn\" class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice disabled:opacity-50 disabled:cursor-not-allowed\" _=\"on click call metrics_event('admin_exec', 'create staff')\"><span id=\"submit-btn-content\" class=\"flex items-center gap-2\"><span class=\"submit-btn-text\">Create Employee</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" id=\"submit-btn\" class=\"px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed\" _=\"on click call metrics_event('admin_exec', 'create staff')\"><span id=\"submit-btn-content\" class=\"flex items-center gap-2\"><span class=\"submit-btn-text\">Create Employee</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
