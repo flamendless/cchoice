@@ -45,7 +45,7 @@ func AdminCPointsGeneratePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-surface min-h-screen flex flex-col\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -69,7 +69,7 @@ func AdminCPointsGeneratePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-cchoice mb-6\">Generate C-Points</h1><form hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-2xl font-bold text-center text-primary mb-6\">Generate C-Points</h1><form hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -82,7 +82,7 @@ func AdminCPointsGeneratePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"outerHTML\" hx-target=\"body\" class=\"space-y-6\"><div><label for=\"customer-id\" class=\"block text-sm font-medium text-gray-700 mb-1\">Customer Email <span class=\"text-red-500\">*</span></label> <select id=\"customer-id\" name=\"customer-id\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"outerHTML\" hx-target=\"body\" class=\"space-y-6\"><div><label for=\"customer-id\" class=\"block text-sm font-medium text-gray-700 mb-1\">Customer Email <span class=\"text-red-500\">*</span></label> <select id=\"customer-id\" name=\"customer-id\" required class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -95,7 +95,7 @@ func AdminCPointsGeneratePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" hx-trigger=\"load\" hx-swap=\"innerHTML\" hx-target=\"this\"><option value=\"\">-- Select Customer --</option></select></div><div><label for=\"value\" class=\"block text-sm font-medium text-gray-700 mb-1\">Value <span class=\"text-red-500\">*</span></label> <input type=\"number\" id=\"value\" name=\"value\" required min=\"1\" step=\"1\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" placeholder=\"Enter C-Points value\"></div><div><label for=\"expires-at\" class=\"block text-sm font-medium text-gray-700 mb-1\">Expires At</label> <select id=\"expires-at\" name=\"expires-at\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">Select expiration (default: 1 year)</option> <option value=\"1_week\">1 week</option> <option value=\"1_month\">1 month</option> <option value=\"1_year\">1 year</option></select></div><div><label for=\"product-skus\" class=\"block text-sm font-medium text-gray-700 mb-1\">Comma Separated Product Serials</label> <input type=\"text\" id=\"product-skus\" name=\"product-skus\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\" placeholder=\"e.g. SERIAL001, SERIAL002, SERIAL003\"><p class=\"text-xs text-gray-500 mt-1\">Separate multiple serials with commas</p></div><div class=\"flex justify-end gap-4\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" hx-trigger=\"load\" hx-swap=\"innerHTML\" hx-target=\"this\"><option value=\"\">-- Select Customer --</option></select></div><div><label for=\"value\" class=\"block text-sm font-medium text-gray-700 mb-1\">Value <span class=\"text-red-500\">*</span></label> <input type=\"number\" id=\"value\" name=\"value\" required min=\"1\" step=\"1\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\" placeholder=\"Enter C-Points value\"></div><div><label for=\"expires-at\" class=\"block text-sm font-medium text-gray-700 mb-1\">Expires At</label> <select id=\"expires-at\" name=\"expires-at\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"\">Select expiration (default: 1 year)</option> <option value=\"1_week\">1 week</option> <option value=\"1_month\">1 month</option> <option value=\"1_year\">1 year</option></select></div><div><label for=\"product-skus\" class=\"block text-sm font-medium text-gray-700 mb-1\">Comma Separated Product Serials</label> <input type=\"text\" id=\"product-skus\" name=\"product-skus\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\" placeholder=\"e.g. SERIAL001, SERIAL002, SERIAL003\"><p class=\"text-xs text-gray-500 mt-1\">Separate multiple serials with commas</p></div><div class=\"flex justify-end gap-4\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -108,7 +108,7 @@ func AdminCPointsGeneratePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" class=\"px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice\">Generate C-Points</button></div></form></div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500\">Cancel</a> <button type=\"submit\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary\">Generate C-Points</button></div></form></div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -140,7 +140,7 @@ func CartPaymentMethod(paymentMethod models.AvailablePaymentMethod) templ.Compon
 			return templ_7745c5c3_Err
 		}
 		if paymentMethod.Enabled {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"flex flex-col w-22 h-22 items-center justify-center p-2 border-2 border-gray-300 rounded-lg cursor-pointer transition-colors hover:border-cchoice hover:bg-cchoice/10 peer-checked:border-cchoice peer-checked:bg-cchoice/20\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"flex flex-col w-22 h-22 items-center justify-center p-2 border-2 border-gray-300 rounded-lg cursor-pointer transition-colors hover:border-primary hover:bg-primary/10 peer-checked:border-primary peer-checked:bg-primary/20\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

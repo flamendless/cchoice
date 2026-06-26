@@ -24,7 +24,7 @@ templ QuotationPage(
 			@common.HeadMeta()
 			@common.TabTitle("[Quotation] C-Choice Customer Portal")
 		</head>
-		<body class="bg-cchoicesoft min-h-screen flex flex-col">
+		<body class="bg-surface min-h-screen flex flex-col">
 			@common.DevRibbon()
 			@common.ErrorBanner()
 			@common.SuccessBanner()
@@ -32,7 +32,7 @@ templ QuotationPage(
 				<div class="max-w-8xl mx-auto">
 					@header.CustomerPortalHeaderWithBackLink(utils.URL("/customer/portal"), "Back to Customer Portal")
 					<div class="mb-8">
-						<h2 class="text-2xl font-bold text-cchoice mb-4">Quotation Draft</h2>
+						<h2 class="text-2xl font-bold text-primary mb-4">Quotation Draft</h2>
 						if len(draftLines) > 0 {
 							<div class="bg-white rounded-lg shadow-md p-6 mb-6">
 								<table class="w-full text-left">
@@ -90,7 +90,7 @@ templ QuotationPage(
 								</div>
 								<div class="mt-4">
 									<button
-										class="px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark"
+										class="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
 										hx-post={ utils.URL("/customer/quotation/submit") }
 										hx-confirm="Submit this quotation draft for review?"
 									>
@@ -105,7 +105,7 @@ templ QuotationPage(
 						}
 					</div>
 					<div class="mb-8">
-						<h2 class="text-2xl font-bold text-cchoice mb-4">Products</h2>
+						<h2 class="text-2xl font-bold text-primary mb-4">Products</h2>
 						<form
 							id="quotation-search-form"
 							hx-get={ utils.URL("/customer/quotation/products") }
@@ -119,11 +119,11 @@ templ QuotationPage(
 									name="search"
 									placeholder="Search by serial or name"
 									value={ searchQuery }
-									class="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									class="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 								/>
 								<select
 									name="brand"
-									class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 								>
 									<option value="">All Brands</option>
 									for _, brand := range brands {
@@ -132,7 +132,7 @@ templ QuotationPage(
 								</select>
 								<select
 									name="category"
-									class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 								>
 									<option value="">All Categories</option>
 									for _, cat := range categories {
@@ -141,7 +141,7 @@ templ QuotationPage(
 								</select>
 								<select
 									name="subcategory"
-									class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+									class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 								>
 									<option value="">All Subcategories</option>
 									for _, sub := range subcategories {
@@ -150,7 +150,7 @@ templ QuotationPage(
 								</select>
 								<button
 									type="submit"
-									class="px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark"
+									class="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
 								>
 									Search
 								</button>
@@ -199,14 +199,14 @@ templ QuotationProductsTable(products []models.QuotationProduct) {
 						<td class="py-3 px-4">{ p.Category } { p.Subcategory }</td>
 						<td class="py-3 px-4">
 							if p.DiscountPercentage != "" {
-								<p class="text-sm font-semibold text-cchoice text-center">
+								<p class="text-sm font-semibold text-primary text-center">
 									{ p.PriceDisplay }
 								</p>
 								<p class="text-xs font-semibold text-black line-through text-center">
 									{ p.OrigPriceDisplay }
 								</p>
 							} else {
-								<p class="text-xs font-semibold text-cchoice">
+								<p class="text-xs font-semibold text-primary">
 									{ p.OrigPriceDisplay }
 								</p>
 							}
@@ -227,7 +227,7 @@ templ Actions(productID string, productSlug string) {
 			<button
 				type="button"
 				name="btn-qty-decrease"
-				class="p-1 border rounded-l-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+				class="p-1 border rounded-l-lg bg-primary text-white hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
 				disabled="true"
 				_="
 					on click
@@ -264,7 +264,7 @@ templ Actions(productID string, productSlug string) {
 			<button
 				type="button"
 				name="btn-qty-increase"
-				class="p-1 border rounded-r-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors"
+				class="p-1 border rounded-r-lg bg-primary text-white hover:bg-primary-dark transition-colors"
 				_="
 					on click
 						set container to the closest <div[data-actions]/> to me
@@ -293,7 +293,7 @@ templ Actions(productID string, productSlug string) {
 			<button
 				type="button"
 				id="btn-add-to-cart"
-				class="bg-cchoice text-white px-2 py-1 rounded-lg font-semibold hover:bg-cchoice_dark transition-colors cursor-pointer mx-2"
+				class="bg-primary text-white px-2 py-1 rounded-lg font-semibold hover:bg-primary-dark transition-colors cursor-pointer mx-2"
 				hx-include="closest [data-actions]"
 				hx-post={ utils.URLf("/customer/quotation/product/%s/add", productID) }
 				hx-swap="none"
@@ -301,7 +301,7 @@ templ Actions(productID string, productSlug string) {
 				Add to Draft Quotation
 			</button>
 			<a
-				class="bg-cchoice text-white px-2 py-1 rounded-lg font-semibold hover:bg-cchoice_dark transition-colors cursor-pointer mx-2"
+				class="bg-primary text-white px-2 py-1 rounded-lg font-semibold hover:bg-primary-dark transition-colors cursor-pointer mx-2"
 				href={ utils.URLf("/product/%s", productSlug) }
 				target="_blank"
 			>

@@ -8,9 +8,9 @@ templ MobileSearchToggle() {
 		type="button"
 		aria-label="Open search"
 		class="
-			text-cchoice p-2 rounded-full
+			text-primary p-2 rounded-full
 			lg:hidden
-			hover:bg-cchoice_border
+			hover:bg-primary-dark
 		"
 		_="
 			on click
@@ -34,7 +34,7 @@ templ MobileSearchPanel() {
 			absolute top-full left-0 right-0 w-full
 			z-[60] shadow-md
 			hidden lg:hidden
-			border-b border-searchbar
+			border-b border-surface
 			bg-white px-3 py-2
 		"
 	>
@@ -61,9 +61,9 @@ templ SearchBarMobile() {
 				class="
 					w-full p-2.5
 					text-xs
-					border border-searchbar rounded-lg
-					bg-searchbar
-					focus:ring-cchoice focus:border-cchoice
+					border border-surface rounded-lg
+					bg-surface
+					focus:ring-primary focus:border-primary
 				"
 				hx-post={ utils.URL("/search") }
 				hx-trigger="input[this.value.length >= 3] delay:300ms, keyup[key=='Enter']"
@@ -94,7 +94,7 @@ templ SearchBarMobile() {
 			<!-- 	type="submit" -->
 			<!-- 	class=" -->
 			<!-- 		absolute end-2 top-1/2 -translate-y-1/2 -->
-			<!-- 		bg-cchoice text-white -->
+			<!-- 		bg-primary text-white -->
 			<!-- 		text-xs px-2 py-1 rounded-md -->
 			<!-- 	" -->
 			<!-- > -->
@@ -102,7 +102,7 @@ templ SearchBarMobile() {
 			<!-- </button> -->
 			<svg
 				id="icon-spinner-search-mobile"
-				class="htmx-indicator hidden absolute end-14 top-1/2 -translate-y-1/2 w-4 text-cchoice"
+				class="htmx-indicator hidden absolute end-14 top-1/2 -translate-y-1/2 w-4 text-primary"
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 300 150"
 			>

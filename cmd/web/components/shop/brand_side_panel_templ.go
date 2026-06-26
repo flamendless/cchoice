@@ -46,8 +46,8 @@ func BrandsSidePanelList(selectedBrandLabel string, brands []models.BrandSidePan
 			return templ_7745c5c3_Err
 		}
 		for _, brand := range brands {
-			var templ_7745c5c3_Var2 = []any{templ.KV("text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-cchoicesoft transition-colors brand-filter-link", true),
-				templ.KV("underline bg-cchoice font-semibold text-white", brand.Label == selectedBrandLabel),
+			var templ_7745c5c3_Var2 = []any{templ.KV("text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer hover:underline hover:bg-surface transition-colors brand-filter-link", true),
+				templ.KV("underline bg-primary font-semibold text-white", brand.Label == selectedBrandLabel),
 			}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 			if templ_7745c5c3_Err != nil {
@@ -165,7 +165,7 @@ func BrandsSidePanel() templ.Component {
 			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div id=\"brands-side-panel\" class=\"w-full flex flex-col border-b-2 border-cchoice_border\"><div class=\"flex items-center justify-between cursor-pointer p-2\" _=\"on click\n\t\t\t\tasync call metrics_event('brands_side_panel_click')\n\t\t\t\ttoggle .hidden on #brands-side-panel-content\n\t\t\t\tif #brands-side-panel-content matches .hidden\n\t\t\t\t\tset #brands-chevron's *transform to 'rotate(0deg)'\n\t\t\t\t\tset #brands-side-panel-content@data-collapsed to 'true'\n\t\t\t\telse\n\t\t\t\t\tset #brands-chevron's *transform to 'rotate(180deg)'\n\t\t\t\t\tset #brands-side-panel-content@data-collapsed to 'false'\n\t\t\t\tend\n\t\t\t\"><p class=\"text-xs font-normal text-nowrap\">Brands</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div id=\"brands-side-panel\" class=\"w-full flex flex-col border-b-2 border-primary-dark\"><div class=\"flex items-center justify-between cursor-pointer p-2\" _=\"on click\n\t\t\t\tasync call metrics_event('brands_side_panel_click')\n\t\t\t\ttoggle .hidden on #brands-side-panel-content\n\t\t\t\tif #brands-side-panel-content matches .hidden\n\t\t\t\t\tset #brands-chevron's *transform to 'rotate(0deg)'\n\t\t\t\t\tset #brands-side-panel-content@data-collapsed to 'true'\n\t\t\t\telse\n\t\t\t\t\tset #brands-chevron's *transform to 'rotate(180deg)'\n\t\t\t\t\tset #brands-side-panel-content@data-collapsed to 'false'\n\t\t\t\tend\n\t\t\t\"><p class=\"text-xs font-normal text-nowrap\">Brands</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

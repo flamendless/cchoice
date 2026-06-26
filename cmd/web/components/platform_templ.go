@@ -66,7 +66,7 @@ func Platforms(platforms []models.Platform) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" alt=\"C-Choice Logo\" class=\"w-16 h-16 mx-auto mb-4\"></div><h1 class=\"text-3xl font-bold text-cchoice\">C-Choice Platforms</h1></div><div class=\"grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 w-full max-w-4xl overflow-y-auto sm:overflow-visible pb-4 sm:pb-0\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" alt=\"C-Choice Logo\" class=\"w-16 h-16 mx-auto mb-4\"></div><h1 class=\"text-3xl font-bold text-primary\">C-Choice Platforms</h1></div><div class=\"grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 w-full max-w-4xl overflow-y-auto sm:overflow-visible pb-4 sm:pb-0\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -84,7 +84,7 @@ func Platforms(platforms []models.Platform) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" target=\"_blank\" rel=\"noopener\" class=\"flex flex-col items-center justify-center p-6 sm:p-8 bg-cchoice rounded-xl hover:bg-cchoice_dark transition-colors cursor-pointer\"><span class=\"text-white mb-2\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" target=\"_blank\" rel=\"noopener\" class=\"flex flex-col items-center justify-center p-6 sm:p-8 bg-primary rounded-xl hover:bg-primary-dark transition-colors cursor-pointer\"><span class=\"text-white mb-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

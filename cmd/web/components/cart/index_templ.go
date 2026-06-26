@@ -209,7 +209,7 @@ func CartPageBody(summaryContent templ.Component) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div></div><div id=\"cart-proceed\" class=\"flex flex-col gap-1 border rounded h-auto p-2\"><button id=\"btn-proceed\" class=\"flex justify-center items-center relative inline-block px-4 py-2 m-2 bg-cchoice font-medium rounded-lg cursor-pointer transition-colors text-white rounded-full hover:bg-cchoicesoft disabled:opacity-50 disabled:cursor-not-allowed\" title=\"proceed to checkout\" alt=\"proceed to checkout button\" type=\"submit\" disabled>Proceed to checkout</button></div></div></div></form></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div></div><div id=\"cart-proceed\" class=\"flex flex-col gap-1 border rounded h-auto p-2\"><button id=\"btn-proceed\" class=\"flex justify-center items-center relative inline-block px-4 py-2 m-2 bg-primary font-medium rounded-lg cursor-pointer transition-colors text-white rounded-full hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed\" title=\"proceed to checkout\" alt=\"proceed to checkout button\" type=\"submit\" disabled>Proceed to checkout</button></div></div></div></form></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -565,11 +565,11 @@ func EmptyCart() templ.Component {
 			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<div class=\"h-[50vh] flex flex-col justify-center items-center\"><h1 class=\"text-2xl text-cchoice-800\">Your cart is empty</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<div class=\"h-[50vh] flex flex-col justify-center items-center\"><h1 class=\"text-2xl text-primary-dark\">Your cart is empty</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = svg.Cart("", "size-32 my-4 stroke-cchoice").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = svg.Cart("", "size-32 my-4 stroke-primary").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -615,7 +615,7 @@ func btnQtyDecrease(cl models.CheckoutLine) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" alt=\"decrease quantity button\" aria-label=\"Decrease quantity\" title=\"Decrease quantity\" class=\"p-1 border rounded bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" alt=\"decrease quantity button\" aria-label=\"Decrease quantity\" title=\"Decrease quantity\" class=\"p-1 border rounded bg-primary text-white hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -693,7 +693,7 @@ func btnQtyIncrease(cl models.CheckoutLine) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" alt=\"increase quantity button\" aria-label=\"Increase quantity\" title=\"Increase quantity\" class=\"p-1 border rounded bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" alt=\"increase quantity button\" aria-label=\"Increase quantity\" title=\"Increase quantity\" class=\"p-1 border rounded bg-primary text-white hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -771,7 +771,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" class=\"flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 border rounded h-auto p-2 sm:p-0\"><div class=\"flex items-center gap-2 pl-0 sm:pl-3\"><input type=\"checkbox\" class=\"w-5 h-5 accent-cchoice_border hover:accent-cchoice\" aria-label=\"Select item\" name=\"checked_item\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" class=\"flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 border rounded h-auto p-2 sm:p-0\"><div class=\"flex items-center gap-2 pl-0 sm:pl-3\"><input type=\"checkbox\" class=\"w-5 h-5 accent-primary-dark hover:accent-primary\" aria-label=\"Select item\" name=\"checked_item\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -911,7 +911,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if cl.DiscountPercentage != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "<p class=\"text-sm font-semibold text-cchoice text-center\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "<p class=\"text-sm font-semibold text-primary text-center\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -942,7 +942,7 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<p class=\"text-xs font-semibold text-cchoice\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<p class=\"text-xs font-semibold text-primary\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1041,11 +1041,11 @@ func CartCheckoutLineItem(cl models.CheckoutLine) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "\" hx-swap=\"outerHTML\" hx-push-url=\"false\" class=\"group stroke-cchoice rounded-full p-2 cursor-pointer hover:bg-cchoice_border\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "\" hx-swap=\"outerHTML\" hx-push-url=\"false\" class=\"group stroke-primary rounded-full p-2 cursor-pointer hover:bg-primary-dark\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = svg.Trash("stroke-cchoice group-hover:stroke-white cursor-pointer").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = svg.Trash("stroke-primary group-hover:stroke-white cursor-pointer").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -52,7 +52,7 @@ templ HomePageBody(data models.HomePageData) {
 				display: flex;
 				align-items: flex-start;
 				width: 85%;
-				border-left: 2px solid #F6b08A;
+				border-left: 2px solid var(--color-primary-muted);
 			}
 			@media (max-width: 1023px) {
 				#desktop-sidebar {
@@ -113,14 +113,14 @@ templ MobileSidebar() {
 		<div class="flex justify-end px-4 mb-4">
 			<button
 				type="button"
-				class="p-2 rounded-lg hover:bg-cchoicesoft"
+				class="p-2 rounded-lg hover:bg-surface"
 				aria-label="Close menu"
 				_="on click
 					add .hidden to #mobile-sidebar
 					add .hidden to #mobile-sidebar-overlay
 				"
 			>
-				<svg class="w-6 h-6 text-cchoice" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
 				</svg>
 			</button>

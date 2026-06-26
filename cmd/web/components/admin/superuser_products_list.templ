@@ -16,7 +16,7 @@ templ AdminSuperuserProductsListPage(title string) {
 			@common.TabTitle("[SUPERUSER] Products - C-Choice Admin")
 		</head>
 		<body
-			class="bg-cchoicesoft min-h-screen flex flex-col"
+			class="bg-surface min-h-screen flex flex-col"
 			_="init call metrics_event('admin_visit', 'products list')"
 		>
 			@common.DevRibbon()
@@ -26,7 +26,7 @@ templ AdminSuperuserProductsListPage(title string) {
 				<div class="max-w-8xl mx-auto">
 					<div class="bg-white rounded-lg shadow-md p-6">
 						@header.AdminStaffHeaderWithBack()
-						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+						<h1 class="text-2xl font-bold text-center text-primary mb-6">
 							Manage Products
 						</h1>
 						@ProductsListSection(utils.URL("/admin/superuser/products/table"))
@@ -60,7 +60,7 @@ templ AdminStaffProductsListPage() {
 			@common.TabTitle("Edit Products - C-Choice Admin")
 		</head>
 		<body
-			class="bg-cchoicesoft min-h-screen flex flex-col"
+			class="bg-surface min-h-screen flex flex-col"
 			_="init call metrics_event('admin_visit', 'staff products list')"
 		>
 			@common.DevRibbon()
@@ -70,7 +70,7 @@ templ AdminStaffProductsListPage() {
 				<div class="max-w-8xl mx-auto">
 					<div class="bg-white rounded-lg shadow-md p-6">
 						@header.AdminStaffHeaderWithBack()
-						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+						<h1 class="text-2xl font-bold text-center text-primary mb-6">
 							Edit Products
 						</h1>
 						@ProductsListSection(utils.URL("/admin/products/table"))

@@ -22,7 +22,7 @@ templ AdminHeader(profile *models.AdminStaffProfile) {
 			Hello, { profile.FullName }
 		</p>
 		<div class="text-center mb-6">
-			<h1 id="current-date" class="text-3xl font-bold text-cchoice">
+			<h1 id="current-date" class="text-3xl font-bold text-primary">
 				{ profile.CurrentDate }
 			</h1>
 			<p class="text-xl text-gray-600" id="clock">
@@ -55,7 +55,7 @@ templ AttendanceToolbar(selectedDate string, userType enums.StaffUserType) {
 					<input type="hidden" name="date-selector-end" class="date-selector-end-hidden"/>
 					<button
 						type="submit"
-						class="w-full sm:w-28 px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark transition-colors inline-flex items-center justify-center gap-2"
+						class="w-full sm:w-28 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors inline-flex items-center justify-center gap-2"
 						_="
 							on click
 								set .staff-id-hidden.value to #staff-id.value
@@ -78,7 +78,7 @@ templ AttendanceToolbar(selectedDate string, userType enums.StaffUserType) {
 					<input type="hidden" name="date-selector-end" class="date-selector-end-hidden"/>
 					<button
 						type="submit"
-						class="w-full sm:w-28 px-4 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark transition-colors inline-flex items-center justify-center gap-2"
+						class="w-full sm:w-28 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors inline-flex items-center justify-center gap-2"
 						_="
 							on click
 								set .staff-id-hidden.value to #staff-id.value
@@ -109,7 +109,7 @@ templ AdminLoginPage() {
 			</style>
 		</head>
 		<body
-			class="bg-cchoicesoft min-h-screen flex items-center justify-center"
+			class="bg-surface min-h-screen flex items-center justify-center"
 			_="init call metrics_event('admin_visit', 'login')"
 		>
 			@common.DevRibbon()
@@ -122,7 +122,7 @@ templ AdminLoginPage() {
 					alt="C-Choice Logo"
 					class="w-20 h-20 mx-auto mb-4"
 				/>
-				<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+				<h1 class="text-2xl font-bold text-center text-primary mb-6">
 					C-Choice Admin Portal
 				</h1>
 				<form
@@ -144,7 +144,7 @@ templ AdminLoginPage() {
 							name="email"
 							required
 							pattern={ constants.PatternEmail }
-							class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+							class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
 						/>
 					</div>
 					<div>
@@ -159,7 +159,7 @@ templ AdminLoginPage() {
 								required
 								maxlength="64"
 								pattern={ constants.PatternPassword }
-								class="block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cchoice focus:border-cchoice"
+								class="block w-full pr-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
 							/>
 							<button
 								type="button"
@@ -174,7 +174,7 @@ templ AdminLoginPage() {
 					<input type="hidden" name="location_lng" id="location_lng" value=""/>
 					<button
 						type="submit"
-						class="w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cchoice hover:bg-cchoice_dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cchoice"
+						class="w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
 					>
 						<span id="login-btn-content" class="inline-flex items-center gap-2">
 							<span id="login-spinner" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" aria-hidden="true"></span>
@@ -183,7 +183,7 @@ templ AdminLoginPage() {
 					</button>
 				</form>
 				<div class="mt-4 text-center">
-					<a href={ utils.URL("/auth/forgot-password?type=staff") } class="text-sm text-cchoice hover:text-cchoice_dark">
+					<a href={ utils.URL("/auth/forgot-password?type=staff") } class="text-sm text-primary hover:text-primary-dark">
 						Forgot password?
 					</a>
 				</div>
@@ -253,7 +253,7 @@ templ ScriptClock() {
 templ BackToHome(url string) {
 	<a
 		href={ url }
-		class="inline-flex items-center text-cchoice hover:text-cchoice_dark transition-colors"
+		class="inline-flex items-center text-primary hover:text-primary-dark transition-colors"
 	>
 		<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 			<path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -354,7 +354,7 @@ templ StaffDropdown() {
 		<select
 			id="staff-id"
 			name="staff-id"
-			class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+			class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 			hx-get={ utils.URL("/admin/staff/list") }
 			hx-trigger="load"
 			hx-swap="innerHTML"
@@ -402,7 +402,7 @@ templ ProductSearchToolbar(url string) {
 				type="text"
 				name="search_serial"
 				placeholder="Search by serial..."
-				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change, search_serial delay:300ms"
 				hx-target="#products-table"
@@ -412,7 +412,7 @@ templ ProductSearchToolbar(url string) {
 				type="text"
 				name="search_brand"
 				placeholder="Search by brand..."
-				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change, search_brand delay:300ms"
 				hx-target="#products-table"
@@ -420,7 +420,7 @@ templ ProductSearchToolbar(url string) {
 			/>
 			<select
 				name="status"
-				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change"
 				hx-target="#products-table"
@@ -536,7 +536,7 @@ templ WeightUnitDropdown(selected enums.WeightUnit) {
 		id="spec_weight_unit"
 		name="spec_weight_unit"
 		required
-		class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+		class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 	>
 		<option value="">Select unit</option>
 		for _, wu := range enums.AllWeightUnits {
@@ -556,7 +556,7 @@ templ StocksInDropdown(selected enums.StocksIn) {
 		id="stocks_in"
 		name="stocks_in"
 		required
-		class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+		class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 	>
 		<option value="">Select</option>
 		for _, si := range enums.AllStocksIn {

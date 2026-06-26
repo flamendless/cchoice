@@ -58,7 +58,7 @@ func QuotationPage(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-cchoicesoft min-h-screen flex flex-col\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-surface min-h-screen flex flex-col\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -82,7 +82,7 @@ func QuotationPage(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"mb-8\"><h2 class=\"text-2xl font-bold text-cchoice mb-4\">Quotation Draft</h2>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"mb-8\"><h2 class=\"text-2xl font-bold text-primary mb-4\">Quotation Draft</h2>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -227,7 +227,7 @@ func QuotationPage(
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</span></div></div></div><div class=\"mt-4\"><button class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark\" hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</span></div></div></div><div class=\"mt-4\"><button class=\"px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark\" hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -250,7 +250,7 @@ func QuotationPage(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div><div class=\"mb-8\"><h2 class=\"text-2xl font-bold text-cchoice mb-4\">Products</h2><form id=\"quotation-search-form\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div><div class=\"mb-8\"><h2 class=\"text-2xl font-bold text-primary mb-4\">Products</h2><form id=\"quotation-search-form\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -276,7 +276,7 @@ func QuotationPage(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" class=\"flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"> <select name=\"brand\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">All Brands</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" class=\"flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"> <select name=\"brand\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"\">All Brands</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -322,7 +322,7 @@ func QuotationPage(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</select> <select name=\"category\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">All Categories</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</select> <select name=\"category\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"\">All Categories</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -368,7 +368,7 @@ func QuotationPage(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</select> <select name=\"subcategory\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice\"><option value=\"\">All Subcategories</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</select> <select name=\"subcategory\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"\">All Subcategories</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -414,7 +414,7 @@ func QuotationPage(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</select> <button type=\"submit\" class=\"px-6 py-2 bg-cchoice text-white rounded-md hover:bg-cchoice_dark\">Search</button></div></form><div id=\"products-table\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</select> <button type=\"submit\" class=\"px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark\">Search</button></div></form><div id=\"products-table\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -521,7 +521,7 @@ func QuotationProductsTable(products []models.QuotationProduct) templ.Component 
 				return templ_7745c5c3_Err
 			}
 			if p.DiscountPercentage != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<p class=\"text-sm font-semibold text-cchoice text-center\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<p class=\"text-sm font-semibold text-primary text-center\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -552,7 +552,7 @@ func QuotationProductsTable(products []models.QuotationProduct) templ.Component 
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "<p class=\"text-xs font-semibold text-cchoice\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "<p class=\"text-xs font-semibold text-primary\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -612,7 +612,7 @@ func Actions(productID string, productSlug string) templ.Component {
 			templ_7745c5c3_Var29 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<div class=\"flex flex-col gap-4\"><div class=\"flex items-center gap-2\" data-actions><button type=\"button\" name=\"btn-qty-decrease\" class=\"p-1 border rounded-l-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\" disabled=\"true\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tset container to the closest <div[data-actions]/> to me\n\t\t\t\t\t\tset qtyInput to container.querySelector('input[name=\\'quantity\\']')\n\t\t\t\t\t\tset increaseBtn to container.querySelector('button[name=\\'btn-qty-increase\\']')\n\n\t\t\t\t\t\tif currentVal > 1\n\t\t\t\t\t\t\tset qtyInput.value to String(currentVal - 1)\n\t\t\t\t\t\t\tif currentVal - 1 <= 1\n\t\t\t\t\t\t\t\tset me.disabled to true\n\t\t\t\t\t\t\tend\n\n\t\t\t\t\t\t\tif currentVal - 1 < 99\n\t\t\t\t\t\t\t\tset increaseBtn.disabled to false\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M20 12H4\"></path></svg></button> <input type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]*\" name=\"quantity\" value=\"1\" class=\"w-8 text-center focus:outline-none focus:ring-0\" hx-validate=\"false\"> <button type=\"button\" name=\"btn-qty-increase\" class=\"p-1 border rounded-r-lg bg-cchoice text-white hover:bg-cchoice_dark transition-colors\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tset container to the closest <div[data-actions]/> to me\n\t\t\t\t\t\tset qtyInput to container.querySelector('input[name=\\'quantity\\']')\n\t\t\t\t\t\tset decreaseBtn to container.querySelector('button[name=\\'btn-qty-decrease\\']')\n\t\t\t\t\t\tset currentVal to Number(qtyInput.value)\n\n\t\t\t\t\t\tif currentVal < 99\n\t\t\t\t\t\t\tset qtyInput.value to String(currentVal + 1)\n\n\t\t\t\t\t\t\tif currentVal + 1 >= 99\n\t\t\t\t\t\t\t\tset me.disabled to true\n\t\t\t\t\t\t\tend\n\n\t\t\t\t\t\t\tif currentVal + 1 > 1\n\t\t\t\t\t\t\t\tset decreaseBtn.disabled to false\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg></button> <button type=\"button\" id=\"btn-add-to-cart\" class=\"bg-cchoice text-white px-2 py-1 rounded-lg font-semibold hover:bg-cchoice_dark transition-colors cursor-pointer mx-2\" hx-include=\"closest [data-actions]\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<div class=\"flex flex-col gap-4\"><div class=\"flex items-center gap-2\" data-actions><button type=\"button\" name=\"btn-qty-decrease\" class=\"p-1 border rounded-l-lg bg-primary text-white hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed\" disabled=\"true\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tset container to the closest <div[data-actions]/> to me\n\t\t\t\t\t\tset qtyInput to container.querySelector('input[name=\\'quantity\\']')\n\t\t\t\t\t\tset increaseBtn to container.querySelector('button[name=\\'btn-qty-increase\\']')\n\n\t\t\t\t\t\tif currentVal > 1\n\t\t\t\t\t\t\tset qtyInput.value to String(currentVal - 1)\n\t\t\t\t\t\t\tif currentVal - 1 <= 1\n\t\t\t\t\t\t\t\tset me.disabled to true\n\t\t\t\t\t\t\tend\n\n\t\t\t\t\t\t\tif currentVal - 1 < 99\n\t\t\t\t\t\t\t\tset increaseBtn.disabled to false\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M20 12H4\"></path></svg></button> <input type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]*\" name=\"quantity\" value=\"1\" class=\"w-8 text-center focus:outline-none focus:ring-0\" hx-validate=\"false\"> <button type=\"button\" name=\"btn-qty-increase\" class=\"p-1 border rounded-r-lg bg-primary text-white hover:bg-primary-dark transition-colors\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tset container to the closest <div[data-actions]/> to me\n\t\t\t\t\t\tset qtyInput to container.querySelector('input[name=\\'quantity\\']')\n\t\t\t\t\t\tset decreaseBtn to container.querySelector('button[name=\\'btn-qty-decrease\\']')\n\t\t\t\t\t\tset currentVal to Number(qtyInput.value)\n\n\t\t\t\t\t\tif currentVal < 99\n\t\t\t\t\t\t\tset qtyInput.value to String(currentVal + 1)\n\n\t\t\t\t\t\t\tif currentVal + 1 >= 99\n\t\t\t\t\t\t\t\tset me.disabled to true\n\t\t\t\t\t\t\tend\n\n\t\t\t\t\t\t\tif currentVal + 1 > 1\n\t\t\t\t\t\t\t\tset decreaseBtn.disabled to false\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg></button> <button type=\"button\" id=\"btn-add-to-cart\" class=\"bg-primary text-white px-2 py-1 rounded-lg font-semibold hover:bg-primary-dark transition-colors cursor-pointer mx-2\" hx-include=\"closest [data-actions]\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -625,7 +625,7 @@ func Actions(productID string, productSlug string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "\" hx-swap=\"none\">Add to Draft Quotation</button> <a class=\"bg-cchoice text-white px-2 py-1 rounded-lg font-semibold hover:bg-cchoice_dark transition-colors cursor-pointer mx-2\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "\" hx-swap=\"none\">Add to Draft Quotation</button> <a class=\"bg-primary text-white px-2 py-1 rounded-lg font-semibold hover:bg-primary-dark transition-colors cursor-pointer mx-2\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

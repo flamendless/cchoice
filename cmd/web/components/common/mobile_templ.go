@@ -148,7 +148,7 @@ func MobileNumberInput(id, name, label, placeholder, value string, required bool
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" class=\"flex-1 block w-full rounded-r-md border border-gray-300 rounded-l-none px-3 py-2 focus:outline-none focus:ring-cchoice focus:border-cchoice\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" class=\"flex-1 block w-full rounded-r-md border border-gray-300 rounded-l-none px-3 py-2 focus:outline-none focus:ring-primary focus:border-primary\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

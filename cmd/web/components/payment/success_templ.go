@@ -112,7 +112,7 @@ func SuccessPaymentPageBody(orderRefNumber string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div><h1 class=\"text-3xl font-semibold text-cchoice-800\">Payment Successful!</h1><p class=\"text-lg text-gray-600 text-center\">Thank you for your purchase. Your payment has been processed successfully.</p><div class=\"bg-green-50 border border-green-200 rounded-lg p-4 mt-2\"><p class=\"text-sm text-gray-600 mb-1\">Order Reference Number:</p><p class=\"text-base font-mono font-semibold text-green-800\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div><h1 class=\"text-3xl font-semibold text-primary-dark\">Payment Successful!</h1><p class=\"text-lg text-gray-600 text-center\">Thank you for your purchase. Your payment has been processed successfully.</p><div class=\"bg-green-50 border border-green-200 rounded-lg p-4 mt-2\"><p class=\"text-sm text-gray-600 mb-1\">Order Reference Number:</p><p class=\"text-base font-mono font-semibold text-green-800\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
