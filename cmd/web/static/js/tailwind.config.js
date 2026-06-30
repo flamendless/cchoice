@@ -28,5 +28,9 @@ module.exports = {
       }
     },
   },
+  safelist: [
+    "bg-primary-emphasis",
+    "bg-primary-muted",
+  ],
   plugins: [],
 }
