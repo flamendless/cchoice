@@ -1,9 +1,11 @@
 package shop
 
+import "fmt"
 import "cchoice/cmd/web/models"
 import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
 import "cchoice/internal/constants"
+
 templ PostHomeContentSections(data models.HomePageData) {
 	<div
 		id="others"
@@ -12,12 +14,12 @@ templ PostHomeContentSections(data models.HomePageData) {
 		for _, section := range data.Sections {
 			<span class="font-bold text-lg mt-4">{ section.Title }</span>
 			switch section.Href {
-				case "about-us", "services":
-					@CommonSection(section)
-				case "store":
-					@StoreSection(section)
-				case "partners":
-					@PartnerSection(section)
+			case "about-us", "services":
+				@CommonSection(section)
+			case "store":
+				@StoreSection(section)
+			case "partners":
+				@PartnerSection(section)
 			}
 		}
 	</div>
@@ -57,46 +59,45 @@ templ StoreSection(section models.PostHomeContentSection) {
 	>
 		<div class="flex flex-col content-center w-full max-w-full">
 			<div class="flex flex-col items-center w-full max-w-full">
-    <div class="relative w-full max-w-2xl overflow-hidden">
-        <div id="storeTrack" class="flex transition-transform duration-500 ease-in-out">
-    for _, imgURL := range constants.GetStoreImages() {
-        <div class="min-w-full">
-            <img src={ imgURL } class="w-full h-[600px] object-cover" alt="Store photo"/>
-        </div>
-    }
-</div>
-</div>
-		<div id="storeDots" class="flex gap-2 mt-3">
-    for i := range constants.GetStoreImages() {
-        if i == 0 {
-            <span class="w-2 h-2 rounded-full bg-gray-800 cursor-pointer"></span>
-        } else {
-            <span class="w-2 h-2 rounded-full bg-gray-300 cursor-pointer"></span>
-        }
-    }
-</div>
+				<div class="relative w-full max-w-2xl overflow-hidden">
+					<div id="storeTrack" class="flex transition-transform duration-500 ease-in-out">
+						for i, imgURL := range constants.GetStoreImages() {
+							<div class="min-w-full">
+								<img src={ imgURL } class="w-full h-[250px] sm:h-[350px] md:h-[500px] object-contain" alt={ fmt.Sprintf("Store photo %d", i+1) }/>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+			<div id="storeDots" class="flex justify-center w-full gap-2 mt-2">
+				for i := range constants.GetStoreImages() {
+					if i == 0 {
+						<span class="w-2 h-2 rounded-full bg-gray-800 cursor-pointer"></span>
+					} else {
+						<span class="w-2 h-2 rounded-full bg-gray-300 cursor-pointer"></span>
+					}
+				}
+			</div>
 
-    <script>
-        (function() {
-            var cur = 0;
-            var track = document.getElementById('storeTrack');
-            var dots = document.querySelectorAll('#storeDots span');
-            var total = dots.length;
-            function goTo(n) {
-                cur = n;
-                track.style.transform = 'translateX(-' + (cur * 100) + '%)';
-                dots.forEach(function(d, i) {
-                    d.style.background = i === cur ? '#1f2937' : '#d1d5db';
-                });
-            }
-            dots.forEach(function(d, i) {
-                d.addEventListener('click', function() { goTo(i); });
-            });
-            setInterval(function() { goTo((cur + 1) % total); }, 5000);
-        })();
-    </script>
-</div>
-
+			<script>
+				(function() {
+					let cur = 0;
+					const track = document.getElementById('storeTrack');
+					const dots = document.querySelectorAll('#storeDots span');
+					const total = dots.length;
+					function goTo(n) {
+						cur = n;
+						track.style.transform = 'translateX(-' + (cur * 100) + '%)';
+						dots.forEach(function(d, i) {
+							d.style.background = i === cur ? '#1f2937' : '#d1d5db';
+						});
+					}
+					dots.forEach(function(d, i) {
+						d.addEventListener('click', function() { goTo(i); });
+					});
+					setInterval(function() { goTo((cur + 1) % total); }, 5000);
+				})();
+			</script>
 
 			<div
 				hx-trigger="load once"

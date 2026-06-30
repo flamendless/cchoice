@@ -9,6 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import "cchoice/internal/utils"
+import "cchoice/internal/constants"
 import "cchoice/cmd/web/components/common"
 
 const lastUpdatedAt = "Last updated: January 2025"
@@ -41,7 +42,7 @@ func backToHome() templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 9, Col: 25}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 10, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -111,7 +112,7 @@ func TermsPage() templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(lastUpdatedAt)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 28, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 29, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -124,7 +125,7 @@ func TermsPage() templ.Component {
 		var templ_7745c5c3_Var5 templ.SafeURL
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/privacy"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 50, Col: 90}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 51, Col: 90}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -187,20 +188,33 @@ func PrivacyPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<h1 class=\"text-3xl font-bold text-gray-900 mb-2\">Privacy Policy</h1><p class=\"text-gray-500 text-sm mb-8\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"flex justify-between items-center mb-2\"><h1 class=\"text-3xl font-bold text-gray-900\">Privacy Policy</h1><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(lastUpdatedAt)
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(constants.PathCORSealImageCDN)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 88, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 90, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</p><div class=\"space-y-4 text-gray-700\"><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">1. Introduction</h2><p>This Privacy Policy describes how we collect, use, and protect information when you use this website and related gallery services (\"Services\"). We are committed to protecting your privacy.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">2. Information We Collect</h2><p>We may collect:</p><ul class=\"list-disc pl-6 mt-2 space-y-1\"><li><strong class=\"text-gray-800\">Usage data:</strong> e.g. IP address, browser type, pages visited, and approximate time of access, for security and operation of the Services.</li><li><strong class=\"text-gray-800\">Information you provide:</strong> e.g. when you enter a gallery (such as a gallery username or password), or when you contact us. Passwords are not stored in plain text.</li><li><strong class=\"text-gray-800\">Cookies and similar tech:</strong> we may use cookies or local storage for session management and preferences where necessary for the Services.</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">3. How We Use Information</h2><p>We use the information to: provide and secure the Services; prevent abuse and enforce our Terms; improve our systems; and, where applicable, respond to your requests. We do not sell your personal information to third parties.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">4. Sharing of Information</h2><p>We may share information only: (a) with service providers who assist in operating the Services, under confidentiality obligations; (b) when required by law or to protect rights and safety; or (c) with your consent.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">5. Data Retention and Security</h2><p>We retain data only as long as needed for the purposes above or as required by law. We use reasonable technical and organisational measures to protect your information; no system is completely secure.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">6. Your Rights</h2><p>Depending on your location, you may have rights to access, correct, delete, or restrict processing of your personal data, or to object to certain processing. To exercise these rights, please contact the tenant or operator using the details on this website.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">7. Changes</h2><p>We may update this Privacy Policy from time to time. The \"Last updated\" date will be revised when changes are made. Continued use of the Services after changes constitutes acceptance of the updated policy.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">8. Contact</h2><p>For privacy-related questions or requests, please contact the tenant or operator through the contact details provided on this website.</p></section></div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" class=\"w-20 h-auto sm:w-24\" alt=\"DPO/DPS Registered Seal\"></div><p class=\"text-gray-500 text-sm mb-8\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(lastUpdatedAt)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 92, Col: 58}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</p><div class=\"space-y-4 text-gray-700\"><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">1. Introduction</h2><p>This Privacy Policy describes how we collect, use, and protect information when you use this website and related gallery services (\"Services\"). We are committed to protecting your privacy.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">2. Information We Collect</h2><p>We may collect:</p><ul class=\"list-disc pl-6 mt-2 space-y-1\"><li><strong class=\"text-gray-800\">Usage data:</strong> e.g. IP address, browser type, pages visited, and approximate time of access, for security and operation of the Services.</li><li><strong class=\"text-gray-800\">Information you provide:</strong> e.g. when you enter a gallery (such as a gallery username or password), or when you contact us. Passwords are not stored in plain text.</li><li><strong class=\"text-gray-800\">Cookies and similar tech:</strong> we may use cookies or local storage for session management and preferences where necessary for the Services.</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">3. How We Use Information</h2><p>We use the information to: provide and secure the Services; prevent abuse and enforce our Terms; improve our systems; and, where applicable, respond to your requests. We do not sell your personal information to third parties.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">4. Sharing of Information</h2><p>We may share information only: (a) with service providers who assist in operating the Services, under confidentiality obligations; (b) when required by law or to protect rights and safety; or (c) with your consent.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">5. Data Retention and Security</h2><p>We retain data only as long as needed for the purposes above or as required by law. We use reasonable technical and organisational measures to protect your information; no system is completely secure.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">6. Your Rights</h2><p>Depending on your location, you may have rights to access, correct, delete, or restrict processing of your personal data, or to object to certain processing. To exercise these rights, please contact the tenant or operator using the details on this website.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">7. Changes</h2><p>We may update this Privacy Policy from time to time. The \"Last updated\" date will be revised when changes are made. Continued use of the Services after changes constitutes acceptance of the updated policy.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">8. Contact</h2><p>For privacy-related questions or requests, please contact the tenant or operator through the contact details provided on this website.</p></section></div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

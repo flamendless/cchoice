@@ -1,4 +1,5 @@
 package constants
+
 func GetStoreImages() []string {
 	return []string{
 		"https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/120dbd5d-37ff-4e7b-f377-86599cb17c00/public",

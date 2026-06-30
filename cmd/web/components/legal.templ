@@ -1,6 +1,7 @@
 package components
 
 import "cchoice/internal/utils"
+import "cchoice/internal/constants"
 import "cchoice/cmd/web/components/common"
 
 const lastUpdatedAt = "Last updated: January 2025"
@@ -84,7 +85,10 @@ templ PrivacyPage() {
 			<div class="flex-1 py-8 px-4">
 				<div class="max-w-3xl mx-auto">
 					@backToHome()
-					<h1 class="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
+					<div class="flex justify-between items-center mb-2">
+						<h1 class="text-3xl font-bold text-gray-900">Privacy Policy</h1>
+						<img src={ constants.PathCORSealImageCDN } class="w-20 h-auto sm:w-24" alt="DPO/DPS Registered Seal"/>
+					</div>
 					<p class="text-gray-500 text-sm mb-8">{ lastUpdatedAt }</p>
 					<div class="space-y-4 text-gray-700">
 						<section>
