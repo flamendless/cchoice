@@ -2,9 +2,8 @@ package shop
 
 import "cchoice/cmd/web/models"
 import "cchoice/internal/utils"
-import "cchoice/internal/constants"
 import "cchoice/cmd/web/components/common"
-
+import "cchoice/internal/constants"
 templ PostHomeContentSections(data models.HomePageData) {
 	<div
 		id="others"
@@ -57,28 +56,48 @@ templ StoreSection(section models.PostHomeContentSection) {
 		class="flex flex-col lg:flex-row justify-between my-6 w-full max-w-full pr-4"
 	>
 		<div class="flex flex-col content-center w-full max-w-full">
-			<div class="flex flex-row justify-center items-center w-full max-w-full gap-4">
-				<img
-					src={ constants.PathStoreImageCDN }
-					hx-trigger="load once"
-					hx-swap="none"
-					class="w-auto h-[256px] m-4"
-					alt="Store location"
-					fetchpriority="high"
-					loading="eager"
-					decoding="async"
-				/>
-				<img
-					src={ constants.PathCORSealImageCDN }
-					hx-trigger="load once"
-					hx-swap="none"
-					class="w-auto h-[128px] m-4"
-					alt="COR seal"
-					fetchpriority="high"
-					loading="eager"
-					decoding="async"
-				/>
-			</div>
+			<div class="flex flex-col items-center w-full max-w-full">
+    <div class="relative w-full max-w-2xl overflow-hidden">
+        <div id="storeTrack" class="flex transition-transform duration-500 ease-in-out">
+    for _, imgURL := range constants.GetStoreImages() {
+        <div class="min-w-full">
+            <img src={ imgURL } class="w-full h-[600px] object-cover" alt="Store photo"/>
+        </div>
+    }
+</div>
+</div>
+		<div id="storeDots" class="flex gap-2 mt-3">
+    for i := range constants.GetStoreImages() {
+        if i == 0 {
+            <span class="w-2 h-2 rounded-full bg-gray-800 cursor-pointer"></span>
+        } else {
+            <span class="w-2 h-2 rounded-full bg-gray-300 cursor-pointer"></span>
+        }
+    }
+</div>
+
+    <script>
+        (function() {
+            var cur = 0;
+            var track = document.getElementById('storeTrack');
+            var dots = document.querySelectorAll('#storeDots span');
+            var total = dots.length;
+            function goTo(n) {
+                cur = n;
+                track.style.transform = 'translateX(-' + (cur * 100) + '%)';
+                dots.forEach(function(d, i) {
+                    d.style.background = i === cur ? '#1f2937' : '#d1d5db';
+                });
+            }
+            dots.forEach(function(d, i) {
+                d.addEventListener('click', function() { goTo(i); });
+            });
+            setInterval(function() { goTo((cur + 1) % total); }, 5000);
+        })();
+    </script>
+</div>
+
+
 			<div
 				hx-trigger="load once"
 				hx-get={ utils.URL("/settings/store") }
