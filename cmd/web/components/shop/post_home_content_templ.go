@@ -47,7 +47,7 @@ func PostHomeContentSections(data models.HomePageData) templ.Component {
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(section.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 15, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 15, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -111,13 +111,13 @@ func CommonSection(section models.PostHomeContentSection) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(section.Href)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 30, Col: 19}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 30, Col: 19}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"flex flex-col lg:flex-row justify-between my-6 w-full max-w-full pr-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"flex flex-col lg:flex-row justify-between my-6 w-full max-w-full px-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -129,7 +129,7 @@ func CommonSection(section models.PostHomeContentSection) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(content.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 38, Col: 20}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 38, Col: 20}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -142,7 +142,7 @@ func CommonSection(section models.PostHomeContentSection) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(content.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 41, Col: 26}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 41, Col: 26}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -230,13 +230,13 @@ func StoreSection(section models.PostHomeContentSection) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(section.Href)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 57, Col: 19}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 57, Col: 19}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"flex flex-col lg:flex-row justify-between my-6 w-full max-w-full pr-4\"><div class=\"flex flex-col content-center w-full max-w-full\"><div class=\"flex flex-col items-center w-full max-w-full\"><div class=\"relative w-full max-w-2xl overflow-hidden\"><div id=\"storeTrack\" class=\"flex transition-transform duration-500 ease-in-out\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"flex flex-col lg:flex-row justify-between my-6 w-full max-w-full px-4\"><div class=\"flex flex-col content-center w-full max-w-full\"><div class=\"flex flex-col items-center w-full max-w-full\"><div class=\"relative overflow-hidden mx-auto max-w-lg w-full\"><div id=\"storeTrack\" class=\"flex transition-transform duration-500 ease-in-out\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -248,20 +248,20 @@ func StoreSection(section models.PostHomeContentSection) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(imgURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 66, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 66, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" class=\"w-full h-[250px] sm:h-[350px] md:h-[500px] object-contain\" alt=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" class=\"w-full h-[300px] sm:h-[380px] md:h-[430px] lg:h-[460px] object-contain\" alt=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("Store photo %d", i+1))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 66, Col: 134}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 66, Col: 147}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -272,31 +272,31 @@ func StoreSection(section models.PostHomeContentSection) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div></div></div><div id=\"storeDots\" class=\"flex justify-center w-full gap-2 mt-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div></div></div><div id=\"storeDots\" class=\"flex justify-center items-center w-full gap-2 mt-2 py-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for i := range constants.GetStoreImages() {
 			if i == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<span class=\"w-2 h-2 rounded-full bg-gray-800 cursor-pointer\"></span>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<span class=\"w-3 h-3 rounded-full cursor-pointer bg-primary-emphasis\"></span>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<span class=\"w-2 h-2 rounded-full bg-gray-300 cursor-pointer\"></span>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<span class=\"w-3 h-3 rounded-full cursor-pointer bg-primary-muted\"></span>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div><script>\n\t\t\t\t(function() {\n\t\t\t\t\tlet cur = 0;\n\t\t\t\t\tconst track = document.getElementById('storeTrack');\n\t\t\t\t\tconst dots = document.querySelectorAll('#storeDots span');\n\t\t\t\t\tconst total = dots.length;\n\t\t\t\t\tfunction goTo(n) {\n\t\t\t\t\t\tcur = n;\n\t\t\t\t\t\ttrack.style.transform = 'translateX(-' + (cur * 100) + '%)';\n\t\t\t\t\t\tdots.forEach(function(d, i) {\n\t\t\t\t\t\t\td.style.background = i === cur ? '#1f2937' : '#d1d5db';\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t\tdots.forEach(function(d, i) {\n\t\t\t\t\t\td.addEventListener('click', function() { goTo(i); });\n\t\t\t\t\t});\n\t\t\t\t\tsetInterval(function() { goTo((cur + 1) % total); }, 5000);\n\t\t\t\t})();\n\t\t\t</script><div hx-trigger=\"load once\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div><script>\n\t\t\t\t(function() {\n\t\t\t\t\tlet cur = 0;\n\t\t\t\t\tconst track = document.getElementById('storeTrack');\n\t\t\t\t\tconst dots = document.querySelectorAll('#storeDots span');\n\t\t\t\t\tconst total = dots.length;\n\t\t\t\t\tfunction goTo(n) {\n\t\t\t\t\t\tcur = n;\n\t\t\t\t\t\ttrack.style.transform = 'translateX(-' + (cur * 100) + '%)';\n\t\t\t\t\t\tdots.forEach(function(d, i) {\n\t\t\t\t\t\t\td.classList.remove('bg-primary-emphasis', 'bg-primary-muted');\n\t\t\t\t\t\t\td.classList.add(i === cur ? 'bg-primary-emphasis' : 'bg-primary-muted');\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t\tdots.forEach(function(d, i) {\n\t\t\t\t\t\td.addEventListener('click', function() { goTo(i); });\n\t\t\t\t\t});\n\t\t\t\t\tsetInterval(function() { goTo((cur + 1) % total); }, 5000);\n\t\t\t\t})();\n\t\t\t</script><div hx-trigger=\"load once\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/settings/store"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 104, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 103, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -314,7 +314,7 @@ func StoreSection(section models.PostHomeContentSection) templ.Component {
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(content.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 118, Col: 20}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 117, Col: 20}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
@@ -327,7 +327,7 @@ func StoreSection(section models.PostHomeContentSection) templ.Component {
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(content.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 121, Col: 26}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 120, Col: 26}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -374,7 +374,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(section.Href)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 130, Col: 19}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 129, Col: 19}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
@@ -397,7 +397,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 				var templ_7745c5c3_Var17 string
 				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(content.BrandImage.CDNURL)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 140, Col: 38}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 139, Col: 38}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
@@ -410,7 +410,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 				var templ_7745c5c3_Var18 string
 				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(content.BrandImage.Alt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 144, Col: 35}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 143, Col: 35}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {
@@ -428,7 +428,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 				var templ_7745c5c3_Var19 string
 				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(content.BrandImage.CDNURL)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 151, Col: 38}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 150, Col: 38}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 				if templ_7745c5c3_Err != nil {
@@ -441,7 +441,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 				var templ_7745c5c3_Var20 string
 				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(content.BrandImage.Alt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 155, Col: 35}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/shop/post_home_content.templ`, Line: 154, Col: 35}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 				if templ_7745c5c3_Err != nil {

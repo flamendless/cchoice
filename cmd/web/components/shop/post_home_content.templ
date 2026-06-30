@@ -28,7 +28,7 @@ templ PostHomeContentSections(data models.HomePageData) {
 templ CommonSection(section models.PostHomeContentSection) {
 	<section
 		id={ section.Href }
-		class="flex flex-col lg:flex-row justify-between my-6 w-full max-w-full pr-4"
+		class="flex flex-col lg:flex-row justify-between my-6 w-full max-w-full px-4"
 	>
 		for _, content := range section.Others {
 			<div
@@ -55,30 +55,29 @@ templ GMapsAndWaze(gmaps string, waze string) {
 templ StoreSection(section models.PostHomeContentSection) {
 	<section
 		id={ section.Href }
-		class="flex flex-col lg:flex-row justify-between my-6 w-full max-w-full pr-4"
+		class="flex flex-col lg:flex-row justify-between my-6 w-full max-w-full px-4"
 	>
 		<div class="flex flex-col content-center w-full max-w-full">
 			<div class="flex flex-col items-center w-full max-w-full">
-				<div class="relative w-full max-w-2xl overflow-hidden">
+				<div class="relative overflow-hidden mx-auto max-w-lg w-full">
 					<div id="storeTrack" class="flex transition-transform duration-500 ease-in-out">
 						for i, imgURL := range constants.GetStoreImages() {
 							<div class="min-w-full">
-								<img src={ imgURL } class="w-full h-[250px] sm:h-[350px] md:h-[500px] object-contain" alt={ fmt.Sprintf("Store photo %d", i+1) }/>
+								<img src={ imgURL } class="w-full h-[300px] sm:h-[380px] md:h-[430px] lg:h-[460px] object-contain" alt={ fmt.Sprintf("Store photo %d", i+1) }/>
 							</div>
 						}
 					</div>
 				</div>
 			</div>
-			<div id="storeDots" class="flex justify-center w-full gap-2 mt-2">
+			<div id="storeDots" class="flex justify-center items-center w-full gap-2 mt-2 py-2">
 				for i := range constants.GetStoreImages() {
 					if i == 0 {
-						<span class="w-2 h-2 rounded-full bg-gray-800 cursor-pointer"></span>
+						<span class="w-3 h-3 rounded-full cursor-pointer bg-primary-emphasis"></span>
 					} else {
-						<span class="w-2 h-2 rounded-full bg-gray-300 cursor-pointer"></span>
+						<span class="w-3 h-3 rounded-full cursor-pointer bg-primary-muted"></span>
 					}
 				}
 			</div>
-
 			<script>
 				(function() {
 					let cur = 0;
@@ -89,7 +88,8 @@ templ StoreSection(section models.PostHomeContentSection) {
 						cur = n;
 						track.style.transform = 'translateX(-' + (cur * 100) + '%)';
 						dots.forEach(function(d, i) {
-							d.style.background = i === cur ? '#1f2937' : '#d1d5db';
+							d.classList.remove('bg-primary-emphasis', 'bg-primary-muted');
+							d.classList.add(i === cur ? 'bg-primary-emphasis' : 'bg-primary-muted');
 						});
 					}
 					dots.forEach(function(d, i) {
@@ -98,7 +98,6 @@ templ StoreSection(section models.PostHomeContentSection) {
 					setInterval(function() { goTo((cur + 1) % total); }, 5000);
 				})();
 			</script>
-
 			<div
 				hx-trigger="load once"
 				hx-get={ utils.URL("/settings/store") }
