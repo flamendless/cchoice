@@ -5,11 +5,13 @@ import (
 	"database/sql"
 
 	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
+	"cchoice/internal/utils"
 	"strings"
 
 	"go.uber.org/zap"
@@ -93,17 +95,8 @@ func (s *StaffLogsService) GetAllAsModel(ctx context.Context) ([]models.StaffLog
 
 	logsList := make([]models.StaffLog, 0, len(logsData))
 	for _, l := range logsData {
-		logsList = append(logsList, models.StaffLog{
-			ID:         s.encoder.Encode(l.ID),
-			StaffID:    s.encoder.Encode(l.StaffID),
-			CreatedAt:  l.CreatedAt,
-			Action:     l.Action,
-			Module:     l.Module,
-			Result:     l.Result,
-			FirstName:  l.FirstName.String,
-			MiddleName: l.MiddleName.String,
-			LastName:   l.LastName.String,
-		})
+		staffLog := s.toStaffLogModel(ctx, l.ID, l.StaffID, l.CreatedAt, l.Action, l.Module, l.Result, l.FirstName, l.MiddleName, l.LastName)
+		logsList = append(logsList, staffLog)
 	}
 	return logsList, nil
 }
@@ -116,19 +109,55 @@ func (s *StaffLogsService) GetFilteredAsModel(ctx context.Context, staffID int64
 
 	logsList := make([]models.StaffLog, 0, len(logsData))
 	for _, l := range logsData {
-		logsList = append(logsList, models.StaffLog{
-			ID:         s.encoder.Encode(l.ID),
-			StaffID:    s.encoder.Encode(l.StaffID),
-			CreatedAt:  l.CreatedAt,
-			Action:     l.Action,
-			Module:     l.Module,
-			Result:     l.Result,
-			FirstName:  l.FirstName.String,
-			MiddleName: l.MiddleName.String,
-			LastName:   l.LastName.String,
-		})
+		staffLog := s.toStaffLogModel(ctx, l.ID, l.StaffID, l.CreatedAt, l.Action, l.Module, l.Result, l.FirstName, l.MiddleName, l.LastName)
+		logsList = append(logsList, staffLog)
 	}
 	return logsList, nil
+}
+
+func (s *StaffLogsService) toStaffLogModel(
+	ctx context.Context,
+	id, staffID int64,
+	createdAt, action, module, result string,
+	firstName, middleName, lastName sql.NullString,
+) models.StaffLog {
+	staffLog := models.StaffLog{
+		ID:         s.encoder.Encode(id),
+		StaffID:    s.encoder.Encode(staffID),
+		CreatedAt:  createdAt,
+		Action:     action,
+		Module:     module,
+		Result:     result,
+		FirstName:  firstName.String,
+		MiddleName: middleName.String,
+		LastName:   lastName.String,
+	}
+	s.enrichReference(ctx, &staffLog)
+	return staffLog
+}
+
+func (s *StaffLogsService) enrichReference(ctx context.Context, log *models.StaffLog) {
+	if log.Module != constants.ModuleProducts {
+		return
+	}
+	if log.Action != constants.ActionCreate && log.Action != constants.ActionUpdate {
+		return
+	}
+	encodedID, ok := utils.ParseStaffLogSuccessID(log.Result)
+	if !ok {
+		return
+	}
+	decoded := s.encoder.Decode(encodedID)
+	if decoded == encode.INVALID {
+		return
+	}
+	slug, err := s.dbRO.GetQueries().GetProductSlugByID(ctx, decoded)
+	if err != nil || !slug.Valid || slug.String == "" {
+		return
+	}
+	ref := utils.BuildStaffLogReference(log.Module, log.Action, slug.String)
+	log.ReferenceLabel = ref.Label
+	log.ReferenceURL = ref.URL
 }
 
 func (s *StaffLogsService) ID() string {
