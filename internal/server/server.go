@@ -122,7 +122,7 @@ func (s *Server) GetProductImageProxyURL(ctx context.Context, thumbnailPath stri
 func NewServer() *ServerInstance {
 	cfg := conf.Conf()
 	sessionManager := scs.New()
-	sessionManager.Lifetime = 1 * time.Hour
+	sessionManager.Lifetime = 4 * time.Hour
 
 	dbRO := database.New(database.DB_MODE_RO)
 	dbRW := database.New(database.DB_MODE_RW)
