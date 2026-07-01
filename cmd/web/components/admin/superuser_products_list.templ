@@ -38,16 +38,17 @@ templ AdminSuperuserProductsListPage(title string, brands []models.AdminBrand) {
 }
 
 templ ProductsListSection(tableURL string, brands []models.AdminBrand) {
-	<div
-		class="bg-white rounded-lg shadow-md p-6"
-		hx-get={ tableURL }
-		hx-trigger="load"
-		hx-target="#products-table"
-		hx-swap="innerHTML"
-	>
+	<div class="bg-white rounded-lg shadow-md p-6">
+		<div id="products-pagination-top"></div>
 		@ProductSearchToolbar(tableURL, brands)
-		<div id="products-table">
-			//AdminSuperuserProductsListTable
+		<div
+			id="products-table-content"
+			hx-get={ tableURL }
+			hx-trigger="load"
+			hx-swap="innerHTML"
+			hx-include="[name='search_serial'],[name='search_brand'],[name='status']"
+		>
+			<p class="text-gray-500 text-center py-4">Loading...</p>
 		</div>
 	</div>
 }
@@ -91,6 +92,19 @@ templ TableCell(w string, extraClasses string) {
 	<td class={ fmt.Sprintf("px-6 py-4 whitespace-nowrap text-sm w-[%s] %s", w, extraClasses) }>
 		{ children... }
 	</td>
+}
+
+templ AdminSuperuserProductsListTableContent(
+	products []models.AdminProductListItem,
+	editOnly bool,
+	basePath string,
+	p models.TablePagination,
+) {
+	<div id="products-pagination-top" hx-swap-oob="true">
+		@TablePaginationBar(p)
+	</div>
+	@AdminSuperuserProductsListTable(products, editOnly, basePath)
+	@TablePaginationBar(p)
 }
 
 templ AdminSuperuserProductsListTable(products []models.AdminProductListItem, editOnly bool, basePath string) {

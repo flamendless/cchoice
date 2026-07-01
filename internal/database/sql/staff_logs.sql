@@ -72,3 +72,32 @@ WHERE
     AND (@module = '' OR sl.module = @module)
     AND (@staff_id = 0 OR sl.staff_id = @staff_id)
 ORDER BY sl.created_at DESC;
+
+-- name: CountFilteredStaffLogs :one
+SELECT COUNT(*) AS count
+FROM tbl_staff_logs sl
+WHERE
+    (@action = '' OR sl.action = @action)
+    AND (@module = '' OR sl.module = @module)
+    AND (@staff_id = 0 OR sl.staff_id = @staff_id);
+
+-- name: GetFilteredStaffLogsPaginated :many
+SELECT
+    sl.id,
+    sl.staff_id,
+    sl.created_at,
+    sl.action,
+    sl.module,
+    sl.result,
+    sl.useragent_id,
+    s.first_name,
+    s.middle_name,
+    s.last_name
+FROM tbl_staff_logs sl
+LEFT JOIN tbl_staffs s ON sl.staff_id = s.id
+WHERE
+    (@action = '' OR sl.action = @action)
+    AND (@module = '' OR sl.module = @module)
+    AND (@staff_id = 0 OR sl.staff_id = @staff_id)
+ORDER BY sl.created_at DESC
+LIMIT @limit OFFSET @offset;

@@ -10,6 +10,28 @@ import (
 	"database/sql"
 )
 
+const countFilteredStaffLogs = `-- name: CountFilteredStaffLogs :one
+SELECT COUNT(*) AS count
+FROM tbl_staff_logs sl
+WHERE
+    (?1 = '' OR sl.action = ?1)
+    AND (?2 = '' OR sl.module = ?2)
+    AND (?3 = 0 OR sl.staff_id = ?3)
+`
+
+type CountFilteredStaffLogsParams struct {
+	Action  interface{}
+	Module  interface{}
+	StaffID interface{}
+}
+
+func (q *Queries) CountFilteredStaffLogs(ctx context.Context, arg CountFilteredStaffLogsParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countFilteredStaffLogs, arg.Action, arg.Module, arg.StaffID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createStaffLog = `-- name: CreateStaffLog :one
 INSERT INTO tbl_staff_logs (
     staff_id,
@@ -191,6 +213,89 @@ func (q *Queries) GetFilteredStaffLogs(ctx context.Context, arg GetFilteredStaff
 	var items []GetFilteredStaffLogsRow
 	for rows.Next() {
 		var i GetFilteredStaffLogsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.StaffID,
+			&i.CreatedAt,
+			&i.Action,
+			&i.Module,
+			&i.Result,
+			&i.UseragentID,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getFilteredStaffLogsPaginated = `-- name: GetFilteredStaffLogsPaginated :many
+SELECT
+    sl.id,
+    sl.staff_id,
+    sl.created_at,
+    sl.action,
+    sl.module,
+    sl.result,
+    sl.useragent_id,
+    s.first_name,
+    s.middle_name,
+    s.last_name
+FROM tbl_staff_logs sl
+LEFT JOIN tbl_staffs s ON sl.staff_id = s.id
+WHERE
+    (?1 = '' OR sl.action = ?1)
+    AND (?2 = '' OR sl.module = ?2)
+    AND (?3 = 0 OR sl.staff_id = ?3)
+ORDER BY sl.created_at DESC
+LIMIT ?5 OFFSET ?4
+`
+
+type GetFilteredStaffLogsPaginatedParams struct {
+	Action  interface{}
+	Module  interface{}
+	StaffID interface{}
+	Offset  int64
+	Limit   int64
+}
+
+type GetFilteredStaffLogsPaginatedRow struct {
+	ID          int64
+	StaffID     int64
+	CreatedAt   string
+	Action      string
+	Module      string
+	Result      string
+	UseragentID sql.NullInt64
+	FirstName   sql.NullString
+	MiddleName  sql.NullString
+	LastName    sql.NullString
+}
+
+func (q *Queries) GetFilteredStaffLogsPaginated(ctx context.Context, arg GetFilteredStaffLogsPaginatedParams) ([]GetFilteredStaffLogsPaginatedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getFilteredStaffLogsPaginated,
+		arg.Action,
+		arg.Module,
+		arg.StaffID,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetFilteredStaffLogsPaginatedRow
+	for rows.Next() {
+		var i GetFilteredStaffLogsPaginatedRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.StaffID,

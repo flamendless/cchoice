@@ -402,6 +402,15 @@ type StaffLog struct {
 	ReferenceURL   string
 }
 
+type TablePagination struct {
+	Page          int
+	PerPage       int
+	TotalCount    int64
+	TableURL      string
+	Include       string
+	ContentTarget string
+}
+
 type AdminCustomerListItem struct {
 	ID           string
 	Email        string
