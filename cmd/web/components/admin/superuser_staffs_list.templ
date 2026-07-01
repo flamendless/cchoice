@@ -106,7 +106,7 @@ templ AdminSuperuserStaffsListTable(staffs []models.AdminStaffListItem) {
 			</thead>
 			<tbody class="bg-white divide-y divide-gray-200">
 				for _, staff := range staffs {
-					<tr id={ fmt.Sprintf("staff-row-%s", staff.ID) }>
+					<tr id={ fmt.Sprintf("staff-row-%s", staff.ID) } class={ staffListRowClass(staff.Status) }>
 						<td class="px-6 py-4 whitespace-nowrap text-sm w-[5%] text-gray-900">
 							{ staff.ID }
 						</td>
