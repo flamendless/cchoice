@@ -2,6 +2,94 @@
 ## [Unreleased]
 
 
+<a name="release-v1.1.22"></a>
+## [release-v1.1.22] - 2026-06-30
+### Bugfix
+- Edit memo
+- Fix sale banner click not navigating to product page
+- Fix inventory stock location update
+- Include superusers in staff list dropdown
+- Minus and plust buttons in cart quantity
+- Upload promo and brand in prod env
+- Fix main url
+- Product image upload on prod
+- Fix redirection in product admin listing
+
+### Docs
+- add system architecture diagram
+- Add metrics section
+
+### Feature
+- add image carousel to Our Store section
+- Products export
+- Staff status management
+- Email sending for memos
+- Memorandums
+- Register staff via portal
+- Add sale price on product create and inventory table filters
+- Decrement stock on order creation
+- Add inventory update modal
+- Add filter toolbar with staff/action/module dropdowns to admin logs
+- Fix indentation and finalize view product column in inventory table
+- Add view product action to admin inventory management table
+- WIP quotations
+
+### Maintenance
+- address PR review comments for store image carousel
+- Add filename in export staff logs
+- Add staff id in staff logs
+- Resolve conflicts
+- Update password regex
+- Fix spacing around DecrementProductInventoryStock
+- Remove redundant stock guard
+- Remove serial field from modal
+- Clean up error handling and redundant ToUpper
+- Use Module enum in GetFiltered, fix error display
+- Use ModuleOptions component and fix error display
+- Replace dynamic module query with Module enum for logs filter
+- refactor BackToShopLink, fix register padding
+- Add horizontal margins to auth cards
+- Update error message to be more descriptive
+- Fix indentation in inventory management table
+- Address sc
+- Address go nilaway lints
+- Ignore govet
+- Address go vet
+- Fix sidebar layout
+- Separate admin requests
+- Fix mobile search bar
+
+### Script
+- Update db backup
+
+### Server
+- Implement promo banner only and prioritization
+- Update brands dropdown for product create form
+- Add ImagePrefix enum
+- Implement brand status
+- Add admin product search by brand
+
+### Web
+- Extend session lifetime
+- Preparation for dynamic theming
+- Add staff edit products
+- Add sale edit in product edit
+- Add staff status in create staff
+- Add staff status in profile view
+- Add role, email, and usertype columns in memo
+- Allow google ads
+- Fix style of view product button
+- Fix sidebar blocking promo banner
+- Add canonical
+- Fix thumbnails in cart and payment pages
+- Specify admin visit metrics
+- Rearrange columns in brands table
+- Search click now redirects to product page
+- Add ingco
+- Display product thumbnail in admin listing
+- Widen admin cards
+
+
 <a name="release-v1.1.21"></a>
 ## [release-v1.1.21] - 2026-04-27
 ### Bugfix
@@ -74,6 +162,9 @@
 ### AI
 - Update
 
+### Docs
+- Dev v0.1.4
+
 ### Feature
 - WIP Brand management
 
@@ -105,6 +196,9 @@
 - Update
 - Explicitly state mage commands
 
+### Docs
+- Release v1.1.19
+
 ### Feature
 - Forgot password
 
@@ -134,6 +228,9 @@
 - Fix
 - Add pkg-config
 - Add libvips
+
+### Docs
+- Release v1.1.18
 
 ### Feature
 - Holidays
@@ -280,6 +377,9 @@
 ### Bugfix
 - Path in templ generate not working
 
+### Docs
+- Release v1.1.13
+
 ### Maintenance
 - Update allowed origins
 
@@ -297,6 +397,9 @@
 ### Bugfix
 - Time out location now stored
 
+### Docs
+- Release v1.1.12
+
 ### Feature
 - Admin profile page
 
@@ -313,6 +416,7 @@
 ## [release-v1.1.12] - 2026-03-08
 ### Docs
 - Update issue templates
+- Release v1.1.11
 
 ### Feature
 - WIP export attendance
@@ -356,6 +460,9 @@
 
 <a name="release-v1.1.11"></a>
 ## [release-v1.1.11] - 2026-02-24
+### Docs
+- Release v1.1.10
+
 ### Feature
 - Location based time in/out enablement
 - Admin page for time tracking
@@ -399,6 +506,9 @@
 ### Bugfix
 - Add to cart count
 
+### Docs
+- Release v1.1.8
+
 ### Web
 - Animate cart on count update
 - Add AddToCart in promo product
@@ -406,12 +516,18 @@
 
 <a name="release-v1.1.8"></a>
 ## [release-v1.1.8] - 2026-02-14
+### Docs
+- Release v1.1.7
+
 ### Web
 - Add metrics to promo product click and checked payment method
 
 
 <a name="release-v1.1.7"></a>
 ## [release-v1.1.7] - 2026-02-12
+### Docs
+- Release v1.1.6
+
 ### Server
 - Fix random promo product not really being randomized
 
@@ -427,6 +543,9 @@
 
 <a name="release-v1.1.5"></a>
 ## [release-v1.1.5] - 2026-02-12
+### Docs
+- Release v1.1.4
+
 ### Script
 - Add checkMigrations
 
@@ -436,6 +555,9 @@
 
 <a name="release-v1.1.4"></a>
 ## [release-v1.1.4] - 2026-02-12
+### Docs
+- Release v1.1.3
+
 ### Server
 - Add random promo product metrics
 - Add random promo product
@@ -449,6 +571,9 @@
 
 <a name="release-v1.1.3"></a>
 ## [release-v1.1.3] - 2026-02-05
+### Docs
+- Release v1.1.2
+
 ### Web
 - Add COR seal
 
@@ -457,6 +582,7 @@
 ## [release-v1.1.2] - 2026-02-02
 ### Docs
 - Add list.md for tracking script execution
+- Release v1.1.1
 
 ### Server
 - Update sale
@@ -465,12 +591,18 @@
 
 <a name="release-v1.1.1"></a>
 ## [release-v1.1.1] - 2026-01-26
+### Docs
+- Release v1.1.0
+
 ### Server
 - Update checkout to use discounts
 
 
 <a name="release-v1.1.0"></a>
 ## [release-v1.1.0] - 2026-01-26
+### Docs
+- Release v1.0.11
+
 ### Server
 - Update sale discount style
 - Implement CSV input for creating product sales
@@ -479,6 +611,9 @@
 
 <a name="release-v1.0.11"></a>
 ## [release-v1.0.11] - 2026-01-15
+### Docs
+- Release v1.0.10
+
 ### Server
 - Set cache age for js files
 - Address lighthouse reports
@@ -488,6 +623,9 @@
 
 <a name="release-v1.0.10"></a>
 ## [release-v1.0.10] - 2025-12-31
+### Docs
+- Release v1.0.9
+
 ### Server
 - Implement basic event metrics
 
@@ -514,6 +652,10 @@
 ### CICD
 - Change email step for dev
 
+### Docs
+- Release v1.0.8
+
+
 <a name="release-v1.0.8"></a>
 ## [release-v1.0.8] - 2025-12-29
 ### CICD
@@ -521,14 +663,26 @@
 - Remove CC
 - Test release notes email
 
+### Docs
+- Release v1.0.8
+- Release v1.0.8
+- Release v1.0.7
+
+
 <a name="release-v1.0.7"></a>
 ## [release-v1.0.7] - 2025-12-29
+### Docs
+- Release v1.0.6
+
 ### Web
 - On search click, display the modal
 
 
 <a name="release-v1.0.6"></a>
 ## [release-v1.0.6] - 2025-12-29
+### Docs
+- Release v1.0.5
+
 ### Script
 - Add svgs in migrate images to cloudflare script
 
@@ -541,6 +695,9 @@
 
 <a name="release-v1.0.5"></a>
 ## [release-v1.0.5] - 2025-12-25
+### Docs
+- Dev v0.1.1
+
 ### Script
 - Update dev
 
@@ -557,6 +714,12 @@
 ## [dev-v0.1.1] - 2025-12-25
 ### Bugfix
 - Use git rev-list to correctly get latest tag
+
+### Docs
+- Release v1.0.4
+- Release v1.0.3
+- Release v1.0.2
+- Release v1.0.2
 
 ### Script
 - Fix serveweb
@@ -580,6 +743,10 @@
 ### Bugfix
 - Use git rev-list to correctly get latest tag
 
+### Docs
+- Release v1.0.3
+- Release v1.0.2
+
 ### Server
 - Implement changelogs parsing
 - Allow cloudflare in CSP
@@ -590,18 +757,27 @@
 
 <a name="release-v1.0.3"></a>
 ## [release-v1.0.3] - 2025-12-17
+### Docs
+- Release v1.0.1
+
 ### Server
 - Allow cloudflare in CSP
 
 
 <a name="release-v1.0.2"></a>
 ## [release-v1.0.2] - 2025-12-17
+### Docs
+- Release v1.0.1
+
 ### Web
 - More responsive fixes and more brand logs
 
 
 <a name="release-v1.0.1"></a>
 ## [release-v1.0.1] - 2025-12-16
+### Docs
+- Release v1.0.0
+
 ### Server
 - Fix searchbar
 - WIP fixing searchbar
@@ -1090,7 +1266,16 @@
 - Improve accessibility by adding alt tags
 
 
-[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.14...HEAD
+[Unreleased]: https://github.com/flamendless/cchoice/compare/release-v1.1.22...HEAD
+[release-v1.1.22]: https://github.com/flamendless/cchoice/compare/release-v1.1.21...release-v1.1.22
+[release-v1.1.21]: https://github.com/flamendless/cchoice/compare/release-v1.1.20...release-v1.1.21
+[release-v1.1.20]: https://github.com/flamendless/cchoice/compare/dev-v0.1.4...release-v1.1.20
+[dev-v0.1.4]: https://github.com/flamendless/cchoice/compare/release-v1.1.19...dev-v0.1.4
+[release-v1.1.19]: https://github.com/flamendless/cchoice/compare/release-v1.1.18...release-v1.1.19
+[release-v1.1.18]: https://github.com/flamendless/cchoice/compare/release-v1.1.17...release-v1.1.18
+[release-v1.1.17]: https://github.com/flamendless/cchoice/compare/release-v1.1.16...release-v1.1.17
+[release-v1.1.16]: https://github.com/flamendless/cchoice/compare/release-v1.1.15...release-v1.1.16
+[release-v1.1.15]: https://github.com/flamendless/cchoice/compare/release-v1.1.14...release-v1.1.15
 [release-v1.1.14]: https://github.com/flamendless/cchoice/compare/release-v1.1.13...release-v1.1.14
 [release-v1.1.13]: https://github.com/flamendless/cchoice/compare/release-v1.1.12...release-v1.1.13
 [release-v1.1.12]: https://github.com/flamendless/cchoice/compare/release-v1.1.11...release-v1.1.12
