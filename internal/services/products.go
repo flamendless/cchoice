@@ -18,8 +18,6 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
-
-	"go.uber.org/zap"
 )
 
 type ProductService struct {
@@ -221,12 +219,14 @@ func (s *ProductService) GetForListingAdmin(
 	productList := make([]models.AdminProductListItem, 0, len(products))
 	for _, p := range products {
 		price := utils.NewMoney(p.UnitPriceWithVat, p.UnitPriceWithVatCurrency)
-		productID := s.encoder.Encode(p.ID)
-		inventory, err := s.productInventory.GetByProductID(ctx, productID)
-		if err != nil || inventory == nil {
-			err = cmp.Or(err, errs.ErrDBNil)
-			logs.Log().Warn(s.ID(), zap.String("product id", productID), zap.Error(err))
-			continue
+
+		salePrice := ""
+		if p.SalePriceWithVat.Valid {
+			currency := p.SalePriceWithVatCurrency.String
+			if currency == "" {
+				currency = p.UnitPriceWithVatCurrency
+			}
+			salePrice = utils.NewMoney(p.SalePriceWithVat.Int64, currency).Display()
 		}
 
 		cdnURL := p.CdnUrl.String
@@ -246,6 +246,7 @@ func (s *ProductService) GetForListingAdmin(
 			Description:   p.Description.String,
 			Brand:         p.BrandName,
 			Price:         price.Display(),
+			SalePrice:     salePrice,
 			Category:      p.Category,
 			Subcategory:   p.Subcategory,
 			Status:        enums.ParseProductStatusToEnum(p.Status),
@@ -263,7 +264,6 @@ func (s *ProductService) GetForListingAdmin(
 			ScopeOfSupply: p.ScopeOfSupply,
 			Weight:        utils.ToWeightDisplay(p.Weight, p.WeightUnit),
 			WeightUnit:    p.WeightUnit,
-			Stocks:        strconv.FormatInt(inventory.Stocks, 10),
 		})
 	}
 

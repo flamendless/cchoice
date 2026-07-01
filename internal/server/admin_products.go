@@ -399,7 +399,27 @@ func (s *Server) adminSuperuserProductsListPageHandler(w http.ResponseWriter, r 
 	const logtag = "[Admin Superuser Products List Page Handler]"
 	ctx := r.Context()
 
-	if err := compadmin.AdminSuperuserProductsListPage("Products").Render(ctx, w); err != nil {
+	brandsRes, err := requests.GetBrandsForAdmin(
+		ctx,
+		s.cache,
+		&s.SF,
+		s.dbRO,
+		requests.GenerateAdminBrandsCacheKey(),
+	)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		brandsRes = []queries.GetBrandsForProductCreateRow{}
+	}
+
+	brands := make([]models.AdminBrand, 0, len(brandsRes))
+	for _, b := range brandsRes {
+		brands = append(brands, models.AdminBrand{
+			ID:   s.encoder.Encode(b.ID),
+			Name: b.Name,
+		})
+	}
+
+	if err := compadmin.AdminSuperuserProductsListPage("Products", brands).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -879,7 +899,27 @@ func (s *Server) adminStaffProductsListPageHandler(w http.ResponseWriter, r *htt
 	const logtag = "[Admin Staff Products List Page Handler]"
 	ctx := r.Context()
 
-	if err := compadmin.AdminStaffProductsListPage().Render(ctx, w); err != nil {
+	brandsRes, err := requests.GetBrandsForAdmin(
+		ctx,
+		s.cache,
+		&s.SF,
+		s.dbRO,
+		requests.GenerateAdminBrandsCacheKey(),
+	)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		brandsRes = []queries.GetBrandsForProductCreateRow{}
+	}
+
+	brands := make([]models.AdminBrand, 0, len(brandsRes))
+	for _, b := range brandsRes {
+		brands = append(brands, models.AdminBrand{
+			ID:   s.encoder.Encode(b.ID),
+			Name: b.Name,
+		})
+	}
+
+	if err := compadmin.AdminStaffProductsListPage(brands).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
