@@ -264,6 +264,7 @@ type AdminProductListItem struct {
 	Description   string
 	Brand         string
 	Price         string
+	SalePrice     string
 	Category      string
 	Subcategory   string
 	ThumbnailPath string

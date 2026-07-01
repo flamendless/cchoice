@@ -395,7 +395,7 @@ templ SerialValidationResult(isValid bool) {
 	}
 }
 
-templ ProductSearchToolbar(url string) {
+templ ProductSearchToolbar(url string, brands []models.AdminBrand) {
 	<div class="flex flex-col sm:flex-row sm:flex-wrap justify-between items-start sm:items-center gap-4 mb-4">
 		<div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
 			<input
@@ -408,23 +408,26 @@ templ ProductSearchToolbar(url string) {
 				hx-target="#products-table"
 				hx-include="[name='search_serial'],[name='search_brand'],[name='status']"
 			/>
-			<input
-				type="text"
+			<select
 				name="search_brand"
-				placeholder="Search by brand..."
 				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
-				hx-trigger="change, search_brand delay:300ms"
+				hx-trigger="change"
 				hx-target="#products-table"
 				hx-include="[name='search_serial'],[name='search_brand'],[name='status']"
-			/>
+			>
+				<option value="">All Brands</option>
+				for _, brand := range brands {
+					<option value={ brand.Name }>{ brand.Name }</option>
+				}
+			</select>
 			<select
 				name="status"
 				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change"
 				hx-target="#products-table"
-				hx-include="[name='search'],[name='search_brand'],[name='status']"
+				hx-include="[name='search_serial'],[name='search_brand'],[name='status']"
 			>
 				<option value="">All</option>
 				for _, ps := range enums.AllProductStatuses {

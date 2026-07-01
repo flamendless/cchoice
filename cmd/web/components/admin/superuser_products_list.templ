@@ -8,7 +8,7 @@ import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/components/header"
 import "cchoice/internal/enums"
 
-templ AdminSuperuserProductsListPage(title string) {
+templ AdminSuperuserProductsListPage(title string, brands []models.AdminBrand) {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
@@ -29,7 +29,7 @@ templ AdminSuperuserProductsListPage(title string) {
 						<h1 class="text-2xl font-bold text-center text-primary mb-6">
 							Manage Products
 						</h1>
-						@ProductsListSection(utils.URL("/admin/superuser/products/table"))
+						@ProductsListSection(utils.URL("/admin/superuser/products/table"), brands)
 					</div>
 				</div>
 			</div>
@@ -37,7 +37,7 @@ templ AdminSuperuserProductsListPage(title string) {
 	</html>
 }
 
-templ ProductsListSection(tableURL string) {
+templ ProductsListSection(tableURL string, brands []models.AdminBrand) {
 	<div
 		class="bg-white rounded-lg shadow-md p-6"
 		hx-get={ tableURL }
@@ -45,14 +45,14 @@ templ ProductsListSection(tableURL string) {
 		hx-target="#products-table"
 		hx-swap="innerHTML"
 	>
-		@ProductSearchToolbar(tableURL)
+		@ProductSearchToolbar(tableURL, brands)
 		<div id="products-table">
 			//AdminSuperuserProductsListTable
 		</div>
 	</div>
 }
 
-templ AdminStaffProductsListPage() {
+templ AdminStaffProductsListPage(brands []models.AdminBrand) {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
@@ -73,7 +73,7 @@ templ AdminStaffProductsListPage() {
 						<h1 class="text-2xl font-bold text-center text-primary mb-6">
 							Edit Products
 						</h1>
-						@ProductsListSection(utils.URL("/admin/products/table"))
+						@ProductsListSection(utils.URL("/admin/products/table"), brands)
 					</div>
 				</div>
 			</div>
@@ -99,33 +99,21 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem, ed
 			<thead class="bg-gray-50">
 				<tr>
 					@TableHeader("3%", "ID")
-					@TableHeader("6%", "Thumbnail (click image to view full image)")
-					@TableHeader("5%", "Serial")
-					@TableHeader("5%", "Name")
-					<!-- @TableHeader("6%", "Description") -->
+					@TableHeader("6%", "Thumbnail")
 					@TableHeader("4%", "Brand")
-					@TableHeader("4%", "Slug")
+					@TableHeader("5%", "Serial")
+					@TableHeader("4%", "Status")
 					@TableHeader("6%", "Price")
-					@TableHeader("6%", "Stocks")
+					@TableHeader("6%", "Sale Price")
+					@TableHeader("8%", "Actions")
 					@TableHeader("6%", "Category")
 					@TableHeader("6%", "Subcategory")
-					<!-- @TableHeader("5%", "Colours") -->
-					<!-- @TableHeader("5%", "Sizes") -->
-					<!-- @TableHeader("5%", "Segment") -->
-					<!-- @TableHeader("5%", "Part No.") -->
-					<!-- @TableHeader("5%", "Power") -->
-					<!-- @TableHeader("5%", "Capacity") -->
-					<!-- @TableHeader("6%", "Scope of Supply") -->
-					@TableHeader("5%", "Weight")
-					<!-- @TableHeader("4%", "Created At") -->
-					@TableHeader("4%", "Status")
-					@TableHeader("8%", "Actions")
-					@TableHeader("4%", "Updated At")
+					@TableHeader("5%", "Updated / Created At")
 				</tr>
 			</thead>
-			<tbody class="bg-white divide-y divide-gray-200">
+			<tbody class="divide-y divide-gray-200">
 				for _, p := range products {
-					<tr id={ fmt.Sprintf("product-row-%s", p.ID) }>
+					<tr id={ fmt.Sprintf("product-row-%s", p.ID) } class={ productListRowClass(p.Status) }>
 						@TableCell("3%", "text-gray-900") {
 							{ p.ID }
 						}
@@ -133,71 +121,28 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem, ed
 							<a
 								href={ p.CDNURL1280 }
 								target="_blank"
-								class="h-10 w-10"
 							>
 								<img
 									src={ p.CDNURL }
 									alt={ p.Serial }
-									class="h-10 w-10 object-contain rounded"
+									class="object-contain rounded"
 								/>
 							</a>
+						}
+						@TableCell("4%", "text-gray-900") {
+							{ p.Brand }
 						}
 						@TableCell("5%", "text-gray-900") {
 							{ p.Serial }
 						}
-						@TableCell("5%", "text-gray-900") {
-							{ p.Name }
-						}
-						<!-- @TableCell("6%", "text-gray-900 max-w-xs truncate") { -->
-						<!-- 	<span title={ p.Description }>{ p.Description }</span> -->
-						<!-- } -->
-						@TableCell("4%", "text-gray-900") {
-							{ p.Brand }
-						}
-						@TableCell("4%", "text-gray-900") {
-							{ p.Slug }
+						@TableCell("4%", "") {
+							@ProductStatus(p.Status)
 						}
 						@TableCell("6%", "text-gray-900") {
 							{ p.Price }
 						}
 						@TableCell("6%", "text-gray-900") {
-							{ p.Stocks }
-						}
-						@TableCell("6%", "text-gray-900 max-w-xs truncate") {
-							<span title={ p.Category }>{ p.Category }</span>
-						}
-						@TableCell("6%", "text-gray-900 max-w-xs truncate") {
-							<span title={ p.Subcategory }>{ p.Subcategory }</span>
-						}
-						<!-- @TableCell("5%", "text-gray-900 max-w-xs truncate") { -->
-						<!-- 	<span title={ p.Colours }>{ p.Colours }</span> -->
-						<!-- } -->
-						<!-- @TableCell("5%", "text-gray-900 max-w-xs truncate") { -->
-						<!-- 	<span title={ p.Sizes }>{ p.Sizes }</span> -->
-						<!-- } -->
-						<!-- @TableCell("5%", "text-gray-900 max-w-xs truncate") { -->
-						<!-- 	<span title={ p.Segmentation }>{ p.Segmentation }</span> -->
-						<!-- } -->
-						<!-- @TableCell("5%", "text-gray-900 max-w-xs truncate") { -->
-						<!-- 	<span title={ p.PartNumber }>{ p.PartNumber }</span> -->
-						<!-- } -->
-						<!-- @TableCell("5%", "text-gray-900 max-w-xs truncate") { -->
-						<!-- 	<span title={ p.Power }>{ p.Power }</span> -->
-						<!-- } -->
-						<!-- @TableCell("5%", "text-gray-900 max-w-xs truncate") { -->
-						<!-- 	<span title={ p.Capacity }>{ p.Capacity }</span> -->
-						<!-- } -->
-						<!-- @TableCell("6%", "text-gray-900 max-w-xs truncate") { -->
-						<!-- 	<span title={ p.ScopeOfSupply }>{ p.ScopeOfSupply }</span> -->
-						<!-- } -->
-						@TableCell("5%", "text-gray-900") {
-							{ p.Weight }
-						}
-						<!-- @TableCell("4%", "text-gray-900") { -->
-						<!-- 	{ p.CreatedAt } -->
-						<!-- } -->
-						@TableCell("4%", "") {
-							@ProductStatus(p.Status)
+							{ p.SalePrice }
 						}
 						@TableCell("8%", "") {
 							<div class="flex flex-col items-center gap-2">
@@ -220,8 +165,14 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem, ed
 								}
 							</div>
 						}
-						@TableCell("4%", "text-gray-900") {
-							{ p.UpdatedAt }
+						@TableCell("6%", "text-gray-900 max-w-xs truncate") {
+							<span title={ p.Category }>{ p.Category }</span>
+						}
+						@TableCell("6%", "text-gray-900 max-w-xs truncate") {
+							<span title={ p.Subcategory }>{ p.Subcategory }</span>
+						}
+						@TableCell("5%", "text-gray-900") {
+							{ productListTimestamp(p.UpdatedAt, p.CreatedAt) }
 						}
 					</tr>
 				}

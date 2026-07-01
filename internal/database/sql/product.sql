@@ -179,7 +179,9 @@ SELECT
 	COALESCE(tbl_product_specs.weight, 0) AS weight,
 	COALESCE(tbl_product_specs.weight_unit, '') AS weight_unit,
 	COALESCE(categories.category, '') AS category,
-	COALESCE(categories.subcategory, '') AS subcategory
+	COALESCE(categories.subcategory, '') AS subcategory,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency
 FROM tbl_products
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
 LEFT JOIN tbl_product_images ON tbl_product_images.id = (
@@ -199,9 +201,17 @@ LEFT JOIN (
 	INNER JOIN tbl_product_categories ON tbl_product_categories.id = tbl_products_categories.category_id
 	GROUP BY tbl_products_categories.product_id
 ) AS categories ON categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales ON tbl_product_sales.id = (
+	SELECT tps.id
+	FROM tbl_product_sales tps
+	WHERE tps.product_id = tbl_products.id
+		AND tps.is_active = 1
+	ORDER BY tps.updated_at DESC
+	LIMIT 1
+)
 WHERE
 	(@search_serial IS NULL OR @search_serial = '' OR LOWER(tbl_products.serial) LIKE '%' || LOWER(@search_serial) || '%')
-	AND (@search_brand IS NULL OR @search_brand = '' OR LOWER(tbl_brands.name) LIKE '%' || LOWER(@search_brand) || '%')
+	AND (@search_brand IS NULL OR @search_brand = '' OR LOWER(tbl_brands.name) = LOWER(@search_brand))
 	AND (@status IS NULL OR @status = '' OR tbl_products.status = @status)
 ORDER BY
 	CASE tbl_products.status
