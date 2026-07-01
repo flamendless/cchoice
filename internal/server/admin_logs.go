@@ -2,11 +2,15 @@ package server
 
 import (
 	"net/http"
+	"strconv"
 
 	compadmin "cchoice/cmd/web/components/admin"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
+	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
 )
@@ -33,6 +37,13 @@ func (s *Server) adminSuperuserLogsTableHandler(w http.ResponseWriter, r *http.R
 	action := r.URL.Query().Get("action")
 	moduleStr := r.URL.Query().Get("module")
 
+	page := 1
+	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
+		if parsed, err := strconv.Atoi(paramPage); err == nil && parsed > 0 {
+			page = parsed
+		}
+	}
+
 	var staffID int64
 	if staffIDStr != "" {
 		decoded := s.encoder.Decode(staffIDStr)
@@ -43,14 +54,30 @@ func (s *Server) adminSuperuserLogsTableHandler(w http.ResponseWriter, r *http.R
 
 	module := enums.ParseModuleToEnum(moduleStr)
 
-	logsList, err := s.services.staffLog.GetFilteredAsModel(ctx, staffID, action, module)
+	logsList, totalCount, page, err := s.services.staffLog.GetFilteredAsModelPaginated(
+		ctx,
+		staffID,
+		action,
+		module,
+		page,
+		constants.DefaultAdminTablePageSize,
+	)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err := compadmin.AdminSuperuserLogsTable(logsList).Render(ctx, w); err != nil {
+	pagination := models.TablePagination{
+		Page:          page,
+		PerPage:       constants.DefaultAdminTablePageSize,
+		TotalCount:    totalCount,
+		TableURL:      utils.URL("/admin/superuser/logs/table"),
+		Include:       "#logs-filter-form",
+		ContentTarget: "#logs-table-content",
+	}
+
+	if err := compadmin.AdminSuperuserLogsTableContent(logsList, pagination).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -73,5 +100,3 @@ func (s *Server) adminSuperuserLogsActionsHandler(w http.ResponseWriter, r *http
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
-
-

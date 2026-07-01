@@ -115,6 +115,51 @@ func (s *StaffLogsService) GetFilteredAsModel(ctx context.Context, staffID int64
 	return logsList, nil
 }
 
+func (s *StaffLogsService) GetFilteredAsModelPaginated(
+	ctx context.Context,
+	staffID int64,
+	action string,
+	module enums.Module,
+	page, perPage int,
+) ([]models.StaffLog, int64, int, error) {
+	var moduleStr string
+	if module.IsValid() {
+		moduleStr = strings.ToLower(module.String())
+	}
+
+	filterParams := queries.CountFilteredStaffLogsParams{
+		Action:  action,
+		Module:  moduleStr,
+		StaffID: staffID,
+	}
+
+	totalCount, err := s.dbRO.GetQueries().CountFilteredStaffLogs(ctx, filterParams)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+
+	page = models.ClampPage(page, totalCount, perPage)
+	offset := int64((page - 1) * perPage)
+
+	logsData, err := s.dbRO.GetQueries().GetFilteredStaffLogsPaginated(ctx, queries.GetFilteredStaffLogsPaginatedParams{
+		Action:  action,
+		Module:  moduleStr,
+		StaffID: staffID,
+		Limit:   int64(perPage),
+		Offset:  offset,
+	})
+	if err != nil {
+		return nil, 0, 0, err
+	}
+
+	logsList := make([]models.StaffLog, 0, len(logsData))
+	for _, l := range logsData {
+		staffLog := s.toStaffLogModel(ctx, l.ID, l.StaffID, l.CreatedAt, l.Action, l.Module, l.Result, l.FirstName, l.MiddleName, l.LastName)
+		logsList = append(logsList, staffLog)
+	}
+	return logsList, totalCount, page, nil
+}
+
 func (s *StaffLogsService) toStaffLogModel(
 	ctx context.Context,
 	id, staffID int64,

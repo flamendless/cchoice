@@ -427,47 +427,14 @@ func (s *Server) adminSuperuserProductsListPageHandler(w http.ResponseWriter, r 
 }
 
 func (s *Server) adminSuperuserProductsListTableHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Admin Superuser Products List Table Handler]"
-	ctx := r.Context()
-
-	searchSerial := r.URL.Query().Get("search_serial")
-	searchBrand := r.URL.Query().Get("search_brand")
-
-	statusStr := r.URL.Query().Get("status")
-	status := enums.ParseProductStatusToEnum(statusStr)
-	if statusStr != "" && status == enums.PRODUCT_STATUS_UNDEFINED {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.String("search serial", searchSerial),
-			zap.String("search brand", searchBrand),
-			zap.String("status", statusStr),
-			zap.Error(errs.ErrEnumInvalid),
-		)
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", errs.ErrEnumInvalid.Error()))
-		return
-	}
-
-	productList, err := s.services.product.GetForListingAdmin(
-		ctx,
-		searchSerial,
-		searchBrand,
-		status,
+	s.renderAdminProductsListTable(
+		w, r,
+		"/admin/superuser/products/table",
+		"/admin/superuser/products",
+		false,
+		"/admin/superuser/products",
+		"[Admin Superuser Products List Table Handler]",
 	)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		productList = []models.AdminProductListItem{}
-	}
-
-	if err := compadmin.AdminSuperuserProductsListTable(productList, false, "/admin/superuser/products").Render(ctx, w); err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.String("search", searchSerial),
-			zap.String("status", statusStr),
-			zap.Error(err),
-		)
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/products", err.Error()))
-		return
-	}
 }
 
 func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter, r *http.Request) {
@@ -927,48 +894,14 @@ func (s *Server) adminStaffProductsListPageHandler(w http.ResponseWriter, r *htt
 }
 
 func (s *Server) adminStaffProductsListTableHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Admin Staff Products List Table Handler]"
-	const page = "/admin/products"
-	ctx := r.Context()
-
-	searchSerial := r.URL.Query().Get("search_serial")
-	searchBrand := r.URL.Query().Get("search_brand")
-
-	statusStr := r.URL.Query().Get("status")
-	status := enums.ParseProductStatusToEnum(statusStr)
-	if statusStr != "" && status == enums.PRODUCT_STATUS_UNDEFINED {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.String("search serial", searchSerial),
-			zap.String("search brand", searchBrand),
-			zap.String("status", statusStr),
-			zap.Error(errs.ErrEnumInvalid),
-		)
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrEnumInvalid.Error()))
-		return
-	}
-
-	productList, err := s.services.product.GetForListingAdmin(
-		ctx,
-		searchSerial,
-		searchBrand,
-		status,
+	s.renderAdminProductsListTable(
+		w, r,
+		"/admin/products/table",
+		"/admin/products",
+		true,
+		"/admin/products",
+		"[Admin Staff Products List Table Handler]",
 	)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		productList = []models.AdminProductListItem{}
-	}
-
-	if err := compadmin.AdminSuperuserProductsListTable(productList, true, "/admin/products").Render(ctx, w); err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.String("search", searchSerial),
-			zap.String("status", statusStr),
-			zap.Error(err),
-		)
-		redirectHX(w, r, utils.URLWithError(page, err.Error()))
-		return
-	}
 }
 
 func (s *Server) adminStaffProductsEditPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -1269,4 +1202,81 @@ func (s *Server) adminStaffProductsUpdateHandler(w http.ResponseWriter, r *http.
 
 	result = fmt.Sprintf("success. ID '%s'", productID)
 	redirectHX(w, r, utils.URLWithSuccess(page, "Product updated successfully"))
+}
+
+const productListFilterInclude = "[name='search_serial'],[name='search_brand'],[name='status']"
+
+func parseAdminProductListPage(r *http.Request) int {
+	page := 1
+	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
+		if parsed, err := strconv.Atoi(paramPage); err == nil && parsed > 0 {
+			page = parsed
+		}
+	}
+	return page
+}
+
+func (s *Server) renderAdminProductsListTable(
+	w http.ResponseWriter,
+	r *http.Request,
+	tableURL string,
+	basePath string,
+	editOnly bool,
+	errorPage string,
+	logtag string,
+) {
+	ctx := r.Context()
+
+	searchSerial := r.URL.Query().Get("search_serial")
+	searchBrand := r.URL.Query().Get("search_brand")
+
+	statusStr := r.URL.Query().Get("status")
+	status := enums.ParseProductStatusToEnum(statusStr)
+	if statusStr != "" && status == enums.PRODUCT_STATUS_UNDEFINED {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("search serial", searchSerial),
+			zap.String("search brand", searchBrand),
+			zap.String("status", statusStr),
+			zap.Error(errs.ErrEnumInvalid),
+		)
+		redirectHX(w, r, utils.URLWithError(errorPage, errs.ErrEnumInvalid.Error()))
+		return
+	}
+
+	page := parseAdminProductListPage(r)
+
+	productList, totalCount, page, err := s.services.product.GetForListingAdminPaginated(
+		ctx,
+		searchSerial,
+		searchBrand,
+		status,
+		page,
+		constants.DefaultAdminTablePageSize,
+	)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		productList = []models.AdminProductListItem{}
+		totalCount = 0
+	}
+
+	pagination := models.TablePagination{
+		Page:          page,
+		PerPage:       constants.DefaultAdminTablePageSize,
+		TotalCount:    totalCount,
+		TableURL:      utils.URL(tableURL),
+		Include:       productListFilterInclude,
+		ContentTarget: "#products-table-content",
+	}
+
+	if err := compadmin.AdminSuperuserProductsListTableContent(productList, editOnly, basePath, pagination).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("search", searchSerial),
+			zap.String("status", statusStr),
+			zap.Error(err),
+		)
+		redirectHX(w, r, utils.URLWithError(errorPage, err.Error()))
+		return
+	}
 }

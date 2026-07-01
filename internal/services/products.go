@@ -207,67 +207,151 @@ func (s *ProductService) GetForListingAdmin(
 	searchBrand string,
 	status enums.ProductStatus,
 ) ([]models.AdminProductListItem, error) {
-	products, err := s.dbRO.GetQueries().AdminGetProductsForListing(ctx, queries.AdminGetProductsForListingParams{
-		SearchSerial: sql.NullString{String: searchSerial, Valid: searchSerial != ""},
-		SearchBrand:  sql.NullString{String: searchBrand, Valid: searchBrand != ""},
-		Status:       sql.NullString{String: status.String(), Valid: status != enums.PRODUCT_STATUS_UNDEFINED},
-	})
+	products, err := s.dbRO.GetQueries().AdminGetProductsForListing(ctx, s.listingAdminFilterParams(searchSerial, searchBrand, status))
 	if err != nil {
 		return nil, err
 	}
 
-	productList := make([]models.AdminProductListItem, 0, len(products))
-	for _, p := range products {
-		price := utils.NewMoney(p.UnitPriceWithVat, p.UnitPriceWithVatCurrency)
+	return s.mapAdminProductListItems(products), nil
+}
 
-		salePrice := ""
-		if p.SalePriceWithVat.Valid {
-			currency := p.SalePriceWithVatCurrency.String
-			if currency == "" {
-				currency = p.UnitPriceWithVatCurrency
-			}
-			salePrice = utils.NewMoney(p.SalePriceWithVat.Int64, currency).Display()
-		}
+func (s *ProductService) GetForListingAdminPaginated(
+	ctx context.Context,
+	searchSerial string,
+	searchBrand string,
+	status enums.ProductStatus,
+	page, perPage int,
+) ([]models.AdminProductListItem, int64, int, error) {
+	filterParams := s.listingAdminFilterParams(searchSerial, searchBrand, status)
 
-		cdnURL := p.CdnUrl.String
-		if cdnURL == "" {
-			cdnURL = s.getCDNURL(p.ThumbnailPath)
-		}
-		cdnURL1280 := p.CdnUrlThumbnail.String
-		if cdnURL1280 == "" {
-			cdnURL1280 = s.getCDNURL(constants.ToPath1280(p.ThumbnailPath))
-		}
-
-		productList = append(productList, models.AdminProductListItem{
-			ID:            s.encoder.Encode(p.ID),
-			Name:          p.Name,
-			Serial:        p.Serial,
-			Slug:          p.Slug.String,
-			Description:   p.Description.String,
-			Brand:         p.BrandName,
-			Price:         price.Display(),
-			SalePrice:     salePrice,
-			Category:      p.Category,
-			Subcategory:   p.Subcategory,
-			Status:        enums.ParseProductStatusToEnum(p.Status),
-			ThumbnailPath: p.ThumbnailPath,
-			CDNURL:        cdnURL,
-			CDNURL1280:    cdnURL1280,
-			CreatedAt:     p.CreatedAt.Format(constants.DateTimeLayoutISO),
-			UpdatedAt:     p.UpdatedAt.Format(constants.DateTimeLayoutISO),
-			Colours:       p.Colours,
-			Sizes:         p.Sizes,
-			Segmentation:  p.Segmentation,
-			PartNumber:    p.PartNumber,
-			Power:         p.Power,
-			Capacity:      p.Capacity,
-			ScopeOfSupply: p.ScopeOfSupply,
-			Weight:        utils.ToWeightDisplay(p.Weight, p.WeightUnit),
-			WeightUnit:    p.WeightUnit,
-		})
+	totalCount, err := s.dbRO.GetQueries().AdminCountProductsForListing(ctx, queries.AdminCountProductsForListingParams(filterParams))
+	if err != nil {
+		return nil, 0, 0, err
 	}
 
-	return productList, nil
+	page = models.ClampPage(page, totalCount, perPage)
+	offset := int64((page - 1) * perPage)
+
+	products, err := s.dbRO.GetQueries().AdminGetProductsForListingPaginated(ctx, queries.AdminGetProductsForListingPaginatedParams{
+		SearchSerial: filterParams.SearchSerial,
+		SearchBrand:  filterParams.SearchBrand,
+		Status:       filterParams.Status,
+		Limit:        int64(perPage),
+		Offset:       offset,
+	})
+	if err != nil {
+		return nil, 0, 0, err
+	}
+
+	return s.mapAdminProductListItemsPaginated(products), totalCount, page, nil
+}
+
+func (s *ProductService) listingAdminFilterParams(
+	searchSerial string,
+	searchBrand string,
+	status enums.ProductStatus,
+) queries.AdminGetProductsForListingParams {
+	return queries.AdminGetProductsForListingParams{
+		SearchSerial: sql.NullString{String: searchSerial, Valid: searchSerial != ""},
+		SearchBrand:  sql.NullString{String: searchBrand, Valid: searchBrand != ""},
+		Status:       sql.NullString{String: status.String(), Valid: status != enums.PRODUCT_STATUS_UNDEFINED},
+	}
+}
+
+func (s *ProductService) mapAdminProductListItems(products []queries.AdminGetProductsForListingRow) []models.AdminProductListItem {
+	productList := make([]models.AdminProductListItem, 0, len(products))
+	for _, p := range products {
+		productList = append(productList, s.mapAdminProductListItem(
+			p.ID, p.Name, p.Serial, p.Slug, p.Description, p.BrandName, p.Status,
+			p.UnitPriceWithVat, p.UnitPriceWithVatCurrency, p.CreatedAt, p.UpdatedAt,
+			p.ThumbnailPath, p.CdnUrl, p.CdnUrlThumbnail, p.Category, p.Subcategory,
+			p.SalePriceWithVat, p.SalePriceWithVatCurrency,
+			p.Colours, p.Sizes, p.Segmentation, p.PartNumber, p.Power, p.Capacity, p.ScopeOfSupply,
+			p.Weight, p.WeightUnit,
+		))
+	}
+	return productList
+}
+
+func (s *ProductService) mapAdminProductListItemsPaginated(products []queries.AdminGetProductsForListingPaginatedRow) []models.AdminProductListItem {
+	productList := make([]models.AdminProductListItem, 0, len(products))
+	for _, p := range products {
+		productList = append(productList, s.mapAdminProductListItem(
+			p.ID, p.Name, p.Serial, p.Slug, p.Description, p.BrandName, p.Status,
+			p.UnitPriceWithVat, p.UnitPriceWithVatCurrency, p.CreatedAt, p.UpdatedAt,
+			p.ThumbnailPath, p.CdnUrl, p.CdnUrlThumbnail, p.Category, p.Subcategory,
+			p.SalePriceWithVat, p.SalePriceWithVatCurrency,
+			p.Colours, p.Sizes, p.Segmentation, p.PartNumber, p.Power, p.Capacity, p.ScopeOfSupply,
+			p.Weight, p.WeightUnit,
+		))
+	}
+	return productList
+}
+
+func (s *ProductService) mapAdminProductListItem(
+	id int64,
+	name, serial string,
+	slug, description sql.NullString,
+	brandName, status string,
+	unitPriceWithVat int64,
+	unitPriceWithVatCurrency string,
+	createdAt, updatedAt time.Time,
+	thumbnailPath string,
+	cdnUrl, cdnUrlThumbnail sql.NullString,
+	category, subcategory string,
+	salePriceWithVat sql.NullInt64,
+	salePriceWithVatCurrency sql.NullString,
+	colours, sizes, segmentation, partNumber, power, capacity, scopeOfSupply string,
+	weight float64,
+	weightUnit string,
+) models.AdminProductListItem {
+	price := utils.NewMoney(unitPriceWithVat, unitPriceWithVatCurrency)
+
+	salePrice := ""
+	if salePriceWithVat.Valid {
+		currency := salePriceWithVatCurrency.String
+		if currency == "" {
+			currency = unitPriceWithVatCurrency
+		}
+		salePrice = utils.NewMoney(salePriceWithVat.Int64, currency).Display()
+	}
+
+	cdnURL := cdnUrl.String
+	if cdnURL == "" {
+		cdnURL = s.getCDNURL(thumbnailPath)
+	}
+	cdnURL1280 := cdnUrlThumbnail.String
+	if cdnURL1280 == "" {
+		cdnURL1280 = s.getCDNURL(constants.ToPath1280(thumbnailPath))
+	}
+
+	return models.AdminProductListItem{
+		ID:            s.encoder.Encode(id),
+		Name:          name,
+		Serial:        serial,
+		Slug:          slug.String,
+		Description:   description.String,
+		Brand:         brandName,
+		Price:         price.Display(),
+		SalePrice:     salePrice,
+		Category:      category,
+		Subcategory:   subcategory,
+		Status:        enums.ParseProductStatusToEnum(status),
+		ThumbnailPath: thumbnailPath,
+		CDNURL:        cdnURL,
+		CDNURL1280:    cdnURL1280,
+		CreatedAt:     createdAt.Format(constants.DateTimeLayoutISO),
+		UpdatedAt:     updatedAt.Format(constants.DateTimeLayoutISO),
+		Colours:       colours,
+		Sizes:         sizes,
+		Segmentation:  segmentation,
+		PartNumber:    partNumber,
+		Power:         power,
+		Capacity:      capacity,
+		ScopeOfSupply: scopeOfSupply,
+		Weight:        utils.ToWeightDisplay(weight, weightUnit),
+		WeightUnit:    weightUnit,
+	}
 }
 
 func (s *ProductService) GetForExportAdmin(

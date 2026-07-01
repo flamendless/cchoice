@@ -60,16 +60,18 @@ templ InventoryFilterToolbar(url string, brands []models.AdminBrand) {
 				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change, search_serial delay:300ms"
-				hx-target="#inventories-table"
+				hx-target="#inventories-table-content"
 				hx-include="[name='search_serial'],[name='search_brand'],[name='product_status'],[name='stocks_in']"
+				hx-vals='{"page": "1"}'
 			/>
 			<select
 				name="search_brand"
 				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change"
-				hx-target="#inventories-table"
+				hx-target="#inventories-table-content"
 				hx-include="[name='search_serial'],[name='search_brand'],[name='product_status'],[name='stocks_in']"
+				hx-vals='{"page": "1"}'
 			>
 				<option value="">All Brands</option>
 				for _, brand := range brands {
@@ -81,8 +83,9 @@ templ InventoryFilterToolbar(url string, brands []models.AdminBrand) {
 				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change"
-				hx-target="#inventories-table"
+				hx-target="#inventories-table-content"
 				hx-include="[name='search_serial'],[name='search_brand'],[name='product_status'],[name='stocks_in']"
+				hx-vals='{"page": "1"}'
 			>
 				<option value="">All Status</option>
 				for _, ps := range enums.AllProductStatuses {
@@ -94,8 +97,9 @@ templ InventoryFilterToolbar(url string, brands []models.AdminBrand) {
 				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change"
-				hx-target="#inventories-table"
+				hx-target="#inventories-table-content"
 				hx-include="[name='search_serial'],[name='search_brand'],[name='product_status'],[name='stocks_in']"
+				hx-vals='{"page": "1"}'
 			>
 				<option value="">All Stocks In</option>
 				for _, si := range enums.AllStocksIn {
@@ -107,17 +111,27 @@ templ InventoryFilterToolbar(url string, brands []models.AdminBrand) {
 }
 
 templ ProductInventoriesSection(brands []models.AdminBrand) {
-	<div
-		class="bg-white rounded-lg shadow-md p-6"
-		hx-get={ utils.URL("/admin/product-inventories/table") }
-		hx-trigger="load"
-		hx-target="#inventories-table"
-		hx-swap="innerHTML"
-	>
+	<div class="bg-white rounded-lg shadow-md p-6">
+		<div id="inventories-pagination-top"></div>
 		@InventoryFilterToolbar(utils.URL("/admin/product-inventories/table"), brands)
-		<div id="inventories-table">
+		<div
+			id="inventories-table-content"
+			hx-get={ utils.URL("/admin/product-inventories/table") }
+			hx-trigger="load"
+			hx-swap="innerHTML"
+			hx-include="[name='search_serial'],[name='search_brand'],[name='product_status'],[name='stocks_in']"
+		>
+			<p class="text-gray-500 text-center py-4">Loading...</p>
 		</div>
 	</div>
+}
+
+templ AdminProductInventoriesTableContent(inventories []models.AdminProductInventoryListItem, p models.TablePagination) {
+	<div id="inventories-pagination-top" hx-swap-oob="true">
+		@TablePaginationBar(p)
+	</div>
+	@AdminProductInventoriesTable(inventories)
+	@TablePaginationBar(p)
 }
 
 templ AdminProductInventoriesTable(inventories []models.AdminProductInventoryListItem) {
@@ -256,7 +270,7 @@ templ InventoryUpdateForm(inv models.AdminProductInventoryListItem) {
 		hx-patch={ utils.URLf("/admin/product-inventories/%s/update", inv.ID) }
 		hx-swap="none"
 		class="flex flex-col gap-4"
-		hx-on::after-request="if(event.detail.successful) { document.getElementById('inventory-update-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/product-inventories/table', { target: '#inventories-table', swap: 'innerHTML' }) }"
+		hx-on::after-request="if(event.detail.successful) { document.getElementById('inventory-update-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/product-inventories/table', { target: '#inventories-table-content', swap: 'innerHTML', include: '[name=\'search_serial\'],[name=\'search_brand\'],[name=\'product_status\'],[name=\'stocks_in\']' }) }"
 	>
 		<div>
 			<label class="block text-sm font-medium text-gray-700 mb-1">

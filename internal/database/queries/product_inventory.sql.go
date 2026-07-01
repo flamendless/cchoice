@@ -10,6 +10,37 @@ import (
 	"database/sql"
 )
 
+const adminCountProductInventoriesListing = `-- name: AdminCountProductInventoriesListing :one
+SELECT COUNT(*) AS count
+FROM tbl_product_inventories
+INNER JOIN tbl_products ON tbl_products.id = tbl_product_inventories.product_id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE
+    (?1 IS NULL OR ?1 = '' OR LOWER(tbl_products.serial) LIKE '%' || LOWER(?1) || '%')
+    AND (?2 IS NULL OR ?2 = '' OR LOWER(tbl_brands.name) LIKE '%' || LOWER(?2) || '%')
+    AND (?3 IS NULL OR ?3 = '' OR tbl_products.status = ?3)
+    AND (?4 IS NULL OR ?4 = '' OR tbl_product_inventories.stocks_in = ?4)
+`
+
+type AdminCountProductInventoriesListingParams struct {
+	SearchSerial  interface{}
+	SearchBrand   interface{}
+	ProductStatus interface{}
+	StocksIn      interface{}
+}
+
+func (q *Queries) AdminCountProductInventoriesListing(ctx context.Context, arg AdminCountProductInventoriesListingParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, adminCountProductInventoriesListing,
+		arg.SearchSerial,
+		arg.SearchBrand,
+		arg.ProductStatus,
+		arg.StocksIn,
+	)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const adminGetProductInventoriesListing = `-- name: AdminGetProductInventoriesListing :many
 SELECT
     tbl_product_inventories.id,
@@ -74,6 +105,100 @@ func (q *Queries) AdminGetProductInventoriesListing(ctx context.Context, arg Adm
 	var items []AdminGetProductInventoriesListingRow
 	for rows.Next() {
 		var i AdminGetProductInventoriesListingRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProductID,
+			&i.Stocks,
+			&i.StocksIn,
+			&i.UpdatedAt,
+			&i.ProductSerial,
+			&i.ProductSlug,
+			&i.ProductStatus,
+			&i.ProductName,
+			&i.BrandName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const adminGetProductInventoriesListingPaginated = `-- name: AdminGetProductInventoriesListingPaginated :many
+SELECT
+    tbl_product_inventories.id,
+    tbl_product_inventories.product_id,
+    tbl_product_inventories.stocks,
+    tbl_product_inventories.stocks_in,
+    tbl_product_inventories.updated_at,
+    tbl_products.serial AS product_serial,
+    tbl_products.slug AS product_slug,
+    tbl_products.status AS product_status,
+    tbl_products.name AS product_name,
+    tbl_brands.name AS brand_name
+FROM tbl_product_inventories
+INNER JOIN tbl_products ON tbl_products.id = tbl_product_inventories.product_id
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE
+    (?1 IS NULL OR ?1 = '' OR LOWER(tbl_products.serial) LIKE '%' || LOWER(?1) || '%')
+    AND (?2 IS NULL OR ?2 = '' OR LOWER(tbl_brands.name) LIKE '%' || LOWER(?2) || '%')
+    AND (?3 IS NULL OR ?3 = '' OR tbl_products.status = ?3)
+    AND (?4 IS NULL OR ?4 = '' OR tbl_product_inventories.stocks_in = ?4)
+ORDER BY
+    CASE
+        WHEN tbl_product_inventories.stocks = 0 THEN 0
+        WHEN tbl_product_inventories.stocks <= 10 THEN 1
+        ELSE 2
+    END ASC,
+    tbl_product_inventories.stocks ASC,
+    tbl_product_inventories.updated_at DESC
+LIMIT ?6 OFFSET ?5
+`
+
+type AdminGetProductInventoriesListingPaginatedParams struct {
+	SearchSerial  interface{}
+	SearchBrand   interface{}
+	ProductStatus interface{}
+	StocksIn      interface{}
+	Offset        int64
+	Limit         int64
+}
+
+type AdminGetProductInventoriesListingPaginatedRow struct {
+	ID            int64
+	ProductID     int64
+	Stocks        int64
+	StocksIn      string
+	UpdatedAt     string
+	ProductSerial string
+	ProductSlug   sql.NullString
+	ProductStatus string
+	ProductName   string
+	BrandName     string
+}
+
+func (q *Queries) AdminGetProductInventoriesListingPaginated(ctx context.Context, arg AdminGetProductInventoriesListingPaginatedParams) ([]AdminGetProductInventoriesListingPaginatedRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetProductInventoriesListingPaginated,
+		arg.SearchSerial,
+		arg.SearchBrand,
+		arg.ProductStatus,
+		arg.StocksIn,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetProductInventoriesListingPaginatedRow
+	for rows.Next() {
+		var i AdminGetProductInventoriesListingPaginatedRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.ProductID,

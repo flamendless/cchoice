@@ -66,38 +66,108 @@ func (s *ProductInventoryService) GetListingForAdmin(
 	productStatus enums.ProductStatus,
 	stocksIn enums.StocksIn,
 ) ([]models.AdminProductInventoryListItem, error) {
+	inventories, err := s.dbRO.GetQueries().AdminGetProductInventoriesListing(ctx, s.listingInventoryFilterParams(searchSerial, searchBrand, productStatus, stocksIn))
+	if err != nil {
+		return nil, errors.Join(errs.ErrProductInventory, err)
+	}
+
+	return s.mapAdminProductInventoryListItems(inventories), nil
+}
+
+func (s *ProductInventoryService) GetListingForAdminPaginated(
+	ctx context.Context,
+	searchSerial string,
+	searchBrand string,
+	productStatus enums.ProductStatus,
+	stocksIn enums.StocksIn,
+	page, perPage int,
+) ([]models.AdminProductInventoryListItem, int64, int, error) {
+	filterParams := s.listingInventoryFilterParams(searchSerial, searchBrand, productStatus, stocksIn)
+
+	totalCount, err := s.dbRO.GetQueries().AdminCountProductInventoriesListing(ctx, queries.AdminCountProductInventoriesListingParams(filterParams))
+	if err != nil {
+		return nil, 0, 0, errors.Join(errs.ErrProductInventory, err)
+	}
+
+	page = models.ClampPage(page, totalCount, perPage)
+	offset := int64((page - 1) * perPage)
+
+	inventories, err := s.dbRO.GetQueries().AdminGetProductInventoriesListingPaginated(ctx, queries.AdminGetProductInventoriesListingPaginatedParams{
+		SearchSerial:  filterParams.SearchSerial,
+		SearchBrand:   filterParams.SearchBrand,
+		ProductStatus: filterParams.ProductStatus,
+		StocksIn:      filterParams.StocksIn,
+		Limit:         int64(perPage),
+		Offset:        offset,
+	})
+	if err != nil {
+		return nil, 0, 0, errors.Join(errs.ErrProductInventory, err)
+	}
+
+	return s.mapAdminProductInventoryListItemsPaginated(inventories), totalCount, page, nil
+}
+
+func (s *ProductInventoryService) listingInventoryFilterParams(
+	searchSerial string,
+	searchBrand string,
+	productStatus enums.ProductStatus,
+	stocksIn enums.StocksIn,
+) queries.AdminGetProductInventoriesListingParams {
 	statusStr := ""
 	if productStatus != enums.PRODUCT_STATUS_UNDEFINED {
 		statusStr = productStatus.String()
 	}
 
-	inventories, err := s.dbRO.GetQueries().AdminGetProductInventoriesListing(ctx, queries.AdminGetProductInventoriesListingParams{
+	return queries.AdminGetProductInventoriesListingParams{
 		SearchSerial:  sql.NullString{String: searchSerial, Valid: searchSerial != ""},
 		SearchBrand:   sql.NullString{String: searchBrand, Valid: searchBrand != ""},
 		ProductStatus: sql.NullString{String: statusStr, Valid: statusStr != ""},
 		StocksIn:      sql.NullString{String: stocksIn.String(), Valid: stocksIn.IsValid()},
-	})
-	if err != nil {
-		return nil, errors.Join(errs.ErrProductInventory, err)
 	}
+}
 
+func (s *ProductInventoryService) mapAdminProductInventoryListItems(inventories []queries.AdminGetProductInventoriesListingRow) []models.AdminProductInventoryListItem {
 	items := make([]models.AdminProductInventoryListItem, 0, len(inventories))
 	for _, inv := range inventories {
-		items = append(items, models.AdminProductInventoryListItem{
-			ID:            s.encoder.Encode(inv.ID),
-			ProductID:     s.encoder.Encode(inv.ProductID),
-			ProductSerial: inv.ProductSerial,
-			ProductSlug:   inv.ProductSlug.String,
-			ProductName:   inv.ProductName,
-			BrandName:     inv.BrandName,
-			Status:        enums.ParseProductStatusToEnum(inv.ProductStatus),
-			StocksIn:      enums.ParseStocksInToEnum(inv.StocksIn),
-			Stocks:        inv.Stocks,
-			UpdatedAt:     inv.UpdatedAt,
-		})
+		items = append(items, s.mapAdminProductInventoryListItem(
+			inv.ID, inv.ProductID, inv.ProductSerial, inv.ProductSlug, inv.ProductName,
+			inv.BrandName, inv.ProductStatus, inv.StocksIn, inv.Stocks, inv.UpdatedAt,
+		))
 	}
+	return items
+}
 
-	return items, nil
+func (s *ProductInventoryService) mapAdminProductInventoryListItemsPaginated(inventories []queries.AdminGetProductInventoriesListingPaginatedRow) []models.AdminProductInventoryListItem {
+	items := make([]models.AdminProductInventoryListItem, 0, len(inventories))
+	for _, inv := range inventories {
+		items = append(items, s.mapAdminProductInventoryListItem(
+			inv.ID, inv.ProductID, inv.ProductSerial, inv.ProductSlug, inv.ProductName,
+			inv.BrandName, inv.ProductStatus, inv.StocksIn, inv.Stocks, inv.UpdatedAt,
+		))
+	}
+	return items
+}
+
+func (s *ProductInventoryService) mapAdminProductInventoryListItem(
+	id, productID int64,
+	productSerial string,
+	productSlug sql.NullString,
+	productName, brandName, productStatus, stocksIn string,
+	stocks int64,
+	updatedAt string,
+) models.AdminProductInventoryListItem {
+	return models.AdminProductInventoryListItem{
+		ID:            s.encoder.Encode(id),
+		ProductID:     s.encoder.Encode(productID),
+		ProductSerial: productSerial,
+		ProductSlug:   productSlug.String,
+		ProductName:   productName,
+		BrandName:     brandName,
+		Status:        enums.ParseProductStatusToEnum(productStatus),
+		StocksIn:      enums.ParseStocksInToEnum(stocksIn),
+		Stocks:        stocks,
+		UpdatedAt:     updatedAt,
+	}
 }
 
 func (s *ProductInventoryService) Create(

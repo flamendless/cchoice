@@ -34,6 +34,31 @@ func (q *Queries) AdminCountProductsForExport(ctx context.Context, arg AdminCoun
 	return count, err
 }
 
+const adminCountProductsForListing = `-- name: AdminCountProductsForListing :one
+;
+
+SELECT COUNT(*) AS count
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+WHERE
+	(?1 IS NULL OR ?1 = '' OR LOWER(tbl_products.serial) LIKE '%' || LOWER(?1) || '%')
+	AND (?2 IS NULL OR ?2 = '' OR LOWER(tbl_brands.name) = LOWER(?2))
+	AND (?3 IS NULL OR ?3 = '' OR tbl_products.status = ?3)
+`
+
+type AdminCountProductsForListingParams struct {
+	SearchSerial interface{}
+	SearchBrand  interface{}
+	Status       interface{}
+}
+
+func (q *Queries) AdminCountProductsForListing(ctx context.Context, arg AdminCountProductsForListingParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, adminCountProductsForListing, arg.SearchSerial, arg.SearchBrand, arg.Status)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const adminGetProductsForExport = `-- name: AdminGetProductsForExport :many
 ;
 
@@ -319,6 +344,172 @@ func (q *Queries) AdminGetProductsForListing(ctx context.Context, arg AdminGetPr
 	var items []AdminGetProductsForListingRow
 	for rows.Next() {
 		var i AdminGetProductsForListingRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Serial,
+			&i.Slug,
+			&i.Description,
+			&i.BrandName,
+			&i.Status,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
+			&i.Colours,
+			&i.Sizes,
+			&i.Segmentation,
+			&i.PartNumber,
+			&i.Power,
+			&i.Capacity,
+			&i.ScopeOfSupply,
+			&i.Weight,
+			&i.WeightUnit,
+			&i.Category,
+			&i.Subcategory,
+			&i.SalePriceWithVat,
+			&i.SalePriceWithVatCurrency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const adminGetProductsForListingPaginated = `-- name: AdminGetProductsForListingPaginated :many
+SELECT
+	tbl_products.id,
+	tbl_products.name,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.description,
+	tbl_brands.name AS brand_name,
+	tbl_products.status,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_products.created_at,
+	tbl_products.updated_at,
+	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail,
+	COALESCE(tbl_product_specs.colours, '') AS colours,
+	COALESCE(tbl_product_specs.sizes, '') AS sizes,
+	COALESCE(tbl_product_specs.segmentation, '') AS segmentation,
+	COALESCE(tbl_product_specs.part_number, '') AS part_number,
+	COALESCE(tbl_product_specs.power, '') AS power,
+	COALESCE(tbl_product_specs.capacity, '') AS capacity,
+	COALESCE(tbl_product_specs.scope_of_supply, '') AS scope_of_supply,
+	COALESCE(tbl_product_specs.weight, 0) AS weight,
+	COALESCE(tbl_product_specs.weight_unit, '') AS weight_unit,
+	COALESCE(categories.category, '') AS category,
+	COALESCE(categories.subcategory, '') AS subcategory,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.id = (
+	SELECT tpi.id
+	FROM tbl_product_images tpi
+	WHERE tpi.product_id = tbl_products.id
+	ORDER BY tpi.updated_at DESC
+	LIMIT 1
+)
+LEFT JOIN tbl_product_specs ON tbl_product_specs.id = tbl_products.product_specs_id
+LEFT JOIN (
+	SELECT
+		tbl_products_categories.product_id,
+		GROUP_CONCAT(tbl_product_categories.category, ', ') AS category,
+		GROUP_CONCAT(tbl_product_categories.subcategory, ', ') AS subcategory
+	FROM tbl_products_categories
+	INNER JOIN tbl_product_categories ON tbl_product_categories.id = tbl_products_categories.category_id
+	GROUP BY tbl_products_categories.product_id
+) AS categories ON categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales ON tbl_product_sales.id = (
+	SELECT tps.id
+	FROM tbl_product_sales tps
+	WHERE tps.product_id = tbl_products.id
+		AND tps.is_active = 1
+	ORDER BY tps.updated_at DESC
+	LIMIT 1
+)
+WHERE
+	(?1 IS NULL OR ?1 = '' OR LOWER(tbl_products.serial) LIKE '%' || LOWER(?1) || '%')
+	AND (?2 IS NULL OR ?2 = '' OR LOWER(tbl_brands.name) = LOWER(?2))
+	AND (?3 IS NULL OR ?3 = '' OR tbl_products.status = ?3)
+ORDER BY
+	CASE tbl_products.status
+		WHEN 'DRAFT' THEN 1
+		WHEN 'ACTIVE' THEN 2
+		WHEN 'DELETED' THEN 3
+		ELSE 4
+	END,
+	tbl_products.updated_at DESC
+LIMIT ?5 OFFSET ?4
+`
+
+type AdminGetProductsForListingPaginatedParams struct {
+	SearchSerial interface{}
+	SearchBrand  interface{}
+	Status       interface{}
+	Offset       int64
+	Limit        int64
+}
+
+type AdminGetProductsForListingPaginatedRow struct {
+	ID                       int64
+	Name                     string
+	Serial                   string
+	Slug                     sql.NullString
+	Description              sql.NullString
+	BrandName                string
+	Status                   string
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	CreatedAt                time.Time
+	UpdatedAt                time.Time
+	ThumbnailPath            string
+	CdnUrl                   sql.NullString
+	CdnUrlThumbnail          sql.NullString
+	Colours                  string
+	Sizes                    string
+	Segmentation             string
+	PartNumber               string
+	Power                    string
+	Capacity                 string
+	ScopeOfSupply            string
+	Weight                   float64
+	WeightUnit               string
+	Category                 string
+	Subcategory              string
+	SalePriceWithVat         sql.NullInt64
+	SalePriceWithVatCurrency sql.NullString
+}
+
+func (q *Queries) AdminGetProductsForListingPaginated(ctx context.Context, arg AdminGetProductsForListingPaginatedParams) ([]AdminGetProductsForListingPaginatedRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetProductsForListingPaginated,
+		arg.SearchSerial,
+		arg.SearchBrand,
+		arg.Status,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetProductsForListingPaginatedRow
+	for rows.Next() {
+		var i AdminGetProductsForListingPaginatedRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,

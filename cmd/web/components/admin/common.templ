@@ -405,16 +405,18 @@ templ ProductSearchToolbar(url string, brands []models.AdminBrand) {
 				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change, search_serial delay:300ms"
-				hx-target="#products-table"
+				hx-target="#products-table-content"
 				hx-include="[name='search_serial'],[name='search_brand'],[name='status']"
+				hx-vals='{"page": "1"}'
 			/>
 			<select
 				name="search_brand"
 				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change"
-				hx-target="#products-table"
+				hx-target="#products-table-content"
 				hx-include="[name='search_serial'],[name='search_brand'],[name='status']"
+				hx-vals='{"page": "1"}'
 			>
 				<option value="">All Brands</option>
 				for _, brand := range brands {
@@ -426,8 +428,9 @@ templ ProductSearchToolbar(url string, brands []models.AdminBrand) {
 				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change"
-				hx-target="#products-table"
+				hx-target="#products-table-content"
 				hx-include="[name='search_serial'],[name='search_brand'],[name='status']"
+				hx-vals='{"page": "1"}'
 			>
 				<option value="">All</option>
 				for _, ps := range enums.AllProductStatuses {
@@ -572,4 +575,63 @@ templ StocksInDropdown(selected enums.StocksIn) {
 			</option>
 		}
 	</select>
+}
+
+templ TablePaginationBar(p models.TablePagination) {
+	<div class="flex flex-wrap justify-center items-center gap-4 py-3">
+		<span class="text-sm text-gray-600">
+			if p.TotalCount == 0 {
+				Showing 0 of 0
+			} else {
+				Showing { fmt.Sprintf("%d", p.StartItem()) }–{ fmt.Sprintf("%d", p.EndItem()) } of { fmt.Sprintf("%d", p.TotalCount) }
+			}
+		</span>
+		<div class="flex items-center gap-2">
+			if p.HasPrev() {
+				<button
+					type="button"
+					class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700"
+					hx-get={ p.TableURL }
+					hx-include={ p.Include }
+					hx-vals={ fmt.Sprintf(`{"page": "%d"}`, p.Page-1) }
+					hx-target={ p.ContentTarget }
+					hx-swap="innerHTML"
+				>
+					Previous
+				</button>
+			} else {
+				<button
+					type="button"
+					class="px-3 py-1 text-sm border border-gray-200 rounded-md text-gray-400 cursor-not-allowed"
+					disabled
+				>
+					Previous
+				</button>
+			}
+			<span class="text-sm text-gray-700">
+				Page { fmt.Sprintf("%d", p.Page) } of { fmt.Sprintf("%d", p.TotalPages()) }
+			</span>
+			if p.HasNext() {
+				<button
+					type="button"
+					class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700"
+					hx-get={ p.TableURL }
+					hx-include={ p.Include }
+					hx-vals={ fmt.Sprintf(`{"page": "%d"}`, p.Page+1) }
+					hx-target={ p.ContentTarget }
+					hx-swap="innerHTML"
+				>
+					Next
+				</button>
+			} else {
+				<button
+					type="button"
+					class="px-3 py-1 text-sm border border-gray-200 rounded-md text-gray-400 cursor-not-allowed"
+					disabled
+				>
+					Next
+				</button>
+			}
+		</div>
+	</div>
 }

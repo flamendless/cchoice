@@ -7,9 +7,10 @@ import (
 	"strconv"
 
 	compadmin "cchoice/cmd/web/components/admin"
-	"cchoice/internal/encode"
 	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
@@ -53,7 +54,7 @@ func (s *Server) adminProductInventoriesPageHandler(w http.ResponseWriter, r *ht
 
 func (s *Server) adminProductInventoriesTableHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Product Inventories Table Handler]"
-	const page = "/admin"
+	const page = "/admin/product-inventories"
 	ctx := r.Context()
 
 	searchSerial := r.URL.Query().Get("search_serial")
@@ -75,19 +76,38 @@ func (s *Server) adminProductInventoriesTableHandler(w http.ResponseWriter, r *h
 		return
 	}
 
-	inventories, err := s.services.productInventory.GetListingForAdmin(
+	listPage := 1
+	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
+		if parsed, err := strconv.Atoi(paramPage); err == nil && parsed > 0 {
+			listPage = parsed
+		}
+	}
+
+	inventories, totalCount, listPage, err := s.services.productInventory.GetListingForAdminPaginated(
 		ctx,
 		searchSerial,
 		searchBrand,
 		productStatus,
 		stocksIn,
+		listPage,
+		constants.DefaultAdminTablePageSize,
 	)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
 	}
 
-	if err := compadmin.AdminProductInventoriesTable(inventories).Render(ctx, w); err != nil {
+	pagination := models.TablePagination{
+		Page:          listPage,
+		PerPage:       constants.DefaultAdminTablePageSize,
+		TotalCount:    totalCount,
+		TableURL:      utils.URL("/admin/product-inventories/table"),
+		Include:       "[name='search_serial'],[name='search_brand'],[name='product_status'],[name='stocks_in']",
+		ContentTarget: "#inventories-table-content",
+	}
+
+	if err := compadmin.AdminProductInventoriesTableContent(inventories, pagination).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 	}

@@ -39,16 +39,16 @@ templ AdminSuperuserLogsPage() {
 }
 
 templ AdminSuperuserLogsSection() {
-	<div
-		class="bg-white rounded-lg shadow-md p-6"
-		hx-get={ utils.URL("/admin/superuser/logs/table") }
-		hx-trigger="load, filter-submit from:#logs-filter-form"
-		hx-target="#logs-table"
-		hx-swap="innerHTML"
-		hx-include="#logs-filter-form"
-	>
+	<div class="bg-white rounded-lg shadow-md p-6">
+		<div id="logs-pagination-top"></div>
 		@LogsFilterForm()
-		<div id="logs-table">
+		<div
+			id="logs-table-content"
+			hx-get={ utils.URL("/admin/superuser/logs/table") }
+			hx-trigger="load, filter-submit from:#logs-filter-form"
+			hx-swap="innerHTML"
+			hx-include="#logs-filter-form"
+		>
 			<p class="text-gray-500 text-center py-4">Loading...</p>
 		</div>
 	</div>
@@ -60,9 +60,10 @@ templ LogsFilterForm() {
 		class="mb-6 p-4 bg-gray-50 rounded-lg"
 		hx-get={ utils.URL("/admin/superuser/logs/table") }
 		hx-trigger="submit"
-		hx-target="#logs-table"
+		hx-target="#logs-table-content"
 		hx-swap="innerHTML"
 		hx-include="this"
+		hx-vals='{"page": "1"}'
 	>
 		<div class="flex flex-wrap gap-3 items-end">
 			<div>
@@ -113,8 +114,8 @@ templ LogsFilterForm() {
 				type="button"
 				class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
 				hx-get={ utils.URL("/admin/superuser/logs/table") }
-				hx-vals='{"staff-id": "", "action": "", "module": ""}'
-				hx-target="#logs-table"
+				hx-vals='{"staff-id": "", "action": "", "module": "", "page": "1"}'
+				hx-target="#logs-table-content"
 				hx-swap="innerHTML"
 				onclick="document.getElementById('logs-filter-form').reset()"
 			>
@@ -136,6 +137,14 @@ templ ModuleOptions(modules []enums.Module) {
 	for _, m := range modules {
 		<option value={ strings.ToLower(m.String()) }>{ m.String() }</option>
 	}
+}
+
+templ AdminSuperuserLogsTableContent(logs []models.StaffLog, p models.TablePagination) {
+	<div id="logs-pagination-top" hx-swap-oob="true">
+		@TablePaginationBar(p)
+	</div>
+	@AdminSuperuserLogsTable(logs)
+	@TablePaginationBar(p)
 }
 
 templ AdminSuperuserLogsTable(logs []models.StaffLog) {
