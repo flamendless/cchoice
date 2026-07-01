@@ -140,7 +140,7 @@ templ ModuleOptions(modules []enums.Module) {
 
 templ AdminSuperuserLogsTable(logs []models.StaffLog) {
 	<div class="overflow-x-auto">
-		<table class="min-w-full divide-y divide-gray-200">
+		<table class="min-w-full table-fixed w-full divide-y divide-gray-200">
 			<thead class="bg-gray-50">
 				<tr>
 					@TableHead("ID")
@@ -148,13 +148,14 @@ templ AdminSuperuserLogsTable(logs []models.StaffLog) {
 					@TableHead("Action")
 					@TableHead("Module")
 					@TableHead("Result")
+					@TableHead("Reference")
 					@TableHead("Created At")
 				</tr>
 			</thead>
 			<tbody class="bg-white divide-y divide-gray-200">
 				if len(logs) == 0 {
 					<tr>
-						<td colspan="6" class="px-6 py-4 text-center text-gray-500">
+						<td colspan="7" class="px-6 py-4 text-center text-gray-500">
 							No logs found.
 						</td>
 					</tr>
@@ -173,8 +174,11 @@ templ AdminSuperuserLogsTable(logs []models.StaffLog) {
 							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 								{ log.Module }
 							</td>
-							<td class="px-6 py-4 whitespace-nowrap text-sm">
+							<td class="px-6 py-4 text-sm max-w-xs w-48 whitespace-normal break-words">
 								@ResultCell(log.Result)
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm">
+								@ReferenceCell(log)
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 								{ log.CreatedAt }
@@ -187,10 +191,22 @@ templ AdminSuperuserLogsTable(logs []models.StaffLog) {
 	</div>
 }
 
+templ ReferenceCell(log models.StaffLog) {
+	if log.ReferenceURL != "" {
+		<a
+			href={ log.ReferenceURL }
+			target="_blank"
+			class="bg-primary text-white px-2 py-1 rounded-lg font-semibold hover:bg-primary-dark transition-colors cursor-pointer"
+		>
+			{ log.ReferenceLabel }
+		</a>
+	}
+}
+
 templ ResultCell(result string) {
 	if strings.Contains(strings.ToLower(result), "success") {
-		<span class="text-green-600 font-medium">{ result }</span>
+		<span class="text-green-600 font-medium break-words">{ result }</span>
 	} else {
-		<span class="text-red-600 font-medium">{ result }</span>
+		<span class="text-red-600 font-medium break-words">{ result }</span>
 	}
 }

@@ -651,6 +651,17 @@ func (q *Queries) GetProductPage(ctx context.Context, slug sql.NullString) (GetP
 	return i, err
 }
 
+const getProductSlugByID = `-- name: GetProductSlugByID :one
+SELECT slug FROM tbl_products WHERE id = ? LIMIT 1
+`
+
+func (q *Queries) GetProductSlugByID(ctx context.Context, id int64) (sql.NullString, error) {
+	row := q.db.QueryRowContext(ctx, getProductSlugByID, id)
+	var slug sql.NullString
+	err := row.Scan(&slug)
+	return slug, err
+}
+
 const getProducts = `-- name: GetProducts :many
 SELECT
 	tbl_products.id, serial, tbl_products.name, description, brand_id, tbl_products.status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, slug, tbl_products_categories.id, category_id, product_id, tbl_products_categories.created_at, tbl_products_categories.updated_at, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_product_specs.created_at, tbl_product_specs.updated_at, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
