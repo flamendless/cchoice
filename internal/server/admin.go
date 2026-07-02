@@ -137,6 +137,12 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_BRANDS)).Patch("/admin/brands/{id}/status", s.adminBrandsUpdateStatusHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_BRANDS)).Delete("/admin/brands/{id}", s.adminBrandsDeleteHandler)
 
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_CATEGORIES)).Get("/admin/categories", s.adminCategoriesListPageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_CATEGORIES)).Get("/admin/categories/table", s.adminCategoriesListTableHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_CATEGORIES)).Get("/admin/categories/subcategories", s.adminCategoriesSubcategoriesHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_CATEGORIES)).Get("/admin/categories/create", s.adminCategoriesCreatePageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_CATEGORIES)).Post("/admin/categories", s.adminCategoriesCreateHandler)
+
 	r.With(s.requireSuperuserAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES)).Get("/admin/product-inventories", s.adminProductInventoriesPageHandler)
 	r.With(s.requireSuperuserAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES)).Get("/admin/product-inventories/table", s.adminProductInventoriesTableHandler)
 	r.With(s.requireSuperuserAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES)).Get("/admin/product-inventories/{id}/update", s.adminProductInventoryUpdateModalHandler)

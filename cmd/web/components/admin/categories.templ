@@ -1,0 +1,325 @@
+package components
+
+import (
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/utils"
+	"fmt"
+)
+
+templ AdminCategoriesListPage() {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("Categories - C-Choice Admin")
+		</head>
+		<body
+			class="bg-surface min-h-screen flex flex-col"
+			_="init call metrics_event('admin_visit', 'categories list')"
+		>
+			@common.DevRibbon()
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-8xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.AdminStaffHeaderWithBack()
+						<h1 class="text-2xl font-bold text-center text-primary mb-6">
+							Manage Categories
+						</h1>
+						@CategoriesListSection()
+					</div>
+				</div>
+			</div>
+			<div id="category-create-modal-container"></div>
+		</body>
+	</html>
+}
+
+templ CategoriesListSection() {
+	<div
+		class="bg-white rounded-lg shadow-md p-6"
+		hx-get={ utils.URL("/admin/categories/table") }
+		hx-trigger="load"
+		hx-target="#categories-table"
+		hx-swap="innerHTML"
+	>
+		@CategoriesToolbar()
+		<div id="categories-table"></div>
+	</div>
+}
+
+templ CategoriesToolbar() {
+	<div class="mb-6 flex flex-wrap gap-3 items-center justify-between">
+		<form
+			class="flex gap-2 items-center"
+			hx-get={ utils.URL("/admin/categories/table") }
+			hx-target="#categories-table"
+			hx-swap="innerHTML"
+		>
+			<input
+				type="search"
+				name="search"
+				placeholder="Search categories..."
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+			/>
+			<button
+				type="submit"
+				class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+			>
+				Search
+			</button>
+		</form>
+		<button
+			type="button"
+			class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+			hx-get={ utils.URL("/admin/categories/create") }
+			hx-target="#category-create-modal-container"
+			hx-swap="innerHTML"
+		>
+			Create Category
+		</button>
+	</div>
+}
+
+templ AdminCategoriesTableContent(categories []models.AdminCategoryListItem, p models.TablePagination) {
+	<div id="categories-table-content">
+		<div id="categories-pagination-top" hx-swap-oob="true">
+			@TablePaginationBar(p)
+		</div>
+		@AdminCategoriesListTable(categories)
+		@TablePaginationBar(p)
+	</div>
+}
+
+templ AdminCategoriesListTable(categories []models.AdminCategoryListItem) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-50">
+				<tr>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[8%]"></th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategories</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				if len(categories) == 0 {
+					<tr>
+						<td colspan="4" class="px-6 py-4 text-center text-gray-500">
+							No categories found.
+						</td>
+					</tr>
+				} else {
+					for i, category := range categories {
+						@CategoryTableRow(category, i)
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ CategoryTableRow(category models.AdminCategoryListItem, rowIndex int) {
+	<tr id={ "category-row-" + categoryRowID(rowIndex) }>
+		<td class="px-4 py-4 whitespace-nowrap text-sm">
+			<button
+				type="button"
+				class="px-2 py-1 text-primary hover:bg-surface rounded"
+				hx-get={ categorySubcategoriesURL(category.Category) }
+				hx-target={ "#" + categorySubCellID(rowIndex) }
+				hx-swap="innerHTML"
+				_={ "on click toggle .hidden on #" + categoryRowID(rowIndex) }
+			>
+				+
+			</button>
+		</td>
+		<td class="px-6 py-4 text-sm text-gray-900">{ category.Category }</td>
+		<td class="px-6 py-4 text-sm text-gray-900">{ fmt.Sprintf("%d", category.SubcategoriesCount) }</td>
+		<td class="px-6 py-4 text-sm text-gray-900">{ fmt.Sprintf("%d", category.ProductsCount) }</td>
+	</tr>
+	<tr id={ categoryRowID(rowIndex) } class="hidden">
+		<td id={ categorySubCellID(rowIndex) } colspan="4" class="px-6 py-2"></td>
+	</tr>
+}
+
+templ CategorySubcategoryRows(rows []models.AdminSubcategoryRow) {
+	<div class="overflow-x-auto bg-gray-50 rounded-md p-2">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead>
+				<tr>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Subcategory</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Promoted at Home Page</th>
+				</tr>
+			</thead>
+			<tbody class="divide-y divide-gray-200">
+				if len(rows) == 0 {
+					<tr>
+						<td colspan="2" class="px-4 py-3 text-center text-sm text-gray-500">No subcategories found.</td>
+					</tr>
+				} else {
+					for _, row := range rows {
+						<tr>
+							<td class="px-4 py-2 text-sm text-gray-900">{ row.Subcategory }</td>
+							<td class="px-4 py-2 text-sm">
+								@CategoryPromotedIcon(row.Promoted)
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ CategoryPromotedIcon(promoted bool) {
+	if promoted {
+		<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-label="Promoted">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+		</svg>
+	} else {
+		<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-label="Not promoted">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+		</svg>
+	}
+}
+
+templ CategoryCreateModal(categories []string) {
+	<div
+		id="category-create-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="
+			on closeModal
+				set #category-create-modal-container.innerHTML to ''
+		"
+	>
+		<div class="absolute inset-0 bg-black/50" _="on click trigger closeModal"></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">Create Category</h2>
+				<button type="button" class="text-gray-400 hover:text-gray-600" _="on click trigger closeModal">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			<form
+				hx-post={ utils.URL("/admin/categories") }
+				hx-swap="none"
+				class="flex flex-col gap-4"
+				data-categories-table-url={ utils.URL("/admin/categories/table") }
+				hx-on::after-request="if(event.detail.successful) { document.getElementById('category-create-modal-container').innerHTML = ''; htmx.ajax('GET', event.target.dataset.categoriesTableUrl, { target: '#categories-table', swap: 'innerHTML' }) }"
+			>
+				<fieldset class="flex flex-col gap-2">
+					<legend class="text-sm font-medium text-gray-700 mb-1">Category type</legend>
+					<label class="inline-flex items-center gap-2 cursor-pointer">
+						<input type="radio" name="mode" value="new" checked onchange="toggleCategoryMode('new')"/>
+						<span class="text-sm text-gray-700">New category</span>
+					</label>
+					<label class="inline-flex items-center gap-2 cursor-pointer">
+						<input type="radio" name="mode" value="existing" onchange="toggleCategoryMode('existing')"/>
+						<span class="text-sm text-gray-700">Existing category</span>
+					</label>
+				</fieldset>
+				<div id="category-new-fields">
+					<label class="block text-sm font-medium text-gray-700 mb-1">
+						Category Name <span class="text-red-500">*</span>
+					</label>
+					<input
+						type="text"
+						name="category_name"
+						placeholder="Enter category name"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+					/>
+				</div>
+				<div id="category-existing-fields" class="hidden">
+					<label class="block text-sm font-medium text-gray-700 mb-1">
+						Category <span class="text-red-500">*</span>
+					</label>
+					<select
+						name="category"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+					>
+						<option value="">Select a category</option>
+						for _, cat := range categories {
+							<option value={ cat }>{ cat }</option>
+						}
+					</select>
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-gray-700 mb-1">
+						Subcategories <span class="text-red-500">*</span>
+					</label>
+					<div id="subcategory-fields" class="flex flex-col gap-2">
+						<div class="flex gap-2 items-center subcategory-row">
+							<input
+								type="text"
+								name="subcategories[]"
+								placeholder="Enter subcategory name"
+								required
+								class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+							/>
+						</div>
+					</div>
+					<button
+						type="button"
+						class="mt-2 px-3 py-1 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+						onclick="addSubcategoryField()"
+					>
+						+ Add subcategory
+					</button>
+				</div>
+				<div class="flex justify-end gap-2 pt-2">
+					<button
+						type="button"
+						class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+						_="on click trigger closeModal"
+					>
+						Cancel
+					</button>
+					<button
+						type="submit"
+						class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+					>
+						Save
+					</button>
+				</div>
+			</form>
+			<script>
+				function toggleCategoryMode(mode) {
+					const newFields = document.getElementById('category-new-fields');
+					const existingFields = document.getElementById('category-existing-fields');
+					const categoryNameInput = newFields.querySelector('input[name="category_name"]');
+					const categorySelect = existingFields.querySelector('select[name="category"]');
+					if (mode === 'new') {
+						newFields.classList.remove('hidden');
+						existingFields.classList.add('hidden');
+						if (categoryNameInput) categoryNameInput.required = true;
+						if (categorySelect) {
+							categorySelect.required = false;
+							categorySelect.value = '';
+						}
+					} else {
+						newFields.classList.add('hidden');
+						existingFields.classList.remove('hidden');
+						if (categoryNameInput) {
+							categoryNameInput.required = false;
+							categoryNameInput.value = '';
+						}
+						if (categorySelect) categorySelect.required = true;
+					}
+				}
+
+				function addSubcategoryField() {
+					const container = document.getElementById('subcategory-fields');
+					const row = document.createElement('div');
+					row.className = 'flex gap-2 items-center subcategory-row';
+					row.innerHTML = '<input type="text" name="subcategories[]" placeholder="Enter subcategory name" required class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" />';
+					container.appendChild(row);
+				}
+			</script>
+		</div>
+	</div>
+}
