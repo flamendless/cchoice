@@ -51,6 +51,7 @@ type Services struct {
 	location         *services.LocationService
 	memo             *services.MemoService
 	product          *services.ProductService
+	productCategory  *services.ProductCategoryService
 	productInventory *services.ProductInventoryService
 	image            *services.ImageService
 	promo            *services.PromoService
@@ -190,6 +191,7 @@ func NewServer() *ServerInstance {
 	holidayService := services.NewHolidayService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService)
 	attendanceService := services.NewAttendanceService(newServer.encoder, newServer.dbRO, newServer.dbRW, holidayService, staffLogService)
 	productInventoryService := services.NewProductInventoryService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService)
+	productCategoryService := services.NewProductCategoryService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService)
 	productService := services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW, newServer.GetCDNURL, productInventoryService, staffLogService)
 	exportService := services.NewExportService(productService, staffLogService)
 
@@ -206,6 +208,7 @@ func NewServer() *ServerInstance {
 		location:         services.NewLocationService(cfg.Settings.ShopLocation),
 		memo:             services.NewMemoService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, emailJobRunner),
 		product:          productService,
+		productCategory:  productCategoryService,
 		productInventory: productInventoryService,
 		image:            services.NewImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
 		promo:            services.NewPromoService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
@@ -232,6 +235,7 @@ func NewServer() *ServerInstance {
 		newServer.services.memo,
 		newServer.services.passwordReset,
 		newServer.services.product,
+		newServer.services.productCategory,
 		newServer.services.productInventory,
 		newServer.services.promo,
 		newServer.services.qr,

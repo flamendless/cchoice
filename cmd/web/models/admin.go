@@ -60,3 +60,15 @@ type StaffMemoCard struct {
 	Message string
 	FileURL string
 }
+
+type AdminCategoryListItem struct {
+	Category           string
+	SubcategoriesCount int64
+	ProductsCount      int64
+}
+
+type AdminSubcategoryRow struct {
+	ID          string
+	Subcategory string
+	Promoted    bool
+}

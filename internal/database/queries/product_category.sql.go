@@ -11,16 +11,43 @@ import (
 	"strings"
 )
 
+const categoryNameExists = `-- name: CategoryNameExists :one
+SELECT COUNT(*) > 0 AS category_exists
+FROM tbl_product_categories
+WHERE category = ?
+`
+
+func (q *Queries) CategoryNameExists(ctx context.Context, category sql.NullString) (bool, error) {
+	row := q.db.QueryRowContext(ctx, categoryNameExists, category)
+	var category_exists bool
+	err := row.Scan(&category_exists)
+	return category_exists, err
+}
+
+const countDistinctCategoriesForAdmin = `-- name: CountDistinctCategoriesForAdmin :one
+;
+
+SELECT COUNT(DISTINCT category) AS count
+FROM tbl_product_categories
+WHERE
+	category IS NOT NULL
+	AND category != ''
+	AND (?1 IS NULL OR ?1 = '' OR LOWER(category) LIKE '%' || LOWER(?1) || '%')
+`
+
+func (q *Queries) CountDistinctCategoriesForAdmin(ctx context.Context, search interface{}) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countDistinctCategoriesForAdmin, search)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createProductCategory = `-- name: CreateProductCategory :one
 INSERT INTO tbl_product_categories (
 	category,
-	subcategory,
-	created_at,
-	updated_at
+	subcategory
 ) VALUES (
-	?, ?,
-	datetime('now'),
-	datetime('now')
+	?, ?
 ) RETURNING id, category, subcategory, promoted_at_homepage
 `
 
@@ -127,6 +154,57 @@ func (q *Queries) GetAllSubcategoryNames(ctx context.Context) ([]sql.NullString,
 			return nil, err
 		}
 		items = append(items, subcategory)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getDistinctCategoriesForAdminPaginated = `-- name: GetDistinctCategoriesForAdminPaginated :many
+SELECT
+	tbl_product_categories.category,
+	COUNT(DISTINCT tbl_product_categories.id) AS subcategories_count,
+	COUNT(DISTINCT tbl_products_categories.product_id) AS products_count
+FROM tbl_product_categories
+LEFT JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
+WHERE
+	tbl_product_categories.category IS NOT NULL
+	AND tbl_product_categories.category != ''
+	AND (?1 IS NULL OR ?1 = '' OR LOWER(tbl_product_categories.category) LIKE '%' || LOWER(?1) || '%')
+GROUP BY tbl_product_categories.category
+ORDER BY tbl_product_categories.category ASC
+LIMIT ?3 OFFSET ?2
+`
+
+type GetDistinctCategoriesForAdminPaginatedParams struct {
+	Search interface{}
+	Offset int64
+	Limit  int64
+}
+
+type GetDistinctCategoriesForAdminPaginatedRow struct {
+	Category           sql.NullString
+	SubcategoriesCount int64
+	ProductsCount      int64
+}
+
+func (q *Queries) GetDistinctCategoriesForAdminPaginated(ctx context.Context, arg GetDistinctCategoriesForAdminPaginatedParams) ([]GetDistinctCategoriesForAdminPaginatedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getDistinctCategoriesForAdminPaginated, arg.Search, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetDistinctCategoriesForAdminPaginatedRow
+	for rows.Next() {
+		var i GetDistinctCategoriesForAdminPaginatedRow
+		if err := rows.Scan(&i.Category, &i.SubcategoriesCount, &i.ProductsCount); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
 	}
 	if err := rows.Close(); err != nil {
 		return nil, err
@@ -497,6 +575,45 @@ func (q *Queries) GetProductsCategoriesByProductID(ctx context.Context, productI
 			return nil, err
 		}
 		items = append(items, category_id)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getSubcategoriesByCategoryForAdmin = `-- name: GetSubcategoriesByCategoryForAdmin :many
+SELECT
+	id,
+	subcategory,
+	promoted_at_homepage
+FROM tbl_product_categories
+WHERE category = ?
+ORDER BY subcategory ASC
+`
+
+type GetSubcategoriesByCategoryForAdminRow struct {
+	ID                 int64
+	Subcategory        sql.NullString
+	PromotedAtHomepage sql.NullBool
+}
+
+func (q *Queries) GetSubcategoriesByCategoryForAdmin(ctx context.Context, category sql.NullString) ([]GetSubcategoriesByCategoryForAdminRow, error) {
+	rows, err := q.db.QueryContext(ctx, getSubcategoriesByCategoryForAdmin, category)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetSubcategoriesByCategoryForAdminRow
+	for rows.Next() {
+		var i GetSubcategoriesByCategoryForAdminRow
+		if err := rows.Scan(&i.ID, &i.Subcategory, &i.PromotedAtHomepage); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
 	}
 	if err := rows.Close(); err != nil {
 		return nil, err

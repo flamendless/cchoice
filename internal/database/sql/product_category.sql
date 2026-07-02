@@ -28,13 +28,9 @@ LIMIT 1;
 -- name: CreateProductCategory :one
 INSERT INTO tbl_product_categories (
 	category,
-	subcategory,
-	created_at,
-	updated_at
+	subcategory
 ) VALUES (
-	?, ?,
-	datetime('now'),
-	datetime('now')
+	?, ?
 ) RETURNING *;
 
 -- name: GetProductsCategoriesByIDs :one
@@ -154,3 +150,40 @@ ORDER BY tbl_product_categories.category ASC
 LIMIT :limit
 OFFSET :offset
 ;
+
+-- name: CountDistinctCategoriesForAdmin :one
+SELECT COUNT(DISTINCT category) AS count
+FROM tbl_product_categories
+WHERE
+	category IS NOT NULL
+	AND category != ''
+	AND (@search IS NULL OR @search = '' OR LOWER(category) LIKE '%' || LOWER(@search) || '%');
+
+-- name: GetDistinctCategoriesForAdminPaginated :many
+SELECT
+	tbl_product_categories.category,
+	COUNT(DISTINCT tbl_product_categories.id) AS subcategories_count,
+	COUNT(DISTINCT tbl_products_categories.product_id) AS products_count
+FROM tbl_product_categories
+LEFT JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
+WHERE
+	tbl_product_categories.category IS NOT NULL
+	AND tbl_product_categories.category != ''
+	AND (@search IS NULL OR @search = '' OR LOWER(tbl_product_categories.category) LIKE '%' || LOWER(@search) || '%')
+GROUP BY tbl_product_categories.category
+ORDER BY tbl_product_categories.category ASC
+LIMIT @limit OFFSET @offset;
+
+-- name: GetSubcategoriesByCategoryForAdmin :many
+SELECT
+	id,
+	subcategory,
+	promoted_at_homepage
+FROM tbl_product_categories
+WHERE category = ?
+ORDER BY subcategory ASC;
+
+-- name: CategoryNameExists :one
+SELECT COUNT(*) > 0 AS category_exists
+FROM tbl_product_categories
+WHERE category = ?;

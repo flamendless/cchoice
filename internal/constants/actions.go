@@ -18,6 +18,7 @@ const (
 	ModuleAttendanceReportCSV  = "attendance_report_csv"
 	ModuleAttendanceReportXLSX = "attendance_report_xlsx"
 	ModuleBrands               = "brands"
+	ModuleCategories           = "categories"
 	ModuleCPoints              = "cpoints"
 	ModuleHolidays             = "holidays"
 	ModuleMemos                = "memos"
