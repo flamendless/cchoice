@@ -39,7 +39,7 @@ var staffCards = []models.StaffCard{
 
 	{Link: "/admin/exports", Title: "Exports", Description: "Export data", Icon: svg.Document("text-primary")},
 
-	{Link: "/admin/orders", Title: "Manage Orders", Description: "View and manage customer orders", Icon: svg.Cart("", "text-cchoice")},
+	{Link: "/admin/orders", Title: "Manage Orders", Description: "View and manage customer orders", Icon: svg.Cart("", "text-primary")},
 
 	{Link: "/admin/superuser/customers", Title: "Customers", Description: "View all registered customers", Icon: svg.Group("text-primary")},
 

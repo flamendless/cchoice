@@ -11,44 +11,129 @@ import (
 	"time"
 )
 
+const adminCountOrdersForListing = `-- name: AdminCountOrdersForListing :one
+SELECT COUNT(*) AS count
+FROM tbl_orders
+WHERE
+	(?1 IS NULL OR ?1 = '' OR LOWER(order_number) LIKE '%' || LOWER(?1) || '%')
+`
+
+func (q *Queries) AdminCountOrdersForListing(ctx context.Context, searchOrderRef interface{}) (int64, error) {
+	row := q.db.QueryRowContext(ctx, adminCountOrdersForListing, searchOrderRef)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const adminGetOrderDetailsByID = `-- name: AdminGetOrderDetailsByID :one
 SELECT
-	id,
-	order_number,
-	status,
-	customer_name,
-	customer_email,
-	customer_phone,
-	shipping_address_line1,
-	shipping_address_line2,
-	shipping_city,
-	shipping_state,
-	shipping_postal_code,
-	shipping_country,
-	paid_at,
-	created_at,
-	updated_at
-FROM tbl_orders
-WHERE id = ?
+	o.id,
+	o.order_number,
+	o.status,
+	o.customer_name,
+	o.customer_email,
+	o.customer_phone,
+	o.notes,
+	o.remarks,
+	o.created_at,
+	o.updated_at,
+	o.paid_at,
+	o.subtotal_amount,
+	o.shipping_amount,
+	o.discount_amount,
+	o.total_amount,
+	o.currency,
+	o.billing_address_line1,
+	o.billing_address_line2,
+	o.billing_city,
+	o.billing_state,
+	o.billing_postal_code,
+	o.billing_country,
+	o.billing_latitude,
+	o.billing_longitude,
+	o.billing_formatted_address,
+	o.billing_place_id,
+	o.shipping_address_line1,
+	o.shipping_address_line2,
+	o.shipping_city,
+	o.shipping_state,
+	o.shipping_postal_code,
+	o.shipping_country,
+	o.shipping_latitude,
+	o.shipping_longitude,
+	o.shipping_formatted_address,
+	o.shipping_place_id,
+	o.shipping_service,
+	o.shipping_order_id,
+	o.shipping_tracking_number,
+	o.shipping_eta,
+	p.gateway AS payment_gateway,
+	p.status AS payment_status,
+	p.description AS payment_description,
+	p.total_amount AS payment_total_amount,
+	p.reference_number AS payment_reference_number,
+	p.payment_method_type AS payment_method_type,
+	p.paid_at AS payment_paid_at,
+	p.metadata_remarks AS payment_metadata_remarks,
+	p.metadata_notes AS payment_metadata_notes,
+	p.metadata_customer_number AS payment_metadata_customer_number
+FROM tbl_orders o
+LEFT JOIN tbl_checkout_payments p ON p.id = o.checkout_payment_id
+WHERE o.id = ?
 LIMIT 1
 `
 
 type AdminGetOrderDetailsByIDRow struct {
-	ID                   int64
-	OrderNumber          string
-	Status               string
-	CustomerName         string
-	CustomerEmail        string
-	CustomerPhone        string
-	ShippingAddressLine1 string
-	ShippingAddressLine2 string
-	ShippingCity         string
-	ShippingState        string
-	ShippingPostalCode   string
-	ShippingCountry      string
-	PaidAt               sql.NullTime
-	CreatedAt            time.Time
-	UpdatedAt            time.Time
+	ID                            int64
+	OrderNumber                   string
+	Status                        string
+	CustomerName                  string
+	CustomerEmail                 string
+	CustomerPhone                 string
+	Notes                         sql.NullString
+	Remarks                       sql.NullString
+	CreatedAt                     time.Time
+	UpdatedAt                     time.Time
+	PaidAt                        sql.NullTime
+	SubtotalAmount                int64
+	ShippingAmount                int64
+	DiscountAmount                int64
+	TotalAmount                   int64
+	Currency                      string
+	BillingAddressLine1           string
+	BillingAddressLine2           string
+	BillingCity                   string
+	BillingState                  string
+	BillingPostalCode             string
+	BillingCountry                string
+	BillingLatitude               sql.NullString
+	BillingLongitude              sql.NullString
+	BillingFormattedAddress       sql.NullString
+	BillingPlaceID                sql.NullString
+	ShippingAddressLine1          string
+	ShippingAddressLine2          string
+	ShippingCity                  string
+	ShippingState                 string
+	ShippingPostalCode            string
+	ShippingCountry               string
+	ShippingLatitude              sql.NullString
+	ShippingLongitude             sql.NullString
+	ShippingFormattedAddress      sql.NullString
+	ShippingPlaceID               sql.NullString
+	ShippingService               sql.NullString
+	ShippingOrderID               sql.NullString
+	ShippingTrackingNumber        sql.NullString
+	ShippingEta                   sql.NullString
+	PaymentGateway                sql.NullString
+	PaymentStatus                 sql.NullString
+	PaymentDescription            sql.NullString
+	PaymentTotalAmount            sql.NullInt64
+	PaymentReferenceNumber        sql.NullString
+	PaymentMethodType             sql.NullString
+	PaymentPaidAt                 sql.NullTime
+	PaymentMetadataRemarks        sql.NullString
+	PaymentMetadataNotes          sql.NullString
+	PaymentMetadataCustomerNumber sql.NullString
 }
 
 func (q *Queries) AdminGetOrderDetailsByID(ctx context.Context, id int64) (AdminGetOrderDetailsByIDRow, error) {
@@ -61,20 +146,435 @@ func (q *Queries) AdminGetOrderDetailsByID(ctx context.Context, id int64) (Admin
 		&i.CustomerName,
 		&i.CustomerEmail,
 		&i.CustomerPhone,
+		&i.Notes,
+		&i.Remarks,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.PaidAt,
+		&i.SubtotalAmount,
+		&i.ShippingAmount,
+		&i.DiscountAmount,
+		&i.TotalAmount,
+		&i.Currency,
+		&i.BillingAddressLine1,
+		&i.BillingAddressLine2,
+		&i.BillingCity,
+		&i.BillingState,
+		&i.BillingPostalCode,
+		&i.BillingCountry,
+		&i.BillingLatitude,
+		&i.BillingLongitude,
+		&i.BillingFormattedAddress,
+		&i.BillingPlaceID,
 		&i.ShippingAddressLine1,
 		&i.ShippingAddressLine2,
 		&i.ShippingCity,
 		&i.ShippingState,
 		&i.ShippingPostalCode,
 		&i.ShippingCountry,
-		&i.PaidAt,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.ShippingLatitude,
+		&i.ShippingLongitude,
+		&i.ShippingFormattedAddress,
+		&i.ShippingPlaceID,
+		&i.ShippingService,
+		&i.ShippingOrderID,
+		&i.ShippingTrackingNumber,
+		&i.ShippingEta,
+		&i.PaymentGateway,
+		&i.PaymentStatus,
+		&i.PaymentDescription,
+		&i.PaymentTotalAmount,
+		&i.PaymentReferenceNumber,
+		&i.PaymentMethodType,
+		&i.PaymentPaidAt,
+		&i.PaymentMetadataRemarks,
+		&i.PaymentMetadataNotes,
+		&i.PaymentMetadataCustomerNumber,
 	)
 	return i, err
 }
 
-const adminGetOrdersForListing = `-- name: AdminGetOrdersForListing :many
+const adminGetOrderLinesByOrderID = `-- name: AdminGetOrderLinesByOrderID :many
+SELECT
+	tbl_order_lines.id,
+	tbl_order_lines.order_id,
+	tbl_order_lines.checkout_line_id,
+	tbl_order_lines.product_id,
+	tbl_order_lines.name,
+	tbl_order_lines.serial,
+	tbl_order_lines.unit_price,
+	tbl_order_lines.quantity,
+	tbl_order_lines.total_price,
+	tbl_order_lines.currency,
+	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
+FROM tbl_order_lines
+LEFT JOIN tbl_product_images ON tbl_product_images.id = (
+	SELECT tpi.id
+	FROM tbl_product_images tpi
+	WHERE tpi.product_id = tbl_order_lines.product_id
+	ORDER BY tpi.updated_at DESC
+	LIMIT 1
+)
+WHERE tbl_order_lines.order_id = ?
+ORDER BY tbl_order_lines.id ASC
+`
+
+type AdminGetOrderLinesByOrderIDRow struct {
+	ID              int64
+	OrderID         int64
+	CheckoutLineID  int64
+	ProductID       int64
+	Name            string
+	Serial          string
+	UnitPrice       int64
+	Quantity        int64
+	TotalPrice      int64
+	Currency        string
+	ThumbnailPath   string
+	CdnUrl          sql.NullString
+	CdnUrlThumbnail sql.NullString
+}
+
+func (q *Queries) AdminGetOrderLinesByOrderID(ctx context.Context, orderID int64) ([]AdminGetOrderLinesByOrderIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetOrderLinesByOrderID, orderID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetOrderLinesByOrderIDRow
+	for rows.Next() {
+		var i AdminGetOrderLinesByOrderIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderID,
+			&i.CheckoutLineID,
+			&i.ProductID,
+			&i.Name,
+			&i.Serial,
+			&i.UnitPrice,
+			&i.Quantity,
+			&i.TotalPrice,
+			&i.Currency,
+			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const adminGetOrdersForListingPaginatedCreatedAtAsc = `-- name: AdminGetOrdersForListingPaginatedCreatedAtAsc :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	updated_at
+FROM tbl_orders
+WHERE
+	(?1 IS NULL OR ?1 = '' OR LOWER(order_number) LIKE '%' || LOWER(?1) || '%')
+ORDER BY created_at ASC
+LIMIT ?3 OFFSET ?2
+`
+
+type AdminGetOrdersForListingPaginatedCreatedAtAscParams struct {
+	SearchOrderRef interface{}
+	Offset         int64
+	Limit          int64
+}
+
+type AdminGetOrdersForListingPaginatedCreatedAtAscRow struct {
+	ID          int64
+	OrderNumber string
+	Status      string
+	PaidAt      sql.NullTime
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+func (q *Queries) AdminGetOrdersForListingPaginatedCreatedAtAsc(ctx context.Context, arg AdminGetOrdersForListingPaginatedCreatedAtAscParams) ([]AdminGetOrdersForListingPaginatedCreatedAtAscRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetOrdersForListingPaginatedCreatedAtAsc, arg.SearchOrderRef, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetOrdersForListingPaginatedCreatedAtAscRow
+	for rows.Next() {
+		var i AdminGetOrdersForListingPaginatedCreatedAtAscRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderNumber,
+			&i.Status,
+			&i.PaidAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const adminGetOrdersForListingPaginatedCreatedAtDesc = `-- name: AdminGetOrdersForListingPaginatedCreatedAtDesc :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	updated_at
+FROM tbl_orders
+WHERE
+	(?1 IS NULL OR ?1 = '' OR LOWER(order_number) LIKE '%' || LOWER(?1) || '%')
+ORDER BY created_at DESC
+LIMIT ?3 OFFSET ?2
+`
+
+type AdminGetOrdersForListingPaginatedCreatedAtDescParams struct {
+	SearchOrderRef interface{}
+	Offset         int64
+	Limit          int64
+}
+
+type AdminGetOrdersForListingPaginatedCreatedAtDescRow struct {
+	ID          int64
+	OrderNumber string
+	Status      string
+	PaidAt      sql.NullTime
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+func (q *Queries) AdminGetOrdersForListingPaginatedCreatedAtDesc(ctx context.Context, arg AdminGetOrdersForListingPaginatedCreatedAtDescParams) ([]AdminGetOrdersForListingPaginatedCreatedAtDescRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetOrdersForListingPaginatedCreatedAtDesc, arg.SearchOrderRef, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetOrdersForListingPaginatedCreatedAtDescRow
+	for rows.Next() {
+		var i AdminGetOrdersForListingPaginatedCreatedAtDescRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderNumber,
+			&i.Status,
+			&i.PaidAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const adminGetOrdersForListingPaginatedStatusAsc = `-- name: AdminGetOrdersForListingPaginatedStatusAsc :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	updated_at
+FROM tbl_orders
+WHERE
+	(?1 IS NULL OR ?1 = '' OR LOWER(order_number) LIKE '%' || LOWER(?1) || '%')
+ORDER BY status ASC
+LIMIT ?3 OFFSET ?2
+`
+
+type AdminGetOrdersForListingPaginatedStatusAscParams struct {
+	SearchOrderRef interface{}
+	Offset         int64
+	Limit          int64
+}
+
+type AdminGetOrdersForListingPaginatedStatusAscRow struct {
+	ID          int64
+	OrderNumber string
+	Status      string
+	PaidAt      sql.NullTime
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+func (q *Queries) AdminGetOrdersForListingPaginatedStatusAsc(ctx context.Context, arg AdminGetOrdersForListingPaginatedStatusAscParams) ([]AdminGetOrdersForListingPaginatedStatusAscRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetOrdersForListingPaginatedStatusAsc, arg.SearchOrderRef, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetOrdersForListingPaginatedStatusAscRow
+	for rows.Next() {
+		var i AdminGetOrdersForListingPaginatedStatusAscRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderNumber,
+			&i.Status,
+			&i.PaidAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const adminGetOrdersForListingPaginatedStatusDesc = `-- name: AdminGetOrdersForListingPaginatedStatusDesc :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	updated_at
+FROM tbl_orders
+WHERE
+	(?1 IS NULL OR ?1 = '' OR LOWER(order_number) LIKE '%' || LOWER(?1) || '%')
+ORDER BY status DESC
+LIMIT ?3 OFFSET ?2
+`
+
+type AdminGetOrdersForListingPaginatedStatusDescParams struct {
+	SearchOrderRef interface{}
+	Offset         int64
+	Limit          int64
+}
+
+type AdminGetOrdersForListingPaginatedStatusDescRow struct {
+	ID          int64
+	OrderNumber string
+	Status      string
+	PaidAt      sql.NullTime
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+func (q *Queries) AdminGetOrdersForListingPaginatedStatusDesc(ctx context.Context, arg AdminGetOrdersForListingPaginatedStatusDescParams) ([]AdminGetOrdersForListingPaginatedStatusDescRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetOrdersForListingPaginatedStatusDesc, arg.SearchOrderRef, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetOrdersForListingPaginatedStatusDescRow
+	for rows.Next() {
+		var i AdminGetOrdersForListingPaginatedStatusDescRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderNumber,
+			&i.Status,
+			&i.PaidAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const adminGetOrdersForListingPaginatedUpdatedAtAsc = `-- name: AdminGetOrdersForListingPaginatedUpdatedAtAsc :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	updated_at
+FROM tbl_orders
+WHERE
+	(?1 IS NULL OR ?1 = '' OR LOWER(order_number) LIKE '%' || LOWER(?1) || '%')
+ORDER BY updated_at ASC
+LIMIT ?3 OFFSET ?2
+`
+
+type AdminGetOrdersForListingPaginatedUpdatedAtAscParams struct {
+	SearchOrderRef interface{}
+	Offset         int64
+	Limit          int64
+}
+
+type AdminGetOrdersForListingPaginatedUpdatedAtAscRow struct {
+	ID          int64
+	OrderNumber string
+	Status      string
+	PaidAt      sql.NullTime
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+func (q *Queries) AdminGetOrdersForListingPaginatedUpdatedAtAsc(ctx context.Context, arg AdminGetOrdersForListingPaginatedUpdatedAtAscParams) ([]AdminGetOrdersForListingPaginatedUpdatedAtAscRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetOrdersForListingPaginatedUpdatedAtAsc, arg.SearchOrderRef, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetOrdersForListingPaginatedUpdatedAtAscRow
+	for rows.Next() {
+		var i AdminGetOrdersForListingPaginatedUpdatedAtAscRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderNumber,
+			&i.Status,
+			&i.PaidAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const adminGetOrdersForListingPaginatedUpdatedAtDesc = `-- name: AdminGetOrdersForListingPaginatedUpdatedAtDesc :many
 SELECT
 	id,
 	order_number,
@@ -86,9 +586,16 @@ FROM tbl_orders
 WHERE
 	(?1 IS NULL OR ?1 = '' OR LOWER(order_number) LIKE '%' || LOWER(?1) || '%')
 ORDER BY updated_at DESC
+LIMIT ?3 OFFSET ?2
 `
 
-type AdminGetOrdersForListingRow struct {
+type AdminGetOrdersForListingPaginatedUpdatedAtDescParams struct {
+	SearchOrderRef interface{}
+	Offset         int64
+	Limit          int64
+}
+
+type AdminGetOrdersForListingPaginatedUpdatedAtDescRow struct {
 	ID          int64
 	OrderNumber string
 	Status      string
@@ -97,15 +604,15 @@ type AdminGetOrdersForListingRow struct {
 	UpdatedAt   time.Time
 }
 
-func (q *Queries) AdminGetOrdersForListing(ctx context.Context, searchOrderRef interface{}) ([]AdminGetOrdersForListingRow, error) {
-	rows, err := q.db.QueryContext(ctx, adminGetOrdersForListing, searchOrderRef)
+func (q *Queries) AdminGetOrdersForListingPaginatedUpdatedAtDesc(ctx context.Context, arg AdminGetOrdersForListingPaginatedUpdatedAtDescParams) ([]AdminGetOrdersForListingPaginatedUpdatedAtDescRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetOrdersForListingPaginatedUpdatedAtDesc, arg.SearchOrderRef, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []AdminGetOrdersForListingRow
+	var items []AdminGetOrdersForListingPaginatedUpdatedAtDescRow
 	for rows.Next() {
-		var i AdminGetOrdersForListingRow
+		var i AdminGetOrdersForListingPaginatedUpdatedAtDescRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.OrderNumber,

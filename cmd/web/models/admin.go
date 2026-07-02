@@ -83,22 +83,73 @@ type AdminOrderListItem struct {
 }
 
 type AdminOrderLineItem struct {
-	Name        string
-	Serial      string
-	Description string
-	UnitPrice   string
-	Quantity    int64
-	TotalPrice  string
+	ThumbnailURL string
+	Name         string
+	Serial       string
+	UnitPrice    string
+	Quantity     int64
+	TotalPrice   string
 }
 
 type AdminOrderCustomerInfo struct {
-	Name    string
-	Email   string
-	Phone   string
-	Address string
+	Name  string
+	Email string
+	Phone string
+}
+
+type AdminOrderInfo struct {
+	OrderReference string
+	Status         enums.OrderStatus
+	Notes          string
+	Remarks        string
+	CreatedAt      string
+	UpdatedAt      string
+}
+
+type AdminOrderPaymentInfo struct {
+	Gateway         string
+	Status          string
+	ReferenceNumber string
+	PaymentMethod   string
+	TotalAmount     string
+	PaidAt          string
+	Description     string
+	MetadataNotes   string
+	MetadataRemarks string
+	CustomerNumber  string
+}
+
+type AdminOrderAddressInfo struct {
+	Line1            string
+	Line2            string
+	City             string
+	State            string
+	PostalCode       string
+	Country          string
+	FormattedAddress string
+}
+
+type AdminOrderShippingInfo struct {
+	AdminOrderAddressInfo
+	Service        string
+	OrderID        string
+	TrackingNumber string
+	ETA            string
+}
+
+type AdminOrderAmountSummary struct {
+	Subtotal string
+	Shipping string
+	Discount string
+	Total    string
 }
 
 type AdminOrderDetails struct {
+	Order    AdminOrderInfo
+	Payment  AdminOrderPaymentInfo
+	Shipping AdminOrderShippingInfo
+	Billing  AdminOrderAddressInfo
 	Customer AdminOrderCustomerInfo
+	Summary  AdminOrderAmountSummary
 	Lines    []AdminOrderLineItem
 }
