@@ -17,7 +17,7 @@ templ AdminOrdersListPage() {
 			@common.TabTitle("Orders - C-Choice Admin")
 		</head>
 		<body
-			class="bg-cchoicesoft min-h-screen flex flex-col"
+			class="bg-surface min-h-screen flex flex-col"
 			_="init call metrics_event('admin_visit', 'orders list')"
 		>
 			@common.DevRibbon()
@@ -27,7 +27,7 @@ templ AdminOrdersListPage() {
 				<div class="max-w-8xl mx-auto">
 					<div class="bg-white rounded-lg shadow-md p-6">
 						@header.AdminStaffHeaderWithBack()
-						<h1 class="text-2xl font-bold text-center text-cchoice mb-6">
+						<h1 class="text-2xl font-bold text-center text-primary mb-6">
 							Manage Orders
 						</h1>
 						@OrdersListSection()
@@ -58,7 +58,7 @@ templ OrdersSearchToolbar(url string) {
 				type="text"
 				name="search_order_ref"
 				placeholder="Search by order reference..."
-				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change, search_order_ref delay:300ms"
 				hx-target="#orders-table"
@@ -66,7 +66,7 @@ templ OrdersSearchToolbar(url string) {
 			/>
 			<select
 				name="sort_by"
-				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change"
 				hx-target="#orders-table"
@@ -78,7 +78,7 @@ templ OrdersSearchToolbar(url string) {
 			</select>
 			<select
 				name="sort_dir"
-				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-cchoice focus:border-cchoice"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change"
 				hx-target="#orders-table"
@@ -88,6 +88,16 @@ templ OrdersSearchToolbar(url string) {
 				<option value="ASC">Sort: Ascending</option>
 			</select>
 		</div>
+	</div>
+}
+
+templ AdminOrdersTableContent(orders []models.AdminOrderListItem, p models.TablePagination) {
+	<div id="orders-table-content">
+		<div id="orders-pagination-top" hx-swap-oob="true">
+			@TablePaginationBar(p)
+		</div>
+		@AdminOrdersListTable(orders)
+		@TablePaginationBar(p)
 	</div>
 }
 
@@ -127,7 +137,7 @@ templ OrderTableRow(order models.AdminOrderListItem) {
 		<td class="px-4 py-4 whitespace-nowrap text-sm">
 			<button
 				type="button"
-				class="px-2 py-1 text-cchoice hover:bg-cchoicesoft rounded"
+				class="px-2 py-1 text-primary hover:bg-surface rounded"
 				hx-get={ utils.URLf("/admin/orders/%s/details", order.ID) }
 				hx-target={ "#order-details-cell-" + order.ID }
 				hx-swap="innerHTML"
@@ -184,22 +194,63 @@ templ OrderIsPaid(isPaid bool) {
 templ OrderDetailsRows(details models.AdminOrderDetails) {
 	<div class="pl-8 pr-4 py-2 space-y-4">
 		<div>
-			<h3 class="text-sm font-semibold text-gray-700 mb-2">Customer Info</h3>
+			<h3 class="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Customer Info</h3>
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-900">
 				<div><span class="font-medium text-gray-600">Name:</span> { details.Customer.Name }</div>
 				<div><span class="font-medium text-gray-600">Email:</span> { details.Customer.Email }</div>
 				<div><span class="font-medium text-gray-600">Phone:</span> { details.Customer.Phone }</div>
-				<div class="sm:col-span-2"><span class="font-medium text-gray-600">Address:</span> { details.Customer.Address }</div>
 			</div>
 		</div>
-		<div>
-			<h3 class="text-sm font-semibold text-gray-700 mb-2">Order Lines</h3>
+		<div class="border-t border-gray-200 pt-4">
+			<h3 class="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Order Details</h3>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-900">
+				<div><span class="font-medium text-gray-600">Order Reference:</span> { details.Order.OrderReference }</div>
+				<div class="flex items-center gap-1 flex-wrap">
+					<span class="font-medium text-gray-600">Status:</span>
+					@OrderStatus(details.Order.Status)
+				</div>
+				<div><span class="font-medium text-gray-600">Notes:</span> { details.Order.Notes }</div>
+				<div><span class="font-medium text-gray-600">Remarks:</span> { details.Order.Remarks }</div>
+				<div><span class="font-medium text-gray-600">Created At:</span> { details.Order.CreatedAt }</div>
+				<div><span class="font-medium text-gray-600">Updated At:</span> { details.Order.UpdatedAt }</div>
+			</div>
+		</div>
+		<div class="border-t border-gray-200 pt-4">
+			<h3 class="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Payment Details</h3>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-900">
+				<div><span class="font-medium text-gray-600">Gateway:</span> { details.Payment.Gateway }</div>
+				<div><span class="font-medium text-gray-600">Status:</span> { details.Payment.Status }</div>
+				<div><span class="font-medium text-gray-600">Reference Number:</span> { details.Payment.ReferenceNumber }</div>
+				<div><span class="font-medium text-gray-600">Payment Method:</span> { details.Payment.PaymentMethod }</div>
+				<div><span class="font-medium text-gray-600">Total Amount:</span> { details.Payment.TotalAmount }</div>
+				<div><span class="font-medium text-gray-600">Paid At:</span> { details.Payment.PaidAt }</div>
+				<div class="sm:col-span-2"><span class="font-medium text-gray-600">Description:</span> { details.Payment.Description }</div>
+				<div><span class="font-medium text-gray-600">Metadata Notes:</span> { details.Payment.MetadataNotes }</div>
+				<div><span class="font-medium text-gray-600">Metadata Remarks:</span> { details.Payment.MetadataRemarks }</div>
+				<div><span class="font-medium text-gray-600">Customer Number:</span> { details.Payment.CustomerNumber }</div>
+			</div>
+		</div>
+		<div class="border-t border-gray-200 pt-4">
+			<h3 class="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Shipping Details</h3>
+			@OrderAddressFields(details.Shipping.AdminOrderAddressInfo)
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-900 mt-2">
+				<div><span class="font-medium text-gray-600">Service:</span> { details.Shipping.Service }</div>
+				<div><span class="font-medium text-gray-600">Shipping Order ID:</span> { details.Shipping.OrderID }</div>
+				<div><span class="font-medium text-gray-600">Tracking Number:</span> { details.Shipping.TrackingNumber }</div>
+				<div><span class="font-medium text-gray-600">ETA:</span> { details.Shipping.ETA }</div>
+			</div>
+		</div>
+		<div class="border-t border-gray-200 pt-4">
+			<h3 class="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Billing Details</h3>
+			@OrderAddressFields(details.Billing)
+		</div>
+		<div class="border-t border-gray-200 pt-4">
+			<h3 class="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Order Lines</h3>
 			<table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-md">
 				<thead class="bg-gray-100">
 					<tr>
 						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
 						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Serial</th>
-						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
 						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Unit Price</th>
 						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
 						<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
@@ -208,14 +259,22 @@ templ OrderDetailsRows(details models.AdminOrderDetails) {
 				<tbody class="divide-y divide-gray-200">
 					if len(details.Lines) == 0 {
 						<tr>
-							<td colspan="6" class="px-4 py-3 text-center text-sm text-gray-500">No order lines.</td>
+							<td colspan="5" class="px-4 py-3 text-center text-sm text-gray-500">No order lines.</td>
 						</tr>
 					} else {
 						for _, line := range details.Lines {
 							<tr>
-								<td class="px-4 py-2 text-sm text-gray-900">{ line.Name }</td>
+								<td class="px-4 py-2 text-sm text-gray-900">
+									<div class="flex items-center gap-3">
+										<img
+											src={ line.ThumbnailURL }
+											alt={ line.Name + " thumbnail" }
+											class="w-12 h-12 object-contain rounded shrink-0"
+										/>
+										<span>{ line.Name }</span>
+									</div>
+								</td>
 								<td class="px-4 py-2 text-sm text-gray-900">{ line.Serial }</td>
-								<td class="px-4 py-2 text-sm text-gray-900">{ line.Description }</td>
 								<td class="px-4 py-2 text-sm text-gray-900">{ line.UnitPrice }</td>
 								<td class="px-4 py-2 text-sm text-gray-900">{ fmt.Sprintf("%d", line.Quantity) }</td>
 								<td class="px-4 py-2 text-sm text-gray-900">{ line.TotalPrice }</td>
@@ -223,7 +282,36 @@ templ OrderDetailsRows(details models.AdminOrderDetails) {
 						}
 					}
 				</tbody>
+				<tfoot class="bg-gray-50">
+					<tr>
+						<td colspan="4" class="px-4 py-2 text-sm font-medium text-gray-600 text-right">Subtotal</td>
+						<td class="px-4 py-2 text-sm text-gray-900">{ details.Summary.Subtotal }</td>
+					</tr>
+					<tr>
+						<td colspan="4" class="px-4 py-2 text-sm font-medium text-gray-600 text-right">Shipping Amount</td>
+						<td class="px-4 py-2 text-sm text-gray-900">{ details.Summary.Shipping }</td>
+					</tr>
+					<tr>
+						<td colspan="4" class="px-4 py-2 text-sm font-medium text-gray-600 text-right">Discount Amount</td>
+						<td class="px-4 py-2 text-sm text-gray-900">{ details.Summary.Discount }</td>
+					</tr>
+					<tr>
+						<td colspan="4" class="px-4 py-2 text-sm font-semibold text-gray-700 text-right">Total</td>
+						<td class="px-4 py-2 text-sm font-semibold text-gray-900">{ details.Summary.Total }</td>
+					</tr>
+				</tfoot>
 			</table>
 		</div>
+	</div>
+}
+
+templ OrderAddressFields(address models.AdminOrderAddressInfo) {
+	<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-900">
+		<div><span class="font-medium text-gray-600">Address Line 1:</span> { address.Line1 }</div>
+		<div><span class="font-medium text-gray-600">Address Line 2:</span> { address.Line2 }</div>
+		<div><span class="font-medium text-gray-600">City:</span> { address.City }</div>
+		<div><span class="font-medium text-gray-600">State:</span> { address.State }</div>
+		<div><span class="font-medium text-gray-600">Postal Code:</span> { address.PostalCode }</div>
+		<div><span class="font-medium text-gray-600">Country:</span> { address.Country }</div>
 	</div>
 }

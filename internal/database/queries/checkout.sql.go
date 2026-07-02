@@ -290,6 +290,7 @@ SELECT
 	tbl_checkout_lines.product_id,
 	tbl_checkout_lines.quantity,
 	tbl_products.name as name,
+	tbl_products.serial as serial,
 	tbl_products.description as description,
 	tbl_products.unit_price_with_vat,
 	tbl_products.unit_price_with_vat_currency,
@@ -329,6 +330,7 @@ type GetCheckoutLinesByCheckoutIDRow struct {
 	ProductID                int64
 	Quantity                 int64
 	Name                     string
+	Serial                   string
 	Description              sql.NullString
 	UnitPriceWithVat         int64
 	UnitPriceWithVatCurrency string
@@ -360,6 +362,7 @@ func (q *Queries) GetCheckoutLinesByCheckoutID(ctx context.Context, checkoutID i
 			&i.ProductID,
 			&i.Quantity,
 			&i.Name,
+			&i.Serial,
 			&i.Description,
 			&i.UnitPriceWithVat,
 			&i.UnitPriceWithVatCurrency,

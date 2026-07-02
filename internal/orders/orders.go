@@ -252,7 +252,7 @@ func CreateOrderFromCheckout(
 			CheckoutLineID: checkoutLine.ID,
 			ProductID:      checkoutLine.ProductID,
 			Name:           checkoutLine.Name,
-			Serial:         "", // TODO: Get serial from product if needed
+			Serial:         checkoutLine.Serial,
 			Description:    checkoutLine.Description.String,
 			UnitPrice:      unitPrice.Amount(),
 			Quantity:       checkoutLine.Quantity,
