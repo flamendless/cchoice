@@ -4,11 +4,12 @@ tmp_dir = "tmp"
 
 [env]
   APP_ENV = "web"
+  TEMPL_DEV_MODE = "true"
 
 [build]
   args_bin = [""]
-  bin = ""
-  cmd = "mage buildweb"
+  entrypoint = ["./tmp/web"]
+  cmd = "mage buildwebfast"
   delay = 300
   exclude_dir = [
     "cmd/web/static/images",
@@ -16,13 +17,13 @@ tmp_dir = "tmp"
     "cmd/web/static/svg",
     "cmd/goose",
     "internal/receipt",
+    "tmp",
   ]
   exclude_file = []
   exclude_regex = [".*_templ.go", ".*.sql.go", ".*_test.go"]
-  exclude_unchanged = false
+  exclude_unchanged = true
   follow_symlink = false
-  full_bin = "APP_ENV='web' ./tmp/web"
-  include_dir = ["cmd/web/components/admin"]
+  include_dir = ["cmd/web/components"]
   include_ext = ["templ", "html", "css", "js"]
   include_file = []
   kill_delay = "500ms"

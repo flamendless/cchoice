@@ -198,6 +198,10 @@ func Build() error {
 	if err := GenAll(); err != nil {
 		return err
 	}
+	return BuildFast()
+}
+
+func BuildFast() error {
 	return run(Command{
 		Type: CmdGoBuild,
 		Out:  filepath.Join(tmpDir, "main"),
@@ -209,6 +213,10 @@ func BuildWeb() error {
 	if err := GenAll(); err != nil {
 		return err
 	}
+	return BuildWebFast()
+}
+
+func BuildWebFast() error {
 	return run(Command{
 		Type: CmdGoBuild,
 		Out:  filepath.Join(tmpDir, "web"),
@@ -223,7 +231,7 @@ func serve(
 	if err := checkMigrations(); err != nil {
 		return err
 	}
-	if err := GenAll(); err != nil {
+	if err := GenServe(); err != nil {
 		return err
 	}
 
@@ -249,6 +257,17 @@ func serve(
 		"--path=cmd/web/components",
 	)
 	if err := runBackground(templCmd); err != nil {
+		return err
+	}
+
+	tailwindCmd := exec.Command(
+		"./tailwindcss",
+		"-m",
+		"-i", "./cmd/web/static/css/main.css",
+		"-o", "./cmd/web/static/css/tailwind.css",
+		"--watch",
+	)
+	if err := runBackground(tailwindCmd); err != nil {
 		return err
 	}
 
@@ -628,23 +647,15 @@ func GenTempl() error {
 	}})
 }
 
-func GenAll() error {
+func GenServe() error {
 	if err := run(Command{Type: CmdExec, Cmd: "go", Args: []string{"generate", "./..."}}); err != nil {
 		return err
 	}
-	// Run genversion from internal/conf directory so it writes version_gen.go in the correct location
-	originalDir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	if err := os.Chdir("internal/conf"); err != nil {
-		return err
-	}
-	if err := run(Command{Type: CmdExec, Cmd: "go", Args: []string{"run", "../../cmd/genversion/genversion.go"}}); err != nil {
-		_ = os.Chdir(originalDir)
-		return err
-	}
-	if err := os.Chdir(originalDir); err != nil {
+	return GenSQL()
+}
+
+func GenAll() error {
+	if err := run(Command{Type: CmdExec, Cmd: "go", Args: []string{"generate", "./..."}}); err != nil {
 		return err
 	}
 	if err := GenSQL(); err != nil {

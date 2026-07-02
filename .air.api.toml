@@ -2,10 +2,13 @@ root = "."
 testdata_dir = "testdata"
 tmp_dir = "tmp"
 
+[env]
+  TEMPL_DEV_MODE = "true"
+
 [build]
   args_bin = []
-  bin = "./tmp/main"
-  cmd = "mage build"
+  entrypoint = ["./tmp/main"]
+  cmd = "mage buildfast"
   delay = 300
   exclude_dir = [
     "internal/database/queries",
@@ -14,12 +17,12 @@ tmp_dir = "tmp"
     "cmd/web/static/svg",
     "cmd/goose",
     "internal/receipt",
+    "tmp",
   ]
   exclude_file = ["internal/conf/version_gen.go"]
   exclude_regex = [".*_test.go", ".*.sql.go", ".*_templ.go", ".*_string.go"]
   exclude_unchanged = true
   follow_symlink = false
-  full_bin = ""
   include_dir = ["cmd/web", "internal"]
   include_ext = ["tpl", "tmpl", "templ", "html", "js", "css", "go"]
   include_file = []
