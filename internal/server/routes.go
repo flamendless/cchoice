@@ -162,6 +162,7 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 	r.NotFound(s.notPageHandler)
 	r.Get("/terms", s.termsHandler)
 	r.Get("/privacy", s.privacyHandler)
+	r.Get("/tech", s.techHandler)
 	r.Get("/maintenance", s.maintenancePageHandler)
 	r.Get("/changelogs", s.changelogsHandler)
 	r.Get("/platforms", s.platformsPageHandler)
@@ -592,6 +593,10 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 			URL:   utils.URL("/"),
 		},
 		{
+			Label: "Tech",
+			URL:   utils.URL("/tech"),
+		},
+		{
 			Label: "Admin",
 			URL:   utils.URL("/admin"),
 		},
@@ -830,6 +835,16 @@ func (s *Server) privacyHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Privacy Handler]"
 	ctx := r.Context()
 	if err := components.PrivacyPage().Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (s *Server) techHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Tech Handler]"
+	ctx := r.Context()
+	if err := components.TechPage().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
