@@ -593,12 +593,13 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 			URL:   utils.URL("/"),
 		},
 		{
-			Label: "Tech",
-			URL:   utils.URL("/tech"),
-		},
-		{
 			Label: "Admin",
 			URL:   utils.URL("/admin"),
+		},
+		{
+			Label:    "Tech",
+			URL:      utils.URL("/tech"),
+			Hideable: true,
 		},
 		{
 			Label:    "About Us",
@@ -611,39 +612,27 @@ func (s *Server) footerTextsHandler(w http.ResponseWriter, r *http.Request) {
 			Hideable: true,
 		},
 		{
-			Label: "Partners",
-			URL:   utils.URL("#partners"),
+			Label:    "Physical Store",
+			URL:      utils.URL("#store"),
+			Hideable: true,
 		},
 		{
-			Label: "Call Us",
-			URL:   constants.ViberURIPrefix + cfg.Settings.MobileNo,
+			Label:    "Partners",
+			URL:      utils.URL("#partners"),
+			Hideable: true,
+		},
+		{
+			Label:    "Call Us",
+			URL:      constants.ViberURIPrefix + cfg.Settings.MobileNo,
+			Hideable: true,
 		},
 		{
 			Label: "E-Mail Us",
 			URL:   "mailto:" + cfg.Settings.EMail,
 		},
 		{
-			Label: "GMaps",
-			URL:   cfg.Settings.URLGMap,
-		},
-		{
-			Label: "Waze",
-			URL:   cfg.Settings.URLWaze,
-		},
-		{
-			Label:    "Store",
-			URL:      utils.URL("#store"),
-			Hideable: true,
-		},
-		{
-			Label:    "Facebook",
-			URL:      cfg.Settings.URLFacebook,
-			Hideable: true,
-		},
-		{
-			Label:    "TikTok",
-			URL:      cfg.Settings.URLTikTok,
-			Hideable: true,
+			Label: "Other Platforms",
+			URL:   utils.URL("/platforms"),
 		},
 	}
 

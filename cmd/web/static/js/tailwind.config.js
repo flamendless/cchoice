@@ -31,6 +31,7 @@ module.exports = {
   safelist: [
     "bg-primary-emphasis",
     "bg-primary-muted",
+    "max-lg:hidden",
   ],
   plugins: [],
 }
