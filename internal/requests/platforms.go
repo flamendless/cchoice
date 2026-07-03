@@ -32,6 +32,7 @@ var platformKeys = []string{
 	"url_facebook",
 	// "url_shopee",
 	"url_tiktok",
+	"url_lazada",
 	// "url_youtube",
 	"url_gmap",
 	"url_waze",
@@ -67,6 +68,11 @@ var platformLabels = map[string]platformData{
 		Label: "TIKTOK",
 		Icon:  svg.TikTok("size-10"),
 		Order: 5,
+	},
+	"url_lazada": platformData{
+		Label: "LAZADA",
+		Icon:  svg.Lazada("size-10"),
+		Order: 6,
 	},
 	// "url_youtube": platformData{
 	// 	Label: "YOUTUBE",

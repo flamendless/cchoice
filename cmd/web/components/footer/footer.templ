@@ -6,22 +6,43 @@ import "cchoice/internal/utils"
 templ FooterRow1Texts(texts []models.FooterRowText) {
 	<div
 		id="footer-row1-texts"
-		class="flex flex-row flex-wrap text-xs"
+		class="flex flex-row flex-wrap items-center text-xs"
 	>
 		for i, hrt := range texts {
-			<a
-				href={ templ.SafeURL(hrt.URL) }
-				class="
-					font-light mx-1 text-nowrap cursor-pointer
-					hover:underline hover:bg-surface transition-colors
-				"
-			>
-				{ hrt.Label }
-			</a>
-			if i < len(texts)-1 {
-				<p class="font-normal mx-1">
-					|
-				</p>
+			if hrt.Hideable {
+				<span class="inline-flex items-center max-lg:hidden">
+					<a
+						href={ templ.SafeURL(hrt.URL) }
+						class="
+							font-light mx-1 text-nowrap cursor-pointer
+							hover:underline hover:bg-surface transition-colors
+						"
+					>
+						{ hrt.Label }
+					</a>
+					if i < len(texts)-1 {
+						<span class="font-normal mx-1">
+							|
+						</span>
+					}
+				</span>
+			} else {
+				<span class="inline-flex items-center">
+					<a
+						href={ templ.SafeURL(hrt.URL) }
+						class="
+							font-light mx-1 text-nowrap cursor-pointer
+							hover:underline hover:bg-surface transition-colors
+						"
+					>
+						{ hrt.Label }
+					</a>
+					if i < len(texts)-1 {
+						<span class="font-normal mx-1">
+							|
+						</span>
+					}
+				</span>
 			}
 		}
 	</div>
@@ -43,7 +64,22 @@ templ Footer() {
 				@FooterRow1Texts(nil)
 			</div>
 			<div class="self-end">
-				<p class="px-2 font-light text-xs text-wrap">
+				<p class="px-2 font-light text-xs lg:hidden">
+					<a
+						class="text-primary underline underline-offset-2"
+						href={ utils.URL("/terms") }
+					>
+						Terms
+					</a>
+					<span class="mx-1">·</span>
+					<a
+						class="text-primary underline underline-offset-2"
+						href={ utils.URL("/privacy") }
+					>
+						Privacy
+					</a>
+				</p>
+				<p class="px-2 font-light text-xs text-wrap hidden lg:block">
 					By using this website, you agree to our
 					<a
 						class="text-primary underline underline-offset-2"
