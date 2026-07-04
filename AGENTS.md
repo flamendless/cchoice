@@ -323,3 +323,28 @@ For `.env` setup, copy `.env.sample` to `.env` and fill in values.
 ---
 
 DO NOT RUN `mage sc` and `mage scf` and `mage dbup` and `mage dbdown`
+
+---
+
+## Cursor Cloud specific instructions
+
+Dependencies (Go tools, `mage`, `goose`, tailwind) are refreshed automatically by the startup update script; system libs (`libvips-dev`, `libmagickwand-dev`, `openslide-tools`, `libxml2-dev`, `libjxl-dev`, `libsqlite3-dev`, `pkg-config`) are baked into the VM snapshot. `mage` lives at `$(go env GOPATH)/bin` (`~/go/bin`), which is on `PATH` in login shells.
+
+### Running the storefront without external secrets (WEB mode)
+- Run in **WEB mode** to exercise the storefront/admin UI without PayMongo/Lalamove/Google Maps/Maileroo credentials. In `LOCAL`/`api` mode those services are `env-required` and the server **panics on boot** (e.g. `[GMAPS]: API key is required`).
+- WEB mode is selected by `APP_ENV` in `.env`. Note: `.air.web.toml` sets `APP_ENV=web`, but `godotenv/autoload` reading `.env` wins, so the value in `.env` is authoritative — set `APP_ENV="web"` there.
+- `.env` also requires (validated even with `USESSL=0`): non-empty `CERTPATH`/`KEYPATH` (dummy paths are fine when `USESSL=0` since certs load only when SSL is on) and **all** `BUSINESS_*` fields non-empty, else boot panics.
+- The app auto-loads `.env` (via `godotenv/autoload`); `goose` also auto-loads `.env`.
+
+### Reliable run vs. hot reload
+- `mage serveweb` starts `templ generate --watch` + tailwind watch + air. On startup the templ watcher rewrites all `*_templ.go` files and **races** air's first build, causing transient `expected 'package', found 'EOF'` failures (large files like `tracked_links_templ.go`). It sometimes recovers on the next file change.
+- For a reliable run, build and run the binary directly: `go build -tags="fts5 staticfs" -o ./tmp/web . && APP_ENV=web ./tmp/web web`. The storefront serves on **http://localhost:2626/cchoice** (port 2626; the `7331` proxy only exists under the templ watcher).
+- The app panics with `open sink "logs/app.log"` if `./logs` is missing. `mage setup` has an early-return that skips creating `logs/` when it also had to create `.env` on the same run — the update script does `mkdir -p logs` to cover this.
+
+### Database & seed data
+- SQLite `test.db`. Apply migrations with the goose binary: `GOOSE_DRIVER=sqlite3 GOOSE_DBSTRING="file:./test.db" GOOSE_MIGRATION_DIR="./migrations/sqlite3" ./tmp/goose up` (per repo policy, migrations are applied manually, never via `mage dbup`).
+- Seed products from the bundled spreadsheet: `go run -tags="fts5 staticfs" ./main.go parse_products -p assets/xlsx/bosch.xlsx -s DATABASE -t BOSCH --use_db --db_path file:./test.db --verify_prices=1 --panic_on_error=1 --images_basepath=./cmd/web/static/images/product_images/bosch/original/ --images_format=webp` (or `mage cleandb`, which also resets the DB).
+- Seed caveats (data, not environment): `parse_products` inserts products with **empty `slug`**, so `/product/{slug}` links 404 (slugs are only generated when products are created via the admin `ProductService`). Product images are referenced as `.webp` but the repo ships `.png` originals, so product/cart thumbnails are blank until `mage genimages` converts them.
+
+### Routes
+- The storefront product catalog is at `/cchoice/` (products lazy-load via HTMX from `/cchoice/product-categories/...`). There is no `/cchoice/shop` route.
