@@ -196,13 +196,21 @@ func (s *StaffLogsService) enrichReference(ctx context.Context, log *models.Staf
 	if decoded == encode.INVALID {
 		return
 	}
-	slug, err := s.dbRO.GetQueries().GetProductSlugByID(ctx, decoded)
-	if err != nil || !slug.Valid || slug.String == "" {
+	product, err := s.dbRO.GetQueries().GetProductSlugByID(ctx, decoded)
+	if err != nil {
 		return
 	}
-	ref := utils.BuildStaffLogReference(log.Module, log.Action, slug.String)
+	slug := ""
+	if product.Slug.Valid {
+		slug = product.Slug.String
+	}
+	ref := utils.BuildStaffLogProductReference(slug, product.Serial, product.Status)
+	if ref.Label == "" {
+		return
+	}
 	log.ReferenceLabel = ref.Label
 	log.ReferenceURL = ref.URL
+	log.ReferenceNewTab = ref.NewTab
 }
 
 func (s *StaffLogsService) ID() string {

@@ -201,14 +201,23 @@ templ AdminSuperuserLogsTable(logs []models.StaffLog) {
 }
 
 templ ReferenceCell(log models.StaffLog) {
-	if log.ReferenceURL != "" {
-		<a
-			href={ log.ReferenceURL }
-			target="_blank"
-			class="bg-primary text-white px-2 py-1 rounded-lg font-semibold hover:bg-primary-dark transition-colors cursor-pointer"
-		>
-			{ log.ReferenceLabel }
-		</a>
+	if log.ReferenceLabel != "" {
+		if log.ReferenceNewTab {
+			<a
+				href={ log.ReferenceURL }
+				target="_blank"
+				class="bg-primary text-white px-2 py-1 rounded-lg font-semibold hover:bg-primary-dark transition-colors cursor-pointer"
+			>
+				{ log.ReferenceLabel }
+			</a>
+		} else {
+			<a
+				href={ log.ReferenceURL }
+				class="bg-primary text-white px-2 py-1 rounded-lg font-semibold hover:bg-primary-dark transition-colors cursor-pointer"
+			>
+				{ log.ReferenceLabel }
+			</a>
+		}
 	}
 }
 

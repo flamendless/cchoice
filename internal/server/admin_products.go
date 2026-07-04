@@ -419,7 +419,12 @@ func (s *Server) adminSuperuserProductsListPageHandler(w http.ResponseWriter, r 
 		})
 	}
 
-	if err := compadmin.AdminSuperuserProductsListPage("Products", brands).Render(ctx, w); err != nil {
+	if err := compadmin.AdminSuperuserProductsListPage(
+		"Products",
+		brands,
+		r.URL.Query().Get("search_serial"),
+		r.URL.Query().Get("status"),
+	).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
