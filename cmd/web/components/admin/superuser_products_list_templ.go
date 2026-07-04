@@ -16,7 +16,7 @@ import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/components/header"
 import "cchoice/internal/enums"
 
-func AdminSuperuserProductsListPage(title string, brands []models.AdminBrand) templ.Component {
+func AdminSuperuserProductsListPage(title string, brands []models.AdminBrand, searchSerial string, status string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -77,7 +77,7 @@ func AdminSuperuserProductsListPage(title string, brands []models.AdminBrand) te
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ProductsListSection(utils.URL("/admin/superuser/products/table"), brands).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ProductsListSection(utils.URL("/admin/superuser/products/table"), brands, searchSerial, status).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -89,7 +89,7 @@ func AdminSuperuserProductsListPage(title string, brands []models.AdminBrand) te
 	})
 }
 
-func ProductsListSection(tableURL string, brands []models.AdminBrand) templ.Component {
+func ProductsListSection(tableURL string, brands []models.AdminBrand, searchSerial string, status string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -114,7 +114,7 @@ func ProductsListSection(tableURL string, brands []models.AdminBrand) templ.Comp
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ProductSearchToolbar(tableURL, brands).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ProductSearchToolbar(tableURL, brands, searchSerial, status).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -200,7 +200,7 @@ func AdminStaffProductsListPage(brands []models.AdminBrand) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ProductsListSection(utils.URL("/admin/products/table"), brands).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ProductsListSection(utils.URL("/admin/products/table"), brands, "", "").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

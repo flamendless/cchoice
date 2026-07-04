@@ -589,4 +589,4 @@ WHERE slug = '' or slug IS NULL;
 UPDATE tbl_products SET slug = ? WHERE id = ?;
 
 -- name: GetProductSlugByID :one
-SELECT slug FROM tbl_products WHERE id = ? LIMIT 1;
+SELECT slug, status, serial FROM tbl_products WHERE id = ? LIMIT 1;

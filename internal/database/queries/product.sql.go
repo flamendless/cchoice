@@ -843,14 +843,20 @@ func (q *Queries) GetProductPage(ctx context.Context, slug sql.NullString) (GetP
 }
 
 const getProductSlugByID = `-- name: GetProductSlugByID :one
-SELECT slug FROM tbl_products WHERE id = ? LIMIT 1
+SELECT slug, status, serial FROM tbl_products WHERE id = ? LIMIT 1
 `
 
-func (q *Queries) GetProductSlugByID(ctx context.Context, id int64) (sql.NullString, error) {
+type GetProductSlugByIDRow struct {
+	Slug   sql.NullString
+	Status string
+	Serial string
+}
+
+func (q *Queries) GetProductSlugByID(ctx context.Context, id int64) (GetProductSlugByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getProductSlugByID, id)
-	var slug sql.NullString
-	err := row.Scan(&slug)
-	return slug, err
+	var i GetProductSlugByIDRow
+	err := row.Scan(&i.Slug, &i.Status, &i.Serial)
+	return i, err
 }
 
 const getProducts = `-- name: GetProducts :many

@@ -395,13 +395,14 @@ templ SerialValidationResult(isValid bool) {
 	}
 }
 
-templ ProductSearchToolbar(url string, brands []models.AdminBrand) {
+templ ProductSearchToolbar(url string, brands []models.AdminBrand, searchSerial string, status string) {
 	<div class="flex flex-col sm:flex-row sm:flex-wrap justify-between items-start sm:items-center gap-4 mb-4">
 		<div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
 			<input
 				type="text"
 				name="search_serial"
 				placeholder="Search by serial..."
+				value={ searchSerial }
 				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
 				hx-get={ url }
 				hx-trigger="change, search_serial delay:300ms"
@@ -434,7 +435,7 @@ templ ProductSearchToolbar(url string, brands []models.AdminBrand) {
 			>
 				<option value="">All</option>
 				for _, ps := range enums.AllProductStatuses {
-					<option value={ ps.String() }>{ ps.String() }</option>
+					<option value={ ps.String() } selected?={ status == ps.String() }>{ ps.String() }</option>
 				}
 			</select>
 		</div>

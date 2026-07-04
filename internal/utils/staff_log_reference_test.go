@@ -46,62 +46,63 @@ func TestParseStaffLogSuccessID(t *testing.T) {
 	}
 }
 
-func TestBuildStaffLogReference(t *testing.T) {
+func TestBuildStaffLogProductReference(t *testing.T) {
 	tests := []struct {
-		name        string
-		module      string
-		action      string
-		productSlug string
-		wantLabel   string
-		wantSlug    string
+		name      string
+		slug      string
+		serial    string
+		status    string
+		wantLabel string
+		wantInURL []string
+		wantNewTab bool
 	}{
 		{
-			name:        "products create",
-			module:      "products",
-			action:      "create",
-			productSlug: "brand-category-serial",
-			wantLabel:   "View Product",
-			wantSlug:    "brand-category-serial",
+			name:       "active product",
+			slug:       "brand-category-serial",
+			serial:     "ABC123",
+			status:     "ACTIVE",
+			wantLabel:  "View Product in Shop",
+			wantInURL:  []string{"/product/brand-category-serial"},
+			wantNewTab: true,
 		},
 		{
-			name:        "products update",
-			module:      "products",
-			action:      "update",
-			productSlug: "some-slug",
-			wantLabel:   "View Product",
-			wantSlug:    "some-slug",
+			name:       "draft product",
+			slug:       "brand-category-serial",
+			serial:     "ABC123",
+			status:     "DRAFT",
+			wantLabel:  "View Product In Manage",
+			wantInURL:  []string{"/admin/superuser/products", "search_serial=ABC123", "status=DRAFT"},
+			wantNewTab: false,
 		},
 		{
-			name:        "wrong module",
-			module:      "brands",
-			action:      "create",
-			productSlug: "some-slug",
+			name:      "active without slug",
+			serial:    "ABC123",
+			status:    "ACTIVE",
+			wantLabel: "",
 		},
 		{
-			name:        "wrong action",
-			module:      "products",
-			action:      "delete",
-			productSlug: "some-slug",
-		},
-		{
-			name:   "empty slug",
-			module: "products",
-			action: "create",
+			name:      "draft without serial",
+			slug:      "brand-category-serial",
+			status:    "DRAFT",
+			wantLabel: "",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
 				if r := recover(); r != nil {
-					t.Skipf("BuildStaffLogReference depends on conf; skipping: %v", r)
+					t.Skipf("BuildStaffLogProductReference depends on conf; skipping: %v", r)
 				}
 			}()
-			ref := BuildStaffLogReference(tt.module, tt.action, tt.productSlug)
+			ref := BuildStaffLogProductReference(tt.slug, tt.serial, tt.status)
 			assert.Equal(t, tt.wantLabel, ref.Label)
-			if tt.wantSlug != "" {
-				assert.Contains(t, ref.URL, "/product/"+tt.wantSlug)
-			} else {
+			assert.Equal(t, tt.wantNewTab, ref.NewTab)
+			if len(tt.wantInURL) == 0 {
 				assert.Empty(t, ref.URL)
+				return
+			}
+			for _, part := range tt.wantInURL {
+				assert.Contains(t, ref.URL, part)
 			}
 		})
 	}

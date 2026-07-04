@@ -8,7 +8,7 @@ import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/components/header"
 import "cchoice/internal/enums"
 
-templ AdminSuperuserProductsListPage(title string, brands []models.AdminBrand) {
+templ AdminSuperuserProductsListPage(title string, brands []models.AdminBrand, searchSerial string, status string) {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
@@ -29,7 +29,7 @@ templ AdminSuperuserProductsListPage(title string, brands []models.AdminBrand) {
 						<h1 class="text-2xl font-bold text-center text-primary mb-6">
 							Manage Products
 						</h1>
-						@ProductsListSection(utils.URL("/admin/superuser/products/table"), brands)
+						@ProductsListSection(utils.URL("/admin/superuser/products/table"), brands, searchSerial, status)
 					</div>
 				</div>
 			</div>
@@ -37,10 +37,10 @@ templ AdminSuperuserProductsListPage(title string, brands []models.AdminBrand) {
 	</html>
 }
 
-templ ProductsListSection(tableURL string, brands []models.AdminBrand) {
+templ ProductsListSection(tableURL string, brands []models.AdminBrand, searchSerial string, status string) {
 	<div class="bg-white rounded-lg shadow-md p-6">
 		<div id="products-pagination-top"></div>
-		@ProductSearchToolbar(tableURL, brands)
+		@ProductSearchToolbar(tableURL, brands, searchSerial, status)
 		<div
 			id="products-table-content"
 			hx-get={ tableURL }
@@ -74,7 +74,7 @@ templ AdminStaffProductsListPage(brands []models.AdminBrand) {
 						<h1 class="text-2xl font-bold text-center text-primary mb-6">
 							Edit Products
 						</h1>
-						@ProductsListSection(utils.URL("/admin/products/table"), brands)
+						@ProductsListSection(utils.URL("/admin/products/table"), brands, "", "")
 					</div>
 				</div>
 			</div>

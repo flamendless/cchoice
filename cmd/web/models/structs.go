@@ -398,8 +398,9 @@ type StaffLog struct {
 	Action         string
 	Module         string
 	Result         string
-	ReferenceLabel string
-	ReferenceURL   string
+	ReferenceLabel  string
+	ReferenceURL    string
+	ReferenceNewTab bool
 }
 
 type TablePagination struct {
