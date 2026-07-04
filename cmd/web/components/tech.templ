@@ -13,7 +13,10 @@ templ TechPage() {
 			@common.DevRibbon()
 			<div class="flex-1 py-8 px-4">
 				<div class="max-w-3xl mx-auto">
-					@backToHome()
+					<div class="flex justify-between items-center">
+						@common.BackToShopLink()
+						@common.ReleaseNotesLink()
+					</div>
 					<h1 class="text-3xl font-bold text-gray-900 mb-2">Technology</h1>
 					<p class="text-gray-500 text-sm mb-8">Technologies powering this platform</p>
 					<div class="space-y-6 text-gray-700">
