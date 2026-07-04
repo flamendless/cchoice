@@ -11,7 +11,10 @@ templ ChangeLogs(logs []changelogs.ChangeLog, limit int) {
 			@common.TabTitle("[CHANGELOGS] C-Choice Construction Supplies")
 		</head>
 		<div class="flex flex-col justify-center items-center max-w-5xl mx-auto px-4 py-4 space-y-4">
-			<div class="w-[50vw] my-2 py-4 flex flex-col justify-center items-center p-4 border border-primary">
+			<div class="w-full">
+				@common.BackToShopLink()
+			</div>
+			<div class="w-[50vw] my-2 py-4 flex flex-col justify-center items-center p-4 border border-primary-muted">
 				<h1 class="text-2xl font-semibold tracking-tight text-primary">
 					C-Choice Changelogs
 				</h1>
@@ -19,7 +22,7 @@ templ ChangeLogs(logs []changelogs.ChangeLog, limit int) {
 					<a
 						href="https://github.com/flamendless"
 						class="
-							px-2 bg-primary font-medium rounded-lg text-white cursor-pointer
+							px-2 bg-primary-muted font-medium rounded-lg text-gray-900 cursor-pointer
 							transition-colors rounded-full hover:bg-surface
 						"
 					>
@@ -31,14 +34,14 @@ templ ChangeLogs(logs []changelogs.ChangeLog, limit int) {
 			</div>
 			<hr/>
 			for _, log := range logs {
-				<section id={ log.Anchor } class="w-[50vw] border border-primary rounded-xl">
-					<header class="px-5 py-4 bg-primary rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+				<section id={ log.Anchor } class="w-[50vw] border border-primary-muted rounded-xl">
+					<header class="px-5 py-4 bg-primary-muted rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
 						<div class="flex items-center gap-3">
-							<span class="text-lg font-bold">
+							<span class="text-lg font-bold text-gray-900">
 								{ log.Version }
 							</span>
 							if log.Date != "" {
-								<span class="text-lg font-bold">
+								<span class="text-lg font-bold text-gray-900">
 									({ log.Date })
 								</span>
 							}
@@ -48,7 +51,7 @@ templ ChangeLogs(logs []changelogs.ChangeLog, limit int) {
 						for _, section := range log.Sections {
 							<div>
 								<div class="flex items-center gap-2 mb-2">
-									<span class="inline-flex items-center rounded-md bg-primary px-2 py-0.5 text-xs font-medium text-slate-700">
+									<span class="inline-flex items-center rounded-md bg-primary-muted px-2 py-0.5 text-xs font-medium text-gray-900">
 										{ section.Title }
 									</span>
 								</div>

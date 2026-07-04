@@ -51,15 +51,19 @@ func TechPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"flex-1 py-8 px-4\"><div class=\"max-w-3xl mx-auto\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"flex-1 py-8 px-4\"><div class=\"max-w-3xl mx-auto\"><div class=\"flex justify-between items-center\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = backToHome().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = common.BackToShopLink().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h1 class=\"text-3xl font-bold text-gray-900 mb-2\">Technology</h1><p class=\"text-gray-500 text-sm mb-8\">Technologies powering this platform</p><div class=\"space-y-6 text-gray-700\"><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">Backend</h2><ul class=\"list-disc pl-6 space-y-1\"><li>Go</li><li>Grafana</li><li>Prometheus</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">Frontend</h2><ul class=\"list-disc pl-6 space-y-1\"><li>Templ</li><li>HTMX</li><li>Hyperscript</li><li>Tailwind CSS</li><li>JavaScript</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">Database</h2><ul class=\"list-disc pl-6 space-y-1\"><li>SQLite</li><li>sqlc</li><li>Goose</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">Integrations</h2><ul class=\"list-disc pl-6 space-y-1\"><li>PayMongo</li><li>Maileroo</li><li>Lalamove</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">Background Jobs</h2><ul class=\"list-disc pl-6 space-y-1\"><li>goqite (SQLite job queue)</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">Dev &amp; Tooling</h2><ul class=\"list-disc pl-6 space-y-1\"><li>Mage</li><li>Air</li></ul></section></div></div></div></body></html>")
+		templ_7745c5c3_Err = common.ReleaseNotesLink().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><h1 class=\"text-3xl font-bold text-gray-900 mb-2\">Technology</h1><p class=\"text-gray-500 text-sm mb-8\">Technologies powering this platform</p><div class=\"space-y-6 text-gray-700\"><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">Backend</h2><ul class=\"list-disc pl-6 space-y-1\"><li>Go</li><li>Grafana</li><li>Prometheus</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">Frontend</h2><ul class=\"list-disc pl-6 space-y-1\"><li>Templ</li><li>HTMX</li><li>Hyperscript</li><li>Tailwind CSS</li><li>JavaScript</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">Database</h2><ul class=\"list-disc pl-6 space-y-1\"><li>SQLite</li><li>sqlc</li><li>Goose</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">Integrations</h2><ul class=\"list-disc pl-6 space-y-1\"><li>PayMongo</li><li>Maileroo</li><li>Lalamove</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">Background Jobs</h2><ul class=\"list-disc pl-6 space-y-1\"><li>goqite (SQLite job queue)</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">Dev &amp; Tooling</h2><ul class=\"list-disc pl-6 space-y-1\"><li>Mage</li><li>Air</li></ul></section></div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
