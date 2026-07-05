@@ -11,6 +11,7 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/geocoding"
 	"cchoice/internal/logs"
+	"cchoice/internal/orderhistory"
 	"cchoice/internal/payments"
 	"cchoice/internal/payments/paymongo"
 	"cchoice/internal/requests"
@@ -237,6 +238,18 @@ func CreateOrderFromCheckout(
 	order, err := dbRW.GetQueries().CreateOrder(ctx, orderParams)
 	if err != nil {
 		return nil, "", err
+	}
+
+	if err := orderhistory.Record(
+		ctx,
+		dbRW,
+		order.ID,
+		sql.NullInt64{},
+		sql.NullString{},
+		enums.ORDER_STATUS_PENDING.String(),
+		sql.NullString{},
+	); err != nil {
+		logs.Log().Warn("failed to record initial order status history", zap.Error(err), zap.Int64("order_id", order.ID))
 	}
 
 	for _, checkoutLine := range params.CheckoutLines {

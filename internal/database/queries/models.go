@@ -293,6 +293,17 @@ type TblOrderLine struct {
 	UpdatedAt      time.Time
 }
 
+type TblOrderStatusHistory struct {
+	ID         int64
+	OrderID    int64
+	StaffID    sql.NullInt64
+	FromStatus sql.NullString
+	ToStatus   string
+	Notes      sql.NullString
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+}
+
 type TblPasswordResetToken struct {
 	ID        int64
 	UserID    int64

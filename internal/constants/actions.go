@@ -22,6 +22,7 @@ const (
 	ModuleCPoints              = "cpoints"
 	ModuleHolidays             = "holidays"
 	ModuleMemos                = "memos"
+	ModuleOrders               = "orders"
 	ModuleProductInventories   = "product_inventories"
 	ModulePasswordReset        = "password_reset"
 	ModuleProducts             = "products"

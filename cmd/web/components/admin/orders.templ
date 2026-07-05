@@ -34,6 +34,8 @@ templ AdminOrdersListPage() {
 					</div>
 				</div>
 			</div>
+			<div id="order-manage-modal-container"></div>
+			<div id="order-track-modal-container"></div>
 		</body>
 	</html>
 }
@@ -111,14 +113,15 @@ templ AdminOrdersListTable(orders []models.AdminOrderListItem) {
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">Order Reference</th>
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">Status</th>
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">Is Paid</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%]">Created At</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%]">Updated At</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">Created At</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">Updated At</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">Actions</th>
 				</tr>
 			</thead>
 			<tbody class="bg-white divide-y divide-gray-200">
 				if len(orders) == 0 {
 					<tr>
-						<td colspan="7" class="px-6 py-4 text-center text-gray-500">
+						<td colspan="8" class="px-6 py-4 text-center text-gray-500">
 							No orders found.
 						</td>
 					</tr>
@@ -149,17 +152,344 @@ templ OrderTableRow(order models.AdminOrderListItem) {
 		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ order.ID }</td>
 		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ order.OrderReference }</td>
 		<td class="px-6 py-4 whitespace-nowrap text-sm">
-			@OrderStatus(order.Status)
+			@OrderStatusPill(order.Status, false)
 		</td>
 		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 			@OrderIsPaid(order.IsPaid)
 		</td>
 		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ order.CreatedAt }</td>
 		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ order.UpdatedAt }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+			@OrderActionsCell(order.ID)
+		</td>
 	</tr>
 	<tr id={ "order-details-" + order.ID } class="hidden">
-		<td id={ "order-details-cell-" + order.ID } colspan="7" class="px-6 py-2"></td>
+		<td id={ "order-details-cell-" + order.ID } colspan="8" class="px-6 py-2"></td>
 	</tr>
+}
+
+templ OrderActionsCell(orderID string) {
+	<div class="flex items-center gap-2">
+		<button
+			type="button"
+			class="px-3 py-1 bg-primary text-white rounded-md hover:bg-primary-dark text-xs font-medium"
+			hx-get={ utils.URLf("/admin/orders/%s/manage", orderID) }
+			hx-target="#order-manage-modal-container"
+			hx-swap="innerHTML"
+		>
+			Manage
+		</button>
+		<button
+			type="button"
+			class="px-3 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-xs font-medium"
+			hx-get={ utils.URLf("/admin/orders/%s/track", orderID) }
+			hx-target="#order-track-modal-container"
+			hx-swap="innerHTML"
+		>
+			Track
+		</button>
+	</div>
+}
+
+templ OrderManageModal(data models.AdminOrderManageModalData) {
+	<div
+		id="order-manage-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="
+			on closeModal
+				set #order-manage-modal-container.innerHTML to ''
+			end
+		"
+	>
+		<div
+			class="absolute inset-0 bg-black/50"
+			_="on click trigger closeModal"
+		></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">Manage Order</h2>
+				<button
+					type="button"
+					class="text-gray-400 hover:text-gray-600"
+					_="on click trigger closeModal"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			<p class="text-sm text-gray-600 mb-4">Order Reference: <span class="font-medium text-gray-900">{ data.OrderReference }</span></p>
+			@OrderManageForm(data)
+		</div>
+	</div>
+}
+
+templ OrderManageForm(data models.AdminOrderManageModalData) {
+	<form
+		hx-patch={ utils.URLf("/admin/orders/%s/status", data.ID) }
+		hx-swap="none"
+		class="flex flex-col gap-4"
+		hx-on::after-request="if(event.detail.successful) { document.getElementById('order-manage-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/orders/table', { target: '#orders-table', swap: 'innerHTML' }) }"
+	>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+			if data.CanUpdateStatus {
+				<select
+					name="status"
+					class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+				>
+					for _, status := range enums.GetAllOrderStatuses() {
+						<option
+							value={ status.String() }
+							selected?={ data.CurrentStatus == status }
+						>
+							{ status.String() }
+						</option>
+					}
+				</select>
+			} else {
+				<input type="hidden" name="status" value={ data.CurrentStatus.String() }/>
+				<select
+					class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+					disabled
+					title="Only superusers or staff with Manage Order Status permission can update order status."
+				>
+					for _, status := range enums.GetAllOrderStatuses() {
+						<option
+							value={ status.String() }
+							selected?={ data.CurrentStatus == status }
+						>
+							{ status.String() }
+						</option>
+					}
+				</select>
+				<p class="mt-2 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+					Only superusers or staff with Manage Order Status permission can update order status.
+				</p>
+			}
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Notes / Remarks</label>
+			<textarea
+				name="notes"
+				rows="4"
+				placeholder="Add notes or remarks for this update..."
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+			></textarea>
+		</div>
+		<div class="flex justify-end gap-2 pt-2">
+			<button
+				type="button"
+				class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm"
+				_="on click trigger closeModal"
+			>
+				Cancel
+			</button>
+			<button
+				type="submit"
+				class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm"
+			>
+				Save
+			</button>
+		</div>
+	</form>
+}
+
+templ OrderTrackModal(data models.AdminOrderTrackModalData) {
+	<div
+		id="order-track-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="
+			on closeModal
+				set #order-track-modal-container.innerHTML to ''
+			end
+		"
+	>
+		<div
+			class="absolute inset-0 bg-black/50"
+			_="on click trigger closeModal"
+		></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 overflow-y-auto max-h-[90vh]">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">Track Order</h2>
+				<button
+					type="button"
+					class="text-gray-400 hover:text-gray-600"
+					_="on click trigger closeModal"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			<p class="text-sm text-gray-600 mb-4">Order Reference: <span class="font-medium text-gray-900">{ data.OrderReference }</span></p>
+			@OrderStatusFlowDiagram(data.FlowSteps, data.CurrentStatus)
+			<div class="mt-6 overflow-x-auto">
+				<table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-md">
+					<thead class="bg-gray-50">
+						<tr>
+							<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+							<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">From</th>
+							<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">To</th>
+							<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Staff</th>
+							<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+						</tr>
+					</thead>
+					<tbody class="bg-white divide-y divide-gray-200">
+						if len(data.History) == 0 {
+							<tr>
+								<td colspan="5" class="px-4 py-3 text-center text-sm text-gray-500">No audit history found.</td>
+							</tr>
+						} else {
+							for _, entry := range data.History {
+								<tr>
+									<td class="px-4 py-2 text-sm text-gray-900 whitespace-nowrap">{ entry.CreatedAt }</td>
+									<td class="px-4 py-2 text-sm">
+										@OrderHistoryStatusPill(entry.FromStatus)
+									</td>
+									<td class="px-4 py-2 text-sm">
+										@OrderHistoryStatusPill(entry.ToStatus)
+									</td>
+									<td class="px-4 py-2 text-sm text-gray-900">{ entry.StaffName }</td>
+									<td class="px-4 py-2 text-sm text-gray-900">{ entry.Notes }</td>
+								</tr>
+							}
+						}
+					</tbody>
+				</table>
+			</div>
+			<div class="flex justify-end mt-6">
+				<button
+					type="button"
+					class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm"
+					_="on click trigger closeModal"
+				>
+					Close
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+templ OrderStatusFlowDiagram(steps []enums.OrderStatus, current enums.OrderStatus) {
+	<div class="border border-gray-200 rounded-md p-4 bg-gray-50">
+		<h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Status Flow</h3>
+		if len(steps) == 0 {
+			<p class="text-sm text-gray-500">No status history available.</p>
+		} else {
+			<div class="flex flex-wrap items-center gap-2">
+				for i, step := range steps {
+					if i > 0 {
+						<span class="text-gray-400 text-lg">→</span>
+					}
+					@OrderStatusFlowBadge(step, step == current)
+				}
+			</div>
+			<p class="mt-3 text-sm text-gray-700 flex items-center gap-2 flex-wrap">
+				<span>Current:</span>
+				@OrderStatusPill(current, true)
+			</p>
+		}
+	</div>
+}
+
+templ OrderStatusFlowBadge(status enums.OrderStatus, isCurrent bool) {
+	@OrderStatusPill(status, isCurrent)
+}
+
+templ OrderHistoryStatusPill(statusLabel string) {
+	if statusLabel == "—" || statusLabel == "" {
+		<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+			—
+		</span>
+	} else {
+		@OrderStatusPill(enums.ParseOrderStatusToEnum(statusLabel), false)
+	}
+}
+
+templ OrderStatusPill(status enums.OrderStatus, isCurrent bool) {
+	switch status {
+		case enums.ORDER_STATUS_PENDING:
+			if isCurrent {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 ring-2 ring-yellow-400 ring-offset-1">
+					{ status.String() }
+				</span>
+			} else {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+					{ status.String() }
+				</span>
+			}
+		case enums.ORDER_STATUS_CONFIRMED:
+			if isCurrent {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 ring-2 ring-blue-400 ring-offset-1">
+					{ status.String() }
+				</span>
+			} else {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+					{ status.String() }
+				</span>
+			}
+		case enums.ORDER_STATUS_PROCESSING:
+			if isCurrent {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 ring-2 ring-indigo-400 ring-offset-1">
+					{ status.String() }
+				</span>
+			} else {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+					{ status.String() }
+				</span>
+			}
+		case enums.ORDER_STATUS_SHIPPED:
+			if isCurrent {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 ring-2 ring-purple-400 ring-offset-1">
+					{ status.String() }
+				</span>
+			} else {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+					{ status.String() }
+				</span>
+			}
+		case enums.ORDER_STATUS_DELIVERED:
+			if isCurrent {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800 ring-2 ring-green-400 ring-offset-1">
+					{ status.String() }
+				</span>
+			} else {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+					{ status.String() }
+				</span>
+			}
+		case enums.ORDER_STATUS_CANCELLED:
+			if isCurrent {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800 ring-2 ring-red-400 ring-offset-1">
+					{ status.String() }
+				</span>
+			} else {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+					{ status.String() }
+				</span>
+			}
+		case enums.ORDER_STATUS_REFUNDED:
+			if isCurrent {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-800 ring-2 ring-gray-400 ring-offset-1">
+					{ status.String() }
+				</span>
+			} else {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+					{ status.String() }
+				</span>
+			}
+		default:
+			if isCurrent {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-800 ring-2 ring-gray-400 ring-offset-1">
+					{ status.String() }
+				</span>
+			} else {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+					{ status.String() }
+				</span>
+			}
+	}
 }
 
 templ OrderStatus(status enums.OrderStatus) {

@@ -18,17 +18,23 @@ import (
 )
 
 type OrderService struct {
-	encoder encode.IEncode
-	dbRO    database.IService
+	encoder  encode.IEncode
+	dbRO     database.IService
+	dbRW     database.IService
+	staffLog *StaffLogsService
 }
 
 func NewOrderService(
 	encoder encode.IEncode,
 	dbRO database.IService,
+	dbRW database.IService,
+	staffLog *StaffLogsService,
 ) *OrderService {
 	return &OrderService{
-		encoder: encoder,
-		dbRO:    dbRO,
+		encoder:  encoder,
+		dbRO:     dbRO,
+		dbRW:     dbRW,
+		staffLog: staffLog,
 	}
 }
 

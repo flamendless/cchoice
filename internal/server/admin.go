@@ -183,6 +183,9 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_ORDERS)).Get("/admin/orders", s.adminOrdersListPageHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_ORDERS)).Get("/admin/orders/table", s.adminOrdersListTableHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_ORDERS)).Get("/admin/orders/{id}/details", s.adminOrdersDetailsHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_ORDERS)).Get("/admin/orders/{id}/manage", s.adminOrdersManageModalHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_ORDERS)).Get("/admin/orders/{id}/track", s.adminOrdersTrackModalHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_ORDERS)).Patch("/admin/orders/{id}/status", s.adminOrdersUpdateStatusHandler)
 }
 
 func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {
