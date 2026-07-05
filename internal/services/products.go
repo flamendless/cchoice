@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -790,8 +791,21 @@ func (s *ProductService) GetForPage(ctx context.Context, slug string) (*models.P
 		models.ProductSpec{Label: "Weight", Value: utils.ToWeightDisplay(row.Weight, row.WeightUnit)},
 	}
 
+	relatedProducts, err := s.getRelatedProducts(ctx, row.CategoryID, row.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get related products: %w", err)
+	}
+
+	priceAmount, priceCurrency := utils.SchemaPrice(salePrice, saleCurrency)
+	productSlug := slug
+	if row.Slug.Valid && row.Slug.String != "" {
+		productSlug = row.Slug.String
+	}
+	meta := s.GenerateMeta(&row, productSlug, cdnURL1280, priceAmount, priceCurrency)
+
 	return &models.ProductPageData{
-		Meta:                       s.GenerateMeta(&row),
+		Meta:                       meta,
+		Slug:                       productSlug,
 		ProductID:                  s.encoder.Encode(row.ID),
 		Serial:                     row.Serial,
 		Name:                       row.Name,
@@ -815,29 +829,251 @@ func (s *ProductService) GetForPage(ctx context.Context, slug string) (*models.P
 		Colours:                    colours,
 		Sizes:                      sizes,
 		Specs:                      specs,
+		RelatedProducts:            relatedProducts,
 	}, nil
 }
 
-func (s *ProductService) GenerateMeta(product *queries.GetProductPageRow) models.ProductsMeta {
-	title := fmt.Sprintf(
-		"%s %s %s (%s) - Price, Specs, Buy Online",
-		product.BrandName,
-		product.Name,
-		product.Power,
-		product.Serial,
-	)
-	content := fmt.Sprintf(
-		"Buy %s %s %s (%s). Power Tool. Durable. Quality. Best Prices in the Philippines. Free Shipping Available. %s",
-		product.BrandName,
-		product.Name,
-		product.Power,
-		product.Serial,
-		product.Description.String,
-	)
-	return models.ProductsMeta{
-		Title:   title,
-		Content: content,
+func (s *ProductService) getRelatedProducts(
+	ctx context.Context,
+	categoryID sql.NullInt64,
+	productID int64,
+) ([]models.RelatedProduct, error) {
+	if !categoryID.Valid || categoryID.Int64 == 0 {
+		return nil, nil
 	}
+
+	rows, err := s.dbRO.GetQueries().GetRelatedProductsByCategory(ctx, queries.GetRelatedProductsByCategoryParams{
+		CategoryID: categoryID.Int64,
+		ID:         productID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	related := make([]models.RelatedProduct, 0, len(rows))
+	for _, row := range rows {
+		if !row.Slug.Valid || row.Slug.String == "" {
+			continue
+		}
+
+		origPrice := utils.NewMoney(row.UnitPriceWithVat, row.UnitPriceWithVatCurrency)
+		var salePrice int64
+		var saleCurrency string
+		if row.IsOnSale == 1 {
+			if sp, ok := row.SalePriceWithVat.(int64); ok {
+				salePrice = sp
+			} else {
+				salePrice = row.UnitPriceWithVat
+			}
+			if sc, ok := row.SalePriceWithVatCurrency.(string); ok {
+				saleCurrency = sc
+			} else {
+				saleCurrency = row.UnitPriceWithVatCurrency
+			}
+		} else {
+			salePrice = row.UnitPriceWithVat
+			saleCurrency = row.UnitPriceWithVatCurrency
+		}
+
+		discountedPrice := utils.NewMoney(salePrice, saleCurrency)
+		_, _, discountPercentage := utils.GetOrigAndDiscounted(
+			row.IsOnSale,
+			row.UnitPriceWithVat,
+			row.UnitPriceWithVatCurrency,
+			sql.NullInt64{Int64: salePrice, Valid: row.IsOnSale == 1},
+			sql.NullString{String: saleCurrency, Valid: row.IsOnSale == 1},
+		)
+
+		cdnURL := row.CdnUrl
+		if cdnURL == "" {
+			cdnURL = s.getCDNURL(row.ThumbnailPath)
+		}
+		cdnURL1280 := row.CdnUrlThumbnail
+		if cdnURL1280 == "" {
+			cdnURL1280 = s.getCDNURL(constants.ToPath1280(row.ThumbnailPath))
+		}
+
+		related = append(related, models.RelatedProduct{
+			ProductID:          s.encoder.Encode(row.ID),
+			Slug:               row.Slug.String,
+			Name:               row.Name,
+			Serial:             row.Serial,
+			BrandName:          row.BrandName,
+			CDNURL:             cdnURL,
+			CDNURL1280:         cdnURL1280,
+			OrigPriceDisplay:   origPrice.Display(),
+			PriceDisplay:       discountedPrice.Display(),
+			DiscountPercentage: discountPercentage,
+		})
+	}
+
+	return related, nil
+}
+
+func (s *ProductService) GenerateMeta(
+	product *queries.GetProductPageRow,
+	slug string,
+	imageURL string,
+	priceAmount string,
+	priceCurrency string,
+) models.ProductsMeta {
+	title := fmt.Sprintf(
+		"%s %s (%s) - Price, Specs, Buy Online | C-Choice",
+		product.BrandName,
+		product.Name,
+		product.Serial,
+	)
+
+	description := strings.TrimSpace(product.Description.String)
+	if description == "" {
+		description = fmt.Sprintf(
+			"Shop %s %s (%s) from %s. Quality construction supplies with competitive pricing in the Philippines.",
+			product.BrandName,
+			product.Name,
+			product.Serial,
+			product.BrandName,
+		)
+	} else if len(description) > 155 {
+		description = description[:152] + "..."
+	}
+
+	keywords := strings.Join([]string{
+		product.BrandName,
+		product.Name,
+		product.Serial,
+		product.ProductCategory,
+		product.ProductSubcategory,
+		"c-choice",
+		"construction supplies",
+		"philippines",
+	}, ", ")
+
+	canonicalURL := utils.SiteURL("/product/" + slug)
+	ogImage := imageURL
+	if ogImage == "" {
+		ogImage = models.DefaultSiteSEO().OGImage
+	}
+
+	return models.ProductsMeta{
+		Title:          title,
+		Content:        description,
+		CanonicalURL:   canonicalURL,
+		OGImage:        ogImage,
+		OGType:         "product",
+		Robots:         "index, follow, max-image-preview:large",
+		Keywords:       keywords,
+		TwitterCard:    "summary_large_image",
+		PriceAmount:    priceAmount,
+		PriceCurrency:  priceCurrency,
+		StructuredData: buildProductStructuredData(product, canonicalURL, ogImage, priceAmount, priceCurrency),
+	}
+}
+
+func buildProductStructuredData(
+	product *queries.GetProductPageRow,
+	canonicalURL string,
+	imageURL string,
+	priceAmount string,
+	priceCurrency string,
+) string {
+	type brand struct {
+		Type string `json:"@type"`
+		Name string `json:"name"`
+	}
+	type offer struct {
+		Type         string `json:"@type"`
+		URL          string `json:"url"`
+		PriceCurrency string `json:"priceCurrency"`
+		Price        string `json:"price"`
+		Availability string `json:"availability"`
+		ItemCondition string `json:"itemCondition"`
+	}
+	type breadcrumbItem struct {
+		Type     string `json:"@type"`
+		Position int    `json:"position"`
+		Name     string `json:"name"`
+		Item     string `json:"item,omitempty"`
+	}
+	type breadcrumbList struct {
+		Type     string           `json:"@type"`
+		ItemList []breadcrumbItem `json:"itemListElement"`
+	}
+	type productSchema struct {
+		Context     string         `json:"@context"`
+		Type        string         `json:"@type"`
+		Name        string         `json:"name"`
+		Description string         `json:"description,omitempty"`
+		Image       []string       `json:"image,omitempty"`
+		SKU         string         `json:"sku"`
+		Brand       brand          `json:"brand"`
+		Offers      offer          `json:"offers"`
+		Breadcrumb  breadcrumbList `json:"breadcrumb"`
+	}
+
+	description := strings.TrimSpace(product.Description.String)
+	images := []string{}
+	if imageURL != "" {
+		images = append(images, imageURL)
+	}
+
+	items := []breadcrumbItem{
+		{Type: "ListItem", Position: 1, Name: "Home", Item: utils.SiteURL("/")},
+	}
+	position := 2
+	if product.ProductCategory != "" {
+		items = append(items, breadcrumbItem{
+			Type:     "ListItem",
+			Position: position,
+			Name:     product.ProductCategory,
+		})
+		position++
+	}
+	if product.ProductSubcategory != "" {
+		items = append(items, breadcrumbItem{
+			Type:     "ListItem",
+			Position: position,
+			Name:     product.ProductSubcategory,
+		})
+		position++
+	}
+	items = append(items, breadcrumbItem{
+		Type:     "ListItem",
+		Position: position,
+		Name:     product.Name,
+		Item:     canonicalURL,
+	})
+
+	schema := productSchema{
+		Context:     "https://schema.org",
+		Type:        "Product",
+		Name:        fmt.Sprintf("%s %s", product.BrandName, product.Name),
+		Description: description,
+		Image:       images,
+		SKU:         product.Serial,
+		Brand:       brand{Type: "Brand", Name: product.BrandName},
+		Offers: offer{
+			Type:          "Offer",
+			URL:           canonicalURL,
+			PriceCurrency: priceCurrency,
+			Price:         priceAmount,
+			Availability:  "https://schema.org/InStock",
+			ItemCondition: "https://schema.org/NewCondition",
+		},
+		Breadcrumb: breadcrumbList{
+			Type:     "BreadcrumbList",
+			ItemList: items,
+		},
+	}
+
+	data, err := json.Marshal(schema)
+	if err != nil {
+		return ""
+	}
+	return string(data)
+}
+
+func (s *ProductService) ListActiveProductSlugs(ctx context.Context) ([]queries.ListActiveProductSlugsRow, error) {
+	return s.dbRO.GetQueries().ListActiveProductSlugs(ctx)
 }
 
 func (s *ProductService) ListForQuotations(ctx context.Context) ([]queries.ListProductsForQuotationsRow, error) {

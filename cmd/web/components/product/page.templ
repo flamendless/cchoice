@@ -11,9 +11,8 @@ templ ProductPage(data models.ProductPageData) {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
-			@common.HeadMeta()
-			<!-- @common.TabTitle(data.Name + " | CChoice") -->
-			@Meta(data.Meta)
+			@common.HeadMetaBase()
+			@ProductSEO(data.Meta)
 		</head>
 		<body class="min-h-screen flex flex-col bg-white">
 			@common.DevRibbon()

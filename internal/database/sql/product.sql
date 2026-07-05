@@ -462,6 +462,7 @@ WHERE id = ?;
 -- name: GetProductPage :one
 SELECT
 	tbl_products.id,
+	tbl_products.slug,
 	tbl_products.serial,
 	tbl_products.name,
 	tbl_products.description,
@@ -478,6 +479,7 @@ SELECT
 	tbl_brand_images.s3_url AS brand_thumbnail_url,
 	COALESCE(pc.category, '') AS product_category,
 	COALESCE(pc.subcategory, '') AS product_subcategory,
+	pc.id AS category_id,
 	COALESCE(tbl_product_images.path, '') AS image_path,
 	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
 	COALESCE(tbl_product_images.cdn_url, '') AS cdn_url,
@@ -534,6 +536,7 @@ LIMIT 1;
 -- name: GetRelatedProductsByCategory :many
 SELECT
 	tbl_products.id,
+	tbl_products.slug,
 	tbl_products.name,
 	tbl_products.serial,
 	tbl_products.unit_price_with_vat,
@@ -590,3 +593,13 @@ UPDATE tbl_products SET slug = ? WHERE id = ?;
 
 -- name: GetProductSlugByID :one
 SELECT slug, status, serial FROM tbl_products WHERE id = ? LIMIT 1;
+
+-- name: ListActiveProductSlugs :many
+SELECT
+	slug,
+	updated_at
+FROM tbl_products
+WHERE status = 'ACTIVE'
+	AND slug != ''
+	AND slug IS NOT NULL
+ORDER BY updated_at DESC;
