@@ -691,6 +691,7 @@ func (q *Queries) GetProductIDBySerial(ctx context.Context, serial string) (int6
 const getProductPage = `-- name: GetProductPage :one
 SELECT
 	tbl_products.id,
+	tbl_products.slug,
 	tbl_products.serial,
 	tbl_products.name,
 	tbl_products.description,
@@ -707,6 +708,7 @@ SELECT
 	tbl_brand_images.s3_url AS brand_thumbnail_url,
 	COALESCE(pc.category, '') AS product_category,
 	COALESCE(pc.subcategory, '') AS product_subcategory,
+	pc.id AS category_id,
 	COALESCE(tbl_product_images.path, '') AS image_path,
 	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
 	COALESCE(tbl_product_images.cdn_url, '') AS cdn_url,
@@ -763,6 +765,7 @@ LIMIT 1
 
 type GetProductPageRow struct {
 	ID                          int64
+	Slug                        sql.NullString
 	Serial                      string
 	Name                        string
 	Description                 sql.NullString
@@ -779,6 +782,7 @@ type GetProductPageRow struct {
 	BrandThumbnailUrl           sql.NullString
 	ProductCategory             string
 	ProductSubcategory          string
+	CategoryID                  sql.NullInt64
 	ImagePath                   string
 	ThumbnailPath               string
 	CdnUrl                      string
@@ -804,6 +808,7 @@ func (q *Queries) GetProductPage(ctx context.Context, slug sql.NullString) (GetP
 	var i GetProductPageRow
 	err := row.Scan(
 		&i.ID,
+		&i.Slug,
 		&i.Serial,
 		&i.Name,
 		&i.Description,
@@ -820,6 +825,7 @@ func (q *Queries) GetProductPage(ctx context.Context, slug sql.NullString) (GetP
 		&i.BrandThumbnailUrl,
 		&i.ProductCategory,
 		&i.ProductSubcategory,
+		&i.CategoryID,
 		&i.ImagePath,
 		&i.ThumbnailPath,
 		&i.CdnUrl,
@@ -1427,6 +1433,7 @@ func (q *Queries) GetRandomProductOnSale(ctx context.Context) (GetRandomProductO
 const getRelatedProductsByCategory = `-- name: GetRelatedProductsByCategory :many
 SELECT
 	tbl_products.id,
+	tbl_products.slug,
 	tbl_products.name,
 	tbl_products.serial,
 	tbl_products.unit_price_with_vat,
@@ -1469,6 +1476,7 @@ type GetRelatedProductsByCategoryParams struct {
 
 type GetRelatedProductsByCategoryRow struct {
 	ID                       int64
+	Slug                     sql.NullString
 	Name                     string
 	Serial                   string
 	UnitPriceWithVat         int64
@@ -1493,6 +1501,7 @@ func (q *Queries) GetRelatedProductsByCategory(ctx context.Context, arg GetRelat
 		var i GetRelatedProductsByCategoryRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.Slug,
 			&i.Name,
 			&i.Serial,
 			&i.UnitPriceWithVat,
@@ -1505,6 +1514,45 @@ func (q *Queries) GetRelatedProductsByCategory(ctx context.Context, arg GetRelat
 			&i.SalePriceWithVat,
 			&i.SalePriceWithVatCurrency,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listActiveProductSlugs = `-- name: ListActiveProductSlugs :many
+SELECT
+	slug,
+	updated_at
+FROM tbl_products
+WHERE status = 'ACTIVE'
+	AND slug != ''
+	AND slug IS NOT NULL
+ORDER BY updated_at DESC
+`
+
+type ListActiveProductSlugsRow struct {
+	Slug      sql.NullString
+	UpdatedAt time.Time
+}
+
+func (q *Queries) ListActiveProductSlugs(ctx context.Context) ([]ListActiveProductSlugsRow, error) {
+	rows, err := q.db.QueryContext(ctx, listActiveProductSlugs)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListActiveProductSlugsRow
+	for rows.Next() {
+		var i ListActiveProductSlugsRow
+		if err := rows.Scan(&i.Slug, &i.UpdatedAt); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

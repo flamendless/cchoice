@@ -1,15 +1,17 @@
 package server
 
 import (
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"go.uber.org/zap"
+
+	"cchoice/cmd/web/components"
 	compproduct "cchoice/cmd/web/components/product"
 	"cchoice/internal/encode"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
-	"net/http"
-
-	"github.com/go-chi/chi/v5"
-	"go.uber.org/zap"
 )
 
 func AddProductHandlers(s *Server, r chi.Router) {
@@ -23,24 +25,22 @@ func (s *Server) productPageHandler(w http.ResponseWriter, r *http.Request) {
 
 	slug := chi.URLParam(r, "slug")
 	if slug == "" {
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrNotFound.Error()))
+		s.renderProductNotFound(w, r, page)
 		return
 	}
 
 	productData, err := s.services.product.GetForPage(ctx, slug)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("slug", slug))
-		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		s.renderProductNotFound(w, r, page)
 		return
 	}
 
 	decodedProductID := s.encoder.Decode(productData.ProductID)
 	if decodedProductID == encode.INVALID {
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrNotFound.Error()))
+		s.renderProductNotFound(w, r, page)
 		return
 	}
-
-	// TODO: Query related products by category
 
 	if err := compproduct.ProductPage(*productData).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
@@ -51,5 +51,19 @@ func (s *Server) productPageHandler(w http.ResponseWriter, r *http.Request) {
 		)
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
+	}
+}
+
+func (s *Server) renderProductNotFound(w http.ResponseWriter, r *http.Request, fallbackURL string) {
+	if isHTMX(r) {
+		redirectHX(w, r, utils.URLWithError(fallbackURL, errs.ErrNotFound.Error()))
+		return
+	}
+
+	ctx := r.Context()
+	w.WriteHeader(http.StatusNotFound)
+	if err := components.NotPage().Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error("[Product Page Handler]", zap.Error(err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 }

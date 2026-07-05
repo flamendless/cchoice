@@ -2,7 +2,31 @@ package product
 
 import "cchoice/cmd/web/models"
 
-templ Meta(meta models.ProductsMeta) {
+templ ProductSEO(meta models.ProductsMeta) {
 	<title>{ meta.Title }</title>
+	<link rel="canonical" href={ meta.CanonicalURL }/>
 	<meta name="description" content={ meta.Content }/>
+	<meta name="robots" content={ meta.Robots }/>
+	if meta.Keywords != "" {
+		<meta name="keywords" content={ meta.Keywords }/>
+	}
+	<meta property="og:title" content={ meta.Title }/>
+	<meta property="og:description" content={ meta.Content }/>
+	<meta property="og:type" content={ meta.OGType }/>
+	<meta property="og:url" content={ meta.CanonicalURL }/>
+	if meta.OGImage != "" {
+		<meta property="og:image" content={ meta.OGImage }/>
+		<meta property="og:image:secure_url" content={ meta.OGImage }/>
+	}
+	<meta name="twitter:card" content={ meta.TwitterCard }/>
+	<meta name="twitter:title" content={ meta.Title }/>
+	<meta name="twitter:description" content={ meta.Content }/>
+	if meta.OGImage != "" {
+		<meta name="twitter:image" content={ meta.OGImage }/>
+	}
+	if meta.StructuredData != "" {
+		<script type="application/ld+json">
+			{ meta.StructuredData }
+		</script>
+	}
 }

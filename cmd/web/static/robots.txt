@@ -9,8 +9,14 @@ Disallow: /metrics/event
 # Internal configuration
 Disallow: /settings/
 
+# Admin and customer areas
+Disallow: /admin/
+Disallow: /customer/
+Disallow: /auth/
+
 # Non-crawlable actions
 Disallow: /search
+Disallow: /carts/
 
 # Prevent query param explosion
 Disallow: /*?*
@@ -19,9 +25,9 @@ Disallow: /*?*
 Allow: /products/image
 Allow: /brands/logo
 Allow: /assets/image
+Allow: /product/
 
-# Optional (add when ready)
-# Sitemap: https://cchoice.shop/sitemap.xml
+# __SITEMAP__
 
 User-agent: Googlebot
 Disallow:

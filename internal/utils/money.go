@@ -61,3 +61,12 @@ func GetDiscountAmount(
 	discount := unitPriceWithVat - salePriceWithVat.Int64
 	return NewMoney(discount, constants.PHP)
 }
+
+func SchemaPrice(amount int64, currency string) (string, string) {
+	dec := decimal.MustNew(amount, constants.DecimalScale)
+	f, ok := dec.Float64()
+	if !ok {
+		return "0.00", currency
+	}
+	return fmt.Sprintf("%.2f", f), currency
+}

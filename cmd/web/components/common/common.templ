@@ -5,6 +5,7 @@ import "cchoice/internal/constants"
 import "cchoice/internal/conf"
 import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/svg"
+import "cchoice/cmd/web/models"
 
 const DISCOUNT_RIBBON = true
 
@@ -33,13 +34,14 @@ templ HR() {
 }
 
 templ HeadMeta() {
+	@HeadMetaBase()
+	@HeadSEO(models.DefaultSiteSEO())
+}
+
+templ HeadMetaBase() {
 	<base href="/"/>
-	<link rel="canonical" href="https://primary.shop/"/>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-	<meta name="description" content="Your Partner in Progress"/>
 	<meta name="google" content="nositelinkssearchbox"/>
-	<meta name="robots" content="noarchive, noimageindex"/>
-	<meta name="keywords" content="primary, c-choice, construction, power tools"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<!--<link rel="dns-prefetch" href="https://images1.primary.com"/>-->
 	<link rel="preload" href={ constants.PathSVGLogoWithCompleteText } as="image" type="image/svg+xml"/>
@@ -58,19 +60,6 @@ templ HeadMeta() {
 		TODO: (Brandon) - preload product images here
 		<link rel="preload" href={ utils.URL("/static/images/product_images/bosch/") } as="image" type="image/png"/>
 	-->
-	<meta property="og:title" content="C-Choice Construction Supplies"/>
-	<meta
-		property="og:description"
-		content="Your Partner in Progress"
-	/>
-	<meta property="og:type" content="website"/>
-	<!--<meta property="og:url" content="https://www.primary.com/"/>-->
-	<meta property="og:image" content="https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-192x192/public"/>
-	<meta
-		property="og:image:secure_url"
-		content={ utils.URL("/static/images/favicons/192x192.png") }
-	/>
-	<meta name="twitter:card" content="summary"/>
 	<meta charset="UTF-8"/>
 	@onceHeadLinks.Once() {
 		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ utils.URL("/static/images/favicons/favicon.ico") }/>
@@ -109,6 +98,32 @@ templ HeadMeta() {
 				});
 			})();
 		</script>
+	}
+}
+
+templ HeadSEO(seo models.SiteSEO) {
+	<link rel="canonical" href={ seo.CanonicalURL }/>
+	<meta name="description" content={ seo.Description }/>
+	<meta name="robots" content={ seo.Robots }/>
+	if seo.Keywords != "" {
+		<meta name="keywords" content={ seo.Keywords }/>
+	}
+	<meta property="og:title" content={ seo.OGTitle }/>
+	<meta property="og:description" content={ seo.OGDescription }/>
+	<meta property="og:type" content={ seo.OGType }/>
+	if seo.OGURL != "" {
+		<meta property="og:url" content={ seo.OGURL }/>
+	}
+	<meta property="og:image" content={ seo.OGImage }/>
+	<meta
+		property="og:image:secure_url"
+		content={ seo.OGImage }
+	/>
+	<meta name="twitter:card" content={ seo.TwitterCard }/>
+	<meta name="twitter:title" content={ seo.OGTitle }/>
+	<meta name="twitter:description" content={ seo.OGDescription }/>
+	if seo.OGImage != "" {
+		<meta name="twitter:image" content={ seo.OGImage }/>
 	}
 }
 
