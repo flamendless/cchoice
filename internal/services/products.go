@@ -4,7 +4,6 @@ import (
 	"cmp"
 	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -18,6 +17,7 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/seo"
 	"cchoice/internal/utils"
 )
 
@@ -917,159 +917,35 @@ func (s *ProductService) GenerateMeta(
 	priceAmount string,
 	priceCurrency string,
 ) models.ProductsMeta {
-	title := fmt.Sprintf(
-		"%s %s (%s) - Price, Specs, Buy Online | C-Choice",
-		product.BrandName,
-		product.Name,
-		product.Serial,
+	meta := seo.GenerateProductMeta(
+		seo.Product{
+			BrandName:          product.BrandName,
+			Name:               product.Name,
+			Serial:             product.Serial,
+			Description:        product.Description.String,
+			ProductCategory:    product.ProductCategory,
+			ProductSubcategory: product.ProductSubcategory,
+		},
+		utils.SiteURL("/product/"+slug),
+		utils.SiteURL("/"),
+		imageURL,
+		priceAmount,
+		priceCurrency,
 	)
 
-	description := strings.TrimSpace(product.Description.String)
-	if description == "" {
-		description = fmt.Sprintf(
-			"Shop %s %s (%s) from %s. Quality construction supplies with competitive pricing in the Philippines.",
-			product.BrandName,
-			product.Name,
-			product.Serial,
-			product.BrandName,
-		)
-	} else if len(description) > 155 {
-		description = description[:152] + "..."
-	}
-
-	keywords := strings.Join([]string{
-		product.BrandName,
-		product.Name,
-		product.Serial,
-		product.ProductCategory,
-		product.ProductSubcategory,
-		"c-choice",
-		"construction supplies",
-		"philippines",
-	}, ", ")
-
-	canonicalURL := utils.SiteURL("/product/" + slug)
-	ogImage := imageURL
-	if ogImage == "" {
-		ogImage = models.DefaultSiteSEO().OGImage
-	}
-
 	return models.ProductsMeta{
-		Title:          title,
-		Content:        description,
-		CanonicalURL:   canonicalURL,
-		OGImage:        ogImage,
-		OGType:         "product",
-		Robots:         "index, follow, max-image-preview:large",
-		Keywords:       keywords,
-		TwitterCard:    "summary_large_image",
-		PriceAmount:    priceAmount,
-		PriceCurrency:  priceCurrency,
-		StructuredData: buildProductStructuredData(product, canonicalURL, ogImage, priceAmount, priceCurrency),
+		Title:          meta.Title,
+		Content:        meta.Description,
+		CanonicalURL:   meta.CanonicalURL,
+		OGImage:        meta.OGImage,
+		OGType:         meta.OGType,
+		Robots:         meta.Robots,
+		Keywords:       meta.Keywords,
+		TwitterCard:    meta.TwitterCard,
+		PriceAmount:    meta.PriceAmount,
+		PriceCurrency:  meta.PriceCurrency,
+		StructuredData: meta.StructuredData,
 	}
-}
-
-func buildProductStructuredData(
-	product *queries.GetProductPageRow,
-	canonicalURL string,
-	imageURL string,
-	priceAmount string,
-	priceCurrency string,
-) string {
-	type brand struct {
-		Type string `json:"@type"`
-		Name string `json:"name"`
-	}
-	type offer struct {
-		Type         string `json:"@type"`
-		URL          string `json:"url"`
-		PriceCurrency string `json:"priceCurrency"`
-		Price        string `json:"price"`
-		Availability string `json:"availability"`
-		ItemCondition string `json:"itemCondition"`
-	}
-	type breadcrumbItem struct {
-		Type     string `json:"@type"`
-		Position int    `json:"position"`
-		Name     string `json:"name"`
-		Item     string `json:"item,omitempty"`
-	}
-	type breadcrumbList struct {
-		Type     string           `json:"@type"`
-		ItemList []breadcrumbItem `json:"itemListElement"`
-	}
-	type productSchema struct {
-		Context     string         `json:"@context"`
-		Type        string         `json:"@type"`
-		Name        string         `json:"name"`
-		Description string         `json:"description,omitempty"`
-		Image       []string       `json:"image,omitempty"`
-		SKU         string         `json:"sku"`
-		Brand       brand          `json:"brand"`
-		Offers      offer          `json:"offers"`
-		Breadcrumb  breadcrumbList `json:"breadcrumb"`
-	}
-
-	description := strings.TrimSpace(product.Description.String)
-	images := []string{}
-	if imageURL != "" {
-		images = append(images, imageURL)
-	}
-
-	items := []breadcrumbItem{
-		{Type: "ListItem", Position: 1, Name: "Home", Item: utils.SiteURL("/")},
-	}
-	position := 2
-	if product.ProductCategory != "" {
-		items = append(items, breadcrumbItem{
-			Type:     "ListItem",
-			Position: position,
-			Name:     product.ProductCategory,
-		})
-		position++
-	}
-	if product.ProductSubcategory != "" {
-		items = append(items, breadcrumbItem{
-			Type:     "ListItem",
-			Position: position,
-			Name:     product.ProductSubcategory,
-		})
-		position++
-	}
-	items = append(items, breadcrumbItem{
-		Type:     "ListItem",
-		Position: position,
-		Name:     product.Name,
-		Item:     canonicalURL,
-	})
-
-	schema := productSchema{
-		Context:     "https://schema.org",
-		Type:        "Product",
-		Name:        fmt.Sprintf("%s %s", product.BrandName, product.Name),
-		Description: description,
-		Image:       images,
-		SKU:         product.Serial,
-		Brand:       brand{Type: "Brand", Name: product.BrandName},
-		Offers: offer{
-			Type:          "Offer",
-			URL:           canonicalURL,
-			PriceCurrency: priceCurrency,
-			Price:         priceAmount,
-			Availability:  "https://schema.org/InStock",
-			ItemCondition: "https://schema.org/NewCondition",
-		},
-		Breadcrumb: breadcrumbList{
-			Type:     "BreadcrumbList",
-			ItemList: items,
-		},
-	}
-
-	data, err := json.Marshal(schema)
-	if err != nil {
-		return ""
-	}
-	return string(data)
 }
 
 func (s *ProductService) ListActiveProductSlugs(ctx context.Context) ([]queries.ListActiveProductSlugsRow, error) {
