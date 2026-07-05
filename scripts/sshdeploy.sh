@@ -64,10 +64,10 @@ ssh_cmd() {
 
 echo "Deploying $ENV to $SSH_ADDR..."
 
-ssh_cmd "$SSH_ADDR" bash --login -s "$ENV" <<'EOF'
+ssh_cmd "$SSH_ADDR" env ENV="$ENV" bash --login -s <<'EOF'
 set -euf -o pipefail
 
-ENV="$1"
+ENV="${ENV:?missing ENV}"
 
 if [ "$ENV" = "dev" ]; then
 	PROJECT_DIR=~/cchoice-dev
@@ -100,18 +100,37 @@ else
 	echo "No existing process found."
 fi
 
-echo "Building..."
-BUILD_OUTPUT=$(mage "$MAGE_TARGET" 2>&1)
-echo "$BUILD_OUTPUT"
+echo "Running migrations..."
+if ! mage dbUp; then
+	echo "Error: mage dbUp failed." >&2
+	exit 1
+fi
 
-RUN_CMD=$(echo "$BUILD_OUTPUT" | grep '^Run: ' | sed 's/^Run: //' | sed 's/ > out.*//' | sed 's/ &//' | xargs)
+echo "Building..."
+BUILD_LOG=$(mktemp)
+trap 'rm -f "$BUILD_LOG"' EXIT
+
+if ! mage "$MAGE_TARGET" 2>&1 | tee "$BUILD_LOG"; then
+	echo "Error: mage $MAGE_TARGET failed." >&2
+	exit 1
+fi
+
+RUN_CMD=$(grep '^Run: ' "$BUILD_LOG" | head -n1 | sed 's/^Run: //' | sed 's/ > out.*//' | sed 's/ &//' | xargs)
 if [ -z "$RUN_CMD" ]; then
 	echo "Error: could not parse run command from mage $MAGE_TARGET output." >&2
 	exit 1
 fi
 
 echo "Starting API with: $RUN_CMD"
-eval "$RUN_CMD > out 2>&1 &"
+nohup $RUN_CMD > out 2>&1 &
+disown
+
+sleep 1
+if pgrep -af "$PROCESS_PATTERN" >/dev/null 2>&1; then
+	echo "API process is running."
+else
+	echo "Warning: API process may not have started. Check the out file." >&2
+fi
 
 echo "Done!"
 EOF
