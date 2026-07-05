@@ -1,14 +1,12 @@
 package server
 
 import (
-	"bytes"
-	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
 	"cchoice/internal/logs"
+	"cchoice/internal/seo"
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -39,8 +37,7 @@ func (s *Server) robotsTxtHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sitemapLine := fmt.Sprintf("Sitemap: %s", utils.SiteURL("/sitemap.xml"))
-	body := strings.Replace(string(content), "# __SITEMAP__", sitemapLine, 1)
+	body := seo.InjectSitemapLine(string(content), utils.SiteURL("/sitemap.xml"))
 
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Set("Cache-Control", "public, max-age=3600")
@@ -60,12 +57,7 @@ func (s *Server) sitemapHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var buf bytes.Buffer
-	buf.WriteString(`<?xml version="1.0" encoding="UTF-8"?>`)
-	buf.WriteString(`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`)
-
-	writeSitemapURL(&buf, utils.SiteURL("/"), time.Now().UTC(), "daily", "1.0")
-
+	entries := make([]seo.SitemapEntry, 0, len(products))
 	for _, product := range products {
 		if !product.Slug.Valid || product.Slug.String == "" {
 			continue
@@ -74,38 +66,19 @@ func (s *Server) sitemapHandler(w http.ResponseWriter, r *http.Request) {
 		if lastMod.IsZero() {
 			lastMod = time.Now().UTC()
 		}
-		writeSitemapURL(
-			&buf,
-			utils.SiteURL("/product/"+product.Slug.String),
-			lastMod.UTC(),
-			"weekly",
-			"0.8",
-		)
+		entries = append(entries, seo.SitemapEntry{
+			Loc:        utils.SiteURL("/product/" + product.Slug.String),
+			LastMod:    lastMod.UTC(),
+			ChangeFreq: "weekly",
+			Priority:   "0.8",
+		})
 	}
 
-	buf.WriteString(`</urlset>`)
+	body := seo.BuildSitemapXML(utils.SiteURL("/"), entries)
 
 	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
 	w.Header().Set("Cache-Control", "public, max-age=3600")
-	if _, err := w.Write(buf.Bytes()); err != nil {
+	if _, err := w.Write([]byte(body)); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}
-}
-
-func writeSitemapURL(buf *bytes.Buffer, loc string, lastMod time.Time, changefreq string, priority string) {
-	fmt.Fprintf(buf, "<url><loc>%s</loc>", escapeXML(loc))
-	fmt.Fprintf(buf, "<lastmod>%s</lastmod>", lastMod.Format("2006-01-02"))
-	fmt.Fprintf(buf, "<changefreq>%s</changefreq>", changefreq)
-	fmt.Fprintf(buf, "<priority>%s</priority></url>", priority)
-}
-
-func escapeXML(s string) string {
-	replacer := strings.NewReplacer(
-		"&", "&amp;",
-		"<", "&lt;",
-		">", "&gt;",
-		"'", "&apos;",
-		"\"", "&quot;",
-	)
-	return replacer.Replace(s)
 }
