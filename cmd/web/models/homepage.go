@@ -62,6 +62,7 @@ type ProductSpec struct {
 
 type ProductPageData struct {
 	Meta                       ProductsMeta
+	Slug                       string
 	ProductID                  string
 	Serial                     string
 	Name                       string
@@ -90,6 +91,7 @@ type ProductPageData struct {
 
 type RelatedProduct struct {
 	ProductID          string
+	Slug               string
 	Name               string
 	Serial             string
 	BrandName          string

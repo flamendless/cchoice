@@ -4,10 +4,27 @@ import (
 	"cchoice/internal/conf"
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 func FullURL(path string) string {
-	return conf.Conf().Server.Address + URL(path)
+	return siteBaseURL() + URL(path)
+}
+
+func SiteURL(path string) string {
+	return siteBaseURL() + URL(path)
+}
+
+func siteBaseURL() string {
+	base := strings.TrimSuffix(conf.Conf().Server.Address, "/")
+	if strings.HasPrefix(base, "http://") || strings.HasPrefix(base, "https://") {
+		return base
+	}
+	scheme := "https://"
+	if conf.Conf().IsLocal() {
+		scheme = "http://"
+	}
+	return scheme + base
 }
 
 func URL(path string) string {
