@@ -153,3 +153,26 @@ type AdminOrderDetails struct {
 	Summary  AdminOrderAmountSummary
 	Lines    []AdminOrderLineItem
 }
+
+type AdminOrderManageModalData struct {
+	ID             string
+	OrderReference string
+	CurrentStatus  enums.OrderStatus
+	CanUpdateStatus bool
+}
+
+type AdminOrderStatusHistoryEntry struct {
+	FromStatus string
+	ToStatus   string
+	StaffName  string
+	Notes      string
+	CreatedAt  string
+}
+
+type AdminOrderTrackModalData struct {
+	ID             string
+	OrderReference string
+	CurrentStatus  enums.OrderStatus
+	History        []AdminOrderStatusHistoryEntry
+	FlowSteps      []enums.OrderStatus
+}

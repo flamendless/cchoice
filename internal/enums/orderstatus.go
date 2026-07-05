@@ -35,3 +35,19 @@ func ParseOrderStatusToEnum(e string) OrderStatus {
 		return ORDER_STATUS_UNDEFINED
 	}
 }
+
+func (s OrderStatus) IsValid() bool {
+	return s != ORDER_STATUS_UNDEFINED
+}
+
+func GetAllOrderStatuses() []OrderStatus {
+	return []OrderStatus{
+		ORDER_STATUS_PENDING,
+		ORDER_STATUS_CONFIRMED,
+		ORDER_STATUS_PROCESSING,
+		ORDER_STATUS_SHIPPED,
+		ORDER_STATUS_DELIVERED,
+		ORDER_STATUS_CANCELLED,
+		ORDER_STATUS_REFUNDED,
+	}
+}

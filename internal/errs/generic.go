@@ -50,7 +50,8 @@ var (
 	ErrValidationStartEndDates        = errors.New("[VALIDATION]: Start date must not be greater than end date")
 	ErrDuplicateEmail                 = errors.New("[VALIDATION]: Email already exists")
 
-	ErrNotFound = errors.New("[NOTFOUND]: Resource not found")
-	ErrRespNil  = errors.New("[GENERIC]: nil response returned")
-	ErrDBNil    = errors.New("[DB]: nil data from database")
+	ErrNotFound  = errors.New("[NOTFOUND]: Resource not found")
+	ErrForbidden = errors.New("[FORBIDDEN]: Operation not permitted")
+	ErrRespNil   = errors.New("[GENERIC]: nil response returned")
+	ErrDBNil     = errors.New("[DB]: nil data from database")
 )

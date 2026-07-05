@@ -220,7 +220,7 @@ func NewServer() *ServerInstance {
 		staff:            services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staffLog:         staffLogService,
 		trackedLink:      services.NewTrackedLinkService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
-		order:            services.NewOrderService(newServer.encoder, newServer.dbRO),
+		order:            services.NewOrderService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
 	}
 
 	newServer.services.all = []services.IService{

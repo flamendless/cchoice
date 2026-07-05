@@ -2,6 +2,7 @@ package payments
 
 import (
 	"context"
+	"database/sql"
 
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
@@ -10,6 +11,7 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/jobs"
 	"cchoice/internal/logs"
+	"cchoice/internal/orderhistory"
 
 	"go.uber.org/zap"
 )
@@ -135,6 +137,25 @@ func OnOrderPaid(ctx context.Context, params OnOrderPaidParams) (*OnOrderPaidRes
 		)
 		return nil, err
 	}
+
+	if err := orderhistory.RecordWithQueries(
+		ctx,
+		qtx,
+		order.ID,
+		sql.NullInt64{},
+		sql.NullString{String: order.Status, Valid: true},
+		enums.ORDER_STATUS_CONFIRMED.String(),
+		sql.NullString{},
+	); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Int64("order_id", order.ID),
+			zap.String("action", "record_status_history"),
+			zap.Error(err),
+		)
+		return nil, err
+	}
+
 	logs.LogCtx(ctx).Info(
 		logtag,
 		zap.String("action", "updated_order"),

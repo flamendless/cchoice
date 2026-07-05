@@ -8,6 +8,7 @@ import (
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
+	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/services"
@@ -117,6 +118,96 @@ func (s *Server) adminOrdersDetailsHandler(w http.ResponseWriter, r *http.Reques
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 	}
+}
+
+func (s *Server) adminOrdersManageModalHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Orders Manage Modal Handler]"
+	const page = "/admin/orders"
+	ctx := r.Context()
+
+	idStr := chi.URLParam(r, "id")
+	data, err := s.services.order.GetManageDataForAdmin(ctx, idStr)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	modalData := models.AdminOrderManageModalData{
+		ID:              idStr,
+		OrderReference:  data.OrderReference,
+		CurrentStatus:   data.Status,
+		CanUpdateStatus: s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_ORDER_STATUS),
+	}
+
+	if err := compadmin.OrderManageModal(modalData).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+	}
+}
+
+func (s *Server) adminOrdersTrackModalHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Orders Track Modal Handler]"
+	const page = "/admin/orders"
+	ctx := r.Context()
+
+	idStr := chi.URLParam(r, "id")
+	trackData, err := s.services.order.GetStatusHistoryForAdmin(ctx, idStr)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	history := make([]models.AdminOrderStatusHistoryEntry, 0, len(trackData.History))
+	for _, entry := range trackData.History {
+		history = append(history, models.AdminOrderStatusHistoryEntry{
+			FromStatus: entry.FromStatus,
+			ToStatus:   entry.ToStatus,
+			StaffName:  entry.StaffName,
+			Notes:      entry.Notes,
+			CreatedAt:  entry.CreatedAt,
+		})
+	}
+
+	modalData := models.AdminOrderTrackModalData{
+		ID:             idStr,
+		OrderReference: trackData.OrderReference,
+		CurrentStatus:  trackData.CurrentStatus,
+		History:        history,
+		FlowSteps:      trackData.FlowSteps,
+	}
+
+	if err := compadmin.OrderTrackModal(modalData).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+	}
+}
+
+func (s *Server) adminOrdersUpdateStatusHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Orders Update Status Handler]"
+	const page = "/admin/orders"
+	ctx := r.Context()
+
+	idStr := chi.URLParam(r, "id")
+	status := r.FormValue("status")
+	notes := r.FormValue("notes")
+	canUpdateStatus := s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_ORDER_STATUS)
+
+	if err := s.services.order.UpdateOrderForAdmin(
+		ctx,
+		s.sessionManager.GetString(ctx, SessionStaffID),
+		idStr,
+		status,
+		notes,
+		canUpdateStatus,
+	); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	redirectHX(w, r, utils.URLWithSuccess(page, "Order updated successfully"))
 }
 
 func mapAdminOrderDetails(details *services.OrderAdminDetails) models.AdminOrderDetails {
