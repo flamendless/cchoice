@@ -194,8 +194,9 @@ func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	showCPointsBanner := s.sessionManager.GetString(ctx, SessionCustomerID) == ""
 	summaryContent := s.generateCartSummaryComponent(ctx)
-	if err := compcart.CartPage(compcart.CartPageBody(summaryContent)).Render(ctx, w); err != nil {
+	if err := compcart.CartPage(compcart.CartPageBody(summaryContent, showCPointsBanner)).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
