@@ -1,0 +1,211 @@
+package shop
+
+import (
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/footer"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/utils"
+	"fmt"
+)
+
+templ SearchPage(data models.SearchPageData) {
+	<!DOCTYPE html>
+	<html lang="en" style="overflow-x: clip;">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("Search Results")
+		</head>
+		@SearchPageBody(data)
+	</html>
+}
+
+templ SearchPageBody(data models.SearchPageData) {
+	<body class="m-0 p-0 custom-scrollbar" style="overflow-x: clip;">
+		@common.DevRibbon()
+		@common.ErrorBanner()
+		@common.SuccessBanner()
+		@header.Header()
+		@MobileSidebar()
+		<style>
+			#sidebar-content-wrapper {
+				display: flex;
+				align-items: flex-start;
+				width: 100%;
+			}
+			#desktop-sidebar {
+				position: sticky;
+				top: 80px;
+				left: 0;
+				z-index: 45;
+				width: 15%;
+				height: calc(100vh - 80px);
+				overflow-y: auto;
+				padding: 0.5rem 1rem 0 0.25rem;
+				background: white;
+				flex-shrink: 0;
+			}
+			#main-content {
+				display: flex;
+				align-items: flex-start;
+				width: 85%;
+				border-left: 2px solid var(--color-primary-muted);
+			}
+			@media (max-width: 1023px) {
+				#desktop-sidebar {
+					display: none !important;
+				}
+				#main-content {
+					width: 100% !important;
+					border-left: none !important;
+				}
+				#sidebar-content-wrapper {
+					width: 100% !important;
+				}
+			}
+		</style>
+		<div id="sidebar-content-wrapper">
+			<div id="desktop-sidebar">
+				@BrandsSidePanel()
+				@CategoriesSidePanel()
+			</div>
+			<div id="main-content" name="right-panel">
+				<div class="w-full">
+					@ModalProductImageViewer("", "")
+					<div class="sticky top-0 bg-white z-20 flex flex-row justify-between items-center px-2 py-2">
+						<p class="text-xs font-normal">
+							Search results for <span class="font-semibold text-primary-dark">"{ data.Query }"</span>
+						</p>
+					</div>
+					@common.HR()
+					<div
+						id="search-results-section"
+						class="w-full flex flex-col overflow-x-hidden"
+						hx-trigger="load once, history:restore"
+						hx-get={ utils.URLWithParams("/search/products", map[string]string{"q": data.Query, "page": "0"}) }
+						hx-target="#search-results-section"
+						hx-swap="innerHTML"
+					>
+						@SearchProductsLoading()
+					</div>
+				</div>
+			</div>
+		</div>
+		@footer.Footer()
+		@LoadImageSrc()
+		@LoadModalImage()
+		@PrefetchProductImage()
+	</body>
+}
+
+templ SearchProductsLoading() {
+	<div class="flex justify-center py-8">
+		<svg class="w-8 h-8 text-primary animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+			<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+			<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+		</svg>
+	</div>
+}
+
+templ SearchProductsPage(data models.SearchProductsPageData) {
+	@CategorySectionProducts(models.CategorySectionProducts{
+		ID:       "search-results",
+		Products: data.Products,
+	})
+	if data.HasMore {
+		<div
+			class="search-products-inf-load"
+			hx-get={ utils.URLWithParams("/search/products", map[string]string{
+				"q":    data.Query,
+				"page": fmt.Sprintf("%d", data.Page+1),
+			}) }
+			hx-target=".search-products-inf-load"
+			hx-swap="outerHTML"
+			hx-trigger="revealed"
+		></div>
+	} else {
+		@SearchEndOfResultsSeparator()
+		<div
+			id="search-related-section"
+			class="w-full"
+			hx-trigger="load once"
+			hx-get={ utils.URLWithParams("/search/related", map[string]string{
+				"q":    data.Query,
+				"page": "0",
+			}) }
+			hx-target="#search-related-section"
+			hx-swap="innerHTML"
+		>
+			@SearchProductsLoading()
+		</div>
+	}
+}
+
+templ SearchEndOfResultsSeparator() {
+	<div class="flex flex-col items-center my-4 px-4">
+		@common.HR()
+		<p class="text-sm font-medium text-primary-dark text-center py-2">
+			End of results. Showing other products
+		</p>
+		@common.HR()
+	</div>
+}
+
+templ SearchRelatedProductsPage(data models.SearchRelatedProductsPageData) {
+	@CategorySectionProducts(models.CategorySectionProducts{
+		ID:       "search-related",
+		Products: data.Products,
+	})
+	if data.HasMore {
+		<div
+			class="search-related-inf-load"
+			hx-get={ utils.URLWithParams("/search/related", map[string]string{
+				"q":      data.Query,
+				"page":   fmt.Sprintf("%d", data.Page+1),
+				"source": data.Source,
+			}) }
+			hx-target=".search-related-inf-load"
+			hx-swap="outerHTML"
+			hx-trigger="revealed"
+		></div>
+	}
+}
+
+templ SearchProductsExhausted(query string) {
+	@SearchEndOfResultsSeparator()
+	<div
+		id="search-related-section"
+		class="w-full"
+		hx-trigger="load once"
+		hx-get={ utils.URLWithParams("/search/related", map[string]string{
+			"q":    query,
+			"page": "0",
+		}) }
+		hx-target="#search-related-section"
+		hx-swap="innerHTML"
+	>
+		@SearchProductsLoading()
+	</div>
+}
+
+templ SearchNoResults(query string) {
+	<div class="flex flex-col items-center py-8 px-4">
+		<p class="text-base text-gray-600 text-center">
+			No products found for <span class="font-semibold text-primary-dark">"{ query }"</span>
+		</p>
+	</div>
+	@SearchEndOfResultsSeparator()
+	<div
+		id="search-related-section"
+		class="w-full"
+		hx-trigger="load once"
+		hx-get={ utils.URLWithParams("/search/related", map[string]string{
+			"q":    query,
+			"page": "0",
+		}) }
+		hx-target="#search-related-section"
+		hx-swap="innerHTML"
+	>
+		@SearchProductsLoading()
+	</div>
+}
