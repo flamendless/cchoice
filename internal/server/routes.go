@@ -183,6 +183,7 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 
 	r.Post("/search", s.searchHandler)
 
+	AddSearchHandlers(s, r)
 	AddProductCategoriesHandlers(s, r)
 	AddProductHandlers(s, r)
 	AddSEOHandlers(s, r)
