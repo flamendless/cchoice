@@ -13,15 +13,17 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/jobs"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 )
 
 type OrderService struct {
-	encoder  encode.IEncode
-	dbRO     database.IService
-	dbRW     database.IService
-	staffLog *StaffLogsService
+	encoder     encode.IEncode
+	dbRO        database.IService
+	dbRW        database.IService
+	staffLog    *StaffLogsService
+	emailRunner *jobs.EmailJobRunner
 }
 
 func NewOrderService(
@@ -29,12 +31,14 @@ func NewOrderService(
 	dbRO database.IService,
 	dbRW database.IService,
 	staffLog *StaffLogsService,
+	emailRunner *jobs.EmailJobRunner,
 ) *OrderService {
 	return &OrderService{
-		encoder:  encoder,
-		dbRO:     dbRO,
-		dbRW:     dbRW,
-		staffLog: staffLog,
+		encoder:     encoder,
+		dbRO:        dbRO,
+		dbRW:        dbRW,
+		staffLog:    staffLog,
+		emailRunner: emailRunner,
 	}
 }
 

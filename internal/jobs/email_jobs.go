@@ -217,6 +217,8 @@ func (ejr *EmailJobRunner) handleSendEmail(ctx context.Context, m []byte) error 
 		return ejr.sendPasswordResetEmail(ctx, emailJob, recipient, cc, emailJob.Subject)
 	case enums.EMAIL_TEMPLATE_MEMO_NOTIFICATION:
 		return ejr.sendMemoNotificationEmail(ctx, emailJob, recipient, cc, emailJob.Subject)
+	case enums.EMAIL_TEMPLATE_ORDER_STATUS_UPDATE:
+		return ejr.sendOrderStatusUpdateEmail(ctx, emailJob, recipient, cc, emailJob.Subject)
 	default:
 		err := fmt.Errorf("unknown template: %s", emailJob.TemplateName)
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -441,6 +443,84 @@ func (ejr *EmailJobRunner) sendMemoNotificationEmail(ctx context.Context, emailJ
 		logtag,
 		zap.String("result", "success"),
 		zap.Int64("memo_id", emailJob.MemoID.Int64),
+		zap.String("recipient", recipient),
+		zap.Strings("cc", cc),
+	)
+
+	return nil
+}
+
+func (ejr *EmailJobRunner) QueueOrderStatusUpdateEmail(ctx context.Context, order queries.TblOrder) error {
+	cfg := conf.Conf()
+	orderID := order.ID
+	return ejr.QueueEmailJob(ctx, EmailJobParams{
+		Recipient:    order.CustomerEmail,
+		CC:           cfg.MailerooConfig.CC,
+		Subject:      "Order Status Update - " + order.OrderNumber,
+		TemplateName: enums.EMAIL_TEMPLATE_ORDER_STATUS_UPDATE,
+		OrderID:      &orderID,
+	})
+}
+
+func (ejr *EmailJobRunner) sendOrderStatusUpdateEmail(
+	ctx context.Context,
+	emailJob queries.TblEmailJob,
+	recipient string,
+	cc []string,
+	subject string,
+) error {
+	const logtag = "[EmailJobRunner sendOrderStatusUpdateEmail]"
+
+	if !emailJob.OrderID.Valid {
+		return errs.ErrJobsOrderNotFound
+	}
+
+	order, err := ejr.dbRO.GetQueries().GetOrderByID(ctx, emailJob.OrderID.Int64)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Int64("order_id", emailJob.OrderID.Int64), zap.Error(err))
+		return errors.Join(errs.ErrJobsOrderNotFound, err)
+	}
+
+	history, err := ejr.dbRO.GetQueries().GetOrderStatusHistoryByOrderID(ctx, order.ID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Int64("order_id", order.ID), zap.Error(err))
+		return err
+	}
+
+	var previousStatus, notes string
+	if len(history) > 0 {
+		latest := history[len(history)-1]
+		if latest.FromStatus.Valid && latest.FromStatus.String != "" {
+			previousStatus = latest.FromStatus.String
+		}
+		if latest.Notes.Valid {
+			notes = latest.Notes.String
+		}
+	}
+
+	cfg := conf.Conf()
+	mobileNo := constants.ViberURIPrefix + cfg.Settings.MobileNo
+	email := cfg.Settings.EMail
+	templateData := mail.TemplateData{
+		"LogoURL":        constants.PathEmailLogoCDN,
+		"OrderNumber":    order.OrderNumber,
+		"NewStatus":      order.Status,
+		"PreviousStatus": previousStatus,
+		"Notes":          notes,
+		"MobileNo":       mobileNo,
+		"EMail":          email,
+	}
+
+	if err := ejr.mailService.SendTemplateEmail(recipient, cc, subject, enums.EMAIL_TEMPLATE_ORDER_STATUS_UPDATE.FileName(), templateData); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		return errors.Join(errs.ErrJobsSendEmail, err)
+	}
+
+	logs.LogCtx(ctx).Info(
+		logtag,
+		zap.String("result", "success"),
+		zap.String("order_number", order.OrderNumber),
+		zap.String("status", order.Status),
 		zap.String("recipient", recipient),
 		zap.Strings("cc", cc),
 	)

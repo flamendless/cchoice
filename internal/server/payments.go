@@ -81,6 +81,22 @@ func (s *Server) paymentsCancelHandler(w http.ResponseWriter, r *http.Request) {
 					zap.String("action", "record_status_history"),
 					zap.Error(err),
 				)
+			} else if s.mailJobRunner != nil {
+				if updatedOrder, err := s.dbRO.GetQueries().GetOrderByID(ctx, order.ID); err != nil {
+					logs.LogCtx(ctx).Error(
+						logtag,
+						zap.Int64("order_id", order.ID),
+						zap.String("action", "load_order_for_status_email"),
+						zap.Error(err),
+					)
+				} else if err := s.mailJobRunner.QueueOrderStatusUpdateEmail(ctx, updatedOrder); err != nil {
+					logs.LogCtx(ctx).Error(
+						logtag,
+						zap.Int64("order_id", order.ID),
+						zap.String("action", "queue_status_email"),
+						zap.Error(err),
+					)
+				}
 			}
 		}
 	}

@@ -179,6 +179,15 @@ func (s *OrderService) UpdateOrderForAdmin(
 		return err
 	}
 
+	if statusChanged && s.emailRunner != nil {
+		updatedOrder, err := s.dbRO.GetQueries().GetOrderByID(ctx, decoded)
+		if err != nil {
+			logs.Log().Warn("[OrderService] failed to load order for status email", zap.Error(err), zap.Int64("order_id", decoded))
+		} else if err := s.emailRunner.QueueOrderStatusUpdateEmail(ctx, updatedOrder); err != nil {
+			logs.Log().Warn("[OrderService] failed to queue order status email", zap.Error(err), zap.Int64("order_id", decoded))
+		}
+	}
+
 	result = fmt.Sprintf("success. order '%s'", orderIDStr)
 	return nil
 }
