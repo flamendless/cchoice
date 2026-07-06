@@ -3,6 +3,7 @@ package cart
 import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/svg"
 import "cchoice/internal/constants"
+import "cchoice/cmd/web/models"
 
 templ MapOption(value string, name string) {
 	<option value={ value }>{ name }</option>
@@ -177,7 +178,7 @@ templ divInputWarning() {
 	</div>
 }
 
-templ infieldLabelInput(t string, name string, label string, pattern ...string) {
+templ infieldLabelInput(t string, name string, label string, value string, pattern ...string) {
 	<div class="relative">
 		<input
 			type={ t }
@@ -185,6 +186,7 @@ templ infieldLabelInput(t string, name string, label string, pattern ...string) 
 			class="border rounded-lg p-3 pt-6 w-full peer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 			placeholder=" "
 			required
+			value={ value }
 			onblur="this.value = this.value.trim()"
 			if len(pattern) > 0 {
 				pattern={ pattern[0] }
@@ -226,7 +228,7 @@ templ infieldLabelSelect(id string, name string, label string, required bool, di
 	</div>
 }
 
-templ ShippingAddressSelect() {
+templ ShippingAddressSelect(prefill models.CartShippingPrefill) {
 	<div id="delivery-fee-loading-template" class="hidden">
 		<h1>Delivery Fee</h1>
 		<h1 class="text-right flex items-center gap-1">
@@ -284,21 +286,25 @@ templ ShippingAddressSelect() {
 			end
 
 			on load
-				-- Restore shipping form values from sessionStorage on page load
-				call restoreShippingFormState()
+				if sessionStorage.getItem('shippingFormState')
+					call restoreShippingFormState()
+				else
+					call restoreCustomerShippingPrefill()
+				end
 			end
 		"
 	>
-		@infieldLabelInput("email", "email", "E-Mail")
-		@infieldLabelInput("fullname", "fullname", "Full Name")
-		@infieldLabelInput("tel", "mobile_no", "Mobile Number (+63)", "^\\+63[0-9]{10}$")
-		@infieldLabelInput("text", "address_line1", "Address Line 1")
+		@infieldLabelInput("email", "email", "E-Mail", prefill.Email)
+		@infieldLabelInput("fullname", "fullname", "Full Name", prefill.FullName)
+		@infieldLabelInput("tel", "mobile_no", "Mobile Number (+63)", prefill.MobileNo, "^\\+63[0-9]{10}$")
+		@infieldLabelInput("text", "address_line1", "Address Line 1", prefill.AddressLine1)
 		<div class="relative">
 			<input
 				type="text"
 				name="address_line2"
 				class="border rounded-lg p-3 pt-6 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 				placeholder=" "
+				value={ prefill.AddressLine2 }
 				onblur="this.value = this.value.trim()"
 			/>
 			<label
@@ -315,6 +321,7 @@ templ ShippingAddressSelect() {
 					class="border rounded-lg px-3 py-2 pt-6 w-full h-14 peer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 					placeholder=" "
 					required
+					value={ prefill.Postal }
 					pattern={ constants.PatternPostalCode }
 					onblur="this.value = this.value.trim()"
 				/>
@@ -353,7 +360,21 @@ templ ShippingAddressSelect() {
 		@CitySelect()
 		@BarangaySelect()
 	</div>
+	@templ.JSONScript("customer-shipping-prefill", prefill)
 	<script type="text/javascript">
+		const customerShippingPrefill = (() => {
+			const el = document.getElementById('customer-shipping-prefill');
+			if (!el) {
+				return {};
+			}
+
+			try {
+				return JSON.parse(el.textContent);
+			} catch (_) {
+				return {};
+			}
+		})();
+
 		function saveShippingFormState() {
 			const form = document.getElementById('shipping-form');
 			const formData = {
@@ -370,90 +391,105 @@ templ ShippingAddressSelect() {
 				cityDisabled: document.getElementById('city')?.disabled || false,
 				barangayDisabled: document.getElementById('barangay')?.disabled || false
 			};
-			console.log('Saving shipping form state:', formData);
 			sessionStorage.setItem('shippingFormState', JSON.stringify(formData));
+		}
+
+		function restoreCustomerShippingPrefill() {
+			if (!customerShippingPrefill || !customerShippingPrefill.Email) {
+				return;
+			}
+
+			applyShippingFormData({
+				email: customerShippingPrefill.Email || '',
+				fullname: customerShippingPrefill.FullName || '',
+				mobile_no: customerShippingPrefill.MobileNo || '',
+				address_line1: customerShippingPrefill.AddressLine1 || '',
+				address_line2: customerShippingPrefill.AddressLine2 || '',
+				postal: customerShippingPrefill.Postal || '',
+				province: customerShippingPrefill.Province || '',
+				city: customerShippingPrefill.City || '',
+				barangay: customerShippingPrefill.Barangay || '',
+				provinceText: customerShippingPrefill.Province || '',
+				cityDisabled: false,
+				barangayDisabled: false
+			});
 		}
 
 		function restoreShippingFormState() {
 			const saved = sessionStorage.getItem('shippingFormState');
-			console.log('Restoring shipping form state:', saved);
-			if (!saved)
-				return
+			if (!saved) {
+				return;
+			}
 
 			try {
-				const formData = JSON.parse(saved);
-				const form = document.getElementById('shipping-form');
-				const provinceSelect = document.getElementById('province');
-				const citySelect = document.getElementById('city');
-				const barangaySelect = document.getElementById('barangay');
-				console.log('Restoring shipping form state:', formData);
-
-				if (formData.email) {
-					const emailInput = form.querySelector('[name="email"]');
-					if (emailInput) emailInput.value = formData.email;
-				}
-				if (formData.fullname) {
-					const fullnameInput = form.querySelector('[name="fullname"]');
-					if (fullnameInput) fullnameInput.value = formData.fullname;
-				}
-				if (formData.mobile_no) {
-					const mobileInput = form.querySelector('[name="mobile_no"]');
-					if (mobileInput) mobileInput.value = formData.mobile_no;
-				}
-				if (formData.address_line1) {
-					const address1Input = form.querySelector('[name="address_line1"]');
-					if (address1Input) address1Input.value = formData.address_line1;
-				}
-				if (formData.address_line2) {
-					const address2Input = form.querySelector('[name="address_line2"]');
-					if (address2Input) address2Input.value = formData.address_line2;
-				}
-				if (formData.postal) {
-					const postalInput = form.querySelector('[name="postal"]');
-					if (postalInput) postalInput.value = formData.postal;
-				}
-
-				// Wait for province options to load
-				if (provinceSelect && formData.province) {
-					const checkAndRestore = () => {
-						if (provinceSelect.options.length > 1) {
-							provinceSelect.value = formData.province;
-
-							// Check if NCR
-							if (formData.provinceText && formData.provinceText.includes('National Capital Region')) {
-								// Restore NCR state
-								citySelect.innerHTML = '<option value="' + formData.city + '" selected>' + formData.city + '</option>';
-								citySelect.disabled = formData.cityDisabled;
-								barangaySelect.innerHTML = '<option value="' + formData.barangay + '" selected>' + formData.barangay + '</option>';
-								barangaySelect.disabled = formData.barangayDisabled;
-							} else {
-								// For other provinces, trigger the change to load cities
-								provinceSelect.dispatchEvent(new Event('change', { bubbles: true }));
-
-								// Wait for cities to load, then restore
-								setTimeout(() => {
-									if (citySelect && formData.city) {
-										citySelect.value = formData.city;
-										citySelect.dispatchEvent(new Event('change', { bubbles: true }));
-
-										// Wait for barangays to load
-										setTimeout(() => {
-											if (barangaySelect && formData.barangay) {
-												barangaySelect.value = formData.barangay;
-											}
-										}, 300);
-									}
-								}, 300);
-							}
-						} else {
-							// Options not loaded yet, wait a bit
-							setTimeout(checkAndRestore, 100);
-						}
-					};
-					checkAndRestore();
-				}
+				applyShippingFormData(JSON.parse(saved));
 			} catch (e) {
 				console.error('Failed to restore shipping form state:', e);
+			}
+		}
+
+		function applyShippingFormData(formData) {
+			const form = document.getElementById('shipping-form');
+			const provinceSelect = document.getElementById('province');
+			const citySelect = document.getElementById('city');
+			const barangaySelect = document.getElementById('barangay');
+
+			if (formData.email) {
+				const emailInput = form.querySelector('[name="email"]');
+				if (emailInput) emailInput.value = formData.email;
+			}
+			if (formData.fullname) {
+				const fullnameInput = form.querySelector('[name="fullname"]');
+				if (fullnameInput) fullnameInput.value = formData.fullname;
+			}
+			if (formData.mobile_no) {
+				const mobileInput = form.querySelector('[name="mobile_no"]');
+				if (mobileInput) mobileInput.value = formData.mobile_no;
+			}
+			if (formData.address_line1) {
+				const address1Input = form.querySelector('[name="address_line1"]');
+				if (address1Input) address1Input.value = formData.address_line1;
+			}
+			if (formData.address_line2) {
+				const address2Input = form.querySelector('[name="address_line2"]');
+				if (address2Input) address2Input.value = formData.address_line2;
+			}
+			if (formData.postal) {
+				const postalInput = form.querySelector('[name="postal"]');
+				if (postalInput) postalInput.value = formData.postal;
+			}
+
+			if (provinceSelect && formData.province) {
+				const checkAndRestore = () => {
+					if (provinceSelect.options.length > 1) {
+						provinceSelect.value = formData.province;
+
+						if (formData.provinceText && formData.provinceText.includes('National Capital Region')) {
+							citySelect.innerHTML = '<option value="' + formData.city + '" selected>' + formData.city + '</option>';
+							citySelect.disabled = formData.cityDisabled;
+							barangaySelect.innerHTML = '<option value="' + formData.barangay + '" selected>' + formData.barangay + '</option>';
+							barangaySelect.disabled = formData.barangayDisabled;
+						} else {
+							provinceSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+							setTimeout(() => {
+								if (citySelect && formData.city) {
+									citySelect.value = formData.city;
+									citySelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+									setTimeout(() => {
+										if (barangaySelect && formData.barangay) {
+											barangaySelect.value = formData.barangay;
+										}
+									}, 300);
+								}
+							}, 300);
+						}
+					} else {
+						setTimeout(checkAndRestore, 100);
+					}
+				};
+				checkAndRestore();
 			}
 		}
 	</script>
