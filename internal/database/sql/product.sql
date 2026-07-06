@@ -411,6 +411,148 @@ WHERE
 	AND tbl_products_fts.name MATCH ?
 LIMIT ?;
 
+-- name: GetProductsBySearchQueryPaginated :many
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	COALESCE(
+		tbl_product_images.thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
+FROM tbl_products_fts
+INNER JOIN tbl_products ON tbl_products.id = tbl_products_fts.rowid
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE
+	tbl_products.status = 'ACTIVE'
+	AND thumbnail_path != 'static/images/empty_96x96.webp'
+	AND tbl_products_fts.name MATCH ?
+ORDER BY is_on_sale DESC, tbl_products.created_at DESC
+LIMIT ? OFFSET ?;
+
+-- name: GetRelatedProductsForSearch :many
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	COALESCE(
+		tbl_product_images.thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+INNER JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE
+	tbl_products.status = 'ACTIVE'
+	AND thumbnail_path != 'static/images/empty_96x96.webp'
+	AND tbl_products_categories.category_id IN (
+		SELECT DISTINCT pc.category_id
+		FROM tbl_products_fts
+		INNER JOIN tbl_products p ON p.id = tbl_products_fts.rowid
+		INNER JOIN tbl_products_categories pc ON pc.product_id = p.id
+		WHERE
+			p.status = 'ACTIVE'
+			AND tbl_products_fts.name MATCH sqlc.arg('search_query')
+	)
+	AND tbl_products.id NOT IN (
+		SELECT p2.id
+		FROM tbl_products_fts
+		INNER JOIN tbl_products p2 ON p2.id = tbl_products_fts.rowid
+		WHERE
+			p2.status = 'ACTIVE'
+			AND tbl_products_fts.name MATCH sqlc.arg('search_query')
+	)
+ORDER BY is_on_sale DESC, tbl_products.created_at DESC
+LIMIT ? OFFSET ?;
+
+-- name: GetOtherProductsForSearch :many
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	COALESCE(
+		tbl_product_images.thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE
+	tbl_products.status = 'ACTIVE'
+	AND thumbnail_path != 'static/images/empty_96x96.webp'
+	AND tbl_products.id NOT IN (
+		SELECT p2.id
+		FROM tbl_products_fts
+		INNER JOIN tbl_products p2 ON p2.id = tbl_products_fts.rowid
+		WHERE
+			p2.status = 'ACTIVE'
+			AND tbl_products_fts.name MATCH sqlc.arg('search_query')
+	)
+ORDER BY is_on_sale DESC, tbl_products.created_at DESC
+LIMIT ? OFFSET ?;
+
 -- name: GetRandomProductOnSale :one
 SELECT
 	tbl_products.id,
