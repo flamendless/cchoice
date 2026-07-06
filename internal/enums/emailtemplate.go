@@ -11,6 +11,7 @@ const (
 	EMAIL_TEMPLATE_CUSTOMER_VERIFICATION
 	EMAIL_TEMPLATE_PASSWORD_RESET
 	EMAIL_TEMPLATE_MEMO_NOTIFICATION
+	EMAIL_TEMPLATE_ORDER_STATUS_UPDATE
 )
 
 func ParseEmailTemplateNameToEnum(e string) EmailTemplateName {
@@ -23,6 +24,8 @@ func ParseEmailTemplateNameToEnum(e string) EmailTemplateName {
 		return EMAIL_TEMPLATE_PASSWORD_RESET
 	case EMAIL_TEMPLATE_MEMO_NOTIFICATION.String():
 		return EMAIL_TEMPLATE_MEMO_NOTIFICATION
+	case EMAIL_TEMPLATE_ORDER_STATUS_UPDATE.String():
+		return EMAIL_TEMPLATE_ORDER_STATUS_UPDATE
 	default:
 		return EMAIL_TEMPLATE_UNDEFINED
 	}
@@ -40,6 +43,8 @@ func (e EmailTemplateName) FileName() string {
 		return "password_reset.html"
 	case EMAIL_TEMPLATE_MEMO_NOTIFICATION:
 		return "memo_notification.html"
+	case EMAIL_TEMPLATE_ORDER_STATUS_UPDATE:
+		return "order_status_update.html"
 	default:
 		return ""
 	}
@@ -57,6 +62,8 @@ func (e EmailTemplateName) DBValue() string {
 		return "password_reset"
 	case EMAIL_TEMPLATE_MEMO_NOTIFICATION:
 		return "memo_notification"
+	case EMAIL_TEMPLATE_ORDER_STATUS_UPDATE:
+		return "order_status_update"
 	default:
 		return ""
 	}
@@ -74,6 +81,8 @@ func ParseEmailTemplateNameFromDB(s string) EmailTemplateName {
 		return EMAIL_TEMPLATE_PASSWORD_RESET
 	case "memo_notification":
 		return EMAIL_TEMPLATE_MEMO_NOTIFICATION
+	case "order_status_update":
+		return EMAIL_TEMPLATE_ORDER_STATUS_UPDATE
 	default:
 		return EMAIL_TEMPLATE_UNDEFINED
 	}
