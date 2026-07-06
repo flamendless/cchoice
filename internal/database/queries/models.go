@@ -275,6 +275,8 @@ type TblOrder struct {
 	UpdatedAt                time.Time
 	PaidAt                   sql.NullTime
 	ShippingEta              sql.NullString
+	CustomerID               sql.NullInt64
+	ShippingBarangay         string
 }
 
 type TblOrderLine struct {

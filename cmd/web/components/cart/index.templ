@@ -52,7 +52,7 @@ templ CPointsLoginBanner() {
 	</div>
 }
 
-templ CartPageBody(summaryContent templ.Component, showCPointsBanner bool) {
+templ CartPageBody(summaryContent templ.Component, showCPointsBanner bool, shippingPrefill models.CartShippingPrefill) {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
 		@common.DevRibbon()
 		@common.ErrorBanner()
@@ -89,7 +89,7 @@ templ CartPageBody(summaryContent templ.Component, showCPointsBanner bool) {
 								id="cart-shipping-content"
 								class="flex flex-col gap-1 p-2"
 							>
-								@CartSubcard("shipping-address-select", "Shipping Information", ShippingAddressSelect())
+								@CartSubcard("shipping-address-select", "Shipping Information", ShippingAddressSelect(shippingPrefill))
 							</div>
 						</div>
 					</div>
