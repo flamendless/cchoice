@@ -25,13 +25,43 @@ templ CartPage(body templ.Component) {
 	</html>
 }
 
-templ CartPageBody(summaryContent templ.Component) {
+templ CPointsLoginBanner() {
+	<div class="w-full max-w-7xl mx-auto px-2 lg:px-8">
+		<div
+			class="
+				bg-primary-muted border border-primary rounded-lg
+				p-3 text-center text-sm text-gray-800
+			"
+			role="status"
+		>
+			<a
+				href={ utils.URL("/customer") }
+				class="text-primary hover:text-primary-dark font-medium underline"
+			>
+				Log in
+			</a>
+			or
+			<a
+				href={ utils.URL("/customer/register") }
+				class="text-primary hover:text-primary-dark font-medium underline"
+			>
+				sign up
+			</a>
+			to earn C-Points for more discounts, vouchers, and benefits!
+		</div>
+	</div>
+}
+
+templ CartPageBody(summaryContent templ.Component, showCPointsBanner bool) {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
 		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()
 		@header.Header()
 		<div class="flex flex-col items-center content-center px-2 pb-32 gap-4">
+			if showCPointsBanner {
+				@CPointsLoginBanner()
+			}
 			<form
 				id="checkout-form"
 				hx-post={ utils.URL("/carts/finalize") }
