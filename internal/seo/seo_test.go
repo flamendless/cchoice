@@ -82,44 +82,59 @@ func TestBuildSitemapXML(t *testing.T) {
 	assert.Contains(t, got, `</urlset>`)
 }
 
-func TestGenerateProductMeta(t *testing.T) {
-	product := Product{
+func gma55Product() Product {
+	return Product{
 		BrandName:          "Bosch",
-		Name:               "Hammer Drill",
-		Serial:             "GBH2-28",
-		Description:        "Professional hammer drill for heavy-duty work.",
-		ProductCategory:    "Power Tools",
-		ProductSubcategory: "Drills",
+		Name:               "GMA 55",
+		Serial:             "BOSCH-GMA-163-0",
+		ProductCategory:    "Table",
+		ProductSubcategory: "Saw",
 	}
+}
+
+const gma55Title = "Bosch GMA 55 Table Saw Power Tools | Price, Specs, Buy Online | C-Choice"
+
+func TestGenerateProductMeta(t *testing.T) {
+	product := gma55Product()
+	product.Description = "Professional table saw for heavy-duty work."
 
 	meta := GenerateProductMeta(
 		product,
-		"https://cchoice.shop/product/bosch-hammer-drill-gbh2-28",
+		"https://cchoice.shop/product/bosch-gma-55",
 		"https://cchoice.shop",
 		"https://cdn.example.com/product.webp",
 		"12999.00",
 		"PHP",
 	)
 
-	assert.Equal(t, "Bosch Hammer Drill (GBH2-28) - Price, Specs, Buy Online | C-Choice", meta.Title)
-	assert.Equal(t, "Professional hammer drill for heavy-duty work.", meta.Description)
-	assert.Equal(t, "https://cchoice.shop/product/bosch-hammer-drill-gbh2-28", meta.CanonicalURL)
+	assert.Equal(t, gma55Title, meta.Title)
+	assert.Equal(t, "Professional table saw for heavy-duty work.", meta.Description)
+	assert.Equal(t, "https://cchoice.shop/product/bosch-gma-55", meta.CanonicalURL)
 	assert.Equal(t, ProductOGType, meta.OGType)
 	assert.Equal(t, ProductRobots, meta.Robots)
 	assert.Equal(t, ProductTwitterCard, meta.TwitterCard)
 	assert.Contains(t, meta.Keywords, "Bosch")
-	assert.Contains(t, meta.Keywords, "Power Tools")
+	assert.Contains(t, meta.Keywords, "Table")
+	assert.Contains(t, meta.Keywords, "Saw")
+	assert.Contains(t, meta.Keywords, "power tools")
+	assert.Contains(t, meta.Keywords, "bosch philippines")
 	assert.NotEmpty(t, meta.StructuredData)
+}
+
+func TestBuildProductTitle(t *testing.T) {
+	title := buildProductTitle(gma55Product())
+	assert.Equal(t, gma55Title, title)
+
+	saleProduct := gma55Product()
+	saleProduct.OnSale = true
+	saleTitle := buildProductTitle(saleProduct)
+	assert.Equal(t, "SALE! "+gma55Title, saleTitle)
 }
 
 func TestGenerateProductMeta_TruncatesLongDescription(t *testing.T) {
 	longDescription := strings.Repeat("a", 200)
-	product := Product{
-		BrandName:   "Bosch",
-		Name:        "Hammer Drill",
-		Serial:      "GBH2-28",
-		Description: longDescription,
-	}
+	product := gma55Product()
+	product.Description = longDescription
 
 	meta := GenerateProductMeta(
 		product,
@@ -135,38 +150,30 @@ func TestGenerateProductMeta_TruncatesLongDescription(t *testing.T) {
 }
 
 func TestGenerateProductMeta_FallbackDescription(t *testing.T) {
-	product := Product{
-		BrandName: "Bosch",
-		Name:      "Hammer Drill",
-		Serial:    "GBH2-28",
-	}
+	product := gma55Product()
 
 	meta := GenerateProductMeta(
 		product,
-		"https://cchoice.shop/product/slug",
+		"https://cchoice.shop/product/bosch-gma-55",
 		"https://cchoice.shop",
 		"",
 		"100.00",
 		"PHP",
 	)
 
-	assert.Contains(t, meta.Description, "Shop Bosch Hammer Drill (GBH2-28)")
+	assert.Contains(t, meta.Description, "Shop Bosch GMA 55 (BOSCH-GMA-163-0)")
+	assert.Contains(t, meta.Description, "C-Choice")
+	assert.Contains(t, meta.Description, "Philippines")
 	assert.Equal(t, DefaultOGImage, meta.OGImage)
 }
 
 func TestBuildProductStructuredData(t *testing.T) {
-	product := Product{
-		BrandName:          "Bosch",
-		Name:               "Hammer Drill",
-		Serial:             "GBH2-28",
-		Description:        "Heavy-duty drill",
-		ProductCategory:    "Power Tools",
-		ProductSubcategory: "Drills",
-	}
+	product := gma55Product()
+	product.Description = "Heavy-duty table saw"
 
 	raw := BuildProductStructuredData(
 		product,
-		"https://cchoice.shop/product/bosch-hammer-drill",
+		"https://cchoice.shop/product/bosch-gma-55",
 		"https://cdn.example.com/product.webp",
 		"12999.00",
 		"PHP",
@@ -178,18 +185,26 @@ func TestBuildProductStructuredData(t *testing.T) {
 
 	assert.Equal(t, "https://schema.org", payload["@context"])
 	assert.Equal(t, "Product", payload["@type"])
-	assert.Equal(t, "Bosch Hammer Drill", payload["name"])
-	assert.Equal(t, "GBH2-28", payload["sku"])
+	assert.Equal(t, "Bosch GMA 55", payload["name"])
+	assert.Equal(t, "BOSCH-GMA-163-0", payload["sku"])
 
 	offers, ok := payload["offers"].(map[string]any)
 	require.True(t, ok)
 	assert.Equal(t, "12999.00", offers["price"])
 	assert.Equal(t, "PHP", offers["priceCurrency"])
-	assert.Equal(t, "https://cchoice.shop/product/bosch-hammer-drill", offers["url"])
+	assert.Equal(t, "https://cchoice.shop/product/bosch-gma-55", offers["url"])
 
 	breadcrumb, ok := payload["breadcrumb"].(map[string]any)
 	require.True(t, ok)
 	items, ok := breadcrumb["itemListElement"].([]any)
 	require.True(t, ok)
 	assert.GreaterOrEqual(t, len(items), 4)
+
+	tableItem, ok := items[1].(map[string]any)
+	require.True(t, ok)
+	assert.Equal(t, "Table", tableItem["name"])
+
+	sawItem, ok := items[2].(map[string]any)
+	require.True(t, ok)
+	assert.Equal(t, "Saw", sawItem["name"])
 }

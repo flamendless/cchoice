@@ -925,6 +925,7 @@ func (s *ProductService) GenerateMeta(
 			Description:        product.Description.String,
 			ProductCategory:    product.ProductCategory,
 			ProductSubcategory: product.ProductSubcategory,
+			OnSale:             product.IsOnSale == 1,
 		},
 		utils.SiteURL("/product/"+slug),
 		utils.SiteURL("/"),
