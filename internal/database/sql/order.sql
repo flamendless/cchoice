@@ -4,6 +4,7 @@ INSERT INTO tbl_orders(
 	checkout_payment_id,
 	order_number,
 	status,
+	customer_id,
 	customer_name,
 	customer_email,
 	customer_phone,
@@ -19,6 +20,7 @@ INSERT INTO tbl_orders(
 	billing_place_id,
 	shipping_address_line1,
 	shipping_address_line2,
+	shipping_barangay,
 	shipping_city,
 	shipping_state,
 	shipping_postal_code,
@@ -41,17 +43,31 @@ INSERT INTO tbl_orders(
 	created_at,
 	updated_at
 ) VALUES (
+	?, ?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
-	?, ?, ?, ?, ?,
-	?, ?, ?,
+	?, ?, ?, ?,
 	datetime('now'),
 	datetime('now')
 ) RETURNING *;
+
+-- name: GetLatestOrderShippingByCustomerID :one
+SELECT
+	shipping_address_line1,
+	shipping_address_line2,
+	shipping_barangay,
+	shipping_city,
+	shipping_state,
+	shipping_postal_code
+FROM tbl_orders
+WHERE
+	customer_id = ?
+ORDER BY created_at DESC
+LIMIT 1;
 
 -- name: GetOrderByID :one
 SELECT * FROM tbl_orders

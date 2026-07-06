@@ -45,6 +45,7 @@ type CreateOrderParams struct {
 	Checkout                cart.CartCheckout
 	CheckoutLines           []queries.GetCheckoutLinesByCheckoutIDRow
 	CheckoutID              int64
+	CustomerID              sql.NullInt64
 }
 
 const (
@@ -195,7 +196,8 @@ func CreateOrderFromCheckout(
 		CheckoutPaymentID:        checkoutPayment.ID,
 		OrderNumber:              orderNumber,
 		Status:                   enums.ORDER_STATUS_PENDING.String(),
-		CustomerName:             params.Checkout.Email,
+		CustomerID:               params.CustomerID,
+		CustomerName:             params.Checkout.FullName,
 		CustomerEmail:            params.Checkout.Email,
 		CustomerPhone:            params.Checkout.MobileNo,
 		BillingAddressLine1:      params.Checkout.AddressLine1,
@@ -210,6 +212,7 @@ func CreateOrderFromCheckout(
 		BillingPlaceID:           shippingPlaceID,
 		ShippingAddressLine1:     params.Checkout.AddressLine1,
 		ShippingAddressLine2:     params.Checkout.AddressLine2,
+		ShippingBarangay:         params.Checkout.Barangay,
 		ShippingCity:             params.Checkout.City,
 		ShippingState:            params.Checkout.Province,
 		ShippingPostalCode:       params.Checkout.Postal,

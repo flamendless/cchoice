@@ -640,6 +640,7 @@ INSERT INTO tbl_orders(
 	checkout_payment_id,
 	order_number,
 	status,
+	customer_id,
 	customer_name,
 	customer_email,
 	customer_phone,
@@ -655,6 +656,7 @@ INSERT INTO tbl_orders(
 	billing_place_id,
 	shipping_address_line1,
 	shipping_address_line2,
+	shipping_barangay,
 	shipping_city,
 	shipping_state,
 	shipping_postal_code,
@@ -677,17 +679,17 @@ INSERT INTO tbl_orders(
 	created_at,
 	updated_at
 ) VALUES (
+	?, ?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
 	?, ?, ?, ?, ?,
-	?, ?, ?, ?, ?,
-	?, ?, ?,
+	?, ?, ?, ?,
 	datetime('now'),
 	datetime('now')
-) RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta
+) RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay
 `
 
 type CreateOrderParams struct {
@@ -695,6 +697,7 @@ type CreateOrderParams struct {
 	CheckoutPaymentID        string
 	OrderNumber              string
 	Status                   string
+	CustomerID               sql.NullInt64
 	CustomerName             string
 	CustomerEmail            string
 	CustomerPhone            string
@@ -710,6 +713,7 @@ type CreateOrderParams struct {
 	BillingPlaceID           sql.NullString
 	ShippingAddressLine1     string
 	ShippingAddressLine2     string
+	ShippingBarangay         string
 	ShippingCity             string
 	ShippingState            string
 	ShippingPostalCode       string
@@ -737,6 +741,7 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (TblOr
 		arg.CheckoutPaymentID,
 		arg.OrderNumber,
 		arg.Status,
+		arg.CustomerID,
 		arg.CustomerName,
 		arg.CustomerEmail,
 		arg.CustomerPhone,
@@ -752,6 +757,7 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (TblOr
 		arg.BillingPlaceID,
 		arg.ShippingAddressLine1,
 		arg.ShippingAddressLine2,
+		arg.ShippingBarangay,
 		arg.ShippingCity,
 		arg.ShippingState,
 		arg.ShippingPostalCode,
@@ -816,6 +822,8 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (TblOr
 		&i.UpdatedAt,
 		&i.PaidAt,
 		&i.ShippingEta,
+		&i.CustomerID,
+		&i.ShippingBarangay,
 	)
 	return i, err
 }
@@ -887,8 +895,46 @@ func (q *Queries) CreateOrderLine(ctx context.Context, arg CreateOrderLineParams
 	return i, err
 }
 
+const getLatestOrderShippingByCustomerID = `-- name: GetLatestOrderShippingByCustomerID :one
+SELECT
+	shipping_address_line1,
+	shipping_address_line2,
+	shipping_barangay,
+	shipping_city,
+	shipping_state,
+	shipping_postal_code
+FROM tbl_orders
+WHERE
+	customer_id = ?
+ORDER BY created_at DESC
+LIMIT 1
+`
+
+type GetLatestOrderShippingByCustomerIDRow struct {
+	ShippingAddressLine1 string
+	ShippingAddressLine2 string
+	ShippingBarangay     string
+	ShippingCity         string
+	ShippingState        string
+	ShippingPostalCode   string
+}
+
+func (q *Queries) GetLatestOrderShippingByCustomerID(ctx context.Context, customerID sql.NullInt64) (GetLatestOrderShippingByCustomerIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getLatestOrderShippingByCustomerID, customerID)
+	var i GetLatestOrderShippingByCustomerIDRow
+	err := row.Scan(
+		&i.ShippingAddressLine1,
+		&i.ShippingAddressLine2,
+		&i.ShippingBarangay,
+		&i.ShippingCity,
+		&i.ShippingState,
+		&i.ShippingPostalCode,
+	)
+	return i, err
+}
+
 const getOrderByCheckoutID = `-- name: GetOrderByCheckoutID :one
-SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta FROM tbl_orders
+SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay FROM tbl_orders
 WHERE checkout_id = ?
 LIMIT 1
 `
@@ -939,12 +985,14 @@ func (q *Queries) GetOrderByCheckoutID(ctx context.Context, checkoutID int64) (T
 		&i.UpdatedAt,
 		&i.PaidAt,
 		&i.ShippingEta,
+		&i.CustomerID,
+		&i.ShippingBarangay,
 	)
 	return i, err
 }
 
 const getOrderByCheckoutPaymentID = `-- name: GetOrderByCheckoutPaymentID :one
-SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta FROM tbl_orders
+SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay FROM tbl_orders
 WHERE checkout_payment_id = ?
 LIMIT 1
 `
@@ -995,12 +1043,14 @@ func (q *Queries) GetOrderByCheckoutPaymentID(ctx context.Context, checkoutPayme
 		&i.UpdatedAt,
 		&i.PaidAt,
 		&i.ShippingEta,
+		&i.CustomerID,
+		&i.ShippingBarangay,
 	)
 	return i, err
 }
 
 const getOrderByID = `-- name: GetOrderByID :one
-SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta FROM tbl_orders
+SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay FROM tbl_orders
 WHERE id = ?
 LIMIT 1
 `
@@ -1051,12 +1101,14 @@ func (q *Queries) GetOrderByID(ctx context.Context, id int64) (TblOrder, error) 
 		&i.UpdatedAt,
 		&i.PaidAt,
 		&i.ShippingEta,
+		&i.CustomerID,
+		&i.ShippingBarangay,
 	)
 	return i, err
 }
 
 const getOrderByOrderNumber = `-- name: GetOrderByOrderNumber :one
-SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta FROM tbl_orders
+SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay FROM tbl_orders
 WHERE order_number = ?
 LIMIT 1
 `
@@ -1107,6 +1159,8 @@ func (q *Queries) GetOrderByOrderNumber(ctx context.Context, orderNumber string)
 		&i.UpdatedAt,
 		&i.PaidAt,
 		&i.ShippingEta,
+		&i.CustomerID,
+		&i.ShippingBarangay,
 	)
 	return i, err
 }
@@ -1187,7 +1241,7 @@ SET status = ?,
 	paid_at = DATETIME('now'),
 	updated_at = DATETIME('now')
 WHERE id = ?
-RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta
+RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay
 `
 
 type UpdateOrderOnPaymentSuccessParams struct {
@@ -1241,6 +1295,8 @@ func (q *Queries) UpdateOrderOnPaymentSuccess(ctx context.Context, arg UpdateOrd
 		&i.UpdatedAt,
 		&i.PaidAt,
 		&i.ShippingEta,
+		&i.CustomerID,
+		&i.ShippingBarangay,
 	)
 	return i, err
 }
@@ -1253,7 +1309,7 @@ SET shipping_service = ?,
 	shipping_eta = ?,
 	updated_at = DATETIME('now')
 WHERE id = ?
-RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta
+RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay
 `
 
 type UpdateOrderShippingInfoParams struct {
@@ -1316,6 +1372,8 @@ func (q *Queries) UpdateOrderShippingInfo(ctx context.Context, arg UpdateOrderSh
 		&i.UpdatedAt,
 		&i.PaidAt,
 		&i.ShippingEta,
+		&i.CustomerID,
+		&i.ShippingBarangay,
 	)
 	return i, err
 }
@@ -1325,7 +1383,7 @@ UPDATE tbl_orders
 SET status = ?,
 	updated_at = DATETIME('now')
 WHERE id = ?
-RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta
+RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay
 `
 
 type UpdateOrderStatusParams struct {
@@ -1379,6 +1437,8 @@ func (q *Queries) UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusPa
 		&i.UpdatedAt,
 		&i.PaidAt,
 		&i.ShippingEta,
+		&i.CustomerID,
+		&i.ShippingBarangay,
 	)
 	return i, err
 }

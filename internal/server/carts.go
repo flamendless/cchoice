@@ -3,6 +3,7 @@ package server
 import (
 	"cmp"
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"net"
@@ -58,6 +59,43 @@ type cartSummaryData struct {
 	DeliveryFee   string
 	Total         string
 	DeliveryETA   string
+}
+
+func (s *Server) getCartShippingPrefill(ctx context.Context) models.CartShippingPrefill {
+	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
+	if customerIDStr == "" {
+		return models.CartShippingPrefill{}
+	}
+
+	if s.encoder.Decode(customerIDStr) == encode.INVALID {
+		return models.CartShippingPrefill{}
+	}
+
+	prefill, err := s.services.customer.GetCartShippingPrefill(ctx, customerIDStr)
+	if err != nil {
+		logs.LogCtx(ctx).Warn(
+			"[Cart Shipping Prefill]",
+			zap.String("customer_id", customerIDStr),
+			zap.Error(err),
+		)
+		return models.CartShippingPrefill{}
+	}
+
+	return prefill
+}
+
+func (s *Server) getSessionCustomerID(ctx context.Context) sql.NullInt64 {
+	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
+	if customerIDStr == "" {
+		return sql.NullInt64{}
+	}
+
+	decodedID := s.encoder.Decode(customerIDStr)
+	if decodedID == encode.INVALID {
+		return sql.NullInt64{}
+	}
+
+	return sql.NullInt64{Int64: decodedID, Valid: true}
 }
 
 func (s *Server) calculateCartSummary(ctx context.Context) (cartSummaryData, error) {
@@ -196,7 +234,8 @@ func (s *Server) cartsPageHandler(w http.ResponseWriter, r *http.Request) {
 
 	showCPointsBanner := s.sessionManager.GetString(ctx, SessionCustomerID) == ""
 	summaryContent := s.generateCartSummaryComponent(ctx)
-	if err := compcart.CartPage(compcart.CartPageBody(summaryContent, showCPointsBanner)).Render(ctx, w); err != nil {
+	shippingPrefill := s.getCartShippingPrefill(ctx)
+	if err := compcart.CartPage(compcart.CartPageBody(summaryContent, showCPointsBanner, shippingPrefill)).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
@@ -758,6 +797,7 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 			Cache:                   s.cache,
 			SingleFlight:            &s.SF,
 			Encoder:                 s.encoder,
+			CustomerID:              s.getSessionCustomerID(ctx),
 		}
 
 		order, checkoutURL, err := orders.CreateOrderFromCheckout(ctx, s.dbRW, orderParams)

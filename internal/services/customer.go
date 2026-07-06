@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"strings"
 
 	"cchoice/cmd/web/models"
@@ -160,6 +161,44 @@ func (s *CustomerService) BuildProfile(ctx context.Context, customerID string) (
 	}
 
 	return profile, nil
+}
+
+func (s *CustomerService) GetCartShippingPrefill(ctx context.Context, customerID string) (models.CartShippingPrefill, error) {
+	profile, err := s.BuildProfile(ctx, customerID)
+	if err != nil {
+		return models.CartShippingPrefill{}, err
+	}
+
+	prefill := models.CartShippingPrefill{
+		Email:    profile.Email,
+		FullName: profile.FullName,
+		MobileNo: profile.MobileNo,
+	}
+
+	decodedID := s.encoder.Decode(customerID)
+	if decodedID == encode.INVALID {
+		return models.CartShippingPrefill{}, errs.ErrInvalidInput
+	}
+
+	order, err := s.dbRO.GetQueries().GetLatestOrderShippingByCustomerID(ctx, sql.NullInt64{
+		Int64: decodedID,
+		Valid: true,
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return prefill, nil
+		}
+		return models.CartShippingPrefill{}, err
+	}
+
+	prefill.AddressLine1 = order.ShippingAddressLine1
+	prefill.AddressLine2 = order.ShippingAddressLine2
+	prefill.Postal = order.ShippingPostalCode
+	prefill.Province = order.ShippingState
+	prefill.City = order.ShippingCity
+	prefill.Barangay = order.ShippingBarangay
+
+	return prefill, nil
 }
 
 func (s *CustomerService) GetAllCustomers(ctx context.Context) ([]CustomerListItem, error) {
