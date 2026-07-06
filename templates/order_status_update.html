@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Status Update - C-Choice Construction Supply Shop</title>
+  </head>
+  <body style="margin:0; padding:0; font-family:Arial, sans-serif; background-color:#F7EFEA;">
+    <table align="center" cellpadding="0" cellspacing="0" width="100%" style="padding: 20px;">
+      <tr>
+        <td>
+          <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(246,116,47,0.15);">
+            <!-- Header -->
+            <tr>
+              {{if .LogoURL}}
+              <td align="center" style="background-color:#F7EFEA; color:#333333; padding: 30px 20px;">
+                <img src="{{.LogoURL}}" alt="C-Choice" style="max-width:200px; height:auto; margin-bottom:15px;" />
+                <h1 style="margin:20px 0 0; font-size:24px; font-weight:normal; color:#F6742F;">Order Status Update</h1>
+                <p style="margin:10px 0 0; font-size:14px; color:#666666;">Your order status has been updated</p>
+              </td>
+              {{else}}
+              <td align="center" style="background-color:#F6742F; color:#ffffff; padding: 30px 20px;">
+                <h2 style="margin:0 0 10px; font-size:28px; font-weight:bold; letter-spacing:1px;">C-CHOICE</h2>
+                <p style="margin:0; font-size:12px; color:#ffffffcc;">Construction Supply Shop</p>
+                <h1 style="margin:20px 0 0; font-size:24px; font-weight:normal;">Order Status Update</h1>
+                <p style="margin:10px 0 0; font-size:14px; color:#ffffffcc;">Your order status has been updated</p>
+              </td>
+              {{end}}
+            </tr>
+
+            <!-- Content -->
+            <tr>
+              <td style="padding: 30px;">
+                <p style="margin:0 0 20px; font-size:14px; color:#666666;">
+                  Hello! We wanted to let you know that the status of your order has been updated.
+                </p>
+
+                <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:20px; background-color:#F7EFEA; border-radius:6px; border:1px solid #F6b08A;">
+                  <tr>
+                    <td style="padding:20px;">
+                      <table cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                          <td style="padding:5px 0; color:#666666; font-size:14px;">Order Number:</td>
+                          <td style="padding:5px 0; color:#333333; font-size:14px; font-weight:bold; text-align:right;">{{.OrderNumber}}</td>
+                        </tr>
+                        {{if .PreviousStatus}}
+                        <tr>
+                          <td style="padding:5px 0; color:#666666; font-size:14px;">Previous Status:</td>
+                          <td style="padding:5px 0; color:#333333; font-size:14px; text-align:right;">{{.PreviousStatus}}</td>
+                        </tr>
+                        {{end}}
+                        <tr>
+                          <td style="padding:5px 0; color:#666666; font-size:14px;">New Status:</td>
+                          <td style="padding:5px 0; color:#F6742F; font-size:14px; font-weight:bold; text-align:right;">{{.NewStatus}}</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+
+                {{if .Notes}}
+                <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:20px;">
+                  <tr>
+                    <td>
+                      <h2 style="margin:0 0 15px; font-size:18px; color:#F6742F; border-bottom:2px solid #F6b08A; padding-bottom:10px;">Notes</h2>
+                      <p style="margin:0; font-size:14px; color:#333333; line-height:1.6; white-space:pre-wrap;">{{.Notes}}</p>
+                    </td>
+                  </tr>
+                </table>
+                {{end}}
+
+                <p style="margin:0; font-size:14px; color:#666666;">
+                  If you have any questions about this update, please contact us using the details below.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td align="center" style="background-color:#F46133; color:#ffffff; padding: 20px; font-size:12px;">
+                <p style="margin:0 0 10px;">If you have any questions about your order, please contact us here: {{.MobileNo}} or {{.EMail}}.</p>
+                <p style="margin:0; color:#ffffffcc;">This is an automated message — please do not reply directly to this email.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
