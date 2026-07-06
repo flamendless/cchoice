@@ -10,7 +10,7 @@ templ HomePage(data models.HomePageData) {
 	<html lang="en" style="overflow-x: clip;">
 		<head>
 			@common.HeadMeta()
-			@common.TabTitle("Home")
+			<title>{ models.DefaultSiteSEO().Title }</title>
 		</head>
 		@HomePageBody(data)
 	</html>

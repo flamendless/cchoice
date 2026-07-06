@@ -1,6 +1,9 @@
 package models
 
-import "cchoice/internal/utils"
+import (
+	"cchoice/internal/seo"
+	"cchoice/internal/utils"
+)
 
 type ProductsMeta struct {
 	Title           string
@@ -28,21 +31,24 @@ type SiteSEO struct {
 	OGURL          string
 	OGImage        string
 	TwitterCard    string
+	StructuredData string
 }
 
 func DefaultSiteSEO() SiteSEO {
 	canonical := utils.SiteURL("/")
+	ogImage := seo.DefaultOGImage
 	return SiteSEO{
-		Title:         "C-Choice Construction Supply",
-		Description:   "Your Partner in Progress. Quality construction tools and materials from trusted brands in the Philippines.",
-		CanonicalURL:  canonical,
-		Robots:        "index, follow",
-		Keywords:      "c-choice, construction, power tools, philippines",
-		OGTitle:       "C-Choice Construction Supplies",
-		OGDescription: "Your Partner in Progress",
-		OGType:        "website",
-		OGURL:         canonical,
-		OGImage:       "https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-192x192/public",
-		TwitterCard:   "summary",
+		Title:          seo.SiteTitle,
+		Description:    seo.SiteDescription,
+		CanonicalURL:   canonical,
+		Robots:         "index, follow, max-image-preview:large",
+		Keywords:       seo.SiteKeywords,
+		OGTitle:        seo.SiteOGTitle,
+		OGDescription:  seo.SiteOGDescription,
+		OGType:         "website",
+		OGURL:          canonical,
+		OGImage:        ogImage,
+		TwitterCard:    "summary_large_image",
+		StructuredData: seo.BuildSiteStructuredData(canonical, ogImage),
 	}
 }

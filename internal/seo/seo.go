@@ -10,10 +10,10 @@ import (
 
 const (
 	ProductRobots      = "index, follow, max-image-preview:large"
-	ProductOGType        = "product"
-	ProductTwitterCard   = "summary_large_image"
-	DefaultOGImage       = "https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-192x192/public"
-	SitemapPlaceholder   = "# __SITEMAP__"
+	ProductOGType      = "product"
+	ProductTwitterCard = "summary_large_image"
+	DefaultOGImage     = "https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-192x192/public"
+	SitemapPlaceholder = "# __SITEMAP__"
 )
 
 type Product struct {
@@ -23,6 +23,7 @@ type Product struct {
 	Description        string
 	ProductCategory    string
 	ProductSubcategory string
+	OnSale             bool
 }
 
 type ProductMeta struct {
@@ -92,6 +93,23 @@ func BuildSitemapXML(homeURL string, products []SitemapEntry) string {
 	return buf.String()
 }
 
+func buildProductTitle(product Product) string {
+	const saleTitlePrefix = "SALE! "
+	parts := []string{product.BrandName, product.Name}
+	if product.ProductCategory != "" {
+		parts = append(parts, product.ProductCategory)
+	}
+	if product.ProductSubcategory != "" {
+		parts = append(parts, product.ProductSubcategory)
+	}
+	parts = append(parts, "Power Tools")
+	title := strings.Join(parts, " ") + " | Price, Specs, Buy Online | C-Choice"
+	if product.OnSale {
+		title = saleTitlePrefix + title
+	}
+	return title
+}
+
 func GenerateProductMeta(
 	product Product,
 	canonicalURL string,
@@ -100,36 +118,35 @@ func GenerateProductMeta(
 	priceAmount string,
 	priceCurrency string,
 ) ProductMeta {
-	title := fmt.Sprintf(
-		"%s %s (%s) - Price, Specs, Buy Online | C-Choice",
-		product.BrandName,
-		product.Name,
-		product.Serial,
-	)
+	title := buildProductTitle(product)
 
 	description := strings.TrimSpace(product.Description)
 	if description == "" {
 		description = fmt.Sprintf(
-			"Shop %s %s (%s) from %s. Quality construction supplies with competitive pricing in the Philippines.",
+			"Shop %s %s (%s) at C-Choice. Power tools and construction supplies in the Philippines with competitive pricing.",
 			product.BrandName,
 			product.Name,
 			product.Serial,
-			product.BrandName,
 		)
 	} else if len(description) > 155 {
 		description = description[:152] + "..."
 	}
 
-	keywords := strings.Join([]string{
+	keywordsParts := []string{
 		product.BrandName,
 		product.Name,
 		product.Serial,
 		product.ProductCategory,
 		product.ProductSubcategory,
-		"c-choice",
-		"construction supplies",
-		"philippines",
-	}, ", ")
+	}
+	keywordsParts = append(keywordsParts, BaseProductKeywords()...)
+	if strings.EqualFold(product.BrandName, "Bosch") {
+		keywordsParts = append(keywordsParts, "bosch philippines", "bosh")
+	}
+	if strings.EqualFold(product.BrandName, "INGCO") {
+		keywordsParts = append(keywordsParts, "ingco philippines")
+	}
+	keywords := strings.Join(keywordsParts, ", ")
 
 	ogImage := imageURL
 	if ogImage == "" {

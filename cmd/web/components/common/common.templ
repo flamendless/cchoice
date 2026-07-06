@@ -125,6 +125,11 @@ templ HeadSEO(seo models.SiteSEO) {
 	if seo.OGImage != "" {
 		<meta name="twitter:image" content={ seo.OGImage }/>
 	}
+	if seo.StructuredData != "" {
+		<script type="application/ld+json">
+			{ seo.StructuredData }
+		</script>
+	}
 }
 
 templ IconActionButton(

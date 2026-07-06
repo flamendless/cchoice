@@ -42,11 +42,20 @@ func HomePage(data models.HomePageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = common.TabTitle("Home").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head>")
+		var templ_7745c5c3_Var2 string
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(models.DefaultSiteSEO().Title)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/index.templ`, Line: 13, Col: 41}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</title></head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -54,7 +63,7 @@ func HomePage(data models.HomePageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -78,12 +87,12 @@ func HomePageBody(data models.HomePageData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var2 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var2 == nil {
-			templ_7745c5c3_Var2 = templ.NopComponent
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<body class=\"m-0 p-0 custom-scrollbar\" style=\"overflow-x: clip;\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<body class=\"m-0 p-0 custom-scrollbar\" style=\"overflow-x: clip;\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -113,12 +122,12 @@ func HomePageBody(data models.HomePageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<style>\n\t\t\t#sidebar-content-wrapper {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: flex-start;\n\t\t\t\twidth: 100%;\n\t\t\t}\n\t\t\t#desktop-sidebar {\n\t\t\t\tposition: sticky;\n\t\t\t\ttop: 80px;\n\t\t\t\tleft: 0;\n\t\t\t\tz-index: 45;\n\t\t\t\twidth: 15%;\n\t\t\t\theight: calc(100vh - 80px);\n\t\t\t\toverflow-y: auto;\n\t\t\t\tpadding: 0.5rem 1rem 0 0.25rem;\n\t\t\t\tbackground: white;\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\t\t\t#promo-section {\n\t\t\t\twidth: 100%;\n\t\t\t\tz-index: 40;\n\t\t\t}\n\t\t\t#main-content {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: flex-start;\n\t\t\t\twidth: 85%;\n\t\t\t\tborder-left: 2px solid var(--color-primary-muted);\n\t\t\t}\n\t\t\t@media (max-width: 1023px) {\n\t\t\t\t#desktop-sidebar {\n\t\t\t\t\tdisplay: none !important;\n\t\t\t\t}\n\t\t\t\t#main-content {\n\t\t\t\t\twidth: 100% !important;\n\t\t\t\t\tborder-left: none !important;\n\t\t\t\t}\n\t\t\t\t#sidebar-content-wrapper {\n\t\t\t\t\twidth: 100% !important;\n\t\t\t\t}\n\t\t\t}\n\t\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<style>\n\t\t\t#sidebar-content-wrapper {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: flex-start;\n\t\t\t\twidth: 100%;\n\t\t\t}\n\t\t\t#desktop-sidebar {\n\t\t\t\tposition: sticky;\n\t\t\t\ttop: 80px;\n\t\t\t\tleft: 0;\n\t\t\t\tz-index: 45;\n\t\t\t\twidth: 15%;\n\t\t\t\theight: calc(100vh - 80px);\n\t\t\t\toverflow-y: auto;\n\t\t\t\tpadding: 0.5rem 1rem 0 0.25rem;\n\t\t\t\tbackground: white;\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\t\t\t#promo-section {\n\t\t\t\twidth: 100%;\n\t\t\t\tz-index: 40;\n\t\t\t}\n\t\t\t#main-content {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: flex-start;\n\t\t\t\twidth: 85%;\n\t\t\t\tborder-left: 2px solid var(--color-primary-muted);\n\t\t\t}\n\t\t\t@media (max-width: 1023px) {\n\t\t\t\t#desktop-sidebar {\n\t\t\t\t\tdisplay: none !important;\n\t\t\t\t}\n\t\t\t\t#main-content {\n\t\t\t\t\twidth: 100% !important;\n\t\t\t\t\tborder-left: none !important;\n\t\t\t\t}\n\t\t\t\t#sidebar-content-wrapper {\n\t\t\t\t\twidth: 100% !important;\n\t\t\t\t}\n\t\t\t}\n\t\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(data.ActivePromos) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div id=\"promo-section\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div id=\"promo-section\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -126,12 +135,12 @@ func HomePageBody(data models.HomePageData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div id=\"sidebar-content-wrapper\"><div id=\"desktop-sidebar\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div id=\"sidebar-content-wrapper\"><div id=\"desktop-sidebar\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -143,7 +152,7 @@ func HomePageBody(data models.HomePageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div><div id=\"main-content\" name=\"right-panel\"><div class=\"w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div><div id=\"main-content\" name=\"right-panel\"><div class=\"w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -155,7 +164,7 @@ func HomePageBody(data models.HomePageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -179,7 +188,7 @@ func HomePageBody(data models.HomePageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</body>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -203,12 +212,12 @@ func MobileSidebar() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var3 == nil {
-			templ_7745c5c3_Var3 = templ.NopComponent
+		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var4 == nil {
+			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div id=\"mobile-sidebar-overlay\" class=\"hidden fixed inset-0 bg-black/50 z-[9998] lg:hidden\" _=\"on click\n\t\t\tadd .hidden to #mobile-sidebar\n\t\t\tadd .hidden to me\n\t\t\"></div><div id=\"mobile-sidebar\" class=\"hidden fixed top-0 left-0 h-full w-[75%] max-w-[300px] bg-white z-[9999] overflow-y-auto shadow-xl pt-4 pb-16 lg:hidden\"><div class=\"flex justify-end px-4 mb-4\"><button type=\"button\" class=\"p-2 rounded-lg hover:bg-surface\" aria-label=\"Close menu\" _=\"on click\n\t\t\t\t\tadd .hidden to #mobile-sidebar\n\t\t\t\t\tadd .hidden to #mobile-sidebar-overlay\n\t\t\t\t\"><svg class=\"w-6 h-6 text-primary\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div><div class=\"px-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div id=\"mobile-sidebar-overlay\" class=\"hidden fixed inset-0 bg-black/50 z-[9998] lg:hidden\" _=\"on click\n\t\t\tadd .hidden to #mobile-sidebar\n\t\t\tadd .hidden to me\n\t\t\"></div><div id=\"mobile-sidebar\" class=\"hidden fixed top-0 left-0 h-full w-[75%] max-w-[300px] bg-white z-[9999] overflow-y-auto shadow-xl pt-4 pb-16 lg:hidden\"><div class=\"flex justify-end px-4 mb-4\"><button type=\"button\" class=\"p-2 rounded-lg hover:bg-surface\" aria-label=\"Close menu\" _=\"on click\n\t\t\t\t\tadd .hidden to #mobile-sidebar\n\t\t\t\t\tadd .hidden to #mobile-sidebar-overlay\n\t\t\t\t\"><svg class=\"w-6 h-6 text-primary\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div><div class=\"px-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -220,7 +229,7 @@ func MobileSidebar() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
