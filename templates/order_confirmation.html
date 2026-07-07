@@ -49,6 +49,20 @@
                   </tr>
                 </table>
 
+                {{if .EarnedCPoints}}
+                <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:20px;">
+                  <tr>
+                    <td align="center" style="padding:16px 20px; background-color:#F7EFEA; border-radius:6px; border:1px solid #F6b08A;">
+                      <p style="margin:0; font-size:16px; color:#666666;">
+                        You've earned
+                        <span style="color:#F6742F; font-weight:bold;">{{.EarnedCPoints}}</span>
+                        C-Points!
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+                {{end}}
+
                 <!-- Line Items Table -->
                 <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:20px;">
                   <tr>

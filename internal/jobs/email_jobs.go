@@ -281,6 +281,7 @@ func (ejr *EmailJobRunner) sendOrderConfirmationEmail(
 		"Total":            utils.NewMoney(order.TotalAmount, order.Currency).Display(),
 		"ShippingAddress":  shippingAddress,
 		"DeliveryETA":      order.ShippingEta.String,
+		"EarnedCPoints":    order.EarnedCpoints,
 		"MobileNo":         mobileNo,
 		"EMail":            email,
 	}
