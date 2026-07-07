@@ -37,10 +37,10 @@ type ProductExportRow struct {
 	ScopeOfSupply    string
 	StocksIn         string
 	StocksQty        string
-	ImageURL       string
-	ThumbnailURL   string
-	CreatedAt      string
-	UpdatedAt      string
+	ImageURL         string
+	ThumbnailURL     string
+	CreatedAt        string
+	UpdatedAt        string
 }
 
 var productExportHeaders = []string{

@@ -73,6 +73,8 @@ func NewWebhookHandler(config WebhookHandlerConfig) http.HandlerFunc {
 				zap.String("error", "webhook timestamp too old"),
 				zap.Int64("timestamp", signature.Timestamp),
 			)
+			http.Error(w, "Webhook timestamp expired", http.StatusUnauthorized)
+			return
 		}
 
 		cfg := conf.Conf()

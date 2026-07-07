@@ -403,16 +403,16 @@ type AdminBrandListItem struct {
 }
 
 type StaffLog struct {
-	ID             string
-	StaffID        string
-	FullName       string
-	FirstName      string
-	MiddleName     string
-	LastName       string
-	CreatedAt      string
-	Action         string
-	Module         string
-	Result         string
+	ID              string
+	StaffID         string
+	FullName        string
+	FirstName       string
+	MiddleName      string
+	LastName        string
+	CreatedAt       string
+	Action          string
+	Module          string
+	Result          string
 	ReferenceLabel  string
 	ReferenceURL    string
 	ReferenceNewTab bool

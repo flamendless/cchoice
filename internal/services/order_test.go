@@ -10,11 +10,11 @@ func TestNormalizeOrderListingSort(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name         string
-		sortBy       string
-		sortDir      string
-		wantSortBy   string
-		wantSortDir  string
+		name        string
+		sortBy      string
+		sortDir     string
+		wantSortBy  string
+		wantSortDir string
 	}{
 		{
 			name:        "defaults empty values",

@@ -8,10 +8,10 @@ import (
 
 func TestParseStaffLogSuccessID(t *testing.T) {
 	tests := []struct {
-		name      string
-		result    string
-		wantID    string
-		wantOK    bool
+		name   string
+		result string
+		wantID string
+		wantOK bool
 	}{
 		{
 			name:   "valid success id",
@@ -48,12 +48,12 @@ func TestParseStaffLogSuccessID(t *testing.T) {
 
 func TestBuildStaffLogProductReference(t *testing.T) {
 	tests := []struct {
-		name      string
-		slug      string
-		serial    string
-		status    string
-		wantLabel string
-		wantInURL []string
+		name       string
+		slug       string
+		serial     string
+		status     string
+		wantLabel  string
+		wantInURL  []string
 		wantNewTab bool
 	}{
 		{

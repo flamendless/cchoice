@@ -48,7 +48,10 @@ func AddCustomerHandlers(s *Server, r chi.Router) {
 	r.With(s.requireCustomerAuth).Patch("/customer/profile", s.customerProfileUpdateHandler)
 	r.With(s.requireCustomerAuth).Post("/customer/change-password", s.customerChangePasswordHandler)
 	r.With(s.requireCustomerAuth).Post("/customer/verify/send", s.customerVerifySendHandler)
-	r.With(s.requireCustomerAuth).Post("/customer/verify", s.customerVerifyHandler)
+	r.Group(func(r chi.Router) {
+		r.Use(s.requireCustomerAuth, s.rateLimiter.Middleware)
+		r.Post("/customer/verify", s.customerVerifyHandler)
+	})
 }
 
 func (s *Server) customerLoginPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -101,6 +104,9 @@ func (s *Server) customerLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	s.sessionManager.Put(ctx, SessionCustomerID, s.encoder.Encode(customer.ID))
 	s.sessionManager.Put(ctx, SessionCustomerAccessID, 0)
+	if err := s.sessionManager.RenewToken(ctx); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
 	redirectHX(w, r, utils.URL("/customer/portal"))
 }
 

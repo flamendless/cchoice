@@ -125,6 +125,9 @@ func NewServer() *ServerInstance {
 	cfg := conf.Conf()
 	sessionManager := scs.New()
 	sessionManager.Lifetime = 4 * time.Hour
+	sessionManager.Cookie.HttpOnly = true
+	sessionManager.Cookie.SameSite = http.SameSiteLaxMode
+	sessionManager.Cookie.Secure = cfg.Server.UseSSL
 
 	dbRO := database.New(database.DB_MODE_RO)
 	dbRW := database.New(database.DB_MODE_RW)

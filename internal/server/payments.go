@@ -6,13 +6,14 @@ import (
 	"net/http"
 
 	comppayment "cchoice/cmd/web/components/payment"
+	"cchoice/internal/conf"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/orderhistory"
 	"cchoice/internal/payments"
 	"cchoice/internal/payments/paymongo"
-	"cchoice/internal/orderhistory"
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -53,50 +54,65 @@ func (s *Server) paymentsCancelHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logs.LogCtx(ctx).Info(logtag, zap.String("payment_ref", paymentRef))
+	token := r.URL.Query().Get("token")
+	webhookSecret := conf.Conf().PayMongo.WebhookSecretKey
+	tokenValid := webhookSecret != "" && payments.VerifyRedirectToken(webhookSecret, paymentRef, token)
 
-	if checkoutPayment, err := s.dbRO.GetQueries().GetCheckoutPaymentByReferenceNumber(ctx, paymentRef); err == nil {
-		if order, err := s.dbRO.GetQueries().GetOrderByCheckoutPaymentID(ctx, checkoutPayment.ID); err == nil {
-			previousStatus := order.Status
-			if _, err := s.dbRW.GetQueries().UpdateOrderStatus(ctx, queries.UpdateOrderStatusParams{
-				ID:     order.ID,
-				Status: enums.ORDER_STATUS_CANCELLED.String(),
-			}); err != nil {
-				logs.LogCtx(ctx).Error(
-					logtag,
-					zap.Int64("order_id", order.ID),
-					zap.Error(err),
-				)
-			} else if err := orderhistory.Record(
-				ctx,
-				s.dbRW,
-				order.ID,
-				sql.NullInt64{},
-				sql.NullString{String: previousStatus, Valid: true},
-				enums.ORDER_STATUS_CANCELLED.String(),
-				sql.NullString{},
-			); err != nil {
-				logs.LogCtx(ctx).Error(
-					logtag,
-					zap.Int64("order_id", order.ID),
-					zap.String("action", "record_status_history"),
-					zap.Error(err),
-				)
-			} else if s.mailJobRunner != nil {
-				if updatedOrder, err := s.dbRO.GetQueries().GetOrderByID(ctx, order.ID); err != nil {
-					logs.LogCtx(ctx).Error(
+	logs.LogCtx(ctx).Info(logtag, zap.String("payment_ref", paymentRef), zap.Bool("token_valid", tokenValid))
+
+	if tokenValid {
+		if checkoutPayment, err := s.dbRO.GetQueries().GetCheckoutPaymentByReferenceNumber(ctx, paymentRef); err == nil {
+			if order, err := s.dbRO.GetQueries().GetOrderByCheckoutPaymentID(ctx, checkoutPayment.ID); err == nil {
+				if enums.ParseOrderStatusToEnum(order.Status) != enums.ORDER_STATUS_PENDING {
+					logs.LogCtx(ctx).Warn(
 						logtag,
 						zap.Int64("order_id", order.ID),
-						zap.String("action", "load_order_for_status_email"),
-						zap.Error(err),
+						zap.String("status", order.Status),
+						zap.String("action", "skip_cancel_non_pending"),
 					)
-				} else if err := s.mailJobRunner.QueueOrderStatusUpdateEmail(ctx, updatedOrder); err != nil {
-					logs.LogCtx(ctx).Error(
-						logtag,
-						zap.Int64("order_id", order.ID),
-						zap.String("action", "queue_status_email"),
-						zap.Error(err),
-					)
+				} else {
+					previousStatus := order.Status
+					if _, err := s.dbRW.GetQueries().UpdateOrderStatus(ctx, queries.UpdateOrderStatusParams{
+						ID:     order.ID,
+						Status: enums.ORDER_STATUS_CANCELLED.String(),
+					}); err != nil {
+						logs.LogCtx(ctx).Error(
+							logtag,
+							zap.Int64("order_id", order.ID),
+							zap.Error(err),
+						)
+					} else if err := orderhistory.Record(
+						ctx,
+						s.dbRW,
+						order.ID,
+						sql.NullInt64{},
+						sql.NullString{String: previousStatus, Valid: true},
+						enums.ORDER_STATUS_CANCELLED.String(),
+						sql.NullString{},
+					); err != nil {
+						logs.LogCtx(ctx).Error(
+							logtag,
+							zap.Int64("order_id", order.ID),
+							zap.String("action", "record_status_history"),
+							zap.Error(err),
+						)
+					} else if s.mailJobRunner != nil {
+						if updatedOrder, err := s.dbRO.GetQueries().GetOrderByID(ctx, order.ID); err != nil {
+							logs.LogCtx(ctx).Error(
+								logtag,
+								zap.Int64("order_id", order.ID),
+								zap.String("action", "load_order_for_status_email"),
+								zap.Error(err),
+							)
+						} else if err := s.mailJobRunner.QueueOrderStatusUpdateEmail(ctx, updatedOrder); err != nil {
+							logs.LogCtx(ctx).Error(
+								logtag,
+								zap.Int64("order_id", order.ID),
+								zap.String("action", "queue_status_email"),
+								zap.Error(err),
+							)
+						}
+					}
 				}
 			}
 		}
@@ -207,7 +223,11 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 			zap.String("expected_status", "succeeded"),
 			zap.String("actual_status", paymentStatus),
 		)
-		http.Redirect(w, r, utils.URL("/payments/cancel?payment_ref="+paymentRef), http.StatusSeeOther)
+		cancelURL := utils.URL("/payments/cancel?payment_ref=" + paymentRef)
+		if token := r.URL.Query().Get("token"); token != "" {
+			cancelURL = utils.URL("/payments/cancel?payment_ref=" + paymentRef + "&token=" + token)
+		}
+		http.Redirect(w, r, cancelURL, http.StatusSeeOther)
 		return
 	}
 

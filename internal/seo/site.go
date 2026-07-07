@@ -34,15 +34,15 @@ func BuildSiteStructuredData(homeURL, logoURL string) string {
 	homeURL = strings.TrimSuffix(homeURL, "/")
 
 	type organization struct {
-		Context      string   `json:"@context"`
-		Type         string   `json:"@type"`
-		Name         string   `json:"name"`
+		Context       string   `json:"@context"`
+		Type          string   `json:"@type"`
+		Name          string   `json:"name"`
 		AlternateName []string `json:"alternateName"`
-		URL          string   `json:"url"`
-		Logo         string   `json:"logo"`
-		Description  string   `json:"description"`
-		AreaServed   string   `json:"areaServed"`
-		KnowsAbout   []string `json:"knowsAbout"`
+		URL           string   `json:"url"`
+		Logo          string   `json:"logo"`
+		Description   string   `json:"description"`
+		AreaServed    string   `json:"areaServed"`
+		KnowsAbout    []string `json:"knowsAbout"`
 	}
 	type webSite struct {
 		Context string `json:"@context"`

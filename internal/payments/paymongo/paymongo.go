@@ -203,10 +203,14 @@ func (p PayMongo) CreatePayload(
 ) payments.CreateCheckoutSessionPayload {
 	referenceNumber := p.GenerateRefNo()
 
+	webhookSecret := conf.Conf().PayMongo.WebhookSecretKey
+	redirectToken := payments.GenerateRedirectToken(webhookSecret, referenceNumber)
+
 	cancelURLWithRef := p.cancelURL
 	if u, err := url.Parse(cancelURLWithRef); err == nil {
 		q := u.Query()
 		q.Set("payment_ref", referenceNumber)
+		q.Set("token", redirectToken)
 		u.RawQuery = q.Encode()
 		cancelURLWithRef = u.String()
 	}
@@ -215,6 +219,7 @@ func (p PayMongo) CreatePayload(
 	if u, err := url.Parse(successURLWithRef); err == nil {
 		q := u.Query()
 		q.Set("payment_ref", referenceNumber)
+		q.Set("token", redirectToken)
 		u.RawQuery = q.Encode()
 		successURLWithRef = u.String()
 	}

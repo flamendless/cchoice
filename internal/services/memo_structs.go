@@ -24,8 +24,8 @@ type Memo struct {
 
 type MemoListItem struct {
 	Memo
-	CreatedByName     string
-	CreatorPosition   string
+	CreatedByName   string
+	CreatorPosition string
 }
 
 type MemoRecipientRow struct {

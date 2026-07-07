@@ -25,6 +25,10 @@ func SecurityHeadersMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
 		w.Header().Set("X-Download-Options", "noopen")
 
+		if conf.Conf().Server.UseSSL {
+			w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+		}
+
 		csp := "default-src 'self'; " +
 			"script-src 'self' 'unsafe-eval' 'unsafe-inline' https://unpkg.com https://ajax.cloudflare.com https://static.cloudflareinsights.com https://pagead2.googlesyndication.com https://www.googletagservices.com https://ep2.adtrafficquality.google; " +
 			"style-src 'self' 'unsafe-inline'; " +
@@ -135,14 +139,14 @@ func (s *Server) requireStaffAuth(next http.Handler) http.Handler {
 
 		staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
 		if err != nil {
-			if enums.ParseStaffStatusToEnum(staff.Status) == enums.STAFF_STATUS_RESIGNED {
-				s.sessionManager.Remove(ctx, SessionStaffID)
-				s.sessionManager.Remove(ctx, SessionStaffAccessID)
-				redirectHX(w, r, utils.URLWithError("/admin", errs.ErrStaffResigned.Error()))
-				return
-			}
-
 			redirectHX(w, r, utils.URLWithError("/admin", "Login to access page"))
+			return
+		}
+
+		if enums.ParseStaffStatusToEnum(staff.Status) == enums.STAFF_STATUS_RESIGNED {
+			s.sessionManager.Remove(ctx, SessionStaffID)
+			s.sessionManager.Remove(ctx, SessionStaffAccessID)
+			redirectHX(w, r, utils.URLWithError("/admin", errs.ErrStaffResigned.Error()))
 			return
 		}
 
