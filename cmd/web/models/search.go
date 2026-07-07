@@ -31,7 +31,7 @@ func ToProductGridProductsFromSearchRows(
 ) []CategorySectionProduct {
 	converted := make([]queries.GetProductsByCategoryIDRow, len(rows))
 	for i, row := range rows {
-		converted[i] = searchPaginatedRowToCategoryRow(row)
+		converted[i] = queries.GetProductsByCategoryIDRow(row)
 	}
 	return ToCategorySectionProducts(encoder, getCDNURL, converted)
 }
@@ -43,7 +43,7 @@ func ToProductGridProductsFromRelatedRows(
 ) []CategorySectionProduct {
 	converted := make([]queries.GetProductsByCategoryIDRow, len(rows))
 	for i, row := range rows {
-		converted[i] = relatedSearchRowToCategoryRow(row)
+		converted[i] = queries.GetProductsByCategoryIDRow(row)
 	}
 	return ToCategorySectionProducts(encoder, getCDNURL, converted)
 }
@@ -55,70 +55,7 @@ func ToProductGridProductsFromOtherRows(
 ) []CategorySectionProduct {
 	converted := make([]queries.GetProductsByCategoryIDRow, len(rows))
 	for i, row := range rows {
-		converted[i] = otherSearchRowToCategoryRow(row)
+		converted[i] = queries.GetProductsByCategoryIDRow(row)
 	}
 	return ToCategorySectionProducts(encoder, getCDNURL, converted)
-}
-
-func searchPaginatedRowToCategoryRow(row queries.GetProductsBySearchQueryPaginatedRow) queries.GetProductsByCategoryIDRow {
-	return queries.GetProductsByCategoryIDRow{
-		ID:                        row.ID,
-		Serial:                    row.Serial,
-		Slug:                      row.Slug,
-		Name:                      row.Name,
-		Description:               row.Description,
-		UnitPriceWithVat:          row.UnitPriceWithVat,
-		UnitPriceWithVatCurrency:  row.UnitPriceWithVatCurrency,
-		SalePriceWithVat:          row.SalePriceWithVat,
-		SalePriceWithVatCurrency:  row.SalePriceWithVatCurrency,
-		IsOnSale:                  row.IsOnSale,
-		DiscountType:              row.DiscountType,
-		DiscountValue:             row.DiscountValue,
-		BrandName:                 row.BrandName,
-		ThumbnailPath:             row.ThumbnailPath,
-		CdnUrl:                    row.CdnUrl,
-		CdnUrlThumbnail:           row.CdnUrlThumbnail,
-	}
-}
-
-func relatedSearchRowToCategoryRow(row queries.GetRelatedProductsForSearchRow) queries.GetProductsByCategoryIDRow {
-	return queries.GetProductsByCategoryIDRow{
-		ID:                        row.ID,
-		Serial:                    row.Serial,
-		Slug:                      row.Slug,
-		Name:                      row.Name,
-		Description:               row.Description,
-		UnitPriceWithVat:          row.UnitPriceWithVat,
-		UnitPriceWithVatCurrency:  row.UnitPriceWithVatCurrency,
-		SalePriceWithVat:          row.SalePriceWithVat,
-		SalePriceWithVatCurrency:  row.SalePriceWithVatCurrency,
-		IsOnSale:                  row.IsOnSale,
-		DiscountType:              row.DiscountType,
-		DiscountValue:             row.DiscountValue,
-		BrandName:                 row.BrandName,
-		ThumbnailPath:             row.ThumbnailPath,
-		CdnUrl:                    row.CdnUrl,
-		CdnUrlThumbnail:           row.CdnUrlThumbnail,
-	}
-}
-
-func otherSearchRowToCategoryRow(row queries.GetOtherProductsForSearchRow) queries.GetProductsByCategoryIDRow {
-	return queries.GetProductsByCategoryIDRow{
-		ID:                        row.ID,
-		Serial:                    row.Serial,
-		Slug:                      row.Slug,
-		Name:                      row.Name,
-		Description:               row.Description,
-		UnitPriceWithVat:          row.UnitPriceWithVat,
-		UnitPriceWithVatCurrency:  row.UnitPriceWithVatCurrency,
-		SalePriceWithVat:          row.SalePriceWithVat,
-		SalePriceWithVatCurrency:  row.SalePriceWithVatCurrency,
-		IsOnSale:                  row.IsOnSale,
-		DiscountType:              row.DiscountType,
-		DiscountValue:             row.DiscountValue,
-		BrandName:                 row.BrandName,
-		ThumbnailPath:             row.ThumbnailPath,
-		CdnUrl:                    row.CdnUrl,
-		CdnUrlThumbnail:           row.CdnUrlThumbnail,
-	}
 }

@@ -48,7 +48,7 @@ func MobileSearchToggle() templ.Component {
 	})
 }
 
-func MobileSearchPanel() templ.Component {
+func MobileSearchPanel(initialQuery string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -73,7 +73,7 @@ func MobileSearchPanel() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = SearchBarMobile().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = SearchBarMobile(initialQuery).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -85,7 +85,7 @@ func MobileSearchPanel() templ.Component {
 	})
 }
 
-func SearchBarMobile() templ.Component {
+func SearchBarMobile(initialQuery string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -106,20 +106,43 @@ func SearchBarMobile() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form class=\"w-full\" _=\"\n\t\t\ton submit\n\t\t\t\tasync call metrics_event('search_mobile', #search-mobile.value)\n\t\t\tend\n\t\t\"><div class=\"relative\"><input id=\"search-mobile\" type=\"search\" name=\"search\" placeholder=\"Search products…\" autocomplete=\"off\" class=\"w-full p-2.5 text-xs border border-surface rounded-lg bg-surface focus:ring-primary focus:border-primary\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form class=\"w-full\" _=\"\n\t\t\ton submit\n\t\t\t\tasync call metrics_event('search_mobile', #search-mobile.value)\n\t\t\tend\n\t\t\"><div class=\"relative\"><input id=\"search-mobile\" type=\"search\" name=\"search\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/search"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `search/searchbar_mobile.templ`, Line: 68, Col: 34}
+		if initialQuery != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(initialQuery)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `search/searchbar_mobile.templ`, Line: 60, Col: 25}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " placeholder=\"Search products…\" autocomplete=\"off\" class=\"w-full p-2.5 text-xs border border-surface rounded-lg bg-surface focus:ring-primary focus:border-primary\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" hx-trigger=\"input[this.value.length >= 3] delay:300ms, keyup[key=='Enter']\" hx-target=\"#search-mobile-results > ul\" hx-swap=\"innerHTML\" hx-indicator=\"#icon-spinner-search-mobile\" _=\"\n\t\t\t\t\ton htmx:beforeRequest from #search-mobile\n\t\t\t\t\t\tlog 'search-mobile is triggered'\n\t\t\t\t\t\tadd .hidden to #search-mobile-results\n\t\t\t\t\t\tremove .hidden from #icon-spinner-search-mobile\n\t\t\t\t\tend\n\n\t\t\t\t\ton htmx:afterRequest from #search-mobile\n\t\t\t\t\t\tlog 'search-mobile is done'\n\t\t\t\t\t\twait 0.25s\n\t\t\t\t\t\tremove .hidden from #search-mobile-results\n\t\t\t\t\t\tadd .hidden to #icon-spinner-search-mobile\n\t\t\t\t\tend\n\n\t\t\t\t\ton focus\n\t\t\t\t\t\tif my value != '' and #search-mobile-results.children.length > 0\n\t\t\t\t\t\tthen remove .hidden from #search-mobile-results\n\t\t\t\t\tend\n\t\t\t\t\"><!-- <button --><!-- \ttype=\"submit\" --><!-- \tclass=\" --><!-- \t\tabsolute end-2 top-1/2 -translate-y-1/2 --><!-- \t\tbg-primary text-white --><!-- \t\ttext-xs px-2 py-1 rounded-md --><!-- \t\" --><!-- > --><!-- \t@svgSearch(\"\", \"\") --><!-- </button> --><svg id=\"icon-spinner-search-mobile\" class=\"htmx-indicator hidden absolute end-14 top-1/2 -translate-y-1/2 w-4 text-primary\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\"><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-dasharray=\"300 385\" d=\"M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z\"><animate attributeName=\"stroke-dashoffset\" dur=\"2s\" values=\"685;-685\" repeatCount=\"indefinite\"></animate></path></svg>")
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/search"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `search/searchbar_mobile.templ`, Line: 71, Col: 34}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-trigger=\"input[this.value.length >= 3] delay:300ms, keyup[key=='Enter']\" hx-target=\"#search-mobile-results > ul\" hx-swap=\"innerHTML\" hx-indicator=\"#icon-spinner-search-mobile\" _=\"\n\t\t\t\t\ton htmx:beforeRequest from #search-mobile\n\t\t\t\t\t\tlog 'search-mobile is triggered'\n\t\t\t\t\t\tadd .hidden to #search-mobile-results\n\t\t\t\t\t\tremove .hidden from #icon-spinner-search-mobile\n\t\t\t\t\tend\n\n\t\t\t\t\ton htmx:afterRequest from #search-mobile\n\t\t\t\t\t\tlog 'search-mobile is done'\n\t\t\t\t\t\twait 0.25s\n\t\t\t\t\t\tremove .hidden from #search-mobile-results\n\t\t\t\t\t\tadd .hidden to #icon-spinner-search-mobile\n\t\t\t\t\tend\n\n\t\t\t\t\ton focus\n\t\t\t\t\t\tif my value != '' and #search-mobile-results.children.length > 0\n\t\t\t\t\t\tthen remove .hidden from #search-mobile-results\n\t\t\t\t\tend\n\t\t\t\t\"><!-- <button --><!-- \ttype=\"submit\" --><!-- \tclass=\" --><!-- \t\tabsolute end-2 top-1/2 -translate-y-1/2 --><!-- \t\tbg-primary text-white --><!-- \t\ttext-xs px-2 py-1 rounded-md --><!-- \t\" --><!-- > --><!-- \t@svgSearch(\"\", \"\") --><!-- </button> --><svg id=\"icon-spinner-search-mobile\" class=\"htmx-indicator hidden absolute end-14 top-1/2 -translate-y-1/2 w-4 text-primary\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 300 150\"><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-dasharray=\"300 385\" d=\"M275 75c0 31-27 50-50 50-58 0-92-100-150-100-28 0-50 22-50 50s23 50 50 50c58 0 92-100 150-100 24 0 50 19 50 50Z\"><animate attributeName=\"stroke-dashoffset\" dur=\"2s\" values=\"685;-685\" repeatCount=\"indefinite\"></animate></path></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -127,7 +150,7 @@ func SearchBarMobile() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

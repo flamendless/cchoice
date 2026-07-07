@@ -3,7 +3,7 @@ package search
 import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/svg"
 
-templ SearchBarDesktop() {
+templ SearchBarDesktop(initialQuery string) {
 	<form
 		class="w-full lg:w-6/12"
 		_="
@@ -51,6 +51,9 @@ templ SearchBarDesktop() {
 				id="search"
 				name="search"
 				autocomplete="off"
+				if initialQuery != "" {
+					value={ initialQuery }
+				}
 				placeholder="Search by product name..."
 				class="block w-full p-3 ps-10 text-sm text-black border border-surface rounded-lg bg-surface
 						focus:ring-primary focus:border-primary"
