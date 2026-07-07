@@ -157,9 +157,9 @@ type AdminOrderDetails struct {
 }
 
 type AdminOrderManageModalData struct {
-	ID             string
-	OrderReference string
-	CurrentStatus  enums.OrderStatus
+	ID              string
+	OrderReference  string
+	CurrentStatus   enums.OrderStatus
 	CanUpdateStatus bool
 }
 

@@ -13,7 +13,7 @@ func TestBuildSiteStructuredData(t *testing.T) {
 	require.NotEmpty(t, raw)
 
 	var payload struct {
-		Context string `json:"@context"`
+		Context string           `json:"@context"`
 		Graph   []map[string]any `json:"@graph"`
 	}
 	require.NoError(t, json.Unmarshal([]byte(raw), &payload))
