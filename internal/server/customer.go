@@ -41,6 +41,9 @@ func AddCustomerHandlers(s *Server, r chi.Router) {
 	r.With(s.requireCustomerAuth).Post("/customer/quotation/submit", s.customerQuotationSubmitDraftHandler)
 
 	r.With(s.requireCustomerAuth).Get("/customer/profile", s.customerProfileHandler)
+	r.With(s.requireCustomerAuth).Get("/customer/orders", s.customerOrdersListPageHandler)
+	r.With(s.requireCustomerAuth).Get("/customer/orders/table", s.customerOrdersListTableHandler)
+	r.With(s.requireCustomerAuth).Get("/customer/orders/{id}", s.customerOrderDetailPageHandler)
 	r.With(s.requireCustomerAuth).Get("/customer/profile/edit", s.customerProfileEditFormHandler)
 	r.With(s.requireCustomerAuth).Patch("/customer/profile", s.customerProfileUpdateHandler)
 	r.With(s.requireCustomerAuth).Post("/customer/change-password", s.customerChangePasswordHandler)

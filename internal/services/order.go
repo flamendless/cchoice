@@ -187,6 +187,7 @@ func (s *OrderService) GetDetailsForAdmin(ctx context.Context, orderID string) (
 			Remarks:        formatAdminOrderNullableString(order.Remarks),
 			CreatedAt:      order.CreatedAt.Format(constants.DateTimeLayoutISO),
 			UpdatedAt:      order.UpdatedAt.Format(constants.DateTimeLayoutISO),
+			EarnedCPoints:  utils.FormatEarnedCPoints(order.EarnedCpoints),
 		},
 		Payment: OrderAdminPaymentInfo{
 			Gateway:         formatAdminOrderNullableString(order.PaymentGateway),

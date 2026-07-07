@@ -12,6 +12,7 @@ import (
 	"cchoice/internal/jobs"
 	"cchoice/internal/logs"
 	"cchoice/internal/orderhistory"
+	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
 )
@@ -21,12 +22,14 @@ type OnOrderPaidParams struct {
 	DBRW            database.IService
 	EmailJobRunner  *jobs.EmailJobRunner
 	ReferenceNumber string
+	CPointAwarder   ICPointAwarder
 }
 
 type OnOrderPaidResult struct {
 	OrderNumber   string
 	CustomerEmail string
 	OrderID       int64
+	EarnedCPoints int64
 }
 
 func OnOrderPaid(ctx context.Context, params OnOrderPaidParams) (*OnOrderPaidResult, error) {
@@ -61,6 +64,7 @@ func OnOrderPaid(ctx context.Context, params OnOrderPaidParams) (*OnOrderPaidRes
 			OrderNumber:   order.OrderNumber,
 			OrderID:       order.ID,
 			CustomerEmail: order.CustomerEmail,
+			EarnedCPoints: order.EarnedCpoints,
 		}, nil
 	}
 
@@ -125,9 +129,26 @@ func OnOrderPaid(ctx context.Context, params OnOrderPaidParams) (*OnOrderPaidRes
 		zap.String("new_status", updatedCheckout.Status),
 	)
 
+	earnedCPoints := int64(0)
+	if params.CPointAwarder != nil && order.CustomerID.Valid {
+		earnedCPoints = utils.CalculateOrderEarnedCPoints(order.TotalAmount)
+		if earnedCPoints > 0 {
+			if _, err := params.CPointAwarder.AwardForPaidOrder(ctx, qtx, order); err != nil {
+				logs.LogCtx(ctx).Error(
+					logtag,
+					zap.Int64("order_id", order.ID),
+					zap.String("action", "award_cpoints"),
+					zap.Error(err),
+				)
+				return nil, err
+			}
+		}
+	}
+
 	updatedOrder, err := qtx.UpdateOrderOnPaymentSuccess(ctx, queries.UpdateOrderOnPaymentSuccessParams{
-		Status: enums.ORDER_STATUS_CONFIRMED.String(),
-		ID:     order.ID,
+		Status:        enums.ORDER_STATUS_CONFIRMED.String(),
+		EarnedCpoints: earnedCPoints,
+		ID:            order.ID,
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(
@@ -210,5 +231,6 @@ func OnOrderPaid(ctx context.Context, params OnOrderPaidParams) (*OnOrderPaidRes
 		OrderNumber:   updatedOrder.OrderNumber,
 		OrderID:       updatedOrder.ID,
 		CustomerEmail: updatedOrder.CustomerEmail,
+		EarnedCPoints: updatedOrder.EarnedCpoints,
 	}, nil
 }

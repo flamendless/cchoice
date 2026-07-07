@@ -1,5 +1,6 @@
 package payment
 
+import "fmt"
 import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/components/header"
@@ -17,7 +18,7 @@ templ SuccessPaymentPage(body templ.Component) {
 	</html>
 }
 
-templ SuccessPaymentPageBody(orderRefNumber string) {
+templ SuccessPaymentPageBody(orderRefNumber string, earnedCPoints int64) {
 	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
 		@common.DevRibbon()
 		@common.ErrorBanner()
@@ -29,6 +30,13 @@ templ SuccessPaymentPageBody(orderRefNumber string) {
 					@svg.Check("w-12 h-12 text-green-600")
 				</div>
 				<h1 class="text-3xl font-semibold text-primary-dark">Payment Successful!</h1>
+				if earnedCPoints > 0 {
+					<p class="text-lg text-gray-600 text-center">
+						You've earned
+						<span class="text-primary font-semibold">{ fmt.Sprintf("%d", earnedCPoints) }</span>
+						C-Points!
+					</p>
+				}
 				<p class="text-lg text-gray-600 text-center">
 					Thank you for your purchase. Your payment has been processed successfully.
 				</p>

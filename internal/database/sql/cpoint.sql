@@ -78,3 +78,19 @@ WHERE
     code = ?
     AND deleted_at = '1970-01-01 00:00:00+00:00'
 LIMIT 1;
+
+-- name: CreateRedeemedCpoint :one
+INSERT INTO tbl_cpoints (
+    customer_id,
+    code,
+    value,
+    product_skus,
+    expires_at,
+    generated_at,
+    redeemed_at,
+    created_at,
+    updated_at,
+    deleted_at
+) VALUES (
+    ?, ?, ?, ?, ?, datetime('now'), datetime('now'), datetime('now'), datetime('now'), '1970-01-01 00:00:00+00:00'
+) RETURNING *;

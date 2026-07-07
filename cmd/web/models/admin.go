@@ -80,6 +80,7 @@ type AdminOrderListItem struct {
 	IsPaid         bool
 	CreatedAt      string
 	UpdatedAt      string
+	EarnedCPoints  string
 }
 
 type AdminOrderLineItem struct {
@@ -104,6 +105,7 @@ type AdminOrderInfo struct {
 	Remarks        string
 	CreatedAt      string
 	UpdatedAt      string
+	EarnedCPoints  string
 }
 
 type AdminOrderPaymentInfo struct {

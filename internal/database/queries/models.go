@@ -277,6 +277,7 @@ type TblOrder struct {
 	ShippingEta              sql.NullString
 	CustomerID               sql.NullInt64
 	ShippingBarangay         string
+	EarnedCpoints            int64
 }
 
 type TblOrderLine struct {

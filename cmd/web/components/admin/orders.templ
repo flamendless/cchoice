@@ -113,15 +113,16 @@ templ AdminOrdersListTable(orders []models.AdminOrderListItem) {
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">Order Reference</th>
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">Status</th>
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">Is Paid</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">Created At</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">Updated At</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">Actions</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">Earned C-Points</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">Created At</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">Updated At</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">Actions</th>
 				</tr>
 			</thead>
 			<tbody class="bg-white divide-y divide-gray-200">
 				if len(orders) == 0 {
 					<tr>
-						<td colspan="8" class="px-6 py-4 text-center text-gray-500">
+						<td colspan="9" class="px-6 py-4 text-center text-gray-500">
 							No orders found.
 						</td>
 					</tr>
@@ -157,6 +158,7 @@ templ OrderTableRow(order models.AdminOrderListItem) {
 		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 			@OrderIsPaid(order.IsPaid)
 		</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ order.EarnedCPoints }</td>
 		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ order.CreatedAt }</td>
 		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ order.UpdatedAt }</td>
 		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -164,7 +166,7 @@ templ OrderTableRow(order models.AdminOrderListItem) {
 		</td>
 	</tr>
 	<tr id={ "order-details-" + order.ID } class="hidden">
-		<td id={ "order-details-cell-" + order.ID } colspan="8" class="px-6 py-2"></td>
+		<td id={ "order-details-cell-" + order.ID } colspan="9" class="px-6 py-2"></td>
 	</tr>
 }
 
@@ -324,40 +326,7 @@ templ OrderTrackModal(data models.AdminOrderTrackModalData) {
 			</div>
 			<p class="text-sm text-gray-600 mb-4">Order Reference: <span class="font-medium text-gray-900">{ data.OrderReference }</span></p>
 			@OrderStatusFlowDiagram(data.FlowSteps, data.CurrentStatus)
-			<div class="mt-6 overflow-x-auto">
-				<table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-md">
-					<thead class="bg-gray-50">
-						<tr>
-							<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-							<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">From</th>
-							<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">To</th>
-							<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Staff</th>
-							<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
-						</tr>
-					</thead>
-					<tbody class="bg-white divide-y divide-gray-200">
-						if len(data.History) == 0 {
-							<tr>
-								<td colspan="5" class="px-4 py-3 text-center text-sm text-gray-500">No audit history found.</td>
-							</tr>
-						} else {
-							for _, entry := range data.History {
-								<tr>
-									<td class="px-4 py-2 text-sm text-gray-900 whitespace-nowrap">{ entry.CreatedAt }</td>
-									<td class="px-4 py-2 text-sm">
-										@OrderHistoryStatusPill(entry.FromStatus)
-									</td>
-									<td class="px-4 py-2 text-sm">
-										@OrderHistoryStatusPill(entry.ToStatus)
-									</td>
-									<td class="px-4 py-2 text-sm text-gray-900">{ entry.StaffName }</td>
-									<td class="px-4 py-2 text-sm text-gray-900">{ entry.Notes }</td>
-								</tr>
-							}
-						}
-					</tbody>
-				</table>
-			</div>
+			@OrderTrackHistoryTable(data.History)
 			<div class="flex justify-end mt-6">
 				<button
 					type="button"
@@ -368,6 +337,43 @@ templ OrderTrackModal(data models.AdminOrderTrackModalData) {
 				</button>
 			</div>
 		</div>
+	</div>
+}
+
+templ OrderTrackHistoryTable(history []models.AdminOrderStatusHistoryEntry) {
+	<div class="mt-6 overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-md">
+			<thead class="bg-gray-50">
+				<tr>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">From</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">To</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Staff</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				if len(history) == 0 {
+					<tr>
+						<td colspan="5" class="px-4 py-3 text-center text-sm text-gray-500">No audit history found.</td>
+					</tr>
+				} else {
+					for _, entry := range history {
+						<tr>
+							<td class="px-4 py-2 text-sm text-gray-900 whitespace-nowrap">{ entry.CreatedAt }</td>
+							<td class="px-4 py-2 text-sm">
+								@OrderHistoryStatusPill(entry.FromStatus)
+							</td>
+							<td class="px-4 py-2 text-sm">
+								@OrderHistoryStatusPill(entry.ToStatus)
+							</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ entry.StaffName }</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ entry.Notes }</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
 	</div>
 }
 
@@ -543,6 +549,7 @@ templ OrderDetailsRows(details models.AdminOrderDetails) {
 				<div><span class="font-medium text-gray-600">Remarks:</span> { details.Order.Remarks }</div>
 				<div><span class="font-medium text-gray-600">Created At:</span> { details.Order.CreatedAt }</div>
 				<div><span class="font-medium text-gray-600">Updated At:</span> { details.Order.UpdatedAt }</div>
+				<div><span class="font-medium text-gray-600">Earned C-Points:</span> { details.Order.EarnedCPoints }</div>
 			</div>
 		</div>
 		<div class="border-t border-gray-200 pt-4">

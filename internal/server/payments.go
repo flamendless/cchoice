@@ -33,6 +33,7 @@ func RegisterPaymentWebhooks(s *Server, r chi.Router) {
 			DBRO:           s.dbRO,
 			DBRW:           s.dbRW,
 			EmailJobRunner: s.mailJobRunner,
+			CPointAwarder:  s.services.cpoint,
 		})
 		r.Post("/webhooks/paymongo", handler)
 		return
@@ -215,6 +216,7 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 		DBRO:            s.dbRO,
 		DBRW:            s.dbRW,
 		EmailJobRunner:  s.mailJobRunner,
+		CPointAwarder:   s.services.cpoint,
 	})
 	if err != nil || result == nil {
 		err = cmp.Or(err, errs.ErrRespNil)
@@ -223,7 +225,7 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if err := comppayment.SuccessPaymentPage(comppayment.SuccessPaymentPageBody(result.OrderNumber)).Render(ctx, w); err != nil {
+	if err := comppayment.SuccessPaymentPage(comppayment.SuccessPaymentPageBody(result.OrderNumber, result.EarnedCPoints)).Render(ctx, w); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

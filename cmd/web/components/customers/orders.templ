@@ -1,0 +1,191 @@
+package components
+
+import (
+	compadmin "cchoice/cmd/web/components/admin"
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/utils"
+)
+
+templ CustomerOrdersListPage() {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("[Orders] C-Choice Customer Portal")
+		</head>
+		<body
+			class="bg-surface min-h-screen flex flex-col"
+			_="init call metrics_event('customer_visit', 'orders')"
+		>
+			@common.DevRibbon()
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-8xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.CustomerPortalHeaderWithBack()
+						<h1 class="text-2xl font-bold text-center text-primary mb-6">
+							My Orders
+						</h1>
+						@CustomerOrdersListSection()
+					</div>
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+templ CustomerOrdersListSection() {
+	<div
+		class="bg-white rounded-lg shadow-md p-6"
+		hx-get={ utils.URL("/customer/orders/table") }
+		hx-trigger="load"
+		hx-target="#customer-orders-table"
+		hx-swap="innerHTML"
+	>
+		@CustomerOrdersSearchToolbar(utils.URL("/customer/orders/table"))
+		<div id="customer-orders-table"></div>
+	</div>
+}
+
+templ CustomerOrdersSearchToolbar(url string) {
+	<div class="flex flex-col sm:flex-row sm:flex-wrap justify-between items-start sm:items-center gap-4 mb-4">
+		<div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+			<input
+				type="text"
+				name="search_order_ref"
+				placeholder="Search by order reference..."
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+				hx-get={ url }
+				hx-trigger="change, search_order_ref delay:300ms"
+				hx-target="#customer-orders-table"
+				hx-include="[name='search_order_ref'],[name='sort_by'],[name='sort_dir']"
+			/>
+			<select
+				name="sort_by"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+				hx-get={ url }
+				hx-trigger="change"
+				hx-target="#customer-orders-table"
+				hx-include="[name='search_order_ref'],[name='sort_by'],[name='sort_dir']"
+			>
+				<option value="CREATED_AT">Sort By: Ordered At</option>
+				<option value="STATUS">Sort By: Status</option>
+			</select>
+			<select
+				name="sort_dir"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+				hx-get={ url }
+				hx-trigger="change"
+				hx-target="#customer-orders-table"
+				hx-include="[name='search_order_ref'],[name='sort_by'],[name='sort_dir']"
+			>
+				<option value="DESC">Sort: Descending</option>
+				<option value="ASC">Sort: Ascending</option>
+			</select>
+		</div>
+	</div>
+}
+
+templ CustomerOrdersTableContent(orders []models.CustomerOrderListItem, p models.TablePagination) {
+	<div id="customer-orders-table-content">
+		<div id="customer-orders-pagination-top" hx-swap-oob="true">
+			@compadmin.TablePaginationBar(p)
+		</div>
+		@CustomerOrdersListTable(orders)
+		@compadmin.TablePaginationBar(p)
+	</div>
+}
+
+templ CustomerOrdersListTable(orders []models.CustomerOrderListItem) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-50">
+				<tr>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%]">Order Reference</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[14%]">Status</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">Is Paid</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[16%]">Ordered At</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">Earned C-Points</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">Actions</th>
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				if len(orders) == 0 {
+					<tr>
+						<td colspan="6" class="px-6 py-4 text-center text-gray-500">
+							No orders found.
+						</td>
+					</tr>
+				} else {
+					for _, order := range orders {
+						@CustomerOrderTableRow(order)
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ CustomerOrderTableRow(order models.CustomerOrderListItem) {
+	<tr>
+		<td class="px-6 py-4 whitespace-nowrap text-sm">
+			<a
+				href={ utils.URLf("/customer/orders/%s", order.ID) }
+				class="text-primary hover:text-primary-dark font-medium"
+			>
+				{ order.OrderReference }
+			</a>
+		</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm">
+			@compadmin.OrderStatusPill(order.Status, false)
+		</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+			@compadmin.OrderIsPaid(order.IsPaid)
+		</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ order.OrderedAt }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ order.EarnedCPoints }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+			<a
+				href={ utils.URLf("/customer/orders/%s#tracking", order.ID) }
+				class="inline-block px-3 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-xs font-medium"
+			>
+				Track
+			</a>
+		</td>
+	</tr>
+}
+
+templ CustomerOrderDetailPage(data models.CustomerOrderDetailPageData) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("[Order] C-Choice Customer Portal")
+		</head>
+		<body class="bg-surface min-h-screen flex flex-col">
+			@common.DevRibbon()
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-8xl mx-auto">
+					@header.CustomerPortalHeaderWithBackLink(utils.URL("/customer/orders"), "Back to Orders")
+					<div id="tracking" class="bg-white rounded-lg shadow-md p-6 mb-6">
+						<h1 class="text-2xl font-bold text-primary mb-6">
+							Order { data.Details.Order.OrderReference }
+						</h1>
+						<h2 class="text-xl font-semibold text-gray-900 mb-4">Order Tracking</h2>
+						@compadmin.OrderStatusFlowDiagram(data.Track.FlowSteps, data.Track.CurrentStatus)
+						@compadmin.OrderTrackHistoryTable(data.Track.History)
+					</div>
+					<div class="bg-white rounded-lg shadow-md p-6">
+						<h2 class="text-xl font-semibold text-gray-900 mb-4">Order Details</h2>
+						@compadmin.OrderDetailsRows(data.Details)
+					</div>
+				</div>
+			</div>
+		</body>
+	</html>
+}

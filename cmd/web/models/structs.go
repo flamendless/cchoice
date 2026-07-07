@@ -185,6 +185,21 @@ type CustomerProfile struct {
 	Status       enums.CustomerStatus
 }
 
+type CustomerOrderListItem struct {
+	ID             string
+	OrderReference string
+	Status         enums.OrderStatus
+	IsPaid         bool
+	OrderedAt      string
+	EarnedCPoints  string
+}
+
+type CustomerOrderDetailPageData struct {
+	Profile CustomerProfile
+	Details AdminOrderDetails
+	Track   AdminOrderTrackModalData
+}
+
 type AttendanceStat struct {
 	In            string
 	Out           string

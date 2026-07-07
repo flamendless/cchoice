@@ -100,6 +100,7 @@ RETURNING *;
 UPDATE tbl_orders
 SET status = ?,
 	paid_at = DATETIME('now'),
+	earned_cpoints = ?,
 	updated_at = DATETIME('now')
 WHERE id = ?
 RETURNING *;
@@ -184,7 +185,8 @@ SELECT
 	status,
 	paid_at,
 	created_at,
-	updated_at
+	updated_at,
+	earned_cpoints
 FROM tbl_orders
 WHERE
 	(@search_order_ref IS NULL OR @search_order_ref = '' OR LOWER(order_number) LIKE '%' || LOWER(@search_order_ref) || '%')
@@ -198,7 +200,8 @@ SELECT
 	status,
 	paid_at,
 	created_at,
-	updated_at
+	updated_at,
+	earned_cpoints
 FROM tbl_orders
 WHERE
 	(@search_order_ref IS NULL OR @search_order_ref = '' OR LOWER(order_number) LIKE '%' || LOWER(@search_order_ref) || '%')
@@ -212,7 +215,8 @@ SELECT
 	status,
 	paid_at,
 	created_at,
-	updated_at
+	updated_at,
+	earned_cpoints
 FROM tbl_orders
 WHERE
 	(@search_order_ref IS NULL OR @search_order_ref = '' OR LOWER(order_number) LIKE '%' || LOWER(@search_order_ref) || '%')
@@ -226,7 +230,8 @@ SELECT
 	status,
 	paid_at,
 	created_at,
-	updated_at
+	updated_at,
+	earned_cpoints
 FROM tbl_orders
 WHERE
 	(@search_order_ref IS NULL OR @search_order_ref = '' OR LOWER(order_number) LIKE '%' || LOWER(@search_order_ref) || '%')
@@ -240,7 +245,8 @@ SELECT
 	status,
 	paid_at,
 	created_at,
-	updated_at
+	updated_at,
+	earned_cpoints
 FROM tbl_orders
 WHERE
 	(@search_order_ref IS NULL OR @search_order_ref = '' OR LOWER(order_number) LIKE '%' || LOWER(@search_order_ref) || '%')
@@ -254,10 +260,78 @@ SELECT
 	status,
 	paid_at,
 	created_at,
-	updated_at
+	updated_at,
+	earned_cpoints
 FROM tbl_orders
 WHERE
 	(@search_order_ref IS NULL OR @search_order_ref = '' OR LOWER(order_number) LIKE '%' || LOWER(@search_order_ref) || '%')
+ORDER BY status ASC
+LIMIT @limit OFFSET @offset;
+
+-- name: CustomerCountOrdersForListing :one
+SELECT COUNT(*) AS count
+FROM tbl_orders
+WHERE
+	customer_id = @customer_id
+	AND (@search_order_ref IS NULL OR @search_order_ref = '' OR LOWER(order_number) LIKE '%' || LOWER(@search_order_ref) || '%');
+
+-- name: CustomerGetOrdersForListingPaginatedCreatedAtDesc :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	earned_cpoints
+FROM tbl_orders
+WHERE
+	customer_id = @customer_id
+	AND (@search_order_ref IS NULL OR @search_order_ref = '' OR LOWER(order_number) LIKE '%' || LOWER(@search_order_ref) || '%')
+ORDER BY created_at DESC
+LIMIT @limit OFFSET @offset;
+
+-- name: CustomerGetOrdersForListingPaginatedCreatedAtAsc :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	earned_cpoints
+FROM tbl_orders
+WHERE
+	customer_id = @customer_id
+	AND (@search_order_ref IS NULL OR @search_order_ref = '' OR LOWER(order_number) LIKE '%' || LOWER(@search_order_ref) || '%')
+ORDER BY created_at ASC
+LIMIT @limit OFFSET @offset;
+
+-- name: CustomerGetOrdersForListingPaginatedStatusDesc :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	earned_cpoints
+FROM tbl_orders
+WHERE
+	customer_id = @customer_id
+	AND (@search_order_ref IS NULL OR @search_order_ref = '' OR LOWER(order_number) LIKE '%' || LOWER(@search_order_ref) || '%')
+ORDER BY status DESC
+LIMIT @limit OFFSET @offset;
+
+-- name: CustomerGetOrdersForListingPaginatedStatusAsc :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	earned_cpoints
+FROM tbl_orders
+WHERE
+	customer_id = @customer_id
+	AND (@search_order_ref IS NULL OR @search_order_ref = '' OR LOWER(order_number) LIKE '%' || LOWER(@search_order_ref) || '%')
 ORDER BY status ASC
 LIMIT @limit OFFSET @offset;
 
@@ -274,6 +348,7 @@ SELECT
 	o.created_at,
 	o.updated_at,
 	o.paid_at,
+	o.earned_cpoints,
 	o.subtotal_amount,
 	o.shipping_amount,
 	o.discount_amount,
