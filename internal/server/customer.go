@@ -109,9 +109,6 @@ func (s *Server) customerLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	s.sessionManager.Put(ctx, SessionCustomerID, s.encoder.Encode(customer.ID))
 	s.sessionManager.Put(ctx, SessionCustomerAccessID, 0)
-	if err := s.sessionManager.RenewToken(ctx); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-	}
 	redirectHX(w, r, utils.URL("/customer/portal"))
 }
 
