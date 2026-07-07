@@ -90,3 +90,10 @@ func BoolToString(b bool) string {
 	}
 	return "false"
 }
+
+func StringFromAny(v any) string {
+	if s, ok := v.(string); ok {
+		return s
+	}
+	return ""
+}

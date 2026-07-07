@@ -13,17 +13,8 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/utils"
 )
-
-func normalizeCustomerOrderListingSort(sortBy, sortDir string) (string, string) {
-	if sortBy == "" {
-		sortBy = "CREATED_AT"
-	}
-	if sortDir == "" {
-		sortDir = "DESC"
-	}
-	return sortBy, sortDir
-}
 
 func mapCustomerOrderListItemFromRow(
 	id int64,
@@ -106,7 +97,7 @@ func (s *OrderService) GetForListingCustomerPaginated(
 	customerIDStr string,
 	searchOrderRef string,
 	sortBy string,
-	sortDir string,
+	sortDir enums.ListingSortDirection,
 	page, perPage int,
 ) ([]OrderCustomerListItem, int64, int, error) {
 	customerDecoded := s.encoder.Decode(customerIDStr)
@@ -114,7 +105,7 @@ func (s *OrderService) GetForListingCustomerPaginated(
 		return nil, 0, 0, errs.ErrDecode
 	}
 
-	sortBy, sortDir = normalizeCustomerOrderListingSort(sortBy, sortDir)
+	sortBy, sortDir = utils.NormalizeListingSort(sortBy, sortDir, "CREATED_AT")
 
 	searchParam := sql.NullString{
 		String: searchOrderRef,
@@ -145,7 +136,8 @@ func (s *OrderService) GetForListingCustomerPaginated(
 func (s *OrderService) queryCustomerOrdersForListingPaginated(
 	ctx context.Context,
 	customerID int64,
-	sortBy, sortDir string,
+	sortBy string,
+	sortDir enums.ListingSortDirection,
 	searchOrderRef sql.NullString,
 	limit, offset int64,
 ) ([]OrderCustomerListItem, error) {
@@ -154,7 +146,7 @@ func (s *OrderService) queryCustomerOrdersForListingPaginated(
 
 	switch sortBy {
 	case "STATUS":
-		if sortDir == "ASC" {
+		if sortDir.IsAscending() {
 			rows, err := q.CustomerGetOrdersForListingPaginatedStatusAsc(ctx, queries.CustomerGetOrdersForListingPaginatedStatusAscParams{
 				CustomerID:     customerParam,
 				SearchOrderRef: searchOrderRef,
@@ -177,7 +169,7 @@ func (s *OrderService) queryCustomerOrdersForListingPaginated(
 		}
 		return mapCustomerOrderListItemsFromStatusDesc(rows), nil
 	default:
-		if sortDir == "ASC" {
+		if sortDir.IsAscending() {
 			rows, err := q.CustomerGetOrdersForListingPaginatedCreatedAtAsc(ctx, queries.CustomerGetOrdersForListingPaginatedCreatedAtAscParams{
 				CustomerID:     customerParam,
 				SearchOrderRef: searchOrderRef,

@@ -156,3 +156,25 @@ func TestBuildFullName(t *testing.T) {
 		})
 	}
 }
+
+func TestStringFromAny(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		input    any
+		expected string
+	}{
+		{name: "string value", input: "PHP", expected: "PHP"},
+		{name: "empty string", input: "", expected: ""},
+		{name: "nil", input: nil, expected: ""},
+		{name: "non string", input: 42, expected: ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, tt.expected, StringFromAny(tt.input))
+		})
+	}
+}

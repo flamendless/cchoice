@@ -200,6 +200,29 @@ type CustomerOrderDetailPageData struct {
 	Track   AdminOrderTrackModalData
 }
 
+type CustomerQuotationListItem struct {
+	ID           string
+	Status       enums.QuotationStatus
+	TotalItems   int64
+	TotalDisplay string
+	SubmittedAt  string
+}
+
+type CustomerQuotationDetailPageData struct {
+	ID             string
+	Status         enums.QuotationStatus
+	SubmittedAt    string
+	UpdatedAt      string
+	Lines          []AdminQuotationLineItem
+	TotalItems     int64
+	TotalPrice     string
+	TotalDiscounts string
+	Total          string
+	History        []AdminQuotationStatusHistoryEntry
+	FlowSteps      []enums.QuotationStatus
+	CurrentStatus  enums.QuotationStatus
+}
+
 type AttendanceStat struct {
 	In            string
 	Out           string

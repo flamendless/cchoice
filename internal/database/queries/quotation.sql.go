@@ -11,6 +11,439 @@ import (
 	"time"
 )
 
+const adminCountQuotationsForListing = `-- name: AdminCountQuotationsForListing :one
+SELECT COUNT(*) AS count
+FROM tbl_quotations q
+INNER JOIN tbl_customers c ON c.id = q.customer_id
+WHERE
+	q.status != 'DRAFT'
+	AND (?1 IS NULL OR ?1 = '' OR LOWER(c.first_name || ' ' || c.last_name) LIKE '%' || LOWER(?1) || '%' OR LOWER(c.email) LIKE '%' || LOWER(?1) || '%')
+`
+
+func (q *Queries) AdminCountQuotationsForListing(ctx context.Context, search interface{}) (int64, error) {
+	row := q.db.QueryRowContext(ctx, adminCountQuotationsForListing, search)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const adminGetQuotationsForListingPaginatedCreatedAtAsc = `-- name: AdminGetQuotationsForListingPaginatedCreatedAtAsc :many
+SELECT
+	q.id,
+	q.status,
+	q.created_at,
+	q.updated_at,
+	q.acknowledged_by_staff_id,
+	c.first_name AS customer_first_name,
+	c.middle_name AS customer_middle_name,
+	c.last_name AS customer_last_name,
+	s.first_name AS staff_first_name,
+	s.last_name AS staff_last_name,
+	COALESCE(line_stats.total_items, 0) AS total_items,
+	COALESCE(line_stats.total_original_price, 0) AS total_original_price,
+	COALESCE(line_stats.total_sale_price, 0) AS total_sale_price,
+	COALESCE(line_stats.currency, '') AS currency
+FROM tbl_quotations q
+INNER JOIN tbl_customers c ON c.id = q.customer_id
+LEFT JOIN tbl_staffs s ON s.id = q.acknowledged_by_staff_id
+LEFT JOIN (
+	SELECT
+		quotation_id,
+		COUNT(*) AS total_items,
+		CAST(SUM(quantity * original_price_snapshot) AS INTEGER) AS total_original_price,
+		CAST(SUM(quantity * COALESCE(sale_price_snapshot, original_price_snapshot)) AS INTEGER) AS total_sale_price,
+		MAX(currency) AS currency
+	FROM tbl_quotation_lines
+	GROUP BY quotation_id
+) line_stats ON line_stats.quotation_id = q.id
+WHERE
+	q.status != 'DRAFT'
+	AND (?1 IS NULL OR ?1 = '' OR LOWER(c.first_name || ' ' || c.last_name) LIKE '%' || LOWER(?1) || '%' OR LOWER(c.email) LIKE '%' || LOWER(?1) || '%')
+ORDER BY q.created_at ASC
+LIMIT ?3 OFFSET ?2
+`
+
+type AdminGetQuotationsForListingPaginatedCreatedAtAscParams struct {
+	Search interface{}
+	Offset int64
+	Limit  int64
+}
+
+type AdminGetQuotationsForListingPaginatedCreatedAtAscRow struct {
+	ID                    int64
+	Status                string
+	CreatedAt             time.Time
+	UpdatedAt             time.Time
+	AcknowledgedByStaffID sql.NullInt64
+	CustomerFirstName     string
+	CustomerMiddleName    sql.NullString
+	CustomerLastName      string
+	StaffFirstName        sql.NullString
+	StaffLastName         sql.NullString
+	TotalItems            int64
+	TotalOriginalPrice    int64
+	TotalSalePrice        int64
+	Currency              interface{}
+}
+
+func (q *Queries) AdminGetQuotationsForListingPaginatedCreatedAtAsc(ctx context.Context, arg AdminGetQuotationsForListingPaginatedCreatedAtAscParams) ([]AdminGetQuotationsForListingPaginatedCreatedAtAscRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetQuotationsForListingPaginatedCreatedAtAsc, arg.Search, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetQuotationsForListingPaginatedCreatedAtAscRow
+	for rows.Next() {
+		var i AdminGetQuotationsForListingPaginatedCreatedAtAscRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.AcknowledgedByStaffID,
+			&i.CustomerFirstName,
+			&i.CustomerMiddleName,
+			&i.CustomerLastName,
+			&i.StaffFirstName,
+			&i.StaffLastName,
+			&i.TotalItems,
+			&i.TotalOriginalPrice,
+			&i.TotalSalePrice,
+			&i.Currency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const adminGetQuotationsForListingPaginatedCreatedAtDesc = `-- name: AdminGetQuotationsForListingPaginatedCreatedAtDesc :many
+SELECT
+	q.id,
+	q.status,
+	q.created_at,
+	q.updated_at,
+	q.acknowledged_by_staff_id,
+	c.first_name AS customer_first_name,
+	c.middle_name AS customer_middle_name,
+	c.last_name AS customer_last_name,
+	s.first_name AS staff_first_name,
+	s.last_name AS staff_last_name,
+	COALESCE(line_stats.total_items, 0) AS total_items,
+	COALESCE(line_stats.total_original_price, 0) AS total_original_price,
+	COALESCE(line_stats.total_sale_price, 0) AS total_sale_price,
+	COALESCE(line_stats.currency, '') AS currency
+FROM tbl_quotations q
+INNER JOIN tbl_customers c ON c.id = q.customer_id
+LEFT JOIN tbl_staffs s ON s.id = q.acknowledged_by_staff_id
+LEFT JOIN (
+	SELECT
+		quotation_id,
+		COUNT(*) AS total_items,
+		CAST(SUM(quantity * original_price_snapshot) AS INTEGER) AS total_original_price,
+		CAST(SUM(quantity * COALESCE(sale_price_snapshot, original_price_snapshot)) AS INTEGER) AS total_sale_price,
+		MAX(currency) AS currency
+	FROM tbl_quotation_lines
+	GROUP BY quotation_id
+) line_stats ON line_stats.quotation_id = q.id
+WHERE
+	q.status != 'DRAFT'
+	AND (?1 IS NULL OR ?1 = '' OR LOWER(c.first_name || ' ' || c.last_name) LIKE '%' || LOWER(?1) || '%' OR LOWER(c.email) LIKE '%' || LOWER(?1) || '%')
+ORDER BY q.created_at DESC
+LIMIT ?3 OFFSET ?2
+`
+
+type AdminGetQuotationsForListingPaginatedCreatedAtDescParams struct {
+	Search interface{}
+	Offset int64
+	Limit  int64
+}
+
+type AdminGetQuotationsForListingPaginatedCreatedAtDescRow struct {
+	ID                    int64
+	Status                string
+	CreatedAt             time.Time
+	UpdatedAt             time.Time
+	AcknowledgedByStaffID sql.NullInt64
+	CustomerFirstName     string
+	CustomerMiddleName    sql.NullString
+	CustomerLastName      string
+	StaffFirstName        sql.NullString
+	StaffLastName         sql.NullString
+	TotalItems            int64
+	TotalOriginalPrice    int64
+	TotalSalePrice        int64
+	Currency              interface{}
+}
+
+func (q *Queries) AdminGetQuotationsForListingPaginatedCreatedAtDesc(ctx context.Context, arg AdminGetQuotationsForListingPaginatedCreatedAtDescParams) ([]AdminGetQuotationsForListingPaginatedCreatedAtDescRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetQuotationsForListingPaginatedCreatedAtDesc, arg.Search, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetQuotationsForListingPaginatedCreatedAtDescRow
+	for rows.Next() {
+		var i AdminGetQuotationsForListingPaginatedCreatedAtDescRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.AcknowledgedByStaffID,
+			&i.CustomerFirstName,
+			&i.CustomerMiddleName,
+			&i.CustomerLastName,
+			&i.StaffFirstName,
+			&i.StaffLastName,
+			&i.TotalItems,
+			&i.TotalOriginalPrice,
+			&i.TotalSalePrice,
+			&i.Currency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const adminGetQuotationsForListingPaginatedStatusAsc = `-- name: AdminGetQuotationsForListingPaginatedStatusAsc :many
+SELECT
+	q.id,
+	q.status,
+	q.created_at,
+	q.updated_at,
+	q.acknowledged_by_staff_id,
+	c.first_name AS customer_first_name,
+	c.middle_name AS customer_middle_name,
+	c.last_name AS customer_last_name,
+	s.first_name AS staff_first_name,
+	s.last_name AS staff_last_name,
+	COALESCE(line_stats.total_items, 0) AS total_items,
+	COALESCE(line_stats.total_original_price, 0) AS total_original_price,
+	COALESCE(line_stats.total_sale_price, 0) AS total_sale_price,
+	COALESCE(line_stats.currency, '') AS currency
+FROM tbl_quotations q
+INNER JOIN tbl_customers c ON c.id = q.customer_id
+LEFT JOIN tbl_staffs s ON s.id = q.acknowledged_by_staff_id
+LEFT JOIN (
+	SELECT
+		quotation_id,
+		COUNT(*) AS total_items,
+		CAST(SUM(quantity * original_price_snapshot) AS INTEGER) AS total_original_price,
+		CAST(SUM(quantity * COALESCE(sale_price_snapshot, original_price_snapshot)) AS INTEGER) AS total_sale_price,
+		MAX(currency) AS currency
+	FROM tbl_quotation_lines
+	GROUP BY quotation_id
+) line_stats ON line_stats.quotation_id = q.id
+WHERE
+	q.status != 'DRAFT'
+	AND (?1 IS NULL OR ?1 = '' OR LOWER(c.first_name || ' ' || c.last_name) LIKE '%' || LOWER(?1) || '%' OR LOWER(c.email) LIKE '%' || LOWER(?1) || '%')
+ORDER BY q.status ASC
+LIMIT ?3 OFFSET ?2
+`
+
+type AdminGetQuotationsForListingPaginatedStatusAscParams struct {
+	Search interface{}
+	Offset int64
+	Limit  int64
+}
+
+type AdminGetQuotationsForListingPaginatedStatusAscRow struct {
+	ID                    int64
+	Status                string
+	CreatedAt             time.Time
+	UpdatedAt             time.Time
+	AcknowledgedByStaffID sql.NullInt64
+	CustomerFirstName     string
+	CustomerMiddleName    sql.NullString
+	CustomerLastName      string
+	StaffFirstName        sql.NullString
+	StaffLastName         sql.NullString
+	TotalItems            int64
+	TotalOriginalPrice    int64
+	TotalSalePrice        int64
+	Currency              interface{}
+}
+
+func (q *Queries) AdminGetQuotationsForListingPaginatedStatusAsc(ctx context.Context, arg AdminGetQuotationsForListingPaginatedStatusAscParams) ([]AdminGetQuotationsForListingPaginatedStatusAscRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetQuotationsForListingPaginatedStatusAsc, arg.Search, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetQuotationsForListingPaginatedStatusAscRow
+	for rows.Next() {
+		var i AdminGetQuotationsForListingPaginatedStatusAscRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.AcknowledgedByStaffID,
+			&i.CustomerFirstName,
+			&i.CustomerMiddleName,
+			&i.CustomerLastName,
+			&i.StaffFirstName,
+			&i.StaffLastName,
+			&i.TotalItems,
+			&i.TotalOriginalPrice,
+			&i.TotalSalePrice,
+			&i.Currency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const adminGetQuotationsForListingPaginatedStatusDesc = `-- name: AdminGetQuotationsForListingPaginatedStatusDesc :many
+SELECT
+	q.id,
+	q.status,
+	q.created_at,
+	q.updated_at,
+	q.acknowledged_by_staff_id,
+	c.first_name AS customer_first_name,
+	c.middle_name AS customer_middle_name,
+	c.last_name AS customer_last_name,
+	s.first_name AS staff_first_name,
+	s.last_name AS staff_last_name,
+	COALESCE(line_stats.total_items, 0) AS total_items,
+	COALESCE(line_stats.total_original_price, 0) AS total_original_price,
+	COALESCE(line_stats.total_sale_price, 0) AS total_sale_price,
+	COALESCE(line_stats.currency, '') AS currency
+FROM tbl_quotations q
+INNER JOIN tbl_customers c ON c.id = q.customer_id
+LEFT JOIN tbl_staffs s ON s.id = q.acknowledged_by_staff_id
+LEFT JOIN (
+	SELECT
+		quotation_id,
+		COUNT(*) AS total_items,
+		CAST(SUM(quantity * original_price_snapshot) AS INTEGER) AS total_original_price,
+		CAST(SUM(quantity * COALESCE(sale_price_snapshot, original_price_snapshot)) AS INTEGER) AS total_sale_price,
+		MAX(currency) AS currency
+	FROM tbl_quotation_lines
+	GROUP BY quotation_id
+) line_stats ON line_stats.quotation_id = q.id
+WHERE
+	q.status != 'DRAFT'
+	AND (?1 IS NULL OR ?1 = '' OR LOWER(c.first_name || ' ' || c.last_name) LIKE '%' || LOWER(?1) || '%' OR LOWER(c.email) LIKE '%' || LOWER(?1) || '%')
+ORDER BY q.status DESC
+LIMIT ?3 OFFSET ?2
+`
+
+type AdminGetQuotationsForListingPaginatedStatusDescParams struct {
+	Search interface{}
+	Offset int64
+	Limit  int64
+}
+
+type AdminGetQuotationsForListingPaginatedStatusDescRow struct {
+	ID                    int64
+	Status                string
+	CreatedAt             time.Time
+	UpdatedAt             time.Time
+	AcknowledgedByStaffID sql.NullInt64
+	CustomerFirstName     string
+	CustomerMiddleName    sql.NullString
+	CustomerLastName      string
+	StaffFirstName        sql.NullString
+	StaffLastName         sql.NullString
+	TotalItems            int64
+	TotalOriginalPrice    int64
+	TotalSalePrice        int64
+	Currency              interface{}
+}
+
+func (q *Queries) AdminGetQuotationsForListingPaginatedStatusDesc(ctx context.Context, arg AdminGetQuotationsForListingPaginatedStatusDescParams) ([]AdminGetQuotationsForListingPaginatedStatusDescRow, error) {
+	rows, err := q.db.QueryContext(ctx, adminGetQuotationsForListingPaginatedStatusDesc, arg.Search, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminGetQuotationsForListingPaginatedStatusDescRow
+	for rows.Next() {
+		var i AdminGetQuotationsForListingPaginatedStatusDescRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.AcknowledgedByStaffID,
+			&i.CustomerFirstName,
+			&i.CustomerMiddleName,
+			&i.CustomerLastName,
+			&i.StaffFirstName,
+			&i.StaffLastName,
+			&i.TotalItems,
+			&i.TotalOriginalPrice,
+			&i.TotalSalePrice,
+			&i.Currency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const approveQuotation = `-- name: ApproveQuotation :one
+UPDATE tbl_quotations
+SET status = ?,
+	acknowledged_by_staff_id = ?,
+	updated_at = datetime('now')
+WHERE id = ?
+RETURNING id, customer_id, acknowledged_by_staff_id, status, created_at, updated_at
+`
+
+type ApproveQuotationParams struct {
+	Status                string
+	AcknowledgedByStaffID sql.NullInt64
+	ID                    int64
+}
+
+func (q *Queries) ApproveQuotation(ctx context.Context, arg ApproveQuotationParams) (TblQuotation, error) {
+	row := q.db.QueryRowContext(ctx, approveQuotation, arg.Status, arg.AcknowledgedByStaffID, arg.ID)
+	var i TblQuotation
+	err := row.Scan(
+		&i.ID,
+		&i.CustomerID,
+		&i.AcknowledgedByStaffID,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const createQuotation = `-- name: CreateQuotation :one
 INSERT INTO tbl_quotations(
 	customer_id,
@@ -101,6 +534,329 @@ func (q *Queries) CreateQuotationLine(ctx context.Context, arg CreateQuotationLi
 	return i, err
 }
 
+const customerCountQuotationsForListing = `-- name: CustomerCountQuotationsForListing :one
+SELECT COUNT(*) AS count
+FROM tbl_quotations q
+WHERE
+	q.customer_id = ?1
+	AND q.status != 'DRAFT'
+`
+
+func (q *Queries) CustomerCountQuotationsForListing(ctx context.Context, customerID int64) (int64, error) {
+	row := q.db.QueryRowContext(ctx, customerCountQuotationsForListing, customerID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const customerGetQuotationsForListingPaginatedCreatedAtAsc = `-- name: CustomerGetQuotationsForListingPaginatedCreatedAtAsc :many
+SELECT
+	q.id,
+	q.status,
+	q.created_at,
+	q.updated_at,
+	COALESCE(line_stats.total_items, 0) AS total_items,
+	COALESCE(line_stats.total_original_price, 0) AS total_original_price,
+	COALESCE(line_stats.total_sale_price, 0) AS total_sale_price,
+	COALESCE(line_stats.currency, '') AS currency
+FROM tbl_quotations q
+LEFT JOIN (
+	SELECT
+		quotation_id,
+		COUNT(*) AS total_items,
+		CAST(SUM(quantity * original_price_snapshot) AS INTEGER) AS total_original_price,
+		CAST(SUM(quantity * COALESCE(sale_price_snapshot, original_price_snapshot)) AS INTEGER) AS total_sale_price,
+		MAX(currency) AS currency
+	FROM tbl_quotation_lines
+	GROUP BY quotation_id
+) line_stats ON line_stats.quotation_id = q.id
+WHERE
+	q.customer_id = ?1
+	AND q.status != 'DRAFT'
+ORDER BY q.created_at ASC
+LIMIT ?3 OFFSET ?2
+`
+
+type CustomerGetQuotationsForListingPaginatedCreatedAtAscParams struct {
+	CustomerID int64
+	Offset     int64
+	Limit      int64
+}
+
+type CustomerGetQuotationsForListingPaginatedCreatedAtAscRow struct {
+	ID                 int64
+	Status             string
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
+	TotalItems         int64
+	TotalOriginalPrice int64
+	TotalSalePrice     int64
+	Currency           interface{}
+}
+
+func (q *Queries) CustomerGetQuotationsForListingPaginatedCreatedAtAsc(ctx context.Context, arg CustomerGetQuotationsForListingPaginatedCreatedAtAscParams) ([]CustomerGetQuotationsForListingPaginatedCreatedAtAscRow, error) {
+	rows, err := q.db.QueryContext(ctx, customerGetQuotationsForListingPaginatedCreatedAtAsc, arg.CustomerID, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CustomerGetQuotationsForListingPaginatedCreatedAtAscRow
+	for rows.Next() {
+		var i CustomerGetQuotationsForListingPaginatedCreatedAtAscRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TotalItems,
+			&i.TotalOriginalPrice,
+			&i.TotalSalePrice,
+			&i.Currency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const customerGetQuotationsForListingPaginatedCreatedAtDesc = `-- name: CustomerGetQuotationsForListingPaginatedCreatedAtDesc :many
+SELECT
+	q.id,
+	q.status,
+	q.created_at,
+	q.updated_at,
+	COALESCE(line_stats.total_items, 0) AS total_items,
+	COALESCE(line_stats.total_original_price, 0) AS total_original_price,
+	COALESCE(line_stats.total_sale_price, 0) AS total_sale_price,
+	COALESCE(line_stats.currency, '') AS currency
+FROM tbl_quotations q
+LEFT JOIN (
+	SELECT
+		quotation_id,
+		COUNT(*) AS total_items,
+		CAST(SUM(quantity * original_price_snapshot) AS INTEGER) AS total_original_price,
+		CAST(SUM(quantity * COALESCE(sale_price_snapshot, original_price_snapshot)) AS INTEGER) AS total_sale_price,
+		MAX(currency) AS currency
+	FROM tbl_quotation_lines
+	GROUP BY quotation_id
+) line_stats ON line_stats.quotation_id = q.id
+WHERE
+	q.customer_id = ?1
+	AND q.status != 'DRAFT'
+ORDER BY q.created_at DESC
+LIMIT ?3 OFFSET ?2
+`
+
+type CustomerGetQuotationsForListingPaginatedCreatedAtDescParams struct {
+	CustomerID int64
+	Offset     int64
+	Limit      int64
+}
+
+type CustomerGetQuotationsForListingPaginatedCreatedAtDescRow struct {
+	ID                 int64
+	Status             string
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
+	TotalItems         int64
+	TotalOriginalPrice int64
+	TotalSalePrice     int64
+	Currency           interface{}
+}
+
+func (q *Queries) CustomerGetQuotationsForListingPaginatedCreatedAtDesc(ctx context.Context, arg CustomerGetQuotationsForListingPaginatedCreatedAtDescParams) ([]CustomerGetQuotationsForListingPaginatedCreatedAtDescRow, error) {
+	rows, err := q.db.QueryContext(ctx, customerGetQuotationsForListingPaginatedCreatedAtDesc, arg.CustomerID, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CustomerGetQuotationsForListingPaginatedCreatedAtDescRow
+	for rows.Next() {
+		var i CustomerGetQuotationsForListingPaginatedCreatedAtDescRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TotalItems,
+			&i.TotalOriginalPrice,
+			&i.TotalSalePrice,
+			&i.Currency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const customerGetQuotationsForListingPaginatedStatusAsc = `-- name: CustomerGetQuotationsForListingPaginatedStatusAsc :many
+SELECT
+	q.id,
+	q.status,
+	q.created_at,
+	q.updated_at,
+	COALESCE(line_stats.total_items, 0) AS total_items,
+	COALESCE(line_stats.total_original_price, 0) AS total_original_price,
+	COALESCE(line_stats.total_sale_price, 0) AS total_sale_price,
+	COALESCE(line_stats.currency, '') AS currency
+FROM tbl_quotations q
+LEFT JOIN (
+	SELECT
+		quotation_id,
+		COUNT(*) AS total_items,
+		CAST(SUM(quantity * original_price_snapshot) AS INTEGER) AS total_original_price,
+		CAST(SUM(quantity * COALESCE(sale_price_snapshot, original_price_snapshot)) AS INTEGER) AS total_sale_price,
+		MAX(currency) AS currency
+	FROM tbl_quotation_lines
+	GROUP BY quotation_id
+) line_stats ON line_stats.quotation_id = q.id
+WHERE
+	q.customer_id = ?1
+	AND q.status != 'DRAFT'
+ORDER BY q.status ASC
+LIMIT ?3 OFFSET ?2
+`
+
+type CustomerGetQuotationsForListingPaginatedStatusAscParams struct {
+	CustomerID int64
+	Offset     int64
+	Limit      int64
+}
+
+type CustomerGetQuotationsForListingPaginatedStatusAscRow struct {
+	ID                 int64
+	Status             string
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
+	TotalItems         int64
+	TotalOriginalPrice int64
+	TotalSalePrice     int64
+	Currency           interface{}
+}
+
+func (q *Queries) CustomerGetQuotationsForListingPaginatedStatusAsc(ctx context.Context, arg CustomerGetQuotationsForListingPaginatedStatusAscParams) ([]CustomerGetQuotationsForListingPaginatedStatusAscRow, error) {
+	rows, err := q.db.QueryContext(ctx, customerGetQuotationsForListingPaginatedStatusAsc, arg.CustomerID, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CustomerGetQuotationsForListingPaginatedStatusAscRow
+	for rows.Next() {
+		var i CustomerGetQuotationsForListingPaginatedStatusAscRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TotalItems,
+			&i.TotalOriginalPrice,
+			&i.TotalSalePrice,
+			&i.Currency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const customerGetQuotationsForListingPaginatedStatusDesc = `-- name: CustomerGetQuotationsForListingPaginatedStatusDesc :many
+SELECT
+	q.id,
+	q.status,
+	q.created_at,
+	q.updated_at,
+	COALESCE(line_stats.total_items, 0) AS total_items,
+	COALESCE(line_stats.total_original_price, 0) AS total_original_price,
+	COALESCE(line_stats.total_sale_price, 0) AS total_sale_price,
+	COALESCE(line_stats.currency, '') AS currency
+FROM tbl_quotations q
+LEFT JOIN (
+	SELECT
+		quotation_id,
+		COUNT(*) AS total_items,
+		CAST(SUM(quantity * original_price_snapshot) AS INTEGER) AS total_original_price,
+		CAST(SUM(quantity * COALESCE(sale_price_snapshot, original_price_snapshot)) AS INTEGER) AS total_sale_price,
+		MAX(currency) AS currency
+	FROM tbl_quotation_lines
+	GROUP BY quotation_id
+) line_stats ON line_stats.quotation_id = q.id
+WHERE
+	q.customer_id = ?1
+	AND q.status != 'DRAFT'
+ORDER BY q.status DESC
+LIMIT ?3 OFFSET ?2
+`
+
+type CustomerGetQuotationsForListingPaginatedStatusDescParams struct {
+	CustomerID int64
+	Offset     int64
+	Limit      int64
+}
+
+type CustomerGetQuotationsForListingPaginatedStatusDescRow struct {
+	ID                 int64
+	Status             string
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
+	TotalItems         int64
+	TotalOriginalPrice int64
+	TotalSalePrice     int64
+	Currency           interface{}
+}
+
+func (q *Queries) CustomerGetQuotationsForListingPaginatedStatusDesc(ctx context.Context, arg CustomerGetQuotationsForListingPaginatedStatusDescParams) ([]CustomerGetQuotationsForListingPaginatedStatusDescRow, error) {
+	rows, err := q.db.QueryContext(ctx, customerGetQuotationsForListingPaginatedStatusDesc, arg.CustomerID, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CustomerGetQuotationsForListingPaginatedStatusDescRow
+	for rows.Next() {
+		var i CustomerGetQuotationsForListingPaginatedStatusDescRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TotalItems,
+			&i.TotalOriginalPrice,
+			&i.TotalSalePrice,
+			&i.Currency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const deleteQuotationLine = `-- name: DeleteQuotationLine :exec
 DELETE FROM tbl_quotation_lines
 WHERE id = ?
@@ -128,6 +884,50 @@ func (q *Queries) GetActiveQuotationByCustomerID(ctx context.Context, customerID
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getQuotationByID = `-- name: GetQuotationByID :one
+SELECT
+	q.id, q.customer_id, q.acknowledged_by_staff_id, q.status, q.created_at, q.updated_at,
+	c.first_name AS customer_first_name,
+	c.middle_name AS customer_middle_name,
+	c.last_name AS customer_last_name,
+	c.email AS customer_email
+FROM tbl_quotations q
+INNER JOIN tbl_customers c ON c.id = q.customer_id
+WHERE q.id = ?
+LIMIT 1
+`
+
+type GetQuotationByIDRow struct {
+	ID                    int64
+	CustomerID            int64
+	AcknowledgedByStaffID sql.NullInt64
+	Status                string
+	CreatedAt             time.Time
+	UpdatedAt             time.Time
+	CustomerFirstName     string
+	CustomerMiddleName    sql.NullString
+	CustomerLastName      string
+	CustomerEmail         string
+}
+
+func (q *Queries) GetQuotationByID(ctx context.Context, id int64) (GetQuotationByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getQuotationByID, id)
+	var i GetQuotationByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.CustomerID,
+		&i.AcknowledgedByStaffID,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.CustomerFirstName,
+		&i.CustomerMiddleName,
+		&i.CustomerLastName,
+		&i.CustomerEmail,
 	)
 	return i, err
 }
@@ -197,6 +997,50 @@ func (q *Queries) GetQuotationLinesByQuotationID(ctx context.Context, quotationI
 	return items, nil
 }
 
+const getQuotationLinesByQuotationIDAndProductID = `-- name: GetQuotationLinesByQuotationIDAndProductID :many
+SELECT id, quotation_id, product_id, quantity, original_price_snapshot, sale_price_snapshot, currency, created_at, updated_at FROM tbl_quotation_lines
+WHERE quotation_id = ? AND product_id = ?
+ORDER BY created_at ASC
+`
+
+type GetQuotationLinesByQuotationIDAndProductIDParams struct {
+	QuotationID int64
+	ProductID   int64
+}
+
+func (q *Queries) GetQuotationLinesByQuotationIDAndProductID(ctx context.Context, arg GetQuotationLinesByQuotationIDAndProductIDParams) ([]TblQuotationLine, error) {
+	rows, err := q.db.QueryContext(ctx, getQuotationLinesByQuotationIDAndProductID, arg.QuotationID, arg.ProductID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TblQuotationLine
+	for rows.Next() {
+		var i TblQuotationLine
+		if err := rows.Scan(
+			&i.ID,
+			&i.QuotationID,
+			&i.ProductID,
+			&i.Quantity,
+			&i.OriginalPriceSnapshot,
+			&i.SalePriceSnapshot,
+			&i.Currency,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getQuotationSummary = `-- name: GetQuotationSummary :one
 SELECT
 	COUNT(*) AS total_items,
@@ -247,6 +1091,48 @@ func (q *Queries) UpdateQuotationAcknowledgedBy(ctx context.Context, arg UpdateQ
 		&i.CustomerID,
 		&i.AcknowledgedByStaffID,
 		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updateQuotationLineOnAdd = `-- name: UpdateQuotationLineOnAdd :one
+UPDATE tbl_quotation_lines
+SET quantity = ?,
+	original_price_snapshot = ?,
+	sale_price_snapshot = ?,
+	currency = ?,
+	updated_at = datetime('now')
+WHERE id = ?
+RETURNING id, quotation_id, product_id, quantity, original_price_snapshot, sale_price_snapshot, currency, created_at, updated_at
+`
+
+type UpdateQuotationLineOnAddParams struct {
+	Quantity              int64
+	OriginalPriceSnapshot sql.NullInt64
+	SalePriceSnapshot     sql.NullInt64
+	Currency              string
+	ID                    int64
+}
+
+func (q *Queries) UpdateQuotationLineOnAdd(ctx context.Context, arg UpdateQuotationLineOnAddParams) (TblQuotationLine, error) {
+	row := q.db.QueryRowContext(ctx, updateQuotationLineOnAdd,
+		arg.Quantity,
+		arg.OriginalPriceSnapshot,
+		arg.SalePriceSnapshot,
+		arg.Currency,
+		arg.ID,
+	)
+	var i TblQuotationLine
+	err := row.Scan(
+		&i.ID,
+		&i.QuotationID,
+		&i.ProductID,
+		&i.Quantity,
+		&i.OriginalPriceSnapshot,
+		&i.SalePriceSnapshot,
+		&i.Currency,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

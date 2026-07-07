@@ -446,6 +446,17 @@ type TblQuotationLine struct {
 	UpdatedAt             time.Time
 }
 
+type TblQuotationStatusHistory struct {
+	ID          int64
+	QuotationID int64
+	StaffID     sql.NullInt64
+	FromStatus  sql.NullString
+	ToStatus    string
+	Notes       sql.NullString
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
 type TblSetting struct {
 	ID    int64
 	Name  string

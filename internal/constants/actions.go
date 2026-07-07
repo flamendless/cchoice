@@ -23,6 +23,7 @@ const (
 	ModuleHolidays             = "holidays"
 	ModuleMemos                = "memos"
 	ModuleOrders               = "orders"
+	ModuleQuotations           = "quotations"
 	ModuleProductInventories   = "product_inventories"
 	ModulePasswordReset        = "password_reset"
 	ModuleProducts             = "products"
