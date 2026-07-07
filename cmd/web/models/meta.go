@@ -1,6 +1,8 @@
 package models
 
 import (
+	"encoding/json"
+
 	"cchoice/internal/seo"
 	"cchoice/internal/utils"
 )
@@ -13,7 +15,7 @@ type ProductsMeta struct {
 	OGType         string
 	Robots         string
 	Keywords       string
-	StructuredData string
+	StructuredData json.RawMessage
 	PriceAmount    string
 	PriceCurrency  string
 	TwitterCard    string
@@ -31,7 +33,7 @@ type SiteSEO struct {
 	OGURL          string
 	OGImage        string
 	TwitterCard    string
-	StructuredData string
+	StructuredData json.RawMessage
 }
 
 func DefaultSiteSEO() SiteSEO {

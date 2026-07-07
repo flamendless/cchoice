@@ -125,10 +125,8 @@ templ HeadSEO(seo models.SiteSEO) {
 	if seo.OGImage != "" {
 		<meta name="twitter:image" content={ seo.OGImage }/>
 	}
-	if seo.StructuredData != "" {
-		<script type="application/ld+json">
-			{ seo.StructuredData }
-		</script>
+	if len(seo.StructuredData) > 0 {
+		@templ.JSONScript("site-structured-data", seo.StructuredData).WithType("application/ld+json")
 	}
 }
 

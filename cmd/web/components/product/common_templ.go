@@ -256,8 +256,8 @@ func ProductSEO(meta models.ProductsMeta) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if meta.StructuredData != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<script type=\"application/ld+json\">\n\t\t\t{ meta.StructuredData }\n\t\t</script>")
+		if len(meta.StructuredData) > 0 {
+			templ_7745c5c3_Err = templ.JSONScript("product-structured-data", meta.StructuredData).WithType("application/ld+json").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
