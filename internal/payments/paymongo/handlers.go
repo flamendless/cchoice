@@ -21,6 +21,7 @@ type WebhookHandlerConfig struct {
 	DBRO           database.IService
 	DBRW           database.IService
 	EmailJobRunner *jobs.EmailJobRunner
+	CPointAwarder  payments.ICPointAwarder
 
 	OnPaymentPaid         WebhookEventHandler
 	OnPaymentFailed       WebhookEventHandler
@@ -230,6 +231,7 @@ func handleCheckoutSessionPaid(ctx context.Context, event *WebhookEvent, config 
 		DBRO:            config.DBRO,
 		DBRW:            config.DBRW,
 		EmailJobRunner:  config.EmailJobRunner,
+		CPointAwarder:   config.CPointAwarder,
 	}); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}

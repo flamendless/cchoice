@@ -9,6 +9,16 @@ type OrderAdminListItem struct {
 	IsPaid         bool
 	CreatedAt      string
 	UpdatedAt      string
+	EarnedCPoints  int64
+}
+
+type OrderCustomerListItem struct {
+	ID             int64
+	OrderReference string
+	Status         enums.OrderStatus
+	IsPaid         bool
+	OrderedAt      string
+	EarnedCPoints  int64
 }
 
 type OrderAdminCustomerInfo struct {
@@ -24,6 +34,7 @@ type OrderAdminInfo struct {
 	Remarks        string
 	CreatedAt      string
 	UpdatedAt      string
+	EarnedCPoints  string
 }
 
 type OrderAdminPaymentInfo struct {

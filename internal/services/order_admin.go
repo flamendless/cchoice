@@ -91,6 +91,7 @@ func mapAdminOrderListItemFromRow(
 	status string,
 	paidAt sql.NullTime,
 	createdAt, updatedAt time.Time,
+	earnedCPoints int64,
 ) OrderAdminListItem {
 	return OrderAdminListItem{
 		ID:             id,
@@ -99,13 +100,14 @@ func mapAdminOrderListItemFromRow(
 		IsPaid:         paidAt.Valid,
 		CreatedAt:      createdAt.Format(constants.DateTimeLayoutISO),
 		UpdatedAt:      updatedAt.Format(constants.DateTimeLayoutISO),
+		EarnedCPoints:  earnedCPoints,
 	}
 }
 
 func mapAdminOrderListItemsFromUpdatedAtDesc(rows []queries.AdminGetOrdersForListingPaginatedUpdatedAtDescRow) []OrderAdminListItem {
 	result := make([]OrderAdminListItem, 0, len(rows))
 	for _, row := range rows {
-		result = append(result, mapAdminOrderListItemFromRow(row.ID, row.OrderNumber, row.Status, row.PaidAt, row.CreatedAt, row.UpdatedAt))
+		result = append(result, mapAdminOrderListItemFromRow(row.ID, row.OrderNumber, row.Status, row.PaidAt, row.CreatedAt, row.UpdatedAt, row.EarnedCpoints))
 	}
 	return result
 }
@@ -113,7 +115,7 @@ func mapAdminOrderListItemsFromUpdatedAtDesc(rows []queries.AdminGetOrdersForLis
 func mapAdminOrderListItemsFromUpdatedAtAsc(rows []queries.AdminGetOrdersForListingPaginatedUpdatedAtAscRow) []OrderAdminListItem {
 	result := make([]OrderAdminListItem, 0, len(rows))
 	for _, row := range rows {
-		result = append(result, mapAdminOrderListItemFromRow(row.ID, row.OrderNumber, row.Status, row.PaidAt, row.CreatedAt, row.UpdatedAt))
+		result = append(result, mapAdminOrderListItemFromRow(row.ID, row.OrderNumber, row.Status, row.PaidAt, row.CreatedAt, row.UpdatedAt, row.EarnedCpoints))
 	}
 	return result
 }
@@ -121,7 +123,7 @@ func mapAdminOrderListItemsFromUpdatedAtAsc(rows []queries.AdminGetOrdersForList
 func mapAdminOrderListItemsFromCreatedAtDesc(rows []queries.AdminGetOrdersForListingPaginatedCreatedAtDescRow) []OrderAdminListItem {
 	result := make([]OrderAdminListItem, 0, len(rows))
 	for _, row := range rows {
-		result = append(result, mapAdminOrderListItemFromRow(row.ID, row.OrderNumber, row.Status, row.PaidAt, row.CreatedAt, row.UpdatedAt))
+		result = append(result, mapAdminOrderListItemFromRow(row.ID, row.OrderNumber, row.Status, row.PaidAt, row.CreatedAt, row.UpdatedAt, row.EarnedCpoints))
 	}
 	return result
 }
@@ -129,7 +131,7 @@ func mapAdminOrderListItemsFromCreatedAtDesc(rows []queries.AdminGetOrdersForLis
 func mapAdminOrderListItemsFromCreatedAtAsc(rows []queries.AdminGetOrdersForListingPaginatedCreatedAtAscRow) []OrderAdminListItem {
 	result := make([]OrderAdminListItem, 0, len(rows))
 	for _, row := range rows {
-		result = append(result, mapAdminOrderListItemFromRow(row.ID, row.OrderNumber, row.Status, row.PaidAt, row.CreatedAt, row.UpdatedAt))
+		result = append(result, mapAdminOrderListItemFromRow(row.ID, row.OrderNumber, row.Status, row.PaidAt, row.CreatedAt, row.UpdatedAt, row.EarnedCpoints))
 	}
 	return result
 }
@@ -137,7 +139,7 @@ func mapAdminOrderListItemsFromCreatedAtAsc(rows []queries.AdminGetOrdersForList
 func mapAdminOrderListItemsFromStatusDesc(rows []queries.AdminGetOrdersForListingPaginatedStatusDescRow) []OrderAdminListItem {
 	result := make([]OrderAdminListItem, 0, len(rows))
 	for _, row := range rows {
-		result = append(result, mapAdminOrderListItemFromRow(row.ID, row.OrderNumber, row.Status, row.PaidAt, row.CreatedAt, row.UpdatedAt))
+		result = append(result, mapAdminOrderListItemFromRow(row.ID, row.OrderNumber, row.Status, row.PaidAt, row.CreatedAt, row.UpdatedAt, row.EarnedCpoints))
 	}
 	return result
 }
@@ -145,7 +147,7 @@ func mapAdminOrderListItemsFromStatusDesc(rows []queries.AdminGetOrdersForListin
 func mapAdminOrderListItemsFromStatusAsc(rows []queries.AdminGetOrdersForListingPaginatedStatusAscRow) []OrderAdminListItem {
 	result := make([]OrderAdminListItem, 0, len(rows))
 	for _, row := range rows {
-		result = append(result, mapAdminOrderListItemFromRow(row.ID, row.OrderNumber, row.Status, row.PaidAt, row.CreatedAt, row.UpdatedAt))
+		result = append(result, mapAdminOrderListItemFromRow(row.ID, row.OrderNumber, row.Status, row.PaidAt, row.CreatedAt, row.UpdatedAt, row.EarnedCpoints))
 	}
 	return result
 }

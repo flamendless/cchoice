@@ -38,6 +38,7 @@ SELECT
 	o.created_at,
 	o.updated_at,
 	o.paid_at,
+	o.earned_cpoints,
 	o.subtotal_amount,
 	o.shipping_amount,
 	o.discount_amount,
@@ -95,6 +96,7 @@ type AdminGetOrderDetailsByIDRow struct {
 	CreatedAt                     time.Time
 	UpdatedAt                     time.Time
 	PaidAt                        sql.NullTime
+	EarnedCpoints                 int64
 	SubtotalAmount                int64
 	ShippingAmount                int64
 	DiscountAmount                int64
@@ -151,6 +153,7 @@ func (q *Queries) AdminGetOrderDetailsByID(ctx context.Context, id int64) (Admin
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.PaidAt,
+		&i.EarnedCpoints,
 		&i.SubtotalAmount,
 		&i.ShippingAmount,
 		&i.DiscountAmount,
@@ -281,7 +284,8 @@ SELECT
 	status,
 	paid_at,
 	created_at,
-	updated_at
+	updated_at,
+	earned_cpoints
 FROM tbl_orders
 WHERE
 	(?1 IS NULL OR ?1 = '' OR LOWER(order_number) LIKE '%' || LOWER(?1) || '%')
@@ -296,12 +300,13 @@ type AdminGetOrdersForListingPaginatedCreatedAtAscParams struct {
 }
 
 type AdminGetOrdersForListingPaginatedCreatedAtAscRow struct {
-	ID          int64
-	OrderNumber string
-	Status      string
-	PaidAt      sql.NullTime
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID            int64
+	OrderNumber   string
+	Status        string
+	PaidAt        sql.NullTime
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	EarnedCpoints int64
 }
 
 func (q *Queries) AdminGetOrdersForListingPaginatedCreatedAtAsc(ctx context.Context, arg AdminGetOrdersForListingPaginatedCreatedAtAscParams) ([]AdminGetOrdersForListingPaginatedCreatedAtAscRow, error) {
@@ -320,6 +325,7 @@ func (q *Queries) AdminGetOrdersForListingPaginatedCreatedAtAsc(ctx context.Cont
 			&i.PaidAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.EarnedCpoints,
 		); err != nil {
 			return nil, err
 		}
@@ -341,7 +347,8 @@ SELECT
 	status,
 	paid_at,
 	created_at,
-	updated_at
+	updated_at,
+	earned_cpoints
 FROM tbl_orders
 WHERE
 	(?1 IS NULL OR ?1 = '' OR LOWER(order_number) LIKE '%' || LOWER(?1) || '%')
@@ -356,12 +363,13 @@ type AdminGetOrdersForListingPaginatedCreatedAtDescParams struct {
 }
 
 type AdminGetOrdersForListingPaginatedCreatedAtDescRow struct {
-	ID          int64
-	OrderNumber string
-	Status      string
-	PaidAt      sql.NullTime
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID            int64
+	OrderNumber   string
+	Status        string
+	PaidAt        sql.NullTime
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	EarnedCpoints int64
 }
 
 func (q *Queries) AdminGetOrdersForListingPaginatedCreatedAtDesc(ctx context.Context, arg AdminGetOrdersForListingPaginatedCreatedAtDescParams) ([]AdminGetOrdersForListingPaginatedCreatedAtDescRow, error) {
@@ -380,6 +388,7 @@ func (q *Queries) AdminGetOrdersForListingPaginatedCreatedAtDesc(ctx context.Con
 			&i.PaidAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.EarnedCpoints,
 		); err != nil {
 			return nil, err
 		}
@@ -401,7 +410,8 @@ SELECT
 	status,
 	paid_at,
 	created_at,
-	updated_at
+	updated_at,
+	earned_cpoints
 FROM tbl_orders
 WHERE
 	(?1 IS NULL OR ?1 = '' OR LOWER(order_number) LIKE '%' || LOWER(?1) || '%')
@@ -416,12 +426,13 @@ type AdminGetOrdersForListingPaginatedStatusAscParams struct {
 }
 
 type AdminGetOrdersForListingPaginatedStatusAscRow struct {
-	ID          int64
-	OrderNumber string
-	Status      string
-	PaidAt      sql.NullTime
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID            int64
+	OrderNumber   string
+	Status        string
+	PaidAt        sql.NullTime
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	EarnedCpoints int64
 }
 
 func (q *Queries) AdminGetOrdersForListingPaginatedStatusAsc(ctx context.Context, arg AdminGetOrdersForListingPaginatedStatusAscParams) ([]AdminGetOrdersForListingPaginatedStatusAscRow, error) {
@@ -440,6 +451,7 @@ func (q *Queries) AdminGetOrdersForListingPaginatedStatusAsc(ctx context.Context
 			&i.PaidAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.EarnedCpoints,
 		); err != nil {
 			return nil, err
 		}
@@ -461,7 +473,8 @@ SELECT
 	status,
 	paid_at,
 	created_at,
-	updated_at
+	updated_at,
+	earned_cpoints
 FROM tbl_orders
 WHERE
 	(?1 IS NULL OR ?1 = '' OR LOWER(order_number) LIKE '%' || LOWER(?1) || '%')
@@ -476,12 +489,13 @@ type AdminGetOrdersForListingPaginatedStatusDescParams struct {
 }
 
 type AdminGetOrdersForListingPaginatedStatusDescRow struct {
-	ID          int64
-	OrderNumber string
-	Status      string
-	PaidAt      sql.NullTime
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID            int64
+	OrderNumber   string
+	Status        string
+	PaidAt        sql.NullTime
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	EarnedCpoints int64
 }
 
 func (q *Queries) AdminGetOrdersForListingPaginatedStatusDesc(ctx context.Context, arg AdminGetOrdersForListingPaginatedStatusDescParams) ([]AdminGetOrdersForListingPaginatedStatusDescRow, error) {
@@ -500,6 +514,7 @@ func (q *Queries) AdminGetOrdersForListingPaginatedStatusDesc(ctx context.Contex
 			&i.PaidAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.EarnedCpoints,
 		); err != nil {
 			return nil, err
 		}
@@ -521,7 +536,8 @@ SELECT
 	status,
 	paid_at,
 	created_at,
-	updated_at
+	updated_at,
+	earned_cpoints
 FROM tbl_orders
 WHERE
 	(?1 IS NULL OR ?1 = '' OR LOWER(order_number) LIKE '%' || LOWER(?1) || '%')
@@ -536,12 +552,13 @@ type AdminGetOrdersForListingPaginatedUpdatedAtAscParams struct {
 }
 
 type AdminGetOrdersForListingPaginatedUpdatedAtAscRow struct {
-	ID          int64
-	OrderNumber string
-	Status      string
-	PaidAt      sql.NullTime
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID            int64
+	OrderNumber   string
+	Status        string
+	PaidAt        sql.NullTime
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	EarnedCpoints int64
 }
 
 func (q *Queries) AdminGetOrdersForListingPaginatedUpdatedAtAsc(ctx context.Context, arg AdminGetOrdersForListingPaginatedUpdatedAtAscParams) ([]AdminGetOrdersForListingPaginatedUpdatedAtAscRow, error) {
@@ -560,6 +577,7 @@ func (q *Queries) AdminGetOrdersForListingPaginatedUpdatedAtAsc(ctx context.Cont
 			&i.PaidAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.EarnedCpoints,
 		); err != nil {
 			return nil, err
 		}
@@ -581,7 +599,8 @@ SELECT
 	status,
 	paid_at,
 	created_at,
-	updated_at
+	updated_at,
+	earned_cpoints
 FROM tbl_orders
 WHERE
 	(?1 IS NULL OR ?1 = '' OR LOWER(order_number) LIKE '%' || LOWER(?1) || '%')
@@ -596,12 +615,13 @@ type AdminGetOrdersForListingPaginatedUpdatedAtDescParams struct {
 }
 
 type AdminGetOrdersForListingPaginatedUpdatedAtDescRow struct {
-	ID          int64
-	OrderNumber string
-	Status      string
-	PaidAt      sql.NullTime
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID            int64
+	OrderNumber   string
+	Status        string
+	PaidAt        sql.NullTime
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	EarnedCpoints int64
 }
 
 func (q *Queries) AdminGetOrdersForListingPaginatedUpdatedAtDesc(ctx context.Context, arg AdminGetOrdersForListingPaginatedUpdatedAtDescParams) ([]AdminGetOrdersForListingPaginatedUpdatedAtDescRow, error) {
@@ -620,6 +640,7 @@ func (q *Queries) AdminGetOrdersForListingPaginatedUpdatedAtDesc(ctx context.Con
 			&i.PaidAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.EarnedCpoints,
 		); err != nil {
 			return nil, err
 		}
@@ -689,7 +710,7 @@ INSERT INTO tbl_orders(
 	?, ?, ?, ?,
 	datetime('now'),
 	datetime('now')
-) RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay
+) RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay, earned_cpoints
 `
 
 type CreateOrderParams struct {
@@ -824,6 +845,7 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (TblOr
 		&i.ShippingEta,
 		&i.CustomerID,
 		&i.ShippingBarangay,
+		&i.EarnedCpoints,
 	)
 	return i, err
 }
@@ -895,6 +917,294 @@ func (q *Queries) CreateOrderLine(ctx context.Context, arg CreateOrderLineParams
 	return i, err
 }
 
+const customerCountOrdersForListing = `-- name: CustomerCountOrdersForListing :one
+SELECT COUNT(*) AS count
+FROM tbl_orders
+WHERE
+	customer_id = ?1
+	AND (?2 IS NULL OR ?2 = '' OR LOWER(order_number) LIKE '%' || LOWER(?2) || '%')
+`
+
+type CustomerCountOrdersForListingParams struct {
+	CustomerID     sql.NullInt64
+	SearchOrderRef interface{}
+}
+
+func (q *Queries) CustomerCountOrdersForListing(ctx context.Context, arg CustomerCountOrdersForListingParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, customerCountOrdersForListing, arg.CustomerID, arg.SearchOrderRef)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const customerGetOrdersForListingPaginatedCreatedAtAsc = `-- name: CustomerGetOrdersForListingPaginatedCreatedAtAsc :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	earned_cpoints
+FROM tbl_orders
+WHERE
+	customer_id = ?1
+	AND (?2 IS NULL OR ?2 = '' OR LOWER(order_number) LIKE '%' || LOWER(?2) || '%')
+ORDER BY created_at ASC
+LIMIT ?4 OFFSET ?3
+`
+
+type CustomerGetOrdersForListingPaginatedCreatedAtAscParams struct {
+	CustomerID     sql.NullInt64
+	SearchOrderRef interface{}
+	Offset         int64
+	Limit          int64
+}
+
+type CustomerGetOrdersForListingPaginatedCreatedAtAscRow struct {
+	ID            int64
+	OrderNumber   string
+	Status        string
+	PaidAt        sql.NullTime
+	CreatedAt     time.Time
+	EarnedCpoints int64
+}
+
+func (q *Queries) CustomerGetOrdersForListingPaginatedCreatedAtAsc(ctx context.Context, arg CustomerGetOrdersForListingPaginatedCreatedAtAscParams) ([]CustomerGetOrdersForListingPaginatedCreatedAtAscRow, error) {
+	rows, err := q.db.QueryContext(ctx, customerGetOrdersForListingPaginatedCreatedAtAsc,
+		arg.CustomerID,
+		arg.SearchOrderRef,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CustomerGetOrdersForListingPaginatedCreatedAtAscRow
+	for rows.Next() {
+		var i CustomerGetOrdersForListingPaginatedCreatedAtAscRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderNumber,
+			&i.Status,
+			&i.PaidAt,
+			&i.CreatedAt,
+			&i.EarnedCpoints,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const customerGetOrdersForListingPaginatedCreatedAtDesc = `-- name: CustomerGetOrdersForListingPaginatedCreatedAtDesc :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	earned_cpoints
+FROM tbl_orders
+WHERE
+	customer_id = ?1
+	AND (?2 IS NULL OR ?2 = '' OR LOWER(order_number) LIKE '%' || LOWER(?2) || '%')
+ORDER BY created_at DESC
+LIMIT ?4 OFFSET ?3
+`
+
+type CustomerGetOrdersForListingPaginatedCreatedAtDescParams struct {
+	CustomerID     sql.NullInt64
+	SearchOrderRef interface{}
+	Offset         int64
+	Limit          int64
+}
+
+type CustomerGetOrdersForListingPaginatedCreatedAtDescRow struct {
+	ID            int64
+	OrderNumber   string
+	Status        string
+	PaidAt        sql.NullTime
+	CreatedAt     time.Time
+	EarnedCpoints int64
+}
+
+func (q *Queries) CustomerGetOrdersForListingPaginatedCreatedAtDesc(ctx context.Context, arg CustomerGetOrdersForListingPaginatedCreatedAtDescParams) ([]CustomerGetOrdersForListingPaginatedCreatedAtDescRow, error) {
+	rows, err := q.db.QueryContext(ctx, customerGetOrdersForListingPaginatedCreatedAtDesc,
+		arg.CustomerID,
+		arg.SearchOrderRef,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CustomerGetOrdersForListingPaginatedCreatedAtDescRow
+	for rows.Next() {
+		var i CustomerGetOrdersForListingPaginatedCreatedAtDescRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderNumber,
+			&i.Status,
+			&i.PaidAt,
+			&i.CreatedAt,
+			&i.EarnedCpoints,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const customerGetOrdersForListingPaginatedStatusAsc = `-- name: CustomerGetOrdersForListingPaginatedStatusAsc :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	earned_cpoints
+FROM tbl_orders
+WHERE
+	customer_id = ?1
+	AND (?2 IS NULL OR ?2 = '' OR LOWER(order_number) LIKE '%' || LOWER(?2) || '%')
+ORDER BY status ASC
+LIMIT ?4 OFFSET ?3
+`
+
+type CustomerGetOrdersForListingPaginatedStatusAscParams struct {
+	CustomerID     sql.NullInt64
+	SearchOrderRef interface{}
+	Offset         int64
+	Limit          int64
+}
+
+type CustomerGetOrdersForListingPaginatedStatusAscRow struct {
+	ID            int64
+	OrderNumber   string
+	Status        string
+	PaidAt        sql.NullTime
+	CreatedAt     time.Time
+	EarnedCpoints int64
+}
+
+func (q *Queries) CustomerGetOrdersForListingPaginatedStatusAsc(ctx context.Context, arg CustomerGetOrdersForListingPaginatedStatusAscParams) ([]CustomerGetOrdersForListingPaginatedStatusAscRow, error) {
+	rows, err := q.db.QueryContext(ctx, customerGetOrdersForListingPaginatedStatusAsc,
+		arg.CustomerID,
+		arg.SearchOrderRef,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CustomerGetOrdersForListingPaginatedStatusAscRow
+	for rows.Next() {
+		var i CustomerGetOrdersForListingPaginatedStatusAscRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderNumber,
+			&i.Status,
+			&i.PaidAt,
+			&i.CreatedAt,
+			&i.EarnedCpoints,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const customerGetOrdersForListingPaginatedStatusDesc = `-- name: CustomerGetOrdersForListingPaginatedStatusDesc :many
+SELECT
+	id,
+	order_number,
+	status,
+	paid_at,
+	created_at,
+	earned_cpoints
+FROM tbl_orders
+WHERE
+	customer_id = ?1
+	AND (?2 IS NULL OR ?2 = '' OR LOWER(order_number) LIKE '%' || LOWER(?2) || '%')
+ORDER BY status DESC
+LIMIT ?4 OFFSET ?3
+`
+
+type CustomerGetOrdersForListingPaginatedStatusDescParams struct {
+	CustomerID     sql.NullInt64
+	SearchOrderRef interface{}
+	Offset         int64
+	Limit          int64
+}
+
+type CustomerGetOrdersForListingPaginatedStatusDescRow struct {
+	ID            int64
+	OrderNumber   string
+	Status        string
+	PaidAt        sql.NullTime
+	CreatedAt     time.Time
+	EarnedCpoints int64
+}
+
+func (q *Queries) CustomerGetOrdersForListingPaginatedStatusDesc(ctx context.Context, arg CustomerGetOrdersForListingPaginatedStatusDescParams) ([]CustomerGetOrdersForListingPaginatedStatusDescRow, error) {
+	rows, err := q.db.QueryContext(ctx, customerGetOrdersForListingPaginatedStatusDesc,
+		arg.CustomerID,
+		arg.SearchOrderRef,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CustomerGetOrdersForListingPaginatedStatusDescRow
+	for rows.Next() {
+		var i CustomerGetOrdersForListingPaginatedStatusDescRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderNumber,
+			&i.Status,
+			&i.PaidAt,
+			&i.CreatedAt,
+			&i.EarnedCpoints,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getLatestOrderShippingByCustomerID = `-- name: GetLatestOrderShippingByCustomerID :one
 SELECT
 	shipping_address_line1,
@@ -934,7 +1244,7 @@ func (q *Queries) GetLatestOrderShippingByCustomerID(ctx context.Context, custom
 }
 
 const getOrderByCheckoutID = `-- name: GetOrderByCheckoutID :one
-SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay FROM tbl_orders
+SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay, earned_cpoints FROM tbl_orders
 WHERE checkout_id = ?
 LIMIT 1
 `
@@ -987,12 +1297,13 @@ func (q *Queries) GetOrderByCheckoutID(ctx context.Context, checkoutID int64) (T
 		&i.ShippingEta,
 		&i.CustomerID,
 		&i.ShippingBarangay,
+		&i.EarnedCpoints,
 	)
 	return i, err
 }
 
 const getOrderByCheckoutPaymentID = `-- name: GetOrderByCheckoutPaymentID :one
-SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay FROM tbl_orders
+SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay, earned_cpoints FROM tbl_orders
 WHERE checkout_payment_id = ?
 LIMIT 1
 `
@@ -1045,12 +1356,13 @@ func (q *Queries) GetOrderByCheckoutPaymentID(ctx context.Context, checkoutPayme
 		&i.ShippingEta,
 		&i.CustomerID,
 		&i.ShippingBarangay,
+		&i.EarnedCpoints,
 	)
 	return i, err
 }
 
 const getOrderByID = `-- name: GetOrderByID :one
-SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay FROM tbl_orders
+SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay, earned_cpoints FROM tbl_orders
 WHERE id = ?
 LIMIT 1
 `
@@ -1103,12 +1415,13 @@ func (q *Queries) GetOrderByID(ctx context.Context, id int64) (TblOrder, error) 
 		&i.ShippingEta,
 		&i.CustomerID,
 		&i.ShippingBarangay,
+		&i.EarnedCpoints,
 	)
 	return i, err
 }
 
 const getOrderByOrderNumber = `-- name: GetOrderByOrderNumber :one
-SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay FROM tbl_orders
+SELECT id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay, earned_cpoints FROM tbl_orders
 WHERE order_number = ?
 LIMIT 1
 `
@@ -1161,6 +1474,7 @@ func (q *Queries) GetOrderByOrderNumber(ctx context.Context, orderNumber string)
 		&i.ShippingEta,
 		&i.CustomerID,
 		&i.ShippingBarangay,
+		&i.EarnedCpoints,
 	)
 	return i, err
 }
@@ -1239,18 +1553,20 @@ const updateOrderOnPaymentSuccess = `-- name: UpdateOrderOnPaymentSuccess :one
 UPDATE tbl_orders
 SET status = ?,
 	paid_at = DATETIME('now'),
+	earned_cpoints = ?,
 	updated_at = DATETIME('now')
 WHERE id = ?
-RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay
+RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay, earned_cpoints
 `
 
 type UpdateOrderOnPaymentSuccessParams struct {
-	Status string
-	ID     int64
+	Status        string
+	EarnedCpoints int64
+	ID            int64
 }
 
 func (q *Queries) UpdateOrderOnPaymentSuccess(ctx context.Context, arg UpdateOrderOnPaymentSuccessParams) (TblOrder, error) {
-	row := q.db.QueryRowContext(ctx, updateOrderOnPaymentSuccess, arg.Status, arg.ID)
+	row := q.db.QueryRowContext(ctx, updateOrderOnPaymentSuccess, arg.Status, arg.EarnedCpoints, arg.ID)
 	var i TblOrder
 	err := row.Scan(
 		&i.ID,
@@ -1297,6 +1613,7 @@ func (q *Queries) UpdateOrderOnPaymentSuccess(ctx context.Context, arg UpdateOrd
 		&i.ShippingEta,
 		&i.CustomerID,
 		&i.ShippingBarangay,
+		&i.EarnedCpoints,
 	)
 	return i, err
 }
@@ -1309,7 +1626,7 @@ SET shipping_service = ?,
 	shipping_eta = ?,
 	updated_at = DATETIME('now')
 WHERE id = ?
-RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay
+RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay, earned_cpoints
 `
 
 type UpdateOrderShippingInfoParams struct {
@@ -1374,6 +1691,7 @@ func (q *Queries) UpdateOrderShippingInfo(ctx context.Context, arg UpdateOrderSh
 		&i.ShippingEta,
 		&i.CustomerID,
 		&i.ShippingBarangay,
+		&i.EarnedCpoints,
 	)
 	return i, err
 }
@@ -1383,7 +1701,7 @@ UPDATE tbl_orders
 SET status = ?,
 	updated_at = DATETIME('now')
 WHERE id = ?
-RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay
+RETURNING id, checkout_id, checkout_payment_id, order_number, status, customer_name, customer_email, customer_phone, billing_address_line1, billing_address_line2, billing_city, billing_state, billing_postal_code, billing_country, billing_latitude, billing_longitude, billing_formatted_address, billing_place_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, shipping_latitude, shipping_longitude, shipping_formatted_address, shipping_place_id, subtotal_amount, shipping_amount, discount_amount, total_amount, currency, shipping_service, shipping_order_id, shipping_tracking_number, notes, remarks, created_at, updated_at, paid_at, shipping_eta, customer_id, shipping_barangay, earned_cpoints
 `
 
 type UpdateOrderStatusParams struct {
@@ -1439,6 +1757,7 @@ func (q *Queries) UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusPa
 		&i.ShippingEta,
 		&i.CustomerID,
 		&i.ShippingBarangay,
+		&i.EarnedCpoints,
 	)
 	return i, err
 }

@@ -59,6 +59,56 @@ func (q *Queries) CreateCpoint(ctx context.Context, arg CreateCpointParams) (Tbl
 	return i, err
 }
 
+const createRedeemedCpoint = `-- name: CreateRedeemedCpoint :one
+INSERT INTO tbl_cpoints (
+    customer_id,
+    code,
+    value,
+    product_skus,
+    expires_at,
+    generated_at,
+    redeemed_at,
+    created_at,
+    updated_at,
+    deleted_at
+) VALUES (
+    ?, ?, ?, ?, ?, datetime('now'), datetime('now'), datetime('now'), datetime('now'), '1970-01-01 00:00:00+00:00'
+) RETURNING id, customer_id, code, value, product_skus, expires_at, generated_at, redeemed_at, created_at, updated_at, deleted_at
+`
+
+type CreateRedeemedCpointParams struct {
+	CustomerID  int64
+	Code        string
+	Value       int64
+	ProductSkus sql.NullString
+	ExpiresAt   sql.NullString
+}
+
+func (q *Queries) CreateRedeemedCpoint(ctx context.Context, arg CreateRedeemedCpointParams) (TblCpoint, error) {
+	row := q.db.QueryRowContext(ctx, createRedeemedCpoint,
+		arg.CustomerID,
+		arg.Code,
+		arg.Value,
+		arg.ProductSkus,
+		arg.ExpiresAt,
+	)
+	var i TblCpoint
+	err := row.Scan(
+		&i.ID,
+		&i.CustomerID,
+		&i.Code,
+		&i.Value,
+		&i.ProductSkus,
+		&i.ExpiresAt,
+		&i.GeneratedAt,
+		&i.RedeemedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const getCpointByCode = `-- name: GetCpointByCode :one
 SELECT
     id,

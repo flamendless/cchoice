@@ -83,6 +83,7 @@ func (s *Server) adminOrdersListTableHandler(w http.ResponseWriter, r *http.Requ
 			IsPaid:         o.IsPaid,
 			CreatedAt:      o.CreatedAt,
 			UpdatedAt:      o.UpdatedAt,
+			EarnedCPoints:  utils.FormatEarnedCPoints(o.EarnedCPoints),
 		})
 	}
 
@@ -231,6 +232,7 @@ func mapAdminOrderDetails(details *services.OrderAdminDetails) models.AdminOrder
 			Remarks:        details.Order.Remarks,
 			CreatedAt:      details.Order.CreatedAt,
 			UpdatedAt:      details.Order.UpdatedAt,
+			EarnedCPoints:  details.Order.EarnedCPoints,
 		},
 		Payment: models.AdminOrderPaymentInfo{
 			Gateway:         details.Payment.Gateway,
