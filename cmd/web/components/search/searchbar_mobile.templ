@@ -27,7 +27,7 @@ templ MobileSearchToggle() {
 	</button>
 }
 
-templ MobileSearchPanel() {
+templ MobileSearchPanel(initialQuery string) {
 	<div
 		id="mobile-search-panel"
 		class="
@@ -38,11 +38,11 @@ templ MobileSearchPanel() {
 			bg-white px-3 py-2
 		"
 	>
-		@SearchBarMobile()
+		@SearchBarMobile(initialQuery)
 	</div>
 }
 
-templ SearchBarMobile() {
+templ SearchBarMobile(initialQuery string) {
 	<form
 		class="w-full"
 		_="
@@ -56,6 +56,9 @@ templ SearchBarMobile() {
 				id="search-mobile"
 				type="search"
 				name="search"
+				if initialQuery != "" {
+					value={ initialQuery }
+				}
 				placeholder="Search products…"
 				autocomplete="off"
 				class="

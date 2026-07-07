@@ -25,7 +25,7 @@ templ SearchPageBody(data models.SearchPageData) {
 		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()
-		@header.Header()
+		@header.HeaderWithSearchQuery(data.Query)
 		@MobileSidebar()
 		<style>
 			#sidebar-content-wrapper {

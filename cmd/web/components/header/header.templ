@@ -107,7 +107,7 @@ templ HeaderRow1Texts(texts []models.HeaderRowText) {
 	</div>
 }
 
-templ HeaderDesktop() {
+templ HeaderDesktop(initialQuery string) {
 	<div
 		id="header-row2-desktop"
 		class="hidden lg:flex w-full flex-row items-center"
@@ -124,7 +124,7 @@ templ HeaderDesktop() {
 				end
 			"
 		>
-			@search.SearchBarDesktop()
+			@search.SearchBarDesktop(initialQuery)
 		</div>
 		<div class="flex flex-row px-8 py-2">
 			@common.IconAction(
@@ -147,7 +147,7 @@ templ HeaderDesktop() {
 	</div>
 }
 
-templ HeaderMobile() {
+templ HeaderMobile(initialQuery string) {
 	<div
 		id="header-row2-mobile"
 		class="w-full flex flex-row items-center px-2 lg:hidden"
@@ -174,7 +174,7 @@ templ HeaderMobile() {
 				"
 			>
 				@search.MobileSearchToggle()
-				@search.MobileSearchPanel()
+				@search.MobileSearchPanel(initialQuery)
 			</div>
 			@common.IconAction(
 				"Cart",
@@ -216,6 +216,10 @@ templ HeaderMobile() {
 }
 
 templ Header() {
+	@HeaderWithSearchQuery("")
+}
+
+templ HeaderWithSearchQuery(initialQuery string) {
 	<header
 		class="
 			sticky top-0 left-0 pt-2 pb-1.5 w-full max-w-full z-50 bg-white
@@ -235,8 +239,8 @@ templ Header() {
 			>
 				@HeaderRow1Texts(nil)
 			</div>
-			@HeaderMobile()
-			@HeaderDesktop()
+			@HeaderMobile(initialQuery)
+			@HeaderDesktop(initialQuery)
 		</div>
 		@common.HR()
 	</header>
