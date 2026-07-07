@@ -23,6 +23,24 @@ templ QuotationPage(
 		<head>
 			@common.HeadMeta()
 			@common.TabTitle("[Quotation] C-Choice Customer Portal")
+			<style>
+				@keyframes quotation-draft-highlight {
+					0% { box-shadow: 0 0 0 0 rgba(217, 72, 15, 0.5); }
+					50% { box-shadow: 0 0 0 6px rgba(217, 72, 15, 0.2); }
+					100% { box-shadow: 0 0 0 0 rgba(217, 72, 15, 0); }
+				}
+				.quotation-draft-updated {
+					animation: quotation-draft-highlight 0.6s ease-out;
+				}
+				@keyframes quotation-add-btn-pulse {
+					0% { transform: scale(1); }
+					50% { transform: scale(1.05); }
+					100% { transform: scale(1); }
+				}
+				.quotation-add-btn-success {
+					animation: quotation-add-btn-pulse 0.3s ease-in-out;
+				}
+			</style>
 		</head>
 		<body class="bg-surface min-h-screen flex flex-col">
 			@common.DevRibbon()
@@ -33,76 +51,7 @@ templ QuotationPage(
 					@header.CustomerPortalHeaderWithBackLink(utils.URL("/customer/portal"), "Back to Customer Portal")
 					<div class="mb-8">
 						<h2 class="text-2xl font-bold text-primary mb-4">Quotation Draft</h2>
-						if len(draftLines) > 0 {
-							<div class="bg-white rounded-lg shadow-md p-6 mb-6">
-								<table class="w-full text-left">
-									<thead>
-										<tr class="border-b">
-											<th class="py-2">Brand</th>
-											<th class="py-2">Serial</th>
-											<th class="py-2">Quantity</th>
-											<th class="py-2">Total Price</th>
-											<th class="py-2">Total Discount</th>
-											<th class="py-2">Actions</th>
-										</tr>
-									</thead>
-									<tbody>
-										for _, line := range draftLines {
-											<tr class="border-b">
-												<td class="py-2">{ line.BrandName }</td>
-												<td class="py-2">{ line.ProductSerial }</td>
-												<td class="py-2">{ line.Quantity }</td>
-												<td class="py-2">{ line.TotalPrice }</td>
-												<td class="py-2">{ line.TotalDiscount }</td>
-												<td class="py-2">
-													<button
-														class="text-red-500 hover:text-red-700 text-sm"
-														hx-delete={ utils.URLf("/customer/quotation/line/%s/remove", line.ID) }
-														hx-confirm="Remove this item from quotation?"
-													>
-														Remove
-													</button>
-												</td>
-											</tr>
-										}
-									</tbody>
-								</table>
-								<div class="mt-6 pt-4 border-t">
-									<h3 class="text-lg font-semibold mb-2">Summary</h3>
-									<div class="grid grid-cols-3 gap-4">
-										<div>
-											<span class="text-gray-600">Total Items:</span>
-											<span class="font-semibold ml-2">{ summary.TotalItems }</span>
-										</div>
-										<div>
-											<span class="text-gray-600">Total Price:</span>
-											<span class="font-semibold ml-2">{ summary.TotalPrice }</span>
-										</div>
-										<div>
-											<span class="text-gray-600">Total Discounts:</span>
-											<span class="font-semibold ml-2">{ summary.TotalDiscounts }</span>
-										</div>
-										<div>
-											<span class="text-gray-600">Total:</span>
-											<span class="font-semibold ml-2">{ summary.Total }</span>
-										</div>
-									</div>
-								</div>
-								<div class="mt-4">
-									<button
-										class="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
-										hx-post={ utils.URL("/customer/quotation/submit") }
-										hx-confirm="Submit this quotation draft for review?"
-									>
-										Submit for Review
-									</button>
-								</div>
-							</div>
-						} else {
-							<div class="bg-white rounded-lg shadow-md p-6 mb-6 text-center text-gray-500">
-								No items in your quotation draft yet. Browse products below to add items.
-							</div>
-						}
+						@QuotationDraftSection(draftLines, summary)
 					</div>
 					<div class="mb-8">
 						<h2 class="text-2xl font-bold text-primary mb-4">Products</h2>
@@ -164,6 +113,85 @@ templ QuotationPage(
 			</div>
 		</body>
 	</html>
+}
+
+templ QuotationDraftSection(draftLines []models.QuotationLine, summary models.QuotationSummary) {
+	<div id="quotation-draft-section">
+		if len(draftLines) > 0 {
+			<div class="bg-white rounded-lg shadow-md p-6 mb-6">
+				<table class="w-full text-left">
+					<thead>
+						<tr class="border-b">
+							<th class="py-2">Brand</th>
+							<th class="py-2">Serial</th>
+							<th class="py-2">Quantity</th>
+							<th class="py-2">Total Price</th>
+							<th class="py-2">Total Discount</th>
+							<th class="py-2">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, line := range draftLines {
+							<tr class="border-b">
+								<td class="py-2">{ line.BrandName }</td>
+								<td class="py-2">{ line.ProductSerial }</td>
+								<td class="py-2">{ line.Quantity }</td>
+								<td class="py-2">{ line.TotalPrice }</td>
+								<td class="py-2">{ line.TotalDiscount }</td>
+								<td class="py-2">
+									<button
+										type="button"
+										class="px-3 py-1 text-sm border border-red-500 text-red-600 rounded-md hover:bg-red-50 transition-colors"
+										hx-delete={ utils.URLf("/customer/quotation/line/%s/remove", line.ID) }
+										hx-target="#quotation-draft-section"
+										hx-swap="outerHTML"
+										hx-confirm="Remove this item from quotation?"
+									>
+										Remove
+									</button>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+				<div class="mt-6 pt-4 border-t">
+					<h3 class="text-lg font-semibold mb-4">Summary</h3>
+					<div class="w-fit">
+						<div class="grid grid-cols-[auto_auto] gap-x-6 gap-y-2 text-gray-600 mb-4">
+							<span>Total Items</span>
+							<span class="font-semibold">{ summary.TotalItems }</span>
+						</div>
+						<div class="bg-gray-50 rounded-lg p-4 space-y-2 w-fit min-w-[16rem]">
+							@quotationSummaryRow("Total Price", summary.TotalPrice, "text-gray-600")
+							@quotationSummaryRow("Total Discounts", summary.TotalDiscounts, "text-red-500")
+							@common.HR()
+							@quotationSummaryRow("Total", summary.Total, "font-bold text-lg text-primary")
+						</div>
+					</div>
+				</div>
+				<div class="mt-4">
+					<button
+						class="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
+						hx-post={ utils.URL("/customer/quotation/submit") }
+						hx-confirm="Submit this quotation draft for review?"
+					>
+						Submit for Review
+					</button>
+				</div>
+			</div>
+		} else {
+			<div class="bg-white rounded-lg shadow-md p-6 mb-6 text-center text-gray-500">
+				No items in your quotation draft yet. Browse products below to add items.
+			</div>
+		}
+	</div>
+}
+
+templ quotationSummaryRow(label string, value string, class ...string) {
+	<div class={ "grid grid-cols-[auto_auto] gap-x-6 " + strings.Join(class, " ") }>
+		<span>{ label }</span>
+		<span class="font-semibold">{ value }</span>
+	</div>
 }
 
 templ QuotationProductsTable(products []models.QuotationProduct) {
@@ -234,6 +262,7 @@ templ Actions(productID string, productSlug string) {
 						set container to the closest <div[data-actions]/> to me
 						set qtyInput to container.querySelector('input[name=\'quantity\']')
 						set increaseBtn to container.querySelector('button[name=\'btn-qty-increase\']')
+						set currentVal to Number(qtyInput.value)
 
 						if currentVal > 1
 							set qtyInput.value to String(currentVal - 1)
@@ -292,11 +321,25 @@ templ Actions(productID string, productSlug string) {
 			</button>
 			<button
 				type="button"
-				id="btn-add-to-cart"
-				class="bg-primary text-white px-2 py-1 rounded-lg font-semibold hover:bg-primary-dark transition-colors cursor-pointer mx-2"
+				class="btn-add-to-draft bg-primary text-white px-2 py-1 rounded-lg font-semibold hover:bg-primary-dark transition-colors cursor-pointer mx-2"
 				hx-include="closest [data-actions]"
 				hx-post={ utils.URLf("/customer/quotation/product/%s/add", productID) }
-				hx-swap="none"
+				hx-target="#quotation-draft-section"
+				hx-swap="outerHTML"
+				_="
+					on htmx:afterRequest
+						if event.detail.successful
+							add .quotation-add-btn-success to me
+							wait 300ms
+							remove .quotation-add-btn-success from me
+							if #quotation-draft-section
+								add .quotation-draft-updated to #quotation-draft-section
+								wait 600ms
+								remove .quotation-draft-updated from #quotation-draft-section
+							end
+						end
+					end
+				"
 			>
 				Add to Draft Quotation
 			</button>

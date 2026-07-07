@@ -449,6 +449,18 @@ templ CustomerPortalPage(profile models.CustomerProfile) {
 							<p class="text-sm text-gray-600">Browse products, add to cart, request quotation!</p>
 						</a>
 						<a
+							href={ utils.URL("/customer/quotations") }
+							class="block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-primary"
+						>
+							<div class="flex justify-center mb-4">
+								<svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+								</svg>
+							</div>
+							<h2 class="text-xl font-semibold text-gray-800 mb-2">My Quotations</h2>
+							<p class="text-sm text-gray-600">View and track your submitted quotations</p>
+						</a>
+						<a
 							href={ utils.URL("/customer/orders") }
 							class="block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-primary"
 						>

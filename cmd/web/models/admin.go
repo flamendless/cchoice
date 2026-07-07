@@ -178,3 +178,36 @@ type AdminOrderTrackModalData struct {
 	History        []AdminOrderStatusHistoryEntry
 	FlowSteps      []enums.OrderStatus
 }
+
+type AdminQuotationListItem struct {
+	ID           string
+	CustomerName string
+	Status       enums.QuotationStatus
+	AssignedTo   string
+	TotalItems   int64
+	TotalDisplay string
+	SubmittedAt  string
+	UpdatedAt    string
+}
+
+type AdminQuotationLineItem struct {
+	BrandName     string
+	ProductSerial string
+	Quantity      int64
+	TotalPrice    string
+	TotalDiscount string
+}
+
+type AdminQuotationApproveModalData struct {
+	ID            string
+	CurrentStatus enums.QuotationStatus
+	Staff         []Staff
+}
+
+type AdminQuotationStatusHistoryEntry struct {
+	FromStatus string
+	ToStatus   string
+	StaffName  string
+	Notes      string
+	CreatedAt  string
+}

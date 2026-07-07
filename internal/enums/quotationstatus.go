@@ -28,3 +28,15 @@ func ParseQuotationStatus(s string) QuotationStatus {
 		return QUOTATION_STATUS_UNDEFINED
 	}
 }
+
+func (s QuotationStatus) IsValid() bool {
+	return s != QUOTATION_STATUS_UNDEFINED && s != QUOTATION_STATUS_DRAFT
+}
+
+func GetAllQuotationStatuses() []QuotationStatus {
+	return []QuotationStatus{
+		QUOTATION_STATUS_IN_REVIEW,
+		QUOTATION_STATUS_APPROVED,
+		QUOTATION_STATUS_COMPLETED,
+	}
+}

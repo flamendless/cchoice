@@ -1,0 +1,388 @@
+package components
+
+import (
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/enums"
+	"cchoice/internal/utils"
+)
+
+templ AdminQuotationsListPage() {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("Quotations - C-Choice Admin")
+		</head>
+		<body
+			class="bg-surface min-h-screen flex flex-col"
+			_="init call metrics_event('admin_visit', 'quotations list')"
+		>
+			@common.DevRibbon()
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-8xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.AdminStaffHeaderWithBack()
+						<h1 class="text-2xl font-bold text-center text-primary mb-6">
+							Manage Quotations
+						</h1>
+						@QuotationsListSection()
+					</div>
+				</div>
+			</div>
+			<div id="quotation-approve-modal-container"></div>
+		</body>
+	</html>
+}
+
+templ QuotationsListSection() {
+	<div
+		class="bg-white rounded-lg shadow-md p-6"
+		hx-get={ utils.URL("/admin/quotations/table") }
+		hx-trigger="load"
+		hx-target="#quotations-table"
+		hx-swap="innerHTML"
+	>
+		@QuotationsSearchToolbar(utils.URL("/admin/quotations/table"))
+		<div id="quotations-table"></div>
+	</div>
+}
+
+templ QuotationsSearchToolbar(url string) {
+	<div class="flex flex-col sm:flex-row sm:flex-wrap justify-between items-start sm:items-center gap-4 mb-4">
+		<div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+			<input
+				type="text"
+				name="search"
+				placeholder="Search by customer name or email..."
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+				hx-get={ url }
+				hx-trigger="change, search delay:300ms"
+				hx-target="#quotations-table"
+				hx-include="[name='search'],[name='sort_by'],[name='sort_dir']"
+			/>
+			<select
+				name="sort_by"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+				hx-get={ url }
+				hx-trigger="change"
+				hx-target="#quotations-table"
+				hx-include="[name='search'],[name='sort_by'],[name='sort_dir']"
+			>
+				<option value="CREATED_AT">Sort By: Submitted At</option>
+				<option value="STATUS">Sort By: Status</option>
+			</select>
+			<select
+				name="sort_dir"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+				hx-get={ url }
+				hx-trigger="change"
+				hx-target="#quotations-table"
+				hx-include="[name='search'],[name='sort_by'],[name='sort_dir']"
+			>
+				<option value="DESC">Sort: Descending</option>
+				<option value="ASC">Sort: Ascending</option>
+			</select>
+		</div>
+	</div>
+}
+
+templ AdminQuotationsTableContent(quotations []models.AdminQuotationListItem, p models.TablePagination) {
+	<div id="quotations-table-content">
+		<div id="quotations-pagination-top" hx-swap-oob="true">
+			@TablePaginationBar(p)
+		</div>
+		@QuotationsListTable(quotations)
+		@TablePaginationBar(p)
+	</div>
+}
+
+templ QuotationsListTable(quotations []models.AdminQuotationListItem) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-50">
+				<tr>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-10"></th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quotation ID</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assigned To</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Items</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted At</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				if len(quotations) == 0 {
+					<tr>
+						<td colspan="9" class="px-6 py-4 text-center text-gray-500">
+							No quotations found.
+						</td>
+					</tr>
+				} else {
+					for _, quotation := range quotations {
+						@QuotationTableRow(quotation)
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ QuotationTableRow(quotation models.AdminQuotationListItem) {
+	<tr id={ "quotation-row-" + quotation.ID }>
+		<td class="px-4 py-4 whitespace-nowrap text-sm">
+			<button
+				type="button"
+				class="px-2 py-1 text-primary hover:bg-surface rounded"
+				hx-get={ utils.URLf("/admin/quotations/%s/details", quotation.ID) }
+				hx-target={ "#quotation-details-cell-" + quotation.ID }
+				hx-swap="innerHTML"
+				_={ "on click toggle .hidden on #quotation-details-" + quotation.ID }
+			>
+				+
+			</button>
+		</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ quotation.ID }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ quotation.CustomerName }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm">
+			@QuotationStatusPill(quotation.Status, false)
+		</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ quotation.AssignedTo }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ quotation.TotalItems }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ quotation.TotalDisplay }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ quotation.SubmittedAt }</td>
+		<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+			@QuotationActionsCell(quotation.ID, quotation.Status)
+		</td>
+	</tr>
+	<tr id={ "quotation-details-" + quotation.ID } class="hidden">
+		<td id={ "quotation-details-cell-" + quotation.ID } colspan="9" class="px-6 py-2"></td>
+	</tr>
+}
+
+templ QuotationActionsCell(quotationID string, status enums.QuotationStatus) {
+	<div class="flex items-center gap-2">
+		if status == enums.QUOTATION_STATUS_IN_REVIEW {
+			<button
+				type="button"
+				class="px-3 py-1 bg-primary text-white rounded-md hover:bg-primary-dark text-xs font-medium"
+				hx-get={ utils.URLf("/admin/quotations/%s/approve", quotationID) }
+				hx-target="#quotation-approve-modal-container"
+				hx-swap="innerHTML"
+			>
+				Approve
+			</button>
+		}
+	</div>
+}
+
+templ QuotationDetailsRows(lines []models.AdminQuotationLineItem) {
+	<div class="bg-gray-50 rounded-lg p-4 my-2">
+		<h4 class="text-sm font-semibold text-gray-700 mb-3">Quotation Items</h4>
+		if len(lines) == 0 {
+			<p class="text-sm text-gray-500">No items in this quotation.</p>
+		} else {
+			<table class="min-w-full text-sm">
+				<thead>
+					<tr class="border-b">
+						<th class="py-2 text-left">Brand</th>
+						<th class="py-2 text-left">Serial</th>
+						<th class="py-2 text-left">Quantity</th>
+						<th class="py-2 text-left">Total Price</th>
+						<th class="py-2 text-left">Total Discount</th>
+					</tr>
+				</thead>
+				<tbody>
+					for _, line := range lines {
+						<tr class="border-b">
+							<td class="py-2">{ line.BrandName }</td>
+							<td class="py-2">{ line.ProductSerial }</td>
+							<td class="py-2">{ line.Quantity }</td>
+							<td class="py-2">{ line.TotalPrice }</td>
+							<td class="py-2">{ line.TotalDiscount }</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+	</div>
+}
+
+templ QuotationApproveModal(data models.AdminQuotationApproveModalData) {
+	<div
+		id="quotation-approve-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="
+			on closeModal
+				set #quotation-approve-modal-container.innerHTML to ''
+			end
+		"
+	>
+		<div
+			class="absolute inset-0 bg-black/50"
+			_="on click trigger closeModal"
+		></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">Approve Quotation</h2>
+				<button
+					type="button"
+					class="text-gray-400 hover:text-gray-600"
+					_="on click trigger closeModal"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			<p class="text-sm text-gray-600 mb-4">
+				Quotation ID: <span class="font-medium text-gray-900">{ data.ID }</span>
+			</p>
+			@QuotationApproveForm(data)
+		</div>
+	</div>
+}
+
+templ QuotationApproveForm(data models.AdminQuotationApproveModalData) {
+	<form
+		hx-patch={ utils.URLf("/admin/quotations/%s/approve", data.ID) }
+		hx-swap="none"
+		class="flex flex-col gap-4"
+		hx-on::after-request="if(event.detail.successful) { document.getElementById('quotation-approve-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/quotations/table', { target: '#quotations-table', swap: 'innerHTML' }) }"
+	>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Assign to</label>
+			<select
+				name="assigned_staff_id"
+				required
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+			>
+				<option value="">Select staff...</option>
+				for _, staff := range data.Staff {
+					<option value={ staff.ID }>{ staff.FullName }</option>
+				}
+			</select>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+			<textarea
+				name="notes"
+				rows="4"
+				placeholder="Add notes for this approval..."
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+			></textarea>
+		</div>
+		<div class="flex justify-end gap-2 pt-2">
+			<button
+				type="button"
+				class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm"
+				_="on click trigger closeModal"
+			>
+				Discard
+			</button>
+			<button
+				type="submit"
+				class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm"
+			>
+				Save
+			</button>
+		</div>
+	</form>
+}
+
+templ QuotationStatusPill(status enums.QuotationStatus, isCurrent bool) {
+	switch status {
+		case enums.QUOTATION_STATUS_IN_REVIEW:
+			if isCurrent {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-200 text-yellow-900 ring-2 ring-yellow-500">IN_REVIEW</span>
+			} else {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">IN_REVIEW</span>
+			}
+		case enums.QUOTATION_STATUS_APPROVED:
+			if isCurrent {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-200 text-green-900 ring-2 ring-green-500">APPROVED</span>
+			} else {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">APPROVED</span>
+			}
+		case enums.QUOTATION_STATUS_COMPLETED:
+			if isCurrent {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-200 text-blue-900 ring-2 ring-blue-500">COMPLETED</span>
+			} else {
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">COMPLETED</span>
+			}
+		default:
+			<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{ status.String() }</span>
+	}
+}
+
+templ QuotationHistoryStatusPill(statusLabel string) {
+	if statusLabel == "—" || statusLabel == "" {
+		<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">—</span>
+	} else {
+		@QuotationStatusPill(enums.ParseQuotationStatus(statusLabel), false)
+	}
+}
+
+templ QuotationTrackHistoryTable(history []models.AdminQuotationStatusHistoryEntry) {
+	<div class="mt-6 overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-md">
+			<thead class="bg-gray-50">
+				<tr>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">From</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">To</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Staff</th>
+					<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				if len(history) == 0 {
+					<tr>
+						<td colspan="5" class="px-4 py-3 text-center text-sm text-gray-500">No history found.</td>
+					</tr>
+				} else {
+					for _, entry := range history {
+						<tr>
+							<td class="px-4 py-2 text-sm text-gray-900 whitespace-nowrap">{ entry.CreatedAt }</td>
+							<td class="px-4 py-2 text-sm">
+								@QuotationHistoryStatusPill(entry.FromStatus)
+							</td>
+							<td class="px-4 py-2 text-sm">
+								@QuotationHistoryStatusPill(entry.ToStatus)
+							</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ entry.StaffName }</td>
+							<td class="px-4 py-2 text-sm text-gray-900">{ entry.Notes }</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ QuotationStatusFlowDiagram(steps []enums.QuotationStatus, current enums.QuotationStatus) {
+	<div class="border border-gray-200 rounded-md p-4 bg-gray-50">
+		<h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Status Flow</h3>
+		if len(steps) == 0 {
+			<p class="text-sm text-gray-500">No status history available.</p>
+		} else {
+			<div class="flex flex-wrap items-center gap-2">
+				for i, step := range steps {
+					if i > 0 {
+						<span class="text-gray-400 text-lg">→</span>
+					}
+					@QuotationStatusPill(step, step == current)
+				}
+			</div>
+			<p class="mt-3 text-sm text-gray-700 flex items-center gap-2 flex-wrap">
+				<span>Current:</span>
+				@QuotationStatusPill(current, true)
+			</p>
+		}
+	</div>
+}

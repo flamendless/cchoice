@@ -138,9 +138,9 @@ func (s *Server) searchRelatedProductsHandler(w http.ResponseWriter, r *http.Req
 	switch source {
 	case searchOtherSource:
 		otherRows, err := s.dbRO.GetQueries().GetOtherProductsForSearch(ctx, queries.GetOtherProductsForSearchParams{
-			Name:   query,
-			Limit:  int64(limit),
-			Offset: int64(offset),
+			SearchQuery: query,
+			Limit:       int64(limit),
+			Offset:      int64(offset),
 		})
 		if err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("query", query))
@@ -153,10 +153,9 @@ func (s *Server) searchRelatedProductsHandler(w http.ResponseWriter, r *http.Req
 		products = models.ToProductGridProductsFromOtherRows(s.encoder, s.GetCDNURL, validOtherRows)
 	default:
 		relatedRows, err := s.dbRO.GetQueries().GetRelatedProductsForSearch(ctx, queries.GetRelatedProductsForSearchParams{
-			Name:   query,
-			Name_2: query,
-			Limit:  int64(limit),
-			Offset: int64(offset),
+			SearchQuery: query,
+			Limit:       int64(limit),
+			Offset:      int64(offset),
 		})
 		if err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("query", query))
@@ -169,9 +168,9 @@ func (s *Server) searchRelatedProductsHandler(w http.ResponseWriter, r *http.Req
 			source = searchOtherSource
 
 			otherRows, otherErr := s.dbRO.GetQueries().GetOtherProductsForSearch(ctx, queries.GetOtherProductsForSearchParams{
-				Name:   query,
-				Limit:  int64(limit),
-				Offset: int64(offset),
+				SearchQuery: query,
+				Limit:       int64(limit),
+				Offset:      int64(offset),
 			})
 			if otherErr != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(otherErr), zap.String("query", query))

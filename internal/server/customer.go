@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 	"strings"
@@ -39,6 +40,10 @@ func AddCustomerHandlers(s *Server, r chi.Router) {
 	r.With(s.requireCustomerAuth).Post("/customer/quotation/product/{productID}/add", s.customerQuotationAddToHandler)
 	r.With(s.requireCustomerAuth).Delete("/customer/quotation/line/{lineID}/remove", s.customerQuotationRemoveFromDraftHandler)
 	r.With(s.requireCustomerAuth).Post("/customer/quotation/submit", s.customerQuotationSubmitDraftHandler)
+
+	r.With(s.requireCustomerAuth).Get("/customer/quotations", s.customerQuotationsListPageHandler)
+	r.With(s.requireCustomerAuth).Get("/customer/quotations/table", s.customerQuotationsListTableHandler)
+	r.With(s.requireCustomerAuth).Get("/customer/quotations/{id}", s.customerQuotationDetailPageHandler)
 
 	r.With(s.requireCustomerAuth).Get("/customer/profile", s.customerProfileHandler)
 	r.With(s.requireCustomerAuth).Get("/customer/orders", s.customerOrdersListPageHandler)
@@ -432,63 +437,22 @@ func (s *Server) customerVerifyHandler(w http.ResponseWriter, r *http.Request) {
 	redirectHX(w, r, utils.URLWithSuccess(page, "Email verified successfully!"))
 }
 
-func (s *Server) customerQuotationPageHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Customer Portal Page Handler]"
-	const page = "/customer"
-	ctx := r.Context()
-
-	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
-	if _, err := s.services.customer.BuildProfile(ctx, customerIDStr); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, err.Error()))
-		return
-	}
-
+func (s *Server) buildQuotationDraftData(ctx context.Context, customerIDStr string) ([]models.QuotationLine, models.QuotationSummary, error) {
 	quotation, err := s.services.quotation.GetOrCreateActive(ctx, customerIDStr)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, err.Error()))
-		return
+		return nil, models.QuotationSummary{}, err
 	}
 
 	quotationID := s.encoder.Encode(quotation.ID)
 
 	draftLines, err := s.services.quotation.GetLines(ctx, quotationID)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		return nil, models.QuotationSummary{}, err
 	}
 
 	summary, err := s.services.quotation.GetSummary(ctx, quotationID)
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-	}
-
-	products, err := s.services.product.ListForQuotations(ctx)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-	}
-
-	brands, err := s.services.brand.GetAllActive(ctx)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-	}
-	activeBrands := make([]models.Brand, 0, len(brands))
-	for _, brand := range brands {
-		activeBrands = append(activeBrands, models.Brand{
-			ID:     s.encoder.Encode(brand.ID),
-			Name:   brand.Name,
-			Status: brand.Status,
-		})
-	}
-
-	categories, err := s.services.product.GetAllCategoryNames(ctx)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-	}
-
-	subcategories, err := s.services.product.GetAllSubcategoryNames(ctx)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		return nil, models.QuotationSummary{}, err
 	}
 
 	draftLinesModel := make([]models.QuotationLine, 0, len(draftLines))
@@ -526,6 +490,65 @@ func (s *Server) customerQuotationPageHandler(w http.ResponseWriter, r *http.Req
 		summaryModel.TotalPrice = origM.Display()
 		summaryModel.TotalDiscounts = discountM.Display()
 		summaryModel.Total = total.Display()
+	}
+
+	return draftLinesModel, summaryModel, nil
+}
+
+func (s *Server) renderQuotationDraftSection(ctx context.Context, w http.ResponseWriter, customerIDStr string) error {
+	draftLinesModel, summaryModel, err := s.buildQuotationDraftData(ctx, customerIDStr)
+	if err != nil {
+		return err
+	}
+
+	return compcustomer.QuotationDraftSection(draftLinesModel, summaryModel).Render(ctx, w)
+}
+
+func (s *Server) customerQuotationPageHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Customer Portal Page Handler]"
+	const page = "/customer"
+	ctx := r.Context()
+
+	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
+	if _, err := s.services.customer.BuildProfile(ctx, customerIDStr); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	draftLinesModel, summaryModel, err := s.buildQuotationDraftData(ctx, customerIDStr)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
+	products, err := s.services.product.ListForQuotations(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
+
+	brands, err := s.services.brand.GetAllActive(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
+	activeBrands := make([]models.Brand, 0, len(brands))
+	for _, brand := range brands {
+		activeBrands = append(activeBrands, models.Brand{
+			ID:     s.encoder.Encode(brand.ID),
+			Name:   brand.Name,
+			Status: brand.Status,
+		})
+	}
+
+	categories, err := s.services.product.GetAllCategoryNames(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
+
+	subcategories, err := s.services.product.GetAllSubcategoryNames(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}
 
 	productsModel := make([]models.QuotationProduct, 0, len(products))
@@ -601,7 +624,10 @@ func (s *Server) customerQuotationAddToHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	redirectHX(w, r, utils.URL(page))
+	if err := s.renderQuotationDraftSection(ctx, w, customerIDStr); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (s *Server) customerQuotationRemoveFromDraftHandler(w http.ResponseWriter, r *http.Request) {
@@ -617,7 +643,11 @@ func (s *Server) customerQuotationRemoveFromDraftHandler(w http.ResponseWriter, 
 		return
 	}
 
-	redirectHX(w, r, utils.URL(page))
+	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
+	if err := s.renderQuotationDraftSection(ctx, w, customerIDStr); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (s *Server) customerQuotationSubmitDraftHandler(w http.ResponseWriter, r *http.Request) {

@@ -11,16 +11,6 @@ import (
 	"cchoice/internal/utils"
 )
 
-func normalizeOrderListingSort(sortBy, sortDir string) (string, string) {
-	if sortBy == "" {
-		sortBy = "UPDATED_AT"
-	}
-	if sortDir == "" {
-		sortDir = "DESC"
-	}
-	return sortBy, sortDir
-}
-
 func formatAdminOrderAddress(parts ...string) string {
 	address := strings.Join(parts, ", ")
 	address = strings.ReplaceAll(address, ", , ", ", ")

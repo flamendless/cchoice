@@ -9,7 +9,6 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
-	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
@@ -34,22 +33,10 @@ func (s *Server) adminOrdersListTableHandler(w http.ResponseWriter, r *http.Requ
 	ctx := r.Context()
 
 	searchOrderRef := strings.TrimSpace(r.URL.Query().Get("search_order_ref"))
-	sortBy := strings.ToUpper(r.URL.Query().Get("sort_by"))
-	sortDir := strings.ToUpper(r.URL.Query().Get("sort_dir"))
-
-	switch sortBy {
-	case "", "UPDATED_AT", "CREATED_AT", "STATUS":
-	default:
-		logs.LogCtx(ctx).Error(logtag, zap.String("sort_by", sortBy), zap.Error(errs.ErrEnumInvalid))
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrEnumInvalid.Error()))
-		return
-	}
-
-	switch sortDir {
-	case "", "ASC", "DESC":
-	default:
-		logs.LogCtx(ctx).Error(logtag, zap.String("sort_dir", sortDir), zap.Error(errs.ErrEnumInvalid))
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrEnumInvalid.Error()))
+	sortBy, sortDir, err := utils.ParseListingSortQuery(r.URL.Query(), "UPDATED_AT", "CREATED_AT", "STATUS")
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.String("sort_by", sortBy), zap.String("sort_dir", sortDir.String()), zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 

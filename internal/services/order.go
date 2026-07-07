@@ -46,10 +46,10 @@ func (s *OrderService) GetForListingAdminPaginated(
 	ctx context.Context,
 	searchOrderRef string,
 	sortBy string,
-	sortDir string,
+	sortDir enums.ListingSortDirection,
 	page, perPage int,
 ) ([]OrderAdminListItem, int64, int, error) {
-	sortBy, sortDir = normalizeOrderListingSort(sortBy, sortDir)
+	sortBy, sortDir = utils.NormalizeListingSort(sortBy, sortDir, "UPDATED_AT")
 
 	searchParam := sql.NullString{
 		String: searchOrderRef,
@@ -74,7 +74,8 @@ func (s *OrderService) GetForListingAdminPaginated(
 
 func (s *OrderService) queryOrdersForListingPaginated(
 	ctx context.Context,
-	sortBy, sortDir string,
+	sortBy string,
+	sortDir enums.ListingSortDirection,
 	searchOrderRef sql.NullString,
 	limit, offset int64,
 ) ([]OrderAdminListItem, error) {
@@ -82,7 +83,7 @@ func (s *OrderService) queryOrdersForListingPaginated(
 
 	switch sortBy {
 	case "CREATED_AT":
-		if sortDir == "ASC" {
+		if sortDir.IsAscending() {
 			rows, err := q.AdminGetOrdersForListingPaginatedCreatedAtAsc(ctx, queries.AdminGetOrdersForListingPaginatedCreatedAtAscParams{
 				SearchOrderRef: searchOrderRef,
 				Limit:          limit,
@@ -103,7 +104,7 @@ func (s *OrderService) queryOrdersForListingPaginated(
 		}
 		return mapAdminOrderListItemsFromCreatedAtDesc(rows), nil
 	case "STATUS":
-		if sortDir == "ASC" {
+		if sortDir.IsAscending() {
 			rows, err := q.AdminGetOrdersForListingPaginatedStatusAsc(ctx, queries.AdminGetOrdersForListingPaginatedStatusAscParams{
 				SearchOrderRef: searchOrderRef,
 				Limit:          limit,
@@ -124,7 +125,7 @@ func (s *OrderService) queryOrdersForListingPaginated(
 		}
 		return mapAdminOrderListItemsFromStatusDesc(rows), nil
 	default:
-		if sortDir == "ASC" {
+		if sortDir.IsAscending() {
 			rows, err := q.AdminGetOrdersForListingPaginatedUpdatedAtAsc(ctx, queries.AdminGetOrdersForListingPaginatedUpdatedAtAscParams{
 				SearchOrderRef: searchOrderRef,
 				Limit:          limit,
