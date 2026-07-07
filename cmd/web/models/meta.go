@@ -6,17 +6,17 @@ import (
 )
 
 type ProductsMeta struct {
-	Title           string
-	Content         string
-	CanonicalURL    string
-	OGImage         string
-	OGType          string
-	Robots          string
-	Keywords        string
-	StructuredData  string
-	PriceAmount     string
-	PriceCurrency   string
-	TwitterCard     string
+	Title          string
+	Content        string
+	CanonicalURL   string
+	OGImage        string
+	OGType         string
+	Robots         string
+	Keywords       string
+	StructuredData string
+	PriceAmount    string
+	PriceCurrency  string
+	TwitterCard    string
 }
 
 type SiteSEO struct {

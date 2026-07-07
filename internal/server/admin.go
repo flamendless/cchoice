@@ -51,7 +51,10 @@ func getOrCreateUserAgentID(ctx context.Context, db database.IService, userAgent
 
 func AddAdminHandlers(s *Server, r chi.Router) {
 	r.Get("/admin", s.adminLoginPageHandler)
-	r.Post("/admin/login", s.adminLoginHandler)
+	r.Group(func(r chi.Router) {
+		r.Use(s.rateLimiter.Middleware)
+		r.Post("/admin/login", s.adminLoginHandler)
+	})
 	r.With(s.requireStaffAuth).Post("/admin/logout", s.adminLogoutHandler)
 	r.With(s.requireStaffAuth).Get("/admin/staff", s.adminStaffHomeHandler)
 	r.With(s.requireStaffAuth).Post("/admin/staff/memos/{id}/accept", s.adminStaffMemoAcceptHandler)
@@ -272,6 +275,10 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.sessionManager.Put(ctx, SessionStaffID, s.encoder.Encode(staff.ID))
+
+	if err := s.sessionManager.RenewToken(ctx); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	}
 
 	useragentID := sql.NullInt64{}
 	if ua := r.UserAgent(); ua != "" {

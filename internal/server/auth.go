@@ -16,9 +16,12 @@ import (
 
 func AddAuthHandlers(s *Server, r chi.Router) {
 	r.Get("/auth/forgot-password", s.forgotPasswordPageHandler)
-	r.Post("/auth/forgot-password", s.forgotPasswordHandler)
 	r.Get("/auth/reset-password", s.resetPasswordPageHandler)
-	r.Post("/auth/reset-password", s.resetPasswordHandler)
+	r.Group(func(r chi.Router) {
+		r.Use(s.rateLimiter.Middleware)
+		r.Post("/auth/forgot-password", s.forgotPasswordHandler)
+		r.Post("/auth/reset-password", s.resetPasswordHandler)
+	})
 }
 
 func (s *Server) forgotPasswordPageHandler(w http.ResponseWriter, r *http.Request) {
