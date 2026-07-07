@@ -37,7 +37,7 @@ type ProductMeta struct {
 	TwitterCard    string
 	PriceAmount    string
 	PriceCurrency  string
-	StructuredData string
+	StructuredData json.RawMessage
 }
 
 type SitemapEntry struct {
@@ -175,7 +175,7 @@ func BuildProductStructuredData(
 	priceAmount string,
 	priceCurrency string,
 	siteBaseURL string,
-) string {
+) json.RawMessage {
 	type brand struct {
 		Type string `json:"@type"`
 		Name string `json:"name"`
@@ -267,7 +267,7 @@ func BuildProductStructuredData(
 
 	data, err := json.Marshal(schema)
 	if err != nil {
-		return ""
+		return nil
 	}
-	return string(data)
+	return data
 }

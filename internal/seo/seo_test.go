@@ -181,7 +181,7 @@ func TestBuildProductStructuredData(t *testing.T) {
 	)
 
 	var payload map[string]any
-	require.NoError(t, json.Unmarshal([]byte(raw), &payload))
+	require.NoError(t, json.Unmarshal(raw, &payload))
 
 	assert.Equal(t, "https://schema.org", payload["@context"])
 	assert.Equal(t, "Product", payload["@type"])

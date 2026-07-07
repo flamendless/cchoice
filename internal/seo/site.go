@@ -30,7 +30,7 @@ func BaseProductKeywords() []string {
 	}
 }
 
-func BuildSiteStructuredData(homeURL, logoURL string) string {
+func BuildSiteStructuredData(homeURL, logoURL string) json.RawMessage {
 	homeURL = strings.TrimSuffix(homeURL, "/")
 
 	type organization struct {
@@ -96,7 +96,7 @@ func BuildSiteStructuredData(homeURL, logoURL string) string {
 
 	data, err := json.Marshal(payload)
 	if err != nil {
-		return ""
+		return nil
 	}
-	return string(data)
+	return data
 }

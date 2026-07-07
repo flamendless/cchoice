@@ -16,7 +16,7 @@ func TestBuildSiteStructuredData(t *testing.T) {
 		Context string           `json:"@context"`
 		Graph   []map[string]any `json:"@graph"`
 	}
-	require.NoError(t, json.Unmarshal([]byte(raw), &payload))
+	require.NoError(t, json.Unmarshal(raw, &payload))
 
 	assert.Equal(t, "https://schema.org", payload.Context)
 	require.Len(t, payload.Graph, 2)

@@ -24,9 +24,7 @@ templ ProductSEO(meta models.ProductsMeta) {
 	if meta.OGImage != "" {
 		<meta name="twitter:image" content={ meta.OGImage }/>
 	}
-	if meta.StructuredData != "" {
-		<script type="application/ld+json">
-			{ meta.StructuredData }
-		</script>
+	if len(meta.StructuredData) > 0 {
+		@templ.JSONScript("product-structured-data", meta.StructuredData).WithType("application/ld+json")
 	}
 }
