@@ -282,10 +282,6 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	s.sessionManager.Put(ctx, SessionStaffID, s.encoder.Encode(staff.ID))
 
-	if err := s.sessionManager.RenewToken(ctx); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-	}
-
 	useragentID := sql.NullInt64{}
 	if ua := r.UserAgent(); ua != "" {
 		useragentID = getOrCreateUserAgentID(context.Background(), s.dbRW, ua)
