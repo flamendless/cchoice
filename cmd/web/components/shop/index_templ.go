@@ -92,7 +92,7 @@ func HomePageBody(data models.HomePageData) templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<body class=\"m-0 p-0 custom-scrollbar\" style=\"overflow-x: clip;\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<body class=\"m-0 p-0 custom-scrollbar\" style=\"overflow-x: clip;\" _=\"init call metrics_event('anon_visit', 'homepage')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

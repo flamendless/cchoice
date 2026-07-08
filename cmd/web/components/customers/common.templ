@@ -44,6 +44,7 @@ templ CustomerLoginPage() {
 					hx-post={ utils.URL("/customer/login") }
 					hx-trigger="submit"
 					hx-indicator="#login-btn-content"
+					_="on submit call metrics_event('customer_exec', 'login')"
 				>
 					<div>
 						<label for="email" class="block text-sm font-medium text-gray-700">
@@ -145,6 +146,7 @@ templ CustomerRegisterPage() {
 					id="customer-register-form"
 					hx-post={ utils.URL("/customer/register") }
 					hx-trigger="submit"
+					_="on submit call metrics_event('customer_exec', 'register')"
 				>
 					<div>
 						<label for="customer_type" class="block text-sm font-medium text-gray-700">

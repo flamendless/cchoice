@@ -13,6 +13,7 @@ templ CPointsHomePage() {
 		</head>
 		<body
 			class="bg-surface min-h-screen flex flex-col"
+			_="init call metrics_event('anon_visit', 'cpoints home')"
 		>
 			@common.DevRibbon()
 			@common.ErrorBanner()

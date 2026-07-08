@@ -87,7 +87,7 @@ func SearchPageBody(data models.SearchPageData) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<body class=\"m-0 p-0 custom-scrollbar\" style=\"overflow-x: clip;\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<body class=\"m-0 p-0 custom-scrollbar\" style=\"overflow-x: clip;\" _=\"init call metrics_event('anon_visit', 'search')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

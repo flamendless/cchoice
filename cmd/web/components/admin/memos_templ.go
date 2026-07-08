@@ -513,7 +513,7 @@ func MemoActionsCell(memo models.AdminMemoListItem, currentStaffID string, isSup
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" hx-confirm=\"Send notification emails to all recipients?\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z\"></path></svg></button>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" hx-confirm=\"Send notification emails to all recipients?\" _=\"on click call metrics_event('admin_exec', 'send memo emails')\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z\"></path></svg></button>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -556,7 +556,7 @@ func MemoFileURLCell(url string) templ.Component {
 			var templ_7745c5c3_Var26 string
 			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(url)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 176, Col: 37}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 177, Col: 37}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 			if templ_7745c5c3_Err != nil {
@@ -569,7 +569,7 @@ func MemoFileURLCell(url string) templ.Component {
 			var templ_7745c5c3_Var27 string
 			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(url)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 176, Col: 45}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 177, Col: 45}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 			if templ_7745c5c3_Err != nil {
@@ -582,7 +582,7 @@ func MemoFileURLCell(url string) templ.Component {
 			var templ_7745c5c3_Var28 templ.SafeURL
 			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(url))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 178, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 179, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 			if templ_7745c5c3_Err != nil {
@@ -659,7 +659,7 @@ func MemoStaffRows(memoID string, rows []models.AdminMemoRecipientRow, currentSt
 				var templ_7745c5c3_Var32 string
 				templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(memoStaffDisplayName(row.StaffName, row.StaffID, currentStaffID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 217, Col: 117}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 218, Col: 117}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 				if templ_7745c5c3_Err != nil {
@@ -672,7 +672,7 @@ func MemoStaffRows(memoID string, rows []models.AdminMemoRecipientRow, currentSt
 				var templ_7745c5c3_Var33 string
 				templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(row.Email)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 218, Col: 62}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 219, Col: 62}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 				if templ_7745c5c3_Err != nil {
@@ -685,7 +685,7 @@ func MemoStaffRows(memoID string, rows []models.AdminMemoRecipientRow, currentSt
 				var templ_7745c5c3_Var34 string
 				templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(row.Position)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 219, Col: 65}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 220, Col: 65}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 				if templ_7745c5c3_Err != nil {
@@ -698,7 +698,7 @@ func MemoStaffRows(memoID string, rows []models.AdminMemoRecipientRow, currentSt
 				var templ_7745c5c3_Var35 string
 				templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(row.UserType.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 220, Col: 74}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 221, Col: 74}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 				if templ_7745c5c3_Err != nil {
@@ -711,7 +711,7 @@ func MemoStaffRows(memoID string, rows []models.AdminMemoRecipientRow, currentSt
 				var templ_7745c5c3_Var36 string
 				templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(memoRecipientStatusLabel(row.ActionStatus))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 221, Col: 95}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 222, Col: 95}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 				if templ_7745c5c3_Err != nil {
@@ -724,7 +724,7 @@ func MemoStaffRows(memoID string, rows []models.AdminMemoRecipientRow, currentSt
 				var templ_7745c5c3_Var37 string
 				templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(row.RejectReason)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 222, Col: 69}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 223, Col: 69}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 				if templ_7745c5c3_Err != nil {
@@ -737,7 +737,7 @@ func MemoStaffRows(memoID string, rows []models.AdminMemoRecipientRow, currentSt
 				var templ_7745c5c3_Var38 string
 				templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(row.AcceptedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 223, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 224, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 				if templ_7745c5c3_Err != nil {
@@ -750,7 +750,7 @@ func MemoStaffRows(memoID string, rows []models.AdminMemoRecipientRow, currentSt
 				var templ_7745c5c3_Var39 string
 				templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(row.RejectedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 224, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 225, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 				if templ_7745c5c3_Err != nil {
@@ -858,7 +858,7 @@ func MemoFormModal(title string, action string, method string, allStaff []models
 		var templ_7745c5c3_Var43 string
 		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 256, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 257, Col: 59}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 		if templ_7745c5c3_Err != nil {
@@ -876,7 +876,7 @@ func MemoFormModal(title string, action string, method string, allStaff []models
 			var templ_7745c5c3_Var44 string
 			templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL(action))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 265, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 266, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var44)
 			if templ_7745c5c3_Err != nil {
@@ -889,13 +889,13 @@ func MemoFormModal(title string, action string, method string, allStaff []models
 			var templ_7745c5c3_Var45 string
 			templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/memos/table"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 268, Col: 59}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 269, Col: 59}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var45)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('memo-create-modal-container').innerHTML = ''; document.getElementById('memo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', event.target.dataset.memosTableUrl, { target: '#memos-table', swap: 'innerHTML' }) }\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('memo-create-modal-container').innerHTML = ''; document.getElementById('memo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', event.target.dataset.memosTableUrl, { target: '#memos-table', swap: 'innerHTML' }) }\" _=\"on submit call metrics_event('admin_exec', 'save memo')\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -915,7 +915,7 @@ func MemoFormModal(title string, action string, method string, allStaff []models
 			var templ_7745c5c3_Var46 string
 			templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL(action))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 275, Col: 33}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 277, Col: 33}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var46)
 			if templ_7745c5c3_Err != nil {
@@ -928,13 +928,13 @@ func MemoFormModal(title string, action string, method string, allStaff []models
 			var templ_7745c5c3_Var47 string
 			templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/memos/table"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 278, Col: 59}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 280, Col: 59}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var47)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('memo-create-modal-container').innerHTML = ''; document.getElementById('memo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', event.target.dataset.memosTableUrl, { target: '#memos-table', swap: 'innerHTML' }) }\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('memo-create-modal-container').innerHTML = ''; document.getElementById('memo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', event.target.dataset.memosTableUrl, { target: '#memos-table', swap: 'innerHTML' }) }\" _=\"on submit call metrics_event('admin_exec', 'save memo')\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -983,7 +983,7 @@ func MemoFormFields(memo models.AdminMemoListItem, allStaff []models.Staff, sele
 		var templ_7745c5c3_Var49 string
 		templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.ResolveAttributeValue(memo.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 294, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 297, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var49)
 		if templ_7745c5c3_Err != nil {
@@ -996,7 +996,7 @@ func MemoFormFields(memo models.AdminMemoListItem, allStaff []models.Staff, sele
 		var templ_7745c5c3_Var50 string
 		templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(memo.Message)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 306, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 309, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 		if templ_7745c5c3_Err != nil {
@@ -1009,7 +1009,7 @@ func MemoFormFields(memo models.AdminMemoListItem, allStaff []models.Staff, sele
 		var templ_7745c5c3_Var51 string
 		templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.ResolveAttributeValue(memo.FileURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 313, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 316, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var51)
 		if templ_7745c5c3_Err != nil {
@@ -1027,7 +1027,7 @@ func MemoFormFields(memo models.AdminMemoListItem, allStaff []models.Staff, sele
 			var templ_7745c5c3_Var52 string
 			templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.ResolveAttributeValue(st.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 323, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 326, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var52)
 			if templ_7745c5c3_Err != nil {
@@ -1050,7 +1050,7 @@ func MemoFormFields(memo models.AdminMemoListItem, allStaff []models.Staff, sele
 			var templ_7745c5c3_Var53 string
 			templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinStringErrs(st.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 323, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 326, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
 			if templ_7745c5c3_Err != nil {
@@ -1121,7 +1121,7 @@ func MemoStartDateField(value string, isEdit bool) templ.Component {
 		var templ_7745c5c3_Var55 string
 		templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.ResolveAttributeValue(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 350, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 353, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var55)
 		if templ_7745c5c3_Err != nil {
@@ -1134,7 +1134,7 @@ func MemoStartDateField(value string, isEdit bool) templ.Component {
 		var templ_7745c5c3_Var56 string
 		templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.ResolveAttributeValue(memoStartDateMin(value, isEdit))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 351, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 354, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var56)
 		if templ_7745c5c3_Err != nil {
@@ -1176,7 +1176,7 @@ func MemoEndDateField(startDate string, value string, isEdit bool) templ.Compone
 		var templ_7745c5c3_Var58 string
 		templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.ResolveAttributeValue(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 373, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 376, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var58)
 		if templ_7745c5c3_Err != nil {
@@ -1189,7 +1189,7 @@ func MemoEndDateField(startDate string, value string, isEdit bool) templ.Compone
 		var templ_7745c5c3_Var59 string
 		templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.ResolveAttributeValue(memoEndDateMin(startDate, isEdit))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 374, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 377, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var59)
 		if templ_7745c5c3_Err != nil {
@@ -1231,7 +1231,7 @@ func MemoStaffChecklist(allStaff []models.Staff, selectedIDs []string, currentSt
 		var templ_7745c5c3_Var61 string
 		templ_7745c5c3_Var61, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", len(allStaff)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 384, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 387, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var61)
 		if templ_7745c5c3_Err != nil {
@@ -1244,7 +1244,7 @@ func MemoStaffChecklist(allStaff []models.Staff, selectedIDs []string, currentSt
 		var templ_7745c5c3_Var62 string
 		templ_7745c5c3_Var62, templ_7745c5c3_Err = templ.JoinStringErrs(memoStaffSelectedLabel(allStaff, selectedIDs))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 403, Col: 118}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 406, Col: 118}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var62))
 		if templ_7745c5c3_Err != nil {
@@ -1262,7 +1262,7 @@ func MemoStaffChecklist(allStaff []models.Staff, selectedIDs []string, currentSt
 			var templ_7745c5c3_Var63 string
 			templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.ResolveAttributeValue(staff.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 438, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 441, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var63)
 			if templ_7745c5c3_Err != nil {
@@ -1285,7 +1285,7 @@ func MemoStaffChecklist(allStaff []models.Staff, selectedIDs []string, currentSt
 			var templ_7745c5c3_Var64 string
 			templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.JoinStringErrs(memoStaffDisplayName(staff.FullName, staff.ID, currentStaffID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 442, Col: 115}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 445, Col: 115}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var64))
 			if templ_7745c5c3_Err != nil {
@@ -1298,7 +1298,7 @@ func MemoStaffChecklist(allStaff []models.Staff, selectedIDs []string, currentSt
 			var templ_7745c5c3_Var65 string
 			templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.JoinStringErrs(staff.Email)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 443, Col: 64}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 446, Col: 64}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var65))
 			if templ_7745c5c3_Err != nil {
@@ -1311,7 +1311,7 @@ func MemoStaffChecklist(allStaff []models.Staff, selectedIDs []string, currentSt
 			var templ_7745c5c3_Var66 string
 			templ_7745c5c3_Var66, templ_7745c5c3_Err = templ.JoinStringErrs(staff.Position)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 444, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 447, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var66))
 			if templ_7745c5c3_Err != nil {
@@ -1324,7 +1324,7 @@ func MemoStaffChecklist(allStaff []models.Staff, selectedIDs []string, currentSt
 			var templ_7745c5c3_Var67 string
 			templ_7745c5c3_Var67, templ_7745c5c3_Err = templ.JoinStringErrs(staff.UserType.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 445, Col: 76}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/memos.templ`, Line: 448, Col: 76}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var67))
 			if templ_7745c5c3_Err != nil {

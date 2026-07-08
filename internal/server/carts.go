@@ -655,6 +655,11 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Cart Finalize Handler]"
 	ctx := r.Context()
 
+	checkoutResult := metrics.CheckoutResultFailure
+	defer func() {
+		metrics.Cart.CheckoutAttempt(checkoutResult)
+	}()
+
 	var cartCheckout cart.CartCheckout
 	if err := utils.FormToStruct(r, &cartCheckout); err != nil {
 		logs.LogCtx(ctx).Error(
@@ -815,7 +820,9 @@ func (s *Server) cartsFinalizeHandler(w http.ResponseWriter, r *http.Request) {
 			zap.String("order_number", order.OrderNumber),
 		)
 
-		metrics.ClientEvent.ClientEventHit("checked_payment_method", cartCheckout.PaymentMethod)
+		metrics.ClientEvent.ClientEventHit(metrics.EventCheckedPaymentMethod, cartCheckout.PaymentMethod)
+		metrics.Orders.Created(cartCheckout.PaymentMethod)
+		checkoutResult = metrics.CheckoutResultSuccess
 
 		// Redirect to payment gateway
 		w.Header().Set("HX-Redirect", checkoutURL)

@@ -53,7 +53,7 @@ templ CPointsLoginBanner() {
 }
 
 templ CartPageBody(summaryContent templ.Component, showCPointsBanner bool, shippingPrefill models.CartShippingPrefill) {
-	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
+	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar" _="init call metrics_event('anon_visit', 'cart')">
 		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()
@@ -67,6 +67,7 @@ templ CartPageBody(summaryContent templ.Component, showCPointsBanner bool, shipp
 				hx-post={ utils.URL("/carts/finalize") }
 				hx-swap="none"
 				class="w-full"
+				_="on submit async call metrics_event('anon_exec', 'checkout')"
 			>
 				<div class="flex flex-col lg:flex-row w-full gap-4 justify-center px-2 lg:px-8 my-4">
 					<!-- Column 1: Line Items (full width on mobile, 1/2 on desktop) -->
@@ -384,6 +385,7 @@ templ CartCheckoutLineItem(cl models.CheckoutLine) {
 						group stroke-primary rounded-full p-2
 						cursor-pointer hover:bg-primary-dark
 					"
+					_="on click async call metrics_event('anon_exec', 'remove from cart')"
 				>
 					@svg.Trash("stroke-primary group-hover:stroke-white cursor-pointer")
 				</button>

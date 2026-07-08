@@ -638,7 +638,7 @@ func OrderManageForm(data models.AdminOrderManageModalData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" hx-swap=\"none\" class=\"flex flex-col gap-4\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('order-manage-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/orders/table', { target: '#orders-table', swap: 'innerHTML' }) }\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Status</label> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" hx-swap=\"none\" class=\"flex flex-col gap-4\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('order-manage-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/orders/table', { target: '#orders-table', swap: 'innerHTML' }) }\" _=\"on submit call metrics_event('admin_exec', 'update order status')\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Status</label> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -655,7 +655,7 @@ func OrderManageForm(data models.AdminOrderManageModalData) templ.Component {
 				var templ_7745c5c3_Var29 string
 				templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.ResolveAttributeValue(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 245, Col: 30}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 246, Col: 30}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
 				if templ_7745c5c3_Err != nil {
@@ -678,7 +678,7 @@ func OrderManageForm(data models.AdminOrderManageModalData) templ.Component {
 				var templ_7745c5c3_Var30 string
 				templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 248, Col: 24}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 249, Col: 24}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 				if templ_7745c5c3_Err != nil {
@@ -701,7 +701,7 @@ func OrderManageForm(data models.AdminOrderManageModalData) templ.Component {
 			var templ_7745c5c3_Var31 string
 			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.CurrentStatus.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 253, Col: 74}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 254, Col: 74}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var31)
 			if templ_7745c5c3_Err != nil {
@@ -719,7 +719,7 @@ func OrderManageForm(data models.AdminOrderManageModalData) templ.Component {
 				var templ_7745c5c3_Var32 string
 				templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.ResolveAttributeValue(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 261, Col: 30}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 262, Col: 30}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
 				if templ_7745c5c3_Err != nil {
@@ -742,7 +742,7 @@ func OrderManageForm(data models.AdminOrderManageModalData) templ.Component {
 				var templ_7745c5c3_Var33 string
 				templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 264, Col: 24}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 265, Col: 24}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 				if templ_7745c5c3_Err != nil {
@@ -794,7 +794,7 @@ func OrderTrackModal(data models.AdminOrderTrackModalData) templ.Component {
 		var templ_7745c5c3_Var35 string
 		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(data.OrderReference)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 327, Col: 119}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 328, Col: 119}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 		if templ_7745c5c3_Err != nil {
@@ -859,7 +859,7 @@ func OrderTrackHistoryTable(history []models.AdminOrderStatusHistoryEntry) templ
 				var templ_7745c5c3_Var37 string
 				templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(entry.CreatedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 363, Col: 86}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 364, Col: 86}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 				if templ_7745c5c3_Err != nil {
@@ -888,7 +888,7 @@ func OrderTrackHistoryTable(history []models.AdminOrderStatusHistoryEntry) templ
 				var templ_7745c5c3_Var38 string
 				templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(entry.StaffName)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 370, Col: 68}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 371, Col: 68}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 				if templ_7745c5c3_Err != nil {
@@ -901,7 +901,7 @@ func OrderTrackHistoryTable(history []models.AdminOrderStatusHistoryEntry) templ
 				var templ_7745c5c3_Var39 string
 				templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(entry.Notes)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 371, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 372, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 				if templ_7745c5c3_Err != nil {
@@ -1089,7 +1089,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var44 string
 				templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 421, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 422, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 				if templ_7745c5c3_Err != nil {
@@ -1107,7 +1107,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var45 string
 				templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 425, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 426, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 				if templ_7745c5c3_Err != nil {
@@ -1127,7 +1127,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var46 string
 				templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 431, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 432, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var46))
 				if templ_7745c5c3_Err != nil {
@@ -1145,7 +1145,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var47 string
 				templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 435, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 436, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
 				if templ_7745c5c3_Err != nil {
@@ -1165,7 +1165,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var48 string
 				templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 441, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 442, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var48))
 				if templ_7745c5c3_Err != nil {
@@ -1183,7 +1183,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var49 string
 				templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 445, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 446, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var49))
 				if templ_7745c5c3_Err != nil {
@@ -1203,7 +1203,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var50 string
 				templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 451, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 452, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 				if templ_7745c5c3_Err != nil {
@@ -1221,7 +1221,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var51 string
 				templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 455, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 456, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var51))
 				if templ_7745c5c3_Err != nil {
@@ -1241,7 +1241,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var52 string
 				templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 461, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 462, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var52))
 				if templ_7745c5c3_Err != nil {
@@ -1259,7 +1259,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var53 string
 				templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 465, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 466, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
 				if templ_7745c5c3_Err != nil {
@@ -1279,7 +1279,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var54 string
 				templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 471, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 472, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
 				if templ_7745c5c3_Err != nil {
@@ -1297,7 +1297,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var55 string
 				templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 475, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 476, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var55))
 				if templ_7745c5c3_Err != nil {
@@ -1317,7 +1317,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var56 string
 				templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 481, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 482, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var56))
 				if templ_7745c5c3_Err != nil {
@@ -1335,7 +1335,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var57 string
 				templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 485, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 486, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var57))
 				if templ_7745c5c3_Err != nil {
@@ -1355,7 +1355,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var58 string
 				templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 491, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 492, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var58))
 				if templ_7745c5c3_Err != nil {
@@ -1373,7 +1373,7 @@ func OrderStatusPill(status enums.OrderStatus, isCurrent bool) templ.Component {
 				var templ_7745c5c3_Var59 string
 				templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 495, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 496, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var59))
 				if templ_7745c5c3_Err != nil {
@@ -1419,7 +1419,7 @@ func OrderStatus(status enums.OrderStatus) templ.Component {
 			var templ_7745c5c3_Var61 string
 			templ_7745c5c3_Var61, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 504, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 505, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var61))
 			if templ_7745c5c3_Err != nil {
@@ -1437,7 +1437,7 @@ func OrderStatus(status enums.OrderStatus) templ.Component {
 			var templ_7745c5c3_Var62 string
 			templ_7745c5c3_Var62, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 506, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 507, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var62))
 			if templ_7745c5c3_Err != nil {
@@ -1455,7 +1455,7 @@ func OrderStatus(status enums.OrderStatus) templ.Component {
 			var templ_7745c5c3_Var63 string
 			templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 508, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 509, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var63))
 			if templ_7745c5c3_Err != nil {
@@ -1473,7 +1473,7 @@ func OrderStatus(status enums.OrderStatus) templ.Component {
 			var templ_7745c5c3_Var64 string
 			templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 510, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 511, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var64))
 			if templ_7745c5c3_Err != nil {
@@ -1491,7 +1491,7 @@ func OrderStatus(status enums.OrderStatus) templ.Component {
 			var templ_7745c5c3_Var65 string
 			templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 512, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 513, Col: 61}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var65))
 			if templ_7745c5c3_Err != nil {
@@ -1509,7 +1509,7 @@ func OrderStatus(status enums.OrderStatus) templ.Component {
 			var templ_7745c5c3_Var66 string
 			templ_7745c5c3_Var66, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 514, Col: 59}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 515, Col: 59}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var66))
 			if templ_7745c5c3_Err != nil {
@@ -1527,7 +1527,7 @@ func OrderStatus(status enums.OrderStatus) templ.Component {
 			var templ_7745c5c3_Var67 string
 			templ_7745c5c3_Var67, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 516, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 517, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var67))
 			if templ_7745c5c3_Err != nil {
@@ -1545,7 +1545,7 @@ func OrderStatus(status enums.OrderStatus) templ.Component {
 			var templ_7745c5c3_Var68 string
 			templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.JoinStringErrs(status.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 518, Col: 48}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 519, Col: 48}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var68))
 			if templ_7745c5c3_Err != nil {
@@ -1624,7 +1624,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var71 string
 		templ_7745c5c3_Var71, templ_7745c5c3_Err = templ.JoinStringErrs(details.Customer.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 535, Col: 85}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 536, Col: 85}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var71))
 		if templ_7745c5c3_Err != nil {
@@ -1637,7 +1637,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var72 string
 		templ_7745c5c3_Var72, templ_7745c5c3_Err = templ.JoinStringErrs(details.Customer.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 536, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 537, Col: 87}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var72))
 		if templ_7745c5c3_Err != nil {
@@ -1650,7 +1650,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var73 string
 		templ_7745c5c3_Var73, templ_7745c5c3_Err = templ.JoinStringErrs(details.Customer.Phone)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 537, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 538, Col: 87}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var73))
 		if templ_7745c5c3_Err != nil {
@@ -1663,7 +1663,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var74 string
 		templ_7745c5c3_Var74, templ_7745c5c3_Err = templ.JoinStringErrs(details.Order.OrderReference)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 543, Col: 103}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 544, Col: 103}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var74))
 		if templ_7745c5c3_Err != nil {
@@ -1684,7 +1684,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var75 string
 		templ_7745c5c3_Var75, templ_7745c5c3_Err = templ.JoinStringErrs(details.Order.Notes)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 548, Col: 84}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 549, Col: 84}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var75))
 		if templ_7745c5c3_Err != nil {
@@ -1697,7 +1697,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var76 string
 		templ_7745c5c3_Var76, templ_7745c5c3_Err = templ.JoinStringErrs(details.Order.Remarks)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 549, Col: 88}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 550, Col: 88}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var76))
 		if templ_7745c5c3_Err != nil {
@@ -1710,7 +1710,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var77 string
 		templ_7745c5c3_Var77, templ_7745c5c3_Err = templ.JoinStringErrs(details.Order.CreatedAt)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 550, Col: 93}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 551, Col: 93}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var77))
 		if templ_7745c5c3_Err != nil {
@@ -1723,7 +1723,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var78 string
 		templ_7745c5c3_Var78, templ_7745c5c3_Err = templ.JoinStringErrs(details.Order.UpdatedAt)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 551, Col: 93}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 552, Col: 93}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var78))
 		if templ_7745c5c3_Err != nil {
@@ -1736,7 +1736,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var79 string
 		templ_7745c5c3_Var79, templ_7745c5c3_Err = templ.JoinStringErrs(details.Order.EarnedCPoints)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 552, Col: 102}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 553, Col: 102}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var79))
 		if templ_7745c5c3_Err != nil {
@@ -1749,7 +1749,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var80 string
 		templ_7745c5c3_Var80, templ_7745c5c3_Err = templ.JoinStringErrs(details.Payment.Gateway)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 558, Col: 90}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 559, Col: 90}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var80))
 		if templ_7745c5c3_Err != nil {
@@ -1762,7 +1762,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var81 string
 		templ_7745c5c3_Var81, templ_7745c5c3_Err = templ.JoinStringErrs(details.Payment.Status)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 559, Col: 88}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 560, Col: 88}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var81))
 		if templ_7745c5c3_Err != nil {
@@ -1775,7 +1775,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var82 string
 		templ_7745c5c3_Var82, templ_7745c5c3_Err = templ.JoinStringErrs(details.Payment.ReferenceNumber)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 560, Col: 107}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 561, Col: 107}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var82))
 		if templ_7745c5c3_Err != nil {
@@ -1788,7 +1788,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var83 string
 		templ_7745c5c3_Var83, templ_7745c5c3_Err = templ.JoinStringErrs(details.Payment.PaymentMethod)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 561, Col: 103}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 562, Col: 103}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var83))
 		if templ_7745c5c3_Err != nil {
@@ -1801,7 +1801,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var84 string
 		templ_7745c5c3_Var84, templ_7745c5c3_Err = templ.JoinStringErrs(details.Payment.TotalAmount)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 562, Col: 99}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 563, Col: 99}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var84))
 		if templ_7745c5c3_Err != nil {
@@ -1814,7 +1814,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var85 string
 		templ_7745c5c3_Var85, templ_7745c5c3_Err = templ.JoinStringErrs(details.Payment.PaidAt)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 563, Col: 89}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 564, Col: 89}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var85))
 		if templ_7745c5c3_Err != nil {
@@ -1827,7 +1827,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var86 string
 		templ_7745c5c3_Var86, templ_7745c5c3_Err = templ.JoinStringErrs(details.Payment.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 564, Col: 120}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 565, Col: 120}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var86))
 		if templ_7745c5c3_Err != nil {
@@ -1840,7 +1840,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var87 string
 		templ_7745c5c3_Var87, templ_7745c5c3_Err = templ.JoinStringErrs(details.Payment.MetadataNotes)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 565, Col: 103}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 566, Col: 103}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var87))
 		if templ_7745c5c3_Err != nil {
@@ -1853,7 +1853,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var88 string
 		templ_7745c5c3_Var88, templ_7745c5c3_Err = templ.JoinStringErrs(details.Payment.MetadataRemarks)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 566, Col: 107}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 567, Col: 107}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var88))
 		if templ_7745c5c3_Err != nil {
@@ -1866,7 +1866,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var89 string
 		templ_7745c5c3_Var89, templ_7745c5c3_Err = templ.JoinStringErrs(details.Payment.CustomerNumber)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 567, Col: 105}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 568, Col: 105}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var89))
 		if templ_7745c5c3_Err != nil {
@@ -1887,7 +1887,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var90 string
 		templ_7745c5c3_Var90, templ_7745c5c3_Err = templ.JoinStringErrs(details.Shipping.Service)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 574, Col: 91}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 575, Col: 91}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var90))
 		if templ_7745c5c3_Err != nil {
@@ -1900,7 +1900,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var91 string
 		templ_7745c5c3_Var91, templ_7745c5c3_Err = templ.JoinStringErrs(details.Shipping.OrderID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 575, Col: 101}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 576, Col: 101}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var91))
 		if templ_7745c5c3_Err != nil {
@@ -1913,7 +1913,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var92 string
 		templ_7745c5c3_Var92, templ_7745c5c3_Err = templ.JoinStringErrs(details.Shipping.TrackingNumber)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 576, Col: 106}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 577, Col: 106}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var92))
 		if templ_7745c5c3_Err != nil {
@@ -1926,7 +1926,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var93 string
 		templ_7745c5c3_Var93, templ_7745c5c3_Err = templ.JoinStringErrs(details.Shipping.ETA)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 577, Col: 83}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 578, Col: 83}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var93))
 		if templ_7745c5c3_Err != nil {
@@ -1958,7 +1958,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 				var templ_7745c5c3_Var94 string
 				templ_7745c5c3_Var94, templ_7745c5c3_Err = templ.ResolveAttributeValue(line.ThumbnailURL)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 607, Col: 34}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 608, Col: 34}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var94)
 				if templ_7745c5c3_Err != nil {
@@ -1971,7 +1971,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 				var templ_7745c5c3_Var95 string
 				templ_7745c5c3_Var95, templ_7745c5c3_Err = templ.ResolveAttributeValue(line.Name + " thumbnail")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 608, Col: 41}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 609, Col: 41}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var95)
 				if templ_7745c5c3_Err != nil {
@@ -1984,7 +1984,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 				var templ_7745c5c3_Var96 string
 				templ_7745c5c3_Var96, templ_7745c5c3_Err = templ.JoinStringErrs(line.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 611, Col: 27}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 612, Col: 27}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var96))
 				if templ_7745c5c3_Err != nil {
@@ -1997,7 +1997,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 				var templ_7745c5c3_Var97 string
 				templ_7745c5c3_Var97, templ_7745c5c3_Err = templ.JoinStringErrs(line.Serial)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 614, Col: 65}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 615, Col: 65}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var97))
 				if templ_7745c5c3_Err != nil {
@@ -2010,7 +2010,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 				var templ_7745c5c3_Var98 string
 				templ_7745c5c3_Var98, templ_7745c5c3_Err = templ.JoinStringErrs(line.UnitPrice)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 615, Col: 68}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 616, Col: 68}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var98))
 				if templ_7745c5c3_Err != nil {
@@ -2023,7 +2023,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 				var templ_7745c5c3_Var99 string
 				templ_7745c5c3_Var99, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", line.Quantity))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 616, Col: 86}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 617, Col: 86}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var99))
 				if templ_7745c5c3_Err != nil {
@@ -2036,7 +2036,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 				var templ_7745c5c3_Var100 string
 				templ_7745c5c3_Var100, templ_7745c5c3_Err = templ.JoinStringErrs(line.TotalPrice)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 617, Col: 69}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 618, Col: 69}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var100))
 				if templ_7745c5c3_Err != nil {
@@ -2055,7 +2055,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var101 string
 		templ_7745c5c3_Var101, templ_7745c5c3_Err = templ.JoinStringErrs(details.Summary.Subtotal)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 625, Col: 76}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 626, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var101))
 		if templ_7745c5c3_Err != nil {
@@ -2068,7 +2068,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var102 string
 		templ_7745c5c3_Var102, templ_7745c5c3_Err = templ.JoinStringErrs(details.Summary.Shipping)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 629, Col: 76}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 630, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var102))
 		if templ_7745c5c3_Err != nil {
@@ -2081,7 +2081,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var103 string
 		templ_7745c5c3_Var103, templ_7745c5c3_Err = templ.JoinStringErrs(details.Summary.Discount)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 633, Col: 76}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 634, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var103))
 		if templ_7745c5c3_Err != nil {
@@ -2094,7 +2094,7 @@ func OrderDetailsRows(details models.AdminOrderDetails) templ.Component {
 		var templ_7745c5c3_Var104 string
 		templ_7745c5c3_Var104, templ_7745c5c3_Err = templ.JoinStringErrs(details.Summary.Total)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 637, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 638, Col: 87}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var104))
 		if templ_7745c5c3_Err != nil {
@@ -2136,7 +2136,7 @@ func OrderAddressFields(address models.AdminOrderAddressInfo) templ.Component {
 		var templ_7745c5c3_Var106 string
 		templ_7745c5c3_Var106, templ_7745c5c3_Err = templ.JoinStringErrs(address.Line1)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 647, Col: 85}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 648, Col: 85}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var106))
 		if templ_7745c5c3_Err != nil {
@@ -2149,7 +2149,7 @@ func OrderAddressFields(address models.AdminOrderAddressInfo) templ.Component {
 		var templ_7745c5c3_Var107 string
 		templ_7745c5c3_Var107, templ_7745c5c3_Err = templ.JoinStringErrs(address.Line2)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 648, Col: 85}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 649, Col: 85}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var107))
 		if templ_7745c5c3_Err != nil {
@@ -2162,7 +2162,7 @@ func OrderAddressFields(address models.AdminOrderAddressInfo) templ.Component {
 		var templ_7745c5c3_Var108 string
 		templ_7745c5c3_Var108, templ_7745c5c3_Err = templ.JoinStringErrs(address.City)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 649, Col: 74}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 650, Col: 74}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var108))
 		if templ_7745c5c3_Err != nil {
@@ -2175,7 +2175,7 @@ func OrderAddressFields(address models.AdminOrderAddressInfo) templ.Component {
 		var templ_7745c5c3_Var109 string
 		templ_7745c5c3_Var109, templ_7745c5c3_Err = templ.JoinStringErrs(address.State)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 650, Col: 76}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 651, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var109))
 		if templ_7745c5c3_Err != nil {
@@ -2188,7 +2188,7 @@ func OrderAddressFields(address models.AdminOrderAddressInfo) templ.Component {
 		var templ_7745c5c3_Var110 string
 		templ_7745c5c3_Var110, templ_7745c5c3_Err = templ.JoinStringErrs(address.PostalCode)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 651, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 652, Col: 87}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var110))
 		if templ_7745c5c3_Err != nil {
@@ -2201,7 +2201,7 @@ func OrderAddressFields(address models.AdminOrderAddressInfo) templ.Component {
 		var templ_7745c5c3_Var111 string
 		templ_7745c5c3_Var111, templ_7745c5c3_Err = templ.JoinStringErrs(address.Country)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 652, Col: 80}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/orders.templ`, Line: 653, Col: 80}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var111))
 		if templ_7745c5c3_Err != nil {

@@ -18,6 +18,7 @@ templ CPointsRedeemPage() {
 		</head>
 		<body
 			class="bg-surface min-h-screen flex flex-col"
+			_="init call metrics_event('anon_visit', 'cpoints redeem')"
 		>
 			@common.DevRibbon()
 			@common.ErrorBanner()
@@ -36,6 +37,7 @@ templ CPointsRedeemPage() {
 							hx-post={ utils.URL("/cpoints/redeem") }
 							hx-trigger="submit"
 							hx-indicator="#redeem-btn-content"
+							_="on submit call metrics_event('anon_exec', 'redeem cpoints')"
 						>
 							<div>
 								<label for="code" class="block text-sm font-medium text-gray-700">

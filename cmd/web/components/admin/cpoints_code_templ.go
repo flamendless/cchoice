@@ -45,7 +45,7 @@ func AdminCPointsCodePage(code string, redemptionURL string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<script>\n\t\t\t\tfunction copyToClipboard(elementId) {\n\t\t\t\t\tvar copyText = document.getElementById(elementId);\n\t\t\t\t\tcopyText.select();\n\t\t\t\t\tcopyText.setSelectionRange(0, 99999);\n\t\t\t\t\tnavigator.clipboard.writeText(copyText.value);\n\t\t\t\t}\n\t\t\t</script></head><body class=\"bg-surface min-h-screen flex flex-col\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<script>\n\t\t\t\tfunction copyToClipboard(elementId) {\n\t\t\t\t\tvar copyText = document.getElementById(elementId);\n\t\t\t\t\tcopyText.select();\n\t\t\t\t\tcopyText.setSelectionRange(0, 99999);\n\t\t\t\t\tnavigator.clipboard.writeText(copyText.value);\n\t\t\t\t}\n\t\t\t</script></head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'cpoints code')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

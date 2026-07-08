@@ -211,6 +211,7 @@ templ CategoryCreateModal(categories []string) {
 				class="flex flex-col gap-4"
 				data-categories-table-url={ utils.URL("/admin/categories/table") }
 				hx-on::after-request="if(event.detail.successful) { document.getElementById('category-create-modal-container').innerHTML = ''; htmx.ajax('GET', event.target.dataset.categoriesTableUrl, { target: '#categories-table', swap: 'innerHTML' }) }"
+				_="on submit call metrics_event('admin_exec', 'create category')"
 			>
 				<fieldset class="flex flex-col gap-2">
 					<legend class="text-sm font-medium text-gray-700 mb-1">Category type</legend>

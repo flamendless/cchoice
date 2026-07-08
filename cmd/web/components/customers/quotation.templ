@@ -42,7 +42,7 @@ templ QuotationPage(
 				}
 			</style>
 		</head>
-		<body class="bg-surface min-h-screen flex flex-col">
+		<body class="bg-surface min-h-screen flex flex-col" _="init call metrics_event('customer_visit', 'quotation')">
 			@common.DevRibbon()
 			@common.ErrorBanner()
 			@common.SuccessBanner()
@@ -146,6 +146,7 @@ templ QuotationDraftSection(draftLines []models.QuotationLine, summary models.Qu
 										hx-target="#quotation-draft-section"
 										hx-swap="outerHTML"
 										hx-confirm="Remove this item from quotation?"
+										_="on click call metrics_event('customer_exec', 'remove quotation line')"
 									>
 										Remove
 									</button>
@@ -174,6 +175,7 @@ templ QuotationDraftSection(draftLines []models.QuotationLine, summary models.Qu
 						class="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
 						hx-post={ utils.URL("/customer/quotation/submit") }
 						hx-confirm="Submit this quotation draft for review?"
+						_="on click call metrics_event('customer_exec', 'submit quotation')"
 					>
 						Submit for Review
 					</button>
@@ -327,6 +329,7 @@ templ Actions(productID string, productSlug string) {
 				hx-target="#quotation-draft-section"
 				hx-swap="outerHTML"
 				_="
+					on click call metrics_event('customer_exec', 'add quotation line')
 					on htmx:afterRequest
 						if event.detail.successful
 							add .quotation-add-btn-success to me

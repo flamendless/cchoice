@@ -232,6 +232,7 @@ templ OrderManageForm(data models.AdminOrderManageModalData) {
 		hx-swap="none"
 		class="flex flex-col gap-4"
 		hx-on::after-request="if(event.detail.successful) { document.getElementById('order-manage-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/orders/table', { target: '#orders-table', swap: 'innerHTML' }) }"
+		_="on submit call metrics_event('admin_exec', 'update order status')"
 	>
 		<div>
 			<label class="block text-sm font-medium text-gray-700 mb-1">Status</label>

@@ -206,6 +206,7 @@ templ ProductsExportModal(brands []models.AdminBrand) {
 						type="submit"
 						id="products-export-submit-btn"
 						class="export-field px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
+						_="on click call metrics_event('admin_exec', 'run export')"
 					>
 						Export
 					</button>

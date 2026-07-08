@@ -19,7 +19,7 @@ templ SuccessPaymentPage(body templ.Component) {
 }
 
 templ SuccessPaymentPageBody(orderRefNumber string, earnedCPoints int64) {
-	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
+	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar" _="init call metrics_event('anon_visit', 'payment success')">
 		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()

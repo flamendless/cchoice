@@ -148,7 +148,7 @@ templ OrderTrackerSearchBoxPlain() {
 }
 
 templ OrderTrackerPageBody(orderNo string, status enums.OrderStatus, deliveryETA string, email string, mobileNo string) {
-	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
+	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar" _="init call metrics_event('anon_visit', 'order tracker')">
 		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()
@@ -216,7 +216,7 @@ templ OrderTrackerStatus(status enums.OrderStatus) {
 }
 
 templ OrderTrackerPageBodyError(orderNo string, email string, mobileNo string) {
-	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
+	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar" _="init call metrics_event('anon_visit', 'order tracker')">
 		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()

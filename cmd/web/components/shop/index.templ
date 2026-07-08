@@ -17,7 +17,7 @@ templ HomePage(data models.HomePageData) {
 }
 
 templ HomePageBody(data models.HomePageData) {
-	<body class="m-0 p-0 custom-scrollbar" style="overflow-x: clip;">
+	<body class="m-0 p-0 custom-scrollbar" style="overflow-x: clip;" _="init call metrics_event('anon_visit', 'homepage')">
 		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()

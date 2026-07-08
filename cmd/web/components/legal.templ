@@ -13,7 +13,7 @@ templ TermsPage() {
 			@common.HeadMeta()
 			@common.TabTitle("Terms and Conditions")
 		</head>
-		<body class="m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-gray-900 my-16">
+		<body class="m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-gray-900 my-16" _="init call metrics_event('anon_visit', 'terms')">
 			@common.DevRibbon()
 			<div class="flex-1 py-8 px-4">
 				<div class="max-w-3xl mx-auto">
@@ -73,7 +73,7 @@ templ PrivacyPage() {
 			@common.HeadMeta()
 			@common.TabTitle("Privacy Policy")
 		</head>
-		<body class="m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-gray-900 my-16">
+		<body class="m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-gray-900 my-16" _="init call metrics_event('anon_visit', 'privacy')">
 			@common.DevRibbon()
 			<div class="flex-1 py-8 px-4">
 				<div class="max-w-3xl mx-auto">
