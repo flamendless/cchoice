@@ -1328,12 +1328,12 @@ func Shopee(cls string) templ.Component {
 			templ_7745c5c3_Var80 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var81 = []any{fmt.Sprintf("size-12 %s", cls)}
+		var templ_7745c5c3_Var81 = []any{cls}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var81...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-4 -3 32 30\" preserveAspectRatio=\"xMidYMid meet\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1346,7 +1346,7 @@ func Shopee(cls string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "\" fill=\"currentColor\"><path d=\"M6.852 5.978a1.008 1.008 0 00-.883.128 10.87 10.87 0 00-3.628 2.584 1.007 1.007 0 00.128 1.395c.196.23.462.353.73.353.284 0 .568-.1.77-.296a12.23 12.23 0 011.623.534c.074.037.148.053.296.053h.118a.864.864 0 01.626.26.864.864 0 01.26.626v.592a.864.864 0 01-.26.626.864.864 0 01-.626.26h-.165a1.048 1.048 0 00-.655-.177c-.39.04-.77.177-1.152.413a9.343 9.343 0 00-.994 3.546H5.24a1.008 1.008 0 00-.997.883 9.358 9.358 0 00.296 3.433 1.005 1.005 0 00.998.884h.867a1.005 1.005 0 00.884-.998 9.343 9.343 0 00-.296-3.433 7.572 7.572 0 01-1.152-.413 1.038 1.038 0 00-.644.165.876.876 0 01-.578-.165v-.59c0-.237-.097-.46-.272-.627a.864.864 0 01-.165-.628v-.118a.852.852 0 01.272-.626c.157-.166.38-.272.628-.165.237.08.475.165.72.237.566.165 1.157.33 1.772.33.64 0 1.245-.18 1.772-.356.553-.186 1.036-.443 1.456-.75a.996.996 0 00.443-.772.992.992 0 00-.413-.772 9.395 9.395 0 00-3.255-2.252 1.005 1.005 0 00-.772.165 10.906 10.906 0 00.048 2.476c-.04 0-.08.008-.128.008-.276 0-.546-.088-.772-.26a1.13 1.13 0 01-.524-.74 1.01 1.01 0 01.177-.964z\"></path></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "\" fill=\"currentColor\"><path d=\"M13.976 20.5c-.65.265-1.35.385-2.051.352a6.628 6.628 0 01-2.802-.725 6.992 6.992 0 01-1.124-.772c-.09-.075-.1-.123-.04-.207.16-.243.273-.404.455-.671.06-.093.159-.101.256-.025.049.039-.1-.074.141.11.933.73 2.02 1.151 3.116 1.194 1.526-.021 2.623-.707 2.82-1.76.216-1.16-.694-2.162-2.475-2.72-.557-.175-1.965-.738-2.224-.89-1.22-.716-1.79-1.653-1.708-2.81.124-1.604 1.613-2.8 3.494-2.808a6.36 6.36 0 012.488.513c.286.12.795.398.971.53.102.074.122.16.064.254l-.388.622c-.06.089-.129.097-.235.03a5.224 5.224 0 00-2.872-.893c-1.31.026-2.292.806-2.357 1.868-.017.96.702 1.66 2.257 2.194 3.154 1.013 4.362 2.202 4.134 4.076-.14 1.152-.838 2.075-1.92 2.538zm1.831-14.71H8.194C8.272 3.35 9.947 1.401 12 1.402c2.054 0 3.728 1.948 3.807 4.388zm6.367.001H17.24C17.119 2.57 14.82 0 12 0 9.181 0 6.882 2.569 6.76 5.79H1.82a.457.457 0 00-.446.495c.241 5.49.496 11.014.711 15.722.107 1.08.894 1.953 1.96 1.993h15.752c1.086-.03 1.964-.913 2.057-2.007.26-5.233.518-10.482.776-15.731a.46.46 0 00-.456-.471Z\"></path></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1375,12 +1375,12 @@ func Lazada(cls string) templ.Component {
 			templ_7745c5c3_Var83 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var84 = []any{fmt.Sprintf("size-12 %s", cls)}
+		var templ_7745c5c3_Var84 = []any{cls}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var84...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 192 192\" fill=\"none\" class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 192 192\" preserveAspectRatio=\"xMidYMid meet\" fill=\"none\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1422,12 +1422,12 @@ func TikTok(cls string) templ.Component {
 			templ_7745c5c3_Var86 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var87 = []any{fmt.Sprintf("size-12 %s", cls)}
+		var templ_7745c5c3_Var87 = []any{cls}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var87...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-1 -1 17 19\" preserveAspectRatio=\"xMidYMid meet\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -17,6 +17,7 @@ const (
 	PatternSerialNumber      = `[a-zA-Z0-9\-_]+`
 	PatternMultipleSpaces    = `\s+`
 	PatternStaffLogSuccessID = `success\. ID '([^']+)'`
+	PatternExternalURL       = `https?://[^\s]+`
 )
 
 var (
@@ -29,6 +30,7 @@ var (
 	ReMobileNumber      = regexp.MustCompile(`^` + PatternMobileNumber + `$`)
 	RePostalCode        = regexp.MustCompile(`^` + PatternPostalCode + `$`)
 	ReStaffLogSuccessID = regexp.MustCompile(`^` + PatternStaffLogSuccessID + `$`)
+	ReExternalURL       = regexp.MustCompile(`^` + PatternExternalURL + `$`)
 )
 
 var YoutubePatterns = []*regexp.Regexp{

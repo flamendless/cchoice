@@ -1,0 +1,40 @@
+package product
+
+import (
+	"cchoice/cmd/web/components/svg"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/enums"
+	"fmt"
+)
+
+templ ProductExternalPlatformLinks(data models.ProductPageData) {
+	if len(data.ExternalLinks) > 0 {
+		<div class="flex flex-wrap items-center gap-3">
+			<span class="text-sm font-medium text-gray-600">Also available on:</span>
+			for _, link := range data.ExternalLinks {
+				<a
+					href={ link.URL }
+					target="_blank"
+					rel="noopener"
+					aria-label={ fmt.Sprintf("View on %s", link.Platform.String()) }
+					title={ fmt.Sprintf("View on %s", link.Platform.String()) }
+					class="inline-flex shrink-0 items-center justify-center w-16 h-16 rounded-lg border border-primary p-3 text-primary hover:bg-primary/5 transition-colors"
+					_={ fmt.Sprintf("on click async call metrics_event('product_external_link_click', '%s:%s')", data.ProductID, link.Platform.String()) }
+				>
+					@ExternalPlatformIcon(link.Platform)
+				</a>
+			}
+		</div>
+	}
+}
+
+templ ExternalPlatformIcon(platform enums.ExternalPlatform) {
+	switch platform {
+		case enums.EXTERNAL_PLATFORM_LAZADA:
+			@svg.Lazada("size-8 shrink-0 text-primary")
+		case enums.EXTERNAL_PLATFORM_TIKTOK:
+			@svg.TikTok("size-8 shrink-0 text-primary")
+		case enums.EXTERNAL_PLATFORM_SHOPEE:
+			@svg.Shopee("size-8 shrink-0 text-primary")
+	}
+}

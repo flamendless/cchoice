@@ -9,6 +9,11 @@ type ProductSpecsInput struct {
 	WeightUnit                               string
 }
 
+type ExternalPlatformLinkInput struct {
+	Platform string
+	URL      string
+}
+
 type CreateProductInput struct {
 	Serial, Name, Description string
 	BrandID                   string
@@ -23,6 +28,7 @@ type CreateProductInput struct {
 	SaleEndDate               string
 	StocksIn                  enums.StocksIn
 	Stocks                    int64
+	ExternalLinks             []ExternalPlatformLinkInput
 }
 
 type UpdateProductInput struct {
@@ -41,6 +47,7 @@ type UpdateProductInput struct {
 	SaleEndDate           string
 	StocksIn              enums.StocksIn
 	Stocks                int64
+	ExternalLinks         []ExternalPlatformLinkInput
 }
 
 type ProductForEdit struct {
@@ -63,4 +70,5 @@ type ProductForEdit struct {
 	Specs                       ProductSpecsInput
 	StocksIn                    enums.StocksIn
 	Stocks                      int64
+	ExternalLinks               []ExternalPlatformLinkInput
 }
