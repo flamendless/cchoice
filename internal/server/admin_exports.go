@@ -17,6 +17,7 @@ import (
 	"cchoice/internal/requests"
 	"cchoice/internal/utils"
 
+	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 )
 
@@ -120,7 +121,7 @@ func (s *Server) adminExportsProductsHandler(w http.ResponseWriter, r *http.Requ
 	if formatEnum == enums.OUTPUT_FORMAT_UNDEFINED {
 		formatEnum = enums.OUTPUT_FORMAT_CSV
 	}
-	if formatEnum != enums.OUTPUT_FORMAT_CSV {
+	if formatEnum != enums.OUTPUT_FORMAT_CSV && formatEnum != enums.OUTPUT_FORMAT_XLSX {
 		writeExportError(w, http.StatusBadRequest, "unsupported export format")
 		return
 	}
@@ -132,24 +133,49 @@ func (s *Server) adminExportsProductsHandler(w http.ResponseWriter, r *http.Requ
 		strings.ToLower(formatEnum.String()),
 	)
 
-	var buf bytes.Buffer
-	writer := csv.NewWriter(&buf)
-	if err := s.services.export.StreamProductsCSV(ctx, writer, brand, status, sortColumn, sortDirection, adminStaffID, reportName); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		writeExportError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	writer.Flush()
-	if err := writer.Error(); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		writeExportError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
+	switch formatEnum {
+	case enums.OUTPUT_FORMAT_CSV:
+		var buf bytes.Buffer
+		writer := csv.NewWriter(&buf)
+		if err := s.services.export.StreamProductsCSV(ctx, writer, brand, status, sortColumn, sortDirection, adminStaffID, reportName); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			writeExportError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		writer.Flush()
+		if err := writer.Error(); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			writeExportError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
 
-	w.Header().Set("Content-Disposition", "attachment; filename="+reportName)
-	w.Header().Set("Content-Type", "text/csv")
-	if _, err := w.Write(buf.Bytes()); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		w.Header().Set("Content-Disposition", "attachment; filename="+reportName)
+		w.Header().Set("Content-Type", "text/csv")
+		if _, err := w.Write(buf.Bytes()); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		}
+	case enums.OUTPUT_FORMAT_XLSX:
+		file := excelize.NewFile()
+		defer file.Close()
+
+		if err := s.services.export.StreamProductsXLSX(ctx, file, brand, status, sortColumn, sortDirection, adminStaffID, reportName); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			writeExportError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		var buf bytes.Buffer
+		if err := file.Write(&buf); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			writeExportError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		w.Header().Set("Content-Disposition", "attachment; filename="+reportName)
+		w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+		if _, err := w.Write(buf.Bytes()); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		}
 	}
 }
 

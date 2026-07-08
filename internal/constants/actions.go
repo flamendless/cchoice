@@ -28,6 +28,8 @@ const (
 	ModulePasswordReset        = "password_reset"
 	ModuleProducts             = "products"
 	ModuleProductsExportCSV    = "products_export_csv"
+	ModuleProductsExportXLSX   = "products_export_xlsx"
+	ModuleProductsBulkImport   = "products_bulk_import"
 	ModulePromos               = "promos"
 	ModuleStaff                = "staffs"
 	ModuleTimeOff              = "time_off"

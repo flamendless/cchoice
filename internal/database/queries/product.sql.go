@@ -1410,12 +1410,19 @@ func (q *Queries) GetProductsBySearchQueryPaginated(ctx context.Context, arg Get
 
 const getProductsBySerial = `-- name: GetProductsBySerial :one
 SELECT
-	tbl_products.id, serial, tbl_products.name, description, brand_id, tbl_products.status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, slug, tbl_product_categories.id, category, subcategory, promoted_at_homepage, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_product_specs.created_at, tbl_product_specs.updated_at, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
-	tbl_brands.name AS brand_name
+	tbl_products.id, tbl_products.serial, tbl_products.name, tbl_products.description, tbl_products.brand_id, tbl_products.status, tbl_products.product_specs_id, tbl_products.unit_price_without_vat, tbl_products.unit_price_with_vat, tbl_products.unit_price_without_vat_currency, tbl_products.unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, tbl_products.slug,
+	tbl_product_specs.id, tbl_product_specs.colours, tbl_product_specs.sizes, tbl_product_specs.segmentation, tbl_product_specs.part_number, tbl_product_specs.power, tbl_product_specs.capacity, tbl_product_specs.scope_of_supply, tbl_product_specs.weight_unit, tbl_product_specs.weight, tbl_product_specs.created_at, tbl_product_specs.updated_at,
+	tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
+	tbl_brands.name AS brand_name,
+	pc.id,
+	pc.category,
+	pc.subcategory,
+	pc.promoted_at_homepage
 FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
 INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_categories AS pc ON pc.id = tbl_products_categories.category_id
 WHERE tbl_products.serial = ?
 LIMIT 1
 `
@@ -1437,10 +1444,6 @@ type GetProductsBySerialRow struct {
 	DeletedAt                   time.Time
 	Slug                        sql.NullString
 	ID_2                        int64
-	Category                    sql.NullString
-	Subcategory                 sql.NullString
-	PromotedAtHomepage          sql.NullBool
-	ID_3                        int64
 	Colours                     sql.NullString
 	Sizes                       sql.NullString
 	Segmentation                sql.NullString
@@ -1452,13 +1455,17 @@ type GetProductsBySerialRow struct {
 	Weight                      sql.NullFloat64
 	CreatedAt_2                 sql.NullTime
 	UpdatedAt_2                 sql.NullTime
-	ID_4                        int64
+	ID_3                        int64
 	Name_2                      string
 	CreatedAt_3                 time.Time
 	UpdatedAt_3                 time.Time
 	DeletedAt_2                 time.Time
 	Status_2                    string
 	BrandName                   string
+	ID_4                        sql.NullInt64
+	Category                    sql.NullString
+	Subcategory                 sql.NullString
+	PromotedAtHomepage          sql.NullBool
 }
 
 func (q *Queries) GetProductsBySerial(ctx context.Context, serial string) (GetProductsBySerialRow, error) {
@@ -1481,10 +1488,6 @@ func (q *Queries) GetProductsBySerial(ctx context.Context, serial string) (GetPr
 		&i.DeletedAt,
 		&i.Slug,
 		&i.ID_2,
-		&i.Category,
-		&i.Subcategory,
-		&i.PromotedAtHomepage,
-		&i.ID_3,
 		&i.Colours,
 		&i.Sizes,
 		&i.Segmentation,
@@ -1496,13 +1499,17 @@ func (q *Queries) GetProductsBySerial(ctx context.Context, serial string) (GetPr
 		&i.Weight,
 		&i.CreatedAt_2,
 		&i.UpdatedAt_2,
-		&i.ID_4,
+		&i.ID_3,
 		&i.Name_2,
 		&i.CreatedAt_3,
 		&i.UpdatedAt_3,
 		&i.DeletedAt_2,
 		&i.Status_2,
 		&i.BrandName,
+		&i.ID_4,
+		&i.Category,
+		&i.Subcategory,
+		&i.PromotedAtHomepage,
 	)
 	return i, err
 }

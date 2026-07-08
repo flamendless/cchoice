@@ -46,6 +46,7 @@ type Services struct {
 	customer         *services.CustomerService
 	customerOTP      *services.CustomerOTPService
 	export           *services.ExportService
+	productBulkImport *services.ProductBulkImportService
 	passwordReset    *services.PasswordResetService
 	holiday          *services.HolidayService
 	location         *services.LocationService
@@ -198,13 +199,15 @@ func NewServer() *ServerInstance {
 	productCategoryService := services.NewProductCategoryService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService)
 	productService := services.NewProductService(newServer.encoder, newServer.dbRO, newServer.dbRW, newServer.GetCDNURL, productInventoryService, staffLogService)
 	exportService := services.NewExportService(productService, staffLogService)
+	productBulkImportService := services.NewProductBulkImportService(productService, staffLogService)
 
 	newServer.services = Services{
 		attendance:       attendanceService,
 		brand:            services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
 		customer:         services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		customerOTP:      services.NewCustomerOTPService(newServer.encoder, newServer.dbRO, newServer.dbRW, mailService, emailJobRunner),
-		export:           exportService,
+		export:            exportService,
+		productBulkImport: productBulkImportService,
 		passwordReset:    services.NewPasswordResetService(newServer.encoder, newServer.dbRO, newServer.dbRW, emailJobRunner, staffLogService),
 		cpoint:           services.NewCpointService(newServer.encoder, newServer.dbRO, newServer.dbRW, cpointTokenService, staffLogService),
 		cpointToken:      cpointTokenService,
@@ -234,6 +237,7 @@ func NewServer() *ServerInstance {
 		newServer.services.customer,
 		newServer.services.customerOTP,
 		newServer.services.export,
+		newServer.services.productBulkImport,
 		newServer.services.holiday,
 		newServer.services.image,
 		newServer.services.location,
