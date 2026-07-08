@@ -58,7 +58,7 @@ func QuotationPage(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t@keyframes quotation-draft-highlight {\n\t\t\t\t\t0% { box-shadow: 0 0 0 0 rgba(217, 72, 15, 0.5); }\n\t\t\t\t\t50% { box-shadow: 0 0 0 6px rgba(217, 72, 15, 0.2); }\n\t\t\t\t\t100% { box-shadow: 0 0 0 0 rgba(217, 72, 15, 0); }\n\t\t\t\t}\n\t\t\t\t.quotation-draft-updated {\n\t\t\t\t\tanimation: quotation-draft-highlight 0.6s ease-out;\n\t\t\t\t}\n\t\t\t\t@keyframes quotation-add-btn-pulse {\n\t\t\t\t\t0% { transform: scale(1); }\n\t\t\t\t\t50% { transform: scale(1.05); }\n\t\t\t\t\t100% { transform: scale(1); }\n\t\t\t\t}\n\t\t\t\t.quotation-add-btn-success {\n\t\t\t\t\tanimation: quotation-add-btn-pulse 0.3s ease-in-out;\n\t\t\t\t}\n\t\t\t</style></head><body class=\"bg-surface min-h-screen flex flex-col\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t@keyframes quotation-draft-highlight {\n\t\t\t\t\t0% { box-shadow: 0 0 0 0 rgba(217, 72, 15, 0.5); }\n\t\t\t\t\t50% { box-shadow: 0 0 0 6px rgba(217, 72, 15, 0.2); }\n\t\t\t\t\t100% { box-shadow: 0 0 0 0 rgba(217, 72, 15, 0); }\n\t\t\t\t}\n\t\t\t\t.quotation-draft-updated {\n\t\t\t\t\tanimation: quotation-draft-highlight 0.6s ease-out;\n\t\t\t\t}\n\t\t\t\t@keyframes quotation-add-btn-pulse {\n\t\t\t\t\t0% { transform: scale(1); }\n\t\t\t\t\t50% { transform: scale(1.05); }\n\t\t\t\t\t100% { transform: scale(1); }\n\t\t\t\t}\n\t\t\t\t.quotation-add-btn-success {\n\t\t\t\t\tanimation: quotation-add-btn-pulse 0.3s ease-in-out;\n\t\t\t\t}\n\t\t\t</style></head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('customer_visit', 'quotation')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -379,7 +379,7 @@ func QuotationDraftSection(draftLines []models.QuotationLine, summary models.Quo
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" hx-target=\"#quotation-draft-section\" hx-swap=\"outerHTML\" hx-confirm=\"Remove this item from quotation?\">Remove</button></td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" hx-target=\"#quotation-draft-section\" hx-swap=\"outerHTML\" hx-confirm=\"Remove this item from quotation?\" _=\"on click call metrics_event('customer_exec', 'remove quotation line')\">Remove</button></td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -391,7 +391,7 @@ func QuotationDraftSection(draftLines []models.QuotationLine, summary models.Quo
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(summary.TotalItems)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 162, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 163, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -424,13 +424,13 @@ func QuotationDraftSection(draftLines []models.QuotationLine, summary models.Quo
 			var templ_7745c5c3_Var18 string
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/customer/quotation/submit"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 175, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 176, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\" hx-confirm=\"Submit this quotation draft for review?\">Submit for Review</button></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\" hx-confirm=\"Submit this quotation draft for review?\" _=\"on click call metrics_event('customer_exec', 'submit quotation')\">Submit for Review</button></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -494,7 +494,7 @@ func quotationSummaryRow(label string, value string, class ...string) templ.Comp
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 192, Col: 15}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 194, Col: 15}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
@@ -507,7 +507,7 @@ func quotationSummaryRow(label string, value string, class ...string) templ.Comp
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 193, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 195, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
@@ -560,7 +560,7 @@ func QuotationProductsTable(products []models.QuotationProduct) templ.Component 
 			var templ_7745c5c3_Var25 string
 			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(p.BrandName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 219, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 221, Col: 41}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 			if templ_7745c5c3_Err != nil {
@@ -575,7 +575,7 @@ func QuotationProductsTable(products []models.QuotationProduct) templ.Component 
 			var templ_7745c5c3_Var26 string
 			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(strings.TrimPrefix(serial, brandName+"-"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 225, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 227, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 			if templ_7745c5c3_Err != nil {
@@ -588,7 +588,7 @@ func QuotationProductsTable(products []models.QuotationProduct) templ.Component 
 			var templ_7745c5c3_Var27 string
 			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(p.Category)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 227, Col: 40}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 229, Col: 40}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 			if templ_7745c5c3_Err != nil {
@@ -601,7 +601,7 @@ func QuotationProductsTable(products []models.QuotationProduct) templ.Component 
 			var templ_7745c5c3_Var28 string
 			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(p.Subcategory)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 227, Col: 58}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 229, Col: 58}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 			if templ_7745c5c3_Err != nil {
@@ -619,7 +619,7 @@ func QuotationProductsTable(products []models.QuotationProduct) templ.Component 
 				var templ_7745c5c3_Var29 string
 				templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(p.PriceDisplay)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 231, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 233, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 				if templ_7745c5c3_Err != nil {
@@ -632,7 +632,7 @@ func QuotationProductsTable(products []models.QuotationProduct) templ.Component 
 				var templ_7745c5c3_Var30 string
 				templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(p.OrigPriceDisplay)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 234, Col: 29}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 236, Col: 29}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 				if templ_7745c5c3_Err != nil {
@@ -650,7 +650,7 @@ func QuotationProductsTable(products []models.QuotationProduct) templ.Component 
 				var templ_7745c5c3_Var31 string
 				templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(p.OrigPriceDisplay)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 238, Col: 29}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 240, Col: 29}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 				if templ_7745c5c3_Err != nil {
@@ -710,20 +710,20 @@ func Actions(productID string, productSlug string) templ.Component {
 		var templ_7745c5c3_Var33 string
 		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URLf("/customer/quotation/product/%s/add", productID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 326, Col: 73}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 328, Col: 73}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var33)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "\" hx-target=\"#quotation-draft-section\" hx-swap=\"outerHTML\" _=\"\n\t\t\t\t\ton htmx:afterRequest\n\t\t\t\t\t\tif event.detail.successful\n\t\t\t\t\t\t\tadd .quotation-add-btn-success to me\n\t\t\t\t\t\t\twait 300ms\n\t\t\t\t\t\t\tremove .quotation-add-btn-success from me\n\t\t\t\t\t\t\tif #quotation-draft-section\n\t\t\t\t\t\t\t\tadd .quotation-draft-updated to #quotation-draft-section\n\t\t\t\t\t\t\t\twait 600ms\n\t\t\t\t\t\t\t\tremove .quotation-draft-updated from #quotation-draft-section\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\">Add to Draft Quotation</button> <a class=\"bg-primary text-white px-2 py-1 rounded-lg font-semibold hover:bg-primary-dark transition-colors cursor-pointer mx-2\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "\" hx-target=\"#quotation-draft-section\" hx-swap=\"outerHTML\" _=\"\n\t\t\t\t\ton click call metrics_event('customer_exec', 'add quotation line')\n\t\t\t\t\ton htmx:afterRequest\n\t\t\t\t\t\tif event.detail.successful\n\t\t\t\t\t\t\tadd .quotation-add-btn-success to me\n\t\t\t\t\t\t\twait 300ms\n\t\t\t\t\t\t\tremove .quotation-add-btn-success from me\n\t\t\t\t\t\t\tif #quotation-draft-section\n\t\t\t\t\t\t\t\tadd .quotation-draft-updated to #quotation-draft-section\n\t\t\t\t\t\t\t\twait 600ms\n\t\t\t\t\t\t\t\tremove .quotation-draft-updated from #quotation-draft-section\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\">Add to Draft Quotation</button> <a class=\"bg-primary text-white px-2 py-1 rounded-lg font-semibold hover:bg-primary-dark transition-colors cursor-pointer mx-2\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var34 templ.SafeURL
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URLf("/product/%s", productSlug))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 348, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `customers/quotation.templ`, Line: 351, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {

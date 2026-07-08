@@ -45,7 +45,7 @@ func CPointsRedeemPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t#redeem-btn-content #redeem-spinner { display: none; }\n\t\t\t\t#redeem-btn-content.htmx-request #redeem-spinner { display: inline-block; }\n\t\t\t\t#redeem-btn-content.htmx-request .redeem-btn-text { display: none; }\n\t\t\t</style></head><body class=\"bg-surface min-h-screen flex flex-col\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t\t#redeem-btn-content #redeem-spinner { display: none; }\n\t\t\t\t#redeem-btn-content.htmx-request #redeem-spinner { display: inline-block; }\n\t\t\t\t#redeem-btn-content.htmx-request .redeem-btn-text { display: none; }\n\t\t\t</style></head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('anon_visit', 'cpoints redeem')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -76,7 +76,7 @@ func CPointsRedeemPage() templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/cpoints/redeem"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cpoints/redeem.templ`, Line: 33, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cpoints/redeem.templ`, Line: 34, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -89,13 +89,13 @@ func CPointsRedeemPage() templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/cpoints/redeem"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cpoints/redeem.templ`, Line: 36, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cpoints/redeem.templ`, Line: 37, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" hx-trigger=\"submit\" hx-indicator=\"#redeem-btn-content\"><div><label for=\"code\" class=\"block text-sm font-medium text-gray-700\">C-Points Code</label> <input type=\"text\" id=\"code\" name=\"code\" required pattern=\"^CP-[A-Z0-9]{3}-[A-Z0-9]{3}-[A-Z0-9]{3}$\" placeholder=\"CP-XXX-XXX-XXX\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary uppercase\"><p class=\"mt-1 text-xs text-gray-500\">Format: CP-XXX-XXX-XXX (e.g., CP-ABC-123-DEF)</p></div><button type=\"submit\" class=\"w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary\"><span id=\"redeem-btn-content\" class=\"inline-flex items-center gap-2\"><span id=\"redeem-spinner\" class=\"w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0\" aria-hidden=\"true\"></span> <span class=\"redeem-btn-text\">Redeem</span></span></button></form></div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" hx-trigger=\"submit\" hx-indicator=\"#redeem-btn-content\" _=\"on submit call metrics_event('anon_exec', 'redeem cpoints')\"><div><label for=\"code\" class=\"block text-sm font-medium text-gray-700\">C-Points Code</label> <input type=\"text\" id=\"code\" name=\"code\" required pattern=\"^CP-[A-Z0-9]{3}-[A-Z0-9]{3}-[A-Z0-9]{3}$\" placeholder=\"CP-XXX-XXX-XXX\" class=\"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary uppercase\"><p class=\"mt-1 text-xs text-gray-500\">Format: CP-XXX-XXX-XXX (e.g., CP-ABC-123-DEF)</p></div><button type=\"submit\" class=\"w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary\"><span id=\"redeem-btn-content\" class=\"inline-flex items-center gap-2\"><span id=\"redeem-spinner\" class=\"w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0\" aria-hidden=\"true\"></span> <span class=\"redeem-btn-text\">Redeem</span></span></button></form></div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -61,6 +61,7 @@ templ HolidaysCreateForm() {
 			hx-target="#holidays-table"
 			hx-swap="innerHTML"
 			class="flex flex-wrap gap-3 items-end"
+			_="on submit call metrics_event('admin_exec', 'create holiday')"
 		>
 			<div>
 				<label class="block text-sm font-medium text-gray-700">Date</label>
@@ -195,6 +196,7 @@ templ HolidayActionsCell(holiday models.AdminHolidayListItem) {
 			hx-target={ fmt.Sprintf("#holiday-row-%s", holiday.ID) }
 			hx-swap="outerHTML"
 			hx-confirm="Are you sure you want to delete this holiday?"
+			_="on click call metrics_event('admin_exec', 'delete holiday')"
 		>
 			Delete
 		</button>
@@ -239,6 +241,7 @@ templ HolidayEditForm(holiday models.AdminHolidayListItem) {
 		hx-swap="outerHTML"
 		class="flex flex-col gap-2 w-full"
 		hx-on::after-request="if(event.detail.successful) { document.getElementById('holiday-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/holidays/table', { target: '#holidays-table', swap: 'innerHTML' }) }"
+		_="on submit call metrics_event('admin_exec', 'update holiday')"
 	>
 		<div class="hidden">
 			<input type="text" name="id" value={ holiday.ID }/>

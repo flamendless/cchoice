@@ -13,6 +13,7 @@ import (
 	"slices"
 	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -116,6 +117,12 @@ func PrometheusMiddleware(next http.Handler) http.Handler {
 		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 
 		next.ServeHTTP(ww, r)
+
+		if routeCtx := chi.RouteContext(r.Context()); routeCtx != nil {
+			if pattern := routeCtx.RoutePattern(); pattern != "" {
+				path = pattern
+			}
+		}
 
 		status := ww.Status()
 

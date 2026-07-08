@@ -160,6 +160,7 @@ templ MemoActionsCell(memo models.AdminMemoListItem, currentStaffID string, isSu
 					title={ memoSendEmailsTooltip(false) }
 					hx-post={ utils.URLf("/admin/memos/%s/send-emails", memo.ID) }
 					hx-confirm="Send notification emails to all recipients?"
+					_="on click call metrics_event('admin_exec', 'send memo emails')"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
@@ -267,6 +268,7 @@ templ MemoFormModal(title string, action string, method string, allStaff []model
 					class="flex flex-col gap-4"
 					data-memos-table-url={ utils.URL("/admin/memos/table") }
 					hx-on::after-request="if(event.detail.successful) { document.getElementById('memo-create-modal-container').innerHTML = ''; document.getElementById('memo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', event.target.dataset.memosTableUrl, { target: '#memos-table', swap: 'innerHTML' }) }"
+					_="on submit call metrics_event('admin_exec', 'save memo')"
 				>
 					@MemoFormFields(memo, allStaff, selectedIDs, currentStaffID, false)
 				</form>
@@ -277,6 +279,7 @@ templ MemoFormModal(title string, action string, method string, allStaff []model
 					class="flex flex-col gap-4"
 					data-memos-table-url={ utils.URL("/admin/memos/table") }
 					hx-on::after-request="if(event.detail.successful) { document.getElementById('memo-create-modal-container').innerHTML = ''; document.getElementById('memo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', event.target.dataset.memosTableUrl, { target: '#memos-table', swap: 'innerHTML' }) }"
+					_="on submit call metrics_event('admin_exec', 'save memo')"
 				>
 					@MemoFormFields(memo, allStaff, selectedIDs, currentStaffID, true)
 				</form>

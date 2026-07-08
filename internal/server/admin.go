@@ -12,6 +12,7 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/metrics"
 	"cchoice/internal/utils"
 
 	"golang.org/x/crypto/bcrypt"
@@ -250,11 +251,13 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	password := r.PostFormValue("password")
 
 	if !constants.ReEmail.MatchString(email) {
+		metrics.Auth.LoginAttempt(metrics.AuthUserTypeAdmin, metrics.AuthResultFailure)
 		redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password format"))
 		return
 	}
 
 	if !constants.RePassword.MatchString(password) {
+		metrics.Auth.LoginAttempt(metrics.AuthUserTypeAdmin, metrics.AuthResultFailure)
 		redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password format"))
 		return
 	}
@@ -262,6 +265,7 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	staff, err := s.dbRO.GetQueries().GetStaffByEmail(ctx, email)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			metrics.Auth.LoginAttempt(metrics.AuthUserTypeAdmin, metrics.AuthResultFailure)
 			redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password"))
 			return
 		}
@@ -271,14 +275,18 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(staff.Password), []byte(password)); err != nil {
+		metrics.Auth.LoginAttempt(metrics.AuthUserTypeAdmin, metrics.AuthResultFailure)
 		redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password"))
 		return
 	}
 
 	if enums.ParseStaffStatusToEnum(staff.Status) == enums.STAFF_STATUS_RESIGNED {
+		metrics.Auth.LoginAttempt(metrics.AuthUserTypeAdmin, metrics.AuthResultFailure)
 		redirectHX(w, r, utils.URLWithError("/admin", errs.ErrStaffResigned.Error()))
 		return
 	}
+
+	metrics.Auth.LoginAttempt(metrics.AuthUserTypeAdmin, metrics.AuthResultSuccess)
 
 	s.sessionManager.Put(ctx, SessionStaffID, s.encoder.Encode(staff.ID))
 

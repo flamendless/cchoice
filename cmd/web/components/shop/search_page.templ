@@ -21,7 +21,7 @@ templ SearchPage(data models.SearchPageData) {
 }
 
 templ SearchPageBody(data models.SearchPageData) {
-	<body class="m-0 p-0 custom-scrollbar" style="overflow-x: clip;">
+	<body class="m-0 p-0 custom-scrollbar" style="overflow-x: clip;" _="init call metrics_event('anon_visit', 'search')">
 		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()

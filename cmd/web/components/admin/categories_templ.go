@@ -585,7 +585,7 @@ func CategoryCreateModal(categories []string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('category-create-modal-container').innerHTML = ''; htmx.ajax('GET', event.target.dataset.categoriesTableUrl, { target: '#categories-table', swap: 'innerHTML' }) }\"><fieldset class=\"flex flex-col gap-2\"><legend class=\"text-sm font-medium text-gray-700 mb-1\">Category type</legend> <label class=\"inline-flex items-center gap-2 cursor-pointer\"><input type=\"radio\" name=\"mode\" value=\"new\" checked onchange=\"toggleCategoryMode('new')\"> <span class=\"text-sm text-gray-700\">New category</span></label> <label class=\"inline-flex items-center gap-2 cursor-pointer\"><input type=\"radio\" name=\"mode\" value=\"existing\" onchange=\"toggleCategoryMode('existing')\"> <span class=\"text-sm text-gray-700\">Existing category</span></label></fieldset><div id=\"category-new-fields\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Category Name <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"category_name\" placeholder=\"Enter category name\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div id=\"category-existing-fields\" class=\"hidden\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Category <span class=\"text-red-500\">*</span></label> <select name=\"category\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"\">Select a category</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('category-create-modal-container').innerHTML = ''; htmx.ajax('GET', event.target.dataset.categoriesTableUrl, { target: '#categories-table', swap: 'innerHTML' }) }\" _=\"on submit call metrics_event('admin_exec', 'create category')\"><fieldset class=\"flex flex-col gap-2\"><legend class=\"text-sm font-medium text-gray-700 mb-1\">Category type</legend> <label class=\"inline-flex items-center gap-2 cursor-pointer\"><input type=\"radio\" name=\"mode\" value=\"new\" checked onchange=\"toggleCategoryMode('new')\"> <span class=\"text-sm text-gray-700\">New category</span></label> <label class=\"inline-flex items-center gap-2 cursor-pointer\"><input type=\"radio\" name=\"mode\" value=\"existing\" onchange=\"toggleCategoryMode('existing')\"> <span class=\"text-sm text-gray-700\">Existing category</span></label></fieldset><div id=\"category-new-fields\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Category Name <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"category_name\" placeholder=\"Enter category name\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"></div><div id=\"category-existing-fields\" class=\"hidden\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Category <span class=\"text-red-500\">*</span></label> <select name=\"category\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"><option value=\"\">Select a category</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -597,7 +597,7 @@ func CategoryCreateModal(categories []string) templ.Component {
 			var templ_7745c5c3_Var25 string
 			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(cat)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/categories.templ`, Line: 247, Col: 26}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/categories.templ`, Line: 248, Col: 26}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 			if templ_7745c5c3_Err != nil {
@@ -610,7 +610,7 @@ func CategoryCreateModal(categories []string) templ.Component {
 			var templ_7745c5c3_Var26 string
 			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(cat)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/categories.templ`, Line: 247, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/categories.templ`, Line: 248, Col: 34}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 			if templ_7745c5c3_Err != nil {

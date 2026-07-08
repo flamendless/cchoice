@@ -11,6 +11,7 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
+	"cchoice/internal/metrics"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
@@ -91,21 +92,26 @@ func (s *Server) customerLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	email := r.PostFormValue("email")
 	if !constants.ReEmail.MatchString(email) {
+		metrics.Auth.LoginAttempt(metrics.AuthUserTypeCustomer, metrics.AuthResultFailure)
 		redirectHX(w, r, utils.URLWithError(page, "Invalid email or password format"))
 		return
 	}
 
 	password := r.PostFormValue("password")
 	if !constants.RePassword.MatchString(password) {
+		metrics.Auth.LoginAttempt(metrics.AuthUserTypeCustomer, metrics.AuthResultFailure)
 		redirectHX(w, r, utils.URLWithError(page, "Invalid email or password format"))
 		return
 	}
 
 	customer, err := s.services.customer.Login(ctx, email, password)
 	if err != nil {
+		metrics.Auth.LoginAttempt(metrics.AuthUserTypeCustomer, metrics.AuthResultFailure)
 		redirectHX(w, r, utils.URLWithError(page, "Invalid email or password"))
 		return
 	}
+
+	metrics.Auth.LoginAttempt(metrics.AuthUserTypeCustomer, metrics.AuthResultSuccess)
 
 	s.sessionManager.Put(ctx, SessionCustomerID, s.encoder.Encode(customer.ID))
 	s.sessionManager.Put(ctx, SessionCustomerAccessID, 0)
@@ -157,11 +163,13 @@ func (s *Server) customerRegisterHandler(w http.ResponseWriter, r *http.Request)
 	companyName := r.PostFormValue("company_name")
 
 	if password != confirmPassword {
+		metrics.Auth.Registration(metrics.AuthResultFailure)
 		redirectHX(w, r, utils.URLWithError(page, "Passwords must match"))
 		return
 	}
 
 	if firstName == "" || lastName == "" || birthdate == "" || sex == "" || email == "" || mobileNo == "" || password == "" || customerType == "" {
+		metrics.Auth.Registration(metrics.AuthResultFailure)
 		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
 		return
 	}
@@ -204,10 +212,12 @@ func (s *Server) customerRegisterHandler(w http.ResponseWriter, r *http.Request)
 		CompanyName:  companyName,
 	}); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		metrics.Auth.Registration(metrics.AuthResultFailure)
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 
+	metrics.Auth.Registration(metrics.AuthResultSuccess)
 	redirectHX(w, r, utils.URLWithSuccess("/customer", "Registration successful! Please log in."))
 }
 

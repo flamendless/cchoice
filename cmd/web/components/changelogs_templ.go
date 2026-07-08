@@ -44,7 +44,7 @@ func ChangeLogs(logs []changelogs.ChangeLog, limit int) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><div class=\"flex flex-col justify-center items-center max-w-5xl mx-auto px-4 py-4 space-y-4\"><div class=\"w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><div class=\"flex flex-col justify-center items-center max-w-5xl mx-auto px-4 py-4 space-y-4\" _=\"init call metrics_event('anon_visit', 'changelogs')\"><div class=\"w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

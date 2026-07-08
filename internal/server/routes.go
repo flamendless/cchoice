@@ -768,7 +768,12 @@ func (s *Server) metricsEventHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "missing event", http.StatusBadRequest)
 		return
 	}
-	value := r.URL.Query().Get("value")
+	if !metrics.IsAllowedClientEvent(event) {
+		http.Error(w, "unknown event", http.StatusBadRequest)
+		return
+	}
+
+	value := metrics.SanitizeClientEventValue(event, r.URL.Query().Get("value"))
 
 	logs.Log().Info(
 		"Got client event",

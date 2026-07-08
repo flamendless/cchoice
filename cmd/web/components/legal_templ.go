@@ -47,7 +47,7 @@ func TermsPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-gray-900 my-16\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-gray-900 my-16\" _=\"init call metrics_event('anon_visit', 'terms')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -130,7 +130,7 @@ func PrivacyPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</head><body class=\"m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-gray-900 my-16\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</head><body class=\"m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-gray-900 my-16\" _=\"init call metrics_event('anon_visit', 'privacy')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -17,7 +17,7 @@ templ CancelPaymentPage(body templ.Component) {
 }
 
 templ CancelPaymentPageBody(orderRefNumber string) {
-	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar">
+	<body class="h-screen m-0 p-0 overflow-x-hidden custom-scrollbar" _="init call metrics_event('anon_visit', 'payment cancel')">
 		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()

@@ -9,7 +9,7 @@ templ TechPage() {
 			@common.HeadMeta()
 			@common.TabTitle("Technology")
 		</head>
-		<body class="m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-gray-900 my-16">
+		<body class="m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-gray-900 my-16" _="init call metrics_event('anon_visit', 'tech')">
 			@common.DevRibbon()
 			<div class="flex-1 py-8 px-4">
 				<div class="max-w-3xl mx-auto">

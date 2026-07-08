@@ -5,6 +5,7 @@ import (
 	"cchoice/cmd/web/components/footer"
 	"cchoice/cmd/web/components/header"
 	"cchoice/cmd/web/models"
+	"fmt"
 )
 
 templ ProductPage(data models.ProductPageData) {
@@ -14,7 +15,7 @@ templ ProductPage(data models.ProductPageData) {
 			@common.HeadMetaBase()
 			@ProductSEO(data.Meta)
 		</head>
-		<body class="min-h-screen flex flex-col bg-white">
+		<body class="min-h-screen flex flex-col bg-white" _={ fmt.Sprintf("init call metrics_event('anon_visit', '%s')", data.ProductID) }>
 			@common.DevRibbon()
 			@common.ErrorBanner()
 			@common.SuccessBanner()

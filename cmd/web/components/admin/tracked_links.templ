@@ -74,6 +74,7 @@ templ TrackedLinksCreateForm() {
 			hx-target="#tracked-links-table"
 			hx-swap="innerHTML"
 			class="flex flex-wrap gap-3 items-end"
+			_="on submit call metrics_event('admin_exec', 'create tracked link')"
 		>
 			<div>
 				<label class="block text-sm font-medium text-gray-700">Name</label>
@@ -336,6 +337,7 @@ templ TrackedLinkActionsCell(link models.AdminTrackedLinkListItem) {
 			hx-target={ fmt.Sprintf("#tracked-link-row-%s", link.ID) }
 			hx-swap="outerHTML"
 			hx-confirm="Are you sure you want to delete this tracked link?"
+			_="on click call metrics_event('admin_exec', 'delete tracked link')"
 		>
 			Delete
 		</button>

@@ -78,6 +78,7 @@ templ RequestTimeOffForm() {
 			hx-post={ utils.URL("/admin/staff/time-off") }
 			hx-trigger="click"
 			hx-swap="none"
+			_="on click call metrics_event('admin_exec', 'submit time off')"
 		>
 			Submit
 		</button>

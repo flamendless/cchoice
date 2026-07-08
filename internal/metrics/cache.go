@@ -50,7 +50,7 @@ var (
 )
 
 func init() {
-	prometheus.MustRegister(headersHit, memHit, reset, linodeAssetHit, linodeAssetError)
+	prometheus.MustRegister(headersHit, headersMiss, memHit, memMiss, reset, linodeAssetHit, linodeAssetError)
 }
 
 type metricsCache struct{}

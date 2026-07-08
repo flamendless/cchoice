@@ -11,7 +11,7 @@ templ AdminCPointsGeneratePage() {
 			@common.HeadMeta()
 			@common.TabTitle("Generate C-Points - C-Choice Admin")
 		</head>
-		<body class="bg-surface min-h-screen flex flex-col">
+		<body class="bg-surface min-h-screen flex flex-col" _="init call metrics_event('admin_visit', 'cpoints generate')">
 			@common.DevRibbon()
 			@common.ErrorBanner()
 			@common.SuccessBanner()

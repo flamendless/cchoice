@@ -11,6 +11,7 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/jobs"
 	"cchoice/internal/logs"
+	"cchoice/internal/metrics"
 	"cchoice/internal/orderhistory"
 	"cchoice/internal/utils"
 
@@ -190,6 +191,8 @@ func OnOrderPaid(ctx context.Context, params OnOrderPaidParams) (*OnOrderPaidRes
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		return nil, err
 	}
+
+	metrics.Orders.Paid()
 
 	logs.LogCtx(ctx).Info(
 		logtag,
