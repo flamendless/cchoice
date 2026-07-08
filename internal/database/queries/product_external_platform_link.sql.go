@@ -7,6 +7,7 @@ package queries
 
 import (
 	"context"
+	"strings"
 )
 
 const createProductExternalPlatformLink = `-- name: CreateProductExternalPlatformLink :one
@@ -65,6 +66,53 @@ ORDER BY platform ASC
 
 func (q *Queries) GetProductExternalPlatformLinksByProductID(ctx context.Context, productID int64) ([]TblProductExternalPlatformLink, error) {
 	rows, err := q.db.QueryContext(ctx, getProductExternalPlatformLinksByProductID, productID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TblProductExternalPlatformLink
+	for rows.Next() {
+		var i TblProductExternalPlatformLink
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProductID,
+			&i.Platform,
+			&i.Url,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getProductExternalPlatformLinksByProductIDs = `-- name: GetProductExternalPlatformLinksByProductIDs :many
+SELECT id, product_id, platform, url, created_at, updated_at
+FROM tbl_product_external_platform_links
+WHERE product_id IN (/*SLICE:product_ids*/?)
+ORDER BY product_id ASC, platform ASC
+`
+
+func (q *Queries) GetProductExternalPlatformLinksByProductIDs(ctx context.Context, productIds []int64) ([]TblProductExternalPlatformLink, error) {
+	query := getProductExternalPlatformLinksByProductIDs
+	var queryParams []interface{}
+	if len(productIds) > 0 {
+		for _, v := range productIds {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:product_ids*/?", strings.Repeat(",?", len(productIds))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:product_ids*/?", "NULL", 1)
+	}
+	rows, err := q.db.QueryContext(ctx, query, queryParams...)
 	if err != nil {
 		return nil, err
 	}

@@ -175,6 +175,11 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_EXPORTS_PRODUCTS)).Get("/admin/exports/products/count", s.adminExportsProductsCountHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_EXPORTS_PRODUCTS)).Post("/admin/exports/products", s.adminExportsProductsHandler)
 
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_EDIT_PRODUCTS)).Get("/admin/imports", s.adminImportsPageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_EDIT_PRODUCTS)).Get("/admin/imports/products/modal", s.adminImportsProductsModalHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_EDIT_PRODUCTS)).Post("/admin/imports/products/preview", s.adminImportsProductsPreviewHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_EDIT_PRODUCTS)).Post("/admin/imports/products/apply", s.adminImportsProductsApplyHandler)
+
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Get("/admin/tracked-links", s.adminTrackedLinksListPageHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Get("/admin/tracked-links/table", s.adminTrackedLinksListTableHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Get("/admin/tracked-links/create", s.adminTrackedLinksCreateModalHandler)

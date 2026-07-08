@@ -52,12 +52,19 @@ LIMIT 1;
 
 -- name: GetProductsBySerial :one
 SELECT
-	*,
-	tbl_brands.name AS brand_name
+	tbl_products.*,
+	tbl_product_specs.*,
+	tbl_brands.*,
+	tbl_brands.name AS brand_name,
+	pc.id,
+	pc.category,
+	pc.subcategory,
+	pc.promoted_at_homepage
 FROM tbl_products
-INNER JOIN tbl_product_categories ON tbl_products.id = tbl_product_categories.product_id
 INNER JOIN tbl_product_specs ON tbl_products.product_specs_id = tbl_product_specs.id
 INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_categories AS pc ON pc.id = tbl_products_categories.category_id
 WHERE tbl_products.serial = ?
 LIMIT 1;
 

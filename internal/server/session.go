@@ -11,6 +11,7 @@ import (
 	"strconv"
 
 	"cchoice/cmd/web/models"
+	"cchoice/internal/services"
 	"cchoice/internal/types"
 
 	"github.com/alexedwards/scs/v2"
@@ -24,10 +25,12 @@ const (
 	skLocationLat            = "location_lat"
 	skLocationLng            = "location_lng"
 	skHomePageFilters        = "home_page_filters"
+	skProductImportPreview   = "product_import_preview"
 )
 
 func init() {
 	gob.Register(models.HomePageFilters{})
+	gob.Register(&services.ProductImportSessionData{})
 }
 
 func AddToCheckoutLineProductIDs(

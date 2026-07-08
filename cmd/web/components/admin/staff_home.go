@@ -55,10 +55,6 @@ var staffCardsWithRoles = []struct {
 		AllowedRole: enums.STAFF_ROLE_MANAGE_PRODUCT_INVENTORIES,
 	},
 	{
-		Card:        models.StaffCard{Link: "/admin/exports", Title: "Exports", Description: "Export data", Icon: svg.Document("text-primary")},
-		AllowedRole: enums.STAFF_ROLE_EXPORTS,
-	},
-	{
 		Card:        models.StaffCard{Link: "/admin/products", Title: "Edit Products", Description: "Edit draft products", Icon: svg.MenuLines("text-primary")},
 		AllowedRole: enums.STAFF_ROLE_EDIT_PRODUCTS,
 	},
@@ -73,6 +69,14 @@ var staffCardsWithRoles = []struct {
 	{
 		Card:        models.StaffCard{Link: "/admin/quotations", Title: "Manage Quotations", Description: "View and approve customer quotations", Icon: svg.Document("text-primary")},
 		AllowedRole: enums.STAFF_ROLE_MANAGE_QUOTATIONS,
+	},
+	{
+		Card:        models.StaffCard{Link: "/admin/imports", Title: "Imports", Description: "Bulk upload", Icon: svg.Document("text-primary")},
+		AllowedRole: enums.STAFF_ROLE_EDIT_PRODUCTS,
+	},
+	{
+		Card:        models.StaffCard{Link: "/admin/exports", Title: "Exports", Description: "Export data", Icon: svg.Document("text-primary")},
+		AllowedRole: enums.STAFF_ROLE_EXPORTS,
 	},
 }
 

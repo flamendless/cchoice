@@ -37,13 +37,15 @@ var staffCards = []models.StaffCard{
 
 	{Link: "/admin/memos", Title: "Manage Memos", Description: "Create and manage staff memorandums", Icon: svg.Document("text-primary")},
 
-	{Link: "/admin/exports", Title: "Exports", Description: "Export data", Icon: svg.Document("text-primary")},
-
 	{Link: "/admin/orders", Title: "Manage Orders", Description: "View and manage customer orders", Icon: svg.Cart("", "text-primary")},
 
 	{Link: "/admin/quotations", Title: "Manage Quotations", Description: "View and approve customer quotations", Icon: svg.Document("text-primary")},
 
 	{Link: "/admin/superuser/customers", Title: "Customers", Description: "View all registered customers", Icon: svg.Group("text-primary")},
+
+	{Link: "/admin/exports", Title: "Exports", Description: "Export data", Icon: svg.Document("text-primary")},
+
+	{Link: "/admin/imports", Title: "Imports", Description: "Bulk upload products", Icon: svg.Document("text-primary")},
 
 	{Link: "/admin/superuser/logs", Title: "Staff Logs", Description: "View staff action logs", Icon: svg.Document("text-primary")},
 	{Link: "/admin/superuser/envs", Title: "Envs", Description: "View application configuration", Icon: svg.Gear("text-primary")},
@@ -122,7 +124,7 @@ func AdminSuperuserHomePage(fullName string, memos []models.StaffMemoCard) templ
 			var templ_7745c5c3_Var2 templ.SafeURL
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL(card.Link))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 65, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 67, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -143,7 +145,7 @@ func AdminSuperuserHomePage(fullName string, memos []models.StaffMemoCard) templ
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(card.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 71, Col: 73}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 73, Col: 73}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -156,7 +158,7 @@ func AdminSuperuserHomePage(fullName string, memos []models.StaffMemoCard) templ
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(card.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 72, Col: 59}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/superuser_home.templ`, Line: 74, Col: 59}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {

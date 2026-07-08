@@ -1,0 +1,415 @@
+package components
+
+import (
+	"fmt"
+
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/components/svg"
+	"cchoice/internal/enums"
+	"cchoice/internal/services"
+	"cchoice/internal/utils"
+)
+
+templ AdminImportsPage(isSuperuser bool, roles []enums.StaffRole, backURL string) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("Imports - C-Choice Admin")
+			<style>
+				@keyframes import-progress {
+					0% { width: 0%; margin-left: 0%; }
+					50% { width: 60%; margin-left: 20%; }
+					100% { width: 0%; margin-left: 100%; }
+				}
+				.import-progress-bar {
+					animation: import-progress 1.5s ease-in-out infinite;
+				}
+			</style>
+		</head>
+		<body
+			class="bg-surface min-h-screen flex flex-col"
+			_="init call metrics_event('admin_visit', 'imports')"
+		>
+			@common.DevRibbon()
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-6xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.AdminStaffHeaderWithBackLink(utils.URL(backURL), "Back to Home")
+						<h1 class="text-2xl font-bold text-center text-primary mb-6">
+							Imports
+						</h1>
+						@ImportsSubcardsSection(isSuperuser, roles)
+					</div>
+				</div>
+			</div>
+			<div id="import-modal-container"></div>
+		</body>
+	</html>
+}
+
+templ ImportsSubcardsSection(isSuperuser bool, roles []enums.StaffRole) {
+	{{ subcards := getImportSubcards(isSuperuser, roles) }}
+	if len(subcards) == 0 {
+		<p class="text-center text-gray-500 py-8">No imports available for your account.</p>
+	} else {
+		<div class="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
+			for _, card := range subcards {
+				<button
+					type="button"
+					class="block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-primary cursor-pointer"
+					hx-get={ utils.URL(card.ModalURL) }
+					hx-target="#import-modal-container"
+					hx-swap="innerHTML"
+				>
+					<div class="flex justify-center mb-4">
+						@svg.Document("text-primary")
+					</div>
+					<h2 class="text-xl font-semibold text-gray-800 mb-2">{ card.Title }</h2>
+					<p class="text-sm text-gray-500">{ card.Description }</p>
+				</button>
+			}
+		</div>
+	}
+}
+
+templ ProductsImportModal() {
+	<div
+		id="products-import-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="
+			on closeModal
+				set #import-modal-container.innerHTML to ''
+		"
+	>
+		<div class="absolute inset-0 bg-black/50" _="on click trigger closeModal"></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-6xl mx-4 overflow-y-auto max-h-[90vh]">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">Bulk Upload Products</h2>
+				<button
+					type="button"
+					id="products-import-close-btn"
+					class="text-gray-400 hover:text-gray-600"
+					_="on click trigger closeModal"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			<div id="products-import-body">
+				@ProductsImportUploadForm()
+			</div>
+			<div id="products-import-result" class="mt-4"></div>
+		</div>
+	</div>
+}
+
+templ ProductsImportUploadForm() {
+	<p class="text-sm text-gray-600 mb-4">
+		Upload a CSV or XLSX file exported from the products export tool. Review the before/after diff, select rows, then apply.
+	</p>
+	<form
+		id="products-import-form"
+		class="flex flex-col gap-4"
+		enctype="multipart/form-data"
+		hx-post={ utils.URL("/admin/imports/products/preview") }
+		hx-target="#products-import-body"
+		hx-swap="innerHTML"
+		hx-encoding="multipart/form-data"
+	>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">File</label>
+			<input
+				type="file"
+				name="file"
+				accept=".csv,.xlsx"
+				required
+				class="import-field w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-white hover:file:bg-primary-dark"
+			/>
+		</div>
+		<div id="products-import-progress" class="hidden">
+			<p class="text-sm text-amber-700 font-medium mb-2">
+				Analyzing file. Do not reload or close this window.
+			</p>
+			<div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+				<div class="import-progress-bar bg-primary h-2 rounded-full"></div>
+			</div>
+		</div>
+		<div class="flex justify-end gap-2 pt-2">
+			<button
+				type="button"
+				class="import-field px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+				_="on click trigger closeModal"
+			>
+				Cancel
+			</button>
+			<button
+				type="submit"
+				class="import-field px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
+				_="on click call metrics_event('admin_exec', 'preview import')"
+			>
+				Preview changes
+			</button>
+		</div>
+	</form>
+	@ProductsImportFormScript()
+}
+
+templ ProductsImportPreview(preview services.BulkImportPreview) {
+	<div class="space-y-4">
+		<div class="rounded-md bg-gray-50 px-3 py-3 text-sm text-gray-700">
+			<p>
+				<span class="font-semibold">{ fmt.Sprintf("%d", preview.TotalRows) }</span> rows parsed —
+				<span class="text-green-700 font-medium">{ fmt.Sprintf("%d", preview.CreateCount) } create</span>,
+				<span class="text-blue-700 font-medium">{ fmt.Sprintf("%d", preview.UpdateCount) } update</span>,
+				<span class="text-gray-500 font-medium">{ fmt.Sprintf("%d", preview.UnchangedCount) } unchanged</span>,
+				<span class="text-red-700 font-medium">{ fmt.Sprintf("%d", preview.ErrorCount) } error</span>
+			</p>
+			<p class="text-gray-500 mt-1">Select the rows you want to save. Blank cells in the file keep existing database values.</p>
+		</div>
+		if preview.SelectableCount == 0 {
+			<p class="text-sm text-amber-700">No rows are available to apply.</p>
+			<button
+				type="button"
+				class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+				hx-get={ utils.URL("/admin/imports/products/modal") }
+				hx-target="#import-modal-container"
+				hx-swap="innerHTML"
+			>
+				Upload another file
+			</button>
+		} else {
+			<form
+				id="products-import-apply-form"
+				class="flex flex-col gap-4"
+				hx-post={ utils.URL("/admin/imports/products/apply") }
+				hx-target="#products-import-result"
+				hx-swap="innerHTML"
+			>
+				<div class="flex items-center justify-between gap-3">
+					<p class="text-sm text-gray-600">
+						<span id="import-selected-count">{ fmt.Sprintf("%d", preview.SelectableCount) }</span>
+						<span> / { fmt.Sprintf("%d", preview.SelectableCount) } selectable</span>
+					</p>
+					<div class="flex items-center gap-3">
+						<button
+							type="button"
+							class="text-sm text-primary hover:underline"
+							_="
+								on click
+									for cb in <.import-row-checkbox/> in #products-import-preview-table
+										set cb.checked to true
+									end
+									call updateImportSelectedCount()
+							"
+						>
+							Select all
+						</button>
+						<button
+							type="button"
+							class="text-sm text-primary hover:underline"
+							_="
+								on click
+									for cb in <.import-row-checkbox/> in #products-import-preview-table
+										set cb.checked to false
+									end
+									call updateImportSelectedCount()
+							"
+						>
+							Deselect all
+						</button>
+					</div>
+				</div>
+				<div
+					id="products-import-preview-table"
+					class="border border-gray-200 rounded-md max-h-[50vh] overflow-auto"
+					_="
+						def updateImportSelectedCount()
+							set selected to 0
+							for cb in <.import-row-checkbox/> in me
+								if cb.checked
+									set selected to selected + 1
+								end
+							end
+							set #import-selected-count.textContent to selected
+						end
+						on change from .import-row-checkbox in me
+							call updateImportSelectedCount()
+					"
+				>
+					<table class="min-w-full divide-y divide-gray-200 text-sm">
+						<thead class="bg-gray-50 sticky top-0">
+							<tr>
+								<th class="px-3 py-2 text-left w-10"></th>
+								<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Line</th>
+								<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Serial</th>
+								<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+								<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+								<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Changes</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-gray-100 bg-white">
+							for _, row := range preview.Rows {
+								@ProductsImportPreviewRow(row)
+							}
+						</tbody>
+					</table>
+				</div>
+				<div id="products-import-apply-progress" class="hidden">
+					<p class="text-sm text-amber-700 font-medium mb-2">
+						Applying selected rows. Do not reload or close this window.
+					</p>
+					<div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+						<div class="import-progress-bar bg-primary h-2 rounded-full"></div>
+					</div>
+				</div>
+				<div class="flex justify-end gap-2 pt-2">
+					<button
+						type="button"
+						class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+						hx-get={ utils.URL("/admin/imports/products/modal") }
+						hx-target="#import-modal-container"
+						hx-swap="innerHTML"
+					>
+						Start over
+					</button>
+					<button
+						type="submit"
+						class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
+						_="on click call metrics_event('admin_exec', 'apply import')"
+					>
+						Apply selected
+					</button>
+				</div>
+			</form>
+		}
+	</div>
+	@ProductsImportApplyFormScript()
+}
+
+templ ProductsImportPreviewRow(row services.BulkImportPreviewRow) {
+	<tr class="align-top">
+		<td class="px-3 py-2">
+			if row.Selectable {
+				<input
+					type="checkbox"
+					name="lines"
+					value={ fmt.Sprintf("%d", row.Line) }
+					checked
+					class="import-row-checkbox rounded border-gray-300 text-primary focus:ring-primary"
+				/>
+			}
+		</td>
+		<td class="px-3 py-2 text-gray-700">{ fmt.Sprintf("%d", row.Line) }</td>
+		<td class="px-3 py-2 text-gray-800 font-medium">{ row.Serial }</td>
+		<td class="px-3 py-2 text-gray-700">{ row.ProductName }</td>
+		<td class="px-3 py-2">
+			@ProductsImportActionBadge(row.Action)
+		</td>
+		<td class="px-3 py-2 text-gray-700">
+			if row.Error != "" {
+				<p class="text-red-600 text-xs">{ row.Error }</p>
+			} else if len(row.Changes) == 0 {
+				<p class="text-gray-400 text-xs">No changes</p>
+			} else {
+				<ul class="space-y-1 text-xs">
+					for _, change := range row.Changes {
+						<li>
+							<span class="font-medium text-gray-800">{ change.Field }:</span>
+							<span class="text-red-600 line-through">{ change.Before }</span>
+							<span class="text-gray-400"> → </span>
+							<span class="text-green-700">{ change.After }</span>
+						</li>
+					}
+				</ul>
+			}
+		</td>
+	</tr>
+}
+
+templ ProductsImportActionBadge(action string) {
+	switch action {
+		case "create":
+			<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Create</span>
+		case "update":
+			<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">Update</span>
+		case "unchanged":
+			<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">Unchanged</span>
+		case "error":
+			<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">Error</span>
+		default:
+			<span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">{ action }</span>
+	}
+}
+
+templ ProductsImportResult(result services.BulkImportResult) {
+	<div class="rounded-md bg-gray-50 px-3 py-3 text-sm text-gray-700 space-y-2">
+		<p>
+			<span class="font-semibold text-green-700">{ fmt.Sprintf("%d", result.Created) }</span> created,
+			<span class="font-semibold text-blue-700">{ fmt.Sprintf("%d", result.Updated) }</span> updated,
+			<span class="font-semibold text-red-700">{ fmt.Sprintf("%d", result.Failed) }</span> failed
+		</p>
+		if len(result.Errors) > 0 {
+			<div class="max-h-64 overflow-y-auto border border-gray-200 rounded-md bg-white p-2">
+				<ul class="space-y-1 text-xs text-red-600">
+					for _, rowErr := range result.Errors {
+						<li>Line { fmt.Sprintf("%d", rowErr.Line) } ({ rowErr.Serial }): { rowErr.Reason }</li>
+					}
+				</ul>
+			</div>
+		}
+	</div>
+}
+
+templ ProductsImportFormScript() {
+	<script>
+		(function () {
+			const form = document.getElementById("products-import-form");
+			if (!form || form.dataset.bound === "1") return;
+			form.dataset.bound = "1";
+
+			const progress = document.getElementById("products-import-progress");
+			const fields = form.querySelectorAll(".import-field");
+
+			form.addEventListener("htmx:beforeRequest", () => {
+				fields.forEach((el) => { el.disabled = true; });
+				if (progress) progress.classList.remove("hidden");
+			});
+
+			form.addEventListener("htmx:afterRequest", () => {
+				fields.forEach((el) => { el.disabled = false; });
+				if (progress) progress.classList.add("hidden");
+			});
+		})();
+	</script>
+}
+
+templ ProductsImportApplyFormScript() {
+	<script>
+		(function () {
+			const form = document.getElementById("products-import-apply-form");
+			if (!form || form.dataset.bound === "1") return;
+			form.dataset.bound = "1";
+
+			const progress = document.getElementById("products-import-apply-progress");
+
+			form.addEventListener("htmx:beforeRequest", (event) => {
+				const checked = form.querySelectorAll(".import-row-checkbox:checked");
+				if (checked.length === 0) {
+					event.preventDefault();
+					alert("Select at least one row to apply.");
+					return;
+				}
+				if (progress) progress.classList.remove("hidden");
+			});
+
+			form.addEventListener("htmx:afterRequest", () => {
+				if (progress) progress.classList.add("hidden");
+			});
+		})();
+	</script>
+}

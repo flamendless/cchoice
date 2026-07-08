@@ -83,6 +83,7 @@ func (s *ProductService) Create(
 	}
 
 	weightVal, weightErr := strconv.ParseFloat(input.Specs.Weight, 64)
+	weightUnit := strings.TrimSpace(input.Specs.WeightUnit)
 	specs, err := s.dbRW.GetQueries().CreateProductSpecs(ctx, queries.CreateProductSpecsParams{
 		Colours:       sql.NullString{String: input.Specs.Colours, Valid: true},
 		Sizes:         sql.NullString{String: input.Specs.Sizes, Valid: true},
@@ -92,7 +93,7 @@ func (s *ProductService) Create(
 		Capacity:      sql.NullString{String: input.Specs.Capacity, Valid: true},
 		ScopeOfSupply: sql.NullString{String: input.Specs.ScopeOfSupply, Valid: true},
 		Weight:        sql.NullFloat64{Float64: weightVal, Valid: weightErr == nil},
-		WeightUnit:    sql.NullString{String: input.Specs.WeightUnit, Valid: true},
+		WeightUnit:    sql.NullString{String: weightUnit, Valid: weightUnit != ""},
 	})
 	if err != nil {
 		return nil, err
@@ -183,6 +184,28 @@ func (s *ProductService) ValidateSerial(ctx context.Context, serial string) (boo
 		return true, nil
 	}
 	return false, nil
+}
+
+func (s *ProductService) GetBySerial(ctx context.Context, serial string) (queries.GetProductsBySerialRow, error) {
+	return s.dbRO.GetQueries().GetProductsBySerial(ctx, serial)
+}
+
+func (s *ProductService) ResolveBrandIDByName(ctx context.Context, brandName string) (string, error) {
+	brandName = strings.TrimSpace(brandName)
+	if brandName == "" {
+		return "", errs.ErrProductBrandRequired
+	}
+
+	brandID, err := s.dbRO.GetQueries().GetBrandsIDByName(ctx, brandName)
+	if err != nil {
+		return "", err
+	}
+
+	return s.encoder.Encode(brandID), nil
+}
+
+func (s *ProductService) EncodeID(id int64) string {
+	return s.encoder.Encode(id)
 }
 
 func (s *ProductService) UpdateStatus(ctx context.Context, productID string, status enums.ProductStatus) error {
@@ -374,6 +397,25 @@ func (s *ProductService) GetForExportAdmin(
 		return nil, err
 	}
 
+	productIDs := make([]int64, 0, len(products))
+	for _, p := range products {
+		productIDs = append(productIDs, p.ID)
+	}
+
+	linksByProduct := make(map[int64]map[string]string)
+	if len(productIDs) > 0 {
+		links, linksErr := s.dbRO.GetQueries().GetProductExternalPlatformLinksByProductIDs(ctx, productIDs)
+		if linksErr != nil {
+			return nil, linksErr
+		}
+		for _, link := range links {
+			if linksByProduct[link.ProductID] == nil {
+				linksByProduct[link.ProductID] = make(map[string]string)
+			}
+			linksByProduct[link.ProductID][link.Platform] = link.Url
+		}
+	}
+
 	rows := make([]ProductExportRow, 0, len(products))
 	for _, p := range products {
 		imageURL := p.CdnUrl.String
@@ -426,6 +468,14 @@ func (s *ProductService) GetForExportAdmin(
 			weightStr = strconv.FormatFloat(p.Weight, 'f', -1, 64)
 		}
 
+		platformLinks := linksByProduct[p.ID]
+		var lazadaURL, tiktokURL, shopeeURL string
+		if platformLinks != nil {
+			lazadaURL = platformLinks[enums.EXTERNAL_PLATFORM_LAZADA.String()]
+			tiktokURL = platformLinks[enums.EXTERNAL_PLATFORM_TIKTOK.String()]
+			shopeeURL = platformLinks[enums.EXTERNAL_PLATFORM_SHOPEE.String()]
+		}
+
 		rows = append(rows, ProductExportRow{
 			Brand:            p.BrandName,
 			Serial:           p.Serial,
@@ -454,6 +504,9 @@ func (s *ProductService) GetForExportAdmin(
 			ThumbnailURL:     thumbnailURL,
 			CreatedAt:        p.CreatedAt.Format(constants.DateTimeLayoutISO),
 			UpdatedAt:        p.UpdatedAt.Format(constants.DateTimeLayoutISO),
+			LazadaURL:        lazadaURL,
+			TiktokURL:        tiktokURL,
+			ShopeeURL:        shopeeURL,
 		})
 	}
 
@@ -537,8 +590,8 @@ func (s *ProductService) GetByIDForEdit(ctx context.Context, productID string) (
 			Weight:        strconv.FormatFloat(product.Weight.Float64, 'f', -1, 64),
 			WeightUnit:    product.WeightUnit.String,
 		},
-		StocksIn: inventory.StocksIn,
-		Stocks:   inventory.Stocks,
+		StocksIn:      inventory.StocksIn,
+		Stocks:        inventory.Stocks,
 		ExternalLinks: externalLinks,
 	}, nil
 }
@@ -574,6 +627,7 @@ func (s *ProductService) Update(ctx context.Context, staffID string, input Updat
 	}
 
 	weightVal, weightErr := strconv.ParseFloat(input.Specs.Weight, 64)
+	weightUnit := strings.TrimSpace(input.Specs.WeightUnit)
 	if err := s.dbRW.GetQueries().UpdateProductSpecs(ctx, queries.UpdateProductSpecsParams{
 		ID:            existingProduct.ProductSpecsID.Int64,
 		Colours:       sql.NullString{String: input.Specs.Colours, Valid: true},
@@ -584,7 +638,7 @@ func (s *ProductService) Update(ctx context.Context, staffID string, input Updat
 		Capacity:      sql.NullString{String: input.Specs.Capacity, Valid: true},
 		ScopeOfSupply: sql.NullString{String: input.Specs.ScopeOfSupply, Valid: true},
 		Weight:        sql.NullFloat64{Float64: weightVal, Valid: weightErr == nil},
-		WeightUnit:    sql.NullString{String: input.Specs.WeightUnit, Valid: true},
+		WeightUnit:    sql.NullString{String: weightUnit, Valid: weightUnit != ""},
 	}); err != nil {
 		return err
 	}

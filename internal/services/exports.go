@@ -4,75 +4,14 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
-	"strconv"
 
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 
+	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 )
-
-type ProductExportRow struct {
-	Brand            string
-	Serial           string
-	Slug             string
-	Status           string
-	Category         string
-	Subcategory      string
-	Name             string
-	UnitPriceWithVat string
-	SalePriceWithVat string
-	SaleStartDate    string
-	SaleEndDate      string
-	Description      string
-	Colours          string
-	Sizes            string
-	Segmentation     string
-	PartNumber       string
-	Power            string
-	Capacity         string
-	Weight           string
-	WeightUnit       string
-	ScopeOfSupply    string
-	StocksIn         string
-	StocksQty        string
-	ImageURL         string
-	ThumbnailURL     string
-	CreatedAt        string
-	UpdatedAt        string
-}
-
-var productExportHeaders = []string{
-	"row number",
-	"brand",
-	"serial number",
-	"product name",
-	"slug",
-	"status",
-	"category",
-	"subcategory",
-	"unit price with vat",
-	"sale price with vat",
-	"sale start date",
-	"sale end date",
-	"description",
-	"colours",
-	"sizes",
-	"segmentation",
-	"part number",
-	"power",
-	"capacity",
-	"weight",
-	"weight unit",
-	"scope of supply",
-	"stocks in",
-	"stocks qty",
-	"product image filename or cdn url",
-	"product image thumbnail filename or cdn url",
-	"created at",
-	"updated at",
-}
 
 type ExportService struct {
 	product  *ProductService
@@ -128,38 +67,79 @@ func (s *ExportService) StreamProductsCSV(
 	}
 
 	for i, row := range rows {
-		if err := writer.Write([]string{
-			strconv.Itoa(i + 1),
-			row.Brand,
-			row.Serial,
-			row.Name,
-			row.Slug,
-			row.Status,
-			row.Category,
-			row.Subcategory,
-			row.UnitPriceWithVat,
-			row.SalePriceWithVat,
-			row.SaleStartDate,
-			row.SaleEndDate,
-			row.Description,
-			row.Colours,
-			row.Sizes,
-			row.Segmentation,
-			row.PartNumber,
-			row.Power,
-			row.Capacity,
-			row.Weight,
-			row.WeightUnit,
-			row.ScopeOfSupply,
-			row.StocksIn,
-			row.StocksQty,
-			row.ImageURL,
-			row.ThumbnailURL,
-			row.CreatedAt,
-			row.UpdatedAt,
-		}); err != nil {
+		if err := writer.Write(productExportRowToStrings(row, i+1)); err != nil {
 			result = err.Error()
 			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *ExportService) StreamProductsXLSX(
+	ctx context.Context,
+	file *excelize.File,
+	brand string,
+	status enums.ProductStatus,
+	sortColumn enums.ProductExportSortColumn,
+	sortDirection enums.ProductExportSortDirection,
+	adminStaffID string,
+	filename string,
+) error {
+	result := fmt.Sprintf("success. filename '%s'", filename)
+	defer func() {
+		if err := s.staffLog.CreateLog(
+			ctx,
+			adminStaffID,
+			constants.ActionExport,
+			constants.ModuleProductsExportXLSX,
+			result,
+			nil,
+		); err != nil {
+			logs.LogCtx(ctx).Error("[ExportService] failed to log products xlsx export", zap.Error(err))
+		}
+	}()
+
+	rows, err := s.product.GetForExportAdmin(ctx, brand, status, sortColumn, sortDirection)
+	if err != nil {
+		result = err.Error()
+		return err
+	}
+
+	const sheet = "Products"
+	if _, err := file.NewSheet(sheet); err != nil {
+		result = err.Error()
+		return err
+	}
+	if err := file.DeleteSheet("Sheet1"); err != nil {
+		result = err.Error()
+		return err
+	}
+
+	for colIdx, header := range productExportHeaders {
+		cell, err := excelize.CoordinatesToCellName(colIdx+1, 1)
+		if err != nil {
+			result = err.Error()
+			return err
+		}
+		if err := file.SetCellValue(sheet, cell, header); err != nil {
+			result = err.Error()
+			return err
+		}
+	}
+
+	for rowIdx, row := range rows {
+		values := productExportRowToStrings(row, rowIdx+1)
+		for colIdx, value := range values {
+			cell, err := excelize.CoordinatesToCellName(colIdx+1, rowIdx+2)
+			if err != nil {
+				result = err.Error()
+				return err
+			}
+			if err := file.SetCellValue(sheet, cell, value); err != nil {
+				result = err.Error()
+				return err
+			}
 		}
 	}
 
