@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
@@ -278,6 +279,12 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		}
 	}
 
+	externalLinks, err := parseExternalPlatformLinksFromForm(r)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
 	product, err := s.services.product.Create(
 		ctx,
 		s.sessionManager.GetString(ctx, SessionStaffID),
@@ -308,6 +315,7 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 			SaleEndDate:         saleEndDate,
 			StocksIn:            stocksIn,
 			Stocks:              stocksQty,
+			ExternalLinks:       externalLinks,
 		})
 	if err != nil || product == nil {
 		err = cmp.Or(err, errs.ErrServerProductNil)
@@ -649,6 +657,7 @@ func (s *Server) adminSuperuserProductsEditPageHandler(w http.ResponseWriter, r 
 		Stocks:        strconv.FormatInt(inventory.Stocks, 10),
 		UpdateURL:     "/admin/superuser/products/" + productID,
 		ListPageURL:   "/admin/superuser/products",
+		ExternalLinks: toAdminProductExternalLinks(product.ExternalLinks),
 	}
 	if product.SalePriceWithVat > 0 {
 		formData.SalePrice = strconv.FormatFloat(float64(product.SalePriceWithVat)/100, 'f', -1, 64)
@@ -805,6 +814,12 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 		return
 	}
 
+	externalLinks, err := parseExternalPlatformLinksFromForm(r)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
 	input := services.UpdateProductInput{
 		ProductID:           productID,
 		BrandID:             brandID,
@@ -823,6 +838,7 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 		SaleEndDate:         saleEndDate,
 		StocksIn:            enums.MustParseStocksInToEnum(r.FormValue("stocks_in")),
 		Stocks:              qty,
+		ExternalLinks:       externalLinks,
 	}
 
 	result := "success"
@@ -991,6 +1007,7 @@ func (s *Server) adminStaffProductsEditPageHandler(w http.ResponseWriter, r *htt
 		DraftPriceOnly: true,
 		UpdateURL:      "/admin/products/" + productID,
 		ListPageURL:    page,
+		ExternalLinks:  toAdminProductExternalLinks(product.ExternalLinks),
 	}
 	if product.SalePriceWithVat > 0 {
 		formData.SalePrice = strconv.FormatFloat(float64(product.SalePriceWithVat)/100, 'f', -1, 64)
@@ -1147,6 +1164,12 @@ func (s *Server) adminStaffProductsUpdateHandler(w http.ResponseWriter, r *http.
 		}
 	}
 
+	externalLinks, err := parseExternalPlatformLinksFromForm(r)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+
 	input := services.UpdateProductInput{
 		ProductID:           productID,
 		BrandID:             brandID,
@@ -1165,6 +1188,7 @@ func (s *Server) adminStaffProductsUpdateHandler(w http.ResponseWriter, r *http.
 		SaleEndDate:         saleEndDate,
 		StocksIn:            product.StocksIn,
 		Stocks:              product.Stocks,
+		ExternalLinks:       externalLinks,
 	}
 
 	result := "success"
@@ -1284,4 +1308,72 @@ func (s *Server) renderAdminProductsListTable(
 		redirectHX(w, r, utils.URLWithError(errorPage, err.Error()))
 		return
 	}
+}
+
+func parseExternalPlatformLinksFromForm(r *http.Request) ([]services.ExternalPlatformLinkInput, error) {
+	platforms := r.Form["external_platform[]"]
+	if len(platforms) == 0 {
+		platforms = r.Form["external_platform"]
+	}
+
+	urls := r.Form["external_url[]"]
+	if len(urls) == 0 {
+		urls = r.Form["external_url"]
+	}
+
+	maxLen := max(len(platforms), len(urls))
+	links := make([]services.ExternalPlatformLinkInput, 0, maxLen)
+	seen := make(map[string]struct{}, maxLen)
+
+	for i := range maxLen {
+		platform := ""
+		url := ""
+		if i < len(platforms) {
+			platform = strings.TrimSpace(platforms[i])
+		}
+		if i < len(urls) {
+			url = strings.TrimSpace(urls[i])
+		}
+
+		if platform == "" && url == "" {
+			continue
+		}
+
+		if platform == "" || url == "" {
+			return nil, errs.ErrInvalidExternalPlatformLink
+		}
+
+		platformEnum := enums.ParseExternalPlatformToEnum(platform)
+		if platformEnum == enums.EXTERNAL_PLATFORM_UNDEFINED {
+			return nil, errs.ErrInvalidExternalPlatformLink
+		}
+
+		platformKey := platformEnum.String()
+		if _, exists := seen[platformKey]; exists {
+			return nil, errs.ErrInvalidExternalPlatformLink
+		}
+		seen[platformKey] = struct{}{}
+
+		if err := utils.ValidateExternalURL(url); err != nil {
+			return nil, errs.ErrInvalidExternalPlatformLink
+		}
+
+		links = append(links, services.ExternalPlatformLinkInput{
+			Platform: platformKey,
+			URL:      url,
+		})
+	}
+
+	return links, nil
+}
+
+func toAdminProductExternalLinks(links []services.ExternalPlatformLinkInput) []models.AdminProductExternalLink {
+	result := make([]models.AdminProductExternalLink, 0, len(links))
+	for _, link := range links {
+		result = append(result, models.AdminProductExternalLink{
+			Platform: enums.ParseExternalPlatformToEnum(link.Platform),
+			URL:      link.URL,
+		})
+	}
+	return result
 }

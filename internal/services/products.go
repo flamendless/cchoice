@@ -170,6 +170,10 @@ func (s *ProductService) Create(
 		}
 	}
 
+	if err := s.SyncExternalPlatformLinks(ctx, product.ID, input.ExternalLinks); err != nil {
+		return nil, err
+	}
+
 	return &product, nil
 }
 
@@ -499,6 +503,11 @@ func (s *ProductService) GetByIDForEdit(ctx context.Context, productID string) (
 		return nil, saleErr
 	}
 
+	externalLinks, err := s.getExternalPlatformLinksForProduct(ctx, decodedProductID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ProductForEdit{
 		ID:                          product.ID,
 		Serial:                      product.Serial,
@@ -530,6 +539,7 @@ func (s *ProductService) GetByIDForEdit(ctx context.Context, productID string) (
 		},
 		StocksIn: inventory.StocksIn,
 		Stocks:   inventory.Stocks,
+		ExternalLinks: externalLinks,
 	}, nil
 }
 
@@ -657,6 +667,10 @@ func (s *ProductService) Update(ctx context.Context, staffID string, input Updat
 		input.SaleStartDate,
 		input.SaleEndDate,
 	); err != nil {
+		return err
+	}
+
+	if err := s.SyncExternalPlatformLinks(ctx, productID, input.ExternalLinks); err != nil {
 		return err
 	}
 
@@ -803,6 +817,11 @@ func (s *ProductService) GetForPage(ctx context.Context, slug string) (*models.P
 	}
 	meta := s.GenerateMeta(&row, productSlug, cdnURL1280, priceAmount, priceCurrency)
 
+	externalLinks, err := s.buildProductExternalPlatformLinks(ctx, row.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &models.ProductPageData{
 		Meta:                       meta,
 		Slug:                       productSlug,
@@ -830,6 +849,7 @@ func (s *ProductService) GetForPage(ctx context.Context, slug string) (*models.P
 		Sizes:                      sizes,
 		Specs:                      specs,
 		RelatedProducts:            relatedProducts,
+		ExternalLinks:              externalLinks,
 	}, nil
 }
 

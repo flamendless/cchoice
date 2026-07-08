@@ -60,6 +60,11 @@ type ProductSpec struct {
 	Value string
 }
 
+type ProductExternalPlatformLink struct {
+	Platform enums.ExternalPlatform
+	URL      string
+}
+
 type ProductPageData struct {
 	Meta                       ProductsMeta
 	Slug                       string
@@ -87,6 +92,7 @@ type ProductPageData struct {
 	Sizes                      []string
 	Specs                      []ProductSpec
 	RelatedProducts            []RelatedProduct
+	ExternalLinks              []ProductExternalPlatformLink
 }
 
 type RelatedProduct struct {

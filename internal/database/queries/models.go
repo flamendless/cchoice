@@ -343,6 +343,15 @@ type TblProductCategory struct {
 	PromotedAtHomepage sql.NullBool
 }
 
+type TblProductExternalPlatformLink struct {
+	ID        int64
+	ProductID int64
+	Platform  string
+	Url       string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 type TblProductImage struct {
 	ID              int64
 	ProductID       int64

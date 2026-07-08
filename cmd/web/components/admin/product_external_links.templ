@@ -1,0 +1,149 @@
+package components
+
+import "cchoice/cmd/web/models"
+import "cchoice/internal/constants"
+import "cchoice/internal/enums"
+
+templ ProductExternalPlatformLinksSection(links []models.AdminProductExternalLink) {
+	<div id="external-platform-links-section" class="border-t pt-6" data-url-pattern={ constants.PatternExternalURL }>
+		<h2 class="text-lg font-semibold text-gray-800 mb-2">External Platform Links</h2>
+		<p class="text-sm text-gray-500 mb-4">Optional. Add links to this product on external marketplaces.</p>
+		<div id="external-platform-link-fields" class="flex flex-col gap-3">
+			if len(links) == 0 {
+				@externalPlatformLinkRow(enums.EXTERNAL_PLATFORM_UNDEFINED, "")
+			} else {
+				for _, link := range links {
+					@externalPlatformLinkRow(link.Platform, link.URL)
+				}
+			}
+		</div>
+		<button
+			type="button"
+			id="add-external-platform-link-btn"
+			class="mt-2 px-3 py-1 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+			onclick="addExternalPlatformLinkRow()"
+		>
+			+ Add platform link
+		</button>
+	</div>
+	<script>
+		const externalPlatformSection = document.getElementById('external-platform-links-section');
+		const externalURLPattern = externalPlatformSection ? externalPlatformSection.dataset.urlPattern : '';
+		const externalPlatformOptions = [
+			{ value: "LAZADA", label: "Lazada" },
+			{ value: "TIKTOK", label: "TikTok" },
+			{ value: "SHOPEE", label: "Shopee" },
+		];
+		const maxExternalPlatformLinks = 3;
+
+		function externalPlatformSelectHTML(selectedValue) {
+			let options = '<option value="">Select platform</option>';
+			for (const option of externalPlatformOptions) {
+				const selected = option.value === selectedValue ? ' selected' : '';
+				options += `<option value="${option.value}"${selected}>${option.label}</option>`;
+			}
+			return `<select name="external_platform[]" class="external-platform-select w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" onchange="updateExternalPlatformOptions()">${options}</select>`;
+		}
+
+		function externalPlatformRowHTML(selectedValue, urlValue) {
+			const safeURL = (urlValue || '').replace(/"/g, '&quot;');
+			return `<div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center external-platform-row">
+				${externalPlatformSelectHTML(selectedValue || '')}
+				<input type="url" name="external_url[]" value="${safeURL}" placeholder="https://..." maxlength="2048" pattern="${externalURLPattern}" class="flex-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" />
+				<button type="button" class="px-3 py-2 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 remove-external-platform-row" onclick="removeExternalPlatformLinkRow(this)">Remove</button>
+			</div>`;
+		}
+
+		function updateExternalPlatformOptions() {
+			const selected = new Set();
+			document.querySelectorAll('.external-platform-select').forEach((select) => {
+				if (select.value) {
+					selected.add(select.value);
+				}
+			});
+
+			document.querySelectorAll('.external-platform-select').forEach((select) => {
+				const currentValue = select.value;
+				select.querySelectorAll('option').forEach((option) => {
+					if (!option.value) {
+						option.disabled = false;
+						return;
+					}
+					option.disabled = option.value !== currentValue && selected.has(option.value);
+				});
+			});
+
+			const rowCount = document.querySelectorAll('.external-platform-row').length;
+			const addBtn = document.getElementById('add-external-platform-link-btn');
+			if (addBtn) {
+				addBtn.disabled = rowCount >= maxExternalPlatformLinks;
+				addBtn.classList.toggle('opacity-50', rowCount >= maxExternalPlatformLinks);
+				addBtn.classList.toggle('cursor-not-allowed', rowCount >= maxExternalPlatformLinks);
+			}
+
+			document.querySelectorAll('.remove-external-platform-row').forEach((btn) => {
+				btn.disabled = rowCount <= 1;
+				btn.classList.toggle('opacity-50', rowCount <= 1);
+				btn.classList.toggle('cursor-not-allowed', rowCount <= 1);
+			});
+		}
+
+		function addExternalPlatformLinkRow() {
+			const container = document.getElementById('external-platform-link-fields');
+			if (!container || container.querySelectorAll('.external-platform-row').length >= maxExternalPlatformLinks) {
+				return;
+			}
+			const row = document.createElement('div');
+			row.innerHTML = externalPlatformRowHTML('', '');
+			container.appendChild(row.firstElementChild);
+			updateExternalPlatformOptions();
+		}
+
+		function removeExternalPlatformLinkRow(button) {
+			const container = document.getElementById('external-platform-link-fields');
+			if (!container || container.querySelectorAll('.external-platform-row').length <= 1) {
+				return;
+			}
+			button.closest('.external-platform-row')?.remove();
+			updateExternalPlatformOptions();
+		}
+
+		updateExternalPlatformOptions();
+	</script>
+}
+
+templ externalPlatformLinkRow(platform enums.ExternalPlatform, url string) {
+	<div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center external-platform-row">
+		<select
+			name="external_platform[]"
+			class="external-platform-select w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+			onchange="updateExternalPlatformOptions()"
+		>
+			<option value="">Select platform</option>
+			for _, p := range enums.AllExternalPlatforms {
+				<option
+					value={ p.String() }
+					selected?={ p == platform }
+				>
+					{ p.String() }
+				</option>
+			}
+		</select>
+		<input
+			type="url"
+			name="external_url[]"
+			value={ url }
+			placeholder="https://..."
+			maxlength="2048"
+			pattern={ constants.PatternExternalURL }
+			class="flex-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+		/>
+		<button
+			type="button"
+			class="px-3 py-2 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 remove-external-platform-row"
+			onclick="removeExternalPlatformLinkRow(this)"
+		>
+			Remove
+		</button>
+	</div>
+}

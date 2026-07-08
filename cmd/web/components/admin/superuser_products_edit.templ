@@ -368,6 +368,7 @@ templ staffDraftProductPriceEditForm(formData models.AdminProductEditForm) {
 				</div>
 			</div>
 		</div>
+		@ProductExternalPlatformLinksSection(formData.ExternalLinks)
 		<div class="border-t pt-6">
 			<h2 class="text-lg font-semibold text-gray-800 mb-4">Product Image</h2>
 			@ImageUploadField(ImageUploadParams{
@@ -773,6 +774,7 @@ templ superuserProductEditForm(formData models.AdminProductEditForm) {
 				</div>
 			</div>
 		</div>
+		@ProductExternalPlatformLinksSection(formData.ExternalLinks)
 		<div class="border-t pt-6">
 			<h2 class="text-lg font-semibold text-gray-800 mb-4">Product Image</h2>
 			@ImageUploadField(ImageUploadParams{

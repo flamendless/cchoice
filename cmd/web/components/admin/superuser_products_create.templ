@@ -374,6 +374,7 @@ templ AdminSuperuserProductsPage(formData models.AdminProductForm) {
 									</div>
 								</div>
 							</div>
+							@ProductExternalPlatformLinksSection(nil)
 							<div class="border-t pt-6">
 								<h2 class="text-lg font-semibold text-gray-800 mb-4">Product Image</h2>
 								@ImageUploadField(ImageUploadParams{

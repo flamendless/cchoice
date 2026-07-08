@@ -363,6 +363,12 @@ type AdminProductEditForm struct {
 	DraftPriceOnly bool
 	UpdateURL      string
 	ListPageURL    string
+	ExternalLinks  []AdminProductExternalLink
+}
+
+type AdminProductExternalLink struct {
+	Platform enums.ExternalPlatform
+	URL      string
 }
 
 type StaffTimeOff struct {

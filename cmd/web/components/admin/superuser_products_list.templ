@@ -129,7 +129,18 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem, ed
 				for _, p := range products {
 					<tr id={ fmt.Sprintf("product-row-%s", p.ID) } class={ productListRowClass(p.Status) }>
 						@TableCell("3%", "text-gray-900") {
-							{ p.ID }
+							if p.Status == enums.PRODUCT_STATUS_ACTIVE && p.Slug != "" {
+								<a
+									href={ utils.URL("/product/" + p.Slug) }
+									target="_blank"
+									rel="noopener"
+									class="text-primary hover:text-primary-dark hover:underline"
+								>
+									{ p.ID }
+								</a>
+							} else {
+								{ p.ID }
+							}
 						}
 						@TableCell("3%", "text-gray-900") {
 							<a

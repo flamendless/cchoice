@@ -44,6 +44,7 @@ var (
 	ErrInvalidInput                   = errors.New("[VALIDATION]: Invalid input")
 	ErrMissingField                   = errors.New("[VALIDATION]: Required field missing")
 	ErrInvalidFormat                  = errors.New("[VALIDATION]: Invalid format")
+	ErrInvalidExternalPlatformLink    = errors.New("[VALIDATION]: Invalid external platform link")
 	ErrValidationTargetMustBeAPointer = errors.New("[VALIDATION]: Target must be a pointer")
 	ErrValidationTargetMustBeAStruct  = errors.New("[VALIDATION]: Target must be a struct")
 	ErrValidationInvalidMobileNumber  = errors.New("[VALIDATION]: Invalid mobile number format")
