@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"cchoice/internal/enums"
+	"cchoice/internal/utils"
 )
 
 const (
@@ -45,6 +48,13 @@ type SitemapEntry struct {
 	LastMod    time.Time
 	ChangeFreq string
 	Priority   string
+}
+
+type breadcrumbItem struct {
+	Type     string `json:"@type"`
+	Position int    `json:"position"`
+	Name     string `json:"name"`
+	Item     string `json:"item,omitempty"`
 }
 
 func ProductCanonicalURL(siteBaseURL, slug string) string {
@@ -97,10 +107,10 @@ func buildProductTitle(product Product) string {
 	const saleTitlePrefix = "SALE! "
 	parts := []string{product.BrandName, product.Name}
 	if product.ProductCategory != "" {
-		parts = append(parts, product.ProductCategory)
+		parts = append(parts, utils.SlugToTile(product.ProductCategory))
 	}
 	if product.ProductSubcategory != "" {
-		parts = append(parts, product.ProductSubcategory)
+		parts = append(parts, utils.SlugToTile(product.ProductSubcategory))
 	}
 	parts = append(parts, "Power Tools")
 	title := strings.Join(parts, " ") + " | Price, Specs, Buy Online | C-Choice"
@@ -168,6 +178,55 @@ func GenerateProductMeta(
 	}
 }
 
+func categoryBreadcrumbURL(siteBaseURL, categorySlug string) string {
+	label := utils.SlugToTile(categorySlug)
+	anchor := utils.LabelToID(enums.MODULE_CATEGORY, label)
+	return strings.TrimSuffix(siteBaseURL, "/") + "/#" + anchor
+}
+
+func buildProductBreadcrumbItems(product Product, siteBaseURL string) []breadcrumbItem {
+	homeURL := strings.TrimSuffix(siteBaseURL, "/") + "/"
+	items := []breadcrumbItem{
+		{Type: "ListItem", Position: 1, Name: "Home", Item: homeURL},
+	}
+
+	position := 2
+	var categoryURL string
+	if product.ProductCategory != "" {
+		categoryURL = categoryBreadcrumbURL(siteBaseURL, product.ProductCategory)
+		items = append(items, breadcrumbItem{
+			Type:     "ListItem",
+			Position: position,
+			Name:     utils.SlugToTile(product.ProductCategory),
+			Item:     categoryURL,
+		})
+		position++
+	}
+
+	subcategory := product.ProductSubcategory
+	if subcategory != "" && !strings.EqualFold(subcategory, product.ProductCategory) {
+		subcategoryURL := categoryURL
+		if subcategoryURL == "" {
+			subcategoryURL = homeURL
+		}
+		items = append(items, breadcrumbItem{
+			Type:     "ListItem",
+			Position: position,
+			Name:     utils.SlugToTile(subcategory),
+			Item:     subcategoryURL,
+		})
+		position++
+	}
+
+	items = append(items, breadcrumbItem{
+		Type:     "ListItem",
+		Position: position,
+		Name:     product.Name,
+	})
+
+	return items
+}
+
 func BuildProductStructuredData(
 	product Product,
 	canonicalURL string,
@@ -188,26 +247,23 @@ func BuildProductStructuredData(
 		Availability  string `json:"availability"`
 		ItemCondition string `json:"itemCondition"`
 	}
-	type breadcrumbItem struct {
-		Type     string `json:"@type"`
-		Position int    `json:"position"`
-		Name     string `json:"name"`
-		Item     string `json:"item,omitempty"`
-	}
 	type breadcrumbList struct {
 		Type     string           `json:"@type"`
 		ItemList []breadcrumbItem `json:"itemListElement"`
 	}
 	type productSchema struct {
-		Context     string         `json:"@context"`
-		Type        string         `json:"@type"`
-		Name        string         `json:"name"`
-		Description string         `json:"description,omitempty"`
-		Image       []string       `json:"image,omitempty"`
-		SKU         string         `json:"sku"`
-		Brand       brand          `json:"brand"`
-		Offers      offer          `json:"offers"`
-		Breadcrumb  breadcrumbList `json:"breadcrumb"`
+		Type        string   `json:"@type"`
+		Name        string   `json:"name"`
+		Description string   `json:"description,omitempty"`
+		Image       []string `json:"image,omitempty"`
+		SKU         string   `json:"sku"`
+		URL         string   `json:"url"`
+		Brand       brand    `json:"brand"`
+		Offers      offer    `json:"offers"`
+	}
+	type graph struct {
+		Context string `json:"@context"`
+		Graph   []any  `json:"@graph"`
 	}
 
 	description := strings.TrimSpace(product.Description)
@@ -216,52 +272,30 @@ func BuildProductStructuredData(
 		images = append(images, imageURL)
 	}
 
-	items := []breadcrumbItem{
-		{Type: "ListItem", Position: 1, Name: "Home", Item: strings.TrimSuffix(siteBaseURL, "/") + "/"},
-	}
-	position := 2
-	if product.ProductCategory != "" {
-		items = append(items, breadcrumbItem{
-			Type:     "ListItem",
-			Position: position,
-			Name:     product.ProductCategory,
-		})
-		position++
-	}
-	if product.ProductSubcategory != "" {
-		items = append(items, breadcrumbItem{
-			Type:     "ListItem",
-			Position: position,
-			Name:     product.ProductSubcategory,
-		})
-		position++
-	}
-	items = append(items, breadcrumbItem{
-		Type:     "ListItem",
-		Position: position,
-		Name:     product.Name,
-		Item:     canonicalURL,
-	})
-
-	schema := productSchema{
-		Context:     "https://schema.org",
-		Type:        "Product",
-		Name:        fmt.Sprintf("%s %s", product.BrandName, product.Name),
-		Description: description,
-		Image:       images,
-		SKU:         product.Serial,
-		Brand:       brand{Type: "Brand", Name: product.BrandName},
-		Offers: offer{
-			Type:          "Offer",
-			URL:           canonicalURL,
-			PriceCurrency: priceCurrency,
-			Price:         priceAmount,
-			Availability:  "https://schema.org/InStock",
-			ItemCondition: "https://schema.org/NewCondition",
-		},
-		Breadcrumb: breadcrumbList{
-			Type:     "BreadcrumbList",
-			ItemList: items,
+	schema := graph{
+		Context: "https://schema.org",
+		Graph: []any{
+			productSchema{
+				Type:        "Product",
+				Name:        fmt.Sprintf("%s %s", product.BrandName, product.Name),
+				Description: description,
+				Image:       images,
+				SKU:         product.Serial,
+				URL:         canonicalURL,
+				Brand:       brand{Type: "Brand", Name: product.BrandName},
+				Offers: offer{
+					Type:          "Offer",
+					URL:           canonicalURL,
+					PriceCurrency: priceCurrency,
+					Price:         priceAmount,
+					Availability:  "https://schema.org/InStock",
+					ItemCondition: "https://schema.org/NewCondition",
+				},
+			},
+			breadcrumbList{
+				Type:     "BreadcrumbList",
+				ItemList: buildProductBreadcrumbItems(product, siteBaseURL),
+			},
 		},
 	}
 

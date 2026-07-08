@@ -87,8 +87,8 @@ func gma55Product() Product {
 		BrandName:          "Bosch",
 		Name:               "GMA 55",
 		Serial:             "BOSCH-GMA-163-0",
-		ProductCategory:    "Table",
-		ProductSubcategory: "Saw",
+		ProductCategory:    "table",
+		ProductSubcategory: "saw",
 	}
 }
 
@@ -114,8 +114,8 @@ func TestGenerateProductMeta(t *testing.T) {
 	assert.Equal(t, ProductRobots, meta.Robots)
 	assert.Equal(t, ProductTwitterCard, meta.TwitterCard)
 	assert.Contains(t, meta.Keywords, "Bosch")
-	assert.Contains(t, meta.Keywords, "Table")
-	assert.Contains(t, meta.Keywords, "Saw")
+	assert.Contains(t, meta.Keywords, "table")
+	assert.Contains(t, meta.Keywords, "saw")
 	assert.Contains(t, meta.Keywords, "power tools")
 	assert.Contains(t, meta.Keywords, "bosch philippines")
 	assert.NotEmpty(t, meta.StructuredData)
@@ -184,27 +184,45 @@ func TestBuildProductStructuredData(t *testing.T) {
 	require.NoError(t, json.Unmarshal(raw, &payload))
 
 	assert.Equal(t, "https://schema.org", payload["@context"])
-	assert.Equal(t, "Product", payload["@type"])
-	assert.Equal(t, "Bosch GMA 55", payload["name"])
-	assert.Equal(t, "BOSCH-GMA-163-0", payload["sku"])
 
-	offers, ok := payload["offers"].(map[string]any)
+	graph, ok := payload["@graph"].([]any)
+	require.True(t, ok)
+	require.Len(t, graph, 2)
+
+	productNode, ok := graph[0].(map[string]any)
+	require.True(t, ok)
+	assert.Equal(t, "Product", productNode["@type"])
+	assert.Equal(t, "Bosch GMA 55", productNode["name"])
+	assert.Equal(t, "BOSCH-GMA-163-0", productNode["sku"])
+	assert.Equal(t, "https://cchoice.shop/product/bosch-gma-55", productNode["url"])
+
+	offers, ok := productNode["offers"].(map[string]any)
 	require.True(t, ok)
 	assert.Equal(t, "12999.00", offers["price"])
 	assert.Equal(t, "PHP", offers["priceCurrency"])
 	assert.Equal(t, "https://cchoice.shop/product/bosch-gma-55", offers["url"])
 
-	breadcrumb, ok := payload["breadcrumb"].(map[string]any)
+	breadcrumb, ok := graph[1].(map[string]any)
 	require.True(t, ok)
+	assert.Equal(t, "BreadcrumbList", breadcrumb["@type"])
+
 	items, ok := breadcrumb["itemListElement"].([]any)
 	require.True(t, ok)
-	assert.GreaterOrEqual(t, len(items), 4)
+	require.GreaterOrEqual(t, len(items), 4)
 
 	tableItem, ok := items[1].(map[string]any)
 	require.True(t, ok)
 	assert.Equal(t, "Table", tableItem["name"])
+	assert.Equal(t, "https://cchoice.shop/#category-table", tableItem["item"])
 
 	sawItem, ok := items[2].(map[string]any)
 	require.True(t, ok)
 	assert.Equal(t, "Saw", sawItem["name"])
+	assert.Equal(t, "https://cchoice.shop/#category-table", sawItem["item"])
+
+	lastItem, ok := items[len(items)-1].(map[string]any)
+	require.True(t, ok)
+	assert.Equal(t, "GMA 55", lastItem["name"])
+	_, hasItem := lastItem["item"]
+	assert.False(t, hasItem)
 }
