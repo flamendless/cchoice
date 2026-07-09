@@ -859,11 +859,6 @@ func (s *ProductService) GetForPage(ctx context.Context, slug string) (*models.P
 		models.ProductSpec{Label: "Weight", Value: utils.ToWeightDisplay(row.Weight, row.WeightUnit)},
 	}
 
-	relatedProducts, err := s.getRelatedProducts(ctx, row.CategoryID, row.ID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get related products: %w", err)
-	}
-
 	priceAmount, priceCurrency := utils.SchemaPrice(salePrice, saleCurrency)
 	productSlug := slug
 	if row.Slug.Valid && row.Slug.String != "" {
@@ -902,86 +897,8 @@ func (s *ProductService) GetForPage(ctx context.Context, slug string) (*models.P
 		Colours:                    colours,
 		Sizes:                      sizes,
 		Specs:                      specs,
-		RelatedProducts:            relatedProducts,
 		ExternalLinks:              externalLinks,
 	}, nil
-}
-
-func (s *ProductService) getRelatedProducts(
-	ctx context.Context,
-	categoryID sql.NullInt64,
-	productID int64,
-) ([]models.RelatedProduct, error) {
-	if !categoryID.Valid || categoryID.Int64 == 0 {
-		return nil, nil
-	}
-
-	rows, err := s.dbRO.GetQueries().GetRelatedProductsByCategory(ctx, queries.GetRelatedProductsByCategoryParams{
-		CategoryID: categoryID.Int64,
-		ID:         productID,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	related := make([]models.RelatedProduct, 0, len(rows))
-	for _, row := range rows {
-		if !row.Slug.Valid || row.Slug.String == "" {
-			continue
-		}
-
-		origPrice := utils.NewMoney(row.UnitPriceWithVat, row.UnitPriceWithVatCurrency)
-		var salePrice int64
-		var saleCurrency string
-		if row.IsOnSale == 1 {
-			if sp, ok := row.SalePriceWithVat.(int64); ok {
-				salePrice = sp
-			} else {
-				salePrice = row.UnitPriceWithVat
-			}
-			if sc, ok := row.SalePriceWithVatCurrency.(string); ok {
-				saleCurrency = sc
-			} else {
-				saleCurrency = row.UnitPriceWithVatCurrency
-			}
-		} else {
-			salePrice = row.UnitPriceWithVat
-			saleCurrency = row.UnitPriceWithVatCurrency
-		}
-
-		discountedPrice := utils.NewMoney(salePrice, saleCurrency)
-		_, _, discountPercentage := utils.GetOrigAndDiscounted(
-			row.IsOnSale,
-			row.UnitPriceWithVat,
-			row.UnitPriceWithVatCurrency,
-			sql.NullInt64{Int64: salePrice, Valid: row.IsOnSale == 1},
-			sql.NullString{String: saleCurrency, Valid: row.IsOnSale == 1},
-		)
-
-		cdnURL := row.CdnUrl
-		if cdnURL == "" {
-			cdnURL = s.getCDNURL(row.ThumbnailPath)
-		}
-		cdnURL1280 := row.CdnUrlThumbnail
-		if cdnURL1280 == "" {
-			cdnURL1280 = s.getCDNURL(constants.ToPath1280(row.ThumbnailPath))
-		}
-
-		related = append(related, models.RelatedProduct{
-			ProductID:          s.encoder.Encode(row.ID),
-			Slug:               row.Slug.String,
-			Name:               row.Name,
-			Serial:             row.Serial,
-			BrandName:          row.BrandName,
-			CDNURL:             cdnURL,
-			CDNURL1280:         cdnURL1280,
-			OrigPriceDisplay:   origPrice.Display(),
-			PriceDisplay:       discountedPrice.Display(),
-			DiscountPercentage: discountPercentage,
-		})
-	}
-
-	return related, nil
 }
 
 func (s *ProductService) GenerateMeta(

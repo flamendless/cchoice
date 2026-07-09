@@ -1655,6 +1655,102 @@ func (q *Queries) GetRandomProductOnSale(ctx context.Context) (GetRandomProductO
 	return i, err
 }
 
+const getRelatedProductsByBrand = `-- name: GetRelatedProductsByBrand :many
+SELECT
+	tbl_products.id,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.serial,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_brands.name AS brand_name,
+	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	COALESCE(tbl_product_images.cdn_url, '') AS cdn_url,
+	COALESCE(tbl_product_images.cdn_url_thumbnail, '') AS cdn_url_thumbnail,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.sale_price_with_vat
+		ELSE tbl_products.unit_price_with_vat
+	END AS sale_price_with_vat,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.sale_price_with_vat_currency
+		ELSE tbl_products.unit_price_with_vat_currency
+	END AS sale_price_with_vat_currency
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE tbl_products.brand_id = ?
+	AND tbl_products.id != ?
+	AND tbl_products.status = 'ACTIVE'
+	AND COALESCE(tbl_product_images.thumbnail, '') != ''
+LIMIT 6
+`
+
+type GetRelatedProductsByBrandParams struct {
+	BrandID int64
+	ID      int64
+}
+
+type GetRelatedProductsByBrandRow struct {
+	ID                       int64
+	Slug                     sql.NullString
+	Name                     string
+	Serial                   string
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	BrandName                string
+	ThumbnailPath            string
+	CdnUrl                   string
+	CdnUrlThumbnail          string
+	IsOnSale                 int64
+	SalePriceWithVat         interface{}
+	SalePriceWithVatCurrency interface{}
+}
+
+func (q *Queries) GetRelatedProductsByBrand(ctx context.Context, arg GetRelatedProductsByBrandParams) ([]GetRelatedProductsByBrandRow, error) {
+	rows, err := q.db.QueryContext(ctx, getRelatedProductsByBrand, arg.BrandID, arg.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRelatedProductsByBrandRow
+	for rows.Next() {
+		var i GetRelatedProductsByBrandRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Slug,
+			&i.Name,
+			&i.Serial,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
+			&i.BrandName,
+			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
+			&i.IsOnSale,
+			&i.SalePriceWithVat,
+			&i.SalePriceWithVatCurrency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getRelatedProductsByCategory = `-- name: GetRelatedProductsByCategory :many
 SELECT
 	tbl_products.id,
@@ -1724,6 +1820,104 @@ func (q *Queries) GetRelatedProductsByCategory(ctx context.Context, arg GetRelat
 	var items []GetRelatedProductsByCategoryRow
 	for rows.Next() {
 		var i GetRelatedProductsByCategoryRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Slug,
+			&i.Name,
+			&i.Serial,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
+			&i.BrandName,
+			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
+			&i.IsOnSale,
+			&i.SalePriceWithVat,
+			&i.SalePriceWithVatCurrency,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getRelatedProductsByParentCategory = `-- name: GetRelatedProductsByParentCategory :many
+SELECT
+	tbl_products.id,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.serial,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_brands.name AS brand_name,
+	COALESCE(tbl_product_images.thumbnail, '') AS thumbnail_path,
+	COALESCE(tbl_product_images.cdn_url, '') AS cdn_url,
+	COALESCE(tbl_product_images.cdn_url_thumbnail, '') AS cdn_url_thumbnail,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.sale_price_with_vat
+		ELSE tbl_products.unit_price_with_vat
+	END AS sale_price_with_vat,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN tbl_product_sales.sale_price_with_vat_currency
+		ELSE tbl_products.unit_price_with_vat_currency
+	END AS sale_price_with_vat_currency
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_categories AS pc ON pc.id = tbl_products_categories.category_id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE pc.category = ?
+	AND tbl_products.id != ?
+	AND tbl_products.status = 'ACTIVE'
+	AND COALESCE(tbl_product_images.thumbnail, '') != ''
+LIMIT 6
+`
+
+type GetRelatedProductsByParentCategoryParams struct {
+	Category sql.NullString
+	ID       int64
+}
+
+type GetRelatedProductsByParentCategoryRow struct {
+	ID                       int64
+	Slug                     sql.NullString
+	Name                     string
+	Serial                   string
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	BrandName                string
+	ThumbnailPath            string
+	CdnUrl                   string
+	CdnUrlThumbnail          string
+	IsOnSale                 int64
+	SalePriceWithVat         interface{}
+	SalePriceWithVatCurrency interface{}
+}
+
+func (q *Queries) GetRelatedProductsByParentCategory(ctx context.Context, arg GetRelatedProductsByParentCategoryParams) ([]GetRelatedProductsByParentCategoryRow, error) {
+	rows, err := q.db.QueryContext(ctx, getRelatedProductsByParentCategory, arg.Category, arg.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRelatedProductsByParentCategoryRow
+	for rows.Next() {
+		var i GetRelatedProductsByParentCategoryRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Slug,
@@ -1843,6 +2037,250 @@ func (q *Queries) GetRelatedProductsForSearch(ctx context.Context, arg GetRelate
 	var items []GetRelatedProductsForSearchRow
 	for rows.Next() {
 		var i GetRelatedProductsForSearchRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Serial,
+			&i.Slug,
+			&i.Name,
+			&i.Description,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
+			&i.SalePriceWithVat,
+			&i.SalePriceWithVatCurrency,
+			&i.IsOnSale,
+			&i.DiscountType,
+			&i.DiscountValue,
+			&i.BrandName,
+			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getRelatedProductsForSearchByBrand = `-- name: GetRelatedProductsForSearchByBrand :many
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	COALESCE(
+		tbl_product_images.thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE
+	tbl_products.status = 'ACTIVE'
+	AND thumbnail_path != 'static/images/empty_96x96.webp'
+	AND tbl_products.brand_id IN (
+		SELECT DISTINCT p.brand_id
+		FROM tbl_products_fts
+		INNER JOIN tbl_products p ON p.id = tbl_products_fts.rowid
+		WHERE
+			p.status = 'ACTIVE'
+			AND tbl_products_fts.name MATCH ?1
+	)
+	AND tbl_products.id NOT IN (
+		SELECT p2.id
+		FROM tbl_products_fts
+		INNER JOIN tbl_products p2 ON p2.id = tbl_products_fts.rowid
+		WHERE
+			p2.status = 'ACTIVE'
+			AND tbl_products_fts.name MATCH ?1
+	)
+ORDER BY is_on_sale DESC, tbl_products.created_at DESC
+LIMIT ?3 OFFSET ?2
+`
+
+type GetRelatedProductsForSearchByBrandParams struct {
+	SearchQuery string
+	Offset      int64
+	Limit       int64
+}
+
+type GetRelatedProductsForSearchByBrandRow struct {
+	ID                       int64
+	Serial                   string
+	Slug                     sql.NullString
+	Name                     string
+	Description              sql.NullString
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	SalePriceWithVat         sql.NullInt64
+	SalePriceWithVatCurrency sql.NullString
+	IsOnSale                 int64
+	DiscountType             sql.NullString
+	DiscountValue            sql.NullInt64
+	BrandName                string
+	ThumbnailPath            string
+	CdnUrl                   sql.NullString
+	CdnUrlThumbnail          sql.NullString
+}
+
+func (q *Queries) GetRelatedProductsForSearchByBrand(ctx context.Context, arg GetRelatedProductsForSearchByBrandParams) ([]GetRelatedProductsForSearchByBrandRow, error) {
+	rows, err := q.db.QueryContext(ctx, getRelatedProductsForSearchByBrand, arg.SearchQuery, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRelatedProductsForSearchByBrandRow
+	for rows.Next() {
+		var i GetRelatedProductsForSearchByBrandRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Serial,
+			&i.Slug,
+			&i.Name,
+			&i.Description,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
+			&i.SalePriceWithVat,
+			&i.SalePriceWithVatCurrency,
+			&i.IsOnSale,
+			&i.DiscountType,
+			&i.DiscountValue,
+			&i.BrandName,
+			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getRelatedProductsForSearchByParentCategory = `-- name: GetRelatedProductsForSearchByParentCategory :many
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	COALESCE(
+		tbl_product_images.thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+INNER JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_categories AS pc ON pc.id = tbl_products_categories.category_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE
+	tbl_products.status = 'ACTIVE'
+	AND thumbnail_path != 'static/images/empty_96x96.webp'
+	AND pc.category IN (
+		SELECT DISTINCT cat.category
+		FROM tbl_products_fts
+		INNER JOIN tbl_products p ON p.id = tbl_products_fts.rowid
+		INNER JOIN tbl_products_categories pc2 ON pc2.product_id = p.id
+		INNER JOIN tbl_product_categories cat ON cat.id = pc2.category_id
+		WHERE
+			p.status = 'ACTIVE'
+			AND tbl_products_fts.name MATCH ?1
+	)
+	AND tbl_products.id NOT IN (
+		SELECT p2.id
+		FROM tbl_products_fts
+		INNER JOIN tbl_products p2 ON p2.id = tbl_products_fts.rowid
+		WHERE
+			p2.status = 'ACTIVE'
+			AND tbl_products_fts.name MATCH ?1
+	)
+ORDER BY is_on_sale DESC, tbl_products.created_at DESC
+LIMIT ?3 OFFSET ?2
+`
+
+type GetRelatedProductsForSearchByParentCategoryParams struct {
+	SearchQuery string
+	Offset      int64
+	Limit       int64
+}
+
+type GetRelatedProductsForSearchByParentCategoryRow struct {
+	ID                       int64
+	Serial                   string
+	Slug                     sql.NullString
+	Name                     string
+	Description              sql.NullString
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	SalePriceWithVat         sql.NullInt64
+	SalePriceWithVatCurrency sql.NullString
+	IsOnSale                 int64
+	DiscountType             sql.NullString
+	DiscountValue            sql.NullInt64
+	BrandName                string
+	ThumbnailPath            string
+	CdnUrl                   sql.NullString
+	CdnUrlThumbnail          sql.NullString
+}
+
+func (q *Queries) GetRelatedProductsForSearchByParentCategory(ctx context.Context, arg GetRelatedProductsForSearchByParentCategoryParams) ([]GetRelatedProductsForSearchByParentCategoryRow, error) {
+	rows, err := q.db.QueryContext(ctx, getRelatedProductsForSearchByParentCategory, arg.SearchQuery, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRelatedProductsForSearchByParentCategoryRow
+	for rows.Next() {
+		var i GetRelatedProductsForSearchByParentCategoryRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Serial,
