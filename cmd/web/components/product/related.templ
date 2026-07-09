@@ -3,6 +3,28 @@ package product
 import "cchoice/cmd/web/models"
 import "cchoice/internal/utils"
 
+templ RelatedProductsLoading() {
+	<div class="flex justify-center py-8 mt-8">
+		<svg class="w-8 h-8 text-primary animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+			<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+			<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+		</svg>
+	</div>
+}
+
+templ RelatedProductsSection(slug string) {
+	<div
+		id="product-related-section"
+		class="w-full"
+		hx-trigger="load once"
+		hx-get={ utils.URL("/product/" + slug + "/related") }
+		hx-target="#product-related-section"
+		hx-swap="innerHTML"
+	>
+		@RelatedProductsLoading()
+	</div>
+}
+
 templ RelatedProducts(products []models.RelatedProduct) {
 	if len(products) > 0 {
 		<div class="flex flex-col gap-4 mt-8">

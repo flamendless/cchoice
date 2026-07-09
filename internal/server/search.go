@@ -52,10 +52,7 @@ func (s *Server) searchProductsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	page := req.Page
-	if page < 0 {
-		page = 0
-	}
+	page := max(req.Page, 0)
 
 	limit := constants.DefaultLimitSearchResultsPage
 	offset := page * limit
@@ -102,9 +99,6 @@ func (s *Server) searchProductsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-const searchRelatedSource = "related"
-const searchOtherSource = "other"
-
 func (s *Server) searchRelatedProductsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Search Related Products Handler]"
 	ctx := r.Context()
@@ -116,85 +110,25 @@ func (s *Server) searchRelatedProductsHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	page := req.Page
-	if page < 0 {
-		page = 0
+	page := max(req.Page, 0)
+
+	result, err := s.services.product.GetSearchRelatedProducts(ctx, req.Q, req.Source, page)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("query", req.Q))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	source := req.Source
-	if source != searchRelatedSource && source != searchOtherSource {
-		source = searchRelatedSource
-	}
-
-	limit := constants.DefaultLimitSearchResultsPage
-	offset := page * limit
-
-	var products []models.CategorySectionProduct
-	hasMore := false
-
-	switch source {
-	case searchOtherSource:
-		otherRows, err := s.dbRO.GetQueries().GetOtherProductsForSearch(ctx, queries.GetOtherProductsForSearchParams{
-			SearchQuery: req.Q,
-			Limit:       int64(limit),
-			Offset:      int64(offset),
-		})
-		if err != nil {
-			logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("query", req.Q))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		validOtherRows := filterOtherSearchRows(otherRows)
-		hasMore = len(validOtherRows) == limit
-		products = models.ToProductGridProductsFromOtherRows(s.encoder, s.GetCDNURL, validOtherRows)
-	default:
-		relatedRows, err := s.dbRO.GetQueries().GetRelatedProductsForSearch(ctx, queries.GetRelatedProductsForSearchParams{
-			SearchQuery: req.Q,
-			Limit:       int64(limit),
-			Offset:      int64(offset),
-		})
-		if err != nil {
-			logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("query", req.Q))
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		validRows := filterRelatedSearchRows(relatedRows)
-		if page == 0 && len(validRows) == 0 {
-			source = searchOtherSource
-
-			otherRows, otherErr := s.dbRO.GetQueries().GetOtherProductsForSearch(ctx, queries.GetOtherProductsForSearchParams{
-				SearchQuery: req.Q,
-				Limit:       int64(limit),
-				Offset:      int64(offset),
-			})
-			if otherErr != nil {
-				logs.LogCtx(ctx).Error(logtag, zap.Error(otherErr), zap.String("query", req.Q))
-				http.Error(w, otherErr.Error(), http.StatusInternalServerError)
-				return
-			}
-
-			validOtherRows := filterOtherSearchRows(otherRows)
-			hasMore = len(validOtherRows) == limit
-			products = models.ToProductGridProductsFromOtherRows(s.encoder, s.GetCDNURL, validOtherRows)
-			break
-		}
-
-		hasMore = len(validRows) == limit
-		products = models.ToProductGridProductsFromRelatedRows(s.encoder, s.GetCDNURL, validRows)
-	}
-
-	if len(products) == 0 {
+	if len(result.Products) == 0 {
 		return
 	}
 
 	if err := compshop.SearchRelatedProductsPage(models.SearchRelatedProductsPageData{
 		Query:    req.Q,
 		Page:     page,
-		HasMore:  hasMore,
-		Source:   source,
-		Products: products,
+		HasMore:  result.HasMore,
+		Source:   result.Source,
+		Products: result.Products,
 	}).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -203,34 +137,6 @@ func (s *Server) searchRelatedProductsHandler(w http.ResponseWriter, r *http.Req
 
 func filterSearchPaginatedRows(rows []queries.GetProductsBySearchQueryPaginatedRow) []queries.GetProductsBySearchQueryPaginatedRow {
 	valid := make([]queries.GetProductsBySearchQueryPaginatedRow, 0, len(rows))
-	for _, row := range rows {
-		if strings.HasSuffix(row.ThumbnailPath, constants.EmptyImageFilename) {
-			continue
-		}
-		if !row.Slug.Valid || row.Slug.String == "" {
-			continue
-		}
-		valid = append(valid, row)
-	}
-	return valid
-}
-
-func filterRelatedSearchRows(rows []queries.GetRelatedProductsForSearchRow) []queries.GetRelatedProductsForSearchRow {
-	valid := make([]queries.GetRelatedProductsForSearchRow, 0, len(rows))
-	for _, row := range rows {
-		if strings.HasSuffix(row.ThumbnailPath, constants.EmptyImageFilename) {
-			continue
-		}
-		if !row.Slug.Valid || row.Slug.String == "" {
-			continue
-		}
-		valid = append(valid, row)
-	}
-	return valid
-}
-
-func filterOtherSearchRows(rows []queries.GetOtherProductsForSearchRow) []queries.GetOtherProductsForSearchRow {
-	valid := make([]queries.GetOtherProductsForSearchRow, 0, len(rows))
 	for _, row := range rows {
 		if strings.HasSuffix(row.ThumbnailPath, constants.EmptyImageFilename) {
 			continue

@@ -17,6 +17,7 @@ import (
 )
 
 func AddProductHandlers(s *Server, r chi.Router) {
+	r.Get("/product/{slug}/related", s.productRelatedProductsHandler)
 	r.Get("/product/{slug}", s.productPageHandler)
 }
 
@@ -54,6 +55,36 @@ func (s *Server) productPageHandler(w http.ResponseWriter, r *http.Request) {
 		)
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
+	}
+}
+
+func (s *Server) productRelatedProductsHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Product Related Products Handler]"
+	ctx := r.Context()
+
+	var pathReq forms.ProductSlugPath
+	if err := httputil.BindPath(r, &pathReq); err != nil {
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+		return
+	}
+
+	relatedProducts, err := s.services.product.GetRelatedProductsForPage(ctx, pathReq.Slug)
+	if err != nil {
+		if err == errs.ErrNotFound {
+			return
+		}
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("slug", pathReq.Slug))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if len(relatedProducts) == 0 {
+		return
+	}
+
+	if err := compproduct.RelatedProducts(relatedProducts).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("slug", pathReq.Slug))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 

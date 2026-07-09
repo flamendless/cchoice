@@ -145,30 +145,32 @@ templ SearchEndOfResultsSeparator() {
 	<div class="flex flex-col items-center my-4 px-4">
 		@common.HR()
 		<p class="text-sm font-medium text-primary-dark text-center py-2">
-			End of results. Showing other products
+			You may also like
 		</p>
 		@common.HR()
 	</div>
 }
 
 templ SearchRelatedProductsPage(data models.SearchRelatedProductsPageData) {
-	@CategorySectionProducts(models.CategorySectionProducts{
-		ID:       "search-related",
-		Products: data.Products,
-	})
-	if data.HasMore {
-		<div
-			class="search-related-inf-load"
-			hx-get={ utils.URLWithParams("/search/related", map[string]string{
-				"q":      data.Query,
-				"page":   fmt.Sprintf("%d", data.Page+1),
-				"source": data.Source,
-			}) }
-			hx-target=".search-related-inf-load"
-			hx-swap="outerHTML"
-			hx-trigger="revealed"
-		></div>
-	}
+	<div class="pb-24 mb-24 lg:pb-12 lg:mb-12">
+		@CategorySectionProducts(models.CategorySectionProducts{
+			ID:       "search-related",
+			Products: data.Products,
+		})
+		if data.HasMore {
+			<div
+				class="search-related-inf-load"
+				hx-get={ utils.URLWithParams("/search/related", map[string]string{
+					"q":      data.Query,
+					"page":   fmt.Sprintf("%d", data.Page+1),
+					"source": data.Source,
+				}) }
+				hx-target=".search-related-inf-load"
+				hx-swap="outerHTML"
+				hx-trigger="revealed"
+			></div>
+		}
+	</div>
 }
 
 templ SearchProductsExhausted(query string) {

@@ -12,5 +12,5 @@ type SearchProductsQuery struct {
 type SearchRelatedQuery struct {
 	Q      string `form:"q" validate:"required,min_search"`
 	Page   int    `form:"page"`
-	Source string `form:"source" validate:"omitempty,oneof=related other"`
+	Source string `form:"source" validate:"omitempty,oneof=related category brand"`
 }

@@ -91,7 +91,6 @@ type ProductPageData struct {
 	Colours                    []string
 	Sizes                      []string
 	Specs                      []ProductSpec
-	RelatedProducts            []RelatedProduct
 	ExternalLinks              []ProductExternalPlatformLink
 }
 
