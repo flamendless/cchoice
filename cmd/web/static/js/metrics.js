@@ -14,9 +14,11 @@ function metrics_event(ev, value) {
 		value = "";
 	}
 
-	const url = `${baseurl}/metrics/event?event=${ev}&value=${value}`
+	const params = new URLSearchParams({ event: ev, value: value })
+	const url = `${baseurl}/collect/event?${params.toString()}`
 	fetch(url, {
 		method: "POST",
+		keepalive: true,
 	})
 	.catch(error => console.error("Error:", error));
 

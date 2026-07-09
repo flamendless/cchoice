@@ -70,5 +70,5 @@ func MatchPath(path string, target string) bool {
 }
 
 func MetricsEvent(event string) string {
-	return fmt.Sprintf("%s?event=%s", URL("/metrics/event"), event)
+	return fmt.Sprintf("%s?event=%s", URL("/collect/event"), event)
 }
