@@ -201,6 +201,18 @@ func TestBuildProductStructuredData(t *testing.T) {
 	assert.Equal(t, "12999.00", offers["price"])
 	assert.Equal(t, "PHP", offers["priceCurrency"])
 	assert.Equal(t, "https://cchoice.shop/product/bosch-gma-55", offers["url"])
+	assert.NotEmpty(t, offers["priceValidUntil"])
+
+	review, ok := productNode["review"].(map[string]any)
+	require.True(t, ok)
+	assert.Equal(t, "Review", review["@type"])
+	assert.Equal(t, "Heavy-duty table saw", review["reviewBody"])
+	assert.Equal(t, "Product Overview", review["name"])
+
+	author, ok := review["author"].(map[string]any)
+	require.True(t, ok)
+	assert.Equal(t, "Organization", author["@type"])
+	assert.Equal(t, "C-Choice", author["name"])
 
 	breadcrumb, ok := graph[1].(map[string]any)
 	require.True(t, ok)
@@ -225,4 +237,28 @@ func TestBuildProductStructuredData(t *testing.T) {
 	assert.Equal(t, "GMA 55", lastItem["name"])
 	_, hasItem := lastItem["item"]
 	assert.False(t, hasItem)
+}
+
+func TestBuildProductStructuredData_OmitsReviewWithoutDescription(t *testing.T) {
+	product := gma55Product()
+
+	raw := BuildProductStructuredData(
+		product,
+		"https://cchoice.shop/product/bosch-gma-55",
+		"https://cdn.example.com/product.webp",
+		"12999.00",
+		"PHP",
+		"https://cchoice.shop",
+	)
+
+	var payload map[string]any
+	require.NoError(t, json.Unmarshal(raw, &payload))
+
+	graph, ok := payload["@graph"].([]any)
+	require.True(t, ok)
+
+	productNode, ok := graph[0].(map[string]any)
+	require.True(t, ok)
+	_, hasReview := productNode["review"]
+	assert.False(t, hasReview)
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/utils"
 )
@@ -55,6 +56,18 @@ type breadcrumbItem struct {
 	Position int    `json:"position"`
 	Name     string `json:"name"`
 	Item     string `json:"item,omitempty"`
+}
+
+type reviewAuthor struct {
+	Type string `json:"@type"`
+	Name string `json:"name"`
+}
+
+type reviewSchema struct {
+	Type       string       `json:"@type"`
+	Name       string       `json:"name,omitempty"`
+	ReviewBody string       `json:"reviewBody,omitempty"`
+	Author     reviewAuthor `json:"author"`
 }
 
 func ProductCanonicalURL(siteBaseURL, slug string) string {
@@ -227,6 +240,27 @@ func buildProductBreadcrumbItems(product Product, siteBaseURL string) []breadcru
 	return items
 }
 
+func buildProductReview(product Product) *reviewSchema {
+	description := strings.TrimSpace(product.Description)
+	if description == "" {
+		return nil
+	}
+
+	return &reviewSchema{
+		Type:       "Review",
+		Name:       "Product Overview",
+		ReviewBody: description,
+		Author: reviewAuthor{
+			Type: "Organization",
+			Name: "C-Choice",
+		},
+	}
+}
+
+func offerPriceValidUntil() string {
+	return time.Now().UTC().AddDate(1, 0, 0).Format(constants.DateLayoutISO)
+}
+
 func BuildProductStructuredData(
 	product Product,
 	canonicalURL string,
@@ -240,26 +274,28 @@ func BuildProductStructuredData(
 		Name string `json:"name"`
 	}
 	type offer struct {
-		Type          string `json:"@type"`
-		URL           string `json:"url"`
-		PriceCurrency string `json:"priceCurrency"`
-		Price         string `json:"price"`
-		Availability  string `json:"availability"`
-		ItemCondition string `json:"itemCondition"`
+		Type            string `json:"@type"`
+		URL             string `json:"url"`
+		PriceCurrency   string `json:"priceCurrency"`
+		Price           string `json:"price"`
+		PriceValidUntil string `json:"priceValidUntil,omitempty"`
+		Availability    string `json:"availability"`
+		ItemCondition   string `json:"itemCondition"`
 	}
 	type breadcrumbList struct {
 		Type     string           `json:"@type"`
 		ItemList []breadcrumbItem `json:"itemListElement"`
 	}
 	type productSchema struct {
-		Type        string   `json:"@type"`
-		Name        string   `json:"name"`
-		Description string   `json:"description,omitempty"`
-		Image       []string `json:"image,omitempty"`
-		SKU         string   `json:"sku"`
-		URL         string   `json:"url"`
-		Brand       brand    `json:"brand"`
-		Offers      offer    `json:"offers"`
+		Type        string        `json:"@type"`
+		Name        string        `json:"name"`
+		Description string        `json:"description,omitempty"`
+		Image       []string      `json:"image,omitempty"`
+		SKU         string        `json:"sku"`
+		URL         string        `json:"url"`
+		Brand       brand         `json:"brand"`
+		Review      *reviewSchema `json:"review,omitempty"`
+		Offers      offer         `json:"offers"`
 	}
 	type graph struct {
 		Context string `json:"@context"`
@@ -283,13 +319,15 @@ func BuildProductStructuredData(
 				SKU:         product.Serial,
 				URL:         canonicalURL,
 				Brand:       brand{Type: "Brand", Name: product.BrandName},
+				Review:      buildProductReview(product),
 				Offers: offer{
-					Type:          "Offer",
-					URL:           canonicalURL,
-					PriceCurrency: priceCurrency,
-					Price:         priceAmount,
-					Availability:  "https://schema.org/InStock",
-					ItemCondition: "https://schema.org/NewCondition",
+					Type:            "Offer",
+					URL:             canonicalURL,
+					PriceCurrency:   priceCurrency,
+					Price:           priceAmount,
+					PriceValidUntil: offerPriceValidUntil(),
+					Availability:    "https://schema.org/InStock",
+					ItemCondition:   "https://schema.org/NewCondition",
 				},
 			},
 			breadcrumbList{
