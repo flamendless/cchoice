@@ -1,0 +1,548 @@
+package components
+
+import (
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
+	"cchoice/internal/enums"
+	"cchoice/internal/utils"
+	"cmp"
+	"time"
+)
+
+templ AdminThemesListPage(title string) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("Themes - C-Choice Admin")
+		</head>
+		<body
+			class="bg-surface min-h-screen flex flex-col"
+			_="init call metrics_event('admin_visit', 'themes list')"
+		>
+			@common.DevRibbon()
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-8xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.AdminStaffHeaderWithBack()
+						<h1 class="text-2xl font-bold text-center text-primary mb-6">
+							Manage Themes
+						</h1>
+						@ThemesListSection()
+					</div>
+				</div>
+			</div>
+			<div id="theme-edit-modal-container"></div>
+			@ThemePreview()
+		</body>
+	</html>
+}
+
+templ ThemesListSection() {
+	<div
+		class="bg-white rounded-lg shadow-md p-6"
+		hx-get={ utils.URL("/admin/themes/table") }
+		hx-trigger="load"
+		hx-target="#themes-table"
+		hx-swap="innerHTML"
+	>
+		@ThemesToolbar(utils.URL("/admin/themes/table"))
+		<div id="themes-table"></div>
+	</div>
+}
+
+templ ThemesToolbar(url string) {
+	<div class="flex flex-col sm:flex-row sm:flex-wrap justify-between items-start sm:items-center gap-4 mb-4">
+		<div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+			<input
+				type="text"
+				name="search"
+				placeholder="Search by title..."
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+				hx-get={ url }
+				hx-trigger="keyup changed delay:300ms, change"
+				hx-target="#themes-table"
+				hx-include="[name='search'],[name='sort_by'],[name='sort_dir']"
+			/>
+			<select
+				name="sort_by"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+				hx-get={ url }
+				hx-trigger="change"
+				hx-target="#themes-table"
+				hx-include="[name='search'],[name='sort_by'],[name='sort_dir']"
+			>
+				<option value="TITLE">Sort By: Title</option>
+				<option value="START_DATE">Sort By: Start Date</option>
+				<option value="END_DATE">Sort By: End Date</option>
+				<option value="STATUS">Sort By: Status</option>
+			</select>
+			<select
+				name="sort_dir"
+				class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+				hx-get={ url }
+				hx-trigger="change"
+				hx-target="#themes-table"
+				hx-include="[name='search'],[name='sort_by'],[name='sort_dir']"
+			>
+				<option value="ASC">Sort: Ascending</option>
+				<option value="DESC">Sort: Descending</option>
+			</select>
+		</div>
+		<a
+			href={ utils.URL("/admin/themes/create") }
+			class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+		>
+			New Theme
+		</a>
+	</div>
+}
+
+templ AdminThemesListTable(themes []models.AdminThemeListItem) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-50">
+				<tr>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[8%]">
+						Active
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
+						ID
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[18%]">
+						Title
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[13%]">
+						Start Date
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[13%]">
+						End Date
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
+						Status
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[13%]">
+						Created At
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
+						Actions
+					</th>
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				if len(themes) == 0 {
+					<tr>
+						<td colspan="8" class="px-6 py-4 text-center text-gray-500">
+							No themes found.
+						</td>
+					</tr>
+				} else {
+					for _, theme := range themes {
+						<tr id={ "theme-row-" + theme.ID }>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+								if theme.Active {
+									<input type="checkbox" checked disabled class="h-4 w-4 accent-primary" title="Currently active"/>
+								} else {
+									<input type="checkbox" disabled class="h-4 w-4"/>
+								}
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+								{ theme.ID }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+								{ theme.Title }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+								{ theme.StartDate }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+								{ theme.EndDate }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm">
+								@ThemeStatusBadge(theme.Status)
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+								{ theme.CreatedAt }
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm">
+								@ThemeActionsCell(theme)
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ ThemeActionsCell(theme models.AdminThemeListItem) {
+	<div class="flex items-center gap-2">
+		if theme.Status == enums.THEME_STATUS_DELETED {
+			<button
+				type="button"
+				class="text-white bg-gray-300 px-3 py-1 rounded text-xs font-medium cursor-not-allowed"
+				disabled
+			>
+				Edit
+			</button>
+		} else {
+			<button
+				type="button"
+				class="text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium"
+				hx-get={ utils.URLf("/admin/themes/%s/edit", theme.ID) }
+				hx-target="#theme-edit-modal-container"
+				hx-swap="innerHTML"
+			>
+				Edit
+			</button>
+		}
+	</div>
+}
+
+templ ThemeStatusBadge(status enums.ThemeStatus) {
+	switch status {
+		case enums.THEME_STATUS_PUBLISHED:
+			<span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
+				{ status }
+			</span>
+		case enums.THEME_STATUS_DRAFT:
+			<span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-orange-100 text-orange-800">
+				{ status }
+			</span>
+		case enums.THEME_STATUS_DELETED:
+			<span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
+				{ status }
+			</span>
+		default:
+			<span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
+				{ status }
+			</span>
+	}
+}
+
+templ ThemeConfigTypeOptions(selected enums.ThemeConfigType) {
+	for _, ct := range enums.AllThemeConfigTypes {
+		if ct == selected {
+			<option value={ ct.String() } selected>{ ct.String() }</option>
+		} else {
+			<option value={ ct.String() }>{ ct.String() }</option>
+		}
+	}
+}
+
+templ ThemeStatusOptions(selected enums.ThemeStatus) {
+	for _, st := range enums.AllThemeStatuses {
+		if st == selected {
+			<option value={ st.String() } selected>{ st.String() }</option>
+		} else {
+			<option value={ st.String() }>{ st.String() }</option>
+		}
+	}
+}
+
+templ ThemeColorFields(configuration map[string]string) {
+	<div class="grid grid-cols-2 gap-3">
+		for _, key := range constants.ThemeColorKeys {
+			<div>
+				<label class="block text-xs font-medium text-gray-700 mb-1">
+					{ key }
+				</label>
+				<div class="flex items-center gap-2">
+					<input
+						type="color"
+						value={ cmp.Or(configuration[key], "#000000") }
+						class="h-9 w-9 shrink-0 border border-gray-300 rounded-md cursor-pointer p-0.5"
+						_={ "on input set #color_text_" + key + ".value to my value" }
+					/>
+					<input
+						type="text"
+						id={ "color_text_" + key }
+						name={ "color_" + key }
+						placeholder="#000000"
+						value={ configuration[key] }
+						class="px-2 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full text-sm"
+						_="on input if my value matches /^#[0-9a-fA-F]{6}$/ set previous <input/>.value to my value"
+					/>
+				</div>
+			</div>
+		}
+	</div>
+}
+
+templ ThemeCreateForm() {
+	<form
+		hx-post={ utils.URL("/admin/themes") }
+		hx-swap="outerHTML"
+		class="flex flex-col gap-4"
+	>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">
+				Title <span class="text-red-500">*</span>
+			</label>
+			<input
+				type="text"
+				name="title"
+				placeholder="Up to 24 alphanumeric characters"
+				maxlength="24"
+				pattern="[a-zA-Z0-9]+"
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"
+			/>
+		</div>
+		<div class="grid grid-cols-2 gap-3">
+			<div>
+				<label class="block text-sm font-medium text-gray-700 mb-1">
+					Start Date <span class="text-red-500">*</span>
+				</label>
+				<input
+					type="date"
+					name="start_date"
+					min={ time.Now().Format(constants.DateLayoutISO) }
+					required
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"
+				/>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-700 mb-1">
+					End Date <span class="text-red-500">*</span>
+				</label>
+				<input
+					type="date"
+					name="end_date"
+					min={ time.Now().Format(constants.DateLayoutISO) }
+					required
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"
+				/>
+			</div>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">
+				Configuration Type <span class="text-red-500">*</span>
+			</label>
+			<select
+				name="configuration_type"
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"
+			>
+				@ThemeConfigTypeOptions(enums.THEME_CONFIG_TYPE_JSON)
+			</select>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-2">
+				Colors
+			</label>
+			@ThemeColorFields(map[string]string{})
+		</div>
+		<p class="text-xs text-gray-500">
+			New themes are saved as DRAFT. Publish from the themes list once ready.
+		</p>
+		<div class="flex justify-end gap-3 mt-2">
+			<a
+				href={ utils.URL("/admin/themes") }
+				class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+			>
+				Cancel
+			</a>
+
+			<button
+				type="button"
+				class="px-4 py-2 border border-primary rounded-md text-primary hover:bg-primary hover:text-white"
+				onclick="openThemePreview(this)"
+			>
+				Preview
+			</button>
+			<button
+				type="submit"
+				class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
+			>
+				Save
+			</button>
+		</div>
+	</form>
+}
+
+templ AdminThemesCreatePage() {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("New Theme - C-Choice Admin")
+		</head>
+		<body
+			class="bg-surface min-h-screen flex flex-col"
+			_="init call metrics_event('admin_visit', 'themes create')"
+		>
+			@common.DevRibbon()
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-4xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.AdminStaffHeaderWithBackLink(utils.URL("/admin/themes"), "Back to Manage Themes")
+						<h1 class="text-2xl font-bold text-center text-primary mb-6">
+							New Theme
+						</h1>
+						@ThemeCreateForm()
+					</div>
+				</div>
+			</div>
+			@ThemePreview()
+		</body>
+	</html>
+}
+
+templ ThemeEditModal(theme models.AdminThemeListItem) {
+	<div
+		id="theme-edit-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="
+			on closeModal
+				set #theme-edit-modal-container.innerHTML to ''
+		"
+	>
+		<div class="absolute inset-0 bg-black/50" _="on click trigger closeModal"></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">Edit Theme</h2>
+				<button
+					type="button"
+					class="text-gray-400 hover:text-gray-600"
+					_="on click trigger closeModal"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			@ThemeEditForm(theme)
+		</div>
+	</div>
+}
+
+templ ThemeEditForm(theme models.AdminThemeListItem) {
+	<form
+		hx-patch={ utils.URLf("/admin/themes/%s", theme.ID) }
+		hx-swap="outerHTML"
+		class="flex flex-col gap-4"
+		hx-on::after-request="if(event.detail.successful) { document.getElementById('theme-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/themes/table', { target: '#themes-table', swap: 'innerHTML' }) }"
+	>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">
+				Title <span class="text-red-500">*</span>
+			</label>
+			<input
+				type="text"
+				name="title"
+				value={ theme.Title }
+				maxlength="24"
+				pattern="[a-zA-Z0-9]+"
+				required
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"
+			/>
+		</div>
+		<div class="grid grid-cols-2 gap-3">
+			<div>
+				<label class="block text-sm font-medium text-gray-700 mb-1">
+					Start Date <span class="text-red-500">*</span>
+				</label>
+				<input
+					type="date"
+					name="start_date"
+					value={ theme.StartDate }
+					required
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"
+				/>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-700 mb-1">
+					End Date <span class="text-red-500">*</span>
+				</label>
+				<input
+					type="date"
+					name="end_date"
+					value={ theme.EndDate }
+					required
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"
+				/>
+			</div>
+		</div>
+		<div class="grid grid-cols-2 gap-3">
+			<div>
+				<label class="block text-sm font-medium text-gray-700 mb-1">
+					Status <span class="text-red-500">*</span>
+				</label>
+				<select
+					name="status"
+					required
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"
+				>
+					@ThemeStatusOptions(theme.Status)
+				</select>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-700 mb-1">
+					Configuration Type <span class="text-red-500">*</span>
+				</label>
+				<select
+					name="configuration_type"
+					required
+					class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"
+				>
+					@ThemeConfigTypeOptions(theme.ConfigurationType)
+				</select>
+			</div>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-2">
+				Colors
+			</label>
+			@ThemeColorFields(theme.Configuration)
+		</div>
+		<div class="flex justify-end gap-3 mt-2">
+			<button
+				type="button"
+				class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+				_="on click trigger closeModal"
+			>
+				Cancel
+			</button>
+
+			<button
+				type="button"
+				class="px-4 py-2 border border-primary rounded-md text-primary hover:bg-primary hover:text-white"
+				onclick="openThemePreview(this)"
+			>
+				Preview
+			</button>
+			<button
+				type="submit"
+				class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
+			>
+				Save
+			</button>
+		</div>
+	</form>
+}
+
+script ThemePreview() {
+	function openThemePreview(button) {
+		const form = button.closest("form");
+		if (!form) return;
+		const theme = {};
+		form.querySelectorAll("[name^='color_']").forEach((input) => {
+			if (input.value) {
+				theme[input.name.replace("color_", "")] = input.value;
+			}
+		});
+		const encodedTheme = btoa(JSON.stringify(theme))
+			.replace(/\+/g, "-")
+			.replace(/\//g, "_")
+			.replace(/=+$/, "");
+		window.open(globalThis._G.URL_PREFIX + "/preview?t=" + encodedTheme, "_blank", "noopener,noreferrer");
+	}
+	window.openThemePreview = openThemePreview;
+}
