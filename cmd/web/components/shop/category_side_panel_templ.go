@@ -106,9 +106,9 @@ func CategoriesSidePanelList(categories []models.CategorySidePanelText) templ.Co
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.URL(utils.URL("/static/js/category_side_panel.js")))
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.URL(utils.URL(utils.VersionedAsset("/static/js/category_side_panel.js"))))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/category_side_panel.templ`, Line: 31, Col: 96}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/category_side_panel.templ`, Line: 31, Col: 118}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {

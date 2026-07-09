@@ -62,14 +62,14 @@ templ HeadMetaBase() {
 	-->
 	<meta charset="UTF-8"/>
 	@onceHeadLinks.Once() {
-		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ utils.URL("/static/images/favicons/favicon.ico") }/>
+		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ utils.URL(utils.VersionedAsset("/static/images/favicons/favicon.ico")) }/>
 		for _, size := range faviconsizes {
 			<link rel="icon" type="image/png" sizes={ size } href={ fmt.Sprintf("https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-%s/public", size) }/>
 		}
-		<link href={ utils.URL("/static/css/tailwind.css") } rel="stylesheet"/>
-		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/htmx.min.js")) }></script>
-		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/hyperscript.min.js")) }></script>
-		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/metrics.js")) }></script>
+		<link href={ utils.URL(utils.VersionedAsset("/static/css/tailwind.css")) } rel="stylesheet"/>
+		<script type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/htmx.min.js"))) }></script>
+		<script async type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/hyperscript.min.js"))) }></script>
+		<script async type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/metrics.js"))) }></script>
 		@ScrAdSense()
 		@templ.JSONScript("url-prefix", utils.URL(""))
 		<script>

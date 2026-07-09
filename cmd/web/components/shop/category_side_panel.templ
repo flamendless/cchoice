@@ -28,7 +28,7 @@ templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 				<div class="py-8"></div>
 			}
 		}
-		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/category_side_panel.js")) }>
+		<script type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/category_side_panel.js"))) }>
 		</script>
 	</div>
 }

@@ -39,8 +39,12 @@ func URLf(path string, args ...any) string {
 }
 
 func URLWithParams(path string, params map[string]string) string {
+	return URL(appendQueryParams(path, params))
+}
+
+func appendQueryParams(path string, params map[string]string) string {
 	base := path
-	hasQuery := false
+	hasQuery := strings.Contains(path, "?")
 	for k, v := range params {
 		sep := "?"
 		if hasQuery {
@@ -49,7 +53,7 @@ func URLWithParams(path string, params map[string]string) string {
 		base = fmt.Sprintf("%s%s%s=%s", base, sep, url.QueryEscape(k), url.QueryEscape(v))
 		hasQuery = true
 	}
-	return URL(base)
+	return base
 }
 
 func URLWithSuccess(path string, message string) string {
