@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 
 	compshop "cchoice/cmd/web/components/shop"
@@ -11,8 +10,10 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -59,19 +60,15 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 	const logtag = "[Categories Section Handler]"
 	ctx := r.Context()
 
-	page := 0
-	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
-		if parsed, err := strconv.Atoi(paramPage); err == nil {
-			page = parsed
-		}
+	var req forms.CategorySectionQuery
+	if err := httputil.BindQuery(r, &req); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, httputil.ErrorMessage(err), http.StatusBadRequest)
+		return
 	}
 
-	limit := constants.DefaultLimitCategories
-	if paramLimit := r.URL.Query().Get("limit"); paramLimit != "" {
-		if parsed, err := strconv.Atoi(paramLimit); err == nil {
-			limit = max(parsed, constants.DefaultLimitCategories)
-		}
-	}
+	page := req.Page
+	limit := req.EffectiveLimit()
 
 	res, err := requests.GetCategorySectionHandler(
 		ctx,
@@ -105,14 +102,19 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 	const logtag = "[Category Products Handler]"
 	ctx := r.Context()
 
-	categoryID := chi.URLParam(r, "category_id")
-	if categoryID == "" {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(errs.ErrInvalidParams))
+	var pathReq forms.CategoryProductsPath
+	if err := httputil.BindPath(r, &pathReq); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, httputil.ErrorMessage(err), http.StatusBadRequest)
+		return
+	}
+	if _, err := httputil.RequireEncodedID(s.encoder, pathReq.CategoryID); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
 
-	categoryDBID := s.encoder.Decode(categoryID)
+	categoryDBID := s.encoder.Decode(pathReq.CategoryID)
 	category, err := s.dbRO.GetQueries().GetProductCategoryByID(ctx, categoryDBID)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -172,7 +174,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	categorySectionProducts := models.CategorySectionProducts{
-		ID:          categoryID,
+		ID:          pathReq.CategoryID,
 		Category:    utils.SlugToTile(category.Category.String),
 		Subcategory: utils.SlugToTile(category.Subcategory.String),
 		Products:    models.ToCategorySectionProducts(s.encoder, s.GetCDNURL, productsWithValidImages),

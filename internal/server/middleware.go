@@ -136,24 +136,25 @@ func PrometheusMiddleware(next http.Handler) http.Handler {
 
 func (s *Server) requireStaffAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		const page = "/admin"
 		ctx := r.Context()
 		staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
 		staffID := s.encoder.Decode(staffIDStr)
 		if staffID == 0 {
-			redirectHX(w, r, utils.URLWithError("/admin", "Login to access page"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrLoginRequired.Error()))
 			return
 		}
 
 		staff, err := s.dbRO.GetQueries().GetStaffByID(ctx, staffID)
 		if err != nil {
-			redirectHX(w, r, utils.URLWithError("/admin", "Login to access page"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrLoginRequired.Error()))
 			return
 		}
 
 		if enums.ParseStaffStatusToEnum(staff.Status) == enums.STAFF_STATUS_RESIGNED {
 			s.sessionManager.Remove(ctx, SessionStaffID)
 			s.sessionManager.Remove(ctx, SessionStaffAccessID)
-			redirectHX(w, r, utils.URLWithError("/admin", errs.ErrStaffResigned.Error()))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrStaffResigned.Error()))
 			return
 		}
 
@@ -163,14 +164,16 @@ func (s *Server) requireStaffAuth(next http.Handler) http.Handler {
 
 func (s *Server) requireSuperuserAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		const page = "/admin"
+		const staffPage = "/admin/staff"
 		staff, err := s.services.staff.GetCurrentStaff(r.Context(), s.sessionManager.GetString(r.Context(), SessionStaffID))
 		if staff.ID == 0 {
-			redirectHX(w, r, utils.URLWithError("/admin", "Login to access page"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrLoginRequired.Error()))
 			return
 		}
 
 		if err != nil || staff.UserType != enums.STAFF_USER_TYPE_SUPERUSER.String() {
-			redirectHX(w, r, utils.URLWithError("/admin/staff", "Login to access page"))
+			redirectHX(w, r, utils.URLWithError(staffPage, errs.ErrLoginRequired.Error()))
 			return
 		}
 		next.ServeHTTP(w, r)
@@ -179,9 +182,10 @@ func (s *Server) requireSuperuserAuth(next http.Handler) http.Handler {
 
 func (s *Server) requireCustomerAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		const page = "/customer"
 		customerID := s.encoder.Decode(s.sessionManager.GetString(r.Context(), SessionCustomerID))
 		if customerID == encode.INVALID {
-			redirectHX(w, r, utils.URLWithError("/customer", "Login to access page"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrLoginRequired.Error()))
 			return
 		}
 		next.ServeHTTP(w, r)
@@ -220,6 +224,7 @@ func (s *Server) HasRole(ctx context.Context, role enums.StaffRole) bool {
 func (s *Server) AllowRoles(roles ...enums.StaffRole) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			const page = "/admin"
 			ctx := r.Context()
 			hasAccess := false
 
@@ -231,7 +236,7 @@ func (s *Server) AllowRoles(roles ...enums.StaffRole) func(http.Handler) http.Ha
 			}
 
 			if !hasAccess {
-				redirectHX(w, r, utils.URLWithError("/admin", "Login to access page"))
+				redirectHX(w, r, utils.URLWithError(page, errs.ErrLoginRequired.Error()))
 				return
 			}
 

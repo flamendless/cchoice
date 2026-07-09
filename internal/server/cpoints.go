@@ -4,7 +4,10 @@ import (
 	"net/http"
 
 	compcpoints "cchoice/cmd/web/components/cpoints"
+	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -58,21 +61,22 @@ func (s *Server) cpointsTotalHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) cpointsClaimHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[C-Points Claim Handler]"
 	const page = "/cpoints"
+	const loginPage = "/customer"
 	ctx := r.Context()
 
 	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
 	if customerIDStr == "" {
-		redirectHX(w, r, utils.URLWithError("/customer", "Log in first"))
+		redirectHX(w, r, utils.URLWithError(loginPage, errs.ErrLogInFirst.Error()))
 		return
 	}
 
-	token := r.URL.Query().Get("token")
-	if token == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Token is required"))
+	var req forms.CPointsClaimQuery
+	if err := httputil.BindQuery(r, &req); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
-	if err := s.services.cpoint.RedeemWithToken(ctx, token, customerIDStr); err != nil {
+	if err := s.services.cpoint.RedeemWithToken(ctx, req.Token, customerIDStr); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
@@ -98,31 +102,28 @@ func (s *Server) cpointsRedeemPageHandler(w http.ResponseWriter, r *http.Request
 func (s *Server) cpointsRedeemHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[C-Points Redeem Handler]"
 	const page = "/cpoints/redeem"
+	const successPage = "/cpoints"
+	const loginPage = "/customer"
 	ctx := r.Context()
 
 	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
 	if customerIDStr == "" {
-		redirectHX(w, r, utils.URLWithError("/customer", "Log in first"))
+		redirectHX(w, r, utils.URLWithError(loginPage, errs.ErrLogInFirst.Error()))
 		return
 	}
 
-	if err := r.ParseForm(); err != nil {
+	var req forms.CPointsRedeemForm
+	if err := httputil.BindPostForm(r, &req); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
-	code := r.PostFormValue("code")
-	if code == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Code is required"))
-		return
-	}
-
-	if err := s.services.cpoint.RedeemCpoint(ctx, customerIDStr, code); err != nil {
+	if err := s.services.cpoint.RedeemCpoint(ctx, customerIDStr, req.Code); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 
-	redirectHX(w, r, utils.URLWithSuccess("/cpoints", "C-Points redeemed successfully!"))
+	redirectHX(w, r, utils.URLWithSuccess(successPage, "C-Points redeemed successfully!"))
 }

@@ -3,14 +3,16 @@ package server
 import (
 	"database/sql"
 	"net/http"
-	"strings"
 	"time"
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/services"
 	"cchoice/internal/types"
 	"cchoice/internal/utils"
@@ -116,33 +118,20 @@ func (s *Server) adminChangePasswordHandler(w http.ResponseWriter, r *http.Reque
 	const page = "/admin/profile"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+	var f forms.AdminStaffChangePasswordForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
-
-	newPassword := r.PostFormValue("new_password")
-	confirmPassword := r.PostFormValue("confirm_password")
-
-	if newPassword == "" || confirmPassword == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Both password fields are required"))
-		return
-	}
-
-	if !constants.RePassword.MatchString(newPassword) {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid password format"))
-		return
-	}
-
-	if newPassword != confirmPassword {
-		redirectHX(w, r, utils.URLWithError(page, "Passwords do not match"))
+	if f.NewPassword != f.ConfirmPassword {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrPasswordsDoNotMatch.Error()))
 		return
 	}
 
 	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
-	if err := s.services.staff.UpdatePassword(ctx, staffID, newPassword); err != nil {
+	if err := s.services.staff.UpdatePassword(ctx, staffID, f.NewPassword); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("staff_id", staffID))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to update password"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrStaffPasswordUpdateFailed.Error()))
 		return
 	}
 
@@ -179,44 +168,28 @@ func (s *Server) adminProfileUpdateHandler(w http.ResponseWriter, r *http.Reques
 	const page = "/admin/profile"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+	var f forms.AdminStaffProfileUpdateForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
-
-	firstName := r.PostFormValue("first_name")
-	middleName := r.PostFormValue("middle_name")
-	lastName := r.PostFormValue("last_name")
-	mobileNo := r.PostFormValue("mobile_no")
-	birthdate := r.PostFormValue("birthdate")
-	dateHired := r.PostFormValue("date_hired")
-
-	if firstName == "" || lastName == "" || mobileNo == "" || birthdate == "" || dateHired == "" {
-		redirectHX(w, r, utils.URLWithError(page, "All required fields must be filled"))
-		return
-	}
-
-	if !strings.HasPrefix(mobileNo, constants.PHMobilePrefix) {
-		mobileNo = constants.PHMobilePrefix + mobileNo
-	}
-
-	if !constants.ReMobileNumber.MatchString(mobileNo) {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid mobile number format"))
+	if !constants.ReMobileNumber.MatchString(f.MobileNo) {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrValidationInvalidMobileNumber.Error()))
 		return
 	}
 
 	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
 	if err := s.services.staff.UpdateProfile(ctx, services.UpdateProfileParams{
 		ID:         staffID,
-		FirstName:  firstName,
-		MiddleName: middleName,
-		LastName:   lastName,
-		MobileNo:   mobileNo,
-		Birthdate:  birthdate,
-		DateHired:  dateHired,
+		FirstName:  f.FirstName,
+		MiddleName: f.MiddleName,
+		LastName:   f.LastName,
+		MobileNo:   f.MobileNo,
+		Birthdate:  f.Birthdate,
+		DateHired:  f.DateHired,
 	}); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("staff_id", staffID))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to update profile"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrStaffUpdateFailed.Error()))
 		return
 	}
 
@@ -257,6 +230,7 @@ func (s *Server) adminStaffListHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Page Handler]"
+	const page = "/admin/staff"
 	ctx := r.Context()
 
 	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
@@ -277,7 +251,7 @@ func (s *Server) adminStaffPageHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err != sql.ErrNoRows {
 			logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-			redirectHX(w, r, utils.URLWithError("/admin/staff", "Error encountered"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrInternalServer.Error()))
 			return
 		}
 	} else {
@@ -375,7 +349,11 @@ func (s *Server) adminStaffAttendanceTableHandler(w http.ResponseWriter, r *http
 		return
 	}
 
-	date := utils.ParseAttendanceDate(r.URL.Query().Get("date"))
+	var q forms.AdminStaffAttendanceDateQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+	}
+	date := utils.ParseAttendanceDate(q.Date)
 	attendance, err := s.services.staff.GetAttendanceByDate(ctx, staff.ID, date)
 	var record *models.Attendance
 	if err == nil {
@@ -422,7 +400,11 @@ func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.
 		return
 	}
 
-	date := utils.ParseAttendanceDate(r.URL.Query().Get("date-selector"))
+	var q forms.AdminStaffAttendanceRowsQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+	}
+	date := utils.ParseAttendanceDate(q.DateSelector)
 	attendance, err := s.services.staff.GetAttendanceByDate(ctx, staff.ID, date)
 	var record *models.Attendance
 	if err == nil {
@@ -459,6 +441,7 @@ func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.
 }
 
 func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request) {
+	const page = "/admin/staff/attendance"
 	ctx := r.Context()
 	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
 	date := utils.NowPH().Format(constants.DateLayoutISO)
@@ -468,10 +451,11 @@ func (s *Server) adminStaffTimeInHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Unable to time in", http.StatusBadRequest)
 		return
 	}
-	redirectHX(w, r, utils.URLWithSuccess("/admin/staff/attendance", "Time in recorded successfully"))
+	redirectHX(w, r, utils.URLWithSuccess(page, "Time in recorded successfully"))
 }
 
 func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request) {
+	const page = "/admin/staff/attendance"
 	ctx := r.Context()
 	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
 	date := utils.NowPH().Format(constants.DateLayoutISO)
@@ -481,11 +465,12 @@ func (s *Server) adminStaffTimeOutHandler(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Unable to time out", http.StatusBadRequest)
 		return
 	}
-	redirectHX(w, r, utils.URLWithSuccess("/admin/staff/attendance", "Time out recorded successfully"))
+	redirectHX(w, r, utils.URLWithSuccess(page, "Time out recorded successfully"))
 }
 
 func (s *Server) adminStaffLunchBreakInHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Lunch Break Start Handler]"
+	const page = "/admin/staff/attendance"
 	ctx := r.Context()
 	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
 	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
@@ -502,11 +487,12 @@ func (s *Server) adminStaffLunchBreakInHandler(w http.ResponseWriter, r *http.Re
 		http.Error(w, "Unable to lunchbreak in", http.StatusBadRequest)
 		return
 	}
-	redirectHX(w, r, utils.URLWithSuccess("/admin/staff/attendance", "Lunch break start recorded successfully"))
+	redirectHX(w, r, utils.URLWithSuccess(page, "Lunch break start recorded successfully"))
 }
 
 func (s *Server) adminStaffLunchBreakOutHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Lunch Break End Handler]"
+	const page = "/admin/staff/attendance"
 	ctx := r.Context()
 	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
 	now := time.Now().UTC().Format(constants.DateTimeLayoutISO)
@@ -523,7 +509,7 @@ func (s *Server) adminStaffLunchBreakOutHandler(w http.ResponseWriter, r *http.R
 		http.Error(w, "Unable to lunchbreak out", http.StatusBadRequest)
 		return
 	}
-	redirectHX(w, r, utils.URLWithSuccess("/admin/staff/attendance", "Lunch break end recorded successfully"))
+	redirectHX(w, r, utils.URLWithSuccess(page, "Lunch break end recorded successfully"))
 }
 
 func (s *Server) adminStaffTimeOffPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -542,28 +528,30 @@ func (s *Server) adminStaffTimeOffPageHandler(w http.ResponseWriter, r *http.Req
 
 func (s *Server) adminStaffTimeOffHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Time Off Handler]"
+	const page = "/admin/staff/time-off"
 	ctx := r.Context()
-	if err := r.ParseForm(); err != nil {
+	var f forms.AdminStaffTimeOffForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	timeOffType := enums.ParseTimeOffToEnum(r.PostFormValue("type"))
+	timeOffType := enums.ParseTimeOffToEnum(f.Type)
 	if timeOffType == enums.TIME_OFF_UNDEFINED {
 		http.Error(w, "Invalid time off type", http.StatusBadRequest)
 		return
 	}
-	description := r.PostFormValue("description")
+	description := f.Description
 	if description == "" {
 		http.Error(w, "Description is required", http.StatusBadRequest)
 		return
 	}
-	startDate, err := time.Parse(constants.DateLayoutISO, r.PostFormValue("start-date"))
+	startDate, err := time.Parse(constants.DateLayoutISO, f.StartDate)
 	if err != nil {
 		http.Error(w, "Invalid start date", http.StatusBadRequest)
 		return
 	}
-	endDate, err := time.Parse(constants.DateLayoutISO, r.PostFormValue("end-date"))
+	endDate, err := time.Parse(constants.DateLayoutISO, f.EndDate)
 	if err != nil {
 		http.Error(w, "Invalid end date", http.StatusBadRequest)
 		return
@@ -586,7 +574,7 @@ func (s *Server) adminStaffTimeOffHandler(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Unable to time off", http.StatusBadRequest)
 		return
 	}
-	redirectHX(w, r, utils.URLWithSuccess("/admin/staff/time-off", "Time off request submitted"))
+	redirectHX(w, r, utils.URLWithSuccess(page, "Time off request submitted"))
 }
 
 func (s *Server) adminStaffTimeOffTableHandler(w http.ResponseWriter, r *http.Request) {

@@ -6,10 +6,10 @@ import (
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/internal/encode"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
-
-	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
@@ -18,7 +18,16 @@ func (s *Server) adminStaffMemoAcceptHandler(w http.ResponseWriter, r *http.Requ
 	ctx := r.Context()
 
 	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
-	memoID := chi.URLParam(r, "id")
+	var p forms.AdminStaffMemoPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(s.staffHomeRedirect(ctx), httputil.ErrorMessage(err)))
+		return
+	}
+	memoID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(s.staffHomeRedirect(ctx), err.Error()))
+		return
+	}
 
 	if err := s.services.memo.AcceptMemo(ctx, staffID, memoID); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -33,7 +42,16 @@ func (s *Server) adminStaffMemoRejectModalHandler(w http.ResponseWriter, r *http
 	const logtag = "[Admin Staff Memo Reject Modal Handler]"
 	ctx := r.Context()
 
-	memoID := chi.URLParam(r, "id")
+	var p forms.AdminStaffMemoPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(s.staffHomeRedirect(ctx), httputil.ErrorMessage(err)))
+		return
+	}
+	memoID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(s.staffHomeRedirect(ctx), err.Error()))
+		return
+	}
 	if err := compadmin.StaffMemoRejectModal(memoID).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(s.staffHomeRedirect(ctx), err.Error()))
@@ -44,15 +62,25 @@ func (s *Server) adminStaffMemoRejectHandler(w http.ResponseWriter, r *http.Requ
 	const logtag = "[Admin Staff Memo Reject Handler]"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var p forms.AdminStaffMemoPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(s.staffHomeRedirect(ctx), httputil.ErrorMessage(err)))
+		return
+	}
+	memoID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(s.staffHomeRedirect(ctx), err.Error()))
+		return
+	}
+	var f forms.AdminStaffMemoRejectForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(s.staffHomeRedirect(ctx), "Failed to parse form"))
+		redirectHX(w, r, utils.URLWithError(s.staffHomeRedirect(ctx), httputil.ErrorMessage(err)))
 		return
 	}
 
 	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
-	memoID := chi.URLParam(r, "id")
-	reason := r.FormValue("reject_reason")
+	reason := f.RejectReason
 
 	if err := s.services.memo.RejectMemo(ctx, staffID, memoID, reason); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))

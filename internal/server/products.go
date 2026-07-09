@@ -10,7 +10,9 @@ import (
 	compproduct "cchoice/cmd/web/components/product"
 	"cchoice/internal/encode"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
 )
 
@@ -23,11 +25,12 @@ func (s *Server) productPageHandler(w http.ResponseWriter, r *http.Request) {
 	const page = "/"
 	ctx := r.Context()
 
-	slug := chi.URLParam(r, "slug")
-	if slug == "" {
+	var pathReq forms.ProductSlugPath
+	if err := httputil.BindPath(r, &pathReq); err != nil {
 		s.renderProductNotFound(w, r, page)
 		return
 	}
+	slug := pathReq.Slug
 
 	productData, err := s.services.product.GetForPage(ctx, slug)
 	if err != nil {

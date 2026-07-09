@@ -9,21 +9,24 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
-	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
 func (s *Server) adminMemosListPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Memos List Page Handler]"
+	const page = "/admin/memos"
 	ctx := r.Context()
 
 	if err := compadmin.AdminMemosListPage().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/memos", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 	}
 }
 
@@ -73,7 +76,16 @@ func (s *Server) adminMemosStaffRowsHandler(w http.ResponseWriter, r *http.Reque
 	const page = "/admin/memos"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
+	var p forms.AdminMemoPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
 	rows, err := s.services.memo.GetRecipientsWithActions(ctx, idStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -106,19 +118,20 @@ func (s *Server) adminMemosStaffRowsHandler(w http.ResponseWriter, r *http.Reque
 
 func (s *Server) adminMemosCreatePageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Memos Create Page Handler]"
+	const page = "/admin/memos"
 	ctx := r.Context()
 
 	staffList, err := s.services.staff.GetAllForMemo(ctx, 100)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/memos", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 
 	currentStaffID := s.sessionManager.GetString(ctx, SessionStaffID)
 	if err := compadmin.MemoCreateModal(staffList, nil, currentStaffID).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/memos", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 	}
 }
 
@@ -127,15 +140,24 @@ func (s *Server) adminMemosEditPageHandler(w http.ResponseWriter, r *http.Reques
 	const page = "/admin/memos"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
+	var p forms.AdminMemoPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrMemoGetFailed.Error()))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrMemoGetFailed.Error()))
+		return
+	}
 	memo, err := s.services.memo.GetMemoByID(ctx, idStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to get memo"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrMemoGetFailed.Error()))
 		return
 	}
 	if memo == nil {
-		redirectHX(w, r, utils.URLWithError(page, "Memo not found"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrMemoNotFound.Error()))
 		return
 	}
 
@@ -167,7 +189,7 @@ func (s *Server) adminMemosEditPageHandler(w http.ResponseWriter, r *http.Reques
 	currentStaffID := s.sessionManager.GetString(ctx, SessionStaffID)
 	if err := compadmin.MemoEditModal(memoItem, staffList, currentStaffID).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to render edit form"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrRenderFailed.Error()))
 	}
 }
 
@@ -176,34 +198,35 @@ func (s *Server) adminMemosCreateHandler(w http.ResponseWriter, r *http.Request)
 	const page = "/admin/memos"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var f forms.AdminMemoForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
-	title := r.FormValue("title")
-	message := r.FormValue("message")
-	fileURL := strings.TrimSpace(r.FormValue("file_url"))
-	statusStr := r.FormValue("status")
-	startDateStr := r.FormValue("start_date")
-	endDateStr := r.FormValue("end_date")
-	staffIDs := r.Form["staff_ids"]
+	title := f.Title
+	message := f.Message
+	fileURL := strings.TrimSpace(f.FileURL)
+	statusStr := f.Status
+	startDateStr := f.StartDate
+	endDateStr := f.EndDate
+	staffIDs := f.StaffIDs
 
 	if title == "" || message == "" || statusStr == "" || startDateStr == "" || endDateStr == "" {
-		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrMemoAllFieldsRequired.Error()))
 		return
 	}
 
 	startDate, err := time.Parse(constants.DateLayoutISO, startDateStr)
 	if err != nil {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid start date format"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrTimeParse.Error()))
 		return
 	}
 
 	endDate, err := time.Parse(constants.DateLayoutISO, endDateStr)
 	if err != nil {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid end date format"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrTimeParse.Error()))
 		return
 	}
 
@@ -214,7 +237,7 @@ func (s *Server) adminMemosCreateHandler(w http.ResponseWriter, r *http.Request)
 
 	status := enums.ParseMemoStatusToEnum(statusStr)
 	if status == enums.MEMO_STATUS_UNDEFINED || status == enums.MEMO_STATUS_DELETED {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid status"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrMemoInvalidStatus.Error()))
 		return
 	}
 
@@ -242,23 +265,33 @@ func (s *Server) adminMemosUpdateHandler(w http.ResponseWriter, r *http.Request)
 	const page = "/admin/memos"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var p forms.AdminMemoPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrMemoAllFieldsRequired.Error()))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrMemoAllFieldsRequired.Error()))
+		return
+	}
+	var f forms.AdminMemoForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
-	idStr := chi.URLParam(r, "id")
-	title := r.FormValue("title")
-	message := r.FormValue("message")
-	fileURL := strings.TrimSpace(r.FormValue("file_url"))
-	statusStr := r.FormValue("status")
-	startDateStr := r.FormValue("start_date")
-	endDateStr := r.FormValue("end_date")
-	staffIDs := r.Form["staff_ids"]
+	title := f.Title
+	message := f.Message
+	fileURL := strings.TrimSpace(f.FileURL)
+	statusStr := f.Status
+	startDateStr := f.StartDate
+	endDateStr := f.EndDate
+	staffIDs := f.StaffIDs
 
 	if idStr == "" || title == "" || message == "" || statusStr == "" || startDateStr == "" || endDateStr == "" {
-		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrMemoAllFieldsRequired.Error()))
 		return
 	}
 
@@ -268,19 +301,19 @@ func (s *Server) adminMemosUpdateHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	if status == enums.MEMO_STATUS_UNDEFINED {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid status"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrMemoInvalidStatus.Error()))
 		return
 	}
 
 	startDate, err := time.Parse(constants.DateLayoutISO, startDateStr)
 	if err != nil {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid start date format"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrTimeParse.Error()))
 		return
 	}
 
 	endDate, err := time.Parse(constants.DateLayoutISO, endDateStr)
 	if err != nil {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid end date format"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrTimeParse.Error()))
 		return
 	}
 
@@ -309,10 +342,19 @@ func (s *Server) adminMemosDeleteHandler(w http.ResponseWriter, r *http.Request)
 	const page = "/admin/memos"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
+	var p forms.AdminMemoPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrMemoDeleteFailed.Error()))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrMemoDeleteFailed.Error()))
+		return
+	}
 	if err := s.services.memo.SoftDeleteMemo(ctx, s.sessionManager.GetString(ctx, SessionStaffID), idStr); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to delete memo"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrMemoDeleteFailed.Error()))
 		return
 	}
 
@@ -324,7 +366,16 @@ func (s *Server) adminMemosSendEmailsHandler(w http.ResponseWriter, r *http.Requ
 	const page = "/admin/memos"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
+	var p forms.AdminMemoPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
 	currentStaffID := s.sessionManager.GetString(ctx, SessionStaffID)
 
 	isSuperuser := false

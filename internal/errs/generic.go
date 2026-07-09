@@ -50,6 +50,7 @@ var (
 	ErrValidationInvalidMobileNumber  = errors.New("[VALIDATION]: Invalid mobile number format")
 	ErrValidationStartEndDates        = errors.New("[VALIDATION]: Start date must not be greater than end date")
 	ErrDuplicateEmail                 = errors.New("[VALIDATION]: Email already exists")
+	ErrAllFieldsRequired              = errors.New("[VALIDATION]: All fields are required")
 
 	ErrNotFound               = errors.New("[NOTFOUND]: Resource not found")
 	ErrForbidden              = errors.New("[FORBIDDEN]: Operation not permitted")

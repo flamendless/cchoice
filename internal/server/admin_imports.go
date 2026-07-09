@@ -6,7 +6,10 @@ import (
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
@@ -60,14 +63,14 @@ func (s *Server) adminImportsProductsPreviewHandler(w http.ResponseWriter, r *ht
 
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to parse upload"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(errs.ErrInvalidParams)))
 		return
 	}
 
 	file, header, err := r.FormFile("file")
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "File is required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrMissingField.Error()))
 		return
 	}
 	defer file.Close()
@@ -92,20 +95,21 @@ func (s *Server) adminImportsProductsApplyHandler(w http.ResponseWriter, r *http
 	const page = "/admin/imports"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var f forms.AdminImportsProductsApplyForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
 	sessionData, ok := s.sessionManager.Get(ctx, skProductImportPreview).(*services.ProductImportSessionData)
 	if !ok || sessionData == nil {
-		redirectHX(w, r, utils.URLWithError(page, "Import preview expired, please upload the file again"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrImportPreviewExpired.Error()))
 		return
 	}
 
-	selectedLines := make([]int, 0, len(r.Form["lines"]))
-	for _, lineStr := range r.Form["lines"] {
+	selectedLines := make([]int, 0, len(f.Lines))
+	for _, lineStr := range f.Lines {
 		line, err := strconv.Atoi(lineStr)
 		if err != nil {
 			continue
@@ -114,7 +118,7 @@ func (s *Server) adminImportsProductsApplyHandler(w http.ResponseWriter, r *http
 	}
 
 	if len(selectedLines) == 0 {
-		redirectHX(w, r, utils.URLWithError(page, "Select at least one row to apply"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrImportNoRowsSelected.Error()))
 		return
 	}
 

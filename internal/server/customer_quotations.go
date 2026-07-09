@@ -2,15 +2,14 @@ package server
 
 import (
 	"net/http"
-	"strconv"
 
 	compcustomer "cchoice/cmd/web/components/customers"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
-
-	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
@@ -30,6 +29,12 @@ func (s *Server) customerQuotationsListTableHandler(w http.ResponseWriter, r *ht
 	ctx := r.Context()
 
 	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
+	var q forms.CustomerQuotationsListQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
 
 	sortBy, sortDir, err := utils.ParseListingSortQuery(r.URL.Query(), "CREATED_AT", "STATUS")
 	if err != nil {
@@ -38,12 +43,7 @@ func (s *Server) customerQuotationsListTableHandler(w http.ResponseWriter, r *ht
 		return
 	}
 
-	listPage := 1
-	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
-		if parsed, err := strconv.Atoi(paramPage); err == nil && parsed > 0 {
-			listPage = parsed
-		}
-	}
+	listPage := httputil.PageOrDefault(q.Page, 1)
 
 	serviceQuotations, totalCount, listPage, err := s.services.quotation.GetForListingCustomerPaginated(
 		ctx,
@@ -87,15 +87,27 @@ func (s *Server) customerQuotationsListTableHandler(w http.ResponseWriter, r *ht
 
 func (s *Server) customerQuotationDetailPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Customer Quotation Detail Page Handler]"
+	const page = "/customer/quotations"
 	ctx := r.Context()
 
 	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
-	quotationIDStr := chi.URLParam(r, "id")
+	var p forms.CustomerQuotationDetailPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	quotationIDStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
 
 	detail, err := s.services.quotation.GetDetailForCustomer(ctx, customerIDStr, quotationIDStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/customer/quotations", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 

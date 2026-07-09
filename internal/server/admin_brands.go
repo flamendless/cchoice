@@ -14,32 +14,35 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
-	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
 func (s *Server) adminBrandsListPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Brands List Page Handler]"
+	const page = "/admin/brands"
 	ctx := r.Context()
 
 	if err := compadmin.AdminBrandsListPage("Brands").Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/brands", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 }
 
 func (s *Server) adminBrandsCreatePageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Brands Create Page Handler]"
+	const page = "/admin/brands"
 	ctx := r.Context()
 
 	if err := compadmin.BrandCreateModal().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/brands", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 }
@@ -51,8 +54,12 @@ func (s *Server) adminBrandsListTableHandler(w http.ResponseWriter, r *http.Requ
 
 	var brands []models.AdminBrandListItem
 
-	searchQuery := r.URL.Query().Get("search")
-	status := enums.ParseBrandStatusToEnum(r.URL.Query().Get("status"))
+	var q forms.AdminBrandsListQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+	}
+	searchQuery := q.Search
+	status := enums.ParseBrandStatusToEnum(q.Status)
 
 	if searchQuery != "" {
 		serviceBrands, err := s.services.brand.SearchBrandsByFilter(
@@ -107,21 +114,22 @@ func (s *Server) adminBrandsCreateHandler(w http.ResponseWriter, r *http.Request
 
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(errs.ErrInvalidParams)))
 		return
 	}
 
-	brandName := r.FormValue("name")
-	if brandName == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Brand name is required"))
+	var f forms.AdminBrandCreateForm
+	if err := httputil.BindMultipartForm(r, &f); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandNameRequired.Error()))
 		return
 	}
+	brandName := f.Name
 
 	var logoS3URL string
 	if conf.Conf().Test.LocalUploadImage || conf.Conf().IsProd() {
 		file, header, err := r.FormFile("logo")
 		if err != nil {
-			redirectHX(w, r, utils.URLWithError(page, "Logo image is required"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandLogoRequired.Error()))
 			return
 		}
 		defer file.Close()
@@ -134,7 +142,7 @@ func (s *Server) adminBrandsCreateHandler(w http.ResponseWriter, r *http.Request
 		buf := bytes.Buffer{}
 		if _, err := io.Copy(&buf, file); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-			redirectHX(w, r, utils.URLWithError(page, "Failed to read image"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrFileRead.Error()))
 			return
 		}
 
@@ -175,15 +183,29 @@ func (s *Server) adminBrandsUpdateHandler(w http.ResponseWriter, r *http.Request
 
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(errs.ErrInvalidParams)))
 		return
 	}
 
-	brandID := chi.URLParam(r, "id")
-	brandName := r.FormValue("name")
+	var p forms.AdminBrandPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandIDAndNameRequired.Error()))
+		return
+	}
+	brandID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrDecode.Error()))
+		return
+	}
+	var f forms.AdminBrandUpdateForm
+	if err := httputil.BindMultipartForm(r, &f); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandIDAndNameRequired.Error()))
+		return
+	}
+	brandName := f.Name
 
 	if brandID == "" || brandName == "" {
-		redirectHX(w, r, utils.URLWithError(page, "id and name are required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandIDAndNameRequired.Error()))
 		return
 	}
 
@@ -206,7 +228,7 @@ func (s *Server) adminBrandsUpdateHandler(w http.ResponseWriter, r *http.Request
 			buf := bytes.Buffer{}
 			if _, err := io.Copy(&buf, file); err != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-				redirectHX(w, r, utils.URLWithError(page, "Failed to read image"))
+				redirectHX(w, r, utils.URLWithError(page, errs.ErrFileRead.Error()))
 				return
 			}
 
@@ -235,7 +257,7 @@ func (s *Server) adminBrandsUpdateHandler(w http.ResponseWriter, r *http.Request
 		logoS3URL,
 	); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to update brand"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandUpdateFailed.Error()))
 		return
 	}
 
@@ -247,10 +269,21 @@ func (s *Server) adminBrandsDeleteHandler(w http.ResponseWriter, r *http.Request
 	const page = "/admin/brands"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
+	var p forms.AdminBrandPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandDeleteFailed.Error()))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandDeleteFailed.Error()))
+		return
+	}
 	if err := s.services.brand.DeleteBrand(ctx, s.sessionManager.GetString(ctx, SessionStaffID), idStr); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to delete brand"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandDeleteFailed.Error()))
 		return
 	}
 
@@ -259,20 +292,30 @@ func (s *Server) adminBrandsDeleteHandler(w http.ResponseWriter, r *http.Request
 
 func (s *Server) adminBrandsEditPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Brands Edit Page Handler]"
+	const page = "/admin/brands"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
+	var p forms.AdminBrandPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
+		return
+	}
 
 	id := s.encoder.Decode(idStr)
 	if id == encode.INVALID {
-		redirectHX(w, r, utils.URLWithError("/admin/brands", "Invalid id format"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
 		return
 	}
 
 	serviceBrands, err := s.services.brand.GetAll(ctx)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/brands", "Internal server error"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInternalServer.Error()))
 		return
 	}
 
@@ -293,13 +336,13 @@ func (s *Server) adminBrandsEditPageHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	if brandItem == nil {
-		redirectHX(w, r, utils.URLWithError("/admin/brands", "Brand not found"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandNotFound.Error()))
 		return
 	}
 
 	if err := compadmin.BrandEditModal(*brandItem).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/brands", "Failed to render edit form"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrRenderFailed.Error()))
 		return
 	}
 }
@@ -309,11 +352,25 @@ func (s *Server) adminBrandsUpdateStatusHandler(w http.ResponseWriter, r *http.R
 	const page = "/admin/brands"
 	ctx := r.Context()
 
-	brandID := chi.URLParam(r, "id")
-	statusStr := r.FormValue("status")
+	var p forms.AdminBrandPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrEnumInvalid.Error()))
+		return
+	}
+	brandID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrEnumInvalid.Error()))
+		return
+	}
+	var f forms.AdminBrandStatusForm
+	if err := httputil.BindForm(r, &f); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrEnumInvalid.Error()))
+		return
+	}
+	statusStr := f.Status
 	status := enums.ParseBrandStatusToEnum(statusStr)
 	if status == enums.BRAND_STATUS_UNDEFINED {
-		redirectHX(w, r, utils.URLWithError(page, "Can't use undefined value"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrEnumInvalid.Error()))
 	}
 
 	if err := s.services.brand.UpdateStatus(ctx, s.sessionManager.GetString(ctx, SessionStaffID), brandID, status); err != nil {

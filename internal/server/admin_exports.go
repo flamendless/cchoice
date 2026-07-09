@@ -13,8 +13,10 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
 
 	"github.com/xuri/excelize/v2"
@@ -85,8 +87,12 @@ func (s *Server) adminExportsProductsCountHandler(w http.ResponseWriter, r *http
 	const logtag = "[Admin Exports Products Count Handler]"
 	ctx := r.Context()
 
-	brand := r.URL.Query().Get("brand")
-	status := enums.ParseProductStatusToEnum(r.URL.Query().Get("status"))
+	var q forms.AdminExportsProductsCountQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+	}
+	brand := q.Brand
+	status := enums.ParseProductStatusToEnum(q.Status)
 
 	count, err := s.services.product.CountForExportAdmin(ctx, brand, status)
 	if err != nil {
@@ -104,20 +110,21 @@ func (s *Server) adminExportsProductsHandler(w http.ResponseWriter, r *http.Requ
 	const logtag = "[Admin Exports Products Handler]"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var f forms.AdminExportsProductsForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		writeExportError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	brand := r.PostFormValue("brand")
-	status := enums.ParseProductStatusToEnum(r.PostFormValue("status"))
+	brand := f.Brand
+	status := enums.ParseProductStatusToEnum(f.Status)
 	sortColumn, sortDirection := parseProductExportSortParams(
-		r.PostFormValue("sort_column"),
-		r.PostFormValue("sort_direction"),
+		f.SortColumn,
+		f.SortDirection,
 	)
 
-	formatEnum := enums.ParseOutputFormatToEnum(r.PostFormValue("format"))
+	formatEnum := enums.ParseOutputFormatToEnum(f.Format)
 	if formatEnum == enums.OUTPUT_FORMAT_UNDEFINED {
 		formatEnum = enums.OUTPUT_FORMAT_CSV
 	}
