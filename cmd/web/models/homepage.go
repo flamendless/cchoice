@@ -42,6 +42,7 @@ type HomePageData struct {
 	Sections          []PostHomeContentSection
 	ActivePromos      []PromoItem
 	Filters           HomePageFilters
+	ThemeCSS          string
 }
 
 type RandomSaleProduct struct {

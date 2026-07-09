@@ -32,6 +32,7 @@ const (
 	ModuleProductsBulkImport   = "products_bulk_import"
 	ModulePromos               = "promos"
 	ModuleStaff                = "staffs"
+	ModuleThemes               = "themes"
 	ModuleTimeOff              = "time_off"
 	ModuleTrackedLinks         = "tracked_links"
 )

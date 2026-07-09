@@ -62,6 +62,7 @@ type Services struct {
 	role              *services.RoleService
 	staff             *services.StaffService
 	staffLog          *services.StaffLogsService
+	theme             *services.ThemeService
 	trackedLink       *services.TrackedLinkService
 	order             *services.OrderService
 	all               []services.IService
@@ -225,6 +226,7 @@ func NewServer() *ServerInstance {
 		role:              services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staff:             services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		staffLog:          staffLogService,
+		theme:             services.NewThemeService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
 		trackedLink:       services.NewTrackedLinkService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
 		order:             services.NewOrderService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, emailJobRunner),
 	}
@@ -253,6 +255,7 @@ func NewServer() *ServerInstance {
 		newServer.services.role,
 		newServer.services.staff,
 		newServer.services.staffLog,
+		newServer.services.theme,
 		newServer.services.trackedLink,
 		newServer.services.order,
 	}

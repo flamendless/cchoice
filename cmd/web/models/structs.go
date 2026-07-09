@@ -470,6 +470,18 @@ type AdminCustomerListItem struct {
 	IsVerified   enums.CustomerStatus
 }
 
+type AdminThemeListItem struct {
+	ID                string
+	Title             string
+	Status            enums.ThemeStatus
+	StartDate         string
+	EndDate           string
+	Configuration     map[string]string
+	ConfigurationType enums.ThemeConfigType
+	Active            bool
+	CreatedAt         string
+}
+
 type AdminTrackedLinkListItem struct {
 	ID             string
 	Name           string

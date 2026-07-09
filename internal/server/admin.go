@@ -181,6 +181,13 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_EDIT_PRODUCTS)).Get("/admin/imports/products/modal", s.adminImportsProductsModalHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_EDIT_PRODUCTS)).Post("/admin/imports/products/preview", s.adminImportsProductsPreviewHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_EDIT_PRODUCTS)).Post("/admin/imports/products/apply", s.adminImportsProductsApplyHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_THEMES)).Get("/admin/themes", s.adminThemesListPageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_THEMES)).Get("/admin/themes/table", s.adminThemesListTableHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_THEMES)).Get("/admin/themes/create", s.adminThemesCreatePageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_THEMES)).Post("/admin/themes", s.adminThemesCreateHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_THEMES)).Get("/admin/themes/{id}/edit", s.adminThemesEditPageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_THEMES)).Patch("/admin/themes/{id}", s.adminThemesUpdateHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_THEMES)).Delete("/admin/themes/{id}", s.adminThemesDeleteHandler)
 
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Get("/admin/tracked-links", s.adminTrackedLinksListPageHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Get("/admin/tracked-links/table", s.adminTrackedLinksListTableHandler)

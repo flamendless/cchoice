@@ -19,6 +19,8 @@ const (
 	PatternStaffLogSuccessID  = `success\. ID '([^']+)'`
 	PatternExternalURL        = `https?://[^\s]+`
 	PatternExportPriceCleanup = `[^0-9.\-]`
+	PatternThemeTitle         = `[a-zA-Z0-9]{1,24}`
+	PatternThemeColor         = `#[0-9a-fA-F]{6}`
 )
 
 var (
@@ -33,6 +35,8 @@ var (
 	ReStaffLogSuccessID  = regexp.MustCompile(`^` + PatternStaffLogSuccessID + `$`)
 	ReExternalURL        = regexp.MustCompile(`^` + PatternExternalURL + `$`)
 	ReExportPriceCleanup = regexp.MustCompile(PatternExportPriceCleanup)
+	ReThemeTitle         = regexp.MustCompile(`^` + PatternThemeTitle + `$`)
+	ReThemeColor         = regexp.MustCompile(`^` + PatternThemeColor + `$`)
 )
 
 var YoutubePatterns = []*regexp.Regexp{

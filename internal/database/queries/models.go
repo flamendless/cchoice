@@ -561,6 +561,20 @@ type TblStaffTimeOff struct {
 	UpdatedAt   string
 }
 
+type TblTheme struct {
+	ID                int64
+	Title             string
+	Status            string
+	StartDate         string
+	EndDate           string
+	Configuration     string
+	ConfigurationType string
+	CreatedBy         int64
+	CreatedAt         string
+	UpdatedAt         string
+	DeletedAt         string
+}
+
 type TblThumbnailJob struct {
 	ID           int64
 	QueueID      string

@@ -175,6 +175,7 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 	r.Post("/collect/event", s.metricsEventHandler)
 
 	r.Get("/", s.indexHandler)
+	r.Get("/preview", s.themePreviewHandler)
 	r.Get("/settings/header-texts", s.headerTextsHandler)
 	r.Get("/settings/footer-texts", s.footerTextsHandler)
 	r.Get("/settings/store", s.storeHandler)
@@ -443,6 +444,7 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 		RandomSaleProduct: randomSaleProduct,
 		ActivePromos:      promoBanners,
 		Filters:           filters,
+		ThemeCSS:          s.activeThemeCSS(ctx, logtag),
 	}
 
 	if err := compshop.HomePage(homePageData).Render(ctx, w); err != nil {
