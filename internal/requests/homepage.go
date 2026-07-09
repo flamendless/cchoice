@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"database/sql"
 	"encoding/gob"
 	"encoding/hex"
 	"fmt"
@@ -208,9 +209,9 @@ func GetCategorySectionHandler(
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
-		res, err := dbRO.GetQueries().GetProductCategoriesForSectionsPagination(
+		categories, err := dbRO.GetQueries().GetDistinctCategoriesForShopSections(
 			ctx,
-			queries.GetProductCategoriesForSectionsPaginationParams{
+			queries.GetDistinctCategoriesForShopSectionsParams{
 				Limit:  int64(limit),
 				Offset: int64(page) * int64(limit),
 			},
@@ -218,14 +219,28 @@ func GetCategorySectionHandler(
 		if err != nil {
 			return nil, err
 		}
-		return res, nil
+		if len(categories) == 0 {
+			return []queries.GetProductCategoriesForSectionsByCategoriesRow{}, nil
+		}
+
+		categoryNames := make([]sql.NullString, 0, len(categories))
+		for _, category := range categories {
+			if category.Valid && category.String != "" {
+				categoryNames = append(categoryNames, category)
+			}
+		}
+		if len(categoryNames) == 0 {
+			return []queries.GetProductCategoriesForSectionsByCategoriesRow{}, nil
+		}
+
+		return dbRO.GetQueries().GetProductCategoriesForSectionsByCategories(ctx, categoryNames)
 	})
 	if err != nil {
 		return nil, err
 	}
 	logs.SF(cacheKey, shared)
 
-	res := sfRes.([]queries.GetProductCategoriesForSectionsPaginationRow)
+	res := sfRes.([]queries.GetProductCategoriesForSectionsByCategoriesRow)
 	categoriesSubcategories := map[string][]models.Subcategory{}
 	for _, v := range res {
 		if v.ProductsCount == 0 || v.Subcategory.String == "" {

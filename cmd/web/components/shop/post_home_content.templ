@@ -9,7 +9,7 @@ import "cchoice/internal/constants"
 templ PostHomeContentSections(data models.HomePageData) {
 	<div
 		id="others"
-		class="absolute flex flex-col left-0 px-4 lg:px-8 pt-4 pb-16 w-full max-w-full border-t-4 border-primary-dark z-999 bg-white"
+		class="relative flex flex-col w-full max-w-full px-4 lg:px-8 pt-4 pb-16 border-t-4 border-primary-dark bg-white"
 	>
 		for _, section := range data.Sections {
 			<span class="font-bold text-lg mt-4">{ section.Title }</span>
