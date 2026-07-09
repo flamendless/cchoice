@@ -9,6 +9,7 @@ import (
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/logs"
+	"cchoice/internal/requests"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
@@ -145,6 +146,8 @@ func (s *Server) adminCategoriesCreateHandler(w http.ResponseWriter, r *http.Req
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
+
+	requests.InvalidateAdminCategoriesCache(s.cache)
 
 	redirectHX(w, r, utils.URLWithSuccess(page, "Category created successfully"))
 }
