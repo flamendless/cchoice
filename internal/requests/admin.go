@@ -29,6 +29,13 @@ func GenerateAdminCategoriesCacheKey() []byte {
 	return fmt.Appendf(nil, "adm_cat_%s", hex.EncodeToString(hash[:])[:16])
 }
 
+func InvalidateAdminCategoriesCache(cache *fastcache.Cache) {
+	if cache == nil {
+		return
+	}
+	cache.Del(GenerateAdminCategoriesCacheKey())
+}
+
 func GetBrandsForAdmin(
 	ctx context.Context,
 	cache *fastcache.Cache,
@@ -93,7 +100,7 @@ func GetCategoriesForAdmin(
 	}
 
 	sfRes, err, shared := sf.Do(string(cacheKey), func() (any, error) {
-		res, err := dbRO.GetQueries().GetProductCategoriesForSections(ctx)
+		res, err := dbRO.GetQueries().GetProductCategoriesForAdmin(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -103,7 +110,7 @@ func GetCategoriesForAdmin(
 		return nil, err
 	}
 	logs.SF(cacheKey, shared)
-	dbRes := sfRes.([]queries.GetProductCategoriesForSectionsRow)
+	dbRes := sfRes.([]queries.GetProductCategoriesForAdminRow)
 
 	categories := make(map[string][]string)
 	for _, v := range dbRes {

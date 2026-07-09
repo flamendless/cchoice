@@ -260,9 +260,48 @@ func (q *Queries) GetProductCategoriesByPromoted(ctx context.Context, limit int6
 	return items, nil
 }
 
-const getProductCategoriesForSections = `-- name: GetProductCategoriesForSections :many
+const getProductCategoriesForAdmin = `-- name: GetProductCategoriesForAdmin :many
 ;
 
+SELECT
+	category,
+	subcategory
+FROM tbl_product_categories
+WHERE
+	category IS NOT NULL
+	AND category != ''
+ORDER BY category ASC, subcategory ASC
+`
+
+type GetProductCategoriesForAdminRow struct {
+	Category    sql.NullString
+	Subcategory sql.NullString
+}
+
+func (q *Queries) GetProductCategoriesForAdmin(ctx context.Context) ([]GetProductCategoriesForAdminRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductCategoriesForAdmin)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductCategoriesForAdminRow
+	for rows.Next() {
+		var i GetProductCategoriesForAdminRow
+		if err := rows.Scan(&i.Category, &i.Subcategory); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getProductCategoriesForSections = `-- name: GetProductCategoriesForSections :many
 SELECT
 	tbl_product_categories.id,
 	tbl_product_categories.category,

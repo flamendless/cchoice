@@ -123,6 +123,16 @@ ORDER BY is_on_sale DESC, tbl_products.created_at DESC
 LIMIT :limit
 ;
 
+-- name: GetProductCategoriesForAdmin :many
+SELECT
+	category,
+	subcategory
+FROM tbl_product_categories
+WHERE
+	category IS NOT NULL
+	AND category != ''
+ORDER BY category ASC, subcategory ASC;
+
 -- name: GetProductCategoriesForSections :many
 SELECT
 	tbl_product_categories.id,
