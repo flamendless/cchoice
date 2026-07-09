@@ -512,7 +512,7 @@ WHERE
 			AND tbl_products_fts.name MATCH sqlc.arg('search_query')
 	)
 ORDER BY is_on_sale DESC, tbl_products.created_at DESC
-LIMIT ? OFFSET ?;
+LIMIT sqlc.arg('limit') OFFSET sqlc.arg('offset');
 
 -- name: GetOtherProductsForSearch :many
 SELECT
@@ -558,7 +558,7 @@ WHERE
 			AND tbl_products_fts.name MATCH sqlc.arg('search_query')
 	)
 ORDER BY is_on_sale DESC, tbl_products.created_at DESC
-LIMIT ? OFFSET ?;
+LIMIT sqlc.arg('limit') OFFSET sqlc.arg('offset');
 
 -- name: GetRandomProductOnSale :one
 SELECT

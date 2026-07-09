@@ -103,7 +103,7 @@ Disallow: /health
 Disallow: /version
 Disallow: /metrics
 Disallow: /metrics/
-Disallow: /metrics/event
+Disallow: /collect/event
 
 # Internal configuration
 Disallow: /settings/

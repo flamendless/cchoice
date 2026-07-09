@@ -171,7 +171,7 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 	r.Get("/l/{slug}", s.handleTrackedLink)
 
 	r.With(MetricsBasicAuth).Handle("/metrics", promhttp.Handler())
-	r.Post("/metrics/event", s.metricsEventHandler)
+	r.Post("/collect/event", s.metricsEventHandler)
 
 	r.Get("/", s.indexHandler)
 	r.Get("/settings/header-texts", s.headerTextsHandler)

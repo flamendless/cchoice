@@ -680,16 +680,16 @@ WHERE
 		INNER JOIN tbl_products p2 ON p2.id = tbl_products_fts.rowid
 		WHERE
 			p2.status = 'ACTIVE'
-			AND tbl_products_fts.name MATCH ?3
+			AND tbl_products_fts.name MATCH ?1
 	)
 ORDER BY is_on_sale DESC, tbl_products.created_at DESC
-LIMIT ? OFFSET ?
+LIMIT ?3 OFFSET ?2
 `
 
 type GetOtherProductsForSearchParams struct {
 	SearchQuery string
-	Limit       int64
 	Offset      int64
+	Limit       int64
 }
 
 type GetOtherProductsForSearchRow struct {
@@ -712,7 +712,7 @@ type GetOtherProductsForSearchRow struct {
 }
 
 func (q *Queries) GetOtherProductsForSearch(ctx context.Context, arg GetOtherProductsForSearchParams) ([]GetOtherProductsForSearchRow, error) {
-	rows, err := q.db.QueryContext(ctx, getOtherProductsForSearch, arg.SearchQuery, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, getOtherProductsForSearch, arg.SearchQuery, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
@@ -1795,7 +1795,7 @@ WHERE
 		INNER JOIN tbl_products_categories pc ON pc.product_id = p.id
 		WHERE
 			p.status = 'ACTIVE'
-			AND tbl_products_fts.name MATCH ?3
+			AND tbl_products_fts.name MATCH ?1
 	)
 	AND tbl_products.id NOT IN (
 		SELECT p2.id
@@ -1803,16 +1803,16 @@ WHERE
 		INNER JOIN tbl_products p2 ON p2.id = tbl_products_fts.rowid
 		WHERE
 			p2.status = 'ACTIVE'
-			AND tbl_products_fts.name MATCH ?3
+			AND tbl_products_fts.name MATCH ?1
 	)
 ORDER BY is_on_sale DESC, tbl_products.created_at DESC
-LIMIT ? OFFSET ?
+LIMIT ?3 OFFSET ?2
 `
 
 type GetRelatedProductsForSearchParams struct {
 	SearchQuery string
-	Limit       int64
 	Offset      int64
+	Limit       int64
 }
 
 type GetRelatedProductsForSearchRow struct {
@@ -1835,7 +1835,7 @@ type GetRelatedProductsForSearchRow struct {
 }
 
 func (q *Queries) GetRelatedProductsForSearch(ctx context.Context, arg GetRelatedProductsForSearchParams) ([]GetRelatedProductsForSearchRow, error) {
-	rows, err := q.db.QueryContext(ctx, getRelatedProductsForSearch, arg.SearchQuery, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, getRelatedProductsForSearch, arg.SearchQuery, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
