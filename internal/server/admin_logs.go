@@ -2,14 +2,15 @@ package server
 
 import (
 	"net/http"
-	"strconv"
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
@@ -33,31 +34,26 @@ func (s *Server) adminSuperuserLogsTableHandler(w http.ResponseWriter, r *http.R
 	const logtag = "[Admin Superuser Logs Table Handler]"
 	ctx := r.Context()
 
-	staffIDStr := r.URL.Query().Get("staff-id")
-	action := r.URL.Query().Get("action")
-	moduleStr := r.URL.Query().Get("module")
-
-	page := 1
-	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
-		if parsed, err := strconv.Atoi(paramPage); err == nil && parsed > 0 {
-			page = parsed
-		}
+	var q forms.AdminLogsFilterQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
 	}
+	page := httputil.PageOrDefault(q.Page, 1)
 
 	var staffID int64
-	if staffIDStr != "" {
-		decoded := s.encoder.Decode(staffIDStr)
+	if q.StaffID != "" {
+		decoded := s.encoder.Decode(q.StaffID)
 		if decoded != encode.INVALID {
 			staffID = decoded
 		}
 	}
 
-	module := enums.ParseModuleToEnum(moduleStr)
+	module := enums.ParseModuleToEnum(q.Module)
 
 	logsList, totalCount, page, err := s.services.staffLog.GetFilteredAsModelPaginated(
 		ctx,
 		staffID,
-		action,
+		q.Action,
 		module,
 		page,
 		constants.DefaultAdminTablePageSize,

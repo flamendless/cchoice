@@ -2,17 +2,15 @@ package server
 
 import (
 	"net/http"
-	"strconv"
-	"strings"
 
 	compcustomer "cchoice/cmd/web/components/customers"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
-
-	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
@@ -32,26 +30,24 @@ func (s *Server) customerOrdersListTableHandler(w http.ResponseWriter, r *http.R
 	ctx := r.Context()
 
 	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
-
-	searchOrderRef := strings.TrimSpace(r.URL.Query().Get("search_order_ref"))
+	var q forms.CustomerOrdersListQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
 	sortBy, sortDir, err := utils.ParseListingSortQuery(r.URL.Query(), "CREATED_AT", "STATUS")
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("sort_by", sortBy), zap.String("sort_dir", sortDir.String()), zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
-
-	listPage := 1
-	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
-		if parsed, err := strconv.Atoi(paramPage); err == nil && parsed > 0 {
-			listPage = parsed
-		}
-	}
+	listPage := httputil.PageOrDefault(q.Page, 1)
 
 	serviceOrders, totalCount, listPage, err := s.services.order.GetForListingCustomerPaginated(
 		ctx,
 		customerIDStr,
-		searchOrderRef,
+		q.SearchOrderRef,
 		sortBy,
 		sortDir,
 		listPage,
@@ -96,7 +92,18 @@ func (s *Server) customerOrderDetailPageHandler(w http.ResponseWriter, r *http.R
 	ctx := r.Context()
 
 	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
-	orderIDStr := chi.URLParam(r, "id")
+	var p forms.CustomerOrderPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Redirect(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)), http.StatusSeeOther)
+		return
+	}
+	orderIDStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Redirect(w, r, utils.URLWithError(page, err.Error()), http.StatusSeeOther)
+		return
+	}
 
 	profile, err := s.services.customer.BuildProfile(ctx, customerIDStr)
 	if err != nil {

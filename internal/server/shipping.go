@@ -6,8 +6,10 @@ import (
 	"cchoice/internal/cart"
 	"cchoice/internal/errs"
 	"cchoice/internal/geocoding"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/shipping"
 	"cchoice/internal/utils"
 	"fmt"
@@ -29,9 +31,18 @@ func (s *Server) shippingAddressHandler(w http.ResponseWriter, r *http.Request) 
 	const logtag = "[Shipping Address Handler]"
 	ctx := r.Context()
 
-	data := r.URL.Query().Get("data")
+	var req forms.ShippingAddressQuery
+	if err := httputil.BindQuery(r, &req); err != nil {
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.Error(err),
+		)
+		http.Error(w, httputil.ErrorMessage(err), http.StatusBadRequest)
+		return
+	}
+
 	var maps []*models.Map
-	switch data {
+	switch req.Data {
 	case "provinces":
 		cachedMaps, err := requests.GetProvinces(s.cache, &s.SF)
 		if err != nil {
@@ -45,18 +56,7 @@ func (s *Server) shippingAddressHandler(w http.ResponseWriter, r *http.Request) 
 		maps = cachedMaps
 
 	case "cities":
-		province := r.URL.Query().Get("province")
-		if province == "" {
-			logs.LogCtx(ctx).Error(
-				logtag,
-				zap.String("province", province),
-				zap.Error(errs.ErrInvalidParams),
-			)
-			http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
-			return
-		}
-
-		cachedMaps, err := requests.GetCitiesByProvince(s.cache, &s.SF, province)
+		cachedMaps, err := requests.GetCitiesByProvince(s.cache, &s.SF, req.Province)
 		if err != nil {
 			logs.LogCtx(ctx).Error(
 				logtag,
@@ -66,21 +66,9 @@ func (s *Server) shippingAddressHandler(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 		maps = cachedMaps
-		// Don't render default option here - it's already set by client-side reset handler
 
 	case "barangays":
-		city := r.URL.Query().Get("city")
-		if city == "" {
-			logs.LogCtx(ctx).Error(
-				logtag,
-				zap.String("city", city),
-				zap.Error(errs.ErrInvalidParams),
-			)
-			http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
-			return
-		}
-
-		cachedMaps, err := requests.GetBarangaysByCity(s.cache, &s.SF, city)
+		cachedMaps, err := requests.GetBarangaysByCity(s.cache, &s.SF, req.City)
 		if err != nil {
 			logs.LogCtx(ctx).Error(
 				logtag,
@@ -90,7 +78,6 @@ func (s *Server) shippingAddressHandler(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 		maps = cachedMaps
-		// Don't render default option here - it's already set by client-side reset handler
 
 	default:
 		logs.LogCtx(ctx).Error(
@@ -102,7 +89,7 @@ func (s *Server) shippingAddressHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if len(maps) == 0 {
-		err := fmt.Errorf("%w for '%s'", errs.ErrServerNoMapsFound, data)
+		err := fmt.Errorf("%w for '%s'", errs.ErrServerNoMapsFound, req.Data)
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
@@ -139,35 +126,22 @@ func (s *Server) shippingQuotationHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if err := r.ParseForm(); err != nil {
+	var formReq forms.ShippingQuotationForm
+	if err := httputil.BindForm(r, &formReq); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
 		)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	addressLine1 := strings.TrimSpace(r.Form.Get("address_line1"))
-	addressLine2 := strings.TrimSpace(r.Form.Get("address_line2"))
-	city := strings.TrimSpace(r.Form.Get("city"))
-	province := strings.TrimSpace(r.Form.Get("province"))
-	barangay := strings.TrimSpace(r.Form.Get("barangay"))
-	postal := strings.TrimSpace(r.Form.Get("postal"))
-
-	if province == "National Capital Region (NCR)" {
-		fmt.Println("NCR province selected")
-	} else if province == "" || city == "" || barangay == "" {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Error(errs.ErrInvalidParams),
-			zap.String("province", province),
-			zap.String("city", city),
-			zap.String("barangay", barangay),
-		)
 		http.Error(w, "Missing required address fields (city, province, barangay)", http.StatusBadRequest)
 		return
 	}
+
+	addressLine1 := formReq.AddressLine1
+	addressLine2 := formReq.AddressLine2
+	city := formReq.City
+	province := formReq.Province
+	barangay := formReq.Barangay
+	postal := formReq.Postal
 
 	allParts := []string{addressLine1, addressLine2, barangay, city, province, postal, "Philippines"}
 	addressParts := make([]string, 0, len(allParts))

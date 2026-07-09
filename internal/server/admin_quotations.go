@@ -2,29 +2,28 @@ package server
 
 import (
 	"net/http"
-	"strconv"
-	"strings"
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
-
-	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
 func (s *Server) adminQuotationsListPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Quotations List Page Handler]"
+	const page = "/admin/quotations"
 	ctx := r.Context()
 
 	if err := compadmin.AdminQuotationsListPage().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/quotations", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 	}
 }
 
@@ -33,7 +32,12 @@ func (s *Server) adminQuotationsListTableHandler(w http.ResponseWriter, r *http.
 	const page = "/admin/quotations"
 	ctx := r.Context()
 
-	search := strings.TrimSpace(r.URL.Query().Get("search"))
+	var q forms.AdminQuotationsListQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
 	sortBy, sortDir, err := utils.ParseListingSortQuery(r.URL.Query(), "CREATED_AT", "STATUS")
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("sort_by", sortBy), zap.String("sort_dir", sortDir.String()), zap.Error(err))
@@ -41,16 +45,11 @@ func (s *Server) adminQuotationsListTableHandler(w http.ResponseWriter, r *http.
 		return
 	}
 
-	listPage := 1
-	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
-		if parsed, err := strconv.Atoi(paramPage); err == nil && parsed > 0 {
-			listPage = parsed
-		}
-	}
+	listPage := httputil.PageOrDefault(q.Page, 1)
 
 	serviceQuotations, totalCount, listPage, err := s.services.quotation.GetForListingAdminPaginated(
 		ctx,
-		search,
+		q.Search,
 		sortBy,
 		sortDir,
 		listPage,
@@ -96,7 +95,16 @@ func (s *Server) adminQuotationsDetailsHandler(w http.ResponseWriter, r *http.Re
 	const page = "/admin/quotations"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
+	var p forms.AdminQuotationPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
 	lines, err := s.services.quotation.GetLinesForAdmin(ctx, idStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -126,7 +134,16 @@ func (s *Server) adminQuotationsApproveModalHandler(w http.ResponseWriter, r *ht
 	const page = "/admin/quotations"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
+	var p forms.AdminQuotationPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
 	track, err := s.services.quotation.GetStatusHistoryForAdmin(ctx, idStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -163,21 +180,29 @@ func (s *Server) adminQuotationsApproveHandler(w http.ResponseWriter, r *http.Re
 	const page = "/admin/quotations"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var p forms.AdminQuotationPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+	var f forms.AdminQuotationApproveForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
-
-	idStr := chi.URLParam(r, "id")
-	assignedStaffID := strings.TrimSpace(r.FormValue("assigned_staff_id"))
-	notes := r.FormValue("notes")
-	actingStaffID := s.sessionManager.GetString(ctx, SessionStaffID)
-
-	if assignedStaffID == "" {
+	assignedStaffID, err := httputil.RequireEncodedID(s.encoder, f.AssignedStaffID)
+	if err != nil {
 		redirectHX(w, r, utils.URLWithError(page, errs.ErrMissingField.Error()))
 		return
 	}
+	notes := f.Notes
+	actingStaffID := s.sessionManager.GetString(ctx, SessionStaffID)
 
 	if err := s.services.quotation.Approve(ctx, actingStaffID, idStr, assignedStaffID, notes); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))

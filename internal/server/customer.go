@@ -3,15 +3,15 @@ package server
 import (
 	"context"
 	"net/http"
-	"strconv"
-	"strings"
 
 	compcustomer "cchoice/cmd/web/components/customers"
 	"cchoice/cmd/web/models"
-	"cchoice/internal/constants"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
 	"cchoice/internal/metrics"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
@@ -62,10 +62,11 @@ func AddCustomerHandlers(s *Server, r chi.Router) {
 
 func (s *Server) customerLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Customer Login Page Handler]"
+	const page = "/customer/portal"
 	ctx := r.Context()
 
 	if s.sessionManager.GetString(ctx, SessionCustomerID) != "" {
-		redirectHX(w, r, utils.URL("/customer/portal"))
+		redirectHX(w, r, utils.URL(page))
 		return
 	}
 
@@ -82,32 +83,21 @@ func (s *Server) customerLoginPageHandler(w http.ResponseWriter, r *http.Request
 func (s *Server) customerLoginHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Customer Login Handler]"
 	const page = "/customer"
+	const portalPage = "/customer/portal"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var req forms.CustomerLoginForm
+	if err := httputil.BindPostForm(r, &req); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
-		return
-	}
-
-	email := r.PostFormValue("email")
-	if !constants.ReEmail.MatchString(email) {
 		metrics.Auth.LoginAttempt(metrics.AuthUserTypeCustomer, metrics.AuthResultFailure)
-		redirectHX(w, r, utils.URLWithError(page, "Invalid email or password format"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
-	password := r.PostFormValue("password")
-	if !constants.RePassword.MatchString(password) {
-		metrics.Auth.LoginAttempt(metrics.AuthUserTypeCustomer, metrics.AuthResultFailure)
-		redirectHX(w, r, utils.URLWithError(page, "Invalid email or password format"))
-		return
-	}
-
-	customer, err := s.services.customer.Login(ctx, email, password)
+	customer, err := s.services.customer.Login(ctx, req.Email, req.Password)
 	if err != nil {
 		metrics.Auth.LoginAttempt(metrics.AuthUserTypeCustomer, metrics.AuthResultFailure)
-		redirectHX(w, r, utils.URLWithError(page, "Invalid email or password"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidEmailOrPassword.Error()))
 		return
 	}
 
@@ -115,14 +105,15 @@ func (s *Server) customerLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	s.sessionManager.Put(ctx, SessionCustomerID, s.encoder.Encode(customer.ID))
 	s.sessionManager.Put(ctx, SessionCustomerAccessID, 0)
-	redirectHX(w, r, utils.URL("/customer/portal"))
+	redirectHX(w, r, utils.URL(portalPage))
 }
 
 func (s *Server) customerLogoutHandler(w http.ResponseWriter, r *http.Request) {
+	const page = "/customer"
 	ctx := r.Context()
 	s.sessionManager.Remove(ctx, SessionCustomerID)
 	s.sessionManager.Remove(ctx, SessionCustomerAccessID)
-	redirectHX(w, r, utils.URL("/customer"))
+	redirectHX(w, r, utils.URL(page))
 }
 
 func (s *Server) customerRegisterPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -142,74 +133,30 @@ func (s *Server) customerRegisterPageHandler(w http.ResponseWriter, r *http.Requ
 func (s *Server) customerRegisterHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Customer Register Handler]"
 	const page = "/customer/register"
+	const loginPage = "/customer"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var req forms.CustomerRegisterForm
+	if err := httputil.BindPostForm(r, &req); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
-		return
-	}
-
-	firstName := r.PostFormValue("first_name")
-	middleName := r.PostFormValue("middle_name")
-	lastName := r.PostFormValue("last_name")
-	birthdate := r.PostFormValue("birthdate")
-	sex := r.PostFormValue("sex")
-	email := r.PostFormValue("email")
-	mobileNo := r.PostFormValue("mobile_no")
-	password := r.PostFormValue("password")
-	confirmPassword := r.PostFormValue("confirm_password")
-	customerType := r.PostFormValue("customer_type")
-	companyName := r.PostFormValue("company_name")
-
-	if password != confirmPassword {
 		metrics.Auth.Registration(metrics.AuthResultFailure)
-		redirectHX(w, r, utils.URLWithError(page, "Passwords must match"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
-	if firstName == "" || lastName == "" || birthdate == "" || sex == "" || email == "" || mobileNo == "" || password == "" || customerType == "" {
-		metrics.Auth.Registration(metrics.AuthResultFailure)
-		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
-		return
-	}
-
-	if !constants.ReEmail.MatchString(email) {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid email format"))
-		return
-	}
-
-	if !strings.HasPrefix(mobileNo, constants.PHMobilePrefix) {
-		mobileNo = constants.PHMobilePrefix + mobileNo
-	}
-
-	if !constants.ReMobileNumber.MatchString(mobileNo) {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid mobile number format"))
-		return
-	}
-
-	if !constants.RePassword.MatchString(password) {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid password format"))
-		return
-	}
-
-	customerTypeEnum := enums.MustParseCustomerTypeToEnum(customerType)
-	if customerTypeEnum == enums.CUSTOMER_TYPE_COMPANY && companyName == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Company name is required for company accounts"))
-		return
-	}
+	customerTypeEnum := enums.MustParseCustomerTypeToEnum(req.CustomerType)
 
 	if _, err := s.services.customer.Register(ctx, services.RegisterCustomerParams{
-		FirstName:    firstName,
-		MiddleName:   middleName,
-		LastName:     lastName,
-		Birthdate:    birthdate,
-		Sex:          sex,
-		Email:        email,
-		MobileNo:     mobileNo,
-		Password:     password,
+		FirstName:    req.FirstName,
+		MiddleName:   req.MiddleName,
+		LastName:     req.LastName,
+		Birthdate:    req.Birthdate,
+		Sex:          req.Sex,
+		Email:        req.Email,
+		MobileNo:     req.MobileNo,
+		Password:     req.Password,
 		CustomerType: customerTypeEnum,
-		CompanyName:  companyName,
+		CompanyName:  req.CompanyName,
 	}); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		metrics.Auth.Registration(metrics.AuthResultFailure)
@@ -218,18 +165,19 @@ func (s *Server) customerRegisterHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	metrics.Auth.Registration(metrics.AuthResultSuccess)
-	redirectHX(w, r, utils.URLWithSuccess("/customer", "Registration successful! Please log in."))
+	redirectHX(w, r, utils.URLWithSuccess(loginPage, "Registration successful! Please log in."))
 }
 
 func (s *Server) customerPortalHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Customer Portal Handler]"
+	const page = "/customer"
 	ctx := r.Context()
 
 	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
 	profile, err := s.services.customer.BuildProfile(ctx, customerIDStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/customer", "Unable to load profile"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrUnableToLoadProfile.Error()))
 		return
 	}
 
@@ -245,13 +193,14 @@ func (s *Server) customerPortalHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) customerProfileHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Customer Profile Handler]"
+	const page = "/customer/portal"
 	ctx := r.Context()
 
 	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
 	profile, err := s.services.customer.BuildProfile(ctx, customerIDStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/customer/portal", "Unable to load profile"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrUnableToLoadProfile.Error()))
 		return
 	}
 
@@ -267,13 +216,14 @@ func (s *Server) customerProfileHandler(w http.ResponseWriter, r *http.Request) 
 
 func (s *Server) customerProfileEditFormHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Customer Profile Edit Form Handler]"
+	const page = "/customer/portal"
 	ctx := r.Context()
 
 	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
 	profile, err := s.services.customer.BuildProfile(ctx, customerIDStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/customer/portal", "Unable to load profile"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrUnableToLoadProfile.Error()))
 		return
 	}
 
@@ -292,46 +242,26 @@ func (s *Server) customerProfileUpdateHandler(w http.ResponseWriter, r *http.Req
 	const page = "/customer/profile"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var req forms.CustomerProfileUpdateForm
+	if err := httputil.BindPostForm(r, &req); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
 	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
-	firstName := r.PostFormValue("first_name")
-	middleName := r.PostFormValue("middle_name")
-	lastName := r.PostFormValue("last_name")
-	mobileNo := r.PostFormValue("mobile_no")
-	birthdate := r.PostFormValue("birthdate")
-	sex := r.PostFormValue("sex")
-
-	if firstName == "" || lastName == "" || birthdate == "" || sex == "" || mobileNo == "" {
-		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
-		return
-	}
-
-	if !strings.HasPrefix(mobileNo, constants.PHMobilePrefix) {
-		mobileNo = constants.PHMobilePrefix + mobileNo
-	}
-
-	if !constants.ReMobileNumber.MatchString(mobileNo) {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid mobile number format"))
-		return
-	}
-
 	err := s.services.customer.UpdateProfile(ctx, services.UpdateCustomerProfileParams{
 		ID:         customerIDStr,
-		FirstName:  firstName,
-		MiddleName: middleName,
-		LastName:   lastName,
-		MobileNo:   mobileNo,
-		Birthdate:  birthdate,
-		Sex:        sex,
+		FirstName:  req.FirstName,
+		MiddleName: req.MiddleName,
+		LastName:   req.LastName,
+		MobileNo:   req.MobileNo,
+		Birthdate:  req.Birthdate,
+		Sex:        req.Sex,
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to update profile"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrCustomerProfileUpdateFailed.Error()))
 		return
 	}
 
@@ -343,48 +273,31 @@ func (s *Server) customerChangePasswordHandler(w http.ResponseWriter, r *http.Re
 	const page = "/customer/page"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var req forms.CustomerChangePasswordForm
+	if err := httputil.BindPostForm(r, &req); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
 	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
-	currentPassword := r.PostFormValue("current_password")
-	newPassword := r.PostFormValue("new_password")
-	confirmPassword := r.PostFormValue("confirm_password")
-
-	if currentPassword == "" || newPassword == "" || confirmPassword == "" {
-		redirectHX(w, r, utils.URLWithError(page, "All password fields are required"))
-		return
-	}
-
-	if newPassword != confirmPassword {
-		redirectHX(w, r, utils.URLWithError(page, "New passwords do not match"))
-		return
-	}
-
-	if !constants.RePassword.MatchString(newPassword) {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid password format"))
-		return
-	}
 
 	customer, err := s.services.customer.GetByID(ctx, customerIDStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Unable to verify current password"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrCustomerPasswordVerifyFailed.Error()))
 		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(customer.Password), []byte(currentPassword)); err != nil {
-		redirectHX(w, r, utils.URLWithError(page, "Current password is incorrect"))
+	if err := bcrypt.CompareHashAndPassword([]byte(customer.Password), []byte(req.CurrentPassword)); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrCustomerPasswordIncorrect.Error()))
 		return
 	}
 
-	err = s.services.customer.UpdatePassword(ctx, customerIDStr, newPassword)
+	err = s.services.customer.UpdatePassword(ctx, customerIDStr, req.NewPassword)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to update password"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrCustomerPasswordUpdateFailed.Error()))
 		return
 	}
 
@@ -400,7 +313,7 @@ func (s *Server) customerVerifySendHandler(w http.ResponseWriter, r *http.Reques
 	customer, err := s.services.customer.GetByID(ctx, customerIDStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Unable to send verification code"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrCustomerOTPUnableToSend.Error()))
 		return
 	}
 
@@ -421,23 +334,18 @@ func (s *Server) customerVerifyHandler(w http.ResponseWriter, r *http.Request) {
 	const page = "/customer/profile"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var req forms.CustomerVerifyForm
+	if err := httputil.BindPostForm(r, &req); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
-		return
-	}
-
-	otpCode := r.PostFormValue("otp_code")
-	if otpCode == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Verification code is required"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
 	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
-	valid, err := s.services.customerOTP.VerifyCode(ctx, customerIDStr, otpCode)
+	valid, err := s.services.customerOTP.VerifyCode(ctx, customerIDStr, req.OTPCode)
 	if err != nil || !valid {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid or expired verification code"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidOTP.Error()))
 		return
 	}
 
@@ -609,23 +517,27 @@ func (s *Server) customerQuotationAddToHandler(w http.ResponseWriter, r *http.Re
 	const page = "/customer/quotation"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var pathReq forms.CustomerQuotationPath
+	if err := httputil.BindPath(r, &pathReq); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, httputil.ErrorMessage(err), http.StatusBadRequest)
+		return
+	}
+	if _, err := httputil.RequireEncodedID(s.encoder, pathReq.ProductID); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, httputil.ErrorMessage(err), http.StatusBadRequest)
 		return
 	}
 
-	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
-	productID := chi.URLParam(r, "productID")
-	var qty int64 = 1
-	if qtyStr := r.FormValue("quantity"); qtyStr != "" {
-		n, err := strconv.ParseInt(qtyStr, 10, 64)
-		if err == nil {
-			qty = n
-		}
+	var formReq forms.CustomerQuotationAddForm
+	_ = httputil.BindForm(r, &formReq)
+	qty := int64(formReq.Quantity)
+	if qty <= 0 {
+		qty = 1
 	}
 
-	if err := s.services.quotation.AddLineToQuotation(ctx, customerIDStr, productID, qty); err != nil {
+	customerIDStr := s.sessionManager.GetString(ctx, SessionCustomerID)
+	if err := s.services.quotation.AddLineToQuotation(ctx, customerIDStr, pathReq.ProductID, qty); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
@@ -642,9 +554,19 @@ func (s *Server) customerQuotationRemoveFromDraftHandler(w http.ResponseWriter, 
 	const page = "/customer/quotation"
 	ctx := r.Context()
 
-	lineID := chi.URLParam(r, "lineID")
+	var pathReq forms.CustomerQuotationLinePath
+	if err := httputil.BindPath(r, &pathReq); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, httputil.ErrorMessage(err), http.StatusBadRequest)
+		return
+	}
+	if _, err := httputil.RequireEncodedID(s.encoder, pathReq.LineID); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, httputil.ErrorMessage(err), http.StatusBadRequest)
+		return
+	}
 
-	if err := s.services.quotation.RemoveLine(ctx, lineID); err != nil {
+	if err := s.services.quotation.RemoveLine(ctx, pathReq.LineID); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return

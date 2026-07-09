@@ -13,16 +13,17 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
-
-	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
 func (s *Server) adminProductInventoriesPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Product Inventories Page Handler]"
+	const page = "/admin/product-inventories"
 	ctx := r.Context()
 
 	brandsRes, err := requests.GetBrandsForAdmin(
@@ -47,7 +48,7 @@ func (s *Server) adminProductInventoriesPageHandler(w http.ResponseWriter, r *ht
 
 	if err := compadmin.AdminProductInventoriesPage(brands).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/product-inventories", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 }
@@ -57,10 +58,16 @@ func (s *Server) adminProductInventoriesTableHandler(w http.ResponseWriter, r *h
 	const page = "/admin/product-inventories"
 	ctx := r.Context()
 
-	searchSerial := r.URL.Query().Get("search_serial")
-	searchBrand := r.URL.Query().Get("search_brand")
+	var q forms.AdminProductInventoriesListQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	searchSerial := q.SearchSerial
+	searchBrand := q.SearchBrand
 
-	statusStr := r.URL.Query().Get("product_status")
+	statusStr := q.ProductStatus
 	productStatus := enums.ParseProductStatusToEnum(statusStr)
 	if statusStr != "" && productStatus == enums.PRODUCT_STATUS_UNDEFINED {
 		logs.LogCtx(ctx).Error(logtag, zap.String("status", statusStr), zap.Error(errs.ErrEnumInvalid))
@@ -68,7 +75,7 @@ func (s *Server) adminProductInventoriesTableHandler(w http.ResponseWriter, r *h
 		return
 	}
 
-	stocksInStr := r.URL.Query().Get("stocks_in")
+	stocksInStr := q.StocksIn
 	stocksIn := enums.ParseStocksInToEnum(stocksInStr)
 	if stocksInStr != "" && stocksIn == enums.STOCKS_IN_UNDEFINED {
 		logs.LogCtx(ctx).Error(logtag, zap.String("stocks_in", stocksInStr), zap.Error(errs.ErrEnumInvalid))
@@ -76,12 +83,7 @@ func (s *Server) adminProductInventoriesTableHandler(w http.ResponseWriter, r *h
 		return
 	}
 
-	listPage := 1
-	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
-		if parsed, err := strconv.Atoi(paramPage); err == nil && parsed > 0 {
-			listPage = parsed
-		}
-	}
+	listPage := httputil.PageOrDefault(q.Page, 1)
 
 	inventories, totalCount, listPage, err := s.services.productInventory.GetListingForAdminPaginated(
 		ctx,
@@ -118,7 +120,16 @@ func (s *Server) adminProductInventoryUpdateModalHandler(w http.ResponseWriter, 
 	const page = "/admin/product-inventories"
 	ctx := r.Context()
 
-	inventoryID := chi.URLParam(r, "id")
+	var p forms.AdminProductInventoryPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrDecode.Error()))
+		return
+	}
+	inventoryID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrDecode.Error()))
+		return
+	}
 	decoded := s.encoder.Decode(inventoryID)
 	if decoded == encode.INVALID {
 		logs.LogCtx(ctx).Error(logtag, zap.String("inventory_id", inventoryID), zap.Error(errs.ErrDecode))
@@ -130,7 +141,7 @@ func (s *Server) adminProductInventoryUpdateModalHandler(w http.ResponseWriter, 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			logs.LogCtx(ctx).Error(logtag, zap.Int64("decoded", decoded), zap.Error(err))
-			redirectHX(w, r, utils.URLWithError(page, "Inventory not found"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInventoryNotFound.Error()))
 			return
 		}
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -158,31 +169,40 @@ func (s *Server) adminProductInventoryUpdateHandler(w http.ResponseWriter, r *ht
 
 	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
 	if staffID == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Unauthorized"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrForbidden.Error()))
 		return
 	}
 
-	if err := r.ParseForm(); err != nil {
+	var p forms.AdminProductInventoryPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	inventoryID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	var f forms.AdminProductInventoryUpdateForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
-
-	inventoryID := chi.URLParam(r, "id")
-	qtyStr := r.PostFormValue("qty")
-	stocksInStr := r.PostFormValue("stocks_in")
+	qtyStr := f.Qty
+	stocksInStr := f.StocksIn
 
 	stocksIn := enums.ParseStocksInToEnum(stocksInStr)
 	if stocksIn == enums.STOCKS_IN_UNDEFINED {
 		logs.LogCtx(ctx).Error(logtag, zap.String("stocks_in", stocksInStr), zap.Error(errs.ErrInvalidInput))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid stock location"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidStocksIn.Error()))
 		return
 	}
 
 	qty, err := strconv.ParseInt(qtyStr, 10, 64)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("qty", qtyStr), zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid quantity"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrParseInt.Error()))
 		return
 	}
 

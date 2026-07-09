@@ -19,13 +19,14 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/jobs"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
-	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
@@ -33,12 +34,13 @@ func (s *Server) adminSuperuserProductsSubcategoriesHandler(w http.ResponseWrite
 	const logtag = "[Admin Superuser Products Subcategories Handler]"
 	ctx := r.Context()
 
-	category := r.URL.Query().Get("category")
-	if category == "" {
+	var q forms.AdminProductsCategoryQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(errs.ErrInvalidParams))
 		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
+	category := q.Category
 
 	categories, err := requests.GetCategoriesForAdmin(
 		ctx,
@@ -71,7 +73,11 @@ func (s *Server) adminSuperuserProductsValidateSerialHandler(w http.ResponseWrit
 	const logtag = "[Admin Superuser Products Validate Serial Handler]"
 	ctx := r.Context()
 
-	serial := r.URL.Query().Get("serial")
+	var q forms.AdminProductsSerialQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+	}
+	serial := q.Serial
 	if serial == "" {
 		if err := compadmin.SerialValidationResult(false).Render(ctx, w); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -107,48 +113,54 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(errs.ErrInvalidParams)))
 		return
 	}
 
-	brandID := r.FormValue("brand_id")
+	var f forms.AdminProductCreateOrUpdateForm
+	if err := httputil.BindMultipartForm(r, &f); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductAllFieldsRequired.Error()))
+		return
+	}
+
+	brandID := f.BrandID
 	if brandID == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid brand"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidBrand.Error()))
 		return
 	}
 
-	category := r.FormValue("category")
-	subcategory := r.FormValue("subcategory")
+	category := f.Category
+	subcategory := f.Subcategory
 	if category == "" || subcategory == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Category and subcategory are required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductCategoryRequired.Error()))
 		return
 	}
 
-	name := r.FormValue("name")
-	serial := r.FormValue("serial")
-	description := r.FormValue("description")
-	priceStr := r.FormValue("price")
+	name := f.Name
+	serial := f.Serial
+	description := f.Description
+	priceStr := f.Price
 	if name == "" || serial == "" || description == "" || priceStr == "" {
-		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductAllFieldsRequired.Error()))
 		return
 	}
 
 	isUnique, err := s.services.product.ValidateSerial(ctx, serial)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to validate serial"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductSerialValidateFailed.Error()))
 		return
 	}
 
 	if !isUnique {
-		redirectHX(w, r, utils.URLWithError(page, "Serial already exists"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductSerialExists.Error()))
 		return
 	}
 
 	price, err := strconv.ParseFloat(priceStr, 64)
 	if err != nil || price <= 0 {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid price"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidPrice.Error()))
 		return
 	}
 
@@ -160,30 +172,30 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 	unitPriceWithoutVat := int64(math.Round(price / (1 + vatPercentage/100)))
 	unitPriceWithVat := int64(math.Round(price))
 
-	specColours := r.FormValue("spec_colours")
-	specSizes := r.FormValue("spec_sizes")
-	specSegmentation := r.FormValue("spec_segmentation")
-	specPartNumber := r.FormValue("spec_part_number")
-	specPower := r.FormValue("spec_power")
-	specCapacity := r.FormValue("spec_capacity")
-	specScopeOfSupply := r.FormValue("spec_scope_of_supply")
-	specWeight := r.FormValue("spec_weight")
-	specWeightUnit := r.FormValue("spec_weight_unit")
-	stocksInStr := r.FormValue("stocks_in")
-	stocksQtyStr := r.FormValue("stocks_qty")
+	specColours := f.SpecColours
+	specSizes := f.SpecSizes
+	specSegmentation := f.SpecSegmentation
+	specPartNumber := f.SpecPartNumber
+	specPower := f.SpecPower
+	specCapacity := f.SpecCapacity
+	specScopeOfSupply := f.SpecScopeOfSupply
+	specWeight := f.SpecWeight
+	specWeightUnit := f.SpecWeightUnit
+	stocksInStr := f.StocksIn
+	stocksQtyStr := f.StocksQty
 
 	if specColours == "" || specSizes == "" || specSegmentation == "" ||
 		specPartNumber == "" || specPower == "" || specCapacity == "" || specScopeOfSupply == "" ||
 		specWeight == "" || specWeightUnit == "" || stocksInStr == "" || stocksQtyStr == "" {
 		logs.LogCtx(ctx).Warn(logtag, zap.Error(err), zap.Any("form", r.Form))
-		redirectHX(w, r, utils.URLWithError(page, "All product specs are required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductSpecsRequired.Error()))
 		return
 	}
 
 	stocksIn := enums.ParseStocksInToEnum(stocksInStr)
 	if stocksIn == enums.STOCKS_IN_UNDEFINED {
 		logs.LogCtx(ctx).Warn(logtag, zap.Error(err), zap.String("stocks in", stocksInStr))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid stocks in"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidStocksIn.Error()))
 		return
 	}
 
@@ -194,21 +206,21 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		return
 	}
 
-	salePriceStr := r.FormValue("sale_price")
-	saleStartDate := r.FormValue("sale_start_date")
-	saleEndDate := r.FormValue("sale_end_date")
+	salePriceStr := f.SalePrice
+	saleStartDate := f.SaleStartDate
+	saleEndDate := f.SaleEndDate
 
 	var salePriceWithoutVat, salePriceWithVat int64
 	if salePriceStr != "" {
 		salePrice, parseErr := strconv.ParseFloat(salePriceStr, 64)
 		if parseErr != nil || salePrice <= 0 {
 			logs.LogCtx(ctx).Warn(logtag, zap.Error(parseErr), zap.String("sale price", salePriceStr))
-			redirectHX(w, r, utils.URLWithError(page, "Invalid sale price"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidSalePrice.Error()))
 			return
 		}
 
 		if saleStartDate == "" || saleEndDate == "" {
-			redirectHX(w, r, utils.URLWithError(page, "Sale start and end dates are required when sale price is set"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrProductSaleDatesRequired.Error()))
 			return
 		}
 
@@ -237,7 +249,7 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		if err != nil {
 			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-			redirectHX(w, r, utils.URLWithError(page, "Product image is required"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrProductImageRequired.Error()))
 			return
 		}
 		defer file.Close()
@@ -246,7 +258,7 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		if err != nil {
 			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-			redirectHX(w, r, utils.URLWithError(page, "Brand not found"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandNotFound.Error()))
 			return
 		}
 
@@ -260,7 +272,7 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		if _, err := io.Copy(&buf, file); err != nil {
 			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-			redirectHX(w, r, utils.URLWithError(page, "Failed to read image"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrFileRead.Error()))
 			return
 		}
 
@@ -274,7 +286,7 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		); err != nil {
 			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-			redirectHX(w, r, utils.URLWithError(page, "Failed to upload image"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrProductImageUploadFailed.Error()))
 			return
 		}
 	}
@@ -427,11 +439,16 @@ func (s *Server) adminSuperuserProductsListPageHandler(w http.ResponseWriter, r 
 		})
 	}
 
+	var q forms.AdminProductsListQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+	}
+
 	if err := compadmin.AdminSuperuserProductsListPage(
 		"Products",
 		brands,
-		r.URL.Query().Get("search_serial"),
-		r.URL.Query().Get("status"),
+		q.SearchSerial,
+		q.Status,
 	).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -455,27 +472,33 @@ func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter
 	const page = "/admin/superuser/products"
 	ctx := r.Context()
 
-	productIDStr := chi.URLParam(r, "id")
-	if productIDStr == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid product ID"))
+	var p forms.AdminProductPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidID.Error()))
+		return
+	}
+	productIDStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidID.Error()))
 		return
 	}
 
-	if err := r.ParseForm(); err != nil {
+	var f forms.AdminProductStatusForm
+	if err := httputil.BindForm(r, &f); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
-	statusStr := r.FormValue("status")
+	statusStr := f.Status
 	if statusStr == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Status is required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductStatusRequired.Error()))
 		return
 	}
 
 	status := enums.ParseProductStatusToEnum(statusStr)
 	if status == enums.PRODUCT_STATUS_UNDEFINED {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid status"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidStatus.Error()))
 		return
 	}
 
@@ -501,7 +524,7 @@ func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter
 			zap.String("status", statusStr),
 			zap.Error(err),
 		)
-		redirectHX(w, r, utils.URLWithError(page, "Failed to update product status"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductUpdateStatusFailed.Error()))
 		return
 	}
 
@@ -514,9 +537,14 @@ func (s *Server) adminSuperuserProductsDeleteHandler(w http.ResponseWriter, r *h
 	const page = "/admin/superuser/products"
 	ctx := r.Context()
 
-	productIDStr := chi.URLParam(r, "id")
-	if productIDStr == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid product ID"))
+	var p forms.AdminProductPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidID.Error()))
+		return
+	}
+	productIDStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidID.Error()))
 		return
 	}
 
@@ -541,7 +569,7 @@ func (s *Server) adminSuperuserProductsDeleteHandler(w http.ResponseWriter, r *h
 			zap.String("product_id", productIDStr),
 			zap.Error(err),
 		)
-		redirectHX(w, r, utils.URLWithError(page, "Failed to delete product"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductDeleteFailed.Error()))
 		return
 	}
 
@@ -554,8 +582,13 @@ func (s *Server) adminSuperuserProductsEditPageHandler(w http.ResponseWriter, r 
 	const page = "/admin/superuser/products"
 	ctx := r.Context()
 
-	productID := chi.URLParam(r, "id")
-	if productID == "" {
+	var p forms.AdminProductPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
+		return
+	}
+	productID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
 		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
 		return
 	}
@@ -676,50 +709,60 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 	const page = "/admin/superuser/products"
 	ctx := r.Context()
 
-	productID := chi.URLParam(r, "id")
-	if productID == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid product ID"))
+	var p forms.AdminProductPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidID.Error()))
+		return
+	}
+	productID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidID.Error()))
 		return
 	}
 
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(errs.ErrInvalidParams)))
 		return
 	}
 
-	brandID := r.FormValue("brand_id")
+	var f forms.AdminProductCreateOrUpdateForm
+	if err := httputil.BindMultipartForm(r, &f); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductAllFieldsRequired.Error()))
+		return
+	}
+	brandID := f.BrandID
 	if brandID == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid brand"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidBrand.Error()))
 		return
 	}
 
-	category := r.FormValue("category")
-	subcategory := r.FormValue("subcategory")
+	category := f.Category
+	subcategory := f.Subcategory
 	if category == "" || subcategory == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Category and subcategory are required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductCategoryRequired.Error()))
 		return
 	}
 
-	name := r.FormValue("name")
-	description := r.FormValue("description")
-	priceStr := r.FormValue("price")
-	statusStr := r.FormValue("status")
+	name := f.Name
+	description := f.Description
+	priceStr := f.Price
+	statusStr := f.Status
 	if name == "" || description == "" || priceStr == "" || statusStr == "" {
-		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductAllFieldsRequired.Error()))
 		return
 	}
 
 	status := enums.ParseProductStatusToEnum(statusStr)
 	if status == enums.PRODUCT_STATUS_UNDEFINED {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid status"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidStatus.Error()))
 		return
 	}
 
 	price, err := strconv.ParseFloat(priceStr, 64)
 	if err != nil || price <= 0 {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid price"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidPrice.Error()))
 		return
 	}
 
@@ -731,21 +774,21 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 	unitPriceWithoutVat := int64(math.Round(price / (1 + vatPercentage/100)))
 	unitPriceWithVat := int64(math.Round(price))
 
-	salePriceStr := r.FormValue("sale_price")
-	saleStartDate := r.FormValue("sale_start_date")
-	saleEndDate := r.FormValue("sale_end_date")
+	salePriceStr := f.SalePrice
+	saleStartDate := f.SaleStartDate
+	saleEndDate := f.SaleEndDate
 
 	var salePriceWithoutVat, salePriceWithVat int64
 	if salePriceStr != "" {
 		salePrice, parseErr := strconv.ParseFloat(salePriceStr, 64)
 		if parseErr != nil || salePrice <= 0 {
 			logs.LogCtx(ctx).Warn(logtag, zap.Error(parseErr), zap.String("sale price", salePriceStr))
-			redirectHX(w, r, utils.URLWithError(page, "Invalid sale price"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidSalePrice.Error()))
 			return
 		}
 
 		if saleStartDate == "" || saleEndDate == "" {
-			redirectHX(w, r, utils.URLWithError(page, "Sale start and end dates are required when sale price is set"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrProductSaleDatesRequired.Error()))
 			return
 		}
 
@@ -754,15 +797,15 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 	}
 
 	specs := services.ProductSpecsInput{
-		Colours:       r.FormValue("spec_colours"),
-		Sizes:         r.FormValue("spec_sizes"),
-		Segmentation:  r.FormValue("spec_segmentation"),
-		PartNumber:    r.FormValue("spec_part_number"),
-		Power:         r.FormValue("spec_power"),
-		Capacity:      r.FormValue("spec_capacity"),
-		ScopeOfSupply: r.FormValue("spec_scope_of_supply"),
-		Weight:        r.FormValue("spec_weight"),
-		WeightUnit:    enums.ParseWeightUnitToEnum(r.FormValue("spec_weight_unit")).ToDB(),
+		Colours:       f.SpecColours,
+		Sizes:         f.SpecSizes,
+		Segmentation:  f.SpecSegmentation,
+		PartNumber:    f.SpecPartNumber,
+		Power:         f.SpecPower,
+		Capacity:      f.SpecCapacity,
+		ScopeOfSupply: f.SpecScopeOfSupply,
+		Weight:        f.SpecWeight,
+		WeightUnit:    enums.ParseWeightUnitToEnum(f.SpecWeightUnit).ToDB(),
 	}
 
 	var filename string
@@ -775,7 +818,7 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 			brandName, err = s.services.brand.GetNameByID(ctx, brandID)
 			if err != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-				redirectHX(w, r, utils.URLWithError(page, "Brand not found"))
+				redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandNotFound.Error()))
 				return
 			}
 
@@ -788,7 +831,7 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 			buf := bytes.Buffer{}
 			if _, err := io.Copy(&buf, file); err != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-				redirectHX(w, r, utils.URLWithError(page, "Failed to read image"))
+				redirectHX(w, r, utils.URLWithError(page, errs.ErrFileRead.Error()))
 				return
 			}
 
@@ -801,13 +844,13 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 				contentType,
 			); err != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-				redirectHX(w, r, utils.URLWithError(page, "Failed to upload image"))
+				redirectHX(w, r, utils.URLWithError(page, errs.ErrProductImageUploadFailed.Error()))
 				return
 			}
 		}
 	}
 
-	qty, err := strconv.ParseInt(r.FormValue("stocks_qty"), 10, 64)
+	qty, err := strconv.ParseInt(f.StocksQty, 10, 64)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
@@ -836,7 +879,7 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 		SalePriceWithVat:    salePriceWithVat,
 		SaleStartDate:       saleStartDate,
 		SaleEndDate:         saleEndDate,
-		StocksIn:            enums.MustParseStocksInToEnum(r.FormValue("stocks_in")),
+		StocksIn:            enums.MustParseStocksInToEnum(f.StocksIn),
 		Stocks:              qty,
 		ExternalLinks:       externalLinks,
 	}
@@ -930,8 +973,13 @@ func (s *Server) adminStaffProductsEditPageHandler(w http.ResponseWriter, r *htt
 	const page = "/admin/products"
 	ctx := r.Context()
 
-	productID := chi.URLParam(r, "id")
-	if productID == "" {
+	var p forms.AdminProductPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
+		return
+	}
+	productID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
 		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
 		return
 	}
@@ -944,7 +992,7 @@ func (s *Server) adminStaffProductsEditPageHandler(w http.ResponseWriter, r *htt
 	}
 
 	if product.Status != enums.PRODUCT_STATUS_DRAFT.String() {
-		redirectHX(w, r, utils.URLWithError(page, "Only draft products can be edited"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductDraftOnly.Error()))
 		return
 	}
 
@@ -1026,9 +1074,14 @@ func (s *Server) adminStaffProductsUpdateHandler(w http.ResponseWriter, r *http.
 	const page = "/admin/products"
 	ctx := r.Context()
 
-	productID := chi.URLParam(r, "id")
-	if productID == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid product ID"))
+	var p forms.AdminProductPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidID.Error()))
+		return
+	}
+	productID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidID.Error()))
 		return
 	}
 
@@ -1040,35 +1093,40 @@ func (s *Server) adminStaffProductsUpdateHandler(w http.ResponseWriter, r *http.
 	}
 
 	if product.Status != enums.PRODUCT_STATUS_DRAFT.String() {
-		redirectHX(w, r, utils.URLWithError(page, "Only draft products can be edited"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductDraftOnly.Error()))
 		return
 	}
 
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(errs.ErrInvalidParams)))
 		return
 	}
 
-	category := r.FormValue("category")
-	subcategory := r.FormValue("subcategory")
+	var f forms.AdminProductCreateOrUpdateForm
+	if err := httputil.BindMultipartForm(r, &f); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductAllFieldsRequired.Error()))
+		return
+	}
+	category := f.Category
+	subcategory := f.Subcategory
 	if category == "" || subcategory == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Category and subcategory are required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductCategoryRequired.Error()))
 		return
 	}
 
-	name := r.FormValue("name")
-	description := r.FormValue("description")
-	priceStr := r.FormValue("price")
+	name := f.Name
+	description := f.Description
+	priceStr := f.Price
 	if name == "" || description == "" || priceStr == "" {
-		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductAllFieldsRequired.Error()))
 		return
 	}
 
 	price, err := strconv.ParseFloat(priceStr, 64)
 	if err != nil || price <= 0 {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid price"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidPrice.Error()))
 		return
 	}
 
@@ -1080,21 +1138,21 @@ func (s *Server) adminStaffProductsUpdateHandler(w http.ResponseWriter, r *http.
 	unitPriceWithoutVat := int64(math.Round(price / (1 + vatPercentage/100)))
 	unitPriceWithVat := int64(math.Round(price))
 
-	salePriceStr := r.FormValue("sale_price")
-	saleStartDate := r.FormValue("sale_start_date")
-	saleEndDate := r.FormValue("sale_end_date")
+	salePriceStr := f.SalePrice
+	saleStartDate := f.SaleStartDate
+	saleEndDate := f.SaleEndDate
 
 	var salePriceWithoutVat, salePriceWithVat int64
 	if salePriceStr != "" {
 		salePrice, parseErr := strconv.ParseFloat(salePriceStr, 64)
 		if parseErr != nil || salePrice <= 0 {
 			logs.LogCtx(ctx).Warn(logtag, zap.Error(parseErr), zap.String("sale price", salePriceStr))
-			redirectHX(w, r, utils.URLWithError(page, "Invalid sale price"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrProductInvalidSalePrice.Error()))
 			return
 		}
 
 		if saleStartDate == "" || saleEndDate == "" {
-			redirectHX(w, r, utils.URLWithError(page, "Sale start and end dates are required when sale price is set"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrProductSaleDatesRequired.Error()))
 			return
 		}
 
@@ -1103,21 +1161,21 @@ func (s *Server) adminStaffProductsUpdateHandler(w http.ResponseWriter, r *http.
 	}
 
 	specs := services.ProductSpecsInput{
-		Colours:       r.FormValue("spec_colours"),
-		Sizes:         r.FormValue("spec_sizes"),
-		Segmentation:  r.FormValue("spec_segmentation"),
-		PartNumber:    r.FormValue("spec_part_number"),
-		Power:         r.FormValue("spec_power"),
-		Capacity:      r.FormValue("spec_capacity"),
-		ScopeOfSupply: r.FormValue("spec_scope_of_supply"),
-		Weight:        r.FormValue("spec_weight"),
-		WeightUnit:    enums.ParseWeightUnitToEnum(r.FormValue("spec_weight_unit")).ToDB(),
+		Colours:       f.SpecColours,
+		Sizes:         f.SpecSizes,
+		Segmentation:  f.SpecSegmentation,
+		PartNumber:    f.SpecPartNumber,
+		Power:         f.SpecPower,
+		Capacity:      f.SpecCapacity,
+		ScopeOfSupply: f.SpecScopeOfSupply,
+		Weight:        f.SpecWeight,
+		WeightUnit:    enums.ParseWeightUnitToEnum(f.SpecWeightUnit).ToDB(),
 	}
 
 	if specs.Colours == "" || specs.Sizes == "" || specs.Segmentation == "" ||
 		specs.PartNumber == "" || specs.Power == "" || specs.Capacity == "" ||
 		specs.ScopeOfSupply == "" || specs.Weight == "" || specs.WeightUnit == "" {
-		redirectHX(w, r, utils.URLWithError(page, "All product specs are required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrProductSpecsRequired.Error()))
 		return
 	}
 
@@ -1132,7 +1190,7 @@ func (s *Server) adminStaffProductsUpdateHandler(w http.ResponseWriter, r *http.
 			brandName, err = s.services.brand.GetNameByID(ctx, brandID)
 			if err != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-				redirectHX(w, r, utils.URLWithError(page, "Brand not found"))
+				redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandNotFound.Error()))
 				return
 			}
 
@@ -1145,7 +1203,7 @@ func (s *Server) adminStaffProductsUpdateHandler(w http.ResponseWriter, r *http.
 			buf := bytes.Buffer{}
 			if _, err := io.Copy(&buf, file); err != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-				redirectHX(w, r, utils.URLWithError(page, "Failed to read image"))
+				redirectHX(w, r, utils.URLWithError(page, errs.ErrFileRead.Error()))
 				return
 			}
 
@@ -1158,7 +1216,7 @@ func (s *Server) adminStaffProductsUpdateHandler(w http.ResponseWriter, r *http.
 				contentType,
 			); err != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-				redirectHX(w, r, utils.URLWithError(page, "Failed to upload image"))
+				redirectHX(w, r, utils.URLWithError(page, errs.ErrProductImageUploadFailed.Error()))
 				return
 			}
 		}
@@ -1236,13 +1294,11 @@ func (s *Server) adminStaffProductsUpdateHandler(w http.ResponseWriter, r *http.
 const productListFilterInclude = "[name='search_serial'],[name='search_brand'],[name='status']"
 
 func parseAdminProductListPage(r *http.Request) int {
-	page := 1
-	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
-		if parsed, err := strconv.Atoi(paramPage); err == nil && parsed > 0 {
-			page = parsed
-		}
+	var q forms.AdminProductsListQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		return 1
 	}
-	return page
+	return httputil.PageOrDefault(q.Page, 1)
 }
 
 func (s *Server) renderAdminProductsListTable(
@@ -1256,10 +1312,16 @@ func (s *Server) renderAdminProductsListTable(
 ) {
 	ctx := r.Context()
 
-	searchSerial := r.URL.Query().Get("search_serial")
-	searchBrand := r.URL.Query().Get("search_brand")
+	var q forms.AdminProductsListQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(errorPage, httputil.ErrorMessage(err)))
+		return
+	}
+	searchSerial := q.SearchSerial
+	searchBrand := q.SearchBrand
 
-	statusStr := r.URL.Query().Get("status")
+	statusStr := q.Status
 	status := enums.ParseProductStatusToEnum(statusStr)
 	if statusStr != "" && status == enums.PRODUCT_STATUS_UNDEFINED {
 		logs.LogCtx(ctx).Error(

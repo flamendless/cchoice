@@ -10,11 +10,13 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
 	"cchoice/internal/metrics"
 	"cchoice/internal/orderhistory"
 	"cchoice/internal/payments"
 	"cchoice/internal/payments/paymongo"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -48,16 +50,16 @@ func (s *Server) paymentsCancelHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Payments Cancel Handler]"
 	ctx := r.Context()
 
-	paymentRef := r.URL.Query().Get("payment_ref")
-	if paymentRef == "" {
+	var q forms.PaymentRedirectQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(errs.ErrInvalidParams))
 		http.Error(w, "Payment reference number is required", http.StatusBadRequest)
 		return
 	}
+	paymentRef := q.PaymentRef
 
-	token := r.URL.Query().Get("token")
 	webhookSecret := conf.Conf().PayMongo.WebhookSecretKey
-	tokenValid := webhookSecret != "" && payments.VerifyRedirectToken(webhookSecret, paymentRef, token)
+	tokenValid := webhookSecret != "" && payments.VerifyRedirectToken(webhookSecret, paymentRef, q.Token)
 
 	logs.LogCtx(ctx).Info(logtag, zap.String("payment_ref", paymentRef), zap.Bool("token_valid", tokenValid))
 
@@ -136,8 +138,8 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 	const logtag = "[Payments Success Handler]"
 	ctx := r.Context()
 
-	paymentRef := r.URL.Query().Get("payment_ref")
-	if paymentRef == "" {
+	var q forms.PaymentRedirectQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(errs.ErrInvalidParams),
@@ -145,6 +147,7 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Payment reference number is required", http.StatusBadRequest)
 		return
 	}
+	paymentRef := q.PaymentRef
 
 	checkoutPayment, err := s.dbRO.GetQueries().GetCheckoutPaymentByReferenceNumber(ctx, paymentRef)
 	if err != nil {
@@ -228,8 +231,8 @@ func (s *Server) paymentsSuccessHandler(w http.ResponseWriter, r *http.Request) 
 			zap.String("actual_status", paymentStatus),
 		)
 		cancelURL := utils.URL("/payments/cancel?payment_ref=" + paymentRef)
-		if token := r.URL.Query().Get("token"); token != "" {
-			cancelURL = utils.URL("/payments/cancel?payment_ref=" + paymentRef + "&token=" + token)
+		if q.Token != "" {
+			cancelURL = utils.URL("/payments/cancel?payment_ref=" + paymentRef + "&token=" + q.Token)
 		}
 		http.Redirect(w, r, cancelURL, http.StatusSeeOther)
 		return

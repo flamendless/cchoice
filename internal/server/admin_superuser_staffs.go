@@ -12,11 +12,12 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
-	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
@@ -35,9 +36,12 @@ func (s *Server) adminSuperuserStaffsListTableHandler(w http.ResponseWriter, r *
 	const logtag = "[Admin Superuser Staffs List Table Handler]"
 	ctx := r.Context()
 
-	search := r.URL.Query().Get("search")
+	var q forms.AdminSuperuserStaffsListQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+	}
 
-	staffRows, err := s.services.staff.GetAllForAdmin(ctx, search)
+	staffRows, err := s.services.staff.GetAllForAdmin(ctx, q.Search)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -75,11 +79,12 @@ func (s *Server) adminSuperuserStaffsRolesOptionsHandler(w http.ResponseWriter, 
 	const logtag = "[Admin Superuser Staffs Roles Options Handler]"
 	ctx := r.Context()
 
-	staffID := r.URL.Query().Get("staff_id")
-	if staffID == "" {
+	var q forms.AdminSuperuserStaffRolesQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
 		http.Error(w, "staff_id is required", http.StatusBadRequest)
 		return
 	}
+	staffID := q.StaffID
 
 	existingRoles, err := s.services.role.GetByStaffID(ctx, staffID)
 	if err != nil {
@@ -112,26 +117,33 @@ func (s *Server) adminSuperuserStaffsRoleHandler(w http.ResponseWriter, r *http.
 	const page = "/admin/superuser/staffs"
 	ctx := r.Context()
 
-	staffID := chi.URLParam(r, "id")
-	if staffID == "" {
-		redirectHX(w, r, utils.URLWithError(page, "staff id is required"))
+	var p forms.AdminSuperuserStaffRolePath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrStaffIDRequired.Error()))
+		return
+	}
+	staffID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrStaffIDRequired.Error()))
 		return
 	}
 
-	action := r.URL.Query().Get("action")
-	if action == "" {
-		redirectHX(w, r, utils.URLWithError(page, "action in required"))
+	var q forms.AdminSuperuserStaffRoleActionQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	action := q.Action
+
+	var f forms.AdminSuperuserStaffRoleForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
-	if err := r.ParseForm(); err != nil {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
-		return
-	}
-
-	role := enums.ParseStaffRoleToEnum(r.FormValue("role"))
+	role := enums.ParseStaffRoleToEnum(f.Role)
 	if !role.IsValid() {
-		redirectHX(w, r, utils.URLWithError(page, "invalid role"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrEnumInvalid.Error()))
 		return
 	}
 
@@ -174,7 +186,7 @@ func (s *Server) adminSuperuserStaffsRoleHandler(w http.ResponseWriter, r *http.
 		}
 
 	default:
-		redirectHX(w, r, utils.URLWithError(page, "invalid action"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrEnumInvalid.Error()))
 		return
 	}
 
@@ -195,23 +207,23 @@ func (s *Server) adminSuperuserStaffsCreatePageHandler(w http.ResponseWriter, r 
 func (s *Server) adminSuperuserStaffsCreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Superuser Staffs Create Post Handler]"
 	const page = "/admin/superuser/staffs/create"
+	const listPage = "/admin/superuser/staffs"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+	var f forms.AdminSuperuserStaffCreateForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
-	password := r.FormValue("password")
-	confirmPassword := r.FormValue("confirm_password")
-	if password != confirmPassword {
-		redirectHX(w, r, utils.URLWithError(page, "Passwords do not match"))
+	if f.Password != f.ConfirmPassword {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrPasswordsDoNotMatch.Error()))
 		return
 	}
 
-	userType := enums.ParseStaffUserTypeToEnum(r.FormValue("user_type"))
+	userType := enums.ParseStaffUserTypeToEnum(f.UserType)
 	if userType == enums.STAFF_USER_TYPE_UNDEFINED {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid user type"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrEnumInvalid.Error()))
 		return
 	}
 
@@ -230,21 +242,21 @@ func (s *Server) adminSuperuserStaffsCreatePostHandler(w http.ResponseWriter, r 
 	}()
 
 	createdStaffID, err := s.services.staff.Create(ctx, services.CreateStaffParams{
-		FirstName:       r.FormValue("first_name"),
-		MiddleName:      r.FormValue("middle_name"),
-		LastName:        r.FormValue("last_name"),
-		Birthdate:       r.FormValue("birthdate"),
-		Sex:             r.FormValue("sex"),
-		DateHired:       r.FormValue("date_hired"),
-		Position:        r.FormValue("position"),
+		FirstName:       f.FirstName,
+		MiddleName:      f.MiddleName,
+		LastName:        f.LastName,
+		Birthdate:       f.Birthdate,
+		Sex:             f.Sex,
+		DateHired:       f.DateHired,
+		Position:        f.Position,
 		UserType:        userType,
-		Email:           r.FormValue("email"),
-		MobileNo:        r.FormValue("mobile_no"),
-		TimeInSchedule:  r.FormValue("time_in_schedule"),
-		TimeOutSchedule: r.FormValue("time_out_schedule"),
-		Password:        password,
-		RequireInShop:   r.FormValue("require_in_shop") == "true",
-		Status:          enums.ParseStaffStatusToEnum(r.FormValue("status")),
+		Email:           f.Email,
+		MobileNo:        f.MobileNo,
+		TimeInSchedule:  f.TimeInSchedule,
+		TimeOutSchedule: f.TimeOutSchedule,
+		Password:        f.Password,
+		RequireInShop:   f.RequireInShop == "true",
+		Status:          enums.ParseStaffStatusToEnum(f.Status),
 	})
 	if err != nil {
 		result = err.Error()
@@ -267,7 +279,7 @@ func (s *Server) adminSuperuserStaffsCreatePostHandler(w http.ResponseWriter, r 
 	}
 
 	result = fmt.Sprintf("success. ID '%s'", createdStaffID)
-	redirectHX(w, r, utils.URLWithSuccess("/admin/superuser/staffs", "Employee created successfully"))
+	redirectHX(w, r, utils.URLWithSuccess(listPage, "Employee created successfully"))
 }
 
 func (s *Server) adminSuperuserStaffsEditPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -275,9 +287,14 @@ func (s *Server) adminSuperuserStaffsEditPageHandler(w http.ResponseWriter, r *h
 	const page = "/admin/superuser/staffs"
 	ctx := r.Context()
 
-	staffID := chi.URLParam(r, "id")
-	if staffID == "" {
-		redirectHX(w, r, utils.URLWithError(page, "staff id is required"))
+	var p forms.AdminSuperuserStaffUpdatePath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrStaffIDRequired.Error()))
+		return
+	}
+	staffID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrStaffIDRequired.Error()))
 		return
 	}
 
@@ -285,16 +302,16 @@ func (s *Server) adminSuperuserStaffsEditPageHandler(w http.ResponseWriter, r *h
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		if errors.Is(err, sql.ErrNoRows) {
-			redirectHX(w, r, utils.URLWithError(page, "Employee not found"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrStaffNotFound.Error()))
 			return
 		}
-		redirectHX(w, r, utils.URLWithError(page, "Failed to load employee"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrStaffLoadFailed.Error()))
 		return
 	}
 
 	if err := compadmin.StaffEditModal(staff).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to render edit form"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrRenderFailed.Error()))
 		return
 	}
 }
@@ -304,20 +321,26 @@ func (s *Server) adminSuperuserStaffsUpdateHandler(w http.ResponseWriter, r *htt
 	const page = "/admin/superuser/staffs"
 	ctx := r.Context()
 
-	staffID := chi.URLParam(r, "id")
-	if staffID == "" {
-		redirectHX(w, r, utils.URLWithError(page, "staff id is required"))
+	var p forms.AdminSuperuserStaffUpdatePath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrStaffIDRequired.Error()))
+		return
+	}
+	staffID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrStaffIDRequired.Error()))
 		return
 	}
 
-	if err := r.ParseForm(); err != nil {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+	var f forms.AdminSuperuserStaffUpdateForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
-	status := enums.ParseStaffStatusToEnum(r.FormValue("status"))
+	status := enums.ParseStaffStatusToEnum(f.Status)
 	if !status.IsValid() {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid status"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrEnumInvalid.Error()))
 		return
 	}
 
@@ -338,10 +361,10 @@ func (s *Server) adminSuperuserStaffsUpdateHandler(w http.ResponseWriter, r *htt
 	if err := s.services.staff.UpdateEmployment(ctx, services.UpdateEmploymentParams{
 		ID:              staffID,
 		Status:          status,
-		Position:        r.FormValue("position"),
-		TimeInSchedule:  r.FormValue("time_in_schedule"),
-		TimeOutSchedule: r.FormValue("time_out_schedule"),
-		RequireInShop:   r.FormValue("require_in_shop") == "true",
+		Position:        f.Position,
+		TimeInSchedule:  f.TimeInSchedule,
+		TimeOutSchedule: f.TimeOutSchedule,
+		RequireInShop:   f.RequireInShop == "true",
 	}); err != nil {
 		result = err.Error()
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))

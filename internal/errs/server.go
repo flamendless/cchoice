@@ -8,4 +8,6 @@ var (
 	ErrServerNoMapsFound          = errors.New("[SERVER]: No maps found")
 	ErrServerFSNotSetup           = errors.New("[SERVER]: Filesystem not setup")
 	ErrServerProductNil           = errors.New("[SERVER]: nil product returned")
+	ErrInternalServer             = errors.New("[SERVER]: Internal server error")
+	ErrRenderFailed               = errors.New("[SERVER]: Failed to render edit form")
 )

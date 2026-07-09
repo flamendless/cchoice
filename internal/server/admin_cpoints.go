@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -11,7 +10,10 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/encode/b64"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
@@ -33,32 +35,24 @@ func (s *Server) adminCPointsGeneratePostHandler(w http.ResponseWriter, r *http.
 	const page = "/admin/cpoints/generate"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var f forms.AdminCPointsGenerateForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Invalid form submission"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
-	customerID := r.PostFormValue("customer-id")
-	valueStr := r.PostFormValue("value")
-	expiresAt := r.PostFormValue("expires-at")
-	productSkusStr := r.PostFormValue("product-skus")
-
-	if customerID == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Please select a customer"))
+	customerID, err := httputil.RequireEncodedID(s.encoder, f.CustomerID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
 		return
 	}
-
-	value, err := strconv.ParseInt(valueStr, 10, 64)
-	if err != nil || value <= 0 {
-		redirectHX(w, r, utils.URLWithError(page, "Please enter a valid value"))
-		return
-	}
+	value := f.Value
 
 	var expiresAtTime *time.Time
-	if expiresAt != "" {
+	if f.ExpiresAt != "" {
 		now := time.Now()
-		switch expiresAt {
+		switch f.ExpiresAt {
 		case "1_week":
 			t := now.AddDate(0, 0, 7)
 			expiresAtTime = &t
@@ -72,8 +66,8 @@ func (s *Server) adminCPointsGeneratePostHandler(w http.ResponseWriter, r *http.
 	}
 
 	var productSkus []string
-	if productSkusStr != "" {
-		parts := strings.SplitSeq(productSkusStr, ",")
+	if f.ProductSkus != "" {
+		parts := strings.SplitSeq(f.ProductSkus, ",")
 		for part := range parts {
 			sku := strings.TrimSpace(part)
 			if sku != "" {
@@ -85,7 +79,7 @@ func (s *Server) adminCPointsGeneratePostHandler(w http.ResponseWriter, r *http.
 	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
 	customerIDDecoded := s.encoder.Decode(customerID)
 	if customerIDDecoded == encode.INVALID {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid customer"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
 		return
 	}
 
@@ -98,7 +92,7 @@ func (s *Server) adminCPointsGeneratePostHandler(w http.ResponseWriter, r *http.
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to generate C-Points"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrCpointGenerateFailed.Error()))
 		return
 	}
 
@@ -118,14 +112,16 @@ func (s *Server) adminCPointsGeneratePostHandler(w http.ResponseWriter, r *http.
 
 func (s *Server) adminCPointsCodePageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin C-Points Code Page Handler]"
+	const page = "/admin/cpoints/generate"
 	ctx := r.Context()
 
-	code := r.URL.Query().Get("code")
-	redemptionURL := r.URL.Query().Get("redemption")
-	if code == "" {
-		redirectHX(w, r, utils.URL("/admin/cpoints/generate"))
+	var q forms.AdminCPointsCodeQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		redirectHX(w, r, utils.URL(page))
 		return
 	}
+	code := q.Code
+	redemptionURL := q.Redemption
 
 	if err := compadmin.AdminCPointsCodePage(code, redemptionURL).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
@@ -137,11 +133,12 @@ func (s *Server) adminCPointsQRHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin C-Points QR Handler]"
 	ctx := r.Context()
 
-	code := r.URL.Query().Get("code")
-	if code == "" {
+	var q forms.AdminCPointsQRQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
 		http.Error(w, "code is required", http.StatusBadRequest)
 		return
 	}
+	code := q.Code
 
 	cpoint, err := s.services.cpoint.GetCpointByCode(ctx, code)
 	if err != nil {

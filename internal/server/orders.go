@@ -5,7 +5,9 @@ import (
 	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -23,7 +25,10 @@ func (s *Server) ordersTrackPageHandler(w http.ResponseWriter, r *http.Request) 
 	mobileNo := constants.ViberURIPrefix + cfg.Settings.MobileNo
 	ctx := r.Context()
 
-	orderNo := r.URL.Query().Get("order_no")
+	var req forms.OrderTrackQuery
+	_ = httputil.BindQuery(r, &req)
+	orderNo := req.OrderNo
+
 	if orderNo == "" {
 		if err := comporder.OrderTrackerPage(comporder.OrderTrackerPageBody(orderNo, enums.ORDER_STATUS_UNDEFINED, "", email, mobileNo)).Render(ctx, w); err != nil {
 			logs.Log().Error(logtag, zap.String("order_no", orderNo), zap.Error(err))

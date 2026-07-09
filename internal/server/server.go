@@ -39,32 +39,32 @@ import (
 )
 
 type Services struct {
-	attendance       *services.AttendanceService
-	brand            *services.BrandService
-	cpoint           *services.CPointService
-	cpointToken      *services.CPointTokenService
-	customer         *services.CustomerService
-	customerOTP      *services.CustomerOTPService
-	export           *services.ExportService
+	attendance        *services.AttendanceService
+	brand             *services.BrandService
+	cpoint            *services.CPointService
+	cpointToken       *services.CPointTokenService
+	customer          *services.CustomerService
+	customerOTP       *services.CustomerOTPService
+	export            *services.ExportService
 	productBulkImport *services.ProductBulkImportService
-	passwordReset    *services.PasswordResetService
-	holiday          *services.HolidayService
-	location         *services.LocationService
-	memo             *services.MemoService
-	product          *services.ProductService
-	productCategory  *services.ProductCategoryService
-	productInventory *services.ProductInventoryService
-	image            *services.ImageService
-	promo            *services.PromoService
-	qr               *services.QRService
-	quotation        *services.QuotationService
-	report           *services.ReportService
-	role             *services.RoleService
-	staff            *services.StaffService
-	staffLog         *services.StaffLogsService
-	trackedLink      *services.TrackedLinkService
-	order            *services.OrderService
-	all              []services.IService
+	passwordReset     *services.PasswordResetService
+	holiday           *services.HolidayService
+	location          *services.LocationService
+	memo              *services.MemoService
+	product           *services.ProductService
+	productCategory   *services.ProductCategoryService
+	productInventory  *services.ProductInventoryService
+	image             *services.ImageService
+	promo             *services.PromoService
+	qr                *services.QRService
+	quotation         *services.QuotationService
+	report            *services.ReportService
+	role              *services.RoleService
+	staff             *services.StaffService
+	staffLog          *services.StaffLogsService
+	trackedLink       *services.TrackedLinkService
+	order             *services.OrderService
+	all               []services.IService
 }
 
 type Server struct {
@@ -202,31 +202,31 @@ func NewServer() *ServerInstance {
 	productBulkImportService := services.NewProductBulkImportService(productService, staffLogService)
 
 	newServer.services = Services{
-		attendance:       attendanceService,
-		brand:            services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
-		customer:         services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		customerOTP:      services.NewCustomerOTPService(newServer.encoder, newServer.dbRO, newServer.dbRW, mailService, emailJobRunner),
+		attendance:        attendanceService,
+		brand:             services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
+		customer:          services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		customerOTP:       services.NewCustomerOTPService(newServer.encoder, newServer.dbRO, newServer.dbRW, mailService, emailJobRunner),
 		export:            exportService,
 		productBulkImport: productBulkImportService,
-		passwordReset:    services.NewPasswordResetService(newServer.encoder, newServer.dbRO, newServer.dbRW, emailJobRunner, staffLogService),
-		cpoint:           services.NewCpointService(newServer.encoder, newServer.dbRO, newServer.dbRW, cpointTokenService, staffLogService),
-		cpointToken:      cpointTokenService,
-		holiday:          holidayService,
-		location:         services.NewLocationService(cfg.Settings.ShopLocation),
-		memo:             services.NewMemoService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, emailJobRunner),
-		product:          productService,
-		productCategory:  productCategoryService,
-		productInventory: productInventoryService,
-		image:            services.NewImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
-		promo:            services.NewPromoService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
-		qr:               services.NewQRService(newServer.cache),
-		quotation:        services.NewQuotationService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
-		report:           services.NewReportService(newServer.encoder, newServer.dbRO, attendanceService, holidayService, staffLogService),
-		role:             services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		staff:            services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
-		staffLog:         staffLogService,
-		trackedLink:      services.NewTrackedLinkService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
-		order:            services.NewOrderService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, emailJobRunner),
+		passwordReset:     services.NewPasswordResetService(newServer.encoder, newServer.dbRO, newServer.dbRW, emailJobRunner, staffLogService),
+		cpoint:            services.NewCpointService(newServer.encoder, newServer.dbRO, newServer.dbRW, cpointTokenService, staffLogService),
+		cpointToken:       cpointTokenService,
+		holiday:           holidayService,
+		location:          services.NewLocationService(cfg.Settings.ShopLocation),
+		memo:              services.NewMemoService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, emailJobRunner),
+		product:           productService,
+		productCategory:   productCategoryService,
+		productInventory:  productInventoryService,
+		image:             services.NewImageService(newServer.objectStorage, newServer.encoder, newServer.dbRO, newServer.dbRW),
+		promo:             services.NewPromoService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
+		qr:                services.NewQRService(newServer.cache),
+		quotation:         services.NewQuotationService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
+		report:            services.NewReportService(newServer.encoder, newServer.dbRO, attendanceService, holidayService, staffLogService),
+		role:              services.NewRoleService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		staff:             services.NewStaffService(newServer.encoder, newServer.dbRO, newServer.dbRW),
+		staffLog:          staffLogService,
+		trackedLink:       services.NewTrackedLinkService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
+		order:             services.NewOrderService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, emailJobRunner),
 	}
 
 	newServer.services.all = []services.IService{

@@ -2,14 +2,15 @@ package server
 
 import (
 	"net/http"
-	"strconv"
-	"strings"
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
+	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
@@ -18,11 +19,12 @@ import (
 
 func (s *Server) adminCategoriesListPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Categories List Page Handler]"
+	const page = "/admin/categories"
 	ctx := r.Context()
 
 	if err := compadmin.AdminCategoriesListPage().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/categories", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 }
@@ -32,18 +34,17 @@ func (s *Server) adminCategoriesListTableHandler(w http.ResponseWriter, r *http.
 	const page = "/admin/categories"
 	ctx := r.Context()
 
-	search := strings.TrimSpace(r.URL.Query().Get("search"))
-
-	listPage := 1
-	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
-		if parsed, err := strconv.Atoi(paramPage); err == nil && parsed > 0 {
-			listPage = parsed
-		}
+	var q forms.AdminCategoriesListQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
 	}
+	listPage := httputil.PageOrDefault(q.Page, 1)
 
 	categories, totalCount, listPage, err := s.services.productCategory.GetCategoriesListingPaginated(
 		ctx,
-		search,
+		q.Search,
 		listPage,
 		constants.DefaultAdminTablePageSize,
 	)
@@ -73,11 +74,12 @@ func (s *Server) adminCategoriesSubcategoriesHandler(w http.ResponseWriter, r *h
 	const page = "/admin/categories"
 	ctx := r.Context()
 
-	categoryName := strings.TrimSpace(r.URL.Query().Get("category"))
-	if categoryName == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Category is required"))
+	var q forms.AdminCategoriesSubcategoriesQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
+	categoryName := q.Category
 
 	rows, err := s.services.productCategory.GetSubcategoriesForCategory(ctx, categoryName)
 	if err != nil {
@@ -115,25 +117,23 @@ func (s *Server) adminCategoriesCreateHandler(w http.ResponseWriter, r *http.Req
 	const page = "/admin/categories"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var f forms.AdminCategoriesCreateForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
-	mode := r.FormValue("mode")
-	categoryName := strings.TrimSpace(r.FormValue("category_name"))
+	mode := f.Mode
+	categoryName := f.CategoryName
 	if mode == "existing" {
-		categoryName = strings.TrimSpace(r.FormValue("category"))
+		categoryName = f.Category
 	}
 
-	subcategories := r.Form["subcategories[]"]
-	if len(subcategories) == 0 {
-		subcategories = r.Form["subcategories"]
-	}
+	subcategories := f.Subcategories
 
 	if mode == "" || categoryName == "" || len(subcategories) == 0 {
-		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrAllFieldsRequired.Error()))
 		return
 	}
 

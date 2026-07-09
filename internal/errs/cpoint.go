@@ -13,4 +13,5 @@ var (
 	ErrCpointInvalidPayload         = errors.New("[CPOINT]: Invalid payload")
 	ErrCpointMissingRequiredFields  = errors.New("[CPOINT]: Missing required fields")
 	ErrCpointTokenExpired           = errors.New("[CPOINT]: Token expired")
+	ErrCpointGenerateFailed         = errors.New("[CPOINT]: Failed to generate C-Points")
 )

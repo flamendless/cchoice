@@ -2,28 +2,27 @@ package server
 
 import (
 	"net/http"
-	"strconv"
-	"strings"
 
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
-
-	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
 func (s *Server) adminOrdersListPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Orders List Page Handler]"
+	const page = "/admin/orders"
 	ctx := r.Context()
 
 	if err := compadmin.AdminOrdersListPage().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/orders", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 	}
 }
 
@@ -32,7 +31,12 @@ func (s *Server) adminOrdersListTableHandler(w http.ResponseWriter, r *http.Requ
 	const page = "/admin/orders"
 	ctx := r.Context()
 
-	searchOrderRef := strings.TrimSpace(r.URL.Query().Get("search_order_ref"))
+	var q forms.AdminOrdersListQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
 	sortBy, sortDir, err := utils.ParseListingSortQuery(r.URL.Query(), "UPDATED_AT", "CREATED_AT", "STATUS")
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("sort_by", sortBy), zap.String("sort_dir", sortDir.String()), zap.Error(err))
@@ -40,16 +44,11 @@ func (s *Server) adminOrdersListTableHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	listPage := 1
-	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
-		if parsed, err := strconv.Atoi(paramPage); err == nil && parsed > 0 {
-			listPage = parsed
-		}
-	}
+	listPage := httputil.PageOrDefault(q.Page, 1)
 
 	serviceOrders, totalCount, listPage, err := s.services.order.GetForListingAdminPaginated(
 		ctx,
-		searchOrderRef,
+		q.SearchOrderRef,
 		sortBy,
 		sortDir,
 		listPage,
@@ -94,7 +93,16 @@ func (s *Server) adminOrdersDetailsHandler(w http.ResponseWriter, r *http.Reques
 	const page = "/admin/orders"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
+	var p forms.AdminOrderPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
 	details, err := s.services.order.GetDetailsForAdmin(ctx, idStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -113,7 +121,16 @@ func (s *Server) adminOrdersManageModalHandler(w http.ResponseWriter, r *http.Re
 	const page = "/admin/orders"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
+	var p forms.AdminOrderPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
 	data, err := s.services.order.GetManageDataForAdmin(ctx, idStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -139,7 +156,16 @@ func (s *Server) adminOrdersTrackModalHandler(w http.ResponseWriter, r *http.Req
 	const page = "/admin/orders"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
+	var p forms.AdminOrderPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
 	trackData, err := s.services.order.GetStatusHistoryForAdmin(ctx, idStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -177,9 +203,23 @@ func (s *Server) adminOrdersUpdateStatusHandler(w http.ResponseWriter, r *http.R
 	const page = "/admin/orders"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
-	status := r.FormValue("status")
-	notes := r.FormValue("notes")
+	var p forms.AdminOrderPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		return
+	}
+	var f forms.AdminOrderStatusForm
+	if err := httputil.BindForm(r, &f); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
+		return
+	}
+	status := f.Status
+	notes := f.Notes
 	canUpdateStatus := s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_ORDER_STATUS)
 
 	if err := s.services.order.UpdateOrderForAdmin(

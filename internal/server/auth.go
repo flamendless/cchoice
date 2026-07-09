@@ -4,10 +4,11 @@ import (
 	"net/http"
 
 	compauth "cchoice/cmd/web/components/auth"
-	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -29,13 +30,13 @@ func (s *Server) forgotPasswordPageHandler(w http.ResponseWriter, r *http.Reques
 	const page = "/auth/forgot-password"
 	ctx := r.Context()
 
-	userTypeStr := r.URL.Query().Get("type")
-	userType := enums.ParseUserTypeToEnum(userTypeStr)
-	if !userType.IsValid() && userTypeStr != "" {
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
+	var req forms.ForgotPasswordQuery
+	if err := httputil.BindQuery(r, &req); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
+	userType := enums.ParseUserTypeToEnum(req.Type)
 	if err := compauth.ForgotPasswordPage(userType).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -51,50 +52,27 @@ func (s *Server) forgotPasswordHandler(w http.ResponseWriter, r *http.Request) {
 	const page = "/auth/forgot-password"
 	ctx := r.Context()
 
-	userTypeStr := r.PostFormValue("user_type")
-	if err := r.ParseForm(); err != nil {
+	var req forms.ForgotPasswordForm
+	if err := httputil.BindPostForm(r, &req); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithParams(
 			page,
 			map[string]string{
-				"error": err.Error(),
-				"type":  userTypeStr,
+				"error": httputil.ErrorMessage(err),
+				"type":  req.UserType,
 			},
 		))
 		return
 	}
 
-	email := r.PostFormValue("email")
-	if !constants.ReEmail.MatchString(email) {
-		redirectHX(w, r, utils.URLWithParams(
-			page,
-			map[string]string{
-				"error": errs.ErrInvalidParams.Error(),
-				"type":  userTypeStr,
-			},
-		))
-		return
-	}
-
-	userType := enums.ParseUserTypeToEnum(userTypeStr)
-	if !userType.IsValid() {
-		redirectHX(w, r, utils.URLWithParams(
-			page,
-			map[string]string{
-				"error": errs.ErrInvalidParams.Error(),
-				"type":  userTypeStr,
-			},
-		))
-		return
-	}
-
-	if err := s.services.passwordReset.RequestReset(ctx, email, userType); err != nil {
+	userType := enums.ParseUserTypeToEnum(req.UserType)
+	if err := s.services.passwordReset.RequestReset(ctx, req.Email, userType); err != nil {
 		if err == errs.ErrPasswordResetRateLimited {
 			redirectHX(w, r, utils.URLWithParams(
 				page,
 				map[string]string{
 					"error": errs.ErrPasswordResetRateLimited.Error(),
-					"type":  userTypeStr,
+					"type":  req.UserType,
 				},
 			))
 			return
@@ -104,18 +82,17 @@ func (s *Server) forgotPasswordHandler(w http.ResponseWriter, r *http.Request) {
 			page,
 			map[string]string{
 				"error": err.Error(),
-				"type":  userTypeStr,
+				"type":  req.UserType,
 			},
 		))
 		return
 	}
 
-	redirectHX(w, r, utils.URLWithSuccess(page, "Check your e-mail"))
 	redirectHX(w, r, utils.URLWithParams(
 		page,
 		map[string]string{
 			"success": "Check your e-mail",
-			"type":    userTypeStr,
+			"type":    req.UserType,
 		},
 	))
 }
@@ -125,13 +102,13 @@ func (s *Server) resetPasswordPageHandler(w http.ResponseWriter, r *http.Request
 	const page = "/auth/forgot-password"
 	ctx := r.Context()
 
-	token := r.URL.Query().Get("token")
-	if token == "" {
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
+	var req forms.ResetPasswordPageQuery
+	if err := httputil.BindQuery(r, &req); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
-	resetCtx, err := s.services.passwordReset.VerifyToken(ctx, token)
+	resetCtx, err := s.services.passwordReset.VerifyToken(ctx, req.Token)
 	if err != nil {
 		if err == errs.ErrInvalidResetToken {
 			redirectHX(w, r, utils.URLWithError(page, err.Error()))
@@ -142,7 +119,7 @@ func (s *Server) resetPasswordPageHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if err := compauth.ResetPasswordPage(resetCtx.UserType, token, resetCtx.Email).Render(ctx, w); err != nil {
+	if err := compauth.ResetPasswordPage(resetCtx.UserType, req.Token, resetCtx.Email).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),
@@ -157,36 +134,14 @@ func (s *Server) resetPasswordHandler(w http.ResponseWriter, r *http.Request) {
 	const page = "/auth/forgot-password"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var req forms.ResetPasswordForm
+	if err := httputil.BindPostForm(r, &req); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
 
-	token := r.PostFormValue("token")
-	if token == "" {
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
-		return
-	}
-
-	newPassword := r.PostFormValue("new_password")
-	confirmPassword := r.PostFormValue("confirm_password")
-	if newPassword == "" || confirmPassword == "" {
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
-		return
-	}
-
-	if newPassword != confirmPassword {
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
-		return
-	}
-
-	if !constants.RePassword.MatchString(newPassword) {
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
-		return
-	}
-
-	userType, err := s.services.passwordReset.ResetPassword(ctx, token, newPassword)
+	userType, err := s.services.passwordReset.ResetPassword(ctx, req.Token, req.NewPassword)
 	if err != nil {
 		if err == errs.ErrInvalidResetToken {
 			redirectHX(w, r, utils.URLWithError(page, err.Error()))

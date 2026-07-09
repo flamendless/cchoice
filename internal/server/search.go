@@ -2,7 +2,6 @@ package server
 
 import (
 	"net/http"
-	"strconv"
 	"strings"
 
 	compshop "cchoice/cmd/web/components/shop"
@@ -10,7 +9,9 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -27,14 +28,14 @@ func (s *Server) searchPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Search Page Handler]"
 	ctx := r.Context()
 
-	query := strings.TrimSpace(r.URL.Query().Get("q"))
-	if len(query) < constants.MinSearchQueryLength {
-		logs.LogCtx(ctx).Warn(logtag, zap.String("query", query))
+	var req forms.SearchPageQuery
+	if err := httputil.BindQuery(r, &req); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
 		http.Redirect(w, r, utils.URL("/"), http.StatusSeeOther)
 		return
 	}
 
-	if err := compshop.SearchPage(models.SearchPageData{Query: query}).Render(ctx, w); err != nil {
+	if err := compshop.SearchPage(models.SearchPageData{Query: req.Q}).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -44,30 +45,28 @@ func (s *Server) searchProductsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Search Products Handler]"
 	ctx := r.Context()
 
-	query := strings.TrimSpace(r.URL.Query().Get("q"))
-	if len(query) < constants.MinSearchQueryLength {
-		logs.LogCtx(ctx).Warn(logtag, zap.String("query", query))
+	var req forms.SearchProductsQuery
+	if err := httputil.BindQuery(r, &req); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
 		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
 
-	page := 0
-	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
-		if parsed, err := strconv.Atoi(paramPage); err == nil && parsed >= 0 {
-			page = parsed
-		}
+	page := req.Page
+	if page < 0 {
+		page = 0
 	}
 
 	limit := constants.DefaultLimitSearchResultsPage
 	offset := page * limit
 
 	rows, err := s.dbRO.GetQueries().GetProductsBySearchQueryPaginated(ctx, queries.GetProductsBySearchQueryPaginatedParams{
-		Name:   query,
+		Name:   req.Q,
 		Limit:  int64(limit),
 		Offset: int64(offset),
 	})
 	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("query", query))
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("query", req.Q))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -75,14 +74,14 @@ func (s *Server) searchProductsHandler(w http.ResponseWriter, r *http.Request) {
 	validRows := filterSearchPaginatedRows(rows)
 	if len(validRows) == 0 {
 		if page == 0 {
-			if err := compshop.SearchNoResults(query).Render(ctx, w); err != nil {
+			if err := compshop.SearchNoResults(req.Q).Render(ctx, w); err != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 			return
 		}
 
-		if err := compshop.SearchProductsExhausted(query).Render(ctx, w); err != nil {
+		if err := compshop.SearchProductsExhausted(req.Q).Render(ctx, w); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -93,7 +92,7 @@ func (s *Server) searchProductsHandler(w http.ResponseWriter, r *http.Request) {
 	products := models.ToProductGridProductsFromSearchRows(s.encoder, s.GetCDNURL, validRows)
 
 	if err := compshop.SearchProductsPage(models.SearchProductsPageData{
-		Query:    query,
+		Query:    req.Q,
 		Page:     page,
 		HasMore:  hasMore,
 		Products: products,
@@ -110,21 +109,19 @@ func (s *Server) searchRelatedProductsHandler(w http.ResponseWriter, r *http.Req
 	const logtag = "[Search Related Products Handler]"
 	ctx := r.Context()
 
-	query := strings.TrimSpace(r.URL.Query().Get("q"))
-	if len(query) < constants.MinSearchQueryLength {
-		logs.LogCtx(ctx).Warn(logtag, zap.String("query", query))
+	var req forms.SearchRelatedQuery
+	if err := httputil.BindQuery(r, &req); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
 		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
 
-	page := 0
-	if paramPage := r.URL.Query().Get("page"); paramPage != "" {
-		if parsed, err := strconv.Atoi(paramPage); err == nil && parsed >= 0 {
-			page = parsed
-		}
+	page := req.Page
+	if page < 0 {
+		page = 0
 	}
 
-	source := r.URL.Query().Get("source")
+	source := req.Source
 	if source != searchRelatedSource && source != searchOtherSource {
 		source = searchRelatedSource
 	}
@@ -138,12 +135,12 @@ func (s *Server) searchRelatedProductsHandler(w http.ResponseWriter, r *http.Req
 	switch source {
 	case searchOtherSource:
 		otherRows, err := s.dbRO.GetQueries().GetOtherProductsForSearch(ctx, queries.GetOtherProductsForSearchParams{
-			SearchQuery: query,
+			SearchQuery: req.Q,
 			Limit:       int64(limit),
 			Offset:      int64(offset),
 		})
 		if err != nil {
-			logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("query", query))
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("query", req.Q))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -153,12 +150,12 @@ func (s *Server) searchRelatedProductsHandler(w http.ResponseWriter, r *http.Req
 		products = models.ToProductGridProductsFromOtherRows(s.encoder, s.GetCDNURL, validOtherRows)
 	default:
 		relatedRows, err := s.dbRO.GetQueries().GetRelatedProductsForSearch(ctx, queries.GetRelatedProductsForSearchParams{
-			SearchQuery: query,
+			SearchQuery: req.Q,
 			Limit:       int64(limit),
 			Offset:      int64(offset),
 		})
 		if err != nil {
-			logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("query", query))
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("query", req.Q))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -168,12 +165,12 @@ func (s *Server) searchRelatedProductsHandler(w http.ResponseWriter, r *http.Req
 			source = searchOtherSource
 
 			otherRows, otherErr := s.dbRO.GetQueries().GetOtherProductsForSearch(ctx, queries.GetOtherProductsForSearchParams{
-				SearchQuery: query,
+				SearchQuery: req.Q,
 				Limit:       int64(limit),
 				Offset:      int64(offset),
 			})
 			if otherErr != nil {
-				logs.LogCtx(ctx).Error(logtag, zap.Error(otherErr), zap.String("query", query))
+				logs.LogCtx(ctx).Error(logtag, zap.Error(otherErr), zap.String("query", req.Q))
 				http.Error(w, otherErr.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -193,7 +190,7 @@ func (s *Server) searchRelatedProductsHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	if err := compshop.SearchRelatedProductsPage(models.SearchRelatedProductsPageData{
-		Query:    query,
+		Query:    req.Q,
 		Page:     page,
 		HasMore:  hasMore,
 		Source:   source,

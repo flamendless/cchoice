@@ -11,8 +11,10 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
 	"cchoice/internal/metrics"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
 
 	"golang.org/x/crypto/bcrypt"
@@ -205,6 +207,9 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 
 func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Login Page Handler]"
+	const page = "/admin"
+	const superuserPage = "/admin/superuser"
+	const staffPage = "/admin/staff"
 	ctx := r.Context()
 
 	staffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
@@ -216,16 +221,16 @@ func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 				if enums.ParseStaffStatusToEnum(staff.Status) == enums.STAFF_STATUS_RESIGNED {
 					s.sessionManager.Remove(ctx, SessionStaffID)
 					s.sessionManager.Remove(ctx, SessionStaffAccessID)
-					redirectHX(w, r, utils.URLWithError("/admin", errs.ErrStaffResigned.Error()))
+					redirectHX(w, r, utils.URLWithError(page, errs.ErrStaffResigned.Error()))
 					return
 				}
 				switch enums.ParseStaffUserTypeToEnum(staff.UserType) {
 				case enums.STAFF_USER_TYPE_SUPERUSER:
-					redirectHX(w, r, utils.URL("/admin/superuser"))
+					redirectHX(w, r, utils.URL(superuserPage))
 				case enums.STAFF_USER_TYPE_STAFF:
-					redirectHX(w, r, utils.URL("/admin/staff"))
+					redirectHX(w, r, utils.URL(staffPage))
 				default:
-					redirectHX(w, r, utils.URL("/admin"))
+					redirectHX(w, r, utils.URL(page))
 				}
 				return
 			}
@@ -244,26 +249,29 @@ func (s *Server) adminLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Login Handler]"
+	const page = "/admin"
+	const superuserPage = "/admin/superuser"
+	const staffPage = "/admin/staff"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var f forms.AdminLoginForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin", "Invalid form submission"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidEmailOrPasswordFormat.Error()))
 		return
 	}
-
-	email := r.PostFormValue("email")
-	password := r.PostFormValue("password")
+	email := f.Email
+	password := f.Password
 
 	if !constants.ReEmail.MatchString(email) {
 		metrics.Auth.LoginAttempt(metrics.AuthUserTypeAdmin, metrics.AuthResultFailure)
-		redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password format"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidEmailOrPasswordFormat.Error()))
 		return
 	}
 
 	if !constants.RePassword.MatchString(password) {
 		metrics.Auth.LoginAttempt(metrics.AuthUserTypeAdmin, metrics.AuthResultFailure)
-		redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password format"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidEmailOrPasswordFormat.Error()))
 		return
 	}
 
@@ -271,7 +279,7 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			metrics.Auth.LoginAttempt(metrics.AuthUserTypeAdmin, metrics.AuthResultFailure)
-			redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidEmailOrPassword.Error()))
 			return
 		}
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -281,13 +289,13 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := bcrypt.CompareHashAndPassword([]byte(staff.Password), []byte(password)); err != nil {
 		metrics.Auth.LoginAttempt(metrics.AuthUserTypeAdmin, metrics.AuthResultFailure)
-		redirectHX(w, r, utils.URLWithError("/admin", "Invalid email or password"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidEmailOrPassword.Error()))
 		return
 	}
 
 	if enums.ParseStaffStatusToEnum(staff.Status) == enums.STAFF_STATUS_RESIGNED {
 		metrics.Auth.LoginAttempt(metrics.AuthUserTypeAdmin, metrics.AuthResultFailure)
-		redirectHX(w, r, utils.URLWithError("/admin", errs.ErrStaffResigned.Error()))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrStaffResigned.Error()))
 		return
 	}
 
@@ -309,18 +317,18 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		s.sessionManager.Put(ctx, SessionStaffAccessID, accessID)
 	}
 
-	if latStr, lngStr := r.PostFormValue("location_lat"), r.PostFormValue("location_lng"); latStr != "" && lngStr != "" {
-		SetLocation(ctx, s.sessionManager, latStr, lngStr)
+	if f.LocationLat != "" && f.LocationLng != "" {
+		SetLocation(ctx, s.sessionManager, f.LocationLat, f.LocationLng)
 	}
 
 	switch enums.ParseStaffUserTypeToEnum(staff.UserType) {
 	case enums.STAFF_USER_TYPE_SUPERUSER:
-		redirectHX(w, r, utils.URL("/admin/superuser"))
+		redirectHX(w, r, utils.URL(superuserPage))
 	case enums.STAFF_USER_TYPE_STAFF:
-		redirectHX(w, r, utils.URL("/admin/staff"))
+		redirectHX(w, r, utils.URL(staffPage))
 	default:
 		logs.Log().Warn(logtag, zap.String("got unhandled", staff.UserType))
-		redirectHX(w, r, utils.URL("/admin"))
+		redirectHX(w, r, utils.URL(page))
 	}
 }
 

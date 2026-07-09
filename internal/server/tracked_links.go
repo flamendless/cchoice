@@ -10,43 +10,45 @@ import (
 
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
 
-	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
 func (s *Server) handleTrackedLink(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[HandleTrackedLink]"
+	const page = "/"
 
-	slug := chi.URLParam(r, "slug")
-	if slug == "" {
-		redirectHX(w, r, utils.URL("/"))
+	var pathReq forms.TrackedLinkPath
+	if err := httputil.BindPath(r, &pathReq); err != nil {
+		redirectHX(w, r, utils.URL(page))
 		return
 	}
+	slug := pathReq.Slug
 
 	ctx := r.Context()
 	link, err := s.services.trackedLink.GetTrackedLinkBySlug(ctx, slug)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URL("/"))
+		redirectHX(w, r, utils.URL(page))
 		return
 	}
 	if link == nil {
-		redirectHX(w, r, utils.URL("/"))
+		redirectHX(w, r, utils.URL(page))
 		return
 	}
 
 	switch link.Status {
 	case enums.TRACKED_LINK_STATUS_DRAFT, enums.TRACKED_LINK_STATUS_DELETED:
-		redirectHX(w, r, utils.URL("/"))
+		redirectHX(w, r, utils.URL(page))
 		return
 	}
 
-	utmSource := r.URL.Query().Get("utm_source")
-	utmMedium := r.URL.Query().Get("utm_medium")
-	utmCampaign := r.URL.Query().Get("utm_campaign")
+	var utmReq forms.TrackedLinkUTMQuery
+	_ = httputil.BindQuery(r, &utmReq)
 
 	go func() {
 		ua := utils.ParseUserAgent(r.UserAgent())
@@ -57,9 +59,9 @@ func (s *Server) handleTrackedLink(w http.ResponseWriter, r *http.Request) {
 			r.UserAgent(),
 			hashIP(r.RemoteAddr),
 			ua.Device,
-			utmSource,
-			utmMedium,
-			utmCampaign,
+			utmReq.UTMSource,
+			utmReq.UTMMedium,
+			utmReq.UTMCampaign,
 		)
 	}()
 
@@ -77,13 +79,17 @@ func (s *Server) handleTrackedLinkQR(w http.ResponseWriter, r *http.Request) {
 	const page = "/admin/tracked-links"
 	ctx := r.Context()
 
-	id := chi.URLParam(r, "id")
-	if id == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Not found"))
+	var pathReq forms.TrackedLinkQRPath
+	if err := httputil.BindPath(r, &pathReq); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrNotFound.Error()))
+		return
+	}
+	if _, err := httputil.RequireEncodedID(s.encoder, pathReq.ID); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrNotFound.Error()))
 		return
 	}
 
-	link, err := s.services.trackedLink.GetTrackedLinkByID(ctx, id)
+	link, err := s.services.trackedLink.GetTrackedLinkByID(ctx, pathReq.ID)
 	if err != nil || link == nil {
 		err = cmp.Or(err, errs.ErrDBNil)
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))

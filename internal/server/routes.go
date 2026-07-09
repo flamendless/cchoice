@@ -25,6 +25,7 @@ import (
 	"cchoice/internal/metrics"
 	"cchoice/internal/payments"
 	"cchoice/internal/requests"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -206,7 +207,13 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Products Image Handler]"
 	ctx := r.Context()
 
-	path := r.URL.Query().Get("path")
+	var q forms.ProductsImageQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+		http.Error(w, "Invalid image path", http.StatusBadRequest)
+		return
+	}
+	path := q.Path
 
 	cleanPath, err := validateImagePath(path, []string{constants.PathProductImages})
 	if err != nil {
@@ -220,13 +227,13 @@ func (s *Server) productsImageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ext := enums.IMAGE_FORMAT_PNG
-	thumbnail := r.URL.Query().Get("thumbnail")
+	thumbnail := q.Thumbnail
 	if thumbnail == "1" {
 		ext = enums.IMAGE_FORMAT_WEBP
 	}
 
-	size := r.URL.Query().Get("size")
-	quality := r.URL.Query().Get("quality")
+	size := q.Size
+	quality := q.Quality
 	if quality == "best" {
 		size = "640x640"
 		ext = enums.IMAGE_FORMAT_WEBP
@@ -240,15 +247,16 @@ func (s *Server) brandLogoHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Brand Logo Handler]"
 	ctx := r.Context()
 
-	filename := r.URL.Query().Get("filename")
-	if filename == "" {
+	var q forms.AssetFilenameQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
 		logs.LogCtx(ctx).Debug(
 			logtag,
-			zap.String("error", "missing filename parameter"),
+			zap.String("error", httputil.ErrorMessage(err)),
 		)
 		http.Error(w, "missing filename parameter", http.StatusBadRequest)
 		return
 	}
+	filename := q.Filename
 
 	path := "static/images/brand_logos/" + filename
 
@@ -272,15 +280,16 @@ func (s *Server) assetImageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Asset Image Handler]"
 	ctx := r.Context()
 
-	filename := r.URL.Query().Get("filename")
-	if filename == "" {
+	var q forms.AssetFilenameQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
 		logs.LogCtx(ctx).Debug(
 			logtag,
-			zap.String("error", "missing filename parameter"),
+			zap.String("error", httputil.ErrorMessage(err)),
 		)
 		http.Error(w, "missing filename parameter", http.StatusBadRequest)
 		return
 	}
+	filename := q.Filename
 
 	path := "static/images/" + filename
 
@@ -410,7 +419,11 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	qBrandID := r.URL.Query().Get("brand_id")
+	var q forms.HomeBrandQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+	}
+	qBrandID := q.BrandID
 
 	filters := GetHomePageFilters(ctx, s.sessionManager)
 	if qBrandID != "" {
@@ -447,8 +460,13 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Changelogs Handler]"
 	const limit = 8
+	ctx := r.Context()
 
-	queryAppEnv := r.URL.Query().Get("appenv")
+	var q forms.ChangelogsQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+	}
+	queryAppEnv := q.AppEnv
 	var parsedAppEnv enums.AppEnv
 	if queryAppEnv == "" {
 		parsedAppEnv = conf.Conf().AppEnv
@@ -456,7 +474,6 @@ func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 		parsedAppEnv = enums.ParseAppEnvToEnum(queryAppEnv)
 	}
 
-	ctx := r.Context()
 	cacheKey := []byte("changelogs:" + parsedAppEnv.String())
 	logsData, err := requests.GetChangeLogs(
 		ctx,
@@ -490,6 +507,7 @@ func (s *Server) changelogsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) platformsPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Platforms Handler]"
+	const page = "/"
 
 	ctx := r.Context()
 	cacheKey := requests.GeneratePlatformsCacheKey()
@@ -502,13 +520,13 @@ func (s *Server) platformsPageHandler(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("path", r.URL.Path))
-		redirectHX(w, r, utils.URL("/"))
+		redirectHX(w, r, utils.URL(page))
 		return
 	}
 
 	if err := components.Platforms(platforms).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("path", r.URL.Path))
-		redirectHX(w, r, utils.URL("/"))
+		redirectHX(w, r, utils.URL(page))
 	}
 }
 
@@ -671,15 +689,13 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Search Handler]"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var f forms.SearchForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	search := r.PostFormValue("search")
-	searchMobile := r.PostFormValue("search-mobile")
-	searchQuery := cmp.Or(search, searchMobile)
+	searchQuery := cmp.Or(f.Search, f.SearchMobile)
 
 	products, err := s.dbRO.GetQueries().GetProductsBySearchQuery(
 		ctx,
@@ -763,17 +779,18 @@ func (s *Server) checkoutsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) metricsEventHandler(w http.ResponseWriter, r *http.Request) {
-	event := r.URL.Query().Get("event")
-	if event == "" {
+	var q forms.MetricsEventQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
 		http.Error(w, "missing event", http.StatusBadRequest)
 		return
 	}
+	event := q.Event
 	if !metrics.IsAllowedClientEvent(event) {
 		http.Error(w, "unknown event", http.StatusBadRequest)
 		return
 	}
 
-	value := metrics.SanitizeClientEventValue(event, r.URL.Query().Get("value"))
+	value := metrics.SanitizeClientEventValue(event, q.Value)
 
 	logs.Log().Info(
 		"Got client event",

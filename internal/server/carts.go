@@ -9,7 +9,6 @@ import (
 	"net"
 	"net/http"
 	"slices"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -23,11 +22,13 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/images"
 	"cchoice/internal/logs"
 	"cchoice/internal/metrics"
 	"cchoice/internal/orders"
 	"cchoice/internal/payments"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/shipping"
 	"cchoice/internal/storage"
 	"cchoice/internal/utils"
@@ -391,25 +392,22 @@ func (s *Server) addProductToCartHandler(w http.ResponseWriter, r *http.Request)
 	ctx := r.Context()
 	token := s.sessionManager.Token(ctx)
 
-	if err := r.ParseForm(); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	var f forms.CartAddProductForm
+	if err := httputil.BindForm(r, &f); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Error(errs.ErrInvalidParams))
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
-
-	productID := r.Form.Get("product_id")
-	if productID == "" {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(errs.ErrInvalidParams), zap.Any("form", r.Form))
+	productID, err := httputil.RequireEncodedID(s.encoder, f.ProductID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 		return
 	}
 
 	var qty int64 = 1
-	if qtyStr := r.FormValue("quantity"); qtyStr != "" {
-		n, err := strconv.ParseInt(qtyStr, 10, 64)
-		if err == nil {
-			qty = n
-		}
+	if f.Quantity != 0 {
+		qty = f.Quantity
 	}
 
 	dbProductID := s.encoder.Decode(productID)
@@ -451,7 +449,18 @@ func (s *Server) removeProductFromCartHandler(w http.ResponseWriter, r *http.Req
 	ctx := r.Context()
 	token := s.sessionManager.Token(ctx)
 
-	checkoutLineID := chi.URLParam(r, "checkoutline_id")
+	var p forms.CartCheckoutLinePath
+	if err := httputil.BindPath(r, &p); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+		return
+	}
+	checkoutLineID, err := httputil.RequireEncodedID(s.encoder, p.CheckoutLineID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+		return
+	}
 	dbCheckoutLineID := s.encoder.Decode(checkoutLineID)
 
 	checkoutLine, err := s.dbRO.GetQueries().GetCheckoutLineByID(ctx, dbCheckoutLineID)
@@ -513,16 +522,13 @@ func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Get Cart Summary Handler]"
 	ctx := r.Context()
 
-	data := r.URL.Query().Get("data")
-	switch data {
-	default:
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.String("data", data),
-			zap.Error(errs.ErrInvalidParams),
-		)
+	var q forms.CartSummaryQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.Error(errs.ErrInvalidParams))
 		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
-
+		return
+	}
+	switch q.Data {
 	case "summary_total":
 		summaryData, err := s.calculateCartSummary(ctx)
 		if err != nil {
@@ -559,6 +565,13 @@ func (s *Server) getCartSummaryHandler(w http.ResponseWriter, r *http.Request) {
 			)
 			http.Error(w, renderErrs.Error(), http.StatusInternalServerError)
 		}
+	default:
+		logs.LogCtx(ctx).Error(
+			logtag,
+			zap.String("data", q.Data),
+			zap.Error(errs.ErrInvalidParams),
+		)
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
 	}
 }
 
@@ -587,13 +600,25 @@ func (s *Server) updateCartLinesQtyHandler(w http.ResponseWriter, r *http.Reques
 	const logtag = "[Update Cart Lines Qty Handler]"
 	ctx := r.Context()
 
-	checkoutLineID := chi.URLParam(r, "checkoutline_id")
+	var p forms.CartCheckoutLinePath
+	if err := httputil.BindPath(r, &p); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+		return
+	}
+	checkoutLineID, err := httputil.RequireEncodedID(s.encoder, p.CheckoutLineID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+		return
+	}
 	dbCheckoutLineID := s.encoder.Decode(checkoutLineID)
 
 	qty := 0
-	if r.URL.Query().Get("dec") == "1" {
+	var q forms.CartUpdateQtyQuery
+	if err := httputil.BindQuery(r, &q); err == nil && q.Dec == "1" {
 		qty = -1
-	} else if r.URL.Query().Get("inc") == "1" {
+	} else if err == nil && q.Inc == "1" {
 		qty = 1
 	}
 
@@ -637,7 +662,18 @@ func (s *Server) toggleCartLineCheckboxHandler(w http.ResponseWriter, r *http.Re
 	const logtag = "[Toggle Cart Line Checkbox Handler]"
 	ctx := r.Context()
 
-	checkoutLineID := chi.URLParam(r, "checkoutline_id")
+	var p forms.CartCheckoutLinePath
+	if err := httputil.BindPath(r, &p); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+		return
+	}
+	checkoutLineID, err := httputil.RequireEncodedID(s.encoder, p.CheckoutLineID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+		return
+	}
 	token := s.sessionManager.Token(ctx)
 	checkedItems := ToggleCheckedItem(ctx, s.sessionManager, checkoutLineID)
 

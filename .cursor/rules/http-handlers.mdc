@@ -1,0 +1,78 @@
+---
+description: HTTP handler conventions for internal/server (redirects, validation, logging, errors)
+globs: internal/server/**/*.go
+alwaysApply: false
+---
+
+# HTTP Handler Conventions
+
+## Handler constants
+
+In handlers that redirect or return HTMX errors, define both:
+
+```go
+const logtag = "[My Handler]"
+const page = "/customer/quotations"
+```
+
+Use `page` for all `redirectHX`, `utils.URLWithError`, `utils.URLWithSuccess`, and `utils.URL` calls that target that handler's route. Do not repeat the path string inline.
+
+When a handler redirects to a different route on success (e.g. create form → list page), add a second constant:
+
+```go
+const page = "/admin/superuser/staffs/create"
+const listPage = "/admin/superuser/staffs"
+```
+
+```go
+// BAD
+redirectHX(w, r, utils.URLWithError("/customer/quotations", err.Error()))
+
+// GOOD
+redirectHX(w, r, utils.URLWithError(page, err.Error()))
+```
+
+Table URLs (`TableURL: utils.URL("/admin/orders/table")`) and route registration paths are exempt — only user-facing redirects need `const page`.
+
+## Sentinel errors
+
+Prefer sentinel errors from `internal/errs` over hardcoded strings when returning errors to users (redirects, `http.Error`, flash messages).
+
+```go
+// BAD — repeated hardcoded string
+redirectHX(w, r, utils.URLWithError(page, "Brand not found"))
+
+// GOOD — domain sentinel error
+redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandNotFound.Error()))
+
+// GOOD — service error propagated
+redirectHX(w, r, utils.URLWithError(page, err.Error()))
+```
+
+Guidelines:
+
+- Add new sentinels to the matching `internal/errs/<domain>.go` file (e.g. `errs.ErrBrandNotFound` in `brand.go`).
+- Use cross-cutting sentinels from `generic.go`, `server.go`, or `auth.go` when no domain file fits (`errs.ErrInternalServer`, `errs.ErrLoginRequired`, `errs.ErrTimeParse`, `errs.ErrEnumInvalid`, `errs.ErrAllFieldsRequired`).
+- For encoded IDs, use `httputil.RequireEncodedID` and surface `errs.ErrInvalidParams` (or `httputil.ErrorMessage(err)`).
+- For bind/validation failures, use `httputil.ErrorMessage(err)` — never duplicate validator messages as literals.
+- Success messages (`URLWithSuccess`) may stay as user-facing strings; errors should use sentinels.
+- Avoid `fmt.Errorf("invalid user type")` in handlers — return or surface `errs.ErrEnumInvalid` (or the domain sentinel) instead.
+
+## Request binding
+
+Prefer `httputil.BindQuery`, `BindForm`, `BindPostForm`, or `BindPath` with structs from `internal/server/forms` instead of manual `r.URL.Query().Get` / `r.PostFormValue` checks.
+
+```go
+var req forms.ShippingAddressQuery
+if err := httputil.BindQuery(r, &req); err != nil {
+    logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+    http.Error(w, httputil.ErrorMessage(err), http.StatusBadRequest)
+    return
+}
+```
+
+For encoded IDs: bind the string, then `httputil.RequireEncodedID(s.encoder, id)`.
+
+## URLs
+
+Always build URLs with `utils.URL`, `utils.URLWithError`, or `utils.URLWithSuccess` — never hardcode full paths outside the `page` constant.

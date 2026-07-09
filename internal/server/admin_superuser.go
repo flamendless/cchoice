@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/xuri/excelize/v2"
 
 	compadmin "cchoice/cmd/web/components/admin"
@@ -16,7 +15,10 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
 
@@ -63,6 +65,7 @@ func (s *Server) adminSuperuserHomeHandler(w http.ResponseWriter, r *http.Reques
 
 func (s *Server) adminSuperuserEnvsHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Superuser Envs Handler]"
+	const page = "/admin/superuser/envs"
 	ctx := r.Context()
 
 	cfg := conf.Conf()
@@ -108,7 +111,7 @@ func (s *Server) adminSuperuserEnvsHandler(w http.ResponseWriter, r *http.Reques
 
 	if err := compadmin.AdminSuperuserEnvsPage(vars).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/superuser/envs", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 	}
 }
 
@@ -116,16 +119,20 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 	const logtag = "[Admin Superuser Attendance Handler]"
 	ctx := r.Context()
 
-	startDateParam := r.URL.Query().Get("date-selector")
+	var q forms.AdminSuperuserAttendanceQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+	}
+	startDateParam := q.StartDate
 	startDate := utils.ParseAttendanceDate(startDateParam)
 
-	endDateParam := r.URL.Query().Get("date-selector-end")
+	endDateParam := q.EndDate
 	if endDateParam == "" {
 		endDateParam = startDateParam
 	}
 	endDate := utils.ParseAttendanceDate(endDateParam)
 
-	attendances, err := s.services.attendance.GetAttendance(ctx, r.FormValue("staff-id"), startDate, endDate)
+	attendances, err := s.services.attendance.GetAttendance(ctx, q.StaffID, startDate, endDate)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("start date", startDateParam), zap.String("end date", endDateParam))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -164,7 +171,11 @@ func (s *Server) adminSuperuserAttendanceHandler(w http.ResponseWriter, r *http.
 func (s *Server) adminSuperuserAttendancePageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Superuser Attendance Page Handler]"
 	ctx := r.Context()
-	date := utils.ParseAttendanceDate(r.URL.Query().Get("date"))
+	var q forms.AdminSuperuserAttendancePageQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+	}
+	date := utils.ParseAttendanceDate(q.Date)
 
 	if err := compadmin.AdminSuperuserAttendancePage("Employee Attendance", date).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
@@ -178,26 +189,27 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 	const page = "/admin/superuser/attendance"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	var f forms.AdminSuperuserAttendanceReportForm
+	if err := httputil.BindPostForm(r, &f); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 
-	startDate := r.FormValue("date-selector")
-	endDate := r.FormValue("date-selector-end")
-	if startDate == "" || endDate == "" {
-		redirectHX(w, r, utils.URLWithError(page, "missing start date or end date"))
-		return
-	}
+	startDate := f.StartDate
+	endDate := f.EndDate
 
-	formatParam := r.URL.Query().Get("format")
+	var q forms.AdminSuperuserAttendanceReportQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+	}
+	formatParam := q.Format
 	formatEnum := enums.ParseOutputFormatToEnum(formatParam)
 	if formatEnum == enums.OUTPUT_FORMAT_UNDEFINED {
 		formatEnum = enums.OUTPUT_FORMAT_CSV
 	}
 
-	staffID := r.FormValue("staff-id")
+	staffID := f.StaffID
 	adminStaffID := s.sessionManager.GetString(ctx, SessionStaffID)
 	attendances, err := s.services.attendance.GetAttendance(ctx, staffID, startDate, endDate)
 	if err != nil {
@@ -206,7 +218,7 @@ func (s *Server) adminSuperuserAttendanceReportHandler(w http.ResponseWriter, r 
 		return
 	}
 	if len(attendances) == 0 {
-		redirectHX(w, r, utils.URLWithError(page, "No attendance data found. Skipping report generation."))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrAttendanceNoData.Error()))
 		return
 	}
 
@@ -348,6 +360,7 @@ func (s *Server) adminSuperuserTimeOffTableHandler(w http.ResponseWriter, r *htt
 
 func (s *Server) adminSuperuserTimeOffApproveHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Superuser Time Off Approve Handler]"
+	const page = "/admin/superuser/time-off"
 	ctx := r.Context()
 	currentStaffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
 	staff, err := s.services.staff.GetCurrentStaff(ctx, currentStaffIDStr)
@@ -357,7 +370,16 @@ func (s *Server) adminSuperuserTimeOffApproveHandler(w http.ResponseWriter, r *h
 		return
 	}
 
-	timeOffID := chi.URLParam(r, "id")
+	var p forms.AdminSuperuserTimeOffPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	timeOffID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 	if err := s.services.attendance.ApproveTimeOff(ctx, timeOffID, currentStaffIDStr); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -368,11 +390,12 @@ func (s *Server) adminSuperuserTimeOffApproveHandler(w http.ResponseWriter, r *h
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	redirectHX(w, r, utils.URLWithSuccess("/admin/superuser/time-off", "Time off request approved"))
+	redirectHX(w, r, utils.URLWithSuccess(page, "Time off request approved"))
 }
 
 func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Superuser Time Off Cancel Handler]"
+	const page = "/admin/superuser/time-off"
 	ctx := r.Context()
 	currentStaffIDStr := s.sessionManager.GetString(ctx, SessionStaffID)
 	staff, err := s.services.staff.GetCurrentStaff(ctx, currentStaffIDStr)
@@ -382,7 +405,16 @@ func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *ht
 		return
 	}
 
-	timeOffID := chi.URLParam(r, "id")
+	var p forms.AdminSuperuserTimeOffPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	timeOffID, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 	if err := s.services.attendance.CancelTimeOff(ctx, timeOffID, currentStaffIDStr); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
@@ -393,7 +425,7 @@ func (s *Server) adminSuperuserTimeOffCancelHandler(w http.ResponseWriter, r *ht
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	redirectHX(w, r, utils.URLWithSuccess("/admin/superuser/time-off", "Time off request cancelled"))
+	redirectHX(w, r, utils.URLWithSuccess(page, "Time off request cancelled"))
 }
 
 func (s *Server) adminCustomersListHandler(w http.ResponseWriter, r *http.Request) {

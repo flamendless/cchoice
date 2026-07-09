@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 	"path/filepath"
-	"strconv"
 	"time"
 
 	compadmin "cchoice/cmd/web/components/admin"
@@ -14,31 +13,34 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
+	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
+	"cchoice/internal/server/forms"
 	"cchoice/internal/utils"
 
-	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
 func (s *Server) adminPromosListPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Promos List Page Handler]"
+	const page = "/admin/promos"
 	ctx := r.Context()
 
 	if err := compadmin.AdminPromosListPage("Promos").Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/promos", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 }
 
 func (s *Server) adminPromosCreatePageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Promos Create Page Handler]"
+	const page = "/admin/promos"
 	ctx := r.Context()
 
 	if err := compadmin.PromoCreateModal().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/promos", err.Error()))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 }
@@ -85,25 +87,29 @@ func (s *Server) adminPromosCreateHandler(w http.ResponseWriter, r *http.Request
 
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(errs.ErrInvalidParams)))
 		return
 	}
 
-	title := r.FormValue("title")
-	description := r.FormValue("description")
-	mediaURL := r.FormValue("media_url")
-
-	startDateStr := r.FormValue("start_date")
+	var f forms.AdminPromoForm
+	if err := httputil.BindMultipartForm(r, &f); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrAllFieldsRequired.Error()))
+		return
+	}
+	title := f.Title
+	description := f.Description
+	mediaURL := f.MediaURL
+	startDateStr := f.StartDate
 	startDate, err := time.Parse(constants.DateLayoutISO, startDateStr)
 	if err != nil {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid start date format"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrTimeParse.Error()))
 		return
 	}
 
-	endDateStr := r.FormValue("end_date")
+	endDateStr := f.EndDate
 	endDate, err := time.Parse(constants.DateLayoutISO, endDateStr)
 	if err != nil {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid end date format"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrTimeParse.Error()))
 		return
 	}
 
@@ -112,34 +118,30 @@ func (s *Server) adminPromosCreateHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	promoTypeStr := r.FormValue("type")
+	promoTypeStr := f.Type
 	promoType := enums.MustParsePromoTypeToEnum(promoTypeStr)
 	if promoType == enums.PROMO_TYPE_BANNER_VIDEO && mediaURL == "" {
-		redirectHX(w, r, utils.URLWithError(page, "Media URL is required for video type"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrPromoMediaURLRequired.Error()))
 		return
 	}
 
 	if title == "" || description == "" || startDateStr == "" || endDateStr == "" || promoTypeStr == "" {
-		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrAllFieldsRequired.Error()))
 		return
 	}
 
-	bannerOnly := r.FormValue("banner_only") == "on"
+	bannerOnly := f.BannerOnly == "on"
 	if err != nil {
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 
-	priority, err := strconv.ParseInt(r.FormValue("priority"), 10, 64)
-	if err != nil {
-		redirectHX(w, r, utils.URLWithError(page, err.Error()))
-		return
-	}
+	priority := f.Priority
 
 	if promoType == enums.PROMO_TYPE_BANNER_IMAGE {
 		file, header, err := r.FormFile("media_file")
 		if err != nil {
-			redirectHX(w, r, utils.URLWithError(page, "Media file is required for image type"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrPromoMediaFileRequired.Error()))
 			return
 		}
 		defer file.Close()
@@ -152,7 +154,7 @@ func (s *Server) adminPromosCreateHandler(w http.ResponseWriter, r *http.Request
 		buf := bytes.Buffer{}
 		if _, err := io.Copy(&buf, file); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-			redirectHX(w, r, utils.URLWithError(page, "Failed to read file"))
+			redirectHX(w, r, utils.URLWithError(page, errs.ErrFileRead.Error()))
 			return
 		}
 
@@ -188,25 +190,35 @@ func (s *Server) adminPromosCreateHandler(w http.ResponseWriter, r *http.Request
 
 func (s *Server) adminPromosEditPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Promos Edit Page Handler]"
+	const page = "/admin/promos"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
+	var p forms.AdminPromoPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
+		return
+	}
 
 	id := s.encoder.Decode(idStr)
 	if id == encode.INVALID {
-		redirectHX(w, r, utils.URLWithError("/admin/promos", "Invalid id format"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
 		return
 	}
 
 	promo, err := s.services.promo.GetPromoByID(ctx, id)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/promos", "Failed to get promo"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrPromoGetFailed.Error()))
 		return
 	}
 
 	if promo == nil {
-		redirectHX(w, r, utils.URLWithError("/admin/promos", "Promo not found"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrPromoNotFound.Error()))
 		return
 	}
 
@@ -226,7 +238,7 @@ func (s *Server) adminPromosEditPageHandler(w http.ResponseWriter, r *http.Reque
 
 	if err := compadmin.PromoEditModal(promoItem).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError("/admin/promos", "Failed to render edit form"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrRenderFailed.Error()))
 		return
 	}
 }
@@ -238,18 +250,32 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to parse form"))
+		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(errs.ErrInvalidParams)))
 		return
 	}
 
-	idStr := chi.URLParam(r, "id")
-	title := r.FormValue("title")
-	description := r.FormValue("description")
-	mediaURL := r.FormValue("media_url")
-	startDateStr := r.FormValue("start_date")
-	endDateStr := r.FormValue("end_date")
-	promoTypeStr := r.FormValue("type")
-	promoStatusStr := r.FormValue("status")
+	var p forms.AdminPromoPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrAllFieldsRequired.Error()))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrAllFieldsRequired.Error()))
+		return
+	}
+	var f forms.AdminPromoForm
+	if err := httputil.BindMultipartForm(r, &f); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrAllFieldsRequired.Error()))
+		return
+	}
+	title := f.Title
+	description := f.Description
+	mediaURL := f.MediaURL
+	startDateStr := f.StartDate
+	endDateStr := f.EndDate
+	promoTypeStr := f.Type
+	promoStatusStr := f.Status
 
 	if idStr == "" || title == "" || description == "" || startDateStr == "" || endDateStr == "" || promoTypeStr == "" || promoStatusStr == "" {
 		logs.Log().Warn(
@@ -257,19 +283,19 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 			zap.String("id", idStr),
 			zap.Any("form value", r.Form),
 		)
-		redirectHX(w, r, utils.URLWithError(page, "All fields are required"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrAllFieldsRequired.Error()))
 		return
 	}
 
 	startDate, err := time.Parse(constants.DateLayoutISO, startDateStr)
 	if err != nil {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid start date format"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrTimeParse.Error()))
 		return
 	}
 
 	endDate, err := time.Parse(constants.DateLayoutISO, endDateStr)
 	if err != nil {
-		redirectHX(w, r, utils.URLWithError(page, "Invalid end date format"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrTimeParse.Error()))
 		return
 	}
 
@@ -286,12 +312,8 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	bannerOnly := r.FormValue("banner_only") == "on"
-	priority, err := strconv.ParseInt(r.FormValue("priority"), 10, 64)
-	if err != nil {
-		redirectHX(w, r, utils.URLWithError(page, err.Error()))
-		return
-	}
+	bannerOnly := f.BannerOnly == "on"
+	priority := f.Priority
 
 	if promoType == enums.PROMO_TYPE_BANNER_IMAGE {
 		file, header, err := r.FormFile("media_file")
@@ -306,7 +328,7 @@ func (s *Server) adminPromosUpdateHandler(w http.ResponseWriter, r *http.Request
 			buf := bytes.Buffer{}
 			if _, err := io.Copy(&buf, file); err != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-				redirectHX(w, r, utils.URLWithError(page, "Failed to read file"))
+				redirectHX(w, r, utils.URLWithError(page, errs.ErrFileRead.Error()))
 				return
 			}
 
@@ -348,10 +370,19 @@ func (s *Server) adminPromosDeleteHandler(w http.ResponseWriter, r *http.Request
 	const page = "/admin/promos"
 	ctx := r.Context()
 
-	idStr := chi.URLParam(r, "id")
+	var p forms.AdminPromoPath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrPromoDeleteFailed.Error()))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrPromoDeleteFailed.Error()))
+		return
+	}
 	if err := s.services.promo.DeletePromo(ctx, s.sessionManager.GetString(ctx, SessionStaffID), idStr); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		redirectHX(w, r, utils.URLWithError(page, "Failed to delete promo"))
+		redirectHX(w, r, utils.URLWithError(page, errs.ErrPromoDeleteFailed.Error()))
 		return
 	}
 
