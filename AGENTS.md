@@ -32,10 +32,11 @@ mage buildweb  # Build web only
 
 ### Code Generation
 ```bash
-mage genall     # Generate all (sqlc + templ + version)
+mage genall     # Generate all (sqlc + templ + version + assets)
 mage gensql     # Generate SQL (sqlc)
 mage gentempl  # Generate templ components
-mage genversion # Generate version file
+mage genversion # Generate version and asset fingerprint files
+mage genassets  # Generate asset fingerprint file only
 mage genimages # Generate/convert product images
 ```
 

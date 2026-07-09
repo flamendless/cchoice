@@ -247,9 +247,9 @@ func HeadMetaBase() templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var12 templ.SafeURL
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/images/favicons/favicon.ico"))
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL(utils.VersionedAsset("/static/images/favicons/favicon.ico")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 65, Col: 135}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 65, Col: 157}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -296,9 +296,9 @@ func HeadMetaBase() templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var15 templ.SafeURL
-			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/css/tailwind.css"))
+			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL(utils.VersionedAsset("/static/css/tailwind.css")))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 69, Col: 52}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 69, Col: 74}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -309,9 +309,9 @@ func HeadMetaBase() templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var16 string
-			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.URL(utils.URL("/static/js/htmx.min.js")))
+			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.URL(utils.URL(utils.VersionedAsset("/static/js/htmx.min.js"))))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 70, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 70, Col: 107}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
 			if templ_7745c5c3_Err != nil {
@@ -322,9 +322,9 @@ func HeadMetaBase() templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var17 string
-			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.URL(utils.URL("/static/js/hyperscript.min.js")))
+			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.URL(utils.URL(utils.VersionedAsset("/static/js/hyperscript.min.js"))))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 71, Col: 98}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 71, Col: 120}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
 			if templ_7745c5c3_Err != nil {
@@ -335,9 +335,9 @@ func HeadMetaBase() templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var18 string
-			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.URL(utils.URL("/static/js/metrics.js")))
+			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.URL(utils.URL(utils.VersionedAsset("/static/js/metrics.js"))))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 72, Col: 90}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `common/common.templ`, Line: 72, Col: 112}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
 			if templ_7745c5c3_Err != nil {

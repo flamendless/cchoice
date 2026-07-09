@@ -216,6 +216,7 @@ require (
 tool (
 	cchoice
 	cchoice/cmd
+	cchoice/cmd/genassets
 	cchoice/cmd/genversion
 	cchoice/cmd/parse_map/enums
 	cchoice/cmd/parse_map/models

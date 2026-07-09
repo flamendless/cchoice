@@ -8,7 +8,7 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   entrypoint = ["./tmp/main"]
-  cmd = "mage buildfast"
+  cmd = "mage buildserve"
   delay = 300
   exclude_dir = [
     "internal/database/queries",
@@ -19,7 +19,7 @@ tmp_dir = "tmp"
     "internal/receipt",
     "tmp",
   ]
-  exclude_file = ["internal/conf/version_gen.go"]
+  exclude_file = ["internal/conf/version_gen.go", "internal/utils/assets_gen.go"]
   exclude_regex = [".*_test.go", ".*.sql.go", ".*_templ.go", ".*_string.go"]
   exclude_unchanged = true
   follow_symlink = false
