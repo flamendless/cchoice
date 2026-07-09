@@ -46,4 +46,48 @@
 	.custom-scrollbar::-webkit-scrollbar-corner {
 		background: var(--color-surface);
 	}
+
+	.product-skeleton-shimmer {
+		position: relative;
+		overflow: hidden;
+		background-color: #f6b08a;
+		animation: product-skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+	}
+
+	.product-skeleton-shimmer::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			115deg,
+			transparent 0%,
+			transparent 38%,
+			rgba(255, 255, 255, 0.65) 50%,
+			transparent 62%,
+			transparent 100%
+		);
+		transform: translateX(-100%);
+		animation: product-skeleton-shine 2.2s ease-in-out infinite;
+	}
+
+	@keyframes product-skeleton-pulse {
+		0%,
+		100% {
+			opacity: 0.35;
+		}
+
+		50% {
+			opacity: 0.65;
+		}
+	}
+
+	@keyframes product-skeleton-shine {
+		0% {
+			transform: translateX(-100%);
+		}
+
+		100% {
+			transform: translateX(100%);
+		}
+	}
 }

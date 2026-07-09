@@ -128,6 +128,7 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 			zap.Int64("category id", category.ID),
 			zap.String("subcategory", category.Subcategory.String),
 		)
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		return
 	}
 
@@ -150,14 +151,6 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if len(products) == 0 {
-		logs.LogCtx(ctx).Debug(
-			logtag,
-			zap.Int64("category id", category.ID),
-			zap.String("category name", category.Category.String),
-		)
-		return
-	}
 
 	validProducts := make([]int, 0, len(products))
 	for i, product := range products {
@@ -173,6 +166,14 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		productsWithValidImages = append(productsWithValidImages, products[i])
 	}
 
+	if len(products) == 0 {
+		logs.LogCtx(ctx).Debug(
+			logtag,
+			zap.Int64("category id", category.ID),
+			zap.String("category name", category.Category.String),
+		)
+	}
+
 	categorySectionProducts := models.CategorySectionProducts{
 		ID:          pathReq.CategoryID,
 		Category:    utils.SlugToTile(category.Category.String),
@@ -180,7 +181,8 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		Products:    models.ToCategorySectionProducts(s.encoder, s.GetCDNURL, productsWithValidImages),
 	}
 
-	if err := compshop.CategorySectionProducts(categorySectionProducts).Render(ctx, w); err != nil {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := compshop.CategorySectionProductsInner(categorySectionProducts).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),

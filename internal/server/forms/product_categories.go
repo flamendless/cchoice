@@ -9,10 +9,7 @@ type CategorySectionQuery struct {
 
 func (q CategorySectionQuery) EffectiveLimit() int {
 	if q.Limit <= 0 {
-		return constants.DefaultLimitCategories
-	}
-	if q.Limit < constants.DefaultLimitCategories {
-		return constants.DefaultLimitCategories
+		return constants.DefaultShopCategorySectionsPerPage
 	}
 	return q.Limit
 }

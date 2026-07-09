@@ -161,6 +161,35 @@ LIMIT :limit
 OFFSET :offset
 ;
 
+-- name: GetDistinctCategoriesForShopSections :many
+SELECT tbl_product_categories.category
+FROM tbl_product_categories
+INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
+WHERE
+	tbl_product_categories.category IS NOT NULL
+	AND tbl_product_categories.category != ''
+	AND tbl_product_categories.subcategory IS NOT NULL
+	AND tbl_product_categories.subcategory != ''
+GROUP BY tbl_product_categories.category
+ORDER BY tbl_product_categories.category ASC
+LIMIT :limit
+OFFSET :offset
+;
+
+-- name: GetProductCategoriesForSectionsByCategories :many
+SELECT
+	tbl_product_categories.id,
+	tbl_product_categories.category,
+	tbl_product_categories.subcategory,
+	COUNT(tbl_products_categories.product_id) AS products_count
+FROM tbl_product_categories
+INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
+WHERE tbl_product_categories.category IN (sqlc.slice('categories'))
+GROUP BY tbl_products_categories.category_id
+HAVING tbl_products_categories.product_id
+ORDER BY tbl_product_categories.category ASC, tbl_product_categories.subcategory ASC
+;
+
 -- name: CountDistinctCategoriesForAdmin :one
 SELECT COUNT(DISTINCT category) AS count
 FROM tbl_product_categories

@@ -215,6 +215,51 @@ func (q *Queries) GetDistinctCategoriesForAdminPaginated(ctx context.Context, ar
 	return items, nil
 }
 
+const getDistinctCategoriesForShopSections = `-- name: GetDistinctCategoriesForShopSections :many
+;
+
+SELECT tbl_product_categories.category
+FROM tbl_product_categories
+INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
+WHERE
+	tbl_product_categories.category IS NOT NULL
+	AND tbl_product_categories.category != ''
+	AND tbl_product_categories.subcategory IS NOT NULL
+	AND tbl_product_categories.subcategory != ''
+GROUP BY tbl_product_categories.category
+ORDER BY tbl_product_categories.category ASC
+LIMIT ?2
+OFFSET ?1
+`
+
+type GetDistinctCategoriesForShopSectionsParams struct {
+	Offset int64
+	Limit  int64
+}
+
+func (q *Queries) GetDistinctCategoriesForShopSections(ctx context.Context, arg GetDistinctCategoriesForShopSectionsParams) ([]sql.NullString, error) {
+	rows, err := q.db.QueryContext(ctx, getDistinctCategoriesForShopSections, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []sql.NullString
+	for rows.Next() {
+		var category sql.NullString
+		if err := rows.Scan(&category); err != nil {
+			return nil, err
+		}
+		items = append(items, category)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProductCategoriesByPromoted = `-- name: GetProductCategoriesByPromoted :many
 ;
 
@@ -331,6 +376,67 @@ func (q *Queries) GetProductCategoriesForSections(ctx context.Context) ([]GetPro
 	var items []GetProductCategoriesForSectionsRow
 	for rows.Next() {
 		var i GetProductCategoriesForSectionsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Category,
+			&i.Subcategory,
+			&i.ProductsCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getProductCategoriesForSectionsByCategories = `-- name: GetProductCategoriesForSectionsByCategories :many
+;
+
+SELECT
+	tbl_product_categories.id,
+	tbl_product_categories.category,
+	tbl_product_categories.subcategory,
+	COUNT(tbl_products_categories.product_id) AS products_count
+FROM tbl_product_categories
+INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
+WHERE tbl_product_categories.category IN (/*SLICE:categories*/?)
+GROUP BY tbl_products_categories.category_id
+HAVING tbl_products_categories.product_id
+ORDER BY tbl_product_categories.category ASC, tbl_product_categories.subcategory ASC
+`
+
+type GetProductCategoriesForSectionsByCategoriesRow struct {
+	ID            int64
+	Category      sql.NullString
+	Subcategory   sql.NullString
+	ProductsCount int64
+}
+
+func (q *Queries) GetProductCategoriesForSectionsByCategories(ctx context.Context, categories []sql.NullString) ([]GetProductCategoriesForSectionsByCategoriesRow, error) {
+	query := getProductCategoriesForSectionsByCategories
+	var queryParams []interface{}
+	if len(categories) > 0 {
+		for _, v := range categories {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:categories*/?", strings.Repeat(",?", len(categories))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:categories*/?", "NULL", 1)
+	}
+	rows, err := q.db.QueryContext(ctx, query, queryParams...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductCategoriesForSectionsByCategoriesRow
+	for rows.Next() {
+		var i GetProductCategoriesForSectionsByCategoriesRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Category,

@@ -16,27 +16,22 @@ func TestCategorySectionQuery_EffectiveLimit(t *testing.T) {
 		want  int
 	}{
 		{
-			name:  "zero uses default",
+			name:  "zero uses shop default",
 			query: forms.CategorySectionQuery{},
-			want:  constants.DefaultLimitCategories,
+			want:  constants.DefaultShopCategorySectionsPerPage,
 		},
 		{
-			name:  "negative uses default",
+			name:  "negative uses shop default",
 			query: forms.CategorySectionQuery{Limit: -1},
-			want:  constants.DefaultLimitCategories,
+			want:  constants.DefaultShopCategorySectionsPerPage,
 		},
 		{
-			name:  "below minimum clamps up",
-			query: forms.CategorySectionQuery{Limit: 3},
-			want:  constants.DefaultLimitCategories,
+			name:  "explicit shop page size",
+			query: forms.CategorySectionQuery{Limit: constants.DefaultShopCategorySectionsPerPage},
+			want:  constants.DefaultShopCategorySectionsPerPage,
 		},
 		{
-			name:  "at minimum",
-			query: forms.CategorySectionQuery{Limit: constants.DefaultLimitCategories},
-			want:  constants.DefaultLimitCategories,
-		},
-		{
-			name:  "above minimum",
+			name:  "above default",
 			query: forms.CategorySectionQuery{Limit: 20},
 			want:  20,
 		},

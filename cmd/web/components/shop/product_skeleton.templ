@@ -1,0 +1,41 @@
+package shop
+
+import "cchoice/cmd/web/components/common"
+
+templ ProductCardSkeleton() {
+	<div
+		class="flex flex-col items-center m-1 sm:m-2 ml-2 sm:ml-4 p-2 rounded-lg"
+		aria-hidden="true"
+	>
+		<div class="product-skeleton-shimmer w-20 h-20 sm:w-24 sm:h-24 rounded-lg"></div>
+		<div class="flex flex-col items-center w-20 sm:w-24 mt-1 gap-1">
+			<div class="product-skeleton-shimmer h-3 w-16 rounded"></div>
+			<div class="product-skeleton-shimmer h-3 w-12 rounded"></div>
+			<div class="product-skeleton-shimmer h-4 w-10 rounded mt-1"></div>
+		</div>
+	</div>
+}
+
+templ ProductGridSkeleton(count int) {
+	<div class="flex flex-row flex-wrap" aria-hidden="true">
+		for range count {
+			@ProductCardSkeleton()
+		}
+	</div>
+}
+
+templ CategorySectionSkeleton() {
+	<div aria-hidden="true">
+		<div class="product-skeleton-shimmer h-5 w-40 rounded m-2 my-0"></div>
+		@ProductGridSkeleton(6)
+		@common.HR()
+	</div>
+}
+
+templ CategorySectionsLoading() {
+	<div aria-busy="true" aria-label="Loading products">
+		for range 4 {
+			@CategorySectionSkeleton()
+		}
+	</div>
+}
