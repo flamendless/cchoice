@@ -31,7 +31,9 @@ func MarshalThemeConfiguration(configuration map[string]string, configType enums
 			return "", err
 		}
 		for k, v := range configuration {
-			section.NewKey(k, v)
+			if _, err := section.NewKey(k, v); err != nil {
+				return "", err
+			}
 		}
 		var buf bytes.Buffer
 		if _, err := file.WriteTo(&buf); err != nil {
