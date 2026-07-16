@@ -38,9 +38,12 @@ document.body.addEventListener("htmx:afterRequest", function(evt) {
 		const successMessage = xhr.getResponseHeader("X-Success-Message");
 		if (successMessage) {
 			showSuccessBanner(successMessage);
-		} else {
-			el_success_banner.setAttribute("hidden", "true");
 		}
+		// Note: no else-hide here. An unrelated successful htmx request
+		// (e.g. the themes table's hx-trigger="load") must not clobber a
+		// success banner that's already showing via the URL ?success=
+		// query-param flow (checkForBannerMessages -> showSuccessBanner),
+		// which has its own 3s auto-hide timer.
 
 	} else if (evt.detail.failed && evt.detail.xhr) {
 		console.warn("Server error", evt.detail);

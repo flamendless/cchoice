@@ -273,10 +273,55 @@ templ ThemeColorFields(configuration map[string]string) {
 	</div>
 }
 
+templ ThemeLogoFields(configuration map[string]string) {
+	<div class="grid grid-cols-2 gap-3">
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">
+				Logo
+			</label>
+			if configuration != nil && configuration[constants.ThemeConfigKeyLogoURL] != "" {
+				<img
+					src={ configuration[constants.ThemeConfigKeyLogoURL] }
+					alt="Current logo"
+					class="h-24 w-24 mb-2 object-contain rounded border border-gray-200 bg-gray-50 p-1"
+				/>
+			}
+			<input
+				type="file"
+				name="logo"
+				accept="image/png,image/svg+xml"
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full text-sm"
+			/>
+			<p class="text-xs text-gray-500 mt-1">PNG or SVG, max 3MB</p>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">
+				Logo with text
+			</label>
+			if configuration != nil && configuration[constants.ThemeConfigKeyLogoWithTextURL] != "" {
+				<img
+					src={ configuration[constants.ThemeConfigKeyLogoWithTextURL] }
+					alt="Current logo with text"
+					class="h-24 w-24 mb-2 object-contain rounded border border-gray-200 bg-gray-50 p-1"
+				/>
+			}
+			<input
+				type="file"
+				name="logo_with_text"
+				accept="image/png,image/svg+xml"
+				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full text-sm"
+			/>
+			<p class="text-xs text-gray-500 mt-1">PNG or SVG, max 3MB</p>
+		</div>
+	</div>
+}
+
 templ ThemeCreateForm() {
 	<form
 		hx-post={ utils.URL("/admin/themes") }
 		hx-swap="outerHTML"
+		hx-encoding="multipart/form-data"
+		enctype="multipart/form-data"
 		class="flex flex-col gap-4"
 	>
 		<div>
@@ -293,6 +338,7 @@ templ ThemeCreateForm() {
 				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"
 			/>
 		</div>
+		@ThemeLogoFields(nil)
 		<div class="grid grid-cols-2 gap-3">
 			<div>
 				<label class="block text-sm font-medium text-gray-700 mb-1">
@@ -427,6 +473,8 @@ templ ThemeEditForm(theme models.AdminThemeListItem) {
 	<form
 		hx-patch={ utils.URLf("/admin/themes/%s", theme.ID) }
 		hx-swap="outerHTML"
+		hx-encoding="multipart/form-data"
+		enctype="multipart/form-data"
 		class="flex flex-col gap-4"
 		hx-on::after-request="if(event.detail.successful) { document.getElementById('theme-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/themes/table', { target: '#themes-table', swap: 'innerHTML' }) }"
 	>
@@ -444,6 +492,7 @@ templ ThemeEditForm(theme models.AdminThemeListItem) {
 				class="mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"
 			/>
 		</div>
+		@ThemeLogoFields(theme.Configuration)
 		<div class="grid grid-cols-2 gap-3">
 			<div>
 				<label class="block text-sm font-medium text-gray-700 mb-1">

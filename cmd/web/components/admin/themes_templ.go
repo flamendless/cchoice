@@ -128,7 +128,7 @@ func ThemesListSection() templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/themes/table"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 48, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 48, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
@@ -178,7 +178,7 @@ func ThemesToolbar(url string) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(url)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 66, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 66, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
@@ -191,7 +191,7 @@ func ThemesToolbar(url string) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(url)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 74, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 74, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {
@@ -204,7 +204,7 @@ func ThemesToolbar(url string) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(url)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 87, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 87, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 		if templ_7745c5c3_Err != nil {
@@ -217,7 +217,7 @@ func ThemesToolbar(url string) templ.Component {
 		var templ_7745c5c3_Var8 templ.SafeURL
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/themes/create"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 97, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 97, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -270,7 +270,7 @@ func AdminThemesListTable(themes []models.AdminThemeListItem) templ.Component {
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue("theme-row-" + theme.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 145, Col: 38}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 145, Col: 38}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 				if templ_7745c5c3_Err != nil {
@@ -298,7 +298,7 @@ func AdminThemesListTable(themes []models.AdminThemeListItem) templ.Component {
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(theme.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 154, Col: 18}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 154, Col: 18}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -311,7 +311,7 @@ func AdminThemesListTable(themes []models.AdminThemeListItem) templ.Component {
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(theme.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 157, Col: 21}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 157, Col: 21}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -324,7 +324,7 @@ func AdminThemesListTable(themes []models.AdminThemeListItem) templ.Component {
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(theme.StartDate)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 160, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 160, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
@@ -337,7 +337,7 @@ func AdminThemesListTable(themes []models.AdminThemeListItem) templ.Component {
 				var templ_7745c5c3_Var14 string
 				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(theme.EndDate)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 163, Col: 23}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 163, Col: 23}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
@@ -358,7 +358,7 @@ func AdminThemesListTable(themes []models.AdminThemeListItem) templ.Component {
 				var templ_7745c5c3_Var15 string
 				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(theme.CreatedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 169, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 169, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 				if templ_7745c5c3_Err != nil {
@@ -424,7 +424,7 @@ func ThemeActionsCell(theme models.AdminThemeListItem) templ.Component {
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URLf("/admin/themes/%s/edit", theme.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 196, Col: 58}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 196, Col: 58}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
 			if templ_7745c5c3_Err != nil {
@@ -473,7 +473,7 @@ func ThemeStatusBadge(status enums.ThemeStatus) templ.Component {
 			var templ_7745c5c3_Var19 string
 			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 210, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 210, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 			if templ_7745c5c3_Err != nil {
@@ -491,7 +491,7 @@ func ThemeStatusBadge(status enums.ThemeStatus) templ.Component {
 			var templ_7745c5c3_Var20 string
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 214, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 214, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
@@ -509,7 +509,7 @@ func ThemeStatusBadge(status enums.ThemeStatus) templ.Component {
 			var templ_7745c5c3_Var21 string
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 218, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 218, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {
@@ -527,7 +527,7 @@ func ThemeStatusBadge(status enums.ThemeStatus) templ.Component {
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 222, Col: 12}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 222, Col: 12}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -572,7 +572,7 @@ func ThemeConfigTypeOptions(selected enums.ThemeConfigType) templ.Component {
 				var templ_7745c5c3_Var24 string
 				templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(ct.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 230, Col: 30}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 230, Col: 30}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
 				if templ_7745c5c3_Err != nil {
@@ -585,7 +585,7 @@ func ThemeConfigTypeOptions(selected enums.ThemeConfigType) templ.Component {
 				var templ_7745c5c3_Var25 string
 				templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(ct.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 230, Col: 55}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 230, Col: 55}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 				if templ_7745c5c3_Err != nil {
@@ -603,7 +603,7 @@ func ThemeConfigTypeOptions(selected enums.ThemeConfigType) templ.Component {
 				var templ_7745c5c3_Var26 string
 				templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(ct.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 232, Col: 30}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 232, Col: 30}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 				if templ_7745c5c3_Err != nil {
@@ -616,7 +616,7 @@ func ThemeConfigTypeOptions(selected enums.ThemeConfigType) templ.Component {
 				var templ_7745c5c3_Var27 string
 				templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(ct.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 232, Col: 46}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 232, Col: 46}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 				if templ_7745c5c3_Err != nil {
@@ -662,7 +662,7 @@ func ThemeStatusOptions(selected enums.ThemeStatus) templ.Component {
 				var templ_7745c5c3_Var29 string
 				templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.ResolveAttributeValue(st.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 240, Col: 30}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 240, Col: 30}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
 				if templ_7745c5c3_Err != nil {
@@ -675,7 +675,7 @@ func ThemeStatusOptions(selected enums.ThemeStatus) templ.Component {
 				var templ_7745c5c3_Var30 string
 				templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(st.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 240, Col: 55}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 240, Col: 55}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 				if templ_7745c5c3_Err != nil {
@@ -693,7 +693,7 @@ func ThemeStatusOptions(selected enums.ThemeStatus) templ.Component {
 				var templ_7745c5c3_Var31 string
 				templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.ResolveAttributeValue(st.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 242, Col: 30}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 242, Col: 30}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var31)
 				if templ_7745c5c3_Err != nil {
@@ -706,7 +706,7 @@ func ThemeStatusOptions(selected enums.ThemeStatus) templ.Component {
 				var templ_7745c5c3_Var32 string
 				templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(st.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 242, Col: 46}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 242, Col: 46}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 				if templ_7745c5c3_Err != nil {
@@ -755,7 +755,7 @@ func ThemeColorFields(configuration map[string]string) templ.Component {
 			var templ_7745c5c3_Var34 string
 			templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(key)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 252, Col: 10}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 252, Col: 10}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 			if templ_7745c5c3_Err != nil {
@@ -768,7 +768,7 @@ func ThemeColorFields(configuration map[string]string) templ.Component {
 			var templ_7745c5c3_Var35 string
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(cmp.Or(configuration[key], "#000000"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 257, Col: 51}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 257, Col: 51}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
 			if templ_7745c5c3_Err != nil {
@@ -781,7 +781,7 @@ func ThemeColorFields(configuration map[string]string) templ.Component {
 			var templ_7745c5c3_Var36 string
 			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.ResolveAttributeValue("on input set #color_text_" + key + ".value to my value")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 259, Col: 66}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 259, Col: 66}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
 			if templ_7745c5c3_Err != nil {
@@ -794,7 +794,7 @@ func ThemeColorFields(configuration map[string]string) templ.Component {
 			var templ_7745c5c3_Var37 string
 			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.ResolveAttributeValue("color_text_" + key)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 263, Col: 30}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 263, Col: 30}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
 			if templ_7745c5c3_Err != nil {
@@ -807,7 +807,7 @@ func ThemeColorFields(configuration map[string]string) templ.Component {
 			var templ_7745c5c3_Var38 string
 			templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.ResolveAttributeValue("color_" + key)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 264, Col: 27}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 264, Col: 27}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var38)
 			if templ_7745c5c3_Err != nil {
@@ -820,7 +820,7 @@ func ThemeColorFields(configuration map[string]string) templ.Component {
 			var templ_7745c5c3_Var39 string
 			templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.ResolveAttributeValue(configuration[key])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 266, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 266, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var39)
 			if templ_7745c5c3_Err != nil {
@@ -832,6 +832,81 @@ func ThemeColorFields(configuration map[string]string) templ.Component {
 			}
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func ThemeLogoFields(configuration map[string]string) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var40 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var40 == nil {
+			templ_7745c5c3_Var40 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "<div class=\"grid grid-cols-2 gap-3\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Logo</label> ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if configuration != nil && configuration[constants.ThemeConfigKeyLogoURL] != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "<img src=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var41 string
+			templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.ResolveAttributeValue(configuration[constants.ThemeConfigKeyLogoURL])
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 284, Col: 57}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var41)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\" alt=\"Current logo\" class=\"h-24 w-24 mb-2 object-contain rounded border border-gray-200 bg-gray-50 p-1\"> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "<input type=\"file\" name=\"logo\" accept=\"image/png,image/svg+xml\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full text-sm\"><p class=\"text-xs text-gray-500 mt-1\">PNG or SVG, max 3MB</p></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Logo with text</label> ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if configuration != nil && configuration[constants.ThemeConfigKeyLogoWithTextURL] != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "<img src=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var42 string
+			templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.ResolveAttributeValue(configuration[constants.ThemeConfigKeyLogoWithTextURL])
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 303, Col: 65}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var42)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" alt=\"Current logo with text\" class=\"h-24 w-24 mb-2 object-contain rounded border border-gray-200 bg-gray-50 p-1\"> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "<input type=\"file\" name=\"logo_with_text\" accept=\"image/png,image/svg+xml\" class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full text-sm\"><p class=\"text-xs text-gray-500 mt-1\">PNG or SVG, max 3MB</p></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -855,51 +930,59 @@ func ThemeCreateForm() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var40 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var40 == nil {
-			templ_7745c5c3_Var40 = templ.NopComponent
+		templ_7745c5c3_Var43 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var43 == nil {
+			templ_7745c5c3_Var43 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "<form hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "<form hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var41 string
-		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/themes"))
+		var templ_7745c5c3_Var44 string
+		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/themes"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 278, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 321, Col: 38}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var41)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "\" hx-swap=\"outerHTML\" class=\"flex flex-col gap-4\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Title <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"title\" placeholder=\"Up to 24 alphanumeric characters\" maxlength=\"24\" pattern=\"[a-zA-Z0-9]+\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div class=\"grid grid-cols-2 gap-3\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Start Date <span class=\"text-red-500\">*</span></label> <input type=\"date\" name=\"start_date\" min=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var44)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var42 string
-		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.ResolveAttributeValue(time.Now().Format(constants.DateLayoutISO))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 304, Col: 53}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var42)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "\" hx-swap=\"outerHTML\" hx-encoding=\"multipart/form-data\" enctype=\"multipart/form-data\" class=\"flex flex-col gap-4\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Title <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"title\" placeholder=\"Up to 24 alphanumeric characters\" maxlength=\"24\" pattern=\"[a-zA-Z0-9]+\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">End Date <span class=\"text-red-500\">*</span></label> <input type=\"date\" name=\"end_date\" min=\"")
+		templ_7745c5c3_Err = ThemeLogoFields(nil).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var43 string
-		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.ResolveAttributeValue(time.Now().Format(constants.DateLayoutISO))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 316, Col: 53}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var43)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "<div class=\"grid grid-cols-2 gap-3\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Start Date <span class=\"text-red-500\">*</span></label> <input type=\"date\" name=\"start_date\" min=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Configuration Type <span class=\"text-red-500\">*</span></label> <select name=\"configuration_type\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\">")
+		var templ_7745c5c3_Var45 string
+		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.ResolveAttributeValue(time.Now().Format(constants.DateLayoutISO))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 350, Col: 53}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var45)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">End Date <span class=\"text-red-500\">*</span></label> <input type=\"date\" name=\"end_date\" min=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var46 string
+		templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.ResolveAttributeValue(time.Now().Format(constants.DateLayoutISO))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 362, Col: 53}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var46)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Configuration Type <span class=\"text-red-500\">*</span></label> <select name=\"configuration_type\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -907,7 +990,7 @@ func ThemeCreateForm() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-2\">Colors</label>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-2\">Colors</label>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -915,20 +998,20 @@ func ThemeCreateForm() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "</div><p class=\"text-xs text-gray-500\">New themes are saved as DRAFT. Publish from the themes list once ready.</p><div class=\"flex justify-end gap-3 mt-2\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "</div><p class=\"text-xs text-gray-500\">New themes are saved as DRAFT. Publish from the themes list once ready.</p><div class=\"flex justify-end gap-3 mt-2\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var44 templ.SafeURL
-		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/themes"))
+		var templ_7745c5c3_Var47 templ.SafeURL
+		templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/admin/themes"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 345, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 391, Col: 37}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50\">Cancel</a> <button type=\"button\" class=\"px-4 py-2 border border-primary rounded-md text-primary hover:bg-primary hover:text-white\" onclick=\"openThemePreview(this)\">Preview</button> <button type=\"submit\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark\">Save</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50\">Cancel</a> <button type=\"button\" class=\"px-4 py-2 border border-primary rounded-md text-primary hover:bg-primary hover:text-white\" onclick=\"openThemePreview(this)\">Preview</button> <button type=\"submit\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark\">Save</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -952,12 +1035,12 @@ func AdminThemesCreatePage() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var45 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var45 == nil {
-			templ_7745c5c3_Var45 = templ.NopComponent
+		templ_7745c5c3_Var48 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var48 == nil {
+			templ_7745c5c3_Var48 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "<!doctype html><html lang=\"en\" class=\"overflow-x-hidden\"><head>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "<!doctype html><html lang=\"en\" class=\"overflow-x-hidden\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -969,7 +1052,7 @@ func AdminThemesCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "</head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'themes create')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "</head><body class=\"bg-surface min-h-screen flex flex-col\" _=\"init call metrics_event('admin_visit', 'themes create')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -985,7 +1068,7 @@ func AdminThemesCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "<div class=\"flex-grow p-4\"><div class=\"max-w-4xl mx-auto\"><div class=\"bg-white rounded-lg shadow-md p-6\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "<div class=\"flex-grow p-4\"><div class=\"max-w-4xl mx-auto\"><div class=\"bg-white rounded-lg shadow-md p-6\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -993,7 +1076,7 @@ func AdminThemesCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "<h1 class=\"text-2xl font-bold text-center text-primary mb-6\">New Theme</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "<h1 class=\"text-2xl font-bold text-center text-primary mb-6\">New Theme</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1001,7 +1084,7 @@ func AdminThemesCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "</div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "</div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1009,7 +1092,7 @@ func AdminThemesCreatePage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1033,12 +1116,12 @@ func ThemeEditModal(theme models.AdminThemeListItem) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var46 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var46 == nil {
-			templ_7745c5c3_Var46 = templ.NopComponent
+		templ_7745c5c3_Var49 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var49 == nil {
+			templ_7745c5c3_Var49 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "<div id=\"theme-edit-modal\" class=\"fixed inset-0 z-50 flex items-center justify-center\" _=\"\n\t\t\ton closeModal\n\t\t\t\tset #theme-edit-modal-container.innerHTML to ''\n\t\t\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">Edit Theme</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "<div id=\"theme-edit-modal\" class=\"fixed inset-0 z-50 flex items-center justify-center\" _=\"\n\t\t\ton closeModal\n\t\t\t\tset #theme-edit-modal-container.innerHTML to ''\n\t\t\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">Edit Theme</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1046,7 +1129,7 @@ func ThemeEditModal(theme models.AdminThemeListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1070,64 +1153,72 @@ func ThemeEditForm(theme models.AdminThemeListItem) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var47 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var47 == nil {
-			templ_7745c5c3_Var47 = templ.NopComponent
+		templ_7745c5c3_Var50 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var50 == nil {
+			templ_7745c5c3_Var50 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "<form hx-patch=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var48 string
-		templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URLf("/admin/themes/%s", theme.ID))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 428, Col: 53}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var48)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "\" hx-swap=\"outerHTML\" class=\"flex flex-col gap-4\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('theme-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/themes/table', { target: '#themes-table', swap: 'innerHTML' }) }\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Title <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"title\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var49 string
-		templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.ResolveAttributeValue(theme.Title)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 440, Col: 23}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var49)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "\" maxlength=\"24\" pattern=\"[a-zA-Z0-9]+\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div class=\"grid grid-cols-2 gap-3\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Start Date <span class=\"text-red-500\">*</span></label> <input type=\"date\" name=\"start_date\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var50 string
-		templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.ResolveAttributeValue(theme.StartDate)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 455, Col: 28}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var50)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">End Date <span class=\"text-red-500\">*</span></label> <input type=\"date\" name=\"end_date\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "<form hx-patch=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var51 string
-		templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.ResolveAttributeValue(theme.EndDate)
+		templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URLf("/admin/themes/%s", theme.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `themes.templ`, Line: 467, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 474, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var51)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div></div><div class=\"grid grid-cols-2 gap-3\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Status <span class=\"text-red-500\">*</span></label> <select name=\"status\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "\" hx-swap=\"outerHTML\" hx-encoding=\"multipart/form-data\" enctype=\"multipart/form-data\" class=\"flex flex-col gap-4\" hx-on::after-request=\"if(event.detail.successful) { document.getElementById('theme-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/themes/table', { target: '#themes-table', swap: 'innerHTML' }) }\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Title <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"title\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var52 string
+		templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.ResolveAttributeValue(theme.Title)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 488, Col: 23}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var52)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "\" maxlength=\"24\" pattern=\"[a-zA-Z0-9]+\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ThemeLogoFields(theme.Configuration).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "<div class=\"grid grid-cols-2 gap-3\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Start Date <span class=\"text-red-500\">*</span></label> <input type=\"date\" name=\"start_date\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var53 string
+		templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.ResolveAttributeValue(theme.StartDate)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 504, Col: 28}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var53)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">End Date <span class=\"text-red-500\">*</span></label> <input type=\"date\" name=\"end_date\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var54 string
+		templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.ResolveAttributeValue(theme.EndDate)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/themes.templ`, Line: 516, Col: 26}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var54)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div></div><div class=\"grid grid-cols-2 gap-3\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Status <span class=\"text-red-500\">*</span></label> <select name=\"status\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1135,7 +1226,7 @@ func ThemeEditForm(theme models.AdminThemeListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Configuration Type <span class=\"text-red-500\">*</span></label> <select name=\"configuration_type\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "</select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Configuration Type <span class=\"text-red-500\">*</span></label> <select name=\"configuration_type\" required class=\"mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1143,7 +1234,7 @@ func ThemeEditForm(theme models.AdminThemeListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "</select></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-2\">Colors</label>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "</select></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-2\">Colors</label>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1151,7 +1242,7 @@ func ThemeEditForm(theme models.AdminThemeListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "</div><div class=\"flex justify-end gap-3 mt-2\"><button type=\"button\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"button\" class=\"px-4 py-2 border border-primary rounded-md text-primary hover:bg-primary hover:text-white\" onclick=\"openThemePreview(this)\">Preview</button> <button type=\"submit\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark\">Save</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "</div><div class=\"flex justify-end gap-3 mt-2\"><button type=\"button\" class=\"px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"button\" class=\"px-4 py-2 border border-primary rounded-md text-primary hover:bg-primary hover:text-white\" onclick=\"openThemePreview(this)\">Preview</button> <button type=\"submit\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark\">Save</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

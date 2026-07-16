@@ -1,7 +1,13 @@
 package server
 
 import (
+	"bytes"
+	"context"
+	"errors"
+	"io"
+	"mime/multipart"
 	"net/http"
+	"path/filepath"
 	"time"
 
 	compadmin "cchoice/cmd/web/components/admin"
@@ -9,6 +15,7 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
@@ -85,7 +92,7 @@ func (s *Server) adminThemesCreateHandler(w http.ResponseWriter, r *http.Request
 	const logtag = "[Admin Themes Create Handler]"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(adminThemesPage, "Failed to parse form"))
 		return
@@ -120,6 +127,12 @@ func (s *Server) adminThemesCreateHandler(w http.ResponseWriter, r *http.Request
 	}
 	configuration := s.services.theme.ReadColorFields(r.Form)
 
+	if err := s.attachThemeLogos(ctx, r, title, configuration); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(adminThemesPage, err.Error()))
+		return
+	}
+
 	if _, err := s.services.theme.CreateTheme(
 		ctx,
 		s.sessionManager.GetString(ctx, SessionStaffID),
@@ -135,6 +148,76 @@ func (s *Server) adminThemesCreateHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	redirectHX(w, r, utils.URLWithSuccess(adminThemesPage, "Theme created successfully"))
+}
+
+// attachThemeLogos reads the optional "logo" and "logo_with_text" files off
+// the multipart form, uploads any that are present, and writes their public
+// URLs into configuration under ThemeConfigKeyLogoURL / ThemeConfigKeyLogoWithTextURL.
+// Both fields are optional; a missing file is not an error.
+func (s *Server) attachThemeLogos(
+	ctx context.Context,
+	r *http.Request,
+	themeTitle string,
+	configuration map[string]string,
+) error {
+	logoFields := []struct {
+		formField string
+		kind      enums.ThemeLogoKind
+		configKey string
+	}{
+		{"logo", enums.THEME_LOGO_KIND_LOGO, constants.ThemeConfigKeyLogoURL},
+		{"logo_with_text", enums.THEME_LOGO_KIND_LOGO_WITH_TEXT, constants.ThemeConfigKeyLogoWithTextURL},
+	}
+
+	for _, lf := range logoFields {
+		file, header, err := r.FormFile(lf.formField)
+		if err != nil {
+			if errors.Is(err, http.ErrMissingFile) {
+				continue
+			}
+			return errs.ErrFileRead
+		}
+
+		if err := s.uploadThemeLogoField(ctx, file, header, themeTitle, lf.kind, lf.configKey, configuration); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *Server) uploadThemeLogoField(
+	ctx context.Context,
+	file multipart.File,
+	header *multipart.FileHeader,
+	themeTitle string,
+	kind enums.ThemeLogoKind,
+	configKey string,
+	configuration map[string]string,
+) error {
+	defer file.Close()
+
+	buf := bytes.Buffer{}
+	if _, err := io.Copy(&buf, file); err != nil {
+		logs.LogCtx(ctx).Error("[Admin Themes] Logo Upload", zap.Error(err))
+		return errs.ErrFileRead
+	}
+
+	contentType := header.Header.Get("Content-Type")
+	url, err := s.services.image.UploadThemeLogo(
+		ctx,
+		themeTitle,
+		kind,
+		filepath.Ext(header.Filename),
+		&buf,
+		contentType,
+	)
+	if err != nil {
+		return err
+	}
+
+	configuration[configKey] = url
+	return nil
 }
 
 func (s *Server) adminThemesEditPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -193,7 +276,7 @@ func (s *Server) adminThemesUpdateHandler(w http.ResponseWriter, r *http.Request
 	const logtag = "[Admin Themes Update Handler]"
 	ctx := r.Context()
 
-	if err := r.ParseForm(); err != nil {
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(adminThemesPage, "Failed to parse form"))
 		return
@@ -244,6 +327,44 @@ func (s *Server) adminThemesUpdateHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 	configuration := s.services.theme.ReadColorFields(r.Form)
+
+	// Logos are optional on edit: uploading only one of "logo" /
+	// "logo_with_text" must not wipe out the other. Seed the incoming
+	// configuration with whatever logo URLs the theme already has, then
+	// let attachThemeLogos overwrite only the field(s) that actually got
+	// a new file this submission.
+	id := s.encoder.Decode(idStr)
+	if id == encode.INVALID {
+		redirectHX(w, r, utils.URLWithError(adminThemesPage, "Invalid id format"))
+		return
+	}
+	existingTheme, err := s.services.theme.GetThemeByID(ctx, id)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(adminThemesPage, "Failed to get theme"))
+		return
+	}
+	if existingTheme == nil {
+		redirectHX(w, r, utils.URLWithError(adminThemesPage, "Theme not found"))
+		return
+	}
+	existingConfig, err := services.UnmarshalThemeConfiguration(existingTheme.Configuration, existingTheme.ConfigurationType)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(adminThemesPage, "Failed to parse theme configuration"))
+		return
+	}
+	for _, key := range []string{constants.ThemeConfigKeyLogoURL, constants.ThemeConfigKeyLogoWithTextURL} {
+		if v := existingConfig[key]; v != "" {
+			configuration[key] = v
+		}
+	}
+
+	if err := s.attachThemeLogos(ctx, r, title, configuration); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(adminThemesPage, err.Error()))
+		return
+	}
 
 	if err := s.services.theme.UpdateTheme(
 		ctx,

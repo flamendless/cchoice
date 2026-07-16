@@ -9,3 +9,12 @@ var ThemeColorKeys = []string{
 	"surface",
 	"accent",
 }
+
+const (
+	ThemeConfigKeyLogoURL         = "logo_url"
+	ThemeConfigKeyLogoWithTextURL = "logo_with_text_url"
+)
+
+// MaxSizeThemeLogoUpload mirrors MaxSizeImageUpload; kept separate so theme
+// logo limits can be tuned independently of other image uploads.
+const MaxSizeThemeLogoUpload int64 = MaxSizeImageUpload

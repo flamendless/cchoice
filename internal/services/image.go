@@ -232,6 +232,81 @@ func (s *ImageService) UploadPromoBannerImage(
 	return key, nil
 }
 
+// ValidateThemeLogoContentType restricts theme logo uploads to PNG and SVG
+// only, since logos need transparency and SVG support (unlike product,
+// brand, and promo images, which stay JPEG/PNG/WebP via ValidateContentType).
+func (s *ImageService) ValidateThemeLogoContentType(contentType string) error {
+	validTypes := map[string]bool{
+		"image/png":     true,
+		"image/svg+xml": true,
+	}
+	if !validTypes[contentType] {
+		return fmt.Errorf("invalid content type: %s", contentType)
+	}
+	return nil
+}
+
+// BuildThemeLogoKey builds the Cloudflare object key for a theme logo, e.g.
+// cchoice_local_theme_holidays_logowithtext.png
+func BuildThemeLogoKey(themeTitle string, kind enums.ThemeLogoKind, ext string) string {
+	env := strings.ToLower(conf.Conf().AppEnv.String())
+	sanitizedTitle := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(themeTitle), " ", "_"))
+	uuid := utils.GenString(16)
+	return fmt.Sprintf("cchoice_%s_theme_%s_%s_%s%s", env, sanitizedTitle, kind.String(), uuid, strings.ToLower(ext))
+}
+
+func (s *ImageService) UploadThemeLogo(
+	ctx context.Context,
+	themeTitle string,
+	kind enums.ThemeLogoKind,
+	ext string,
+	file io.Reader,
+	contentType string,
+) (string, error) {
+	const logtag = "[ImageService] Theme Logo"
+	if err := s.ValidateThemeLogoContentType(contentType); err != nil {
+		return "", err
+	}
+	data, err := s.ValidateSize(file)
+	if err != nil {
+		return "", err
+	}
+	if int64(len(data)) > constants.MaxSizeThemeLogoUpload {
+		return "", fmt.Errorf("file too large: %d bytes", len(data))
+	}
+
+	filename := BuildThemeLogoKey(themeTitle, kind, ext)
+	file = bytes.NewReader(data)
+	isLocalStorage := s.objectStorage.ProviderEnum() == storage.STORAGE_PROVIDER_LOCAL
+
+	logs.Log().Info(
+		logtag,
+		zap.String("storing theme logo", filename),
+		zap.Stringer("using", s.objectStorage.ProviderEnum()),
+		zap.String("theme", themeTitle),
+		zap.Stringer("kind", kind),
+		zap.Bool("local storage", isLocalStorage),
+	)
+
+	if !conf.Conf().IsProd() && !conf.Conf().Test.LocalUploadImage || isLocalStorage {
+		sourceName := filepath.Base(filename)
+		localPath := filepath.Join("cmd/web/static/images/theme_logos", strings.ToLower(themeTitle), sourceName)
+		if err := os.MkdirAll(filepath.Dir(localPath), 0755); err != nil {
+			return "", err
+		}
+		if err := os.WriteFile(localPath, data, 0644); err != nil {
+			return "", err
+		}
+		return s.objectStorage.GetPublicURL(filename), nil
+	}
+
+	if err := s.objectStorage.PutObject(ctx, filename, file, contentType); err != nil {
+		return "", err
+	}
+
+	return s.objectStorage.GetPublicURL(filename), nil
+}
+
 func (s *ImageService) ID() string {
 	return "Image"
 }
