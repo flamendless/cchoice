@@ -117,7 +117,7 @@ func GetCategoriesSidePanel(
 		}
 		categories = append(categories, models.CategorySidePanelText{
 			Label:          label,
-			URL:            "/product-category/" + v.Category.String,
+			URL:            utils.URLf("/categories/%s", v.Category.String),
 			ScrollTargetID: utils.LabelToID(enums.MODULE_CATEGORY, label),
 		})
 		found[label] = true

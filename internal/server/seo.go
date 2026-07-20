@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -71,6 +72,33 @@ func (s *Server) sitemapHandler(w http.ResponseWriter, r *http.Request) {
 			LastMod:    lastMod.UTC(),
 			ChangeFreq: "weekly",
 			Priority:   "0.8",
+		})
+	}
+
+	categorySlugs, err := s.services.productCategory.ListCategorySitemapSlugs(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	now := time.Now().UTC()
+	parentCategories := make(map[string]struct{}, len(categorySlugs))
+	for _, row := range categorySlugs {
+		parentCategories[row.Category] = struct{}{}
+		entries = append(entries, seo.SitemapEntry{
+			Loc:        utils.SiteURL(fmt.Sprintf("/categories/%s/%s", row.Category, row.Subcategory)),
+			LastMod:    now,
+			ChangeFreq: "weekly",
+			Priority:   "0.7",
+		})
+	}
+	for category := range parentCategories {
+		entries = append(entries, seo.SitemapEntry{
+			Loc:        utils.SiteURL("/categories/" + category),
+			LastMod:    now,
+			ChangeFreq: "weekly",
+			Priority:   "0.7",
 		})
 	}
 

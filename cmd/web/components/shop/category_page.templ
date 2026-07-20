@@ -1,0 +1,118 @@
+package shop
+
+import (
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/footer"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/utils"
+)
+
+templ CategoryPage(data models.CategoryPageData) {
+	<!DOCTYPE html>
+	<html lang="en" style="overflow-x: clip;">
+		<head>
+			@common.HeadMetaBase()
+			if data.ThemeCSS != "" {
+				@common.ThemeStyle(data.ThemeCSS)
+			}
+			@common.HeadSEO(data.SEO)
+			<title>{ data.SEO.Title }</title>
+		</head>
+		@CategoryPageBody(data)
+	</html>
+}
+
+templ CategoryPageBody(data models.CategoryPageData) {
+	<body class="m-0 p-0 custom-scrollbar" style="overflow-x: clip;" _="init call metrics_event('anon_visit', 'category')">
+		@common.DevRibbon()
+		@common.ErrorBanner()
+		@common.SuccessBanner()
+		@header.Header()
+		@MobileSidebar()
+		<style>
+			#sidebar-content-wrapper {
+				display: flex;
+				align-items: flex-start;
+				width: 100%;
+			}
+			#desktop-sidebar {
+				position: sticky;
+				top: 80px;
+				left: 0;
+				z-index: 45;
+				width: 15%;
+				height: calc(100vh - 80px);
+				overflow-y: auto;
+				padding: 0.5rem 1rem 0 0.25rem;
+				background: white;
+				flex-shrink: 0;
+			}
+			#main-content {
+				display: flex;
+				align-items: flex-start;
+				width: 85%;
+				border-left: 2px solid var(--color-primary-muted);
+			}
+			@media (max-width: 1023px) {
+				#desktop-sidebar {
+					display: none !important;
+				}
+				#main-content {
+					width: 100% !important;
+					border-left: none !important;
+				}
+				#sidebar-content-wrapper {
+					width: 100% !important;
+				}
+			}
+		</style>
+		<div id="sidebar-content-wrapper">
+			<div id="desktop-sidebar">
+				@BrandsSidePanel()
+				@CategoriesSidePanel()
+			</div>
+			<div id="main-content" name="right-panel">
+				<div class="w-full">
+					@ModalProductImageViewer("", "")
+					<div class="px-2 py-3">
+						@CategoryPageBreadcrumbs(data)
+						<h1 class="text-lg font-semibold text-primary-dark mt-2">
+							if data.SubcategoryLabel != "" && data.SubcategoryLabel != data.CategoryLabel {
+								{ data.SubcategoryLabel }
+								<span class="text-sm font-normal text-gray-600"> / { data.CategoryLabel }</span>
+							} else {
+								{ data.CategoryLabel }
+							}
+						</h1>
+					</div>
+					@common.HR()
+					@CategorySectionProductsInner(models.CategorySectionProducts{
+						ID:          "category-page-products",
+						Category:    data.CategoryLabel,
+						Subcategory: data.SubcategoryLabel,
+						Products:    data.Products,
+					})
+				</div>
+			</div>
+		</div>
+		@footer.Footer()
+		@LoadImageSrc()
+		@LoadModalImage()
+		@PrefetchProductImage()
+	</body>
+}
+
+templ CategoryPageBreadcrumbs(data models.CategoryPageData) {
+	<nav class="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+		<a href={ utils.URL("/") } class="hover:text-primary transition-colors">Home</a>
+		<span class="text-gray-400">/</span>
+		if data.SubcategorySlug != "" && data.SubcategorySlug != data.CategorySlug {
+			<a href={ utils.URLf("/categories/%s", data.CategorySlug) } class="hover:text-primary transition-colors">{ data.CategoryLabel }</a>
+			<span class="text-gray-400">/</span>
+			<span class="text-gray-800 font-medium">{ data.SubcategoryLabel }</span>
+		} else {
+			<span class="text-gray-800 font-medium">{ data.CategoryLabel }</span>
+		}
+	</nav>
+}

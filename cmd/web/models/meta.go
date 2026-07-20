@@ -54,3 +54,37 @@ func DefaultSiteSEO() SiteSEO {
 		StructuredData: seo.BuildSiteStructuredData(canonical, ogImage),
 	}
 }
+
+func NotFoundSEO() SiteSEO {
+	seoMeta := DefaultSiteSEO()
+	seoMeta.Robots = "noindex, follow"
+	seoMeta.CanonicalURL = ""
+	seoMeta.OGURL = ""
+	return seoMeta
+}
+
+func HomePageSEO(filters HomePageFilters) SiteSEO {
+	seoMeta := DefaultSiteSEO()
+	if filters.BrandID != "" {
+		seoMeta.Robots = "noindex, follow"
+	}
+	return seoMeta
+}
+
+func CategoryPageSEO(categorySlug, subcategorySlug string) SiteSEO {
+	meta := seo.GenerateCategoryMeta(categorySlug, subcategorySlug)
+	return SiteSEO{
+		Title:          meta.Title,
+		Description:    meta.Description,
+		CanonicalURL:   meta.CanonicalURL,
+		Robots:         meta.Robots,
+		Keywords:       meta.Keywords,
+		OGTitle:        meta.Title,
+		OGDescription:  meta.Description,
+		OGType:         meta.OGType,
+		OGURL:          meta.CanonicalURL,
+		OGImage:        meta.OGImage,
+		TwitterCard:    meta.TwitterCard,
+		StructuredData: meta.StructuredData,
+	}
+}

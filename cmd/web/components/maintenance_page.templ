@@ -4,6 +4,7 @@ import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/components/header"
 import "cchoice/cmd/web/components/footer"
+import "cchoice/cmd/web/models"
 
 templ MaintenancePage() {
 	<!DOCTYPE html>
@@ -66,7 +67,8 @@ templ NotPage() {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
-			@common.HeadMeta()
+			@common.HeadMetaBase()
+			@common.HeadSEO(models.NotFoundSEO())
 			@common.TabTitle("Page Not Found")
 		</head>
 		<body class="m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col">

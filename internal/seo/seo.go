@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"cchoice/internal/constants"
-	"cchoice/internal/enums"
 	"cchoice/internal/utils"
 )
 
@@ -192,9 +191,7 @@ func GenerateProductMeta(
 }
 
 func categoryBreadcrumbURL(siteBaseURL, categorySlug string) string {
-	label := utils.SlugToTile(categorySlug)
-	anchor := utils.LabelToID(enums.MODULE_CATEGORY, label)
-	return strings.TrimSuffix(siteBaseURL, "/") + "/#" + anchor
+	return CategoryPageURL(siteBaseURL, categorySlug, "")
 }
 
 func buildProductBreadcrumbItems(product Product, siteBaseURL string) []breadcrumbItem {
@@ -218,15 +215,11 @@ func buildProductBreadcrumbItems(product Product, siteBaseURL string) []breadcru
 
 	subcategory := product.ProductSubcategory
 	if subcategory != "" && !strings.EqualFold(subcategory, product.ProductCategory) {
-		subcategoryURL := categoryURL
-		if subcategoryURL == "" {
-			subcategoryURL = homeURL
-		}
 		items = append(items, breadcrumbItem{
 			Type:     "ListItem",
 			Position: position,
 			Name:     utils.SlugToTile(subcategory),
-			Item:     subcategoryURL,
+			Item:     CategoryPageURL(siteBaseURL, product.ProductCategory, subcategory),
 		})
 		position++
 	}

@@ -12,7 +12,7 @@ templ CategoriesSidePanelList(categories []models.CategorySidePanelText) {
 		for i, category := range categories {
 			<a
 				id={ "category-link-" + category.ScrollTargetID }
-				href={ templ.SafeURL(utils.URL("#" + category.ScrollTargetID)) }
+				href={ templ.SafeURL(category.URL) }
 				class="
 					text-xs font-light ml-2 my-0.5 py-0.5 cursor-pointer
 					hover:underline hover:bg-surface transition-colors

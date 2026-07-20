@@ -187,6 +187,7 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 
 	AddSearchHandlers(s, r)
 	AddProductCategoriesHandlers(s, r)
+	AddCategoryPageHandlers(s, r)
 	AddProductHandlers(s, r)
 	AddSEOHandlers(s, r)
 	AddBrandsHandlers(s, r)
@@ -824,6 +825,7 @@ func (s *Server) notPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Not Page Handler]"
 	ctx := r.Context()
 
+	w.WriteHeader(http.StatusNotFound)
 	if err := components.NotPage().Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,

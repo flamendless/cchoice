@@ -110,7 +110,9 @@ templ HeadMetaBase() {
 }
 
 templ HeadSEO(seo models.SiteSEO) {
-	<link rel="canonical" href={ seo.CanonicalURL }/>
+	if seo.CanonicalURL != "" {
+		<link rel="canonical" href={ seo.CanonicalURL }/>
+	}
 	<meta name="description" content={ seo.Description }/>
 	<meta name="robots" content={ seo.Robots }/>
 	if seo.Keywords != "" {

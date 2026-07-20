@@ -9,8 +9,12 @@ templ HomePage(data models.HomePageData) {
 	<!DOCTYPE html>
 	<html lang="en" style="overflow-x: clip;">
 		<head>
-			@common.HeadMetaWithTheme(data.ThemeCSS)
-			<title>{ models.DefaultSiteSEO().Title }</title>
+			@common.HeadMetaBase()
+			if data.ThemeCSS != "" {
+				@common.ThemeStyle(data.ThemeCSS)
+			}
+			@common.HeadSEO(models.HomePageSEO(data.Filters))
+			<title>{ models.HomePageSEO(data.Filters).Title }</title>
 		</head>
 		@HomePageBody(data)
 	</html>
