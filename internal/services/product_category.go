@@ -14,6 +14,7 @@ import (
 	"cchoice/internal/encode"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
 )
@@ -129,6 +130,121 @@ func (s *ProductCategoryService) GetAllCategoryNames(ctx context.Context) ([]str
 		}
 	}
 	return names, nil
+}
+
+func (s *ProductCategoryService) GetCategoryPageData(
+	ctx context.Context,
+	categorySlug string,
+	subcategorySlug string,
+	getCDNURL models.CDNURLFunc,
+) (*models.CategoryPageData, error) {
+	categorySlug = strings.TrimSpace(categorySlug)
+	if categorySlug == "" {
+		return nil, errs.ErrNotFound
+	}
+
+	subcategorySlug = strings.TrimSpace(subcategorySlug)
+	var products []queries.GetProductsByCategoryIDRow
+
+	if subcategorySlug != "" {
+		_, err := s.dbRO.GetQueries().GetProductCategoryByCategoryAndSubcategory(ctx, queries.GetProductCategoryByCategoryAndSubcategoryParams{
+			Category:    sql.NullString{String: categorySlug, Valid: true},
+			Subcategory: sql.NullString{String: subcategorySlug, Valid: true},
+		})
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return nil, errs.ErrNotFound
+			}
+			return nil, errors.Join(errs.ErrCategory, err)
+		}
+
+		rows, err := s.dbRO.GetQueries().GetProductsByCategoryAndSubcategorySlug(ctx, queries.GetProductsByCategoryAndSubcategorySlugParams{
+			Category:    sql.NullString{String: categorySlug, Valid: true},
+			Subcategory: sql.NullString{String: subcategorySlug, Valid: true},
+			Limit:       constants.DefaultCategoryPageProductLimit,
+		})
+		if err != nil {
+			return nil, errors.Join(errs.ErrCategory, err)
+		}
+		products = subcategorySlugRowsToIDRows(rows)
+	} else {
+		exists, err := s.dbRO.GetQueries().CategoryNameExists(ctx, sql.NullString{
+			String: categorySlug,
+			Valid:  true,
+		})
+		if err != nil {
+			return nil, errors.Join(errs.ErrCategory, err)
+		}
+		if !exists {
+			return nil, errs.ErrNotFound
+		}
+
+		rows, err := s.dbRO.GetQueries().GetProductsByCategorySlug(ctx, queries.GetProductsByCategorySlugParams{
+			Category: sql.NullString{String: categorySlug, Valid: true},
+			Limit:    constants.DefaultCategoryPageProductLimit,
+		})
+		if err != nil {
+			return nil, errors.Join(errs.ErrCategory, err)
+		}
+		products = categorySlugRowsToIDRows(rows)
+	}
+
+	if len(products) == 0 {
+		return nil, errs.ErrNotFound
+	}
+
+	categoryLabel := utils.SlugToTile(categorySlug)
+	subcategoryLabel := ""
+	if subcategorySlug != "" {
+		subcategoryLabel = utils.SlugToTile(subcategorySlug)
+	}
+
+	return &models.CategoryPageData{
+		CategorySlug:     categorySlug,
+		SubcategorySlug:  subcategorySlug,
+		CategoryLabel:    categoryLabel,
+		SubcategoryLabel: subcategoryLabel,
+		Products:         models.ToCategorySectionProducts(s.encoder, getCDNURL, products),
+		SEO:              models.CategoryPageSEO(categorySlug, subcategorySlug),
+	}, nil
+}
+
+func (s *ProductCategoryService) ListCategorySitemapSlugs(ctx context.Context) ([]models.CategorySitemapSlug, error) {
+	rows, err := s.dbRO.GetQueries().ListCategorySitemapEntries(ctx)
+	if err != nil {
+		return nil, errors.Join(errs.ErrCategory, err)
+	}
+
+	result := make([]models.CategorySitemapSlug, 0, len(rows))
+	for _, row := range rows {
+		if !row.Category.Valid || row.Category.String == "" {
+			continue
+		}
+		if !row.Subcategory.Valid || row.Subcategory.String == "" {
+			continue
+		}
+		result = append(result, models.CategorySitemapSlug{
+			Category:    row.Category.String,
+			Subcategory: row.Subcategory.String,
+		})
+	}
+	return result, nil
+}
+
+func categorySlugRowsToIDRows(rows []queries.GetProductsByCategorySlugRow) []queries.GetProductsByCategoryIDRow {
+	res := make([]queries.GetProductsByCategoryIDRow, 0, len(rows))
+	for _, row := range rows {
+		res = append(res, queries.GetProductsByCategoryIDRow(row))
+	}
+	return res
+}
+
+func subcategorySlugRowsToIDRows(rows []queries.GetProductsByCategoryAndSubcategorySlugRow) []queries.GetProductsByCategoryIDRow {
+	res := make([]queries.GetProductsByCategoryIDRow, 0, len(rows))
+	for _, row := range rows {
+		res = append(res, queries.GetProductsByCategoryIDRow(row))
+	}
+	return res
 }
 
 func (s *ProductCategoryService) CreateCategories(

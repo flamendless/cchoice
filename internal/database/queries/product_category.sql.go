@@ -573,6 +573,114 @@ func (q *Queries) GetProductCategoryByID(ctx context.Context, id int64) (TblProd
 	return i, err
 }
 
+const getProductsByCategoryAndSubcategorySlug = `-- name: GetProductsByCategoryAndSubcategorySlug :many
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	COALESCE(
+		tbl_product_images.thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+INNER JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+INNER JOIN tbl_product_categories ON tbl_product_categories.id = tbl_products_categories.category_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE
+	tbl_products.status = 'ACTIVE'
+	AND thumbnail_path != 'static/images/empty_96x96.webp'
+	AND tbl_product_categories.category = ?
+	AND tbl_product_categories.subcategory = ?
+ORDER BY is_on_sale DESC, tbl_products.created_at DESC
+LIMIT ?
+`
+
+type GetProductsByCategoryAndSubcategorySlugParams struct {
+	Category    sql.NullString
+	Subcategory sql.NullString
+	Limit       int64
+}
+
+type GetProductsByCategoryAndSubcategorySlugRow struct {
+	ID                       int64
+	Serial                   string
+	Slug                     sql.NullString
+	Name                     string
+	Description              sql.NullString
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	SalePriceWithVat         sql.NullInt64
+	SalePriceWithVatCurrency sql.NullString
+	IsOnSale                 int64
+	DiscountType             sql.NullString
+	DiscountValue            sql.NullInt64
+	BrandName                string
+	ThumbnailPath            string
+	CdnUrl                   sql.NullString
+	CdnUrlThumbnail          sql.NullString
+}
+
+func (q *Queries) GetProductsByCategoryAndSubcategorySlug(ctx context.Context, arg GetProductsByCategoryAndSubcategorySlugParams) ([]GetProductsByCategoryAndSubcategorySlugRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductsByCategoryAndSubcategorySlug, arg.Category, arg.Subcategory, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductsByCategoryAndSubcategorySlugRow
+	for rows.Next() {
+		var i GetProductsByCategoryAndSubcategorySlugRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Serial,
+			&i.Slug,
+			&i.Name,
+			&i.Description,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
+			&i.SalePriceWithVat,
+			&i.SalePriceWithVatCurrency,
+			&i.IsOnSale,
+			&i.DiscountType,
+			&i.DiscountValue,
+			&i.BrandName,
+			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProductsByCategoryID = `-- name: GetProductsByCategoryID :many
 SELECT
 	tbl_products.id,
@@ -684,6 +792,112 @@ func (q *Queries) GetProductsByCategoryID(ctx context.Context, arg GetProductsBy
 	return items, nil
 }
 
+const getProductsByCategorySlug = `-- name: GetProductsByCategorySlug :many
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	COALESCE(
+		tbl_product_images.thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+INNER JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+INNER JOIN tbl_product_categories ON tbl_product_categories.id = tbl_products_categories.category_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE
+	tbl_products.status = 'ACTIVE'
+	AND thumbnail_path != 'static/images/empty_96x96.webp'
+	AND tbl_product_categories.category = ?
+ORDER BY is_on_sale DESC, tbl_products.created_at DESC
+LIMIT ?
+`
+
+type GetProductsByCategorySlugParams struct {
+	Category sql.NullString
+	Limit    int64
+}
+
+type GetProductsByCategorySlugRow struct {
+	ID                       int64
+	Serial                   string
+	Slug                     sql.NullString
+	Name                     string
+	Description              sql.NullString
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	SalePriceWithVat         sql.NullInt64
+	SalePriceWithVatCurrency sql.NullString
+	IsOnSale                 int64
+	DiscountType             sql.NullString
+	DiscountValue            sql.NullInt64
+	BrandName                string
+	ThumbnailPath            string
+	CdnUrl                   sql.NullString
+	CdnUrlThumbnail          sql.NullString
+}
+
+func (q *Queries) GetProductsByCategorySlug(ctx context.Context, arg GetProductsByCategorySlugParams) ([]GetProductsByCategorySlugRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductsByCategorySlug, arg.Category, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductsByCategorySlugRow
+	for rows.Next() {
+		var i GetProductsByCategorySlugRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Serial,
+			&i.Slug,
+			&i.Name,
+			&i.Description,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
+			&i.SalePriceWithVat,
+			&i.SalePriceWithVatCurrency,
+			&i.IsOnSale,
+			&i.DiscountType,
+			&i.DiscountValue,
+			&i.BrandName,
+			&i.ThumbnailPath,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProductsCategoriesByIDs = `-- name: GetProductsCategoriesByIDs :one
 SELECT id FROM tbl_products_categories
 WHERE product_id = ? AND category_id = ?
@@ -756,6 +970,52 @@ func (q *Queries) GetSubcategoriesByCategoryForAdmin(ctx context.Context, catego
 	for rows.Next() {
 		var i GetSubcategoriesByCategoryForAdminRow
 		if err := rows.Scan(&i.ID, &i.Subcategory, &i.PromotedAtHomepage); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listCategorySitemapEntries = `-- name: ListCategorySitemapEntries :many
+SELECT DISTINCT
+	tbl_product_categories.category,
+	tbl_product_categories.subcategory
+FROM tbl_product_categories
+INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
+INNER JOIN tbl_products ON tbl_products.id = tbl_products_categories.product_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+WHERE
+	tbl_products.status = 'ACTIVE'
+	AND tbl_product_categories.category IS NOT NULL
+	AND tbl_product_categories.category != ''
+	AND tbl_product_categories.subcategory IS NOT NULL
+	AND tbl_product_categories.subcategory != ''
+	AND COALESCE(tbl_product_images.thumbnail, 'static/images/empty_96x96.webp') != 'static/images/empty_96x96.webp'
+ORDER BY tbl_product_categories.category ASC, tbl_product_categories.subcategory ASC
+`
+
+type ListCategorySitemapEntriesRow struct {
+	Category    sql.NullString
+	Subcategory sql.NullString
+}
+
+func (q *Queries) ListCategorySitemapEntries(ctx context.Context) ([]ListCategorySitemapEntriesRow, error) {
+	rows, err := q.db.QueryContext(ctx, listCategorySitemapEntries)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListCategorySitemapEntriesRow
+	for rows.Next() {
+		var i ListCategorySitemapEntriesRow
+		if err := rows.Scan(&i.Category, &i.Subcategory); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

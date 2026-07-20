@@ -1,33 +1,43 @@
 # Search engines
 User-agent: Googlebot
-Disallow:
+Disallow: /version
+Disallow: /*?brand_id=
 
 User-agent: Googlebot-Image
-Disallow:
+Disallow: /version
+Disallow: /*?brand_id=
 
 User-agent: AdsBot-Google
-Disallow:
+Disallow: /version
+Disallow: /*?brand_id=
 
 User-agent: Bingbot
-Disallow:
+Disallow: /version
+Disallow: /*?brand_id=
 
 User-agent: Slurp
-Disallow:
+Disallow: /version
+Disallow: /*?brand_id=
 
 User-agent: DuckDuckBot
-Disallow:
+Disallow: /version
+Disallow: /*?brand_id=
 
 User-agent: Baiduspider
-Disallow:
+Disallow: /version
+Disallow: /*?brand_id=
 
 User-agent: YandexBot
-Disallow:
+Disallow: /version
+Disallow: /*?brand_id=
 
 User-agent: Applebot
-Disallow:
+Disallow: /version
+Disallow: /*?brand_id=
 
 User-agent: facebot
-Disallow:
+Disallow: /version
+Disallow: /*?brand_id=
 
 # AI and machine-learning crawlers
 User-agent: GPTBot

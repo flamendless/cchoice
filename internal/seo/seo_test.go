@@ -225,12 +225,12 @@ func TestBuildProductStructuredData(t *testing.T) {
 	tableItem, ok := items[1].(map[string]any)
 	require.True(t, ok)
 	assert.Equal(t, "Table", tableItem["name"])
-	assert.Equal(t, "https://cchoice.shop/#category-table", tableItem["item"])
+	assert.Equal(t, "https://cchoice.shop/categories/table", tableItem["item"])
 
 	sawItem, ok := items[2].(map[string]any)
 	require.True(t, ok)
 	assert.Equal(t, "Saw", sawItem["name"])
-	assert.Equal(t, "https://cchoice.shop/#category-table", sawItem["item"])
+	assert.Equal(t, "https://cchoice.shop/categories/table/saw", sawItem["item"])
 
 	lastItem, ok := items[len(items)-1].(map[string]any)
 	require.True(t, ok)

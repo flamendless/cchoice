@@ -222,6 +222,106 @@ FROM tbl_product_categories
 WHERE category = ?
 ORDER BY subcategory ASC;
 
+-- name: GetProductsByCategorySlug :many
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	COALESCE(
+		tbl_product_images.thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+INNER JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+INNER JOIN tbl_product_categories ON tbl_product_categories.id = tbl_products_categories.category_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE
+	tbl_products.status = 'ACTIVE'
+	AND thumbnail_path != 'static/images/empty_96x96.webp'
+	AND tbl_product_categories.category = ?
+ORDER BY is_on_sale DESC, tbl_products.created_at DESC
+LIMIT ?;
+
+-- name: GetProductsByCategoryAndSubcategorySlug :many
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.description,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	COALESCE(
+		tbl_product_images.thumbnail,
+		'static/images/empty_96x96.webp'
+	) AS thumbnail_path,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+INNER JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+INNER JOIN tbl_product_categories ON tbl_product_categories.id = tbl_products_categories.category_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE
+	tbl_products.status = 'ACTIVE'
+	AND thumbnail_path != 'static/images/empty_96x96.webp'
+	AND tbl_product_categories.category = ?
+	AND tbl_product_categories.subcategory = ?
+ORDER BY is_on_sale DESC, tbl_products.created_at DESC
+LIMIT ?;
+
+-- name: ListCategorySitemapEntries :many
+SELECT DISTINCT
+	tbl_product_categories.category,
+	tbl_product_categories.subcategory
+FROM tbl_product_categories
+INNER JOIN tbl_products_categories ON tbl_products_categories.category_id = tbl_product_categories.id
+INNER JOIN tbl_products ON tbl_products.id = tbl_products_categories.product_id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+WHERE
+	tbl_products.status = 'ACTIVE'
+	AND tbl_product_categories.category IS NOT NULL
+	AND tbl_product_categories.category != ''
+	AND tbl_product_categories.subcategory IS NOT NULL
+	AND tbl_product_categories.subcategory != ''
+	AND COALESCE(tbl_product_images.thumbnail, 'static/images/empty_96x96.webp') != 'static/images/empty_96x96.webp'
+ORDER BY tbl_product_categories.category ASC, tbl_product_categories.subcategory ASC;
+
 -- name: CategoryNameExists :one
 SELECT COUNT(*) > 0 AS category_exists
 FROM tbl_product_categories
