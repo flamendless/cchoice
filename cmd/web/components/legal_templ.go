@@ -12,7 +12,7 @@ import "cchoice/internal/utils"
 import "cchoice/internal/constants"
 import "cchoice/cmd/web/components/common"
 
-const lastUpdatedAt = "Last updated: January 2025"
+const lastUpdatedAt = "Last updated: January 2026"
 
 func TermsPage() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -97,7 +97,7 @@ func TermsPage() templ.Component {
 	})
 }
 
-func PrivacyPage() templ.Component {
+func ReturnPolicyPage(supportEmail, facebookURL, viberURL string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -126,11 +126,11 @@ func PrivacyPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = common.TabTitle("Privacy Policy").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = common.TabTitle("Return Policy").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</head><body class=\"m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-gray-900 my-16\" _=\"init call metrics_event('anon_visit', 'privacy')\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</head><body class=\"m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-gray-900 my-16\" _=\"init call metrics_event('anon_visit', 'return')\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -146,33 +146,124 @@ func PrivacyPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"flex justify-between items-center mb-2\"><h1 class=\"text-3xl font-bold text-gray-900\">Privacy Policy</h1><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<h1 class=\"text-3xl font-bold text-gray-900 mb-2\">Return Policy</h1><p class=\"text-gray-500 text-sm mb-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(constants.PathCORSealImageCDN)
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(lastUpdatedAt)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 83, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 82, Col: 58}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" class=\"w-20 h-auto sm:w-24\" alt=\"DPO/DPS Registered Seal\"></div><p class=\"text-gray-500 text-sm mb-8\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</p><div class=\"space-y-4 text-gray-700\"><section><p>At <strong class=\"text-gray-800\">C-Choice Construction Supply</strong>, we strive to provide quality products to our customers. Returns are accepted <strong class=\"text-gray-800\">only for products that are defective upon delivery or have a manufacturing defect</strong>. We do <strong class=\"text-gray-800\">not</strong> accept returns for change of mind, incorrect purchases, compatibility issues, or buyer's remorse.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">1. Eligibility for Return</h2><p>A return request may be approved only if all of the following conditions are met:</p><ul class=\"list-disc pl-6 mt-2 space-y-1\"><li>The product has a verified manufacturing defect or arrived damaged before first use.</li><li>The request is submitted within <strong class=\"text-gray-800\">7 calendar days</strong> from the date the order was delivered.</li><li>The product is returned complete with all original accessories, manuals, packaging, labels, and proof of purchase.</li><li>The defect was not caused by misuse, abuse, improper installation, modification, accident, neglect, or normal wear and tear.</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">2. Non-Returnable Items</h2><p>Returns will <strong class=\"text-gray-800\">not</strong> be accepted for:</p><ul class=\"list-disc pl-6 mt-2 space-y-1\"><li>Incorrect product selection or ordering mistakes made by the customer.</li><li>Change of mind or no longer needing the product.</li><li>Compatibility issues with the customer's equipment unless explicitly guaranteed by C-Choice Construction Supply.</li><li>Products that have been installed, modified, altered, or damaged due to improper handling.</li><li>Products showing signs of misuse, negligence, or unauthorized repair.</li><li>Consumable items unless defective upon delivery.</li><li>Products without proof of purchase.</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">3. No Exchanges</h2><p><strong class=\"text-gray-800\">C-Choice Construction Supply does not offer product exchanges.</strong></p><p class=\"mt-2\">If a returned product is confirmed to be defective after inspection, C-Choice Construction Supply will, at its sole discretion:</p><ul class=\"list-disc pl-6 mt-2 space-y-1\"><li>Issue a refund to the original payment method; or</li><li>Provide store credit where permitted by applicable law.</li></ul><p class=\"mt-2\">Replacement or exchange of products is <strong class=\"text-gray-800\">not</strong> available.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">4. Inspection Process</h2><p>All returned products are subject to inspection and testing by C-Choice Construction Supply or, where applicable, the manufacturer.</p><p class=\"mt-2\">Submission of a return request does <strong class=\"text-gray-800\">not</strong> guarantee approval. If inspection determines that the product is functioning normally or the defect resulted from improper use or external causes, the return request may be denied and the product will be returned to the customer.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">5. Return Procedure</h2><p>To request a return:</p><ol class=\"list-decimal pl-6 mt-2 space-y-1\"><li>Contact <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(lastUpdatedAt)
+		var templ_7745c5c3_Var6 templ.SafeURL
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL("mailto:" + supportEmail))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 85, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 133, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</p><div class=\"space-y-4 text-gray-700\"><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">1. Introduction</h2><p>This Privacy Policy describes how we collect, use, and protect information when you use this website and related gallery services (\"Services\"). We are committed to protecting your privacy.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">2. Information We Collect</h2><p>We may collect:</p><ul class=\"list-disc pl-6 mt-2 space-y-1\"><li><strong class=\"text-gray-800\">Usage data:</strong> e.g. IP address, browser type, pages visited, and approximate time of access, for security and operation of the Services.</li><li><strong class=\"text-gray-800\">Information you provide:</strong> e.g. when you enter a gallery (such as a gallery username or password), or when you contact us. Passwords are not stored in plain text.</li><li><strong class=\"text-gray-800\">Cookies and similar tech:</strong> we may use cookies or local storage for session management and preferences where necessary for the Services.</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">3. How We Use Information</h2><p>We use the information to: provide and secure the Services; prevent abuse and enforce our Terms; improve our systems; and, where applicable, respond to your requests. We do not sell your personal information to third parties.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">4. Sharing of Information</h2><p>We may share information only: (a) with service providers who assist in operating the Services, under confidentiality obligations; (b) when required by law or to protect rights and safety; or (c) with your consent.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">5. Data Retention and Security</h2><p>We retain data only as long as needed for the purposes above or as required by law. We use reasonable technical and organisational measures to protect your information; no system is completely secure.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">6. Your Rights</h2><p>Depending on your location, you may have rights to access, correct, delete, or restrict processing of your personal data, or to object to certain processing. To exercise these rights, please contact the tenant or operator using the details on this website.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">7. Changes</h2><p>We may update this Privacy Policy from time to time. The \"Last updated\" date will be revised when changes are made. Continued use of the Services after changes constitutes acceptance of the updated policy.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">8. Contact</h2><p>For privacy-related questions or requests, please contact the tenant or operator through the contact details provided on this website.</p></section></div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"text-primary underline underline-offset-2\">C-Choice Construction Supply Customer Support</a> within <strong class=\"text-gray-800\">7 calendar days</strong> of delivery.</li><li>Provide your order number, proof of purchase, a detailed description of the issue, and clear photos or videos showing the defect.</li><li>Wait for return authorization before sending the product.</li><li>Securely package the item to prevent damage during transit.</li></ol><p class=\"mt-2\">Returns sent without prior authorization may be refused.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">6. Shipping Costs</h2><ul class=\"list-disc pl-6 mt-2 space-y-1\"><li>If the return is approved because the product is confirmed defective, C-Choice Construction Supply may reimburse reasonable return shipping costs or provide a prepaid shipping arrangement, at its discretion.</li><li>If inspection finds no manufacturing defect, the customer is responsible for all shipping costs.</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">7. Consumer Rights</h2><p>Nothing in this Return Policy limits or excludes any rights that customers may have under applicable Philippine consumer protection laws, including the Consumer Act of the Philippines (Republic Act No. 7394).</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">8. Contact Us</h2><p>For return requests or questions regarding this policy, please contact C-Choice Construction Supply Customer Support through the contact information provided on our website.</p>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ContactIconLinks(facebookURL, supportEmail, viberURL).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</section></div></div></div></body></html>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func PrivacyPage() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var7 == nil {
+			templ_7745c5c3_Var7 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<!doctype html><html lang=\"en\" class=\"overflow-x-hidden\"><head>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = common.HeadMeta().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = common.TabTitle("Privacy Policy").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</head><body class=\"m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-gray-900 my-16\" _=\"init call metrics_event('anon_visit', 'privacy')\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = common.DevRibbon().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"flex-1 py-8 px-4\"><div class=\"max-w-3xl mx-auto\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = common.BackToShopLink().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"flex justify-between items-center mb-2\"><h1 class=\"text-3xl font-bold text-gray-900\">Privacy Policy</h1><img src=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(constants.PathCORSealImageCDN)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 179, Col: 46}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" class=\"w-20 h-auto sm:w-24\" alt=\"DPO/DPS Registered Seal\"></div><p class=\"text-gray-500 text-sm mb-8\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(lastUpdatedAt)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `legal.templ`, Line: 181, Col: 58}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</p><div class=\"space-y-4 text-gray-700\"><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">1. Introduction</h2><p>This Privacy Policy describes how we collect, use, and protect information when you use this website and related gallery services (\"Services\"). We are committed to protecting your privacy.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">2. Information We Collect</h2><p>We may collect:</p><ul class=\"list-disc pl-6 mt-2 space-y-1\"><li><strong class=\"text-gray-800\">Usage data:</strong> e.g. IP address, browser type, pages visited, and approximate time of access, for security and operation of the Services.</li><li><strong class=\"text-gray-800\">Information you provide:</strong> e.g. when you enter a gallery (such as a gallery username or password), or when you contact us. Passwords are not stored in plain text.</li><li><strong class=\"text-gray-800\">Cookies and similar tech:</strong> we may use cookies or local storage for session management and preferences where necessary for the Services.</li></ul></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">3. How We Use Information</h2><p>We use the information to: provide and secure the Services; prevent abuse and enforce our Terms; improve our systems; and, where applicable, respond to your requests. We do not sell your personal information to third parties.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">4. Sharing of Information</h2><p>We may share information only: (a) with service providers who assist in operating the Services, under confidentiality obligations; (b) when required by law or to protect rights and safety; or (c) with your consent.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">5. Data Retention and Security</h2><p>We retain data only as long as needed for the purposes above or as required by law. We use reasonable technical and organisational measures to protect your information; no system is completely secure.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">6. Your Rights</h2><p>Depending on your location, you may have rights to access, correct, delete, or restrict processing of your personal data, or to object to certain processing. To exercise these rights, please contact the tenant or operator using the details on this website.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">7. Changes</h2><p>We may update this Privacy Policy from time to time. The \"Last updated\" date will be revised when changes are made. Continued use of the Services after changes constitutes acceptance of the updated policy.</p></section><section><h2 class=\"text-xl font-semibold text-gray-900 mb-2\">8. Contact</h2><p>For privacy-related questions or requests, please contact the tenant or operator through the contact details provided on this website.</p></section></div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
