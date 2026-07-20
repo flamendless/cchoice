@@ -457,11 +457,19 @@ func (s *Server) adminSuperuserProductsListPageHandler(w http.ResponseWriter, r 
 }
 
 func (s *Server) adminSuperuserProductsListTableHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	staff, err := s.services.staff.GetCurrentStaff(ctx, s.sessionManager.GetString(ctx, SessionStaffID))
+	isSuperuser := err == nil && staff.UserType == enums.STAFF_USER_TYPE_SUPERUSER.String()
+	actions := models.AdminProductListActions{
+		CanPublish: s.HasRole(ctx, enums.STAFF_ROLE_PUBLISH_PRODUCTS),
+		CanEdit:    isSuperuser,
+		CanDelete:  isSuperuser,
+	}
 	s.renderAdminProductsListTable(
 		w, r,
 		"/admin/superuser/products/table",
 		"/admin/superuser/products",
-		false,
+		actions,
 		"/admin/superuser/products",
 		"[Admin Superuser Products List Table Handler]",
 	)
@@ -962,7 +970,7 @@ func (s *Server) adminStaffProductsListTableHandler(w http.ResponseWriter, r *ht
 		w, r,
 		"/admin/products/table",
 		"/admin/products",
-		true,
+		models.AdminProductListActions{CanEdit: true},
 		"/admin/products",
 		"[Admin Staff Products List Table Handler]",
 	)
@@ -1306,7 +1314,7 @@ func (s *Server) renderAdminProductsListTable(
 	r *http.Request,
 	tableURL string,
 	basePath string,
-	editOnly bool,
+	actions models.AdminProductListActions,
 	errorPage string,
 	logtag string,
 ) {
@@ -1360,7 +1368,7 @@ func (s *Server) renderAdminProductsListTable(
 		ContentTarget: "#products-table-content",
 	}
 
-	if err := compadmin.AdminSuperuserProductsListTableContent(productList, editOnly, basePath, pagination).Render(ctx, w); err != nil {
+	if err := compadmin.AdminSuperuserProductsListTableContent(productList, actions, basePath, pagination).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("search", searchSerial),

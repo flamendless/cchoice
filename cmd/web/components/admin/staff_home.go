@@ -65,6 +65,10 @@ var staffCardsWithRoles = []struct {
 		AllowedRole: enums.STAFF_ROLE_EDIT_PRODUCTS,
 	},
 	{
+		Card:        models.StaffCard{Link: "/admin/superuser/products", Title: "Manage Products", Description: "View and publish products", Icon: svg.MenuLines("text-primary")},
+		AllowedRole: enums.STAFF_ROLE_PUBLISH_PRODUCTS,
+	},
+	{
 		Card:        models.StaffCard{Link: "/admin/categories", Title: "Manage Categories", Description: "View and manage product categories", Icon: svg.MenuLines("text-primary")},
 		AllowedRole: enums.STAFF_ROLE_MANAGE_CATEGORIES,
 	},
