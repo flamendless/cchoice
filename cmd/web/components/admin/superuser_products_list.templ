@@ -13,7 +13,7 @@ templ AdminSuperuserProductsListPage(title string, brands []models.AdminBrand, s
 	<html lang="en" class="overflow-x-hidden">
 		<head>
 			@common.HeadMeta()
-			@common.TabTitle("[SUPERUSER] Products - C-Choice Admin")
+			@common.TabTitle("Products - C-Choice Admin")
 		</head>
 		<body
 			class="bg-surface min-h-screen flex flex-col"
@@ -96,18 +96,18 @@ templ TableCell(w string, extraClasses string) {
 
 templ AdminSuperuserProductsListTableContent(
 	products []models.AdminProductListItem,
-	editOnly bool,
+	actions models.AdminProductListActions,
 	basePath string,
 	p models.TablePagination,
 ) {
 	<div id="products-pagination-top" hx-swap-oob="true">
 		@TablePaginationBar(p)
 	</div>
-	@AdminSuperuserProductsListTable(products, editOnly, basePath)
+	@AdminSuperuserProductsListTable(products, actions, basePath)
 	@TablePaginationBar(p)
 }
 
-templ AdminSuperuserProductsListTable(products []models.AdminProductListItem, editOnly bool, basePath string) {
+templ AdminSuperuserProductsListTable(products []models.AdminProductListItem, actions models.AdminProductListActions, basePath string) {
 	<div class="overflow-x-auto">
 		<table class="min-w-full divide-y divide-gray-200">
 			<thead class="bg-gray-50">
@@ -171,21 +171,26 @@ templ AdminSuperuserProductsListTable(products []models.AdminProductListItem, ed
 						}
 						@TableCell("8%", "") {
 							<div class="flex flex-col items-center gap-2">
-								if editOnly {
-									switch p.Status {
-										case enums.PRODUCT_STATUS_DRAFT:
-											@ProductActionEditTo(p.ID, basePath)
-									}
-								} else {
+								if actions.CanPublish {
 									switch p.Status {
 										case enums.PRODUCT_STATUS_ACTIVE:
 											@ProductActionDraft(p.ID)
 										case enums.PRODUCT_STATUS_DRAFT:
 											@ProductActionPublish(p.ID)
-											@ProductActionEdit(p.ID)
-											@ProductActionDelete(p.ID)
 										case enums.PRODUCT_STATUS_DELETED:
 											@ProductActionDraft(p.ID)
+									}
+								}
+								if actions.CanEdit {
+									switch p.Status {
+										case enums.PRODUCT_STATUS_DRAFT:
+											@ProductActionEditTo(p.ID, basePath)
+									}
+								}
+								if actions.CanDelete {
+									switch p.Status {
+										case enums.PRODUCT_STATUS_DRAFT:
+											@ProductActionDelete(p.ID)
 									}
 								}
 							</div>
