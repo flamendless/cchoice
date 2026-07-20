@@ -4,7 +4,7 @@ import "cchoice/internal/utils"
 import "cchoice/internal/constants"
 import "cchoice/cmd/web/components/common"
 
-const lastUpdatedAt = "Last updated: January 2025"
+const lastUpdatedAt = "Last updated: January 2026"
 
 templ TermsPage() {
 	<!DOCTYPE html>
@@ -58,6 +58,102 @@ templ TermsPage() {
 						<section>
 							<h2 class="text-xl font-semibold text-gray-900 mb-2">8. Contact</h2>
 							<p>For questions about these Terms and Conditions, please contact the tenant or operator through the contact details provided on this website.</p>
+						</section>
+					</div>
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+templ ReturnPolicyPage(supportEmail, facebookURL, viberURL string) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("Return Policy")
+		</head>
+		<body class="m-0 p-0 overflow-x-hidden custom-scrollbar min-h-screen flex flex-col bg-white text-gray-900 my-16" _="init call metrics_event('anon_visit', 'return')">
+			@common.DevRibbon()
+			<div class="flex-1 py-8 px-4">
+				<div class="max-w-3xl mx-auto">
+					@common.BackToShopLink()
+					<h1 class="text-3xl font-bold text-gray-900 mb-2">Return Policy</h1>
+					<p class="text-gray-500 text-sm mb-8">{ lastUpdatedAt }</p>
+					<div class="space-y-4 text-gray-700">
+						<section>
+							<p>
+								At <strong class="text-gray-800">C-Choice Construction Supply</strong>, we strive to provide quality products to our customers. Returns are accepted <strong class="text-gray-800">only for products that are defective upon delivery or have a manufacturing defect</strong>. We do <strong class="text-gray-800">not</strong> accept returns for change of mind, incorrect purchases, compatibility issues, or buyer's remorse.
+							</p>
+						</section>
+						<section>
+							<h2 class="text-xl font-semibold text-gray-900 mb-2">1. Eligibility for Return</h2>
+							<p>A return request may be approved only if all of the following conditions are met:</p>
+							<ul class="list-disc pl-6 mt-2 space-y-1">
+								<li>The product has a verified manufacturing defect or arrived damaged before first use.</li>
+								<li>The request is submitted within <strong class="text-gray-800">7 calendar days</strong> from the date the order was delivered.</li>
+								<li>The product is returned complete with all original accessories, manuals, packaging, labels, and proof of purchase.</li>
+								<li>The defect was not caused by misuse, abuse, improper installation, modification, accident, neglect, or normal wear and tear.</li>
+							</ul>
+						</section>
+						<section>
+							<h2 class="text-xl font-semibold text-gray-900 mb-2">2. Non-Returnable Items</h2>
+							<p>Returns will <strong class="text-gray-800">not</strong> be accepted for:</p>
+							<ul class="list-disc pl-6 mt-2 space-y-1">
+								<li>Incorrect product selection or ordering mistakes made by the customer.</li>
+								<li>Change of mind or no longer needing the product.</li>
+								<li>Compatibility issues with the customer's equipment unless explicitly guaranteed by C-Choice Construction Supply.</li>
+								<li>Products that have been installed, modified, altered, or damaged due to improper handling.</li>
+								<li>Products showing signs of misuse, negligence, or unauthorized repair.</li>
+								<li>Consumable items unless defective upon delivery.</li>
+								<li>Products without proof of purchase.</li>
+							</ul>
+						</section>
+						<section>
+							<h2 class="text-xl font-semibold text-gray-900 mb-2">3. No Exchanges</h2>
+							<p><strong class="text-gray-800">C-Choice Construction Supply does not offer product exchanges.</strong></p>
+							<p class="mt-2">If a returned product is confirmed to be defective after inspection, C-Choice Construction Supply will, at its sole discretion:</p>
+							<ul class="list-disc pl-6 mt-2 space-y-1">
+								<li>Issue a refund to the original payment method; or</li>
+								<li>Provide store credit where permitted by applicable law.</li>
+							</ul>
+							<p class="mt-2">Replacement or exchange of products is <strong class="text-gray-800">not</strong> available.</p>
+						</section>
+						<section>
+							<h2 class="text-xl font-semibold text-gray-900 mb-2">4. Inspection Process</h2>
+							<p>All returned products are subject to inspection and testing by C-Choice Construction Supply or, where applicable, the manufacturer.</p>
+							<p class="mt-2">Submission of a return request does <strong class="text-gray-800">not</strong> guarantee approval. If inspection determines that the product is functioning normally or the defect resulted from improper use or external causes, the return request may be denied and the product will be returned to the customer.</p>
+						</section>
+						<section>
+							<h2 class="text-xl font-semibold text-gray-900 mb-2">5. Return Procedure</h2>
+							<p>To request a return:</p>
+							<ol class="list-decimal pl-6 mt-2 space-y-1">
+								<li>
+									Contact
+									<a href={ templ.SafeURL("mailto:" + supportEmail) } class="text-primary underline underline-offset-2">C-Choice Construction Supply Customer Support</a>
+									within <strong class="text-gray-800">7 calendar days</strong> of delivery.
+								</li>
+								<li>Provide your order number, proof of purchase, a detailed description of the issue, and clear photos or videos showing the defect.</li>
+								<li>Wait for return authorization before sending the product.</li>
+								<li>Securely package the item to prevent damage during transit.</li>
+							</ol>
+							<p class="mt-2">Returns sent without prior authorization may be refused.</p>
+						</section>
+						<section>
+							<h2 class="text-xl font-semibold text-gray-900 mb-2">6. Shipping Costs</h2>
+							<ul class="list-disc pl-6 mt-2 space-y-1">
+								<li>If the return is approved because the product is confirmed defective, C-Choice Construction Supply may reimburse reasonable return shipping costs or provide a prepaid shipping arrangement, at its discretion.</li>
+								<li>If inspection finds no manufacturing defect, the customer is responsible for all shipping costs.</li>
+							</ul>
+						</section>
+						<section>
+							<h2 class="text-xl font-semibold text-gray-900 mb-2">7. Consumer Rights</h2>
+							<p>Nothing in this Return Policy limits or excludes any rights that customers may have under applicable Philippine consumer protection laws, including the Consumer Act of the Philippines (Republic Act No. 7394).</p>
+						</section>
+						<section>
+							<h2 class="text-xl font-semibold text-gray-900 mb-2">8. Contact Us</h2>
+							<p>For return requests or questions regarding this policy, please contact C-Choice Construction Supply Customer Support through the contact information provided on our website.</p>
+							@ContactIconLinks(facebookURL, supportEmail, viberURL)
 						</section>
 					</div>
 				</div>

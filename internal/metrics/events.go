@@ -39,6 +39,7 @@ const (
 	VisitOrderTracker   = "order tracker"
 	VisitTerms          = "terms"
 	VisitPrivacy        = "privacy"
+	VisitReturn         = "return"
 	VisitChangelogs     = "changelogs"
 	VisitTech           = "tech"
 	VisitForgotPassword = "forgot password"

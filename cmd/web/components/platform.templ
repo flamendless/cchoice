@@ -2,6 +2,7 @@ package components
 
 import "cchoice/cmd/web/models"
 import "cchoice/cmd/web/components/common"
+import "cchoice/cmd/web/components/svg"
 import "cchoice/internal/constants"
 
 templ Platforms(platforms []models.Platform) {
@@ -45,4 +46,41 @@ templ Platforms(platforms []models.Platform) {
 			</div>
 		</body>
 	</html>
+}
+
+templ ContactIconLinks(facebookURL, supportEmail, viberURL string) {
+	<div class="flex flex-wrap items-center gap-2 mt-4">
+		if facebookURL != "" {
+			<a
+				href={ facebookURL }
+				target="_blank"
+				rel="noopener noreferrer"
+				aria-label="Facebook"
+				title="Facebook"
+				class="inline-flex items-center justify-center p-2 rounded-md text-primary hover:text-primary-dark hover:bg-surface transition-colors"
+			>
+				@svg.Facebook("size-8")
+			</a>
+		}
+		if supportEmail != "" {
+			<a
+				href={ templ.SafeURL("mailto:" + supportEmail) }
+				aria-label="Email"
+				title="Email"
+				class="inline-flex items-center justify-center p-2 rounded-md text-primary hover:text-primary-dark hover:bg-surface transition-colors"
+			>
+				@svg.Envelope("size-8")
+			</a>
+		}
+		if viberURL != "" {
+			<a
+				href={ templ.SafeURL(viberURL) }
+				aria-label="Viber"
+				title="Viber"
+				class="inline-flex items-center justify-center p-2 rounded-md text-primary hover:text-primary-dark hover:bg-surface transition-colors"
+			>
+				@svg.Viber("size-8")
+			</a>
+		}
+	</div>
 }
