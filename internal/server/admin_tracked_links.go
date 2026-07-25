@@ -27,13 +27,8 @@ func (s *Server) adminTrackedLinksEditPageHandler(w http.ResponseWriter, r *http
 		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
 		return
 	}
-	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
-	if err != nil {
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrInvalidParams.Error()))
-		return
-	}
 
-	link, err := s.services.trackedLink.GetTrackedLinkByID(ctx, idStr)
+	link, err := s.services.trackedLink.GetTrackedLinkByID(ctx, p.ID)
 	if err != nil || link == nil {
 		err = cmp.Or(err, errs.ErrDBNil)
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -177,11 +172,6 @@ func (s *Server) adminTrackedLinksUpdateHandler(w http.ResponseWriter, r *http.R
 		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
-	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
-	if err != nil {
-		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
-		return
-	}
 	var f forms.AdminTrackedLinkForm
 	if err := httputil.BindForm(r, &f); err != nil {
 		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
@@ -195,7 +185,7 @@ func (s *Server) adminTrackedLinksUpdateHandler(w http.ResponseWriter, r *http.R
 	campaign := f.Campaign
 	statusStr := f.Status
 
-	if idStr == "" || name == "" || slug == "" || destinationURL == "" {
+	if p.ID == "" || name == "" || slug == "" || destinationURL == "" {
 		redirectHX(w, r, utils.URLWithError(page, errs.ErrMissingField.Error()))
 		return
 	}
@@ -212,7 +202,7 @@ func (s *Server) adminTrackedLinksUpdateHandler(w http.ResponseWriter, r *http.R
 	if err := s.services.trackedLink.UpdateTrackedLink(
 		ctx,
 		s.sessionManager.GetString(ctx, SessionStaffID),
-		idStr,
+		p.ID,
 		name,
 		slug,
 		destinationURL,
@@ -239,16 +229,11 @@ func (s *Server) adminTrackedLinksDeleteHandler(w http.ResponseWriter, r *http.R
 		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
 		return
 	}
-	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
-	if err != nil {
-		redirectHX(w, r, utils.URLWithError(page, httputil.ErrorMessage(err)))
-		return
-	}
 
 	if err := s.services.trackedLink.DeleteTrackedLink(
 		ctx,
 		s.sessionManager.GetString(ctx, SessionStaffID),
-		idStr,
+		p.ID,
 	); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))

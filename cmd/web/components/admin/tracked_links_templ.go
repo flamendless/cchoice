@@ -586,27 +586,27 @@ func TrackedLinkActionsCell(link models.AdminTrackedLinkListItem) templ.Componen
 			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<div class=\"flex items-center gap-2\"><form method=\"POST\" action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<div class=\"flex items-center gap-2\"><button type=\"button\" class=\"text-primary bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium\" title=\"Generate QR\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var23 templ.SafeURL
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URLf("/admin/tracked-links/%s/qr", link.ID))
+		var templ_7745c5c3_Var23 string
+		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URLf("/admin/tracked-links/%s/qr", link.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 306, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 308, Col: 61}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\" class=\"w-full sm:w-auto\"><button type=\"submit\" class=\"text-primary bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium\" title=\"Generate QR\" _=\"\n\t\t\t\t\ton click\n\t\t\t\t\t\tcall metrics_event('admin_exec', 'generate tracked link qr')\n\t\t\t\t\tend\n\t\t\t\t\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z\"></path></svg></button></form><button type=\"button\" class=\"text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\" hx-target=\"#tracked-links-qr-modal-container\" hx-swap=\"innerHTML\" _=\"on click call metrics_event('admin_exec', 'generate tracked link qr')\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z\"></path></svg></button> <button type=\"button\" class=\"text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URLf("/admin/tracked-links/%s/edit", link.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 327, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 320, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
 		if templ_7745c5c3_Err != nil {
@@ -619,7 +619,7 @@ func TrackedLinkActionsCell(link models.AdminTrackedLinkListItem) templ.Componen
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URLf("/admin/tracked-links/%s", link.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 336, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 329, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 		if templ_7745c5c3_Err != nil {
@@ -632,7 +632,7 @@ func TrackedLinkActionsCell(link models.AdminTrackedLinkListItem) templ.Componen
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("#tracked-link-row-%s", link.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 337, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 330, Col: 59}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 		if templ_7745c5c3_Err != nil {
@@ -711,7 +711,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 		var templ_7745c5c3_Var29 string
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URLf("/admin/tracked-links/%s", link.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 381, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 374, Col: 59}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
 		if templ_7745c5c3_Err != nil {
@@ -724,7 +724,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 		var templ_7745c5c3_Var30 string
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.ResolveAttributeValue(link.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 391, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 384, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
 		if templ_7745c5c3_Err != nil {
@@ -737,7 +737,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.ResolveAttributeValue(link.Slug)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 401, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 394, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var31)
 		if templ_7745c5c3_Err != nil {
@@ -750,7 +750,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 		var templ_7745c5c3_Var32 string
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.ResolveAttributeValue(link.DestinationURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 411, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 404, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
 		if templ_7745c5c3_Err != nil {
@@ -768,7 +768,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 			var templ_7745c5c3_Var33 string
 			templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.ResolveAttributeValue(s.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 425, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 418, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var33)
 			if templ_7745c5c3_Err != nil {
@@ -791,7 +791,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 			var templ_7745c5c3_Var34 string
 			templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(s.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 428, Col: 18}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 421, Col: 18}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 			if templ_7745c5c3_Err != nil {
@@ -814,7 +814,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 			var templ_7745c5c3_Var35 string
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(m.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 442, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 435, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
 			if templ_7745c5c3_Err != nil {
@@ -837,7 +837,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 			var templ_7745c5c3_Var36 string
 			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(m.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 445, Col: 18}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 438, Col: 18}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 			if templ_7745c5c3_Err != nil {
@@ -855,7 +855,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 		var templ_7745c5c3_Var37 string
 		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.ResolveAttributeValue(link.Campaign)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 455, Col: 25}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 448, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
 		if templ_7745c5c3_Err != nil {
@@ -874,7 +874,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 				var templ_7745c5c3_Var38 string
 				templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.ResolveAttributeValue(s.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 469, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 462, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var38)
 				if templ_7745c5c3_Err != nil {
@@ -897,7 +897,7 @@ func TrackedLinksEditForm(link models.AdminTrackedLinkListItem) templ.Component 
 				var templ_7745c5c3_Var39 string
 				templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(s.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 472, Col: 19}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 465, Col: 19}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 				if templ_7745c5c3_Err != nil {
@@ -982,7 +982,7 @@ func TrackedLinksCreateFormModal() templ.Component {
 		var templ_7745c5c3_Var42 string
 		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/tracked-links"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 530, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 523, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var42)
 		if templ_7745c5c3_Err != nil {
@@ -1000,7 +1000,7 @@ func TrackedLinksCreateFormModal() templ.Component {
 			var templ_7745c5c3_Var43 string
 			templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.ResolveAttributeValue(s.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 573, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 566, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var43)
 			if templ_7745c5c3_Err != nil {
@@ -1013,7 +1013,7 @@ func TrackedLinksCreateFormModal() templ.Component {
 			var templ_7745c5c3_Var44 string
 			templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(s.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 573, Col: 46}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 566, Col: 46}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 			if templ_7745c5c3_Err != nil {
@@ -1036,7 +1036,7 @@ func TrackedLinksCreateFormModal() templ.Component {
 			var templ_7745c5c3_Var45 string
 			templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.ResolveAttributeValue(m.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 585, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 578, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var45)
 			if templ_7745c5c3_Err != nil {
@@ -1049,7 +1049,7 @@ func TrackedLinksCreateFormModal() templ.Component {
 			var templ_7745c5c3_Var46 string
 			templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.JoinStringErrs(m.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 585, Col: 46}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 578, Col: 46}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var46))
 			if templ_7745c5c3_Err != nil {
@@ -1101,20 +1101,20 @@ func AdminTrackedLinksQRModal(qr QRData) templ.Component {
 		var templ_7745c5c3_Var48 string
 		templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.ResolveAttributeValue(qr.Base64)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 650, Col: 20}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 643, Col: 20}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var48)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "\" alt=\"QR Code\" class=\"w-64 h-64\"> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "\" alt=\"QR Code\" class=\"w-64 h-64\"></div><div class=\"flex w-full gap-1 justify-center mt-6\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var49 templ.SafeURL
 		templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.JoinURLErrs(qr.Base64)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 655, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 650, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var49))
 		if templ_7745c5c3_Err != nil {
@@ -1127,13 +1127,13 @@ func AdminTrackedLinksQRModal(qr QRData) templ.Component {
 		var templ_7745c5c3_Var50 string
 		templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.ResolveAttributeValue(qr.Filename)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 656, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/tracked_links.templ`, Line: 651, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var50)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2\">Download QR</a></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "\" class=\"px-3 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm\">Save</a> <button type=\"button\" class=\"px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm\" _=\"on click trigger closeQRModal\">Close</button></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
