@@ -196,7 +196,7 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Post("/admin/tracked-links", s.adminTrackedLinksCreateHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Patch("/admin/tracked-links/{id}", s.adminTrackedLinksUpdateHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Delete("/admin/tracked-links/{id}", s.adminTrackedLinksDeleteHandler)
-	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Post("/admin/tracked-links/{id}/qr", s.handleTrackedLinkQR)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_TRACKED_LINKS)).Get("/admin/tracked-links/{id}/qr", s.handleTrackedLinkQR)
 
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_ORDERS)).Get("/admin/orders", s.adminOrdersListPageHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_ORDERS)).Get("/admin/orders/table", s.adminOrdersListTableHandler)

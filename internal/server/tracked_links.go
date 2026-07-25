@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 
+	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/httputil"
@@ -84,10 +85,6 @@ func (s *Server) handleTrackedLinkQR(w http.ResponseWriter, r *http.Request) {
 		redirectHX(w, r, utils.URLWithError(page, errs.ErrNotFound.Error()))
 		return
 	}
-	if _, err := httputil.RequireEncodedID(s.encoder, pathReq.ID); err != nil {
-		redirectHX(w, r, utils.URLWithError(page, errs.ErrNotFound.Error()))
-		return
-	}
 
 	link, err := s.services.trackedLink.GetTrackedLinkByID(ctx, pathReq.ID)
 	if err != nil || link == nil {
@@ -101,19 +98,21 @@ func (s *Server) handleTrackedLinkQR(w http.ResponseWriter, r *http.Request) {
 
 	sfKey := "qr:" + link.Slug
 	res, err, _ := s.SF.Do(sfKey, func() (any, error) {
-		return s.services.qr.GenerateQR(ctx, qrURL)
+		return s.services.qr.GenerateQRBase64(ctx, qrURL)
 	})
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
 	}
 
-	qrBytes := res.([]byte)
+	qrBase64 := res.(string)
 
-	w.Header().Set("Content-Type", "image/png")
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s.png", link.Slug))
-	if _, err := w.Write(qrBytes); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if err := compadmin.AdminTrackedLinksQRModal(compadmin.QRData{
+		Base64:   qrBase64,
+		Filename: link.Slug + ".png",
+	}).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 	}
 }
