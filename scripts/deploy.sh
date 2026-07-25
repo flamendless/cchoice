@@ -11,6 +11,12 @@ git pull origin main
 echo "Fetching tags..."
 git fetch --prune --tags origin
 
+echo "Syncing Go modules..."
+go mod download
+
+echo "Installing/updating Go tools..."
+go install tool
+
 echo "Stopping existing process..."
 pkill -x "./tmp/main api" || echo "No existing process found."
 
