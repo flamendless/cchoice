@@ -152,6 +152,23 @@ func (s *TrackedLinkService) UpdateTrackedLink(
 		}
 	}()
 
+	existing, err := s.GetTrackedLinkByID(ctx, id)
+	if err != nil {
+		result = err.Error()
+		return err
+	}
+	if existing == nil {
+		result = errs.ErrNotFound.Error()
+		return errs.ErrNotFound
+	}
+
+	if status == enums.TRACKED_LINK_STATUS_DRAFT || status == enums.TRACKED_LINK_STATUS_DELETED {
+		if err := s.ensureTrackedLinkNotUsedByPromo(ctx, id); err != nil {
+			result = err.Error()
+			return err
+		}
+	}
+
 	if err := s.dbRW.GetQueries().UpdateTrackedLink(ctx, queries.UpdateTrackedLinkParams{
 		Name:           name,
 		Slug:           slug.Make(slugs),
@@ -184,6 +201,11 @@ func (s *TrackedLinkService) DeleteTrackedLink(ctx context.Context, staffID stri
 			logs.Log().Warn("create log", zap.Error(err))
 		}
 	}()
+
+	if err := s.ensureTrackedLinkNotUsedByPromo(ctx, id); err != nil {
+		result = err.Error()
+		return err
+	}
 
 	if err := s.dbRW.GetQueries().SoftDeleteTrackedLink(ctx, id); err != nil {
 		result = err.Error()
@@ -237,6 +259,17 @@ func (s *TrackedLinkService) GetClickCount(ctx context.Context, linkID string) (
 	}
 
 	return count, nil
+}
+
+func (s *TrackedLinkService) ensureTrackedLinkNotUsedByPromo(ctx context.Context, trackedLinkID string) error {
+	count, err := s.dbRO.GetQueries().CountPublishedPromosUsingTrackedLink(ctx, trackedLinkID)
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return errs.ErrTrackedLinkInUseByPromo
+	}
+	return nil
 }
 
 func (s *TrackedLinkService) mapRowToTrackedLink(row queries.TblTrackedLink) *TrackedLink {

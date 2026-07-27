@@ -419,19 +419,21 @@ type TblProductsFt struct {
 }
 
 type TblPromo struct {
-	ID          int64
-	Title       string
-	Description string
-	MediaUrl    string
-	StartDate   string
-	EndDate     string
-	Type        string
-	Status      string
-	CreatedAt   string
-	UpdatedAt   string
-	DeletedAt   string
-	BannerOnly  sql.NullBool
-	Priority    sql.NullInt64
+	ID            int64
+	Title         string
+	Description   string
+	MediaUrl      string
+	StartDate     string
+	EndDate       string
+	Type          string
+	Status        string
+	CreatedAt     string
+	UpdatedAt     string
+	DeletedAt     string
+	BannerOnly    sql.NullBool
+	Priority      sql.NullInt64
+	TrackedLinkID string
+	LinkUrl       string
 }
 
 type TblQuotation struct {

@@ -20,6 +20,14 @@ AND start_date <= datetime('now')
 AND end_date >= datetime('now')
 ORDER BY priority ASC;
 
+-- name: CountPublishedPromosUsingTrackedLink :one
+SELECT COUNT(*) AS count
+FROM tbl_promos
+WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+AND status = 'PUBLISHED'
+AND end_date >= datetime('now')
+AND tracked_link_id = ?;
+
 -- name: CreatePromo :one
 INSERT INTO tbl_promos (
     title,
@@ -31,12 +39,14 @@ INSERT INTO tbl_promos (
     status,
     banner_only,
     priority,
+    tracked_link_id,
+    link_url,
     created_at,
     updated_at,
     deleted_at
 ) VALUES (
     ?, ?, ?, ?, ?, ?,
-    'DRAFT', ?, ?,
+    'DRAFT', ?, ?, ?, ?,
     datetime('now'),
     datetime('now'),
     '1970-01-01 00:00:00+00:00'
@@ -54,6 +64,8 @@ SET
     status = ?,
     banner_only = ?,
     priority = ?,
+    tracked_link_id = ?,
+    link_url = ?,
     updated_at = datetime('now')
 WHERE id = ?
 AND deleted_at = '1970-01-01 00:00:00+00:00';

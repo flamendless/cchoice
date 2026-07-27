@@ -84,6 +84,21 @@ func (s *ImageService) ValidateSize(file io.Reader) ([]byte, error) {
 	return data, nil
 }
 
+func promoLocalImageURL(promoTitle, filename string) string {
+	sourceName := filepath.Base(filename)
+	promoDir := strings.ToLower(promoTitle)
+	return utils.URL(fmt.Sprintf("/static/images/promo_images/%s/%s", promoDir, sourceName))
+}
+
+func (s *ImageService) savePromoImageLocally(promoTitle, filename string, data []byte) error {
+	sourceName := filepath.Base(filename)
+	localPath := filepath.Join("cmd/web/static/images/promo_images", strings.ToLower(promoTitle), sourceName)
+	if err := os.MkdirAll(filepath.Dir(localPath), 0755); err != nil {
+		return err
+	}
+	return os.WriteFile(localPath, data, 0644)
+}
+
 func (s *ImageService) UploadProductImage(
 	ctx context.Context,
 	brand string,
@@ -208,28 +223,24 @@ func (s *ImageService) UploadPromoBannerImage(
 		zap.Bool("local storage", isLocalStorage),
 	)
 
-	if !conf.Conf().IsProd() && !conf.Conf().Test.LocalUploadImage || isLocalStorage {
-		sourceName := filepath.Base(filename)
-		localPath := filepath.Join("cmd/web/static/images/promo_images", strings.ToLower(promoTitle), sourceName)
-		if err := os.MkdirAll(filepath.Dir(localPath), 0755); err != nil {
+	if isLocalStorage {
+		if err := s.savePromoImageLocally(promoTitle, filename, data); err != nil {
 			return "", err
 		}
-		data, err := io.ReadAll(file)
-		if err != nil {
-			return "", err
-		}
-		if err := os.WriteFile(localPath, data, 0644); err != nil {
-			return "", err
-		}
-		return s.objectStorage.GetPublicURL(filename), nil
+		return promoLocalImageURL(promoTitle, filename), nil
 	}
 
 	if err := s.objectStorage.PutObject(ctx, filename, file, contentType); err != nil {
 		return "", err
 	}
 
-	key := s.objectStorage.GetPublicURL(filename)
-	return key, nil
+	if !conf.Conf().IsProd() && !conf.Conf().Test.LocalUploadImage {
+		if err := s.savePromoImageLocally(promoTitle, filename, data); err != nil {
+			logs.Log().Warn(logtag, zap.Error(err))
+		}
+	}
+
+	return s.objectStorage.GetPublicURL(filename), nil
 }
 
 // ValidateThemeLogoContentType restricts theme logo uploads to PNG and SVG

@@ -10,6 +10,22 @@ import (
 	"database/sql"
 )
 
+const countPublishedPromosUsingTrackedLink = `-- name: CountPublishedPromosUsingTrackedLink :one
+SELECT COUNT(*) AS count
+FROM tbl_promos
+WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+AND status = 'PUBLISHED'
+AND end_date >= datetime('now')
+AND tracked_link_id = ?
+`
+
+func (q *Queries) CountPublishedPromosUsingTrackedLink(ctx context.Context, trackedLinkID string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countPublishedPromosUsingTrackedLink, trackedLinkID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createPromo = `-- name: CreatePromo :one
 INSERT INTO tbl_promos (
     title,
@@ -21,12 +37,14 @@ INSERT INTO tbl_promos (
     status,
     banner_only,
     priority,
+    tracked_link_id,
+    link_url,
     created_at,
     updated_at,
     deleted_at
 ) VALUES (
     ?, ?, ?, ?, ?, ?,
-    'DRAFT', ?, ?,
+    'DRAFT', ?, ?, ?, ?,
     datetime('now'),
     datetime('now'),
     '1970-01-01 00:00:00+00:00'
@@ -34,14 +52,16 @@ INSERT INTO tbl_promos (
 `
 
 type CreatePromoParams struct {
-	Title       string
-	Description string
-	MediaUrl    string
-	StartDate   string
-	EndDate     string
-	Type        string
-	BannerOnly  sql.NullBool
-	Priority    sql.NullInt64
+	Title         string
+	Description   string
+	MediaUrl      string
+	StartDate     string
+	EndDate       string
+	Type          string
+	BannerOnly    sql.NullBool
+	Priority      sql.NullInt64
+	TrackedLinkID string
+	LinkUrl       string
 }
 
 func (q *Queries) CreatePromo(ctx context.Context, arg CreatePromoParams) (int64, error) {
@@ -54,6 +74,8 @@ func (q *Queries) CreatePromo(ctx context.Context, arg CreatePromoParams) (int64
 		arg.Type,
 		arg.BannerOnly,
 		arg.Priority,
+		arg.TrackedLinkID,
+		arg.LinkUrl,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -61,7 +83,7 @@ func (q *Queries) CreatePromo(ctx context.Context, arg CreatePromoParams) (int64
 }
 
 const getActivePromos = `-- name: GetActivePromos :many
-SELECT tbl_promos.id, tbl_promos.title, tbl_promos.description, tbl_promos.media_url, tbl_promos.start_date, tbl_promos.end_date, tbl_promos.type, tbl_promos.status, tbl_promos.created_at, tbl_promos.updated_at, tbl_promos.deleted_at, tbl_promos.banner_only, tbl_promos.priority
+SELECT tbl_promos.id, tbl_promos.title, tbl_promos.description, tbl_promos.media_url, tbl_promos.start_date, tbl_promos.end_date, tbl_promos.type, tbl_promos.status, tbl_promos.created_at, tbl_promos.updated_at, tbl_promos.deleted_at, tbl_promos.banner_only, tbl_promos.priority, tbl_promos.tracked_link_id, tbl_promos.link_url
 FROM tbl_promos
 WHERE deleted_at = '1970-01-01 00:00:00+00:00'
 AND status = 'PUBLISHED'
@@ -97,6 +119,8 @@ func (q *Queries) GetActivePromos(ctx context.Context) ([]GetActivePromosRow, er
 			&i.TblPromo.DeletedAt,
 			&i.TblPromo.BannerOnly,
 			&i.TblPromo.Priority,
+			&i.TblPromo.TrackedLinkID,
+			&i.TblPromo.LinkUrl,
 		); err != nil {
 			return nil, err
 		}
@@ -112,7 +136,7 @@ func (q *Queries) GetActivePromos(ctx context.Context) ([]GetActivePromosRow, er
 }
 
 const getAllPromos = `-- name: GetAllPromos :many
-SELECT tbl_promos.id, tbl_promos.title, tbl_promos.description, tbl_promos.media_url, tbl_promos.start_date, tbl_promos.end_date, tbl_promos.type, tbl_promos.status, tbl_promos.created_at, tbl_promos.updated_at, tbl_promos.deleted_at, tbl_promos.banner_only, tbl_promos.priority
+SELECT tbl_promos.id, tbl_promos.title, tbl_promos.description, tbl_promos.media_url, tbl_promos.start_date, tbl_promos.end_date, tbl_promos.type, tbl_promos.status, tbl_promos.created_at, tbl_promos.updated_at, tbl_promos.deleted_at, tbl_promos.banner_only, tbl_promos.priority, tbl_promos.tracked_link_id, tbl_promos.link_url
 FROM tbl_promos
 WHERE deleted_at = '1970-01-01 00:00:00+00:00'
 ORDER BY priority ASC, updated_at DESC
@@ -145,6 +169,8 @@ func (q *Queries) GetAllPromos(ctx context.Context) ([]GetAllPromosRow, error) {
 			&i.TblPromo.DeletedAt,
 			&i.TblPromo.BannerOnly,
 			&i.TblPromo.Priority,
+			&i.TblPromo.TrackedLinkID,
+			&i.TblPromo.LinkUrl,
 		); err != nil {
 			return nil, err
 		}
@@ -160,7 +186,7 @@ func (q *Queries) GetAllPromos(ctx context.Context) ([]GetAllPromosRow, error) {
 }
 
 const getPromoByID = `-- name: GetPromoByID :one
-SELECT tbl_promos.id, tbl_promos.title, tbl_promos.description, tbl_promos.media_url, tbl_promos.start_date, tbl_promos.end_date, tbl_promos.type, tbl_promos.status, tbl_promos.created_at, tbl_promos.updated_at, tbl_promos.deleted_at, tbl_promos.banner_only, tbl_promos.priority
+SELECT tbl_promos.id, tbl_promos.title, tbl_promos.description, tbl_promos.media_url, tbl_promos.start_date, tbl_promos.end_date, tbl_promos.type, tbl_promos.status, tbl_promos.created_at, tbl_promos.updated_at, tbl_promos.deleted_at, tbl_promos.banner_only, tbl_promos.priority, tbl_promos.tracked_link_id, tbl_promos.link_url
 FROM tbl_promos
 WHERE id = ?
 AND deleted_at = '1970-01-01 00:00:00+00:00'
@@ -188,6 +214,8 @@ func (q *Queries) GetPromoByID(ctx context.Context, id int64) (GetPromoByIDRow, 
 		&i.TblPromo.DeletedAt,
 		&i.TblPromo.BannerOnly,
 		&i.TblPromo.Priority,
+		&i.TblPromo.TrackedLinkID,
+		&i.TblPromo.LinkUrl,
 	)
 	return i, err
 }
@@ -218,22 +246,26 @@ SET
     status = ?,
     banner_only = ?,
     priority = ?,
+    tracked_link_id = ?,
+    link_url = ?,
     updated_at = datetime('now')
 WHERE id = ?
 AND deleted_at = '1970-01-01 00:00:00+00:00'
 `
 
 type UpdatePromoParams struct {
-	Title       string
-	Description string
-	MediaUrl    string
-	StartDate   string
-	EndDate     string
-	Type        string
-	Status      string
-	BannerOnly  sql.NullBool
-	Priority    sql.NullInt64
-	ID          int64
+	Title         string
+	Description   string
+	MediaUrl      string
+	StartDate     string
+	EndDate       string
+	Type          string
+	Status        string
+	BannerOnly    sql.NullBool
+	Priority      sql.NullInt64
+	TrackedLinkID string
+	LinkUrl       string
+	ID            int64
 }
 
 func (q *Queries) UpdatePromo(ctx context.Context, arg UpdatePromoParams) error {
@@ -247,6 +279,8 @@ func (q *Queries) UpdatePromo(ctx context.Context, arg UpdatePromoParams) error 
 		arg.Status,
 		arg.BannerOnly,
 		arg.Priority,
+		arg.TrackedLinkID,
+		arg.LinkUrl,
 		arg.ID,
 	)
 	return err

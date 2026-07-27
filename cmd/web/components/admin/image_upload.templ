@@ -41,6 +41,9 @@ templ ImageUploadField(params ImageUploadParams) {
 			class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark"
 			data-upload-preview
 			data-max-size={ strconv.FormatInt(params.MaxSize, 10) }
+			if params.Required {
+				required
+			}
 		/>
 		if params.HelpText != "" {
 			<p class="mt-1 text-xs text-gray-500">{ params.HelpText }</p>

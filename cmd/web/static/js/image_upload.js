@@ -15,6 +15,7 @@
 			|| document.querySelector('[data-upload-preview-image]');
 
 		input.addEventListener("change", function() {
+			this.setCustomValidity("");
 			const file = this.files[0];
 
 			if (!file) {

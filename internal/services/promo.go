@@ -81,6 +81,14 @@ func (s *PromoService) GetActivePromos(ctx context.Context) ([]Promo, error) {
 	return result, nil
 }
 
+func (s *PromoService) CountPublishedPromosUsingTrackedLink(ctx context.Context, trackedLinkID string) (int64, error) {
+	count, err := s.dbRO.GetQueries().CountPublishedPromosUsingTrackedLink(ctx, trackedLinkID)
+	if err != nil {
+		return 0, errors.Join(errs.ErrPromo, err)
+	}
+	return count, nil
+}
+
 func (s *PromoService) CreatePromo(
 	ctx context.Context,
 	staffID string,
@@ -92,6 +100,7 @@ func (s *PromoService) CreatePromo(
 	promoType enums.PromoType,
 	bannerOnly bool,
 	priority int64,
+	linkFields PromoLinkFields,
 ) (string, error) {
 	result := "success"
 	defer func() {
@@ -113,14 +122,16 @@ func (s *PromoService) CreatePromo(
 	}
 
 	id, err := s.dbRW.GetQueries().CreatePromo(ctx, queries.CreatePromoParams{
-		Title:       title,
-		Description: description,
-		MediaUrl:    mediaURL,
-		StartDate:   startDate.Format(constants.DateLayoutISO),
-		EndDate:     endDate.Format(constants.DateLayoutISO),
-		Type:        promoType.String(),
-		BannerOnly:  sql.NullBool{Valid: true, Bool: bannerOnly},
-		Priority:    sql.NullInt64{Valid: true, Int64: priority},
+		Title:         title,
+		Description:   description,
+		MediaUrl:      mediaURL,
+		StartDate:     startDate.Format(constants.DateLayoutISO),
+		EndDate:       endDate.Format(constants.DateLayoutISO),
+		Type:          promoType.String(),
+		BannerOnly:    sql.NullBool{Valid: true, Bool: bannerOnly},
+		Priority:      sql.NullInt64{Valid: true, Int64: priority},
+		TrackedLinkID: linkFields.TrackedLinkID,
+		LinkUrl:       linkFields.LinkURL,
 	})
 	if err != nil {
 		result = err.Error()
@@ -145,6 +156,7 @@ func (s *PromoService) UpdatePromo(
 	promoStatus enums.PromoStatus,
 	bannerOnly bool,
 	priority int64,
+	linkFields PromoLinkFields,
 ) error {
 	result := "success"
 	defer func() {
@@ -177,16 +189,18 @@ func (s *PromoService) UpdatePromo(
 	}
 
 	if err := s.dbRW.GetQueries().UpdatePromo(ctx, queries.UpdatePromoParams{
-		ID:          id,
-		Title:       title,
-		Description: description,
-		MediaUrl:    cmp.Or(mediaURL, promo.MediaURL),
-		StartDate:   startDate.Format(constants.DateLayoutISO),
-		EndDate:     endDate.Format(constants.DateLayoutISO),
-		Type:        promoType.String(),
-		Status:      promoStatus.String(),
-		BannerOnly:  sql.NullBool{Valid: true, Bool: bannerOnly},
-		Priority:    sql.NullInt64{Valid: true, Int64: priority},
+		ID:            id,
+		Title:         title,
+		Description:   description,
+		MediaUrl:      cmp.Or(mediaURL, promo.MediaURL),
+		StartDate:     startDate.Format(constants.DateLayoutISO),
+		EndDate:       endDate.Format(constants.DateLayoutISO),
+		Type:          promoType.String(),
+		Status:        promoStatus.String(),
+		BannerOnly:    sql.NullBool{Valid: true, Bool: bannerOnly},
+		Priority:      sql.NullInt64{Valid: true, Int64: priority},
+		TrackedLinkID: linkFields.TrackedLinkID,
+		LinkUrl:       linkFields.LinkURL,
 	}); err != nil {
 		result = err.Error()
 		return errors.Join(errs.ErrPromo, err)
@@ -240,9 +254,11 @@ func (s *PromoService) mapRowToPromo(p queries.TblPromo) *Promo {
 		EndDate:     p.EndDate,
 		Type:        enums.ParsePromoTypeToEnum(p.Type),
 		Status:      enums.ParsePromoStatusToEnum(p.Status),
-		BannerOnly:  p.BannerOnly,
-		Priority:    p.Priority,
-		CreatedAt:   createdAt,
+		BannerOnly:    p.BannerOnly,
+		Priority:      p.Priority,
+		TrackedLinkID: p.TrackedLinkID,
+		LinkURL:       p.LinkUrl,
+		CreatedAt:     createdAt,
 		UpdatedAt:   updatedAt,
 		DeletedAt:   p.DeletedAt,
 	}

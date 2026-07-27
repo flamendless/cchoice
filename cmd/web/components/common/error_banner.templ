@@ -8,7 +8,14 @@ var onceErrorHandler = templ.NewOnceHandle()
 templ ErrorBanner() {
 	<div id="error_banner" hidden>
 		@errorBannerHandlerOnce.Once() {
-			<div class="fixed inset-0 flex items-start justify-center z-[9999] my-4">
+			<div
+				class="fixed inset-0 flex items-start justify-center z-[9999] my-4"
+				_="on click
+					if target is me
+						hide #error_banner
+					end
+				"
+			>
 				<div
 					class="
 						flex flex-row justify-between items-center w-[90%] max-w-md
