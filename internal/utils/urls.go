@@ -27,6 +27,20 @@ func siteBaseURL() string {
 	return scheme + base
 }
 
+func IsExternalURL(link string) bool {
+	return strings.HasPrefix(link, "http://") || strings.HasPrefix(link, "https://")
+}
+
+func ResolveHref(pathOrURL string) string {
+	if pathOrURL == "" {
+		return ""
+	}
+	if IsExternalURL(pathOrURL) {
+		return pathOrURL
+	}
+	return URL(pathOrURL)
+}
+
 func URL(path string) string {
 	if conf.Conf().IsProd() {
 		return path

@@ -7,7 +7,17 @@ import (
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/utils"
+	"fmt"
 )
+
+var scrPromoLinks = templ.NewOnceHandle()
+
+templ ScrPromoLinks() {
+	@scrPromoLinks.Once() {
+		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/promo_links.js")) }>
+		</script>
+	}
+}
 
 templ AdminPromosListPage(title string) {
 	<!DOCTYPE html>
@@ -37,6 +47,7 @@ templ AdminPromosListPage(title string) {
 			<div id="promo-create-modal-container"></div>
 			<div id="promo-edit-modal-container"></div>
 			@ScrImageUpload()
+			@ScrPromoLinks()
 		</body>
 	</html>
 }
@@ -89,9 +100,12 @@ templ AdminPromosListTable(promos []models.AdminPromoListItem) {
 						Status
 					</th>
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
+						Link
+					</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
 						Created At
 					</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">
 						Actions
 					</th>
 				</tr>
@@ -99,7 +113,7 @@ templ AdminPromosListTable(promos []models.AdminPromoListItem) {
 			<tbody class="bg-white divide-y divide-gray-200">
 				if len(promos) == 0 {
 					<tr>
-						<td colspan="7" class="px-6 py-4 text-center text-gray-500">
+						<td colspan="8" class="px-6 py-4 text-center text-gray-500">
 							No promos found.
 						</td>
 					</tr>
@@ -120,6 +134,9 @@ templ AdminPromosListTable(promos []models.AdminPromoListItem) {
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap text-sm">
 								@PromoStatusBadge(promo.Status)
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 max-w-[10rem] truncate" title={ promo.LinkLabel }>
+								{ promo.LinkLabel }
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
 								{ promo.CreatedAt }
@@ -210,7 +227,7 @@ templ PromoStatusBadge(status enums.PromoStatus) {
 	}
 }
 
-templ PromoCreateModal() {
+templ PromoCreateModal(trackedLinks []models.AdminTrackedLinkOption) {
 	<div
 		id="promo-create-modal"
 		class="fixed inset-0 z-50 flex items-center justify-center"
@@ -233,18 +250,20 @@ templ PromoCreateModal() {
 					</svg>
 				</button>
 			</div>
-			@PromoCreateForm()
+			@PromoCreateForm(trackedLinks)
 		</div>
 	</div>
 }
 
-templ PromoCreateForm() {
+templ PromoCreateForm(trackedLinks []models.AdminTrackedLinkOption) {
 	<form
 		enctype="multipart/form-data"
+		hx-encoding="multipart/form-data"
 		hx-post={ utils.URL("/admin/promos") }
 		hx-swap="outerHTML"
 		class="flex flex-col gap-4"
 		hx-on::after-request="if(event.detail.successful) { document.getElementById('promo-create-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/promos/table', { target: '#promos-table', swap: 'innerHTML' }) }"
+		onsubmit="return validatePromoCreateForm(event)"
 		_="on submit call metrics_event('admin_exec', 'create promo')"
 	>
 		<div>
@@ -373,22 +392,52 @@ templ PromoCreateForm() {
 			/>
 			<p class="mt-1 text-xs text-gray-500">Provide video URL or YouTube link</p>
 		</div>
+		<div id="promo_link_section">
+			@PromoLinkFieldsSection(trackedLinks, enums.PROMO_LINK_TYPE_NONE, "", "")
+		</div>
 		<script>
+			function validatePromoMediaUpload(event) {
+				const form = event.currentTarget;
+				const typeSelect = form.querySelector('select[name="type"]');
+				const fileInput = form.querySelector('input[name="media_file"]');
+				if (!typeSelect || typeSelect.value !== 'BANNER_IMAGE') {
+					return true;
+				}
+				if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+					event.preventDefault();
+					event.stopPropagation();
+					fileInput.setCustomValidity('Please upload a banner image.');
+					fileInput.reportValidity();
+					return false;
+				}
+				fileInput.setCustomValidity('');
+				return true;
+			}
+			function validatePromoCreateForm(event) {
+				return validatePromoMediaUpload(event) && validatePromoLinkFields(event);
+			}
 			function toggleMediaInput(promoType) {
 				const urlField = document.getElementById('media_url_field');
 				const uploadField = document.getElementById('media_upload_field');
+				const linkSection = document.getElementById('promo_link_section');
+				const fileInput = uploadField.querySelector('input[name="media_file"]');
+				const urlInput = urlField.querySelector('input[name="media_url"]');
 				if (promoType === 'BANNER_VIDEO') {
 					urlField.classList.remove('hidden');
 					uploadField.classList.add('hidden');
-					urlField.querySelector('input').setAttribute('required', 'true');
-					uploadField.querySelector('input').removeAttribute('required');
+					linkSection.classList.add('hidden');
+					urlInput.setAttribute('required', 'true');
+					fileInput.removeAttribute('required');
+					fileInput.setCustomValidity('');
 				} else {
 					urlField.classList.add('hidden');
 					uploadField.classList.remove('hidden');
-					urlField.querySelector('input').removeAttribute('required');
-					uploadField.querySelector('input').setAttribute('required', 'true');
+					linkSection.classList.remove('hidden');
+					urlInput.removeAttribute('required');
+					fileInput.setAttribute('required', 'true');
 				}
 			}
+			setPromoLinkFieldState('NONE');
 		</script>
 		<div class="flex w-full gap-2 justify-end">
 			<button
@@ -408,7 +457,7 @@ templ PromoCreateForm() {
 	</form>
 }
 
-templ PromoEditModal(promo models.AdminPromoListItem) {
+templ PromoEditModal(promo models.AdminPromoListItem, trackedLinks []models.AdminTrackedLinkOption) {
 	<div
 		id="promo-edit-modal"
 		class="fixed inset-0 z-50 flex items-center justify-center"
@@ -431,18 +480,20 @@ templ PromoEditModal(promo models.AdminPromoListItem) {
 					</svg>
 				</button>
 			</div>
-			@PromoEditForm(promo)
+			@PromoEditForm(promo, trackedLinks)
 		</div>
 	</div>
 }
 
-templ PromoEditForm(promo models.AdminPromoListItem) {
+templ PromoEditForm(promo models.AdminPromoListItem, trackedLinks []models.AdminTrackedLinkOption) {
 	<form
 		enctype="multipart/form-data"
+		hx-encoding="multipart/form-data"
 		hx-patch={ utils.URLf("/admin/promos/%s", promo.ID) }
 		hx-swap="outerHTML"
 		class="flex flex-col gap-4"
 		hx-on::after-request="if(event.detail.successful) { document.getElementById('promo-edit-modal-container').innerHTML = ''; htmx.ajax('GET', '/admin/promos/table', { target: '#promos-table', swap: 'innerHTML' }) }"
+		onsubmit="return validatePromoLinkFields(event)"
 		_="on submit call metrics_event('admin_exec', 'update promo')"
 	>
 		<div class="hidden">
@@ -589,6 +640,17 @@ templ PromoEditForm(promo models.AdminPromoListItem) {
 				}
 			</div>
 		}
+		if promo.Type == enums.PROMO_TYPE_BANNER_IMAGE {
+			@PromoLinkFieldsSection(trackedLinks, promo.LinkType, promo.TrackedLinkID, promo.LinkURL)
+			<script>
+				(function() {
+					const checked = document.querySelector('#promo-edit-modal input[name="link_type"]:checked');
+					if (checked) {
+						setPromoLinkFieldState(checked.value);
+					}
+				})();
+			</script>
+		}
 		<div>
 			<label class="block text-sm font-medium text-gray-700 mb-1">
 				Status <span class="text-red-500">*</span>
@@ -621,4 +683,76 @@ templ PromoEditForm(promo models.AdminPromoListItem) {
 			</button>
 		</div>
 	</form>
+}
+
+templ PromoLinkFieldsSection(trackedLinks []models.AdminTrackedLinkOption, linkType enums.PromoLinkType, trackedLinkID string, linkURL string) {
+	<fieldset class="border border-gray-200 rounded-md p-4 flex flex-col gap-3">
+		<legend class="text-sm font-medium text-gray-700 px-1">Banner Link (optional)</legend>
+		<label class="inline-flex items-center gap-2 cursor-pointer">
+			<input
+				type="radio"
+				name="link_type"
+				value={ enums.PROMO_LINK_TYPE_NONE.String() }
+				checked?={ linkType == enums.PROMO_LINK_TYPE_NONE || linkType == enums.PROMO_LINK_TYPE_UNDEFINED }
+				onchange="togglePromoLinkType('NONE')"
+			/>
+			<span class="text-sm text-gray-700">None</span>
+		</label>
+		<label class="inline-flex items-center gap-2 cursor-pointer">
+			<input
+				type="radio"
+				name="link_type"
+				value={ enums.PROMO_LINK_TYPE_TRACKED.String() }
+				checked?={ linkType == enums.PROMO_LINK_TYPE_TRACKED }
+				onchange="togglePromoLinkType('TRACKED')"
+			/>
+			<span class="text-sm text-gray-700">Tracked link</span>
+		</label>
+		<label class="inline-flex items-center gap-2 cursor-pointer">
+			<input
+				type="radio"
+				name="link_type"
+				value={ enums.PROMO_LINK_TYPE_CUSTOM.String() }
+				checked?={ linkType == enums.PROMO_LINK_TYPE_CUSTOM }
+				onchange="togglePromoLinkType('CUSTOM')"
+			/>
+			<span class="text-sm text-gray-700">Custom URL</span>
+		</label>
+		<div id="promo_link_tracked_field" class={ templ.KV("hidden", linkType != enums.PROMO_LINK_TYPE_TRACKED) }>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Tracked link</label>
+			<select
+				name="tracked_link_id"
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+			>
+				<option value="">Select a tracked link</option>
+				for _, link := range trackedLinks {
+					<option value={ link.ID } selected?={ link.ID == trackedLinkID }>
+						{ fmt.Sprintf("%s (/l/%s) — %s", link.Name, link.Slug, link.Status) }
+					</option>
+				}
+			</select>
+			<p class="mt-2 text-xs text-gray-500">
+				Tracked links record clicks and campaign metrics. Use this when you want to measure banner performance.
+				<a
+					href={ utils.URL("/admin/tracked-links") }
+					target="_blank"
+					rel="noopener noreferrer"
+					class="text-primary hover:underline ml-1"
+				>Manage Tracked Links</a>
+			</p>
+		</div>
+		<div id="promo_link_custom_field" class={ templ.KV("hidden", linkType != enums.PROMO_LINK_TYPE_CUSTOM) }>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Custom URL</label>
+			<input
+				type="text"
+				name="link_url"
+				value={ linkURL }
+				placeholder="/product/example or https://example.com"
+				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+				oninput="if(this.value.trim() && typeof isValidPromoCustomURL === 'function' && isValidPromoCustomURL(this.value)) this.setCustomValidity('')"
+				onblur="if(!this.disabled && typeof validatePromoCustomLinkInput === 'function') validatePromoCustomLinkInput(this)"
+			/>
+			<p class="mt-1 text-xs text-gray-500">Use a path starting with / or an absolute https:// URL.</p>
+		</div>
+	</fieldset>
 }

@@ -1,6 +1,5 @@
 package components
 
-import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
 import "cchoice/cmd/web/components/header"
 import "cchoice/cmd/web/components/svg"
@@ -62,23 +61,11 @@ templ AdminSuperuserHomePage(fullName string, memos []models.StaffMemoCard) {
 				<div class="max-w-6xl mx-auto">
 					@header.AdminStaffHeaderWithSubtitle(fullName)
 					@StaffMemoCards(memos)
-					<div class="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
-						for _, card := range staffCards {
-							<a
-								href={ utils.URL(card.Link) }
-								class="block w-64 bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-primary"
-							>
-								<div class="flex justify-center mb-4">
-									@card.Icon
-								</div>
-								<h2 class="text-xl font-semibold text-gray-800 mb-2">{ card.Title }</h2>
-								<p class="text-sm text-gray-500">{ card.Description }</p>
-							</a>
-						}
-					</div>
+					@AdminStaffCardsGrid(staffCards)
 				</div>
 			</div>
 			<div id="memo-reject-modal-container"></div>
+			@ScriptAdminDashboardSearch()
 		</body>
 	</html>
 }

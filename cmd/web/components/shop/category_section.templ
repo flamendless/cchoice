@@ -92,7 +92,8 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 				<div
 					id={ "category-sections-" + subcategory.CategoryID }
 					class="w-full max-w-full ml-0.5 pr-2 lg:pr-6 border-primary-dark"
-					hx-trigger="revealed once, history:restore"
+					data-category-product-section
+					hx-trigger="nearViewport once, history:restore"
 					hx-get={ utils.URL("/product-categories/" + subcategory.CategoryID + "/products") }
 					hx-target="this"
 					hx-swap="innerHTML"
@@ -118,7 +119,7 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 				}) }
 				hx-target=".category-sections-inf-load"
 				hx-swap="outerHTML"
-				hx-trigger="revealed, history:restore"
+				hx-trigger="nearViewport, history:restore"
 			></div>
 		}
 	}
@@ -146,5 +147,7 @@ templ AllCategorySections() {
 		>
 			@CategorySectionsLoading()
 		</div>
+		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/revealed_preload.js")) }>
+		</script>
 	</div>
 }

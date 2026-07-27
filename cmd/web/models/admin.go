@@ -13,18 +13,29 @@ type StaffCard struct {
 	Icon        templ.Component
 }
 
+type AdminTrackedLinkOption struct {
+	ID     string
+	Name   string
+	Slug   string
+	Status enums.TrackedLinkStatus
+}
+
 type AdminPromoListItem struct {
-	ID          string
-	Title       string
-	Description string
-	MediaURL    string
-	StartDate   string
-	EndDate     string
-	Type        enums.PromoType
-	Status      enums.PromoStatus
-	BannerOnly  bool
-	Priority    int64
-	CreatedAt   string
+	ID            string
+	Title         string
+	Description   string
+	MediaURL      string
+	StartDate     string
+	EndDate       string
+	Type          enums.PromoType
+	Status        enums.PromoStatus
+	BannerOnly    bool
+	Priority      int64
+	CreatedAt     string
+	LinkType      enums.PromoLinkType
+	TrackedLinkID string
+	LinkURL       string
+	LinkLabel     string
 }
 
 type AdminMemoListItem struct {

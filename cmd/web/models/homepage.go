@@ -31,6 +31,7 @@ type PromoItem struct {
 	MediaURL    string
 	Type        enums.PromoType
 	BannerOnly  bool
+	Href        string
 }
 
 type HomePageFilters struct {
