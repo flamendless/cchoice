@@ -1,10 +1,28 @@
 (function() {
-	let categoryObserver = null;
+	const DEFAULT_HEADER_HEIGHT = 150;
 
+	let categoryObserver = null;
+	let headerHeight = null;
+
+	// Reading offsetHeight forces a synchronous layout. The panel is rebuilt on
+	// every htmx swap, so the measurement is cached and only invalidated when the
+	// viewport changes.
 	function getHeaderHeight() {
+		if (headerHeight !== null) {
+			return headerHeight;
+		}
 		const header = document.querySelector("header");
-		return header ? header.offsetHeight : 150;
+		const measured = header ? header.offsetHeight : 0;
+		if (measured <= 0) {
+			return DEFAULT_HEADER_HEIGHT;
+		}
+		headerHeight = measured;
+		return headerHeight;
 	}
+
+	window.addEventListener("resize", function() {
+		headerHeight = null;
+	}, { passive: true });
 
 	function setupCategoryScrollLinks() {
 		document.querySelectorAll(".category-scroll-link").forEach(function(link) {

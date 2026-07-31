@@ -2,21 +2,25 @@ package shop
 
 import (
 	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/utils"
 )
 
+var promoBannerStyleOnce = templ.NewOnceHandle()
+
 templ ActivePromosSection(promos []models.PromoItem) {
+	@promoBannerStyle()
 	<div class="w-full px-4 py-6">
 		<div class="flex flex-col lg:flex-row gap-4">
-			for _, promo := range promos {
-				@PromoBannerCard(promo)
+			for i, promo := range promos {
+				@PromoBannerCard(promo, i == 0)
 			}
 		</div>
 	</div>
 }
 
-templ PromoBannerCard(promo models.PromoItem) {
+templ PromoBannerCard(promo models.PromoItem, isFirst bool) {
 	if promo.Type == enums.PROMO_TYPE_BANNER_IMAGE && promo.Href != "" {
 		<a
 			href={ templ.SafeURL(promo.Href) }
@@ -26,18 +30,34 @@ templ PromoBannerCard(promo models.PromoItem) {
 			}
 			class="flex flex-col justify-center w-full lg:w-1/2 overflow-hidden rounded-lg shadow-md bg-surface cursor-pointer hover:opacity-95 transition"
 		>
-			@PromoBannerMedia(promo)
+			@PromoBannerMedia(promo, isFirst)
 			@PromoBannerText(promo)
 		</a>
 	} else {
 		<div class="flex flex-col justify-center w-full lg:w-1/2 overflow-hidden rounded-lg shadow-md bg-surface">
-			@PromoBannerMedia(promo)
+			@PromoBannerMedia(promo, isFirst)
 			@PromoBannerText(promo)
 		</div>
 	}
 }
 
-templ PromoBannerMedia(promo models.PromoItem) {
+// promoBannerStyle reserves the banner's box up front. Uploaded banners have no
+// stored dimensions, so without a fixed ratio the surrounding page reflows once
+// each image decodes.
+templ promoBannerStyle() {
+	@promoBannerStyleOnce.Once() {
+		<style>
+			.promo-banner-media {
+				aspect-ratio: 2 / 1;
+				width: 100%;
+				height: auto;
+				object-fit: cover;
+			}
+		</style>
+	}
+}
+
+templ PromoBannerMedia(promo models.PromoItem, isFirst bool) {
 	switch promo.Type {
 		case enums.PROMO_TYPE_BANNER_VIDEO:
 			if utils.IsYouTubeURL(promo.MediaURL) {
@@ -51,7 +71,7 @@ templ PromoBannerMedia(promo models.PromoItem) {
 				></iframe>
 			} else {
 				<video
-					class="w-full h-auto object-cover"
+					class="promo-banner-media"
 					src={ promo.MediaURL }
 					autoplay
 					loop
@@ -61,10 +81,20 @@ templ PromoBannerMedia(promo models.PromoItem) {
 			}
 		case enums.PROMO_TYPE_BANNER_IMAGE:
 			<img
-				class="w-full h-auto object-cover"
-				src={ promo.MediaURL }
+				class="promo-banner-media"
+				src={ utils.CDNImageWidth(promo.MediaURL, constants.WidthPromoBannerDefault) }
+				if srcset := utils.CDNImageSrcSet(promo.MediaURL, constants.WidthsPromoBanner...); srcset != "" {
+					srcset={ srcset }
+					sizes={ constants.SizesPromoBanner }
+				}
 				alt={ promo.Title }
-				loading="lazy"
+				decoding="async"
+				if isFirst {
+					loading="eager"
+					fetchpriority="high"
+				} else {
+					loading="lazy"
+				}
 			/>
 	}
 }

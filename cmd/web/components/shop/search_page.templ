@@ -95,7 +95,7 @@ templ SearchPageBody(data models.SearchPageData) {
 		@LoadImageSrc()
 		@LoadModalImage()
 		@PrefetchProductImage()
-		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/revealed_preload.js")) }>
+		<script defer type="text/javascript" src={ templ.URL(utils.StaticURL("/static/js/revealed_preload.js")) }>
 		</script>
 	</body>
 }

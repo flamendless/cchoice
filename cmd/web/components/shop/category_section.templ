@@ -23,10 +23,17 @@ templ CategorySectionProductsInner(data models.CategorySectionProducts) {
 			>
 				<div class="relative inline-block">
 					<img
-						src={ product.CDNURL }
+						src={ utils.CDNImageWidth(product.CDNURL, constants.WidthProductThumbnailDefault) }
+						if srcset := utils.CDNImageSrcSet(product.CDNURL, constants.WidthsProductThumbnail...); srcset != "" {
+							srcset={ srcset }
+							sizes={ constants.SizesProductThumbnail }
+						}
 						class="w-20 max-w-20 h-20 sm:w-24 sm:max-w-24 sm:h-24 object-contain"
 						title="show high-quality image"
 						alt={ product.Name + " thumbnail" }
+						width={ constants.ProductThumbnailSize }
+						height={ constants.ProductThumbnailSize }
+						decoding="async"
 						loading={ func() string { if utils.IsProductOnSale(product.DiscountPercentage) { return "eager" }; return "lazy" }() }
 						data-product-id={ product.ProductID }
 						data-product-thumbnail-path={ product.CDNURL1280 }
@@ -147,7 +154,7 @@ templ AllCategorySections() {
 		>
 			@CategorySectionsLoading()
 		</div>
-		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/revealed_preload.js")) }>
+		<script defer type="text/javascript" src={ templ.URL(utils.StaticURL("/static/js/revealed_preload.js")) }>
 		</script>
 	</div>
 }

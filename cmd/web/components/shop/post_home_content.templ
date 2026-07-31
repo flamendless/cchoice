@@ -6,6 +6,8 @@ import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
 import "cchoice/internal/constants"
 
+const clsBrandLogo = "w-3xs h-24 object-contain m-auto mt-8"
+
 templ PostHomeContentSections(data models.HomePageData) {
 	<div
 		id="others"
@@ -14,12 +16,12 @@ templ PostHomeContentSections(data models.HomePageData) {
 		for _, section := range data.Sections {
 			<span class="font-bold text-lg mt-4">{ section.Title }</span>
 			switch section.Href {
-			case "about-us", "services":
-				@CommonSection(section)
-			case "store":
-				@StoreSection(section)
-			case "partners":
-				@PartnerSection(section)
+				case "about-us", "services":
+					@CommonSection(section)
+				case "store":
+					@StoreSection(section)
+				case "partners":
+					@PartnerSection(section)
 			}
 		}
 	</div>
@@ -60,10 +62,24 @@ templ StoreSection(section models.PostHomeContentSection) {
 		<div class="flex flex-col content-center w-full max-w-full">
 			<div class="flex flex-col items-center w-full max-w-full">
 				<div class="relative overflow-hidden mx-auto max-w-lg w-full">
+					// The carousel sits well below the fold, so every slide is lazy.
+					// Eagerly loading all seven cost ~600KiB on the initial page load.
 					<div id="storeTrack" class="flex transition-transform duration-500 ease-in-out">
 						for i, imgURL := range constants.GetStoreImages() {
 							<div class="min-w-full">
-								<img src={ imgURL } class="w-full h-[300px] sm:h-[380px] md:h-[430px] lg:h-[460px] object-contain" alt={ fmt.Sprintf("Store photo %d", i+1) }/>
+								<img
+									src={ utils.CDNImageWidth(imgURL, constants.WidthStorePhotoDefault) }
+									if srcset := utils.CDNImageSrcSet(imgURL, constants.WidthsStorePhoto...); srcset != "" {
+										srcset={ srcset }
+										sizes={ constants.SizesStorePhoto }
+									}
+									class="w-full h-[300px] sm:h-[380px] md:h-[430px] lg:h-[460px] object-contain"
+									alt={ fmt.Sprintf("Store photo %d", i+1) }
+									width={ constants.StoreImageWidth }
+									height={ constants.StoreImageHeight }
+									loading="lazy"
+									decoding="async"
+								/>
 							</div>
 						}
 					</div>
@@ -81,6 +97,7 @@ templ StoreSection(section models.PostHomeContentSection) {
 			<script>
 				(function() {
 					let cur = 0;
+					let timer = null;
 					const track = document.getElementById('storeTrack');
 					const dots = document.querySelectorAll('#storeDots span');
 					const total = dots.length;
@@ -95,7 +112,27 @@ templ StoreSection(section models.PostHomeContentSection) {
 					dots.forEach(function(d, i) {
 						d.addEventListener('click', function() { goTo(i); });
 					});
-					setInterval(function() { goTo((cur + 1) % total); }, 5000);
+					// Only advance while the carousel is on screen, so an
+					// off-screen section costs neither main-thread work nor the
+					// bandwidth of loading slides nobody is looking at.
+					function start() {
+						if (timer === null) {
+							timer = setInterval(function() { goTo((cur + 1) % total); }, 5000);
+						}
+					}
+					function stop() {
+						if (timer !== null) {
+							clearInterval(timer);
+							timer = null;
+						}
+					}
+					if (typeof IntersectionObserver === 'function') {
+						new IntersectionObserver(function(entries) {
+							entries[0].isIntersecting ? start() : stop();
+						}).observe(track);
+					} else {
+						start();
+					}
 				})();
 			</script>
 			<div
@@ -133,28 +170,37 @@ templ PartnerSection(section models.PostHomeContentSection) {
 			<div
 				class="px-2 my-auto basis-1/2 lg:basis-1/6 flex-shrink-0"
 			>
+				// Brand logos have wildly different intrinsic ratios, so they are
+				// drawn into a fixed box with object-contain to keep the row from
+				// reflowing as each one decodes.
 				<div class="relative inline-block">
 					if !content.BrandImage.IsComingSoon {
 						<img
-							src={ content.BrandImage.CDNURL }
-							hx-trigger="load once"
-							hx-swap="none"
-							class="w-3xs h-auto m-auto mt-8"
+							src={ utils.CDNImageWidth(content.BrandImage.CDNURL, constants.WidthBrandLogoDefault) }
+							if srcset := utils.CDNImageSrcSet(content.BrandImage.CDNURL, constants.WidthsBrandLogo...); srcset != "" {
+								srcset={ srcset }
+								sizes={ constants.SizesBrandLogo }
+							}
+							class={ clsBrandLogo }
 							alt={ content.BrandImage.Alt }
 							loading="lazy"
-							width="256"
-							height="256"
+							decoding="async"
+							width={ constants.BrandLogoWidth }
+							height={ constants.BrandLogoHeight }
 						/>
 					} else {
 						<img
-							src={ content.BrandImage.CDNURL }
-							hx-trigger="load once"
-							hx-swap="none"
-							class="w-3xs h-auto m-auto mt-8 opacity-80"
+							src={ utils.CDNImageWidth(content.BrandImage.CDNURL, constants.WidthBrandLogoDefault) }
+							if srcset := utils.CDNImageSrcSet(content.BrandImage.CDNURL, constants.WidthsBrandLogo...); srcset != "" {
+								srcset={ srcset }
+								sizes={ constants.SizesBrandLogo }
+							}
+							class={ clsBrandLogo, "opacity-80" }
 							alt={ content.BrandImage.Alt }
 							loading="lazy"
-							width="256"
-							height="256"
+							decoding="async"
+							width={ constants.BrandLogoWidth }
+							height={ constants.BrandLogoHeight }
 						/>
 						<div
 							class="

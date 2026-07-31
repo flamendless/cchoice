@@ -327,8 +327,18 @@ func PrefetchProductImage() templ.ComponentScript {
 
 func PrefetchSaleProductImages() templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_PrefetchSaleProductImages_3dc0`,
-		Function: `function __templ_PrefetchSaleProductImages_3dc0(){const prefetched = new Set();
+		Name: `__templ_PrefetchSaleProductImages_cbe5`,
+		Function: `function __templ_PrefetchSaleProductImages_cbe5(){// Full-size images are only speculatively fetched when there is bandwidth to
+	// spare: on a metered or slow connection they compete with the images the
+	// visitor is actually looking at.
+	const connection = navigator.connection;
+	if (connection) {
+		if (connection.saveData) return;
+		const slow = ["slow-2g", "2g", "3g"];
+		if (slow.includes(connection.effectiveType)) return;
+	}
+
+	const prefetched = new Set();
 
 	function runPrefetch(root) {
 		const products = root.querySelectorAll('[data-product-on-sale="true"]');
@@ -345,13 +355,21 @@ func PrefetchSaleProductImages() templ.ComponentScript {
 		});
 	}
 
-	runPrefetch(document);
+	function schedule(root) {
+		if (typeof requestIdleCallback === "function") {
+			requestIdleCallback(() => runPrefetch(root), { timeout: 5000 });
+			return;
+		}
+		setTimeout(() => runPrefetch(root), 1000);
+	}
+
+	schedule(document);
 	document.body.addEventListener("htmx:afterSwap", function(evt) {
-		runPrefetch(evt.target);
+		schedule(evt.target);
 	});
 }`,
-		Call:       templ.SafeScript(`__templ_PrefetchSaleProductImages_3dc0`),
-		CallInline: templ.SafeScriptInline(`__templ_PrefetchSaleProductImages_3dc0`),
+		Call:       templ.SafeScript(`__templ_PrefetchSaleProductImages_cbe5`),
+		CallInline: templ.SafeScriptInline(`__templ_PrefetchSaleProductImages_cbe5`),
 	}
 }
 

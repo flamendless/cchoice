@@ -1,16 +1,49 @@
 package httputil
 
 import (
-	"cchoice/internal/metrics"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"net/http"
 	"os"
+	"path"
 	"sort"
 	"strings"
 	"time"
+
+	"cchoice/internal/constants"
+	"cchoice/internal/metrics"
 )
+
+const (
+	// cacheControlImmutable is used for fingerprinted assets: the URL changes
+	// whenever the file does, so the response can be kept for a year.
+	cacheControlImmutable = "public, max-age=31536000, immutable"
+
+	// cacheControlLongLived is used for assets requested without a fingerprint.
+	cacheControlLongLived = "public, max-age=2592000, stale-while-revalidate=86400" // 30 days, stale 1 day
+)
+
+// immutableAssetExts lists the extensions served out of the static filesystem
+// that are generated or replaced wholesale on deploy.
+var immutableAssetExts = map[string]struct{}{
+	".avif":  {},
+	".css":   {},
+	".gif":   {},
+	".ico":   {},
+	".jpeg":  {},
+	".jpg":   {},
+	".js":    {},
+	".json":  {},
+	".mjs":   {},
+	".otf":   {},
+	".png":   {},
+	".svg":   {},
+	".ttf":   {},
+	".webp":  {},
+	".woff":  {},
+	".woff2": {},
+}
 
 func CacheHeaders(
 	w http.ResponseWriter,
@@ -88,20 +121,30 @@ func parseAndSortQuery(rawQuery string) string {
 }
 
 func setCacheControlHeaders(w http.ResponseWriter, r *http.Request) {
+	isFingerprinted := r.URL.Query().Get(constants.QueryParamAssetVersion) != ""
+
 	switch {
-	case strings.Contains(r.URL.Path, "/static/"):
-		w.Header().Set("Cache-Control", "public, max-age=86400") // 1 day
-	case strings.HasPrefix(r.URL.Path, "js/") && strings.HasSuffix(r.URL.Path, ".js"):
-		w.Header().Set("Cache-Control", "public, max-age=604800") // 7 day
+	case isFingerprinted && isImmutableAsset(r.URL.Path):
+		// The fingerprint changes whenever the file does, so the response never
+		// needs to be revalidated.
+		w.Header().Set("Cache-Control", cacheControlImmutable)
+	case isImmutableAsset(r.URL.Path):
+		w.Header().Set("Cache-Control", cacheControlLongLived)
 	case r.URL.Path == "robots.txt":
 		w.Header().Set("Cache-Control", "public, max-age=604800") // 1 week
 	default:
 		w.Header().Set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400") // 1 hour, stale 1 day
 	}
 
-	if r.URL.RawQuery != "" {
-		w.Header().Set("Vary", "Accept, Accept-Encoding")
-	}
+	w.Header().Set("Vary", "Accept-Encoding")
+}
+
+// isImmutableAsset reports whether name points at a build artifact whose
+// contents are replaced rather than edited in place, which makes it safe to
+// cache for a long time.
+func isImmutableAsset(name string) bool {
+	_, ok := immutableAssetExts[strings.ToLower(path.Ext(name))]
+	return ok
 }
 
 // SetNoCacheHeaders sets headers to prevent caching of error responses

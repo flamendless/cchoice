@@ -1,10 +1,13 @@
 package utils
 
 import (
-	"cchoice/internal/conf"
 	"fmt"
 	"net/url"
 	"strings"
+
+	"cchoice/internal/assets"
+	"cchoice/internal/conf"
+	"cchoice/internal/constants"
 )
 
 func FullURL(path string) string {
@@ -46,6 +49,18 @@ func URL(path string) string {
 		return path
 	}
 	return "/cchoice" + path
+}
+
+// StaticURL builds a URL for a file under /static with a fingerprint of its
+// contents attached, which lets the response be cached immutably while still
+// being replaced as soon as the file changes.
+func StaticURL(path string) string {
+	return fmt.Sprintf(
+		"%s?%s=%s",
+		URL(path),
+		constants.QueryParamAssetVersion,
+		assets.Version(path),
+	)
 }
 
 func URLf(path string, args ...any) string {

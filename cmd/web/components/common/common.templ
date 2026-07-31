@@ -47,37 +47,41 @@ templ HeadMetaWithTheme(themeCSS string) {
 }
 
 templ HeadMetaBase() {
+	<meta charset="UTF-8"/>
 	<base href="/"/>
-	<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 	<meta name="google" content="nositelinkssearchbox"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-	<!--<link rel="dns-prefetch" href="https://images1.primary.com"/>-->
-	<link rel="preload" href={ constants.PathSVGLogoWithCompleteText } as="image" type="image/svg+xml"/>
+	<link rel="preconnect" href={ constants.OriginImageCDN } crossorigin/>
+	<link rel="dns-prefetch" href={ constants.OriginImageCDN }/>
+	// Both header logos are always in the markup and revealed by breakpoint, so
+	// preload only the one the current viewport will actually paint.
 	<link
 		rel="preload"
-		href={ constants.PathEmptyImageCDN }
+		href={ utils.LogoWithTextURL() }
 		as="image"
-		type="image/png"
+		media={ constants.MediaQueryDesktop }
+		fetchpriority="high"
 	/>
 	<link
 		rel="preload"
-		href={ constants.PathStoreImageCDN }
+		href={ utils.LogoOnlyURL() }
 		as="image"
+		media={ constants.MediaQueryMobile }
+		fetchpriority="high"
 	/>
-	<!--
-		TODO: (Brandon) - preload product images here
-		<link rel="preload" href={ utils.URL("/static/images/product_images/bosch/") } as="image" type="image/png"/>
-	-->
-	<meta charset="UTF-8"/>
+	<link rel="preload" href={ constants.PathEmptyImageCDN } as="image"/>
 	@onceHeadLinks.Once() {
-		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ utils.URL("/static/images/favicons/favicon.ico") }/>
+		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ utils.StaticURL("/static/images/favicons/favicon.ico") }/>
 		for _, size := range faviconsizes {
-			<link rel="icon" type="image/png" sizes={ size } href={ fmt.Sprintf("https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/favicons-%s/public", size) }/>
+			<link rel="icon" type="image/png" sizes={ size } href={ fmt.Sprintf("%s/favicons-%s/public", constants.PathImageCDNBase, size) }/>
 		}
-		<link href={ utils.URL("/static/css/tailwind.css") } rel="stylesheet"/>
-		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/htmx.min.js")) }></script>
-		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/hyperscript.min.js")) }></script>
-		<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/metrics.js")) }></script>
+		<link href={ utils.StaticURL("/static/css/tailwind.css") } rel="stylesheet"/>
+		// Deferred scripts run in document order, so metrics.js must come before
+		// hyperscript, which evaluates `init` features — some of which call
+		// metrics_event — as soon as it executes.
+		<script defer type="text/javascript" src={ templ.URL(utils.StaticURL("/static/js/htmx.min.js")) }></script>
+		<script defer type="text/javascript" src={ templ.URL(utils.StaticURL("/static/js/metrics.js")) }></script>
+		<script defer type="text/javascript" src={ templ.URL(utils.StaticURL("/static/js/hyperscript.min.js")) }></script>
 		@ScrAdSense()
 		@templ.JSONScript("url-prefix", utils.URL(""))
 		<script>

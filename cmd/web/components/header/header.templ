@@ -14,12 +14,18 @@ const clsHeaderIconButton = "w-full stroke-primary group-hover:stroke-white"
 templ headerLogo(platform string) {
 	@logoStyleOnce.Once() {
 		<style>
+			/*
+			 * The height is fixed rather than capped so that, combined with the
+			 * width/height attributes below, the browser can reserve the logo's
+			 * box before the image is decoded.
+			 */
 			.logo-responsive {
-				max-height: 48px;
+				height: 48px;
+				width: auto;
 			}
 			@media (min-width: 1024px) {
 				.logo-responsive {
-					max-height: 128px;
+					height: 128px;
 				}
 			}
 		</style>
@@ -32,19 +38,28 @@ templ headerLogo(platform string) {
 			lg:-mt-8 lg:-mb-4 lg:ml-4
 		"
 	>
+		// Both variants are always rendered and one is hidden by breakpoint, so
+		// keep them lazy to avoid downloading the hidden one. The matching variant
+		// is preloaded in the head, so the visible logo still paints immediately.
 		if platform == "desktop" {
 			<img
-				src={ constants.PathSVGLogoWithCompleteText }
+				src={ utils.LogoWithTextURL() }
 				alt="primary logo and text"
 				class="object-contain logo-responsive"
+				width={ constants.LogoWithTextWidth }
+				height={ constants.LogoWithTextHeight }
 				loading="lazy"
+				decoding="async"
 			/>
 		} else {
 			<img
-				src={ constants.PathSVGLogoOnly }
+				src={ utils.LogoOnlyURL() }
 				alt="primary logo"
 				class="object-contain logo-responsive"
+				width={ constants.LogoOnlyWidth }
+				height={ constants.LogoOnlyHeight }
 				loading="lazy"
+				decoding="async"
 			/>
 		}
 	</a>

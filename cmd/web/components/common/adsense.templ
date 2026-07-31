@@ -1,5 +1,40 @@
 package common
 
+const urlAdSense = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904940380415570"
+
+script scheduleAdSense(src string) {
+	function request() {
+		if (globalThis.__adSenseRequested) {
+			return;
+		}
+		globalThis.__adSenseRequested = true;
+
+		const script = document.createElement("script");
+		script.async = true;
+		script.crossOrigin = "anonymous";
+		script.src = src;
+		document.head.appendChild(script);
+	}
+
+	function schedule() {
+		if (typeof requestIdleCallback === "function") {
+			requestIdleCallback(request, { timeout: 5000 });
+			return;
+		}
+		setTimeout(request, 2000);
+	}
+
+	if (document.readyState === "complete") {
+		schedule();
+	} else {
+		addEventListener("load", schedule, { once: true });
+	}
+}
+
+// ScrAdSense pulls in AdSense once the page has finished loading and the main
+// thread is idle. Requesting it from the head costs ~220KiB of transfer plus
+// main-thread time while the page is still painting.
 templ ScrAdSense() {
-	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904940380415570" crossorigin="anonymous"></script>
+	<link rel="dns-prefetch" href="https://pagead2.googlesyndication.com"/>
+	@scheduleAdSense(urlAdSense)
 }

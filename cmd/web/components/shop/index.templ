@@ -197,6 +197,16 @@ script PrefetchProductImage() {
 }
 
 script PrefetchSaleProductImages() {
+	// Full-size images are only speculatively fetched when there is bandwidth to
+	// spare: on a metered or slow connection they compete with the images the
+	// visitor is actually looking at.
+	const connection = navigator.connection;
+	if (connection) {
+		if (connection.saveData) return;
+		const slow = ["slow-2g", "2g", "3g"];
+		if (slow.includes(connection.effectiveType)) return;
+	}
+
 	const prefetched = new Set();
 
 	function runPrefetch(root) {
@@ -214,8 +224,16 @@ script PrefetchSaleProductImages() {
 		});
 	}
 
-	runPrefetch(document);
+	function schedule(root) {
+		if (typeof requestIdleCallback === "function") {
+			requestIdleCallback(() => runPrefetch(root), { timeout: 5000 });
+			return;
+		}
+		setTimeout(() => runPrefetch(root), 1000);
+	}
+
+	schedule(document);
 	document.body.addEventListener("htmx:afterSwap", function(evt) {
-		runPrefetch(evt.target);
+		schedule(evt.target);
 	});
 }

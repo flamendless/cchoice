@@ -217,23 +217,33 @@ templ StaffLocationStatus(profile models.AdminStaffProfile) {
 		(function () {
 			if (!navigator.geolocation) return;
 
-			navigator.geolocation.getCurrentPosition(
-				function (pos) {
-					var el = document.getElementById("staff-location-status");
-					if (!el) return;
+			// htmx is deferred, so wait for it before requesting a fix: the
+			// success callback triggers an htmx event.
+			if (document.readyState === "loading") {
+				document.addEventListener("DOMContentLoaded", requestLocation, { once: true });
+			} else {
+				requestLocation();
+			}
 
-					el.setAttribute("hx-vals", JSON.stringify({
-						lat: pos.coords.latitude,
-						lng: pos.coords.longitude
-					}));
+			function requestLocation() {
+				navigator.geolocation.getCurrentPosition(
+					function (pos) {
+						var el = document.getElementById("staff-location-status");
+						if (!el) return;
 
-					htmx.trigger(el, "location-ready");
-				},
-				function () {
-					console.warn("Unable to retrieve location");
-				},
-				{ enableHighAccuracy: true, timeout: 15000 }
-			);
+						el.setAttribute("hx-vals", JSON.stringify({
+							lat: pos.coords.latitude,
+							lng: pos.coords.longitude
+						}));
+
+						htmx.trigger(el, "location-ready");
+					},
+					function () {
+						console.warn("Unable to retrieve location");
+					},
+					{ enableHighAccuracy: true, timeout: 15000 }
+				);
+			}
 		})();
 	</script>
 }

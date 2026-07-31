@@ -8,6 +8,46 @@ package common
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+const urlAdSense = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904940380415570"
+
+func scheduleAdSense(src string) templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_scheduleAdSense_bf9c`,
+		Function: `function __templ_scheduleAdSense_bf9c(src){function request() {
+		if (globalThis.__adSenseRequested) {
+			return;
+		}
+		globalThis.__adSenseRequested = true;
+
+		const script = document.createElement("script");
+		script.async = true;
+		script.crossOrigin = "anonymous";
+		script.src = src;
+		document.head.appendChild(script);
+	}
+
+	function schedule() {
+		if (typeof requestIdleCallback === "function") {
+			requestIdleCallback(request, { timeout: 5000 });
+			return;
+		}
+		setTimeout(request, 2000);
+	}
+
+	if (document.readyState === "complete") {
+		schedule();
+	} else {
+		addEventListener("load", schedule, { once: true });
+	}
+}`,
+		Call:       templ.SafeScript(`__templ_scheduleAdSense_bf9c`, src),
+		CallInline: templ.SafeScriptInline(`__templ_scheduleAdSense_bf9c`, src),
+	}
+}
+
+// ScrAdSense pulls in AdSense once the page has finished loading and the main
+// thread is idle. Requesting it from the head costs ~220KiB of transfer plus
+// main-thread time while the page is still painting.
 func ScrAdSense() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -29,7 +69,11 @@ func ScrAdSense() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<script async src=\"https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904940380415570\" crossorigin=\"anonymous\"></script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<link rel=\"dns-prefetch\" href=\"https://pagead2.googlesyndication.com\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = scheduleAdSense(urlAdSense).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

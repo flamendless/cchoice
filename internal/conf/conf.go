@@ -153,6 +153,11 @@ type CloudflareImagesConfig struct {
 	AccountHash string `env:"CLOUDFLARE_ACCOUNT_HASH"`
 	APIToken    string `env:"CLOUDFLARE_IMAGES_API_TOKEN"`
 	Variant     string `env:"CLOUDFLARE_IMAGES_VARIANT" env-default:"public"`
+
+	// FlexibleVariants must match the "Flexible variants" setting of the
+	// Cloudflare Images account. When it is off, delivery URLs may only use
+	// named variants and any resize transform is rejected with HTTP 403.
+	FlexibleVariants bool `env:"CLOUDFLARE_IMAGES_FLEXIBLE_VARIANTS" env-default:"false"`
 }
 
 func (lc *LinodeConfig) GetBuckets() map[enums.LinodeBucketEnum]LinodeBucketConfig {

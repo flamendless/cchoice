@@ -1,6 +1,9 @@
 package shop
 
+import "fmt"
+
 import "cchoice/cmd/web/models"
+import "cchoice/internal/constants"
 import "cchoice/internal/utils"
 import "cchoice/cmd/web/components/common"
 
@@ -15,15 +18,6 @@ templ SaleBanner(product models.RandomSaleProduct) {
 				hidden
 			"
 		_="
-				init
-					if sessionStorage.getItem('saleBannerShown') !== 'true' then
-						remove .hidden from me
-						sessionStorage.setItem('saleBannerShown', 'true')
-					end
-
-					set #promo-product-id.value to my @data-product-id
-				end
-
 				on click
 					if target is not #sale-banner-content then
 						add .hidden to #sale-banner
@@ -33,7 +27,7 @@ templ SaleBanner(product models.RandomSaleProduct) {
 	>
 		<a
 			id="sale-banner-content"
-			href={ utils.URL("/product/"+product.Slug) }
+			href={ utils.URL("/product/" + product.Slug) }
 			data-promo-product-id={ product.ProductID }
 			class="
 				relative w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto
@@ -47,10 +41,16 @@ templ SaleBanner(product models.RandomSaleProduct) {
 		>
 			<!-- Product Image -->
 			<img
-				src={ product.CDNURL1280 }
+				src={ product.CDNURL }
+				srcset={ fmt.Sprintf("%s 640w, %s 1280w", product.CDNURL, product.CDNURL1280) }
+				sizes={ constants.SizesSaleBannerImage }
 				alt={ product.Name }
 				class="w-full h-64 object-cover"
-				loading="lazy"
+				width="448"
+				height="256"
+				loading="eager"
+				fetchpriority="high"
+				decoding="async"
 			/>
 			<!-- Product Info -->
 			<div class="p-6 bg-gradient-to-r from-surface to-white">
@@ -110,4 +110,33 @@ templ SaleBanner(product models.RandomSaleProduct) {
 			</button>
 		</a>
 	</div>
+	@revealSaleBanner()
+}
+
+// revealSaleBanner runs inline, immediately after the banner markup, instead of
+// from a hyperscript `init` feature. The banner starts hidden, so waiting for
+// hyperscript to download would stop the browser from fetching the banner image
+// until well after the document is parsed.
+
+script revealSaleBanner() {
+	const banner = document.getElementById("sale-banner");
+	if (!banner) {
+		return;
+	}
+
+	const productID = document.getElementById("promo-product-id");
+	if (productID) {
+		productID.value = banner.dataset.productId;
+	}
+
+	try {
+		if (sessionStorage.getItem("saleBannerShown") === "true") {
+			return;
+		}
+		sessionStorage.setItem("saleBannerShown", "true");
+	} catch (_) {
+		// Private browsing modes can reject sessionStorage; show the banner.
+	}
+
+	banner.classList.remove("hidden");
 }

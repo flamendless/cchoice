@@ -188,42 +188,44 @@ func TestSetCacheControlHeaders(t *testing.T) {
 		path                 string
 		query                string
 		expectedCacheControl string
-		expectVary           bool
 	}{
 		{
-			name:                 "static file path",
-			path:                 "/static/images/logo.png",
+			name:                 "image without fingerprint",
+			path:                 "images/logo.png",
 			query:                "",
-			expectedCacheControl: "public, max-age=86400",
-			expectVary:           false,
+			expectedCacheControl: cacheControlLongLived,
 		},
 		{
-			name:                 "non-static path",
-			path:                 "/api/products",
+			name:                 "fingerprinted stylesheet",
+			path:                 "css/tailwind.css",
+			query:                "v=abc123",
+			expectedCacheControl: cacheControlImmutable,
+		},
+		{
+			name:                 "fingerprinted script",
+			path:                 "js/htmx.min.js",
+			query:                "v=abc123",
+			expectedCacheControl: cacheControlImmutable,
+		},
+		{
+			name:                 "fingerprint on a non-asset path is ignored",
+			path:                 "robots.txt",
+			query:                "v=abc123",
+			expectedCacheControl: "public, max-age=604800",
+		},
+		{
+			name:                 "unknown extension",
+			path:                 "downloads/catalog.pdf",
 			query:                "",
 			expectedCacheControl: "public, max-age=3600, stale-while-revalidate=86400",
-			expectVary:           false,
-		},
-		{
-			name:                 "static path with query",
-			path:                 "/static/images/photo.jpg",
-			query:                "width=100",
-			expectedCacheControl: "public, max-age=86400",
-			expectVary:           true,
-		},
-		{
-			name:                 "non-static path with query",
-			path:                 "/home",
-			query:                "page=2",
-			expectedCacheControl: "public, max-age=3600, stale-while-revalidate=86400",
-			expectVary:           true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodGet, tt.path+"?"+tt.query, nil)
+			req := httptest.NewRequest(http.MethodGet, "/"+tt.path+"?"+tt.query, nil)
+			req.URL.Path = tt.path
 
 			setCacheControlHeaders(w, req)
 
@@ -232,14 +234,8 @@ func TestSetCacheControlHeaders(t *testing.T) {
 				t.Errorf("setCacheControlHeaders() Cache-Control = %q, want %q", cacheControl, tt.expectedCacheControl)
 			}
 
-			vary := w.Header().Get("Vary")
-			hasVary := vary != ""
-			if hasVary != tt.expectVary {
-				t.Errorf("setCacheControlHeaders() Vary header presence = %v, want %v", hasVary, tt.expectVary)
-			}
-
-			if tt.expectVary && vary != "Accept, Accept-Encoding" {
-				t.Errorf("setCacheControlHeaders() Vary = %q, want %q", vary, "Accept, Accept-Encoding")
+			if vary := w.Header().Get("Vary"); vary != "Accept-Encoding" {
+				t.Errorf("setCacheControlHeaders() Vary = %q, want %q", vary, "Accept-Encoding")
 			}
 		})
 	}
@@ -412,10 +408,9 @@ func TestCacheHeaders(t *testing.T) {
 			t.Errorf("CacheHeaders() cached = %v, want false", cached)
 		}
 
-		// Verify Vary header is set for requests with query params
 		vary := w.Header().Get("Vary")
-		if vary != "Accept, Accept-Encoding" {
-			t.Errorf("CacheHeaders() Vary = %q, want %q", vary, "Accept, Accept-Encoding")
+		if vary != "Accept-Encoding" {
+			t.Errorf("CacheHeaders() Vary = %q, want %q", vary, "Accept-Encoding")
 		}
 
 		file.Close()

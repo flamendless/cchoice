@@ -9,6 +9,10 @@ const (
 	PHP                  = "PHP"
 	PHMobilePrefix       = "+63"
 	PrefixHTTPS          = "https://"
+
+	// QueryParamAssetVersion carries the static asset fingerprint. Requests
+	// that include it are served with an immutable cache policy.
+	QueryParamAssetVersion = "v"
 )
 
 var CDNExcludePrefixKey = []string{

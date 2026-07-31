@@ -14,7 +14,7 @@ var scrPromoLinks = templ.NewOnceHandle()
 
 templ ScrPromoLinks() {
 	@scrPromoLinks.Once() {
-		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/promo_links.js")) }>
+		<script defer type="text/javascript" src={ templ.URL(utils.StaticURL("/static/js/promo_links.js")) }>
 		</script>
 	}
 }
