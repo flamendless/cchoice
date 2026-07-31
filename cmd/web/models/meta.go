@@ -88,3 +88,39 @@ func CategoryPageSEO(categorySlug, subcategorySlug string) SiteSEO {
 		StructuredData: meta.StructuredData,
 	}
 }
+
+func BrandsListingPageSEO() SiteSEO {
+	meta := seo.GenerateBrandsListingMeta()
+	return SiteSEO{
+		Title:          meta.Title,
+		Description:    meta.Description,
+		CanonicalURL:   meta.CanonicalURL,
+		Robots:         meta.Robots,
+		Keywords:       meta.Keywords,
+		OGTitle:        meta.Title,
+		OGDescription:  meta.Description,
+		OGType:         meta.OGType,
+		OGURL:          meta.CanonicalURL,
+		OGImage:        meta.OGImage,
+		TwitterCard:    meta.TwitterCard,
+		StructuredData: meta.StructuredData,
+	}
+}
+
+func BrandPageSEO(brandSlug, brandName string) SiteSEO {
+	meta := seo.GenerateBrandMeta(brandSlug, brandName)
+	return SiteSEO{
+		Title:          meta.Title,
+		Description:    meta.Description,
+		CanonicalURL:   meta.CanonicalURL,
+		Robots:         meta.Robots,
+		Keywords:       meta.Keywords,
+		OGTitle:        meta.Title,
+		OGDescription:  meta.Description,
+		OGType:         meta.OGType,
+		OGURL:          meta.CanonicalURL,
+		OGImage:        meta.OGImage,
+		TwitterCard:    meta.TwitterCard,
+		StructuredData: meta.StructuredData,
+	}
+}

@@ -1,0 +1,149 @@
+package shop
+
+import (
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/footer"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/utils"
+	"fmt"
+)
+
+templ BrandsListingPage(data models.BrandsListingPageData) {
+	<!DOCTYPE html>
+	<html lang="en" style="overflow-x: clip;">
+		<head>
+			@common.HeadMetaBase()
+			if data.ThemeCSS != "" {
+				@common.ThemeStyle(data.ThemeCSS)
+			}
+			@common.HeadSEO(data.SEO)
+			<title>{ data.SEO.Title }</title>
+		</head>
+		@BrandsListingPageBody(data)
+	</html>
+}
+
+templ BrandsListingPageBody(data models.BrandsListingPageData) {
+	<body class="m-0 p-0 custom-scrollbar" style="overflow-x: clip;" _="init call metrics_event('anon_visit', 'brands_list')">
+		@common.DevRibbon()
+		@common.ErrorBanner()
+		@common.SuccessBanner()
+		@header.Header()
+		@MobileSidebar()
+		<style>
+			#sidebar-content-wrapper {
+				display: flex;
+				align-items: flex-start;
+				width: 100%;
+			}
+			#desktop-sidebar {
+				position: sticky;
+				top: 80px;
+				left: 0;
+				z-index: 45;
+				width: 15%;
+				height: calc(100vh - 80px);
+				overflow-y: auto;
+				padding: 0.5rem 1rem 0 0.25rem;
+				background: white;
+				flex-shrink: 0;
+			}
+			#main-content {
+				display: flex;
+				align-items: flex-start;
+				width: 85%;
+				border-left: 2px solid var(--color-primary-muted);
+			}
+			@media (max-width: 1023px) {
+				#desktop-sidebar {
+					display: none !important;
+				}
+				#main-content {
+					width: 100% !important;
+					border-left: none !important;
+				}
+				#sidebar-content-wrapper {
+					width: 100% !important;
+				}
+			}
+		</style>
+		<div id="sidebar-content-wrapper">
+			<div id="desktop-sidebar">
+				@BrandsSidePanel()
+				@CategoriesSidePanel()
+			</div>
+			<div id="main-content" name="right-panel">
+				<div class="w-full">
+					<div class="px-2 py-3">
+						@BrandsListingBreadcrumbs()
+						<h1 class="text-lg font-semibold text-primary-dark mt-2">Brands</h1>
+					</div>
+					@common.HR()
+					@BrandsListingGrid(data.Brands)
+				</div>
+			</div>
+		</div>
+		@footer.Footer()
+	</body>
+}
+
+templ BrandsListingBreadcrumbs() {
+	<nav class="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+		<a href={ utils.URL("/") } class="hover:text-primary transition-colors">Home</a>
+		<span class="text-gray-400">/</span>
+		<span class="text-gray-800 font-medium">Brands</span>
+	</nav>
+}
+
+templ BrandsListingGrid(brands []models.BrandListingCard) {
+	<div class="flex flex-row flex-wrap px-2 py-4 gap-2">
+		for _, brand := range brands {
+			if brand.ComingSoon {
+				<div
+					class="group flex flex-col items-center m-1 sm:m-2 p-3 rounded-lg border border-gray-200 bg-gray-50 opacity-75 w-28 sm:w-32"
+				>
+					<div class="relative inline-block">
+						if brand.LogoURL != "" {
+							<img
+								src={ brand.LogoURL }
+								class="w-20 max-w-20 h-20 sm:w-24 sm:max-w-24 sm:h-24 object-contain grayscale"
+								alt={ brand.Name + " logo" }
+								loading="lazy"
+							/>
+						}
+						<div
+							class="absolute w-full bottom-0 mb-1 bg-black/50 text-white text-xs font-semibold tracking-wide py-1 text-center"
+						>
+							Coming Soon
+						</div>
+					</div>
+					<p class="text-xs font-normal text-gray-500 text-center mt-2 text-ellipsis overflow-hidden w-full">
+						{ brand.Name }
+					</p>
+					<p class="text-xs font-light text-gray-400">0 products</p>
+				</div>
+			} else {
+				<a
+					href={ templ.SafeURL(brand.PageURL) }
+					class="group flex flex-col items-center m-1 sm:m-2 p-3 rounded-lg border border-primary-muted hover:bg-surface transition-colors cursor-pointer w-28 sm:w-32"
+				>
+					if brand.LogoURL != "" {
+						<img
+							src={ brand.LogoURL }
+							class="w-20 max-w-20 h-20 sm:w-24 sm:max-w-24 sm:h-24 object-contain"
+							alt={ brand.Name + " logo" }
+							loading="lazy"
+						/>
+					}
+					<p class="text-xs font-normal text-primary-dark text-center mt-2 text-ellipsis overflow-hidden w-full group-hover:font-bold transition-colors">
+						{ brand.Name }
+					</p>
+					<p class="text-xs font-light text-gray-600">
+						{ fmt.Sprintf("%d products", brand.ProductCount) }
+					</p>
+				</a>
+			}
+		}
+	</div>
+}

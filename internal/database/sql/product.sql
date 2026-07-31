@@ -736,6 +736,7 @@ SELECT
 	tbl_products.updated_at,
 	tbl_brands.id AS brand_id,
 	tbl_brands.name AS brand_name,
+	tbl_brands.slug AS brand_slug,
 	tbl_brand_images.path AS brand_thumbnail_path,
 	tbl_brand_images.s3_url AS brand_thumbnail_url,
 	COALESCE(pc.category, '') AS product_category,

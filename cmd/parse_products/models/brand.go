@@ -3,6 +3,7 @@ package models
 import (
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
+	"cchoice/internal/utils"
 	"context"
 	"database/sql"
 	"time"
@@ -41,7 +42,10 @@ func (brand *Brand) GetDBID(ctx context.Context, db database.IService) int64 {
 }
 
 func (brand *Brand) InsertToDB(ctx context.Context, db database.IService) (int64, error) {
-	newBrandID, err := db.GetQueries().CreateBrands(ctx, brand.Name)
+	newBrandID, err := db.GetQueries().CreateBrands(ctx, queries.CreateBrandsParams{
+		Name: brand.Name,
+		Slug: sql.NullString{String: utils.BrandSlug(brand.Name), Valid: true},
+	})
 	if err != nil {
 		return 0, err
 	}

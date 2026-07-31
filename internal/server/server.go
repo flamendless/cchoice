@@ -41,6 +41,7 @@ import (
 type Services struct {
 	attendance        *services.AttendanceService
 	brand             *services.BrandService
+	brandPage         *services.BrandPageService
 	cpoint            *services.CPointService
 	cpointToken       *services.CPointTokenService
 	customer          *services.CustomerService
@@ -205,6 +206,7 @@ func NewServer() *ServerInstance {
 	newServer.services = Services{
 		attendance:        attendanceService,
 		brand:             services.NewBrandService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
+		brandPage:         services.NewBrandPageService(newServer.encoder, newServer.dbRO),
 		customer:          services.NewCustomerService(newServer.encoder, newServer.dbRO, newServer.dbRW),
 		customerOTP:       services.NewCustomerOTPService(newServer.encoder, newServer.dbRO, newServer.dbRW, mailService, emailJobRunner),
 		export:            exportService,
@@ -234,6 +236,7 @@ func NewServer() *ServerInstance {
 	newServer.services.all = []services.IService{
 		newServer.services.attendance,
 		newServer.services.brand,
+		newServer.services.brandPage,
 		newServer.services.cpoint,
 		newServer.services.cpointToken,
 		newServer.services.customer,

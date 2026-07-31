@@ -9,4 +9,6 @@ const (
 	DefaultLimitSearchResultsPage      = 24
 	MaxSearchShowResults               = 6
 	MinSearchQueryLength               = 3
+	DefaultBrandPagePriorityRowLimit   = 8
+	DefaultBrandPageProductsLimit      = 256
 )

@@ -38,3 +38,7 @@ func ProductSlug(
 
 	return slug.Make(s)
 }
+
+func BrandSlug(name string) string {
+	return slug.Make(strings.TrimSpace(name))
+}

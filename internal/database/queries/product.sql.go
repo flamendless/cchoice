@@ -816,6 +816,7 @@ SELECT
 	tbl_products.updated_at,
 	tbl_brands.id AS brand_id,
 	tbl_brands.name AS brand_name,
+	tbl_brands.slug AS brand_slug,
 	tbl_brand_images.path AS brand_thumbnail_path,
 	tbl_brand_images.s3_url AS brand_thumbnail_url,
 	COALESCE(pc.category, '') AS product_category,
@@ -890,6 +891,7 @@ type GetProductPageRow struct {
 	UpdatedAt                   time.Time
 	BrandID                     int64
 	BrandName                   string
+	BrandSlug                   sql.NullString
 	BrandThumbnailPath          string
 	BrandThumbnailUrl           sql.NullString
 	ProductCategory             string
@@ -933,6 +935,7 @@ func (q *Queries) GetProductPage(ctx context.Context, slug sql.NullString) (GetP
 		&i.UpdatedAt,
 		&i.BrandID,
 		&i.BrandName,
+		&i.BrandSlug,
 		&i.BrandThumbnailPath,
 		&i.BrandThumbnailUrl,
 		&i.ProductCategory,
@@ -979,7 +982,7 @@ func (q *Queries) GetProductSlugByID(ctx context.Context, id int64) (GetProductS
 
 const getProducts = `-- name: GetProducts :many
 SELECT
-	tbl_products.id, serial, tbl_products.name, description, brand_id, tbl_products.status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, slug, tbl_products_categories.id, category_id, product_id, tbl_products_categories.created_at, tbl_products_categories.updated_at, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_product_specs.created_at, tbl_product_specs.updated_at, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
+	tbl_products.id, serial, tbl_products.name, description, brand_id, tbl_products.status, product_specs_id, unit_price_without_vat, unit_price_with_vat, unit_price_without_vat_currency, unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, tbl_products.slug, tbl_products_categories.id, category_id, product_id, tbl_products_categories.created_at, tbl_products_categories.updated_at, tbl_product_specs.id, colours, sizes, segmentation, part_number, power, capacity, scope_of_supply, weight_unit, weight, tbl_product_specs.created_at, tbl_product_specs.updated_at, tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status, tbl_brands.slug,
 	tbl_brands.name AS brand_name
 FROM tbl_products
 INNER JOIN tbl_products_categories ON tbl_products.id = tbl_products_categories.product_id
@@ -1027,6 +1030,7 @@ type GetProductsRow struct {
 	UpdatedAt_4                 time.Time
 	DeletedAt_2                 time.Time
 	Status_2                    string
+	Slug_2                      sql.NullString
 	BrandName                   string
 }
 
@@ -1078,6 +1082,7 @@ func (q *Queries) GetProducts(ctx context.Context) ([]GetProductsRow, error) {
 			&i.UpdatedAt_4,
 			&i.DeletedAt_2,
 			&i.Status_2,
+			&i.Slug_2,
 			&i.BrandName,
 		); err != nil {
 			return nil, err
@@ -1412,7 +1417,7 @@ const getProductsBySerial = `-- name: GetProductsBySerial :one
 SELECT
 	tbl_products.id, tbl_products.serial, tbl_products.name, tbl_products.description, tbl_products.brand_id, tbl_products.status, tbl_products.product_specs_id, tbl_products.unit_price_without_vat, tbl_products.unit_price_with_vat, tbl_products.unit_price_without_vat_currency, tbl_products.unit_price_with_vat_currency, tbl_products.created_at, tbl_products.updated_at, tbl_products.deleted_at, tbl_products.slug,
 	tbl_product_specs.id, tbl_product_specs.colours, tbl_product_specs.sizes, tbl_product_specs.segmentation, tbl_product_specs.part_number, tbl_product_specs.power, tbl_product_specs.capacity, tbl_product_specs.scope_of_supply, tbl_product_specs.weight_unit, tbl_product_specs.weight, tbl_product_specs.created_at, tbl_product_specs.updated_at,
-	tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
+	tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status, tbl_brands.slug,
 	tbl_brands.name AS brand_name,
 	pc.id,
 	pc.category,
@@ -1461,6 +1466,7 @@ type GetProductsBySerialRow struct {
 	UpdatedAt_3                 time.Time
 	DeletedAt_2                 time.Time
 	Status_2                    string
+	Slug_2                      sql.NullString
 	BrandName                   string
 	ID_4                        sql.NullInt64
 	Category                    sql.NullString
@@ -1505,6 +1511,7 @@ func (q *Queries) GetProductsBySerial(ctx context.Context, serial string) (GetPr
 		&i.UpdatedAt_3,
 		&i.DeletedAt_2,
 		&i.Status_2,
+		&i.Slug_2,
 		&i.BrandName,
 		&i.ID_4,
 		&i.Category,

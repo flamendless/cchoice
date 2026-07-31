@@ -897,6 +897,7 @@ func (s *ProductService) GetForPage(ctx context.Context, slug string) (*models.P
 		Name:                       row.Name,
 		Description:                row.Description.String,
 		BrandID:                    s.encoder.Encode(row.BrandID),
+		BrandSlug:                  resolveProductBrandSlug(row.BrandSlug, row.BrandName),
 		BrandName:                  row.BrandName,
 		BrandThumbnail:             row.BrandThumbnailUrl.String,
 		ProductCategory:            row.ProductCategory,
@@ -996,6 +997,13 @@ func (s *ProductService) GetAllSubcategoryNames(ctx context.Context) ([]string, 
 		}
 	}
 	return names, nil
+}
+
+func resolveProductBrandSlug(brandSlug sql.NullString, brandName string) string {
+	if brandSlug.Valid && brandSlug.String != "" {
+		return brandSlug.String
+	}
+	return utils.BrandSlug(brandName)
 }
 
 func (s *ProductService) ID() string {

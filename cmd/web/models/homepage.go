@@ -75,6 +75,7 @@ type ProductPageData struct {
 	Name                       string
 	Description                string
 	BrandID                    string
+	BrandSlug                  string
 	BrandName                  string
 	BrandThumbnail             string
 	ProductCategory            string

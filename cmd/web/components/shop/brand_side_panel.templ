@@ -36,7 +36,7 @@ templ BrandsSidePanelList(selectedBrandLabel string, brands []models.BrandSidePa
 				text-xs font-light ml-2 my-0.5 py-0.5
 			"
 		>
-			More coming soon...
+			<a href={ utils.URL("/brands/") } class="hover:underline hover:text-primary">View all brands</a>
 		</p>
 		<!-- <script type="text/javascript" src={ templ.URL(utils.URL("/static/js/brand_side_panel.js")) }></script> -->
 	</div>

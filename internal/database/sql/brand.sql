@@ -50,10 +50,11 @@ LIMIT ?;
 -- name: CreateBrands :one
 INSERT INTO tbl_brands (
 	name,
+	slug,
 	created_at,
 	updated_at
 ) VALUES (
-	?,
+	?, ?,
 	DATETIME('now'),
 	DATETIME('now')
 ) RETURNING id;
@@ -76,11 +77,21 @@ INSERT INTO tbl_brand_images (
 SELECT
 	id,
 	name,
+	slug,
 	status
 FROM tbl_brands
 WHERE status = 'ACTIVE'
 ORDER BY name ASC
 LIMIT ?;
+
+-- name: UpdateBrandSlug :exec
+UPDATE tbl_brands
+SET
+	slug = ?,
+	updated_at = DATETIME('now')
+WHERE
+	id = ?
+	AND deleted_at = '1970-01-01 00:00:00+00:00';
 
 -- name: GetBrandsForProductCreate :many
 SELECT
@@ -141,6 +152,7 @@ ORDER BY tbl_brands.status ASC;
 UPDATE tbl_brands
 SET
 	name = ?,
+	slug = ?,
 	updated_at = DATETIME('now')
 WHERE
 	id = ?

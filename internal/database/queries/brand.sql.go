@@ -48,17 +48,23 @@ func (q *Queries) CreateBrandImages(ctx context.Context, arg CreateBrandImagesPa
 const createBrands = `-- name: CreateBrands :one
 INSERT INTO tbl_brands (
 	name,
+	slug,
 	created_at,
 	updated_at
 ) VALUES (
-	?,
+	?, ?,
 	DATETIME('now'),
 	DATETIME('now')
 ) RETURNING id
 `
 
-func (q *Queries) CreateBrands(ctx context.Context, name string) (int64, error) {
-	row := q.db.QueryRowContext(ctx, createBrands, name)
+type CreateBrandsParams struct {
+	Name string
+	Slug sql.NullString
+}
+
+func (q *Queries) CreateBrands(ctx context.Context, arg CreateBrandsParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createBrands, arg.Name, arg.Slug)
 	var id int64
 	err := row.Scan(&id)
 	return id, err
@@ -181,7 +187,7 @@ func (q *Queries) GetBrandImageS3URLByPath(ctx context.Context, path string) (sq
 
 const getBrandsByID = `-- name: GetBrandsByID :one
 SELECT
-	tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status,
+	tbl_brands.id, tbl_brands.name, tbl_brands.created_at, tbl_brands.updated_at, tbl_brands.deleted_at, tbl_brands.status, tbl_brands.slug,
 	tbl_brand_images.id AS brand_image_id,
 	tbl_brand_images.path AS path,
 	tbl_brand_images.s3_url AS s3_url
@@ -199,6 +205,7 @@ type GetBrandsByIDRow struct {
 	UpdatedAt    time.Time
 	DeletedAt    time.Time
 	Status       string
+	Slug         sql.NullString
 	BrandImageID int64
 	Path         string
 	S3Url        sql.NullString
@@ -214,6 +221,7 @@ func (q *Queries) GetBrandsByID(ctx context.Context, id int64) (GetBrandsByIDRow
 		&i.UpdatedAt,
 		&i.DeletedAt,
 		&i.Status,
+		&i.Slug,
 		&i.BrandImageID,
 		&i.Path,
 		&i.S3Url,
@@ -265,6 +273,7 @@ const getBrandsForSidePanel = `-- name: GetBrandsForSidePanel :many
 SELECT
 	id,
 	name,
+	slug,
 	status
 FROM tbl_brands
 WHERE status = 'ACTIVE'
@@ -275,6 +284,7 @@ LIMIT ?
 type GetBrandsForSidePanelRow struct {
 	ID     int64
 	Name   string
+	Slug   sql.NullString
 	Status string
 }
 
@@ -287,7 +297,12 @@ func (q *Queries) GetBrandsForSidePanel(ctx context.Context, limit int64) ([]Get
 	var items []GetBrandsForSidePanelRow
 	for rows.Next() {
 		var i GetBrandsForSidePanelRow
-		if err := rows.Scan(&i.ID, &i.Name, &i.Status); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Slug,
+			&i.Status,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -453,6 +468,7 @@ const updateBrand = `-- name: UpdateBrand :exec
 UPDATE tbl_brands
 SET
 	name = ?,
+	slug = ?,
 	updated_at = DATETIME('now')
 WHERE
 	id = ?
@@ -461,11 +477,12 @@ WHERE
 
 type UpdateBrandParams struct {
 	Name string
+	Slug sql.NullString
 	ID   int64
 }
 
 func (q *Queries) UpdateBrand(ctx context.Context, arg UpdateBrandParams) error {
-	_, err := q.db.ExecContext(ctx, updateBrand, arg.Name, arg.ID)
+	_, err := q.db.ExecContext(ctx, updateBrand, arg.Name, arg.Slug, arg.ID)
 	return err
 }
 
@@ -487,6 +504,26 @@ type UpdateBrandImageParams struct {
 
 func (q *Queries) UpdateBrandImage(ctx context.Context, arg UpdateBrandImageParams) error {
 	_, err := q.db.ExecContext(ctx, updateBrandImage, arg.S3Url, arg.BrandID)
+	return err
+}
+
+const updateBrandSlug = `-- name: UpdateBrandSlug :exec
+UPDATE tbl_brands
+SET
+	slug = ?,
+	updated_at = DATETIME('now')
+WHERE
+	id = ?
+	AND deleted_at = '1970-01-01 00:00:00+00:00'
+`
+
+type UpdateBrandSlugParams struct {
+	Slug sql.NullString
+	ID   int64
+}
+
+func (q *Queries) UpdateBrandSlug(ctx context.Context, arg UpdateBrandSlugParams) error {
+	_, err := q.db.ExecContext(ctx, updateBrandSlug, arg.Slug, arg.ID)
 	return err
 }
 
