@@ -181,6 +181,8 @@ templ PartnerSection(section models.PostHomeContentSection) {
 								srcset={ srcset }
 								sizes={ constants.SizesBrandLogo }
 							}
+							hx-trigger="load once"
+							hx-swap="none"
 							class={ clsBrandLogo }
 							alt={ content.BrandImage.Alt }
 							loading="lazy"
@@ -195,6 +197,8 @@ templ PartnerSection(section models.PostHomeContentSection) {
 								srcset={ srcset }
 								sizes={ constants.SizesBrandLogo }
 							}
+							hx-trigger="load once"
+							hx-swap="none"
 							class={ clsBrandLogo, "opacity-80" }
 							alt={ content.BrandImage.Alt }
 							loading="lazy"

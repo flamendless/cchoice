@@ -89,6 +89,8 @@ templ PromoBannerMedia(promo models.PromoItem, isFirst bool) {
 					sizes={ constants.SizesPromoBanner }
 				}
 				alt={ promo.Title }
+				width={ constants.PromoBannerWidth }
+				height={ constants.PromoBannerHeight }
 				decoding="async"
 				if isFirst {
 					loading="eager"

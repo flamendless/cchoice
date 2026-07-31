@@ -48,11 +48,15 @@ templ ModalProductImageViewer(productID string, imageData string) {
 			class="modal-content w-full max-w-[32rem] h-screen flex flex-col items-center justify-center px-4"
 		>
 			<div class="relative inline-block">
+				// The placeholder is swapped for the product image when the modal
+				// opens, so it must not be fetched during page load.
 				<img
 					id="modal_image_viewer_image"
 					src={ constants.PathEmptyImageCDN }
 					class="w-auto h-auto"
 					alt="modal image viewer"
+					loading="lazy"
+					decoding="async"
 				/>
 				<span
 					class="absolute top-0 right-0 size-8

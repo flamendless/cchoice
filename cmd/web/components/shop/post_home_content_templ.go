@@ -508,7 +508,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, " class=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, " hx-trigger=\"load once\" hx-swap=\"none\" class=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -528,7 +528,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 				var templ_7745c5c3_Var26 string
 				templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(content.BrandImage.Alt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 185, Col: 35}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 187, Col: 35}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 				if templ_7745c5c3_Err != nil {
@@ -541,7 +541,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 				var templ_7745c5c3_Var27 string
 				templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(constants.BrandLogoWidth)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 188, Col: 39}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 190, Col: 39}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
 				if templ_7745c5c3_Err != nil {
@@ -554,7 +554,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 				var templ_7745c5c3_Var28 string
 				templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.ResolveAttributeValue(constants.BrandLogoHeight)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 189, Col: 41}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 191, Col: 41}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
 				if templ_7745c5c3_Err != nil {
@@ -577,7 +577,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 				var templ_7745c5c3_Var30 string
 				templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.CDNImageWidth(content.BrandImage.CDNURL, constants.WidthBrandLogoDefault))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 193, Col: 92}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 195, Col: 92}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
 				if templ_7745c5c3_Err != nil {
@@ -595,7 +595,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 					var templ_7745c5c3_Var31 string
 					templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.ResolveAttributeValue(srcset)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 195, Col: 23}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 197, Col: 23}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var31)
 					if templ_7745c5c3_Err != nil {
@@ -608,7 +608,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 					var templ_7745c5c3_Var32 string
 					templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.ResolveAttributeValue(constants.SizesBrandLogo)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 196, Col: 40}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 198, Col: 40}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
 					if templ_7745c5c3_Err != nil {
@@ -619,7 +619,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, " class=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, " hx-trigger=\"load once\" hx-swap=\"none\" class=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -639,7 +639,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 				var templ_7745c5c3_Var34 string
 				templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.ResolveAttributeValue(content.BrandImage.Alt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 199, Col: 35}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 203, Col: 35}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var34)
 				if templ_7745c5c3_Err != nil {
@@ -652,7 +652,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 				var templ_7745c5c3_Var35 string
 				templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(constants.BrandLogoWidth)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 202, Col: 39}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 206, Col: 39}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
 				if templ_7745c5c3_Err != nil {
@@ -665,7 +665,7 @@ func PartnerSection(section models.PostHomeContentSection) templ.Component {
 				var templ_7745c5c3_Var36 string
 				templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.ResolveAttributeValue(constants.BrandLogoHeight)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 203, Col: 41}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/post_home_content.templ`, Line: 207, Col: 41}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
 				if templ_7745c5c3_Err != nil {

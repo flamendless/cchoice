@@ -27,6 +27,12 @@ const (
 	// ProductThumbnailSize is the rendered size of a product grid thumbnail at
 	// the largest breakpoint.
 	ProductThumbnailSize = "96"
+
+	// PromoBannerWidth and PromoBannerHeight state the 2:1 ratio that promo
+	// banners are drawn at. Uploaded banners have no stored dimensions, so this
+	// is the ratio the CSS enforces rather than a measured intrinsic size.
+	PromoBannerWidth  = "1366"
+	PromoBannerHeight = "683"
 )
 
 // The `sizes` descriptors below tell the browser how wide each image renders so

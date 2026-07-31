@@ -69,7 +69,6 @@ templ HeadMetaBase() {
 		media={ constants.MediaQueryMobile }
 		fetchpriority="high"
 	/>
-	<link rel="preload" href={ constants.PathEmptyImageCDN } as="image"/>
 	@onceHeadLinks.Once() {
 		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ utils.StaticURL("/static/images/favicons/favicon.ico") }/>
 		for _, size := range faviconsizes {
