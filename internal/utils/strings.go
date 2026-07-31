@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"database/sql"
 	"cchoice/internal/enums"
 	"crypto/rand"
 	"strings"
@@ -38,6 +39,13 @@ func SlugToTile(input string) string {
 	keywords := strings.Split(input, "-")
 	joined := strings.Join(keywords, " ")
 	return caser.String(joined)
+}
+
+func NullStringValue(value sql.NullString) string {
+	if value.Valid {
+		return value.String
+	}
+	return ""
 }
 
 func GetBoolFlag(flag string) bool {

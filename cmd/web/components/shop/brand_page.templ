@@ -1,0 +1,189 @@
+package shop
+
+import (
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/footer"
+	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/utils"
+)
+
+templ BrandPage(data models.BrandPageData) {
+	<!DOCTYPE html>
+	<html lang="en" style="overflow-x: clip;">
+		<head>
+			@common.HeadMetaBase()
+			if data.ThemeCSS != "" {
+				@common.ThemeStyle(data.ThemeCSS)
+			}
+			@common.HeadSEO(data.SEO)
+			<title>{ data.SEO.Title }</title>
+		</head>
+		@BrandPageBody(data)
+	</html>
+}
+
+templ BrandPageBody(data models.BrandPageData) {
+	<body class="m-0 p-0 custom-scrollbar" style="overflow-x: clip;" _="init call metrics_event('anon_visit', 'brand')">
+		@common.DevRibbon()
+		@common.ErrorBanner()
+		@common.SuccessBanner()
+		@header.Header()
+		@MobileSidebar()
+		<style>
+			#sidebar-content-wrapper {
+				display: flex;
+				align-items: flex-start;
+				width: 100%;
+			}
+			#desktop-sidebar {
+				position: sticky;
+				top: 80px;
+				left: 0;
+				z-index: 45;
+				width: 15%;
+				height: calc(100vh - 80px);
+				overflow-y: auto;
+				padding: 0.5rem 1rem 0 0.25rem;
+				background: white;
+				flex-shrink: 0;
+			}
+			#main-content {
+				display: flex;
+				align-items: flex-start;
+				width: 85%;
+				border-left: 2px solid var(--color-primary-muted);
+			}
+			@media (max-width: 1023px) {
+				#desktop-sidebar {
+					display: none !important;
+				}
+				#main-content {
+					width: 100% !important;
+					border-left: none !important;
+				}
+				#sidebar-content-wrapper {
+					width: 100% !important;
+				}
+			}
+		</style>
+		<div id="sidebar-content-wrapper">
+			<div id="desktop-sidebar">
+				@BrandsSidePanel()
+				@CategoriesSidePanel()
+			</div>
+			<div id="main-content" name="right-panel">
+				<div class="w-full">
+					@ModalProductImageViewer("", "")
+					<div class="px-2 py-3">
+						@BrandPageBreadcrumbs(data)
+						<div class="flex flex-col items-center mt-4 mb-2">
+							if data.LogoURL != "" {
+								<img
+									src={ data.LogoURL }
+									class="w-32 h-32 sm:w-40 sm:h-40 object-contain"
+									alt={ data.Name + " logo" }
+									loading="eager"
+								/>
+							}
+							<h1 class="text-lg font-semibold text-primary-dark mt-3">{ data.Name }</h1>
+						</div>
+					</div>
+					@common.HR()
+					if len(data.BestSelling.Products) > 0 {
+						@BrandPrioritySection(data.Slug, data.BestSelling, "best-selling")
+						@common.HR()
+					}
+					if len(data.HighestDiscount.Products) > 0 {
+						@BrandPrioritySection(data.Slug, data.HighestDiscount, "highest-discount")
+						@common.HR()
+					}
+					@BrandCategorySections(data.Slug, data.CategorySections)
+				</div>
+			</div>
+		</div>
+		@footer.Footer()
+		@LoadImageSrc()
+		@LoadModalImage()
+		@PrefetchProductImage()
+	</body>
+}
+
+templ BrandPageBreadcrumbs(data models.BrandPageData) {
+	<nav class="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+		<a href={ utils.URL("/") } class="hover:text-primary transition-colors">Home</a>
+		<span class="text-gray-400">/</span>
+		<a href={ utils.URL("/brands/") } class="hover:text-primary transition-colors">Brands</a>
+		<span class="text-gray-400">/</span>
+		<span class="text-gray-800 font-medium">{ data.Name }</span>
+	</nav>
+}
+
+templ BrandPrioritySection(brandSlug string, section models.BrandPrioritySection, sectionKey string) {
+	<div id={ "brand-section-" + sectionKey } class="w-full">
+		<p class="text-base font-medium text-primary-dark m-2 my-0">
+			{ section.Title }
+		</p>
+		<div
+			id={ "brand-section-products-" + sectionKey }
+			class="w-full"
+		>
+			@CategorySectionProductsInner(models.CategorySectionProducts{
+				ID:          sectionKey,
+				Category:    section.Title,
+				Subcategory: section.Title,
+				Products:    section.Products,
+			})
+		</div>
+		if section.HasMore {
+			<div class="flex justify-center py-2">
+				<button
+					type="button"
+					class="text-sm font-medium text-primary hover:text-primary-dark underline cursor-pointer"
+					hx-get={ utils.URLf("/brands/%s/sections/%s", brandSlug, sectionKey) }
+					hx-target={ "#brand-section-products-" + sectionKey }
+					hx-swap="innerHTML"
+					_="on click call metrics_event('brand_show_more', sectionKey)"
+				>
+					Show more ({ section.TotalCount } products)
+				</button>
+			</div>
+		}
+	</div>
+}
+
+templ BrandCategorySections(brandSlug string, categories []models.BrandGroupedCategorySection) {
+	if len(categories) > 0 {
+		<div id="brand-category-sections" class="w-full">
+			for _, category := range categories {
+				<div>
+					<p
+						id={ category.ScrollTargetID }
+						class="text-base font-medium text-primary-dark m-2 my-0 scroll-mt-20"
+					>
+						{ category.Label }
+					</p>
+					for _, subcategory := range category.Subcategories {
+						<div
+							id={ "brand-category-sections-" + subcategory.CategoryID }
+							class="w-full max-w-full ml-0.5 pr-2 lg:pr-6"
+							data-category-product-section
+							hx-trigger="nearViewport once, history:restore"
+							hx-get={ utils.URLf("/brands/%s/categories/%s/products", brandSlug, subcategory.CategoryID) }
+							hx-target="this"
+							hx-swap="innerHTML"
+						>
+							if subcategory.Label != category.Label {
+								<p class="text-sm font-normal text-primary-dark m-2 ml-4 my-0">
+									{ subcategory.Label }
+								</p>
+							}
+							@ProductGridSkeleton(6)
+						</div>
+					}
+				</div>
+				@common.HR()
+			}
+		</div>
+	}
+}

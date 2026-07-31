@@ -13,6 +13,7 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
+	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
 )
@@ -148,7 +149,10 @@ func (s *BrandService) CreateBrand(ctx context.Context, staffID string, name str
 		}
 	}()
 
-	brandID, err := s.dbRW.GetQueries().CreateBrands(ctx, name)
+	brandID, err := s.dbRW.GetQueries().CreateBrands(ctx, queries.CreateBrandsParams{
+		Name: name,
+		Slug: sql.NullString{String: utils.BrandSlug(name), Valid: true},
+	})
 	if err != nil {
 		result = err.Error()
 		return "", errors.Join(errs.ErrBrand, err)
@@ -188,6 +192,7 @@ func (s *BrandService) UpdateBrand(ctx context.Context, staffID string, id strin
 	if err := s.dbRW.GetQueries().UpdateBrand(ctx, queries.UpdateBrandParams{
 		ID:   brandID,
 		Name: name,
+		Slug: sql.NullString{String: utils.BrandSlug(name), Valid: true},
 	}); err != nil {
 		result = err.Error()
 		return errors.Join(errs.ErrBrand, err)

@@ -1,21 +1,25 @@
 package product
 
 import "cchoice/cmd/web/models"
+import "cchoice/internal/utils"
 
 templ ProductHeader(data models.ProductPageData) {
 	<div class="flex flex-col gap-2">
-		// TODO: if we have brand page now
-		<!-- <a -->
-		<!-- 	href={ utils.URLf("/brands/%s", data.BrandID) } -->
-		<!-- 	class="text-sm text-gray-500 font-medium">{ data.BrandName } -->
-		<!-- </a> -->
+		if data.BrandSlug != "" {
+			<a
+				href={ utils.URLf("/brands/%s", data.BrandSlug) }
+				class="text-sm text-gray-500 font-medium hover:text-primary transition-colors"
+			>
+				{ data.BrandName }
+			</a>
+		}
 		if data.BrandThumbnail != "" {
 			<img
 				src={ data.BrandThumbnail }
 				alt={ data.BrandName }
 				class="w-[96px]"
 			/>
-		} else {
+		} else if data.BrandSlug == "" {
 			<p class="text-sm text-gray-500 font-medium">{ data.BrandName }</p>
 		}
 		<h1 class="text-2xl font-bold text-gray-900">{ data.Name }</h1>

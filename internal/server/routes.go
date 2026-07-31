@@ -192,6 +192,7 @@ func (s *Server) registerAllRoutes(r chi.Router) {
 	AddProductHandlers(s, r)
 	AddSEOHandlers(s, r)
 	AddBrandsHandlers(s, r)
+	AddBrandPageHandlers(s, r)
 	AddCartsHandlers(s, r)
 	AddOrdersHandlers(s, r)
 	AddShippingHandlers(s, r)
