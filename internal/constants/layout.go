@@ -29,10 +29,6 @@ const (
 	ProductThumbnailSize = "96"
 )
 
-// PromoBannerAspectRatio reserves space for promo banners, whose intrinsic size
-// is not known until the uploaded image is decoded.
-const PromoBannerAspectRatio = "2 / 1"
-
 // The `sizes` descriptors below tell the browser how wide each image renders so
 // it can pick the smallest usable candidate out of the accompanying srcset.
 const (

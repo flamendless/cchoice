@@ -145,7 +145,8 @@ func PromoBannerCard(promo models.PromoItem, isFirst bool) templ.Component {
 
 // promoBannerStyle reserves the banner's box up front. Uploaded banners have no
 // stored dimensions, so without a fixed ratio the surrounding page reflows once
-// each image decodes.
+// each image decodes. Banners are expected to be 2:1; anything else is cropped
+// to fill the box.
 func promoBannerStyle() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -224,7 +225,7 @@ func PromoBannerMedia(promo models.PromoItem, isFirst bool) templ.Component {
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.URL(utils.ConvertYouTubeToEmbed(promo.MediaURL)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 66, Col: 65}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 67, Col: 65}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 				if templ_7745c5c3_Err != nil {
@@ -237,7 +238,7 @@ func PromoBannerMedia(promo models.PromoItem, isFirst bool) templ.Component {
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(promo.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 67, Col: 24}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 68, Col: 24}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 				if templ_7745c5c3_Err != nil {
@@ -255,7 +256,7 @@ func PromoBannerMedia(promo models.PromoItem, isFirst bool) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(promo.MediaURL)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 75, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 76, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 				if templ_7745c5c3_Err != nil {
@@ -274,7 +275,7 @@ func PromoBannerMedia(promo models.PromoItem, isFirst bool) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.CDNImageWidth(promo.MediaURL, constants.WidthPromoBannerDefault))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 85, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 86, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 			if templ_7745c5c3_Err != nil {
@@ -292,7 +293,7 @@ func PromoBannerMedia(promo models.PromoItem, isFirst bool) templ.Component {
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(srcset)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 87, Col: 20}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 88, Col: 20}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 				if templ_7745c5c3_Err != nil {
@@ -305,7 +306,7 @@ func PromoBannerMedia(promo models.PromoItem, isFirst bool) templ.Component {
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(constants.SizesPromoBanner)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 88, Col: 39}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 89, Col: 39}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 				if templ_7745c5c3_Err != nil {
@@ -323,7 +324,7 @@ func PromoBannerMedia(promo models.PromoItem, isFirst bool) templ.Component {
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(promo.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 90, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 91, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 			if templ_7745c5c3_Err != nil {
@@ -386,7 +387,7 @@ func PromoBannerText(promo models.PromoItem) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(promo.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 105, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 106, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -399,7 +400,7 @@ func PromoBannerText(promo models.PromoItem) templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(promo.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 106, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/active_promos.templ`, Line: 107, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {

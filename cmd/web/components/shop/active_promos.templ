@@ -43,7 +43,8 @@ templ PromoBannerCard(promo models.PromoItem, isFirst bool) {
 
 // promoBannerStyle reserves the banner's box up front. Uploaded banners have no
 // stored dimensions, so without a fixed ratio the surrounding page reflows once
-// each image decodes.
+// each image decodes. Banners are expected to be 2:1; anything else is cropped
+// to fill the box.
 templ promoBannerStyle() {
 	@promoBannerStyleOnce.Once() {
 		<style>
