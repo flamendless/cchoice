@@ -46,7 +46,7 @@ func GenerateBrandsListingMeta() BrandMeta {
 	}
 }
 
-func GenerateBrandMeta(brandSlug, brandName string) BrandMeta {
+func GenerateBrandMeta(brandSlug, brandName, ogImageURL string) BrandMeta {
 	title := fmt.Sprintf("%s | C-Choice Construction Supply", brandName)
 	description := fmt.Sprintf(
 		"Shop %s power tools and construction supplies at C-Choice Philippines. Browse best sellers, deals, and products from %s.",
@@ -63,11 +63,16 @@ func GenerateBrandMeta(brandSlug, brandName string) BrandMeta {
 		"philippines",
 	}, ", ")
 
+	ogImage := strings.TrimSpace(ogImageURL)
+	if ogImage == "" {
+		ogImage = DefaultOGImage
+	}
+
 	return BrandMeta{
 		Title:          title,
 		Description:    description,
 		CanonicalURL:   canonicalURL,
-		OGImage:        DefaultOGImage,
+		OGImage:        ogImage,
 		OGType:         "website",
 		Robots:         ProductRobots,
 		Keywords:       keywords,
@@ -77,6 +82,10 @@ func GenerateBrandMeta(brandSlug, brandName string) BrandMeta {
 }
 
 func BuildBrandsListingStructuredData(canonicalURL, title, description string) json.RawMessage {
+	type breadcrumbList struct {
+		Type     string           `json:"@type"`
+		ItemList []breadcrumbItem `json:"itemListElement"`
+	}
 	type collectionPage struct {
 		Type        string `json:"@type"`
 		Name        string `json:"name"`
@@ -97,6 +106,10 @@ func BuildBrandsListingStructuredData(canonicalURL, title, description string) j
 				Description: description,
 				URL:         canonicalURL,
 			},
+			breadcrumbList{
+				Type:     "BreadcrumbList",
+				ItemList: buildBrandsListingBreadcrumbItems(canonicalURL),
+			},
 		},
 	}
 
@@ -107,15 +120,37 @@ func BuildBrandsListingStructuredData(canonicalURL, title, description string) j
 	return data
 }
 
+func buildBrandsListingBreadcrumbItems(canonicalURL string) []breadcrumbItem {
+	homeURL := siteHomeURLFromCanonical(canonicalURL)
+
+	return []breadcrumbItem{
+		{Type: "ListItem", Position: 1, Name: "Home", Item: homeURL},
+		{Type: "ListItem", Position: 2, Name: "Brands", Item: canonicalURL},
+	}
+}
+
 func buildBrandBreadcrumbItems(brandSlug, brandName, canonicalURL string) []breadcrumbItem {
-	homeURL := strings.TrimSuffix(utils.SiteURL("/"), "/") + "/"
-	brandsURL := BrandsListingPageURL(utils.SiteURL("/"))
+	homeURL := siteHomeURLFromCanonical(canonicalURL)
+	brandsURL := BrandsListingPageURL(strings.TrimSuffix(homeURL, "/"))
 
 	return []breadcrumbItem{
 		{Type: "ListItem", Position: 1, Name: "Home", Item: homeURL},
 		{Type: "ListItem", Position: 2, Name: "Brands", Item: brandsURL},
 		{Type: "ListItem", Position: 3, Name: brandName, Item: canonicalURL},
 	}
+}
+
+func siteHomeURLFromCanonical(canonicalURL string) string {
+	if idx := strings.Index(canonicalURL, "/brands"); idx > 0 {
+		return canonicalURL[:idx] + "/"
+	}
+
+	base := strings.TrimSuffix(canonicalURL, "/")
+	if strings.HasSuffix(base, "/brands") {
+		return base[:len(base)-len("/brands")] + "/"
+	}
+
+	return base + "/"
 }
 
 func BuildBrandStructuredData(brandSlug, brandName, canonicalURL, title, description string) json.RawMessage {
@@ -137,7 +172,12 @@ func BuildBrandStructuredData(brandSlug, brandName, canonicalURL, title, descrip
 	metaTitle := title
 	metaDescription := description
 	if metaTitle == "" || metaDescription == "" {
-		metaTitle, metaDescription = GenerateBrandMeta(brandSlug, brandName).Title, GenerateBrandMeta(brandSlug, brandName).Description
+		metaTitle = fmt.Sprintf("%s | C-Choice Construction Supply", brandName)
+		metaDescription = fmt.Sprintf(
+			"Shop %s power tools and construction supplies at C-Choice Philippines. Browse best sellers, deals, and products from %s.",
+			brandName,
+			brandName,
+		)
 	}
 
 	payload := graph{
