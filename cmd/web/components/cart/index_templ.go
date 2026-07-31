@@ -286,9 +286,9 @@ func CartPageBody(summaryContent templ.Component, showCPointsBanner bool, shippi
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var10 string
-		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.URL(utils.StaticURL("/static/js/cart.js")))
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.URL(utils.URL(utils.VersionedAsset("/static/js/cart.js"))))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/index.templ`, Line: 166, Col: 93}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cart/index.templ`, Line: 166, Col: 109}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 		if templ_7745c5c3_Err != nil {

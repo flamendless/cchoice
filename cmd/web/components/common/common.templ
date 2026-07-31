@@ -70,17 +70,17 @@ templ HeadMetaBase() {
 		fetchpriority="high"
 	/>
 	@onceHeadLinks.Once() {
-		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ utils.StaticURL("/static/images/favicons/favicon.ico") }/>
+		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ utils.URL(utils.VersionedAsset("/static/images/favicons/favicon.ico")) }/>
 		for _, size := range faviconsizes {
 			<link rel="icon" type="image/png" sizes={ size } href={ fmt.Sprintf("%s/favicons-%s/public", constants.PathImageCDNBase, size) }/>
 		}
-		<link href={ utils.StaticURL("/static/css/tailwind.css") } rel="stylesheet"/>
+		<link href={ utils.URL(utils.VersionedAsset("/static/css/tailwind.css")) } rel="stylesheet"/>
 		// Deferred scripts run in document order, so metrics.js must come before
 		// hyperscript, which evaluates `init` features — some of which call
 		// metrics_event — as soon as it executes.
-		<script defer type="text/javascript" src={ templ.URL(utils.StaticURL("/static/js/htmx.min.js")) }></script>
-		<script defer type="text/javascript" src={ templ.URL(utils.StaticURL("/static/js/metrics.js")) }></script>
-		<script defer type="text/javascript" src={ templ.URL(utils.StaticURL("/static/js/hyperscript.min.js")) }></script>
+		<script defer type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/htmx.min.js"))) }></script>
+		<script defer type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/metrics.js"))) }></script>
+		<script defer type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/hyperscript.min.js"))) }></script>
 		@ScrAdSense()
 		@templ.JSONScript("url-prefix", utils.URL(""))
 		<script>

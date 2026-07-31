@@ -5,9 +5,7 @@ import (
 	"net/url"
 	"strings"
 
-	"cchoice/internal/assets"
 	"cchoice/internal/conf"
-	"cchoice/internal/constants"
 )
 
 func FullURL(path string) string {
@@ -51,25 +49,17 @@ func URL(path string) string {
 	return "/cchoice" + path
 }
 
-// StaticURL builds a URL for a file under /static with a fingerprint of its
-// contents attached, which lets the response be cached immutably while still
-// being replaced as soon as the file changes.
-func StaticURL(path string) string {
-	return fmt.Sprintf(
-		"%s?%s=%s",
-		URL(path),
-		constants.QueryParamAssetVersion,
-		assets.Version(path),
-	)
-}
-
 func URLf(path string, args ...any) string {
 	return URL(fmt.Sprintf(path, args...))
 }
 
 func URLWithParams(path string, params map[string]string) string {
+	return URL(appendQueryParams(path, params))
+}
+
+func appendQueryParams(path string, params map[string]string) string {
 	base := path
-	hasQuery := false
+	hasQuery := strings.Contains(path, "?")
 	for k, v := range params {
 		sep := "?"
 		if hasQuery {
@@ -78,7 +68,7 @@ func URLWithParams(path string, params map[string]string) string {
 		base = fmt.Sprintf("%s%s%s=%s", base, sep, url.QueryEscape(k), url.QueryEscape(v))
 		hasQuery = true
 	}
-	return URL(base)
+	return base
 }
 
 func URLWithSuccess(path string, message string) string {

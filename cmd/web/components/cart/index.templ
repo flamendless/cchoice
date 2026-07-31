@@ -163,7 +163,7 @@ templ CartPageBody(summaryContent templ.Component, showCPointsBanner bool, shipp
 			</form>
 		</div>
 		@footer.Footer()
-		<script defer type="text/javascript" src={ templ.URL(utils.StaticURL("/static/js/cart.js")) }>
+		<script defer type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/cart.js"))) }>
 		</script>
 	</body>
 }

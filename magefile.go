@@ -209,6 +209,13 @@ func BuildFast() error {
 	})
 }
 
+func BuildServe() error {
+	if err := GenAssets(); err != nil {
+		return err
+	}
+	return BuildFast()
+}
+
 func BuildWeb() error {
 	if err := GenAll(); err != nil {
 		return err
@@ -652,6 +659,18 @@ func GenServe() error {
 		return err
 	}
 	return GenSQL()
+}
+
+func GenAssets() error {
+	return run(Command{Type: CmdExec, Cmd: "go", Args: []string{"generate", "./internal/utils/..."}})
+}
+
+func GenVersion() error {
+	return run(Command{Type: CmdExec, Cmd: "go", Args: []string{
+		"generate",
+		"./internal/conf/...",
+		"./internal/utils/...",
+	}})
 }
 
 func GenAll() error {

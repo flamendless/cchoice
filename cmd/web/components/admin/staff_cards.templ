@@ -51,5 +51,5 @@ templ AdminStaffCardsGrid(cards []models.StaffCard) {
 }
 
 templ ScriptAdminDashboardSearch() {
-	<script defer type="text/javascript" src={ templ.URL(utils.StaticURL("/static/js/admin_dashboard_search.js")) }></script>
+	<script defer type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/admin_dashboard_search.js"))) }></script>
 }
