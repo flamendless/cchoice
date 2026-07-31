@@ -107,8 +107,8 @@ func BrandsListingPageSEO() SiteSEO {
 	}
 }
 
-func BrandPageSEO(brandSlug, brandName string) SiteSEO {
-	meta := seo.GenerateBrandMeta(brandSlug, brandName)
+func BrandPageSEO(brandSlug, brandName, ogImageURL string) SiteSEO {
+	meta := seo.GenerateBrandMeta(brandSlug, brandName, ogImageURL)
 	return SiteSEO{
 		Title:          meta.Title,
 		Description:    meta.Description,

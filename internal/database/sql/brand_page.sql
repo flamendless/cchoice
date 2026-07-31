@@ -206,11 +206,16 @@ ORDER BY is_on_sale DESC, tbl_products.created_at DESC
 LIMIT ?;
 
 -- name: ListBrandSitemapSlugs :many
-SELECT slug
+SELECT DISTINCT tbl_brands.slug
 FROM tbl_brands
+INNER JOIN tbl_products ON tbl_products.brand_id = tbl_brands.id
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
 WHERE
-	status = 'ACTIVE'
-	AND deleted_at = '1970-01-01 00:00:00+00:00'
-	AND slug IS NOT NULL
-	AND slug != ''
-ORDER BY name ASC;
+	tbl_brands.status = 'ACTIVE'
+	AND tbl_brands.deleted_at = '1970-01-01 00:00:00+00:00'
+	AND tbl_brands.slug IS NOT NULL
+	AND tbl_brands.slug != ''
+	AND tbl_products.status = 'ACTIVE'
+	AND tbl_products.deleted_at = '1970-01-01 00:00:00+00:00'
+	AND COALESCE(tbl_product_images.thumbnail, 'static/images/empty_96x96.webp') != 'static/images/empty_96x96.webp'
+ORDER BY tbl_brands.name ASC;

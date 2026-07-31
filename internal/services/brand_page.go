@@ -124,7 +124,7 @@ func (s *BrandPageService) GetBrandPageData(
 			utils.URLf("/brands/%s/sections/highest-discount", brandSlug),
 		),
 		CategorySections: groupedCategories,
-		SEO:              models.BrandPageSEO(brandSlug, brand.Name),
+		SEO:              models.BrandPageSEO(brandSlug, brand.Name, resolveBrandLogoURL(brand.S3Url, brand.Path, getBrandLogoURL)),
 	}, nil
 }
 

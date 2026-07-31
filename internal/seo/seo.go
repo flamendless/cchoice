@@ -21,6 +21,7 @@ const (
 
 type Product struct {
 	BrandName          string
+	BrandSlug          string
 	Name               string
 	Serial             string
 	Description        string
@@ -201,6 +202,16 @@ func buildProductBreadcrumbItems(product Product, siteBaseURL string) []breadcru
 	}
 
 	position := 2
+	if product.BrandSlug != "" {
+		items = append(items, breadcrumbItem{
+			Type:     "ListItem",
+			Position: position,
+			Name:     product.BrandName,
+			Item:     BrandPageURL(siteBaseURL, product.BrandSlug),
+		})
+		position++
+	}
+
 	var categoryURL string
 	if product.ProductCategory != "" {
 		categoryURL = categoryBreadcrumbURL(siteBaseURL, product.ProductCategory)

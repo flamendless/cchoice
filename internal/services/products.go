@@ -930,6 +930,7 @@ func (s *ProductService) GenerateMeta(
 	meta := seo.GenerateProductMeta(
 		seo.Product{
 			BrandName:          product.BrandName,
+			BrandSlug:          resolveProductBrandSlug(product.BrandSlug, product.BrandName),
 			Name:               product.Name,
 			Serial:             product.Serial,
 			Description:        product.Description.String,
