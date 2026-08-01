@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cchoice/internal/cmdaudit"
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
@@ -214,6 +215,10 @@ var cmdMigrateImagesCloudflare = &cobra.Command{
 			zap.Int("total_skipped", totalSkipped),
 			zap.Int("total_errors", totalErrors),
 		)
+		cmd.SetContext(cmdaudit.SetSummary(
+			cmd.Context(),
+			fmt.Sprintf("dry_run=%t uploaded=%d skipped=%d errors=%d", flagsMigrateImagesCloudflare.dryRun, totalUploaded, totalSkipped, totalErrors),
+		))
 	},
 }
 

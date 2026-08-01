@@ -145,7 +145,14 @@ func (s *service) Health() map[string]string {
 
 func (s *service) Close() error {
 	logs.Log().Info("Disconnected from database", zap.String("db url", conf.Conf().DBURL))
-	return s.db.Close()
+	err := s.db.Close()
+	if s == dbInstanceRO {
+		dbInstanceRO = nil
+	}
+	if s == dbInstanceRW {
+		dbInstanceRW = nil
+	}
+	return err
 }
 
 var _ IService = (*service)(nil)

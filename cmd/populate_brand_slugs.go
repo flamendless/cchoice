@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cchoice/internal/cmdaudit"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/logs"
@@ -71,6 +72,11 @@ var cmdPopulateBrandSlugs = &cobra.Command{
 			zap.Int("failures", len(updateErrors)),
 			zap.Errors("errors", updateErrors),
 		)
+
+		cmd.SetContext(cmdaudit.SetSummary(
+			cmd.Context(),
+			fmt.Sprintf("dry_run=%t brands=%d updated=%d failures=%d", flagsPopulateBrandSlugs.dryRun, len(brands), updated, len(updateErrors)),
+		))
 
 		return nil
 	},

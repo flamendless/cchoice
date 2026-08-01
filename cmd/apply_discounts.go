@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cchoice/internal/cmdaudit"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/errs"
@@ -8,6 +9,7 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"errors"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -166,6 +168,11 @@ var cmdApplyDiscount = &cobra.Command{
 			zap.Int("success", success),
 			zap.Int("total", total),
 		)
+
+		cmd.SetContext(cmdaudit.SetSummary(
+			cmd.Context(),
+			fmt.Sprintf("dry_run=%t success=%d total=%d", flagDryRun, success, total),
+		))
 
 		return nil
 	},

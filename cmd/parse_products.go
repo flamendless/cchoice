@@ -17,6 +17,7 @@ import (
 
 	"cchoice/cmd/parse_products/models"
 	"cchoice/cmd/parse_products/templates"
+	"cchoice/internal/cmdaudit"
 	"cchoice/internal/conf"
 	"cchoice/internal/database"
 	"cchoice/internal/enums"
@@ -381,6 +382,11 @@ var cmdParseProducts = &cobra.Command{
 			"Set initial promoted categories",
 			zap.Int("promoted categories count", len(promotedCategoryIDs)),
 		)
+
+		cmd.SetContext(cmdaudit.SetSummary(
+			cmd.Context(),
+			fmt.Sprintf("products=%d inserted=%d updated=%d images=%d", len(products), len(insertedIds), len(updatedIds), foundImages),
+		))
 
 		tpl.CtxApp.Metrics.LogTime(logs.Log())
 	},

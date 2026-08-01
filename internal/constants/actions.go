@@ -10,6 +10,7 @@ const (
 	ActionExport       = "export"
 	ActionReset        = "reset"
 	ActionTrigger      = "trigger"
+	ActionRun          = "run"
 	ActionUpdate       = "update"
 	ActionUpdateStatus = "update status"
 )

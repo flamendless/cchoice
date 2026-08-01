@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 
+	"cchoice/internal/cmdaudit"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
@@ -86,5 +87,10 @@ var cmdSeedHolidays = &cobra.Command{
 			zap.Int("successful", success),
 			zap.Int("total", len(holidays)),
 		)
+
+		cmd.SetContext(cmdaudit.SetSummary(
+			cmd.Context(),
+			fmt.Sprintf("year=%d successful=%d total=%d", flagYear, success, len(holidays)),
+		))
 	},
 }

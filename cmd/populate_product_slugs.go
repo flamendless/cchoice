@@ -1,13 +1,15 @@
 package cmd
 
 import (
+	"fmt"
+
+	"cchoice/internal/cmdaudit"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode/sqids"
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 	"database/sql"
-	"fmt"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -72,6 +74,11 @@ var cmdPopulateProductSlugs = &cobra.Command{
 			zap.Int("failures", len(errors)),
 			zap.Errors("errors", errors),
 		)
+
+		cmd.SetContext(cmdaudit.SetSummary(
+			cmd.Context(),
+			fmt.Sprintf("dry_run=%t products=%d failures=%d", flagsPopulateProductSlugs.dryRun, len(products), len(errors)),
+		))
 
 		return nil
 	},

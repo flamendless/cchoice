@@ -16,6 +16,7 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
+	EnableCommandAudit(rootCmd)
 	start := time.Now()
 	defer func() {
 		logs.Log().Info(

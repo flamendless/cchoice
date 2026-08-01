@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"cchoice/internal/cmdaudit"
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
@@ -162,6 +163,10 @@ var cmdMigrateImagesLinode = &cobra.Command{
 		}
 
 		logs.Log().Info("Image migration completed")
+		cmd.SetContext(cmdaudit.SetSummary(
+			cmd.Context(),
+			fmt.Sprintf("dry_run=%t bucket=%s", flagsMigrateImagesLinode.dryRun, flagsMigrateImagesLinode.bucket),
+		))
 	},
 }
 
