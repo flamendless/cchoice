@@ -93,6 +93,23 @@ WHERE
 	id = ?
 	AND deleted_at = '1970-01-01 00:00:00+00:00';
 
+-- name: BrandSlugExistsForOtherBrand :one
+SELECT COUNT(*) > 0 AS slug_exists
+FROM tbl_brands
+WHERE
+	slug = ?
+	AND id != ?
+	AND deleted_at = '1970-01-01 00:00:00+00:00';
+
+-- name: ListBrandsForSlugBackfill :many
+SELECT
+	id,
+	name,
+	slug
+FROM tbl_brands
+WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+ORDER BY id ASC;
+
 -- name: GetBrandsForProductCreate :many
 SELECT
 	id,

@@ -30,7 +30,7 @@ SELECT
 	tbl_brand_images.path AS path,
 	tbl_brand_images.s3_url AS s3_url
 FROM tbl_brands
-INNER JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id AND tbl_brand_images.is_main = true
+LEFT JOIN tbl_brand_images ON tbl_brand_images.brand_id = tbl_brands.id AND tbl_brand_images.is_main = true
 WHERE
 	tbl_brands.slug = ?
 	AND tbl_brands.status = 'ACTIVE'

@@ -41,8 +41,8 @@ type BrandGroupedCategorySection struct {
 }
 
 type BrandSubcategorySection struct {
-	CategoryID string
-	Label      string
+	CategoryID  string
+	Label       string
 	ProductsURL string
 }
 

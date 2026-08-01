@@ -532,7 +532,7 @@ func CleanDB() error {
 	}); err != nil {
 		return err
 	}
-	return run(Command{
+	if err := run(Command{
 		Type: CmdGoRun,
 		Tags: []string{"fts5", "staticfs"},
 		Args: []string{"./main.go", "parse_products",
@@ -543,7 +543,10 @@ func CleanDB() error {
 			"--images_basepath=./cmd/web/static/images/product_images/bosch/original/",
 			"--images_format=webp",
 		},
-	})
+	}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func Deps() error {

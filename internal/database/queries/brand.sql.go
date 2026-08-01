@@ -11,6 +11,27 @@ import (
 	"time"
 )
 
+const brandSlugExistsForOtherBrand = `-- name: BrandSlugExistsForOtherBrand :one
+SELECT COUNT(*) > 0 AS slug_exists
+FROM tbl_brands
+WHERE
+	slug = ?
+	AND id != ?
+	AND deleted_at = '1970-01-01 00:00:00+00:00'
+`
+
+type BrandSlugExistsForOtherBrandParams struct {
+	Slug sql.NullString
+	ID   int64
+}
+
+func (q *Queries) BrandSlugExistsForOtherBrand(ctx context.Context, arg BrandSlugExistsForOtherBrandParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, brandSlugExistsForOtherBrand, arg.Slug, arg.ID)
+	var slug_exists bool
+	err := row.Scan(&slug_exists)
+	return slug_exists, err
+}
+
 const createBrandImages = `-- name: CreateBrandImages :one
 INSERT INTO tbl_brand_images (
 	brand_id,
@@ -370,6 +391,45 @@ func (q *Queries) GetBrandsLogos(ctx context.Context, limit int64) ([]GetBrandsL
 			&i.Path,
 			&i.S3Url,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listBrandsForSlugBackfill = `-- name: ListBrandsForSlugBackfill :many
+SELECT
+	id,
+	name,
+	slug
+FROM tbl_brands
+WHERE deleted_at = '1970-01-01 00:00:00+00:00'
+ORDER BY id ASC
+`
+
+type ListBrandsForSlugBackfillRow struct {
+	ID   int64
+	Name string
+	Slug sql.NullString
+}
+
+func (q *Queries) ListBrandsForSlugBackfill(ctx context.Context) ([]ListBrandsForSlugBackfillRow, error) {
+	rows, err := q.db.QueryContext(ctx, listBrandsForSlugBackfill)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListBrandsForSlugBackfillRow
+	for rows.Next() {
+		var i ListBrandsForSlugBackfillRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.Slug); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

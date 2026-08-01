@@ -100,19 +100,15 @@ func (s *BrandPageService) GetBrandPageData(
 		return nil, errors.Join(errs.ErrBrand, err)
 	}
 
-	if len(bestSellingRows) == 0 && len(highestDiscountRows) == 0 && len(categoryRows) == 0 {
-		return nil, errs.ErrNotFound
-	}
-
 	bestSellingProducts := bestSellingRowsToCategoryProducts(s.encoder, getCDNURL, bestSellingRows)
 	highestDiscountProducts := highestDiscountRowsToCategoryProducts(s.encoder, getCDNURL, highestDiscountRows)
 
-	groupedCategories := buildBrandGroupedCategorySections(s.encoder, categoryRows)
+	groupedCategories := buildBrandGroupedCategorySections(brandSlug, s.encoder, categoryRows)
 
 	return &models.BrandPageData{
 		Slug:    brandSlug,
 		Name:    brand.Name,
-		LogoURL: resolveBrandLogoURL(brand.S3Url, brand.Path, getBrandLogoURL),
+		LogoURL: resolveBrandLogoURL(brand.S3Url, utils.NullStringValue(brand.Path), getBrandLogoURL),
 		BestSelling: buildBrandPrioritySection(
 			"Best Selling",
 			bestSellingProducts,
@@ -124,7 +120,7 @@ func (s *BrandPageService) GetBrandPageData(
 			utils.URLf("/brands/%s/sections/highest-discount", brandSlug),
 		),
 		CategorySections: groupedCategories,
-		SEO:              models.BrandPageSEO(brandSlug, brand.Name, resolveBrandLogoURL(brand.S3Url, brand.Path, getBrandLogoURL)),
+		SEO:              models.BrandPageSEO(brandSlug, brand.Name, resolveBrandLogoURL(brand.S3Url, utils.NullStringValue(brand.Path), getBrandLogoURL)),
 	}, nil
 }
 
@@ -282,6 +278,7 @@ func buildBrandPrioritySection(
 }
 
 func buildBrandGroupedCategorySections(
+	brandSlug string,
 	encoder encode.IEncode,
 	rows []queries.GetBrandProductCategoriesForSectionsRow,
 ) []models.BrandGroupedCategorySection {
@@ -307,10 +304,11 @@ func buildBrandGroupedCategorySections(
 			order = append(order, categoryLabel)
 		}
 
+		categoryID := encoder.Encode(row.ID)
 		grouped[categoryLabel].Subcategories = append(grouped[categoryLabel].Subcategories, models.BrandSubcategorySection{
-			CategoryID:  encoder.Encode(row.ID),
+			CategoryID:  categoryID,
 			Label:       subcategoryLabel,
-			ProductsURL: "",
+			ProductsURL: utils.URLf("/brands/%s/categories/%s/products", brandSlug, categoryID),
 		})
 	}
 
@@ -386,24 +384,7 @@ func brandCategoryRowsToCategoryProducts(
 ) []models.CategorySectionProduct {
 	res := make([]queries.GetProductsByCategoryIDRow, 0, len(rows))
 	for _, row := range rows {
-		res = append(res, queries.GetProductsByCategoryIDRow{
-			ID:                       row.ID,
-			Serial:                   row.Serial,
-			Slug:                     row.Slug,
-			Name:                     row.Name,
-			Description:              row.Description,
-			UnitPriceWithVat:         row.UnitPriceWithVat,
-			UnitPriceWithVatCurrency: row.UnitPriceWithVatCurrency,
-			SalePriceWithVat:         row.SalePriceWithVat,
-			SalePriceWithVatCurrency: row.SalePriceWithVatCurrency,
-			IsOnSale:                 row.IsOnSale,
-			DiscountType:             row.DiscountType,
-			DiscountValue:            row.DiscountValue,
-			BrandName:                row.BrandName,
-			ThumbnailPath:            row.ThumbnailPath,
-			CdnUrl:                   row.CdnUrl,
-			CdnUrlThumbnail:          row.CdnUrlThumbnail,
-		})
+		res = append(res, queries.GetProductsByCategoryIDRow(row))
 	}
 	return models.ToCategorySectionProducts(encoder, getCDNURL, res)
 }

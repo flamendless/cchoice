@@ -91,14 +91,14 @@ templ BrandPageBody(data models.BrandPageData) {
 					</div>
 					@common.HR()
 					if len(data.BestSelling.Products) > 0 {
-						@BrandPrioritySection(data.Slug, data.BestSelling, "best-selling")
+						@BrandPrioritySection(data.BestSelling, "best-selling")
 						@common.HR()
 					}
 					if len(data.HighestDiscount.Products) > 0 {
-						@BrandPrioritySection(data.Slug, data.HighestDiscount, "highest-discount")
+						@BrandPrioritySection(data.HighestDiscount, "highest-discount")
 						@common.HR()
 					}
-					@BrandCategorySections(data.Slug, data.CategorySections)
+					@BrandCategorySections(data.CategorySections)
 				</div>
 			</div>
 		</div>
@@ -119,7 +119,7 @@ templ BrandPageBreadcrumbs(data models.BrandPageData) {
 	</nav>
 }
 
-templ BrandPrioritySection(brandSlug string, section models.BrandPrioritySection, sectionKey string) {
+templ BrandPrioritySection(section models.BrandPrioritySection, sectionKey string) {
 	<div id={ "brand-section-" + sectionKey } class="w-full">
 		<p class="text-base font-medium text-primary-dark m-2 my-0">
 			{ section.Title }
@@ -140,7 +140,7 @@ templ BrandPrioritySection(brandSlug string, section models.BrandPrioritySection
 				<button
 					type="button"
 					class="text-sm font-medium text-primary hover:text-primary-dark underline cursor-pointer"
-					hx-get={ utils.URLf("/brands/%s/sections/%s", brandSlug, sectionKey) }
+					hx-get={ section.ShowMoreURL }
 					hx-target={ "#brand-section-products-" + sectionKey }
 					hx-swap="innerHTML"
 					_="on click call metrics_event('brand_show_more', sectionKey)"
@@ -152,7 +152,7 @@ templ BrandPrioritySection(brandSlug string, section models.BrandPrioritySection
 	</div>
 }
 
-templ BrandCategorySections(brandSlug string, categories []models.BrandGroupedCategorySection) {
+templ BrandCategorySections(categories []models.BrandGroupedCategorySection) {
 	if len(categories) > 0 {
 		<div id="brand-category-sections" class="w-full">
 			for _, category := range categories {
@@ -169,7 +169,7 @@ templ BrandCategorySections(brandSlug string, categories []models.BrandGroupedCa
 							class="w-full max-w-full ml-0.5 pr-2 lg:pr-6"
 							data-category-product-section
 							hx-trigger="nearViewport once, history:restore"
-							hx-get={ utils.URLf("/brands/%s/categories/%s/products", brandSlug, subcategory.CategoryID) }
+							hx-get={ subcategory.ProductsURL }
 							hx-target="this"
 							hx-swap="innerHTML"
 						>
