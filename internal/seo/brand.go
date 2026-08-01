@@ -47,7 +47,7 @@ func GenerateBrandsListingMeta() BrandMeta {
 }
 
 func GenerateBrandMeta(brandSlug, brandName, ogImageURL string) BrandMeta {
-	title := fmt.Sprintf("%s | C-Choice Construction Supply", brandName)
+	title := brandName + " | C-Choice Construction Supply"
 	description := fmt.Sprintf(
 		"Shop %s power tools and construction supplies at C-Choice Philippines. Browse best sellers, deals, and products from %s.",
 		brandName,
@@ -172,7 +172,7 @@ func BuildBrandStructuredData(brandSlug, brandName, canonicalURL, title, descrip
 	metaTitle := title
 	metaDescription := description
 	if metaTitle == "" || metaDescription == "" {
-		metaTitle = fmt.Sprintf("%s | C-Choice Construction Supply", brandName)
+		metaTitle = brandName + " | C-Choice Construction Supply"
 		metaDescription = fmt.Sprintf(
 			"Shop %s power tools and construction supplies at C-Choice Philippines. Browse best sellers, deals, and products from %s.",
 			brandName,

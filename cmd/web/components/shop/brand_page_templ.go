@@ -215,7 +215,7 @@ func BrandPageBody(data models.BrandPageData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if len(data.BestSelling.Products) > 0 {
-			templ_7745c5c3_Err = BrandPrioritySection(data.Slug, data.BestSelling, "best-selling").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = BrandPrioritySection(data.BestSelling, "best-selling").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -229,7 +229,7 @@ func BrandPageBody(data models.BrandPageData) templ.Component {
 			}
 		}
 		if len(data.HighestDiscount.Products) > 0 {
-			templ_7745c5c3_Err = BrandPrioritySection(data.Slug, data.HighestDiscount, "highest-discount").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = BrandPrioritySection(data.HighestDiscount, "highest-discount").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -242,7 +242,7 @@ func BrandPageBody(data models.BrandPageData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = BrandCategorySections(data.Slug, data.CategorySections).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = BrandCategorySections(data.CategorySections).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -342,7 +342,7 @@ func BrandPageBreadcrumbs(data models.BrandPageData) templ.Component {
 	})
 }
 
-func BrandPrioritySection(brandSlug string, section models.BrandPrioritySection, sectionKey string) templ.Component {
+func BrandPrioritySection(section models.BrandPrioritySection, sectionKey string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -425,9 +425,9 @@ func BrandPrioritySection(brandSlug string, section models.BrandPrioritySection,
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var15 string
-			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URLf("/brands/%s/sections/%s", brandSlug, sectionKey))
+			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(section.ShowMoreURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_page.templ`, Line: 143, Col: 73}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_page.templ`, Line: 143, Col: 33}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
 			if templ_7745c5c3_Err != nil {
@@ -472,7 +472,7 @@ func BrandPrioritySection(brandSlug string, section models.BrandPrioritySection,
 	})
 }
 
-func BrandCategorySections(brandSlug string, categories []models.BrandGroupedCategorySection) templ.Component {
+func BrandCategorySections(categories []models.BrandGroupedCategorySection) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -548,9 +548,9 @@ func BrandCategorySections(brandSlug string, categories []models.BrandGroupedCat
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var22 string
-					templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URLf("/brands/%s/categories/%s/products", brandSlug, subcategory.CategoryID))
+					templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.ResolveAttributeValue(subcategory.ProductsURL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_page.templ`, Line: 172, Col: 98}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/brand_page.templ`, Line: 172, Col: 39}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
 					if templ_7745c5c3_Err != nil {

@@ -13,7 +13,6 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
-	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
 )
@@ -149,9 +148,15 @@ func (s *BrandService) CreateBrand(ctx context.Context, staffID string, name str
 		}
 	}()
 
+	slug, err := resolveAvailableBrandSlug(ctx, s.dbRO.GetQueries(), name, 0)
+	if err != nil {
+		result = err.Error()
+		return "", errors.Join(errs.ErrBrand, err)
+	}
+
 	brandID, err := s.dbRW.GetQueries().CreateBrands(ctx, queries.CreateBrandsParams{
 		Name: name,
-		Slug: sql.NullString{String: utils.BrandSlug(name), Valid: true},
+		Slug: sql.NullString{String: slug, Valid: true},
 	})
 	if err != nil {
 		result = err.Error()
@@ -189,10 +194,16 @@ func (s *BrandService) UpdateBrand(ctx context.Context, staffID string, id strin
 	}()
 
 	brandID := s.encoder.Decode(id)
+	slug, err := resolveAvailableBrandSlug(ctx, s.dbRO.GetQueries(), name, brandID)
+	if err != nil {
+		result = err.Error()
+		return errors.Join(errs.ErrBrand, err)
+	}
+
 	if err := s.dbRW.GetQueries().UpdateBrand(ctx, queries.UpdateBrandParams{
 		ID:   brandID,
 		Name: name,
-		Slug: sql.NullString{String: utils.BrandSlug(name), Valid: true},
+		Slug: sql.NullString{String: slug, Valid: true},
 	}); err != nil {
 		result = err.Error()
 		return errors.Join(errs.ErrBrand, err)
