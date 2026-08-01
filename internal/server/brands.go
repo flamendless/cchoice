@@ -33,16 +33,23 @@ func (s *Server) brandsSidePanelHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	brandLabel := compshop.PrimaryBrand
-
-	filters := GetHomePageFilters(ctx, s.sessionManager)
-	if filters.BrandID != "" {
-		brandName, err := s.services.brand.GetNameByID(ctx, filters.BrandID)
-		if err != nil {
-			logs.Log().Warn(logtag, zap.Error(err), zap.String("brand id", filters.BrandID))
-		} else {
-			brandLabel = brandName
+	selectedBrand := strings.TrimSpace(r.URL.Query().Get("selected_brand"))
+	var brandLabel string
+	switch selectedBrand {
+	case compshop.NoBrandHighlight:
+		brandLabel = ""
+	case "":
+		filters := GetHomePageFilters(ctx, s.sessionManager)
+		if filters.BrandID != "" {
+			brandName, err := s.services.brand.GetNameByID(ctx, filters.BrandID)
+			if err != nil {
+				logs.Log().Warn(logtag, zap.Error(err), zap.String("brand id", filters.BrandID))
+			} else {
+				brandLabel = brandName
+			}
 		}
+	default:
+		brandLabel = selectedBrand
 	}
 
 	if err := compshop.BrandsSidePanelList(strings.ToUpper(brandLabel), brands).Render(ctx, w); err != nil {

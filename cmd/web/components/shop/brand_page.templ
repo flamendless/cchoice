@@ -6,6 +6,7 @@ import (
 	"cchoice/cmd/web/components/header"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/utils"
+	"strings"
 )
 
 templ BrandPage(data models.BrandPageData) {
@@ -69,7 +70,7 @@ templ BrandPageBody(data models.BrandPageData) {
 		</style>
 		<div id="sidebar-content-wrapper">
 			<div id="desktop-sidebar">
-				@BrandsSidePanel()
+				@BrandsSidePanel(strings.ToUpper(data.Name))
 				@CategoriesSidePanel()
 			</div>
 			<div id="main-content" name="right-panel">
@@ -77,16 +78,15 @@ templ BrandPageBody(data models.BrandPageData) {
 					@ModalProductImageViewer("", "")
 					<div class="px-2 py-3">
 						@BrandPageBreadcrumbs(data)
-						<div class="flex flex-col items-center mt-4 mb-2">
+						<div class="flex flex-col items-center mt-4 mb-2 px-4">
 							if data.LogoURL != "" {
 								<img
 									src={ data.LogoURL }
-									class="w-32 h-32 sm:w-40 sm:h-40 object-contain"
+									class="w-full max-w-md sm:max-w-xl object-contain"
 									alt={ data.Name + " logo" }
 									loading="eager"
 								/>
 							}
-							<h1 class="text-lg font-semibold text-primary-dark mt-3">{ data.Name }</h1>
 						</div>
 					</div>
 					@common.HR()

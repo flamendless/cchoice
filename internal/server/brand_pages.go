@@ -17,7 +17,7 @@ import (
 )
 
 func AddBrandPageHandlers(s *Server, r chi.Router) {
-	r.Get("/brands/", s.brandsListingPageHandler)
+	r.Get("/brands", s.brandsListingPageHandler)
 	r.Get("/brands/{brand}/sections/{section}", s.brandPrioritySectionHandler)
 	r.Get("/brands/{brand}/categories/{category_id}/products", s.brandCategoryProductsHandler)
 	r.Get("/brands/{brand}", s.brandPageHandler)

@@ -70,7 +70,7 @@ templ BrandsListingPageBody(data models.BrandsListingPageData) {
 		</style>
 		<div id="sidebar-content-wrapper">
 			<div id="desktop-sidebar">
-				@BrandsSidePanel()
+				@BrandsSidePanel(NoBrandHighlight)
 				@CategoriesSidePanel()
 			</div>
 			<div id="main-content" name="right-panel">
@@ -97,53 +97,56 @@ templ BrandsListingBreadcrumbs() {
 }
 
 templ BrandsListingGrid(brands []models.BrandListingCard) {
-	<div class="flex flex-row flex-wrap px-2 py-4 gap-2">
+	<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 px-2 py-4">
 		for _, brand := range brands {
 			if brand.ComingSoon {
 				<div
-					class="group flex flex-col items-center m-1 sm:m-2 p-3 rounded-lg border border-gray-200 bg-gray-50 opacity-75 w-28 sm:w-32"
+					class="group flex flex-col items-center p-4 rounded-lg border border-gray-200 bg-gray-50 opacity-75 cursor-not-allowed"
 				>
-					<div class="relative inline-block">
+					<div class="relative w-full flex justify-center">
 						if brand.LogoURL != "" {
 							<img
 								src={ brand.LogoURL }
-								class="w-20 max-w-20 h-20 sm:w-24 sm:max-w-24 sm:h-24 object-contain grayscale"
+								class="w-full max-h-24 sm:max-h-28 object-contain grayscale"
 								alt={ brand.Name + " logo" }
 								loading="lazy"
 							/>
 						}
-						<div
-							class="absolute w-full bottom-0 mb-1 bg-black/50 text-white text-xs font-semibold tracking-wide py-1 text-center"
-						>
-							Coming Soon
-						</div>
+						@BrandComingSoonRibbon()
 					</div>
-					<p class="text-xs font-normal text-gray-500 text-center mt-2 text-ellipsis overflow-hidden w-full">
+					<p class="text-sm font-medium text-gray-500 text-center mt-3 text-ellipsis overflow-hidden w-full">
 						{ brand.Name }
 					</p>
-					<p class="text-xs font-light text-gray-400">0 products</p>
 				</div>
 			} else {
 				<a
 					href={ templ.SafeURL(brand.PageURL) }
-					class="group flex flex-col items-center m-1 sm:m-2 p-3 rounded-lg border border-primary-muted hover:bg-surface transition-colors cursor-pointer w-28 sm:w-32"
+					class="group flex flex-col items-center p-4 rounded-lg border border-primary-muted bg-white hover:bg-surface hover:shadow-lg hover:scale-105 hover:border-primary transition-all duration-200 cursor-pointer"
 				>
 					if brand.LogoURL != "" {
 						<img
 							src={ brand.LogoURL }
-							class="w-20 max-w-20 h-20 sm:w-24 sm:max-w-24 sm:h-24 object-contain"
+							class="w-full max-h-24 sm:max-h-28 object-contain group-hover:scale-105 transition-transform duration-200"
 							alt={ brand.Name + " logo" }
 							loading="lazy"
 						/>
 					}
-					<p class="text-xs font-normal text-primary-dark text-center mt-2 text-ellipsis overflow-hidden w-full group-hover:font-bold transition-colors">
+					<p class="text-sm font-medium text-primary-dark text-center mt-3 text-ellipsis overflow-hidden w-full group-hover:font-bold transition-colors">
 						{ brand.Name }
 					</p>
-					<p class="text-xs font-light text-gray-600">
+					<p class="text-xs font-light text-gray-600 mt-1">
 						{ fmt.Sprintf("%d products", brand.ProductCount) }
 					</p>
 				</a>
 			}
 		}
+	</div>
+}
+
+templ BrandComingSoonRibbon() {
+	<div
+		class="absolute w-full bottom-0 mb-1 bg-black/50 text-white text-xs font-semibold tracking-wide py-1 text-center"
+	>
+		Coming Soon
 	</div>
 }

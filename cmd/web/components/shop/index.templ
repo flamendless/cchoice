@@ -78,7 +78,7 @@ templ HomePageBody(data models.HomePageData) {
 		}
 		<div id="sidebar-content-wrapper">
 			<div id="desktop-sidebar">
-				@BrandsSidePanel()
+				@BrandsSidePanel("")
 				@CategoriesSidePanel()
 			</div>
 			<div id="main-content" name="right-panel">
@@ -130,7 +130,7 @@ templ MobileSidebar() {
 			</button>
 		</div>
 		<div class="px-2">
-			@BrandsSidePanel()
+			@BrandsSidePanel("")
 			@CategoriesSidePanel()
 		</div>
 	</div>
