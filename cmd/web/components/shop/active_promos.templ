@@ -51,7 +51,7 @@ templ PromoBannerMedia(promo models.PromoItem) {
 				></iframe>
 			} else {
 				<video
-					class="w-full h-auto object-cover"
+					class="w-full h-auto object-cover aspect-[2/1]"
 					src={ promo.MediaURL }
 					autoplay
 					loop
@@ -61,7 +61,7 @@ templ PromoBannerMedia(promo models.PromoItem) {
 			}
 		case enums.PROMO_TYPE_BANNER_IMAGE:
 			<img
-				class="w-full h-auto object-cover"
+				class="w-full h-auto object-cover aspect-[2/1]"
 				src={ promo.MediaURL }
 				alt={ promo.Title }
 				loading="lazy"

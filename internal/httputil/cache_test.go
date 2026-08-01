@@ -218,6 +218,27 @@ func TestSetCacheControlHeaders(t *testing.T) {
 			expectedCacheControl: "public, max-age=3600, stale-while-revalidate=86400",
 			expectVary:           true,
 		},
+		{
+			name:                 "versioned asset uses immutable long cache",
+			path:                 "/static/css/tailwind.css",
+			query:                "v=ee51fda12671",
+			expectedCacheControl: "public, max-age=31536000, immutable",
+			expectVary:           true,
+		},
+		{
+			name:                 "css file without static prefix uses 7 day cache",
+			path:                 "/css/tailwind.css",
+			query:                "",
+			expectedCacheControl: "public, max-age=604800",
+			expectVary:           false,
+		},
+		{
+			name:                 "js file without static prefix uses 7 day cache",
+			path:                 "/js/htmx.min.js",
+			query:                "",
+			expectedCacheControl: "public, max-age=604800",
+			expectVary:           false,
+		},
 	}
 
 	for _, tt := range tests {

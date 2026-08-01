@@ -71,8 +71,8 @@ templ BrandPageBody(data models.BrandPageData) {
 		</style>
 		<div id="sidebar-content-wrapper">
 			<div id="desktop-sidebar">
-				@BrandsSidePanel(strings.ToUpper(data.Name))
-				@CategoriesSidePanel()
+				@BrandsSidePanel(strings.ToUpper(data.Name), false)
+				@CategoriesSidePanel(false)
 			</div>
 			<div id="main-content" name="right-panel">
 				<div class="w-full">

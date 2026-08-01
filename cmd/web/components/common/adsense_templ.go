@@ -8,6 +8,9 @@ package common
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+// ScrAdSense defers loading the AdSense script until the browser is idle or
+// the user first interacts with the page, so it doesn't compete with
+// critical-path resources (CSS/JS/LCP image) during initial load.
 func ScrAdSense() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -29,7 +32,7 @@ func ScrAdSense() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<script async src=\"https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904940380415570\" crossorigin=\"anonymous\"></script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<script>\n\t\t(function() {\n\t\t\tvar loaded = false;\n\t\t\tfunction loadAdSense() {\n\t\t\t\tif (loaded) return;\n\t\t\t\tloaded = true;\n\t\t\t\tvar s = document.createElement(\"script\");\n\t\t\t\ts.async = true;\n\t\t\t\ts.src = \"https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904940380415570\";\n\t\t\t\ts.crossOrigin = \"anonymous\";\n\t\t\t\tdocument.head.appendChild(s);\n\t\t\t}\n\t\t\t[\"scroll\", \"pointerdown\", \"keydown\", \"touchstart\"].forEach(function(evt) {\n\t\t\t\twindow.addEventListener(evt, loadAdSense, { passive: true, once: true });\n\t\t\t});\n\t\t\tif (\"requestIdleCallback\" in window) {\n\t\t\t\trequestIdleCallback(loadAdSense, { timeout: 5000 });\n\t\t\t} else {\n\t\t\t\tsetTimeout(loadAdSense, 3000);\n\t\t\t}\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

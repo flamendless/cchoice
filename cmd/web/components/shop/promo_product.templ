@@ -50,7 +50,7 @@ templ SaleBanner(product models.RandomSaleProduct) {
 				src={ product.CDNURL1280 }
 				alt={ product.Name }
 				class="w-full h-64 object-cover"
-				loading="lazy"
+				fetchpriority="high"
 			/>
 			<!-- Product Info -->
 			<div class="p-6 bg-gradient-to-r from-surface to-white">

@@ -191,7 +191,7 @@ func PromoBannerMedia(promo models.PromoItem) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<video class=\"w-full h-auto object-cover\" src=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<video class=\"w-full h-auto object-cover aspect-[2/1]\" src=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -210,7 +210,7 @@ func PromoBannerMedia(promo models.PromoItem) templ.Component {
 				}
 			}
 		case enums.PROMO_TYPE_BANNER_IMAGE:
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<img class=\"w-full h-auto object-cover\" src=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<img class=\"w-full h-auto object-cover aspect-[2/1]\" src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

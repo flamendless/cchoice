@@ -1,5 +1,26 @@
 package common
 
 templ ScrAdSense() {
-	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904940380415570" crossorigin="anonymous"></script>
+	<script>
+		(function() {
+			var loaded = false;
+			function loadAdSense() {
+				if (loaded) return;
+				loaded = true;
+				var s = document.createElement("script");
+				s.async = true;
+				s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904940380415570";
+				s.crossOrigin = "anonymous";
+				document.head.appendChild(s);
+			}
+			["scroll", "pointerdown", "keydown", "touchstart"].forEach(function(evt) {
+				window.addEventListener(evt, loadAdSense, { passive: true, once: true });
+			});
+			if ("requestIdleCallback" in window) {
+				requestIdleCallback(loadAdSense, { timeout: 5000 });
+			} else {
+				setTimeout(loadAdSense, 3000);
+			}
+		})();
+	</script>
 }

@@ -66,8 +66,8 @@ templ SearchPageBody(data models.SearchPageData) {
 		</style>
 		<div id="sidebar-content-wrapper">
 			<div id="desktop-sidebar">
-				@BrandsSidePanel("")
-				@CategoriesSidePanel()
+				@BrandsSidePanel("", false)
+				@CategoriesSidePanel(false)
 			</div>
 			<div id="main-content" name="right-panel">
 				<div class="w-full">

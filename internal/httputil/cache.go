@@ -89,10 +89,15 @@ func parseAndSortQuery(rawQuery string) string {
 
 func setCacheControlHeaders(w http.ResponseWriter, r *http.Request) {
 	switch {
+	case r.URL.Query().Get("v") != "":
+		// Fingerprinted asset (see utils.VersionedAsset / mage genassets) -
+		// the query string changes whenever the file content changes, so
+		// it's safe for browsers/CDNs to cache it for a full year.
+		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable") // 1 year, immutable
+	case strings.HasSuffix(r.URL.Path, ".css"), strings.HasSuffix(r.URL.Path, ".js"):
+		w.Header().Set("Cache-Control", "public, max-age=604800") // 7 day
 	case strings.Contains(r.URL.Path, "/static/"):
 		w.Header().Set("Cache-Control", "public, max-age=86400") // 1 day
-	case strings.HasPrefix(r.URL.Path, "js/") && strings.HasSuffix(r.URL.Path, ".js"):
-		w.Header().Set("Cache-Control", "public, max-age=604800") // 7 day
 	case r.URL.Path == "robots.txt":
 		w.Header().Set("Cache-Control", "public, max-age=604800") // 1 week
 	default:

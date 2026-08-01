@@ -39,7 +39,7 @@ templ BrandsSidePanelList(selectedBrandLabel string, brands []models.BrandSidePa
 	</div>
 }
 
-templ BrandsSidePanel(selectedBrandLabel string) {
+templ BrandsSidePanel(selectedBrandLabel string, lazy bool) {
 	<div
 		id="brands-side-panel"
 		class="
@@ -68,7 +68,12 @@ templ BrandsSidePanel(selectedBrandLabel string) {
 		</div>
 		<div
 			id="brands-side-panel-content"
-			hx-trigger="load once, history:restore"
+			hx-trigger={ func() string {
+				if lazy {
+					return "intersect once, history:restore"
+				}
+				return "load once, history:restore"
+			}() }
 			hx-get={ brandSidePanelListURL(selectedBrandLabel) }
 			hx-select="#brands-side-panel-list"
 			hx-target="find #brands-side-panel-list"

@@ -70,8 +70,8 @@ templ BrandsListingPageBody(data models.BrandsListingPageData) {
 		</style>
 		<div id="sidebar-content-wrapper">
 			<div id="desktop-sidebar">
-				@BrandsSidePanel(NoBrandHighlight)
-				@CategoriesSidePanel()
+				@BrandsSidePanel(NoBrandHighlight, false)
+				@CategoriesSidePanel(false)
 			</div>
 			<div id="main-content" name="right-panel">
 				<div class="w-full">

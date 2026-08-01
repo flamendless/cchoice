@@ -3,7 +3,6 @@ package common
 import "cchoice/internal/utils"
 
 var errorBannerHandlerOnce = templ.NewOnceHandle()
-var onceErrorHandler = templ.NewOnceHandle()
 
 templ ErrorBanner() {
 	<div id="error_banner" hidden>
@@ -39,8 +38,8 @@ templ ErrorBanner() {
 				</div>
 			</div>
 		}
-		@onceErrorHandler.Once() {
-			<script type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/banner_handler.js"))) }>
+		@bannerHandlerScriptOnce.Once() {
+			<script defer type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/banner_handler.js"))) }>
 			</script>
 		}
 	</div>

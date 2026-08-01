@@ -2,5 +2,5 @@
 package utils
 
 func init() {
-    assetVersion = "ee51fda12671"
+    assetVersion = "089a511ae316"
 }

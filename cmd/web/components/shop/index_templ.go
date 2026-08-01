@@ -154,11 +154,11 @@ func HomePageBody(data models.HomePageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = BrandsSidePanel("").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = BrandsSidePanel("", false).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = CategoriesSidePanel().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = CategoriesSidePanel(false).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -231,11 +231,11 @@ func MobileSidebar() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = BrandsSidePanel("").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = BrandsSidePanel("", true).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = CategoriesSidePanel().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = CategoriesSidePanel(true).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

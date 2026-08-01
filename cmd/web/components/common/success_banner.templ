@@ -3,7 +3,6 @@ package common
 import "cchoice/internal/utils"
 
 var successBannerHandlerOnce = templ.NewOnceHandle()
-var onceSuccessHandler = templ.NewOnceHandle()
 
 templ SuccessBanner() {
 	<div id="success_banner" hidden>
@@ -39,8 +38,8 @@ templ SuccessBanner() {
 				</div>
 			</div>
 		}
-		@onceSuccessHandler.Once() {
-			<script type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/banner_handler.js"))) }>
+		@bannerHandlerScriptOnce.Once() {
+			<script defer type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/banner_handler.js"))) }>
 			</script>
 		}
 	</div>

@@ -78,8 +78,8 @@ templ HomePageBody(data models.HomePageData) {
 		}
 		<div id="sidebar-content-wrapper">
 			<div id="desktop-sidebar">
-				@BrandsSidePanel("")
-				@CategoriesSidePanel()
+				@BrandsSidePanel("", false)
+				@CategoriesSidePanel(false)
 			</div>
 			<div id="main-content" name="right-panel">
 				<div class="w-full">
@@ -130,8 +130,8 @@ templ MobileSidebar() {
 			</button>
 		</div>
 		<div class="px-2">
-			@BrandsSidePanel("")
-			@CategoriesSidePanel()
+			@BrandsSidePanel("", true)
+			@CategoriesSidePanel(true)
 		</div>
 	</div>
 }
