@@ -122,6 +122,7 @@ templ BrandsListingGrid(brands []models.BrandListingCard) {
 				<a
 					href={ templ.SafeURL(brand.PageURL) }
 					class="group flex flex-col items-center p-4 rounded-lg border border-primary-muted bg-white hover:bg-surface hover:shadow-lg hover:scale-105 hover:border-primary transition-all duration-200 cursor-pointer"
+					_={ fmt.Sprintf("on click call metrics_event('brand_click', '%s')", brand.Slug) }
 				>
 					if brand.LogoURL != "" {
 						<img

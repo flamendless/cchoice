@@ -30,6 +30,7 @@ type BrandSidePanelText struct {
 	Label   string
 	URL     string
 	BrandID string
+	Slug    string
 }
 
 type Brand struct {

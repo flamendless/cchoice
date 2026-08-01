@@ -177,6 +177,7 @@ func GetBrandsSidePanel(
 			Label:   strings.ToUpper(v.Name),
 			URL:     utils.URLf("/brands/%s", slug),
 			BrandID: encoder.Encode(v.ID),
+			Slug:    slug,
 		})
 	}
 

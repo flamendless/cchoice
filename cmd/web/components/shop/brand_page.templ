@@ -6,6 +6,7 @@ import (
 	"cchoice/cmd/web/components/header"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/utils"
+	"fmt"
 	"strings"
 )
 
@@ -25,7 +26,7 @@ templ BrandPage(data models.BrandPageData) {
 }
 
 templ BrandPageBody(data models.BrandPageData) {
-	<body class="m-0 p-0 custom-scrollbar" style="overflow-x: clip;" _="init call metrics_event('anon_visit', 'brand')">
+	<body class="m-0 p-0 custom-scrollbar" style="overflow-x: clip;" _={ fmt.Sprintf("init call metrics_event('anon_visit', '%s')", data.Slug) }>
 		@common.DevRibbon()
 		@common.ErrorBanner()
 		@common.SuccessBanner()
@@ -91,11 +92,11 @@ templ BrandPageBody(data models.BrandPageData) {
 					</div>
 					@common.HR()
 					if len(data.BestSelling.Products) > 0 {
-						@BrandPrioritySection(data.BestSelling, "best-selling")
+						@BrandPrioritySection(data.BestSelling, data.Slug, "best-selling")
 						@common.HR()
 					}
 					if len(data.HighestDiscount.Products) > 0 {
-						@BrandPrioritySection(data.HighestDiscount, "highest-discount")
+						@BrandPrioritySection(data.HighestDiscount, data.Slug, "highest-discount")
 						@common.HR()
 					}
 					@BrandCategorySections(data.CategorySections)
@@ -119,7 +120,7 @@ templ BrandPageBreadcrumbs(data models.BrandPageData) {
 	</nav>
 }
 
-templ BrandPrioritySection(section models.BrandPrioritySection, sectionKey string) {
+templ BrandPrioritySection(section models.BrandPrioritySection, brandSlug string, sectionKey string) {
 	<div id={ "brand-section-" + sectionKey } class="w-full">
 		<p class="text-base font-medium text-primary-dark m-2 my-0">
 			{ section.Title }
@@ -143,7 +144,7 @@ templ BrandPrioritySection(section models.BrandPrioritySection, sectionKey strin
 					hx-get={ section.ShowMoreURL }
 					hx-target={ "#brand-section-products-" + sectionKey }
 					hx-swap="innerHTML"
-					_="on click call metrics_event('brand_show_more', sectionKey)"
+					_={ fmt.Sprintf("on click call metrics_event('brand_show_more', '%s:%s')", brandSlug, sectionKey) }
 				>
 					Show more ({ section.TotalCount } products)
 				</button>

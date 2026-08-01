@@ -17,6 +17,9 @@ func TestIsAllowedClientEvent(t *testing.T) {
 	}{
 		{name: "admin visit", event: EventAdminVisit, want: true},
 		{name: "anon exec", event: EventAnonExec, want: true},
+		{name: "brand show more", event: EventBrandShowMore, want: true},
+		{name: "brand click", event: EventBrandClick, want: true},
+		{name: "brand side panel select", event: EventBrandSidePanelSelect, want: true},
 		{name: "unknown", event: "unknown_event", want: false},
 		{name: "empty", event: "", want: false},
 	}

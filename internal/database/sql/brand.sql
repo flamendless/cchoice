@@ -80,7 +80,17 @@ SELECT
 	slug,
 	status
 FROM tbl_brands
-WHERE status = 'ACTIVE'
+WHERE
+	status = 'ACTIVE'
+	AND deleted_at = '1970-01-01 00:00:00+00:00'
+	AND EXISTS (
+		SELECT 1
+		FROM tbl_products
+		WHERE
+			tbl_products.brand_id = tbl_brands.id
+			AND tbl_products.status = 'ACTIVE'
+			AND tbl_products.deleted_at = '1970-01-01 00:00:00+00:00'
+	)
 ORDER BY name ASC
 LIMIT ?;
 

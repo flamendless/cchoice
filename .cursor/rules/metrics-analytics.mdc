@@ -1,0 +1,89 @@
+---
+description: Client-side metrics and analytics conventions (Hyperscript, events.go, Grafana)
+globs: cmd/web/components/**/*.templ,internal/metrics/**/*.go,grafana/**/*
+alwaysApply: false
+---
+
+# Metrics & Analytics
+
+C-Choice uses a first-party metrics stack — not Google Analytics, GTM, or third-party product analytics.
+
+## Stack
+
+1. **Browser** — Hyperscript `_` attribute calls `metrics_event(event, value)` in `cmd/web/static/js/metrics.js`
+2. **Server** — `POST /collect/event` (`metricsEventHandler` in `internal/server/routes.go`)
+3. **Allowlist** — `internal/metrics/events.go` (`IsAllowedClientEvent`, `SanitizeClientEventValue`)
+4. **Storage** — Prometheus counter `cchoice_client_client_event{event, value}`
+5. **Dashboards** — `grafana/dashboards/user-activity.json` (and related)
+
+`metrics.js` is loaded globally via `common.HeadMetaBase()`.
+
+## Adding a new client event
+
+**Always register before use** — unlisted events return `400 unknown event`.
+
+1. Add `Event*` constant in `internal/metrics/events.go`
+2. Add entry to `allowedClientEvents` map
+3. Add `Visit*` or `Exec*` value constant when the event uses a canonical second argument
+4. Add to `highCardinalityEvents` only for unbounded values (search queries, order lookups)
+5. Add a test case in `internal/metrics/events_test.go`
+6. Instrument templ with Hyperscript (see below)
+7. Run `mage gentempl`
+8. Optionally add a Grafana panel in `grafana/dashboards/user-activity.json`
+
+## Templ instrumentation patterns
+
+### Page visits
+
+On `<body>` init — use entity slug/ID for entity pages, page-type string for listing pages:
+
+```html
+<!-- Listing page -->
+<body _="init call metrics_event('anon_visit', 'brands_list')">
+
+<!-- Entity page (dynamic value) -->
+<body _={ fmt.Sprintf("init call metrics_event('anon_visit', '%s')", data.Slug) }>
+```
+
+Role prefixes: `anon_visit`, `customer_visit`, `admin_visit` (and matching `*_exec` for actions).
+
+### Interactions
+
+```html
+_="on click call metrics_event('brand_click', my @data-brand-slug)"
+_={ fmt.Sprintf("on click call metrics_event('brand_show_more', '%s:%s')", brandSlug, sectionKey) }
+_="on submit call metrics_event('anon_exec', 'checkout')"
+```
+
+Use `fmt.Sprintf` in templ when the value must be rendered at compile time from Go data. Use `my @data-*` when reading from element attributes at runtime.
+
+Do **not** use `data-analytics` attributes — the project uses Hyperscript `_` exclusively.
+
+## Value conventions
+
+| Context | Value format | Example |
+|---------|--------------|---------|
+| Listing / static pages | `Visit*` constant string | `brands_list`, `homepage`, `search` |
+| Entity pages | Entity slug or encoded ID | brand slug, product ID |
+| Composite actions | `entity:detail` | `nike:best-selling` for show-more |
+| Admin/customer actions | Human-readable exec string | `create brand`, `checkout` |
+
+Keep values under 128 chars (32 for high-cardinality events).
+
+## Brand page checklist
+
+When adding or changing brand pages, ensure these events are covered:
+
+| Interaction | Event | Value |
+|-------------|-------|-------|
+| Individual brand page load | `anon_visit` | brand slug |
+| Brands listing page load | `anon_visit` | `brands_list` |
+| Listing grid card click | `brand_click` | brand slug |
+| Side panel brand link | `brand_side_panel_select` | brand slug |
+| Side panel expand/collapse | `brands_side_panel_click` | (empty) |
+| Priority section show more | `brand_show_more` | `{slug}:{sectionKey}` |
+| Product thumbnail click | `product_click` | encoded product ID (via `category_section.templ`) |
+
+## Server-side metrics
+
+For handler/service events (orders, auth, checkout), call subsystem helpers in `internal/metrics/` directly — no client JS needed. HTTP traffic is tracked by `PrometheusMiddleware`.

@@ -26,7 +26,7 @@ Dashboards use a **Data source** template variable (regex excludes usage/ML metr
 | File | UID | Purpose |
 |------|-----|---------|
 | `overview.json` | `cchoice-overview` | Promo products, client events, HTTP requests (matches Grafana Cloud Metrics Overview) |
-| `user-activity.json` | `cchoice-user-activity` | Page visits, actions, search, product clicks |
+| `user-activity.json` | `cchoice-user-activity` | Page visits, actions, search, product clicks, brand activity |
 | `commerce.json` | `cchoice-commerce` | Orders, checkout, auth, shopping signals |
 
 ## Key PromQL queries
@@ -42,6 +42,9 @@ Dashboards use a **Data source** template variable (regex excludes usage/ML metr
 - Events by type: `sum by (event) (rate(cchoice_client_client_event[5m]))`
 - Page visits: `sum by (value) (rate(cchoice_client_client_event{event=~"admin_visit|customer_visit|anon_visit"}[5m]))`
 - Actions: `sum by (value) (rate(cchoice_client_client_event{event=~".*_exec"}[5m]))`
+- Brand page visits: `sum(rate(cchoice_client_client_event{event="anon_visit", value="brands_list"}[5m]))` and per-slug visits via `anon_visit` value
+- Brand interactions: `sum by (event) (rate(cchoice_client_client_event{event=~"brand_click|brand_show_more|brand_side_panel_select|brands_side_panel_click"}[5m]))`
+- Top brand clicks: `topk(10, sum by (value) (increase(cchoice_client_client_event{event="brand_click"}[24h])))`
 
 ### Commerce
 

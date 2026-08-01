@@ -19,6 +19,8 @@ templ BrandsSidePanelList(selectedBrandLabel string, brands []models.BrandSidePa
 				}
 				data-brand-name={ brand.Label }
 				data-brand-id={ brand.BrandID }
+				data-brand-slug={ brand.Slug }
+				_="on click call metrics_event('brand_side_panel_select', my @data-brand-slug)"
 			>
 				<p class="text-ellipsis text-nowrap overflow-hidden">
 					{ brand.Label }
