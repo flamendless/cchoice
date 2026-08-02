@@ -198,6 +198,74 @@ type TblHoliday struct {
 	UpdatedAt sql.NullString
 }
 
+type TblInvoice struct {
+	ID                     int64
+	InvoiceNumber          string
+	RecipientID            sql.NullInt64
+	RecipientName          string
+	RecipientEmail         string
+	RecipientContactNumber string
+	RecipientAddress       string
+	RecipientTin           string
+	Status                 string
+	IssueDate              string
+	DueDate                string
+	Notes                  string
+	Currency               string
+	Subtotal               int64
+	VatPercentage          string
+	VatAmount              int64
+	Total                  int64
+	EmailedAt              string
+	CreatedBy              int64
+	CreatedAt              string
+	UpdatedAt              string
+}
+
+type TblInvoiceConfig struct {
+	ID              int64
+	BusinessName    string
+	Address         string
+	Tin             string
+	VatRegistration string
+	Email           string
+	ContactNumber   string
+	Website         string
+	FooterNotes     string
+	LogoUrl         string
+	LogoPath        string
+	Currency        string
+	VatPercentage   string
+	CreatedAt       string
+	UpdatedAt       string
+}
+
+type TblInvoiceLine struct {
+	ID          int64
+	InvoiceID   int64
+	ProductID   sql.NullInt64
+	Description string
+	Quantity    int64
+	UnitPrice   int64
+	LineTotal   int64
+	Currency    string
+	CreatedAt   string
+	UpdatedAt   string
+}
+
+type TblInvoiceRecipient struct {
+	ID            int64
+	Name          string
+	Email         string
+	ContactNumber string
+	Address       string
+	Tin           string
+	Notes         string
+	CreatedAt     string
+	UpdatedAt     string
+	DeletedAt     string
+}
+
 type TblLinkClick struct {
 	ID          int64
 	LinkID      string
