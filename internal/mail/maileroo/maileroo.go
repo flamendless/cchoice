@@ -58,10 +58,14 @@ func (m *Maileroo) Enum() mail.MailService {
 }
 
 func (m *Maileroo) SendEmail(to string, cc []string, subject, body string) error {
-	return m.sendEmail(context.Background(), to, cc, subject, body, false)
+	return m.sendEmail(context.Background(), to, cc, subject, body, false, nil)
 }
 
 func (m *Maileroo) SendTemplateEmail(to string, cc []string, subject, templateName string, data mail.TemplateData) error {
+	return m.SendTemplateEmailWithAttachments(to, cc, subject, templateName, data, nil)
+}
+
+func (m *Maileroo) SendTemplateEmailWithAttachments(to string, cc []string, subject, templateName string, data mail.TemplateData, attachments []mail.Attachment) error {
 	templatePath := filepath.Join("templates", templateName)
 	tmplContent, err := os.ReadFile(templatePath)
 	if err != nil {
@@ -78,10 +82,10 @@ func (m *Maileroo) SendTemplateEmail(to string, cc []string, subject, templateNa
 		return errors.Join(errs.ErrTemplateExecute, err)
 	}
 
-	return m.sendEmail(context.Background(), to, cc, subject, buf.String(), true)
+	return m.sendEmail(context.Background(), to, cc, subject, buf.String(), true, attachments)
 }
 
-func (m *Maileroo) sendEmail(ctx context.Context, to string, cc []string, subject, body string, isHTML bool) error {
+func (m *Maileroo) sendEmail(ctx context.Context, to string, cc []string, subject, body string, isHTML bool, attachments []mail.Attachment) error {
 	const logTag = "[Maileroo Send Email]"
 
 	toAddresses := []maileroo.EmailAddress{maileroo.NewEmail(to, "")}
@@ -96,6 +100,19 @@ func (m *Maileroo) sendEmail(ctx context.Context, to string, cc []string, subjec
 		To:      toAddresses,
 		Cc:      ccAddresses,
 		Subject: subject,
+	}
+
+	if len(attachments) > 0 {
+		mailerooAttachments := make([]maileroo.Attachment, 0, len(attachments))
+		for _, att := range attachments {
+			a, err := maileroo.AttachmentFromContent(att.FileName, att.Content, att.ContentType, false)
+			if err != nil {
+				logs.Log().Error(logTag, zap.Error(err))
+				return errors.Join(errs.ErrMailerooSendFailed, err)
+			}
+			mailerooAttachments = append(mailerooAttachments, *a)
+		}
+		emailData.Attachments = mailerooAttachments
 	}
 
 	if isHTML {
