@@ -318,6 +318,68 @@ func (s *ImageService) UploadThemeLogo(
 	return s.objectStorage.GetPublicURL(filename), nil
 }
 
+// ValidateInvoiceLogoContentType restricts invoice logo uploads to PNG and
+// JPEG only, since these are the raster formats the PDF renderer can embed.
+func (s *ImageService) ValidateInvoiceLogoContentType(contentType string) error {
+	validTypes := map[string]bool{
+		"image/png":  true,
+		"image/jpeg": true,
+	}
+	if !validTypes[contentType] {
+		return fmt.Errorf("invalid content type: %s", contentType)
+	}
+	return nil
+}
+
+// UploadInvoiceLogo stores the invoice/business logo and returns the public URL
+// plus a local filesystem path (empty when stored on object storage) that the
+// PDF renderer can read directly.
+func (s *ImageService) UploadInvoiceLogo(
+	ctx context.Context,
+	ext string,
+	file io.Reader,
+	contentType string,
+) (string, string, error) {
+	const logtag = "[ImageService] Invoice Logo"
+	if err := s.ValidateInvoiceLogoContentType(contentType); err != nil {
+		return "", "", err
+	}
+	data, err := s.ValidateSize(file)
+	if err != nil {
+		return "", "", err
+	}
+
+	env := strings.ToLower(conf.Conf().AppEnv.String())
+	uuid := utils.GenString(16)
+	filename := fmt.Sprintf("cchoice_%s_invoice_logo_%s%s", env, uuid, strings.ToLower(ext))
+	file = bytes.NewReader(data)
+	isLocalStorage := s.objectStorage.ProviderEnum() == storage.STORAGE_PROVIDER_LOCAL
+
+	logs.Log().Info(
+		logtag,
+		zap.String("storing invoice logo", filename),
+		zap.Stringer("using", s.objectStorage.ProviderEnum()),
+		zap.Bool("local storage", isLocalStorage),
+	)
+
+	if !conf.Conf().IsProd() && !conf.Conf().Test.LocalUploadImage || isLocalStorage {
+		localPath := filepath.Join("cmd/web/static/images/invoice_logos", filepath.Base(filename))
+		if err := os.MkdirAll(filepath.Dir(localPath), 0755); err != nil {
+			return "", "", err
+		}
+		if err := os.WriteFile(localPath, data, 0644); err != nil {
+			return "", "", err
+		}
+		return s.objectStorage.GetPublicURL(filename), localPath, nil
+	}
+
+	if err := s.objectStorage.PutObject(ctx, filename, file, contentType); err != nil {
+		return "", "", err
+	}
+
+	return s.objectStorage.GetPublicURL(filename), "", nil
+}
+
 func (s *ImageService) ID() string {
 	return "Image"
 }
