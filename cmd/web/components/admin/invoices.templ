@@ -1,0 +1,549 @@
+package components
+
+import (
+	"fmt"
+	"strconv"
+
+	"cchoice/cmd/web/components/common"
+	"cchoice/cmd/web/components/header"
+	"cchoice/internal/constants"
+	"cchoice/internal/services"
+	"cchoice/internal/utils"
+)
+
+templ AdminInvoicesListPage(config services.InvoiceConfig) {
+	<!DOCTYPE html>
+	<html lang="en" class="overflow-x-hidden">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle("Invoices - C-Choice Admin")
+		</head>
+		<body
+			class="bg-surface min-h-screen flex flex-col"
+			_="init call metrics_event('admin_visit', 'invoices list')"
+		>
+			@common.DevRibbon()
+			@common.ErrorBanner()
+			@common.SuccessBanner()
+			<div class="flex-grow p-4">
+				<div class="max-w-6xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6">
+						@header.AdminStaffHeaderWithBack()
+						<h1 class="text-2xl font-bold text-center text-primary mb-6">
+							Invoices
+						</h1>
+						@InvoiceConfigCard(config)
+						@InvoiceRecipientsSection()
+						@InvoicesSection()
+					</div>
+				</div>
+			</div>
+			<div id="invoice-recipient-modal-container"></div>
+			<div id="invoice-generate-modal-container"></div>
+			@ScrImageUpload()
+			@ScrInvoiceGenerate()
+		</body>
+	</html>
+}
+
+templ ScrInvoiceGenerate() {
+	<script type="text/javascript" src={ utils.URL(utils.VersionedAsset("/static/js/invoice_generate.js")) }></script>
+}
+
+templ InvoiceConfigCard(config services.InvoiceConfig) {
+	<div class="bg-white rounded-lg shadow-md border border-gray-100 p-6 mb-8">
+		<h2 class="text-xl font-semibold text-gray-900 mb-1">Business / Invoice Configuration</h2>
+		<p class="text-sm text-gray-500 mb-4">These details appear on every invoice you generate.</p>
+		<form
+			hx-post={ utils.URL("/admin/invoices/config") }
+			enctype="multipart/form-data"
+			class="grid grid-cols-1 md:grid-cols-2 gap-4"
+			_="on submit call metrics_event('admin_exec', 'save invoice config')"
+		>
+			<div class="md:col-span-2">
+				@invoiceTextField("business_name", "Business Name", config.BusinessName, "C-Choice Construction Supply Shop", true)
+			</div>
+			<div class="md:col-span-2">
+				<label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+				<textarea name="address" rows="2" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full">{ config.Address }</textarea>
+			</div>
+			@invoiceTextFieldWrap("tin", "TIN", config.TIN, "000-000-000-000")
+			@invoiceTextFieldWrap("vat_registration", "VAT Registration", config.VATRegistration, "VAT / Non-VAT")
+			@invoiceTextFieldWrap("email", "Email", config.Email, "billing@example.com")
+			@invoiceTextFieldWrap("contact_number", "Contact Number", config.ContactNumber, "+63...")
+			@invoiceTextFieldWrap("website", "Website", config.Website, "https://...")
+			<div>
+				<label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+				<input type="text" name="currency" value={ orDefault(config.Currency, "PHP") } class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-700 mb-1">VAT Percentage (%)</label>
+				<input type="number" step="0.01" min="0" name="vat_percentage" value={ orDefault(config.VATPercentage, "12") } class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
+			</div>
+			<div class="md:col-span-2">
+				<label class="block text-sm font-medium text-gray-700 mb-1">Footer Notes</label>
+				<textarea name="footer_notes" rows="2" placeholder="Thank you for your business!" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full">{ config.FooterNotes }</textarea>
+			</div>
+			<div class="md:col-span-2">
+				@ImageUploadField(ImageUploadParams{
+					Name:         "logo",
+					Label:        "Logo",
+					Accept:       "image/png,image/jpeg",
+					MaxSize:      constants.MaxSizeImageUpload,
+					ExistingURL:  config.LogoURL,
+					PreviewClass: "h-20 w-auto object-contain rounded border border-gray-200",
+					HelpText:     "PNG or JPEG. Used on generated PDFs.",
+				})
+			</div>
+			<div class="md:col-span-2 flex justify-end">
+				<button type="submit" class="px-5 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+					Save Configuration
+				</button>
+			</div>
+		</form>
+	</div>
+}
+
+templ invoiceTextField(name string, label string, value string, placeholder string, required bool) {
+	<label class="block text-sm font-medium text-gray-700 mb-1">
+		{ label }
+		if required {
+			<span class="text-red-500">*</span>
+		}
+	</label>
+	<input
+		type="text"
+		name={ name }
+		value={ value }
+		placeholder={ placeholder }
+		if required {
+			required
+		}
+		class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"
+	/>
+}
+
+templ invoiceTextFieldWrap(name string, label string, value string, placeholder string) {
+	<div>
+		@invoiceTextField(name, label, value, placeholder, false)
+	</div>
+}
+
+templ InvoiceRecipientsSection() {
+	<div class="bg-white rounded-lg shadow-md border border-gray-100 p-6 mb-8">
+		<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+			<div>
+				<h2 class="text-xl font-semibold text-gray-900">Recipients / Clients</h2>
+				<p class="text-sm text-gray-500">Manage the clients you issue invoices to.</p>
+			</div>
+			<button
+				type="button"
+				class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+				hx-get={ utils.URL("/admin/invoices/recipients/create") }
+				hx-target="#invoice-recipient-modal-container"
+				hx-swap="innerHTML"
+			>
+				Add Recipient
+			</button>
+		</div>
+		<form
+			class="flex gap-2 items-center mb-4"
+			hx-get={ utils.URL("/admin/invoices/recipients/table") }
+			hx-target="#invoice-recipients-table"
+			hx-swap="innerHTML"
+		>
+			<input type="search" name="search" placeholder="Search recipients..." class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"/>
+			<button type="submit" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">Search</button>
+		</form>
+		<div
+			hx-get={ utils.URL("/admin/invoices/recipients/table") }
+			hx-trigger="load"
+			hx-target="#invoice-recipients-table"
+			hx-swap="innerHTML"
+		>
+			<div id="invoice-recipients-table"></div>
+		</div>
+	</div>
+}
+
+templ AdminInvoiceRecipientsTable(recipients []services.InvoiceRecipient, searchQuery string) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-50">
+				<tr>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TIN</th>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				if len(recipients) == 0 {
+					<tr>
+						<td colspan="5" class="px-4 py-4 text-center text-gray-500">
+							No recipients found.
+						</td>
+					</tr>
+				} else {
+					for _, recipient := range recipients {
+						<tr id={ fmt.Sprintf("invoice-recipient-row-%s", recipient.ID) }>
+							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{ recipient.Name }</td>
+							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{ orDash(recipient.Email) }</td>
+							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{ orDash(recipient.ContactNumber) }</td>
+							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{ orDash(recipient.TIN) }</td>
+							<td class="px-4 py-3 whitespace-nowrap text-sm">
+								<div class="flex items-center gap-2">
+									<button
+										type="button"
+										class="text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium"
+										hx-get={ utils.URLf("/admin/invoices/recipients/%s/edit", recipient.ID) }
+										hx-target="#invoice-recipient-modal-container"
+										hx-swap="innerHTML"
+									>
+										Edit
+									</button>
+									<button
+										type="button"
+										class="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs font-medium"
+										hx-delete={ utils.URLf("/admin/invoices/recipients/%s", recipient.ID) }
+										hx-target={ fmt.Sprintf("#invoice-recipient-row-%s", recipient.ID) }
+										hx-swap="outerHTML"
+										hx-confirm="Delete this recipient?"
+									>
+										Delete
+									</button>
+								</div>
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ InvoiceRecipientCreateModal() {
+	@invoiceModalShell("invoice-recipient-modal", "Add Recipient") {
+		@InvoiceRecipientForm(services.InvoiceRecipient{}, utils.URL("/admin/invoices/recipients"), "post", "Create")
+	}
+}
+
+templ InvoiceRecipientEditModal(recipient services.InvoiceRecipient) {
+	@invoiceModalShell("invoice-recipient-modal", "Edit Recipient") {
+		@InvoiceRecipientForm(recipient, utils.URLf("/admin/invoices/recipients/%s", recipient.ID), "patch", "Save")
+	}
+}
+
+templ InvoiceRecipientForm(recipient services.InvoiceRecipient, action string, method string, submitLabel string) {
+	<form
+		if method == "patch" {
+			hx-patch={ action }
+		} else {
+			hx-post={ action }
+		}
+		hx-swap="none"
+		class="flex flex-col gap-3"
+		hx-on::after-request="if(event.detail.successful){document.getElementById('invoice-recipient-modal-container').innerHTML='';htmx.ajax('GET','/admin/invoices/recipients/table',{target:'#invoice-recipients-table',swap:'innerHTML'})}"
+	>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
+			<input type="text" name="name" value={ recipient.Name } required class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
+		</div>
+		<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+			<div>
+				<label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+				<input type="email" name="email" value={ recipient.Email } class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+				<input type="text" name="contact_number" value={ recipient.ContactNumber } class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
+			</div>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+			<textarea name="address" rows="2" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full">{ recipient.Address }</textarea>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">TIN</label>
+			<input type="text" name="tin" value={ recipient.TIN } class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+			<textarea name="notes" rows="2" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full">{ recipient.Notes }</textarea>
+		</div>
+		<div class="flex w-full gap-2 justify-end pt-2">
+			<button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm" _="on click trigger closeModal">Cancel</button>
+			<button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm">{ submitLabel }</button>
+		</div>
+	</form>
+}
+
+templ InvoicesSection() {
+	<div class="bg-white rounded-lg shadow-md border border-gray-100 p-6">
+		<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+			<div>
+				<h2 class="text-xl font-semibold text-gray-900">Invoices</h2>
+				<p class="text-sm text-gray-500">Generate, download and email invoices.</p>
+			</div>
+			<button
+				type="button"
+				class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+				hx-get={ utils.URL("/admin/invoices/generate") }
+				hx-target="#invoice-generate-modal-container"
+				hx-swap="innerHTML"
+				_="on click call metrics_event('admin_exec', 'open invoice generator')"
+			>
+				Generate Invoice
+			</button>
+		</div>
+		<div
+			hx-get={ utils.URL("/admin/invoices/table") }
+			hx-trigger="load"
+			hx-target="#invoices-table"
+			hx-swap="innerHTML"
+		>
+			<div id="invoices-table"></div>
+		</div>
+	</div>
+}
+
+templ AdminInvoicesTable(invoices []services.InvoiceListItem) {
+	<div class="overflow-x-auto">
+		<table class="min-w-full divide-y divide-gray-200">
+			<thead class="bg-gray-50">
+				<tr>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice #</th>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recipient</th>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issue Date</th>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+				</tr>
+			</thead>
+			<tbody class="bg-white divide-y divide-gray-200">
+				if len(invoices) == 0 {
+					<tr>
+						<td colspan="6" class="px-4 py-4 text-center text-gray-500">No invoices yet.</td>
+					</tr>
+				} else {
+					for _, invoice := range invoices {
+						<tr>
+							<td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{ invoice.InvoiceNumber }</td>
+							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{ orDash(invoice.RecipientName) }</td>
+							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{ invoice.IssueDate }</td>
+							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{ invoice.Total }</td>
+							<td class="px-4 py-3 whitespace-nowrap text-sm">
+								<span class="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">{ invoice.Status.String() }</span>
+								if invoice.Emailed {
+									<span class="ml-1 inline-flex px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Emailed</span>
+								}
+							</td>
+							<td class="px-4 py-3 whitespace-nowrap text-sm">
+								<div class="flex items-center gap-2">
+									<a
+										href={ utils.URLf("/admin/invoices/%s/pdf", invoice.ID) }
+										target="_blank"
+										class="text-primary hover:underline text-xs font-medium"
+									>
+										PDF
+									</a>
+									<button
+										type="button"
+										class="text-white bg-primary hover:bg-primary-dark px-3 py-1 rounded text-xs font-medium"
+										hx-post={ utils.URLf("/admin/invoices/%s/email", invoice.ID) }
+										hx-confirm="Email this invoice to the recipient?"
+									>
+										Email
+									</button>
+								</div>
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ invoiceModalShell(id string, title string) {
+	<div
+		id={ id }
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="on closeModal set #invoice-recipient-modal-container.innerHTML to '' then set #invoice-generate-modal-container.innerHTML to '' end"
+	>
+		<div class="absolute inset-0 bg-black/50" _="on click trigger closeModal"></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">{ title }</h2>
+				<button type="button" class="text-gray-400 hover:text-gray-600" _="on click trigger closeModal">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			{ children... }
+		</div>
+	</div>
+}
+
+templ InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.InvoiceRecipient, products []services.InvoiceProductOption) {
+	<div
+		id="invoice-generate-modal"
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		data-create-url={ utils.URL("/admin/invoices") }
+		data-table-url={ utils.URL("/admin/invoices/table") }
+		data-currency={ orDefault(config.Currency, "PHP") }
+		data-vat={ orDefault(config.VATPercentage, "0") }
+		_="on closeModal set #invoice-generate-modal-container.innerHTML to '' end"
+	>
+		<div class="absolute inset-0 bg-black/50" _="on click trigger closeModal"></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 overflow-y-auto max-h-[92vh]">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">Generate Invoice</h2>
+				<button type="button" class="text-gray-400 hover:text-gray-600" _="on click trigger closeModal">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			@invoiceConfigPreview(config)
+			<div id="invoice-generate-error" class="hidden mb-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2"></div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+				<div>
+					<label class="block text-sm font-medium text-gray-700 mb-1">Recipient <span class="text-red-500">*</span></label>
+					<select id="invoice-recipient-select" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full">
+						<option value="">-- Select recipient --</option>
+						for _, r := range recipients {
+							<option value={ r.ID }>{ r.Name }{ recipientOptionSuffix(r) }</option>
+						}
+						<option value="__new__">+ New recipient…</option>
+					</select>
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+					<input type="date" id="invoice-due-date" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
+				</div>
+			</div>
+			<div id="invoice-new-recipient" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 p-3 rounded-md bg-gray-50 border border-gray-200">
+				<div class="sm:col-span-2">
+					<label class="block text-xs font-medium text-gray-600 mb-1">New Recipient Name</label>
+					<input type="text" data-new-recipient="name" class="px-3 py-2 border border-gray-300 rounded-md w-full"/>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Email</label>
+					<input type="email" data-new-recipient="email" class="px-3 py-2 border border-gray-300 rounded-md w-full"/>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Contact Number</label>
+					<input type="text" data-new-recipient="contact_number" class="px-3 py-2 border border-gray-300 rounded-md w-full"/>
+				</div>
+				<div class="sm:col-span-2">
+					<label class="block text-xs font-medium text-gray-600 mb-1">Address</label>
+					<input type="text" data-new-recipient="address" class="px-3 py-2 border border-gray-300 rounded-md w-full"/>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">TIN</label>
+					<input type="text" data-new-recipient="tin" class="px-3 py-2 border border-gray-300 rounded-md w-full"/>
+				</div>
+			</div>
+			<div class="mb-3">
+				<div class="flex flex-wrap items-end gap-2 mb-2">
+					<div class="flex-grow">
+						<label class="block text-sm font-medium text-gray-700 mb-1">Add product line</label>
+						<select id="invoice-product-select" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full">
+							<option value="">-- Select a product --</option>
+							for _, p := range products {
+								<option value={ p.ID } data-name={ p.Name } data-price={ strconv.FormatInt(p.UnitPrice, 10) }>
+									{ productOptionLabel(p) }
+								</option>
+							}
+						</select>
+					</div>
+					<button type="button" id="invoice-add-product" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm">Add Product</button>
+					<button type="button" id="invoice-add-manual" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm">Add Manual Line</button>
+				</div>
+				<div class="overflow-x-auto border border-gray-200 rounded-md">
+					<table class="min-w-full text-sm">
+						<thead class="bg-gray-50">
+							<tr>
+								<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+								<th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase w-20">Qty</th>
+								<th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase w-32">Unit Price</th>
+								<th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase w-32">Amount</th>
+								<th class="px-3 py-2 w-10"></th>
+							</tr>
+						</thead>
+						<tbody id="invoice-lines"></tbody>
+					</table>
+				</div>
+			</div>
+			<div class="flex flex-col sm:flex-row gap-4 justify-between items-start">
+				<div class="w-full sm:w-1/2">
+					<label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+					<textarea id="invoice-notes" rows="2" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"></textarea>
+				</div>
+				<div class="w-full sm:w-1/2 text-sm">
+					<div class="flex justify-between py-1"><span class="text-gray-500">Subtotal</span><span id="invoice-subtotal" class="text-gray-900 font-medium">—</span></div>
+					<div class="flex justify-between py-1"><span class="text-gray-500" id="invoice-vat-label">VAT</span><span id="invoice-vat" class="text-gray-900 font-medium">—</span></div>
+					<div class="flex justify-between py-2 border-t border-gray-200 mt-1"><span class="text-primary font-semibold">Total</span><span id="invoice-total" class="text-primary font-bold">—</span></div>
+				</div>
+			</div>
+			<div class="flex flex-wrap gap-2 justify-end pt-4 mt-4 border-t border-gray-200">
+				<button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm" _="on click trigger closeModal">Cancel</button>
+				<button type="button" data-invoice-action="save" class="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 text-sm">Save</button>
+				<button type="button" data-invoice-action="download" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm">Save &amp; Download PDF</button>
+				<button type="button" data-invoice-action="email" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm">Save &amp; Email</button>
+			</div>
+		</div>
+	</div>
+}
+
+templ invoiceConfigPreview(config services.InvoiceConfig) {
+	<div class="flex items-center gap-4 mb-4 p-3 rounded-md bg-surface border border-gray-200">
+		if config.LogoURL != "" {
+			<img src={ config.LogoURL } alt="Logo" class="h-12 w-auto object-contain"/>
+		}
+		<div class="text-sm">
+			<div class="font-semibold text-gray-900">{ orDefault(config.BusinessName, "Set up your business configuration above") }</div>
+			if config.Address != "" {
+				<div class="text-gray-500">{ config.Address }</div>
+			}
+			if config.TIN != "" {
+				<div class="text-gray-500">TIN: { config.TIN }</div>
+			}
+		</div>
+	</div>
+}
+
+func orDefault(v string, fallback string) string {
+	if v == "" {
+		return fallback
+	}
+	return v
+}
+
+func orDash(v string) string {
+	if v == "" {
+		return "-"
+	}
+	return v
+}
+
+func recipientOptionSuffix(r services.InvoiceRecipient) string {
+	if r.Email != "" {
+		return " (" + r.Email + ")"
+	}
+	return ""
+}
+
+func productOptionLabel(p services.InvoiceProductOption) string {
+	label := p.Name
+	if p.BrandName != "" {
+		label = p.BrandName + " - " + label
+	}
+	if p.Price != "" {
+		label = label + " · " + p.Price
+	}
+	return label
+}

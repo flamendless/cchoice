@@ -42,6 +42,8 @@ var staffCards = []models.StaffCard{
 
 	{Link: "/admin/quotations", Title: "Manage Quotations", Description: "View and approve customer quotations", Icon: svg.Document("text-primary")},
 
+	{Link: "/admin/invoices", Title: "Invoices", Description: "Configure and generate invoices", Icon: svg.Document("text-primary")},
+
 	{Link: "/admin/superuser/customers", Title: "Customers", Description: "View all registered customers", Icon: svg.Group("text-primary")},
 
 	{Link: "/admin/exports", Title: "Exports", Description: "Export data", Icon: svg.Document("text-primary")},

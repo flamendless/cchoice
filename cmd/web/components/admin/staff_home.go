@@ -81,6 +81,10 @@ var staffCardsWithRoles = []struct {
 		AllowedRole: enums.STAFF_ROLE_MANAGE_QUOTATIONS,
 	},
 	{
+		Card:        models.StaffCard{Link: "/admin/invoices", Title: "Invoices", Description: "Configure and generate invoices", Icon: svg.Document("text-primary")},
+		AllowedRole: enums.STAFF_ROLE_MANAGE_INVOICES,
+	},
+	{
 		Card:        models.StaffCard{Link: "/admin/imports", Title: "Imports", Description: "Bulk upload", Icon: svg.Document("text-primary")},
 		AllowedRole: enums.STAFF_ROLE_EDIT_PRODUCTS,
 	},
