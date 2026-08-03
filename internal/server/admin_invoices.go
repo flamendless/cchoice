@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,6 +11,9 @@ import (
 	"strings"
 
 	compadmin "cchoice/cmd/web/components/admin"
+	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
+	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
@@ -33,7 +37,8 @@ func (s *Server) adminInvoicesListPageHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if err := compadmin.AdminInvoicesListPage(config).Render(ctx, w); err != nil {
+	canManage := s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_INVOICES)
+	if err := compadmin.AdminInvoicesListPage(config, canManage).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, err.Error()))
 		return
@@ -58,18 +63,22 @@ func (s *Server) adminInvoicesConfigUpdateHandler(w http.ResponseWriter, r *http
 	}
 
 	in := services.InvoiceConfigInput{
-		BusinessName:    strings.TrimSpace(r.FormValue("business_name")),
-		Address:         strings.TrimSpace(r.FormValue("address")),
-		TIN:             strings.TrimSpace(r.FormValue("tin")),
-		VATRegistration: strings.TrimSpace(r.FormValue("vat_registration")),
-		Email:           strings.TrimSpace(r.FormValue("email")),
-		ContactNumber:   strings.TrimSpace(r.FormValue("contact_number")),
-		Website:         strings.TrimSpace(r.FormValue("website")),
-		FooterNotes:     strings.TrimSpace(r.FormValue("footer_notes")),
-		Currency:        strings.TrimSpace(r.FormValue("currency")),
-		VATPercentage:   strings.TrimSpace(r.FormValue("vat_percentage")),
-		LogoURL:         existing.LogoURL,
-		LogoPath:        existing.LogoPath,
+		BusinessName:        strings.TrimSpace(r.FormValue("business_name")),
+		Address:             strings.TrimSpace(r.FormValue("address")),
+		TIN:                 strings.TrimSpace(r.FormValue("tin")),
+		VATRegistration:     strings.TrimSpace(r.FormValue("vat_registration")),
+		Email:               strings.TrimSpace(r.FormValue("email")),
+		ContactNumber:       strings.TrimSpace(r.FormValue("contact_number")),
+		Website:             strings.TrimSpace(r.FormValue("website")),
+		FooterNotes:         strings.TrimSpace(r.FormValue("footer_notes")),
+		Currency:            strings.TrimSpace(r.FormValue("currency")),
+		VATPercentage:       strings.TrimSpace(r.FormValue("vat_percentage")),
+		ProprietorName:      strings.TrimSpace(r.FormValue("proprietor_name")),
+		BIRBookletsInfo:     strings.TrimSpace(r.FormValue("bir_booklets_info")),
+		BIRAuthorityToPrint: strings.TrimSpace(r.FormValue("bir_authority_to_print")),
+		BIRDateIssued:       strings.TrimSpace(r.FormValue("bir_date_issued")),
+		LogoURL:             existing.LogoURL,
+		LogoPath:            existing.LogoPath,
 	}
 
 	if file, header, ferr := r.FormFile("logo"); ferr == nil {
@@ -100,6 +109,23 @@ func (s *Server) adminInvoicesConfigUpdateHandler(w http.ResponseWriter, r *http
 	redirectHX(w, r, utils.URLWithSuccess(adminInvoicesPage, "Invoice configuration saved"))
 }
 
+func (s *Server) adminInvoicesConfigModalHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Invoices Config Modal Handler]"
+	ctx := r.Context()
+
+	config, err := s.services.invoice.GetConfig(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, err.Error()))
+		return
+	}
+
+	if err := compadmin.InvoiceConfigModal(config).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, errs.ErrRenderFailed.Error()))
+	}
+}
+
 func (s *Server) adminInvoicesRecipientsTableHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Invoices Recipients Table Handler]"
 	ctx := r.Context()
@@ -109,14 +135,28 @@ func (s *Server) adminInvoicesRecipientsTableHandler(w http.ResponseWriter, r *h
 		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
 	}
 
-	recipients, err := s.services.invoice.GetRecipients(ctx, q.Search)
+	listPage := max(q.Page, 1)
+	perPage := constants.DefaultAdminTablePageSize
+
+	recipients, totalCount, err := s.services.invoice.GetRecipientsPaginated(ctx, q.Search, listPage, perPage)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, err.Error()))
 		return
 	}
 
-	if err := compadmin.AdminInvoiceRecipientsTable(recipients, q.Search).Render(ctx, w); err != nil {
+	listPage = models.ClampPage(listPage, totalCount, perPage)
+	canManage := s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_INVOICES)
+	pagination := models.TablePagination{
+		Page:          listPage,
+		PerPage:       perPage,
+		TotalCount:    totalCount,
+		TableURL:      utils.URL("/admin/invoices/recipients/table"),
+		Include:       "[name='search']",
+		ContentTarget: "#invoice-recipients-table-content",
+	}
+
+	if err := compadmin.AdminInvoiceRecipientsTableContent(recipients, q.Search, canManage, pagination).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, err.Error()))
 	}
@@ -141,6 +181,7 @@ func (s *Server) adminInvoicesRecipientCreateHandler(w http.ResponseWriter, r *h
 		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, httputil.ErrorMessage(err)))
 		return
 	}
+	f.Normalize()
 
 	if _, err := s.services.invoice.CreateRecipient(ctx, s.sessionManager.GetString(ctx, SessionStaffID), toRecipientInput(f)); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -199,6 +240,7 @@ func (s *Server) adminInvoicesRecipientUpdateHandler(w http.ResponseWriter, r *h
 		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, httputil.ErrorMessage(err)))
 		return
 	}
+	f.Normalize()
 
 	if err := s.services.invoice.UpdateRecipient(ctx, s.sessionManager.GetString(ctx, SessionStaffID), idStr, toRecipientInput(f)); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -237,14 +279,31 @@ func (s *Server) adminInvoicesTableHandler(w http.ResponseWriter, r *http.Reques
 	const logtag = "[Admin Invoices Table Handler]"
 	ctx := r.Context()
 
-	invoices, err := s.services.invoice.GetAllInvoices(ctx)
+	var q forms.AdminInvoicesTableQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+	}
+
+	listPage := max(q.Page, 1)
+	perPage := constants.DefaultAdminTablePageSize
+
+	invoices, totalCount, err := s.services.invoice.GetInvoicesPaginated(ctx, listPage, perPage)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, err.Error()))
 		return
 	}
 
-	if err := compadmin.AdminInvoicesTable(invoices).Render(ctx, w); err != nil {
+	listPage = models.ClampPage(listPage, totalCount, perPage)
+	pagination := models.TablePagination{
+		Page:          listPage,
+		PerPage:       perPage,
+		TotalCount:    totalCount,
+		TableURL:      utils.URL("/admin/invoices/table"),
+		ContentTarget: "#invoices-table-content",
+	}
+
+	if err := compadmin.AdminInvoicesTableContent(invoices, pagination).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, err.Error()))
 	}
@@ -274,7 +333,8 @@ func (s *Server) adminInvoicesGenerateModalHandler(w http.ResponseWriter, r *htt
 		products = nil
 	}
 
-	if err := compadmin.InvoiceGenerateModal(config, recipients, products).Render(ctx, w); err != nil {
+	canManage := s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_INVOICES)
+	if err := compadmin.InvoiceGenerateModal(config, recipients, products, canManage).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, errs.ErrRenderFailed.Error()))
 	}
@@ -291,20 +351,21 @@ func (s *Server) adminInvoicesCreateHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	canManage := s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_INVOICES)
 	in := services.CreateInvoiceInput{
-		RecipientID: strings.TrimSpace(f.RecipientID),
-		Notes:       strings.TrimSpace(f.Notes),
-		DueDate:     strings.TrimSpace(f.DueDate),
+		RecipientID:             strings.TrimSpace(f.RecipientID),
+		TransactionType:         strings.TrimSpace(f.TransactionType),
+		RecipientRegisteredName: strings.TrimSpace(f.RecipientRegisteredName),
+		Notes:                   strings.TrimSpace(f.Notes),
+		DueDate:                 strings.TrimSpace(f.DueDate),
 	}
-	if f.NewRecipient != nil && strings.TrimSpace(f.NewRecipient.Name) != "" {
-		in.NewRecipient = &services.InvoiceRecipientInput{
-			Name:          f.NewRecipient.Name,
-			Email:         f.NewRecipient.Email,
-			ContactNumber: f.NewRecipient.ContactNumber,
-			Address:       f.NewRecipient.Address,
-			TIN:           f.NewRecipient.TIN,
-			Notes:         f.NewRecipient.Notes,
-		}
+	if canManage {
+		in.WithholdingTax = strings.TrimSpace(f.WithholdingTax)
+		in.SCPWDDiscount = strings.TrimSpace(f.SCPWDDiscount)
+		in.AddVAT = strings.TrimSpace(f.AddVAT)
+	}
+	if nr := buildInvoiceNewRecipient(f); nr != nil {
+		in.NewRecipient = nr
 	}
 	for _, l := range f.Lines {
 		in.Lines = append(in.Lines, services.InvoiceLineInput{
@@ -312,6 +373,7 @@ func (s *Server) adminInvoicesCreateHandler(w http.ResponseWriter, r *http.Reque
 			Description: l.Description,
 			UnitPrice:   l.UnitPrice,
 			Quantity:    l.Quantity,
+			TaxType:     strings.TrimSpace(l.TaxType),
 		})
 	}
 
@@ -323,32 +385,36 @@ func (s *Server) adminInvoicesCreateHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	emailed := false
-	var emailErr string
-	if f.Action == "email" {
-		if err := s.services.invoice.SendInvoiceEmail(ctx, staffID, invoice.ID); err != nil {
-			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-			emailErr = err.Error()
-		} else {
-			emailed = true
-		}
+	invoiceDBID, err := s.services.invoice.GetInvoiceDBID(ctx, invoice.ID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		writeInvoiceJSONError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	pdfStatus := "queued"
+	if err := s.queueInvoicePDF(ctx, invoiceDBID); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		pdfStatus = "failed"
 	}
 
 	resp := map[string]any{
-		"id":             invoice.ID,
-		"invoice_number": invoice.InvoiceNumber,
-		"pdf_url":        utils.URL(fmt.Sprintf("/admin/invoices/%s/pdf", invoice.ID)),
-		"emailed":        emailed,
+		"id":                 invoice.ID,
+		"invoice_number":     invoice.InvoiceNumber,
+		"preview_url":        utils.URL(fmt.Sprintf("/admin/invoices/%s/preview", invoice.ID)),
+		"pdf_url":            utils.URL(fmt.Sprintf("/admin/invoices/%s/pdf", invoice.ID)),
+		"pdf_status":         pdfStatus,
+		"created_recipient":  in.NewRecipient != nil,
 	}
-	if emailErr != "" {
-		resp["email_error"] = emailErr
+	if f.Action == "preview" {
+		resp["open_preview"] = true
 	}
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(resp)
 }
 
-func (s *Server) adminInvoicesPDFHandler(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Admin Invoices PDF Handler]"
+func (s *Server) adminInvoicesViewHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Invoices View Handler]"
 	ctx := r.Context()
 
 	var p forms.AdminInvoicePath
@@ -368,7 +434,6 @@ func (s *Server) adminInvoicesPDFHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-
 	config, err := s.services.invoice.GetConfig(ctx)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
@@ -376,11 +441,106 @@ func (s *Server) adminInvoicesPDFHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	pdfBytes, err := services.RenderInvoicePDF(config, invoice, lines)
+	data := s.services.invoice.BuildRenderData(config, invoice, lines)
+	if err := compadmin.AdminInvoiceViewPage(data).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, errs.ErrRenderFailed.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (s *Server) adminInvoicesPreviewModalHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Invoices Preview Modal Handler]"
+	ctx := r.Context()
+
+	var p forms.AdminInvoicePath
+	if err := httputil.BindPath(r, &p); err != nil {
+		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, errs.ErrInvalidParams.Error()))
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, errs.ErrInvalidParams.Error()))
+		return
+	}
+
+	invoice, lines, err := s.services.invoice.GetInvoice(ctx, idStr)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, errs.ErrInvoicePDFFailed.Error(), http.StatusInternalServerError)
+		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, err.Error()))
 		return
+	}
+	config, err := s.services.invoice.GetConfig(ctx)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, err.Error()))
+		return
+	}
+
+	data := s.services.invoice.BuildRenderData(config, invoice, lines)
+	if err := compadmin.InvoicePreviewModal(data).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, errs.ErrRenderFailed.Error()))
+	}
+}
+
+func (s *Server) adminInvoicesPDFHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Invoices PDF Handler]"
+	ctx := r.Context()
+
+	var p forms.AdminInvoicePath
+	if err := httputil.BindPath(r, &p); err != nil {
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+		return
+	}
+	idStr, err := httputil.RequireEncodedID(s.encoder, p.ID)
+	if err != nil {
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+		return
+	}
+
+	invoice, _, err := s.services.invoice.GetInvoice(ctx, idStr)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	if invoice.Status == enums.INVOICE_STATUS_PROCESSING && strings.TrimSpace(invoice.PDFPath) == "" {
+		http.Error(w, "PDF is still being generated", http.StatusConflict)
+		return
+	}
+
+	invoiceDBID, err := s.services.invoice.GetInvoiceDBID(ctx, idStr)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	pdfBytes, err := s.services.invoice.ReadStoredPDF(invoiceDBID, invoice.PDFPath)
+	if err != nil {
+		if s.invoiceJobRunner != nil {
+			if qerr := s.invoiceJobRunner.QueueGeneratePDF(ctx, invoiceDBID); qerr != nil {
+				logs.LogCtx(ctx).Error(logtag, zap.Error(qerr))
+			}
+			http.Error(w, "PDF is being generated", http.StatusConflict)
+			return
+		}
+		config, cfgErr := s.services.invoice.GetConfig(ctx)
+		if cfgErr != nil {
+			http.Error(w, cfgErr.Error(), http.StatusInternalServerError)
+			return
+		}
+		_, lines, getErr := s.services.invoice.GetInvoice(ctx, idStr)
+		if getErr != nil {
+			http.Error(w, getErr.Error(), http.StatusInternalServerError)
+			return
+		}
+		pdfBytes, err = services.RenderInvoicePDF(config, invoice, lines)
+		if err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			http.Error(w, errs.ErrInvoicePDFFailed.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	filename := invoice.InvoiceNumber
@@ -388,10 +548,48 @@ func (s *Server) adminInvoicesPDFHandler(w http.ResponseWriter, r *http.Request)
 		filename = "invoice"
 	}
 	w.Header().Set("Content-Type", "application/pdf")
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s.pdf", filename))
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.pdf"`, filename))
 	if _, err := w.Write(pdfBytes); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 	}
+}
+
+func (s *Server) adminInvoicesJobStatusHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Invoices Job Status Handler]"
+	ctx := r.Context()
+
+	var p forms.AdminInvoicePath
+	if err := httputil.BindPath(r, &p); err != nil {
+		writeInvoiceJSONError(w, http.StatusBadRequest, errs.ErrInvalidParams.Error())
+		return
+	}
+	invoiceDBID, err := s.services.invoice.GetInvoiceDBID(ctx, p.ID)
+	if err != nil {
+		writeInvoiceJSONError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	status, err := s.services.invoice.GetJobStatus(ctx, invoiceDBID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		writeInvoiceJSONError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	invoice, _, err := s.services.invoice.GetInvoice(ctx, p.ID)
+	if err != nil {
+		writeInvoiceJSONError(w, http.StatusNotFound, err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(map[string]any{
+		"pdf_status":   status.PDFStatus,
+		"email_status": status.EmailStatus,
+		"pdf_error":    status.PDFError,
+		"email_error":  status.EmailError,
+		"pdf_ready":    strings.TrimSpace(invoice.PDFPath) != "",
+	})
 }
 
 func (s *Server) adminInvoicesEmailHandler(w http.ResponseWriter, r *http.Request) {
@@ -409,23 +607,85 @@ func (s *Server) adminInvoicesEmailHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if err := s.services.invoice.SendInvoiceEmail(ctx, s.sessionManager.GetString(ctx, SessionStaffID), idStr); err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+	invoiceDBID, err := s.services.invoice.GetInvoiceDBID(ctx, idStr)
+	if err != nil {
 		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, err.Error()))
 		return
 	}
 
-	redirectHX(w, r, utils.URLWithSuccess(adminInvoicesPage, "Invoice emailed successfully"))
+	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
+	if err := s.queueInvoiceEmail(ctx, staffID, invoiceDBID); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		respondInvoiceHX(w, r, adminInvoicesPage, "", err.Error())
+		return
+	}
+
+	respondInvoiceHX(w, r, adminInvoicesPage, "Invoice email queued", "")
+}
+
+func (s *Server) queueInvoicePDF(ctx context.Context, invoiceID int64) error {
+	if s.invoiceJobRunner != nil {
+		return s.invoiceJobRunner.QueueGeneratePDF(ctx, invoiceID)
+	}
+	return s.services.invoice.GenerateAndStorePDF(ctx, invoiceID)
+}
+
+func (s *Server) queueInvoiceEmail(ctx context.Context, staffID string, invoiceID int64) error {
+	if s.invoiceJobRunner != nil {
+		return s.invoiceJobRunner.QueueSendEmail(ctx, staffID, invoiceID)
+	}
+	return s.services.invoice.SendInvoiceEmailByID(ctx, staffID, invoiceID)
 }
 
 func toRecipientInput(f forms.AdminInvoiceRecipientForm) services.InvoiceRecipientInput {
 	return services.InvoiceRecipientInput{
-		Name:          f.Name,
-		Email:         f.Email,
-		ContactNumber: f.ContactNumber,
-		Address:       f.Address,
-		TIN:           f.TIN,
-		Notes:         f.Notes,
+		Name:           f.Name,
+		Email:          f.Email,
+		ContactNumber:  f.ContactNumber,
+		Address:        f.Address,
+		TIN:            f.TIN,
+		RegisteredName: f.RegisteredName,
+		Notes:          f.Notes,
+	}
+}
+
+func buildInvoiceNewRecipient(f forms.AdminInvoiceCreateForm) *services.InvoiceRecipientInput {
+	if strings.TrimSpace(f.RecipientID) != "" {
+		return nil
+	}
+
+	var nr forms.AdminInvoiceNewRecipientInput
+	if f.NewRecipient != nil {
+		nr = *f.NewRecipient
+	}
+
+	name := strings.TrimSpace(nr.Name)
+	regName := strings.TrimSpace(f.RecipientRegisteredName)
+	if regName == "" {
+		regName = strings.TrimSpace(nr.RegisteredName)
+	}
+	if name == "" {
+		name = regName
+	}
+	if regName == "" {
+		regName = name
+	}
+	if name == "" {
+		return nil
+	}
+
+	nr.Name = name
+	nr.RegisteredName = regName
+	nr.Normalize()
+
+	return &services.InvoiceRecipientInput{
+		Name:           name,
+		Email:          strings.TrimSpace(nr.Email),
+		ContactNumber:  nr.ContactNumber,
+		Address:        strings.TrimSpace(nr.Address),
+		TIN:            strings.TrimSpace(nr.TIN),
+		RegisteredName: regName,
+		Notes:          strings.TrimSpace(nr.Notes),
 	}
 }
 
@@ -433,4 +693,24 @@ func writeInvoiceJSONError(w http.ResponseWriter, status int, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(map[string]string{"error": message})
+}
+
+func respondInvoiceHX(w http.ResponseWriter, r *http.Request, page, successMsg, errorMsg string) {
+	if isHTMX(r) {
+		if errorMsg != "" {
+			w.Header().Set("X-Error-Message", errorMsg)
+			http.Error(w, errorMsg, http.StatusBadRequest)
+			return
+		}
+		if successMsg != "" {
+			w.Header().Set("X-Success-Message", successMsg)
+		}
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	if errorMsg != "" {
+		redirectHX(w, r, utils.URLWithError(page, errorMsg))
+		return
+	}
+	redirectHX(w, r, utils.URLWithSuccess(page, successMsg))
 }

@@ -24,6 +24,7 @@ const (
 	STAFF_ROLE_MANAGE_QUOTATIONS
 	STAFF_ROLE_MANAGE_THEMES
 	STAFF_ROLE_MANAGE_INVOICES
+	STAFF_ROLE_CREATE_INVOICE
 )
 
 func ParseStaffRoleToEnum(e string) StaffRole {
@@ -64,6 +65,8 @@ func ParseStaffRoleToEnum(e string) StaffRole {
 		return STAFF_ROLE_MANAGE_THEMES
 	case STAFF_ROLE_MANAGE_INVOICES.String():
 		return STAFF_ROLE_MANAGE_INVOICES
+	case STAFF_ROLE_CREATE_INVOICE.String():
+		return STAFF_ROLE_CREATE_INVOICE
 	default:
 		return STAFF_ROLE_UNDEFINED
 	}
@@ -107,6 +110,8 @@ func MustParseStaffRoleToEnum(e string) StaffRole {
 		return STAFF_ROLE_MANAGE_THEMES
 	case STAFF_ROLE_MANAGE_INVOICES.String():
 		return STAFF_ROLE_MANAGE_INVOICES
+	case STAFF_ROLE_CREATE_INVOICE.String():
+		return STAFF_ROLE_CREATE_INVOICE
 	default:
 		panic("Invalid StaffRole. Got '" + e + "'")
 	}
@@ -136,6 +141,7 @@ func GetAllStaffRoles() []StaffRole {
 		STAFF_ROLE_MANAGE_QUOTATIONS,
 		STAFF_ROLE_MANAGE_THEMES,
 		STAFF_ROLE_MANAGE_INVOICES,
+		STAFF_ROLE_CREATE_INVOICE,
 	}
 }
 

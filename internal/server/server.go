@@ -87,6 +87,7 @@ type Server struct {
 	sessionManager     *scs.SessionManager
 	mailJobRunner      *jobs.EmailJobRunner
 	thumbnailJobRunner *jobs.ThumbnailJobRunner
+	invoiceJobRunner   *jobs.InvoiceJobRunner
 	rateLimiter        *middleware.RateLimiter
 	address            string
 	services           Services
@@ -145,6 +146,7 @@ func NewServer() *ServerInstance {
 	var geocoder geocoding.IGeocoder
 	var thumbnailService *services.ThumbnailService
 	var thumbnailJobRunner *jobs.ThumbnailJobRunner
+	var invoiceJobRunner *jobs.InvoiceJobRunner
 
 	if cfg.IsWeb() {
 		objStorage, productImageFS = mustInitStorageProvider()
@@ -160,7 +162,7 @@ func NewServer() *ServerInstance {
 		thumbnailService = services.NewThumbnailService(objStorage)
 		thumbnailJobRunner = jobs.NewThumbnailJobRunner(dbRW.GetDB(), dbRO, dbRW, thumbnailService)
 	}
-	if cfg.IsProd() || cfg.Test.LocalOTP || cfg.Test.LocalForgotPassword {
+	if cfg.IsProd() || cfg.Test.LocalOTP || cfg.Test.LocalForgotPassword || cfg.Test.LocalMemoEmailSend || cfg.Test.LocalInvoiceJobs {
 		mailService = mustInitMailService()
 		emailJobRunner = jobs.NewEmailJobRunner(dbRW.GetDB(), dbRO, dbRW, mailService)
 	}
@@ -184,6 +186,7 @@ func NewServer() *ServerInstance {
 		mailJobRunner:      emailJobRunner,
 		thumbnailService:   thumbnailService,
 		thumbnailJobRunner: thumbnailJobRunner,
+		invoiceJobRunner:   invoiceJobRunner,
 		useHTTP2:           cfg.Server.UseHTTP2,
 		useSSL:             cfg.Server.UseSSL,
 		rateLimiter: middleware.NewRateLimiterWithDebug(
@@ -233,6 +236,10 @@ func NewServer() *ServerInstance {
 		theme:             services.NewThemeService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
 		trackedLink:       services.NewTrackedLinkService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService),
 		order:             services.NewOrderService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, emailJobRunner),
+	}
+
+	if cfg.IsProd() || cfg.Test.LocalInvoiceJobs {
+		newServer.invoiceJobRunner = jobs.NewInvoiceJobRunner(dbRW.GetDB(), dbRO, dbRW, newServer.services.invoice)
 	}
 
 	newServer.services.all = []services.IService{

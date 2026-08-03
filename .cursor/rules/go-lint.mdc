@@ -31,6 +31,23 @@ if len(s) < 14 {
 
 `fmt.Sprintf` remains appropriate for multi-value or non-scalar format strings (e.g. `"%d. %s -> %s"`).
 
+## modernize (min / max)
+
+Go 1.21+ built-in `min` and `max` replace manual compare-and-assign for bounds. Prefer them when clamping a single value.
+
+```go
+// BAD
+listPage := q.Page
+if listPage < 1 {
+    listPage = 1
+}
+
+// GOOD
+listPage := max(q.Page, 1)
+```
+
+Use `models.ClampPage` (or similar) when the upper bound depends on total count and page size—not when only enforcing a minimum of 1.
+
 ### concat-loop
 
 Do not concatenate strings with `+=` inside a loop. Use `strings.Join`, `strings.Builder`, or `fmt.Appendf` on a `[]byte` buffer instead.

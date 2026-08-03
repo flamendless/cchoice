@@ -28,17 +28,39 @@ func TestNewMoney(t *testing.T) {
 	}
 }
 
+func TestSanitizePrice(t *testing.T) {
+	tests := []struct {
+		name       string
+		price      string
+		wantAmount int64
+	}{
+		{"integer pesos", "100", 10000},
+		{"decimal pesos", "99.50", 9950},
+		{"with currency prefix", "PHP 250", 25000},
+		{"with thousands comma", "1,250.75", 125075},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m, errs := SanitizePrice(tt.price)
+			require.Empty(t, errs)
+			require.NotNil(t, m)
+			assert.Equal(t, tt.wantAmount, m.Amount())
+		})
+	}
+}
+
 func TestNewMoneyFromString(t *testing.T) {
 	tests := []struct {
-		name     string
-		price    string
-		currency string
-		wantErr  bool
+		name       string
+		price      string
+		currency   string
+		wantAmount int64
+		wantErr    bool
 	}{
-		{"valid integer", "100", constants.PHP, false},
-		{"valid decimal", "99.50", constants.PHP, false},
-		{"invalid", "not-a-number", constants.PHP, true},
-		{"empty", "", constants.PHP, true},
+		{"valid integer", "100", constants.PHP, 10000, false},
+		{"valid decimal", "99.50", constants.PHP, 9950, false},
+		{"invalid", "not-a-number", constants.PHP, 0, true},
+		{"empty", "", constants.PHP, 0, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -50,6 +72,7 @@ func TestNewMoneyFromString(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, m)
 			assert.Equal(t, tt.currency, m.Currency().Code)
+			assert.Equal(t, tt.wantAmount, m.Amount())
 		})
 	}
 }

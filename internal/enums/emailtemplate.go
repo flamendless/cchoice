@@ -49,7 +49,7 @@ func (e EmailTemplateName) FileName() string {
 	case EMAIL_TEMPLATE_ORDER_STATUS_UPDATE:
 		return "order_status_update.html"
 	case EMAIL_TEMPLATE_INVOICE:
-		return "invoice.html"
+		return "invoice_email.html"
 	default:
 		return ""
 	}

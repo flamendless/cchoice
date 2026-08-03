@@ -9,6 +9,7 @@ type InvoiceStatus int
 const (
 	INVOICE_STATUS_UNDEFINED InvoiceStatus = iota
 	INVOICE_STATUS_DRAFT
+	INVOICE_STATUS_PROCESSING
 	INVOICE_STATUS_ISSUED
 	INVOICE_STATUS_SENT
 	INVOICE_STATUS_PAID
@@ -19,6 +20,8 @@ func ParseInvoiceStatusToEnum(e string) InvoiceStatus {
 	switch strings.ToUpper(e) {
 	case INVOICE_STATUS_DRAFT.String():
 		return INVOICE_STATUS_DRAFT
+	case INVOICE_STATUS_PROCESSING.String():
+		return INVOICE_STATUS_PROCESSING
 	case INVOICE_STATUS_ISSUED.String():
 		return INVOICE_STATUS_ISSUED
 	case INVOICE_STATUS_SENT.String():

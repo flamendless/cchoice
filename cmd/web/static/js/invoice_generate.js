@@ -5,6 +5,11 @@
     return document.getElementById("invoice-generate-modal");
   }
 
+  function canManage() {
+    var m = modal();
+    return m && m.dataset.canManage === "true";
+  }
+
   function formatMoney(centavos, currency) {
     var negative = centavos < 0;
     var v = Math.abs(centavos);
@@ -15,7 +20,6 @@
     return cur + (negative ? "-" : "") + intStr + "." + (frac < 10 ? "0" + frac : frac);
   }
 
-  // Parse a decimal peso string into integer centavos.
   function toCentavos(str) {
     if (!str) return 0;
     var cleaned = ("" + str).replace(/,/g, "").trim();
@@ -28,10 +32,14 @@
     var tr = document.createElement("tr");
     tr.className = "invoice-line-row border-t border-gray-100";
     if (productId) tr.dataset.productId = productId;
+    var taxCell = canManage()
+      ? '<td class="px-3 py-2"><select class="line-tax px-2 py-1 border border-gray-300 rounded w-full text-xs"><option value="VATABLE">VAT</option><option value="VAT_EXEMPT">Exempt</option><option value="ZERO_RATED">Zero</option></select></td>'
+      : "";
     tr.innerHTML =
       '<td class="px-3 py-2"><input type="text" class="line-desc px-2 py-1 border border-gray-300 rounded w-full" placeholder="Item description"></td>' +
       '<td class="px-3 py-2"><input type="number" min="1" step="1" value="1" class="line-qty px-2 py-1 border border-gray-300 rounded w-full text-right"></td>' +
       '<td class="px-3 py-2"><input type="text" class="line-price px-2 py-1 border border-gray-300 rounded w-full text-right" placeholder="0.00"></td>' +
+      taxCell +
       '<td class="px-3 py-2 text-right line-amount text-gray-700">—</td>' +
       '<td class="px-3 py-2 text-center"><button type="button" class="line-remove text-red-600 hover:text-red-800 font-bold">&times;</button></td>';
     tr.querySelector(".line-desc").value = name || "";
@@ -47,19 +55,28 @@
     var currency = m.dataset.currency || "PHP";
     var vatPct = parseFloat(m.dataset.vat || "0") || 0;
     var subtotal = 0;
+    var vatAmount = 0;
     m.querySelectorAll(".invoice-line-row").forEach(function (row) {
       var qty = parseInt(row.querySelector(".line-qty").value, 10) || 0;
       var price = toCentavos(row.querySelector(".line-price").value);
       var amount = qty * price;
       subtotal += amount;
+      var taxSel = row.querySelector(".line-tax");
+      var taxType = taxSel ? taxSel.value : "VATABLE";
+      if (taxType === "VATABLE" && vatPct > 0) {
+        var net = Math.round(amount / (1 + vatPct / 100));
+        vatAmount += amount - net;
+      }
       row.querySelector(".line-amount").textContent = formatMoney(amount, currency);
     });
-    var vat = Math.round((subtotal * vatPct) / 100);
-    var total = subtotal + vat;
+    var withholding = canManage() ? toCentavos((m.querySelector("#invoice-withholding-tax") || {}).value) : 0;
+    var scPwd = canManage() ? toCentavos((m.querySelector("#invoice-sc-pwd-discount") || {}).value) : 0;
+    var addVAT = canManage() ? toCentavos((m.querySelector("#invoice-add-vat") || {}).value) : 0;
+    var total = subtotal - withholding - scPwd + addVAT;
     var vatLabel = m.querySelector("#invoice-vat-label");
     if (vatLabel) vatLabel.textContent = vatPct ? "VAT (" + vatPct + "%)" : "VAT";
     setText(m, "#invoice-subtotal", formatMoney(subtotal, currency));
-    setText(m, "#invoice-vat", formatMoney(vat, currency));
+    setText(m, "#invoice-vat", formatMoney(vatAmount, currency));
     setText(m, "#invoice-total", formatMoney(total, currency));
   }
 
@@ -82,24 +99,42 @@
     box.classList.remove("hidden");
   }
 
+  function collectNewRecipientFields(root) {
+    var nr = {};
+    root.querySelectorAll("[data-new-recipient]").forEach(function (input) {
+      nr[input.getAttribute("data-new-recipient")] = input.value || "";
+    });
+    return nr;
+  }
+
   function collectPayload(action) {
     var m = modal();
     var recipientSelect = m.querySelector("#invoice-recipient-select");
     var recipientId = recipientSelect ? recipientSelect.value : "";
+    var registeredName = ((m.querySelector("#invoice-registered-name") || {}).value || "").trim();
+    var isNewRecipient = recipientId === "__new__" || (!recipientId && registeredName);
     var payload = {
-      recipient_id: recipientId === "__new__" ? "" : recipientId,
+      recipient_id: isNewRecipient ? "" : recipientId,
       new_recipient: null,
+      transaction_type: (m.querySelector("#invoice-transaction-type") || {}).value || "CASH_SALES",
+      recipient_registered_name: registeredName,
       notes: (m.querySelector("#invoice-notes") || {}).value || "",
       due_date: (m.querySelector("#invoice-due-date") || {}).value || "",
+      withholding_tax: canManage() ? (m.querySelector("#invoice-withholding-tax") || {}).value || "" : "",
+      sc_pwd_discount: canManage() ? (m.querySelector("#invoice-sc-pwd-discount") || {}).value || "" : "",
+      add_vat: canManage() ? (m.querySelector("#invoice-add-vat") || {}).value || "" : "",
       action: action,
       lines: [],
     };
 
-    if (recipientId === "__new__") {
-      var nr = {};
-      m.querySelectorAll("[data-new-recipient]").forEach(function (input) {
-        nr[input.getAttribute("data-new-recipient")] = input.value || "";
-      });
+    if (isNewRecipient) {
+      var nr = collectNewRecipientFields(m);
+      if (registeredName && !((nr.name || "").trim())) {
+        nr.name = registeredName;
+      }
+      if (registeredName) {
+        nr.registered_name = registeredName;
+      }
       payload.new_recipient = nr;
     }
 
@@ -107,12 +142,14 @@
       var desc = row.querySelector(".line-desc").value.trim();
       var qty = parseInt(row.querySelector(".line-qty").value, 10) || 0;
       var price = row.querySelector(".line-price").value.trim();
+      var taxSel = row.querySelector(".line-tax");
       if (!desc && !price) return;
       payload.lines.push({
         product_id: row.dataset.productId || "",
         description: desc,
         unit_price: price,
         quantity: qty,
+        tax_type: taxSel ? taxSel.value : "VATABLE",
       });
     });
 
@@ -122,17 +159,45 @@
   function validate(payload) {
     var m = modal();
     var recipientSelect = m.querySelector("#invoice-recipient-select");
+    var registeredName = ((m.querySelector("#invoice-registered-name") || {}).value || "").trim();
     if (recipientSelect && recipientSelect.value === "__new__") {
-      if (!payload.new_recipient || !payload.new_recipient.name) {
+      if (!payload.new_recipient || !((payload.new_recipient.name || "").trim())) {
         return "Please enter a name for the new recipient.";
       }
     } else if (!payload.recipient_id) {
-      return "Please select a recipient.";
+      if (!registeredName && (!payload.new_recipient || !((payload.new_recipient.name || "").trim()))) {
+        return "Please select a recipient.";
+      }
     }
     if (!payload.lines.length) {
       return "Please add at least one line item.";
     }
     return "";
+  }
+
+  function openPreviewModal(previewUrl) {
+    if (!previewUrl || !window.htmx) return;
+    window.htmx.ajax("GET", previewUrl, {
+      target: "#invoice-preview-modal-container",
+      swap: "innerHTML",
+    });
+  }
+
+  function closeGenerateModal() {
+    var container = document.getElementById("invoice-generate-modal-container");
+    if (container) container.innerHTML = "";
+  }
+
+  function refreshTable(tableUrl) {
+    if (window.htmx && tableUrl) {
+      window.htmx.ajax("GET", tableUrl, { target: "#invoices-table-content", swap: "innerHTML" });
+    }
+  }
+
+  function refreshRecipientsTable(tableUrl) {
+    if (window.htmx && tableUrl) {
+      window.htmx.ajax("GET", tableUrl, { target: "#invoice-recipients-table-content", swap: "innerHTML" });
+    }
   }
 
   function submit(action) {
@@ -148,6 +213,7 @@
 
     var url = m.dataset.createUrl;
     var tableUrl = m.dataset.tableUrl;
+    var recipientsTableUrl = m.dataset.recipientsTableUrl;
     fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -164,28 +230,18 @@
           return;
         }
         var data = res.data;
-        if (action === "download" && data.pdf_url) {
-          window.open(data.pdf_url, "_blank");
-        }
-        if (action === "email" && data.email_error) {
-          showError("Invoice saved, but email failed: " + data.email_error);
-          refreshTable(tableUrl);
-          return;
-        }
-        // Close modal and refresh the invoices table.
-        var container = document.getElementById("invoice-generate-modal-container");
-        if (container) container.innerHTML = "";
+        closeGenerateModal();
         refreshTable(tableUrl);
+        if (data.created_recipient) {
+          refreshRecipientsTable(recipientsTableUrl);
+        }
+        if (action === "preview" && data.preview_url) {
+          openPreviewModal(data.preview_url);
+        }
       })
       .catch(function () {
         showError("Network error while creating invoice.");
       });
-  }
-
-  function refreshTable(tableUrl) {
-    if (window.htmx && tableUrl) {
-      window.htmx.ajax("GET", tableUrl, { target: "#invoices-table", swap: "innerHTML" });
-    }
   }
 
   document.addEventListener("click", function (e) {
@@ -231,7 +287,12 @@
   document.addEventListener("input", function (e) {
     var m = modal();
     if (!m || !m.contains(e.target)) return;
-    if (e.target.closest(".invoice-line-row")) {
+    if (
+      e.target.closest(".invoice-line-row") ||
+      e.target.id === "invoice-withholding-tax" ||
+      e.target.id === "invoice-sc-pwd-discount" ||
+      e.target.id === "invoice-add-vat"
+    ) {
       recompute();
     }
   });
@@ -245,9 +306,11 @@
         newBox.classList.toggle("hidden", e.target.value !== "__new__");
       }
     }
+    if (e.target.classList && e.target.classList.contains("line-tax")) {
+      recompute();
+    }
   });
 
-  // Seed the modal with one empty line when it is swapped in.
   document.body.addEventListener("htmx:afterSwap", function (evt) {
     if (evt.detail && evt.detail.target && evt.detail.target.id === "invoice-generate-modal-container") {
       var m = modal();
