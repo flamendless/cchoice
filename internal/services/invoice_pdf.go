@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -182,7 +183,7 @@ func drawBIRLineItemsTable(pdf *fpdf.Fpdf, tr func(string) string, lines []Invoi
 			rowH = 5
 		}
 		pdf.SetXY(x, y)
-		pdf.CellFormat(qtyW, rowH, fmt.Sprintf("%d", l.Quantity), "1", 0, "C", false, 0, "")
+		pdf.CellFormat(qtyW, rowH, strconv.FormatInt(l.Quantity, 10), "1", 0, "C", false, 0, "")
 		pdf.CellFormat(unitW, rowH, formatMoneyPlain(l.UnitPriceRaw, currency), "1", 0, "R", false, 0, "")
 		pdf.SetXY(x+qtyW+unitW, y)
 		pdf.CellFormat(descW, rowH, "", "1", 0, "L", false, 0, "")
@@ -447,7 +448,7 @@ func formatMoneyPlain(centavos int64, currency string) string {
 	pesos := centavos / 100
 	frac := centavos % 100
 
-	intStr := fmt.Sprintf("%d", pesos)
+	intStr := strconv.FormatInt(pesos, 10)
 	var grouped strings.Builder
 	n := len(intStr)
 	for i, ch := range intStr {

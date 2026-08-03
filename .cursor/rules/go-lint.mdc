@@ -29,6 +29,16 @@ if len(s) < 14 {
 }
 ```
 
+For simple string suffixes/prefixes, use concatenation instead of `fmt.Sprintf("%s.pdf", name)`:
+
+```go
+// BAD
+FileName: fmt.Sprintf("%s.pdf", cmpOr(invoice.InvoiceNumber, "invoice"))
+
+// GOOD
+FileName: cmpOr(invoice.InvoiceNumber, "invoice") + ".pdf"
+```
+
 `fmt.Sprintf` remains appropriate for multi-value or non-scalar format strings (e.g. `"%d. %s -> %s"`).
 
 ## modernize (min / max)

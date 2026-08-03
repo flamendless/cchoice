@@ -1044,7 +1044,7 @@ func (s *InvoiceService) SendInvoiceEmail(ctx context.Context, staffID string, i
 
 	attachments := []mail.Attachment{
 		{
-			FileName:    fmt.Sprintf("%s.pdf", cmpOr(invoice.InvoiceNumber, "invoice")),
+			FileName:    cmpOr(invoice.InvoiceNumber, "invoice") + ".pdf",
 			ContentType: "application/pdf",
 			Content:     pdfBytes,
 		},
