@@ -368,8 +368,8 @@ func (s *ProductService) mapAdminProductListItem(
 		ThumbnailPath: thumbnailPath,
 		CDNURL:        cdnURL,
 		CDNURL1280:    cdnURL1280,
-		CreatedAt:     createdAt.Format(constants.DateTimeLayoutISO),
-		UpdatedAt:     updatedAt.Format(constants.DateTimeLayoutISO),
+		CreatedAt:     utils.FormatTimePH(createdAt),
+		UpdatedAt:     utils.FormatTimePH(updatedAt),
 		Colours:       colours,
 		Sizes:         sizes,
 		Segmentation:  segmentation,
@@ -447,11 +447,11 @@ func (s *ProductService) GetForExportAdmin(
 
 		saleStartDate := ""
 		if p.SaleStartsAt.Valid {
-			saleStartDate = p.SaleStartsAt.Time.Format(constants.DateTimeLayoutISO)
+			saleStartDate = utils.FormatTimePH(p.SaleStartsAt.Time)
 		}
 		saleEndDate := ""
 		if p.SaleEndsAt.Valid {
-			saleEndDate = p.SaleEndsAt.Time.Format(constants.DateTimeLayoutISO)
+			saleEndDate = utils.FormatTimePH(p.SaleEndsAt.Time)
 		}
 
 		stocksIn := ""
@@ -502,8 +502,8 @@ func (s *ProductService) GetForExportAdmin(
 			StocksQty:        stocksQty,
 			ImageURL:         imageURL,
 			ThumbnailURL:     thumbnailURL,
-			CreatedAt:        p.CreatedAt.Format(constants.DateTimeLayoutISO),
-			UpdatedAt:        p.UpdatedAt.Format(constants.DateTimeLayoutISO),
+			CreatedAt:        utils.FormatTimePH(p.CreatedAt),
+			UpdatedAt:        utils.FormatTimePH(p.UpdatedAt),
 			LazadaURL:        lazadaURL,
 			TiktokURL:        tiktokURL,
 			ShopeeURL:        shopeeURL,

@@ -19,21 +19,45 @@ func TestShouldSkipCommand(t *testing.T) {
 	tests := []struct {
 		name     string
 		command  string
+		parent   string
 		expected bool
 	}{
-		{name: "empty", command: "", expected: true},
+		{name: "nil", command: "", parent: "", expected: true},
+		{name: "empty", command: "", parent: "root", expected: true},
 		{name: "web", command: "web", expected: true},
 		{name: "api", command: "api", expected: true},
 		{name: "datamigrate", command: "datamigrate", expected: true},
+		{name: "datamigrate check child", command: "check", parent: "datamigrate", expected: true},
 		{name: "populate", command: "populate_brand_slugs", expected: false},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			assert.Equal(t, tt.expected, ShouldSkipCommand(tt.command))
+			var cmd *cobra.Command
+			if tt.name == "nil" {
+				assert.True(t, ShouldSkipCommand(nil))
+				return
+			}
+			cmd = &cobra.Command{Use: tt.command}
+			if tt.parent != "" {
+				parent := &cobra.Command{Use: tt.parent}
+				parent.AddCommand(cmd)
+			}
+			assert.Equal(t, tt.expected, ShouldSkipCommand(cmd))
 		})
 	}
+}
+
+func TestIsSystemCLIRun(t *testing.T) {
+	t.Setenv(EnvCLIStaffID, "")
+	assert.True(t, isSystemCLIRun())
+
+	t.Setenv(EnvCLIStaffID, "encoded-staff-id")
+	assert.False(t, isSystemCLIRun())
+
+	t.Setenv(EnvCLIStaffID, "   ")
+	assert.True(t, isSystemCLIRun())
 }
 
 func TestShouldRedactFlag(t *testing.T) {

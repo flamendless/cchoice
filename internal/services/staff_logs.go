@@ -169,7 +169,7 @@ func (s *StaffLogsService) toStaffLogModel(
 	staffLog := models.StaffLog{
 		ID:         s.encoder.Encode(id),
 		StaffID:    s.encoder.Encode(staffID),
-		CreatedAt:  createdAt,
+		CreatedAt:  utils.ConvertToPH(createdAt),
 		Action:     action,
 		Module:     module,
 		Result:     result,

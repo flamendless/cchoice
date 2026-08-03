@@ -10,7 +10,6 @@ import (
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/conf"
-	"cchoice/internal/constants"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
@@ -100,7 +99,7 @@ func (s *Server) filterAndConvertBrands(ctx context.Context, serviceBrands []ser
 			LogoS3URL:    b.LogoS3URL,
 			BrandImageID: s.encoder.Encode(b.BrandImageID),
 			ProductCount: b.ProductCount,
-			CreatedAt:    b.CreatedAt.Format(constants.DateTimeLayoutISO),
+			CreatedAt:    utils.FormatTimePH(b.CreatedAt),
 			Status:       b.Status,
 		})
 	}

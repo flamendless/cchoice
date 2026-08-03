@@ -7,7 +7,6 @@ import (
 	"fmt"
 
 	"cchoice/cmd/web/models"
-	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
@@ -186,8 +185,8 @@ func (s *OrderService) GetDetailsForAdmin(ctx context.Context, orderID string) (
 			Status:         enums.ParseOrderStatusToEnum(order.Status),
 			Notes:          formatAdminOrderNullableString(order.Notes),
 			Remarks:        formatAdminOrderNullableString(order.Remarks),
-			CreatedAt:      order.CreatedAt.Format(constants.DateTimeLayoutISO),
-			UpdatedAt:      order.UpdatedAt.Format(constants.DateTimeLayoutISO),
+			CreatedAt:      utils.FormatTimePH(order.CreatedAt),
+			UpdatedAt:      utils.FormatTimePH(order.UpdatedAt),
 			EarnedCPoints:  utils.FormatEarnedCPoints(order.EarnedCpoints),
 		},
 		Payment: OrderAdminPaymentInfo{

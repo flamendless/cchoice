@@ -240,6 +240,7 @@ go build -tags="imageprocessing,staticfs" -o ./tmp/genimages .  # image CLI tool
 - Always define/use date/time layout in constants package instead of hardcoded strings
 - always do above for date/time parsing
 - always do above for date/time format
+- **UTC for storage, PH for display** — see `.cursor/rules/datetime.mdc` (store UTC in DB; convert with `utils.FormatTimePH` / `utils.ConvertToPH` before frontend, email, or PDF output)
 
 ### Email templates
 - create templates in ./templates

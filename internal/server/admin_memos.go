@@ -60,7 +60,7 @@ func (s *Server) adminMemosListTableHandler(w http.ResponseWriter, r *http.Reque
 			EndDate:       m.EndDate,
 			CreatedByID:   s.encoder.Encode(m.CreatedBy),
 			CreatedByName: m.CreatedByName,
-			CreatedAt:     m.CreatedAt.Format(constants.DateTimeLayoutISO),
+			CreatedAt:     utils.FormatTimePH(m.CreatedAt),
 			EmailsSentAt:  m.EmailsSentAt,
 		})
 	}

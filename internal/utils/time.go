@@ -32,6 +32,13 @@ func ConvertToPH(datetimeStr string) string {
 	return t.In(phLocation).Format(constants.DateTimeLayoutISO)
 }
 
+func FormatTimePH(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	return t.UTC().In(phLocation).Format(constants.DateTimeLayoutISO)
+}
+
 func TimeToMinutes(s string) (int, bool) {
 	if s == "" {
 		return 0, false

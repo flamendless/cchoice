@@ -801,8 +801,8 @@ func (s *InvoiceService) mapInvoice(inv queries.TblInvoice, currency string) Inv
 		Subtotal:                  utils.NewMoney(inv.Subtotal, currency).Display(),
 		VATAmount:                 utils.NewMoney(inv.VatAmount, currency).Display(),
 		Total:                     utils.NewMoney(inv.Total, currency).Display(),
-		EmailedAt:                 inv.EmailedAt,
-		CreatedAt:                 inv.CreatedAt,
+		EmailedAt:                 utils.ConvertToPH(inv.EmailedAt),
+		CreatedAt:                 utils.ConvertToPH(inv.CreatedAt),
 		PDFPath:                   inv.PdfPath,
 		ReceivedAmount:            inv.ReceivedAmount,
 		SCPWDIDNo:                 inv.ScPwdIDNo,
@@ -880,7 +880,7 @@ func (s *InvoiceService) mapInvoiceListItem(r queries.ListInvoicesPaginatedRow) 
 		Total:          utils.NewMoney(r.Total, currency).Display(),
 		Emailed:        r.EmailedAt != "",
 		PDFReady:       strings.TrimSpace(r.PdfPath) != "",
-		CreatedAt:      r.CreatedAt,
+		CreatedAt:      utils.ConvertToPH(r.CreatedAt),
 	}
 }
 

@@ -14,6 +14,7 @@ import (
 	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/orderhistory"
+	"cchoice/internal/utils"
 
 	"go.uber.org/zap"
 )
@@ -224,7 +225,7 @@ func mapOrderStatusHistoryEntry(row queries.GetOrderStatusHistoryByOrderIDRow) O
 		ToStatus:   row.ToStatus,
 		StaffName:  staffName,
 		Notes:      notes,
-		CreatedAt:  row.CreatedAt.Format(constants.DateTimeLayoutISO),
+		CreatedAt:  utils.FormatTimePH(row.CreatedAt),
 	}
 }
 

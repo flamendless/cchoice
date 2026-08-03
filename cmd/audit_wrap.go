@@ -34,7 +34,7 @@ func walkCommands(cmd *cobra.Command, fn func(*cobra.Command)) {
 }
 
 func wrapCommandAudit(cmd *cobra.Command) {
-	if cmd == nil || cmd.Name() == "" || cmdaudit.ShouldSkipCommand(cmd.Name()) {
+	if cmd == nil || cmd.Name() == "" || cmdaudit.ShouldSkipCommand(cmd) {
 		return
 	}
 
@@ -60,7 +60,7 @@ func wrapCommandAudit(cmd *cobra.Command) {
 }
 
 func logCommandAudit(cmd *cobra.Command, args []string, runErr error, duration time.Duration) {
-	if cmd == nil || cmdaudit.ShouldSkipCommand(cmd.Name()) {
+	if cmd == nil || cmdaudit.ShouldSkipCommand(cmd) {
 		return
 	}
 

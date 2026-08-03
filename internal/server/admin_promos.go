@@ -453,7 +453,7 @@ func toAdminPromoListItem(encoder encode.IEncode, p services.Promo, trackedLinkS
 		Status:        p.Status,
 		BannerOnly:    p.BannerOnly.Bool,
 		Priority:      p.Priority.Int64,
-		CreatedAt:     p.CreatedAt.Format(constants.DateTimeLayoutISO),
+		CreatedAt:     utils.FormatTimePH(p.CreatedAt),
 		LinkType:      linkType,
 		TrackedLinkID: p.TrackedLinkID,
 		LinkURL:       p.LinkURL,

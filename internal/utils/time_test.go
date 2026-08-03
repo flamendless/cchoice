@@ -2,6 +2,9 @@ package utils
 
 import (
 	"testing"
+	"time"
+
+	"cchoice/internal/constants"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -30,6 +33,54 @@ func TestTimeToMinutes(t *testing.T) {
 			assert.Equal(t, tt.wantOk, gotOk)
 		})
 	}
+}
+
+func TestConvertToPH(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name   string
+		input  string
+		expect string
+	}{
+		{name: "empty", input: "", expect: ""},
+		{name: "utc midnight to ph morning", input: "2026-08-03 00:00:00", expect: "2026-08-03 08:00:00"},
+		{name: "utc afternoon to ph evening", input: "2026-08-03 10:30:00", expect: "2026-08-03 18:30:00"},
+		{name: "invalid passthrough", input: "not-a-date", expect: "not-a-date"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, tt.expect, ConvertToPH(tt.input))
+		})
+	}
+}
+
+func TestFormatTimePH(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name   string
+		input  time.Time
+		expect string
+	}{
+		{name: "zero", input: time.Time{}, expect: ""},
+		{name: "utc to ph", input: time.Date(2026, 8, 3, 5, 40, 0, 0, time.UTC), expect: "2026-08-03 13:40:00"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, tt.expect, FormatTimePH(tt.input))
+		})
+	}
+}
+
+func TestFormatTimePHUsesProjectLayout(t *testing.T) {
+	t.Parallel()
+
+	got := FormatTimePH(time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC))
+	_, err := time.Parse(constants.DateTimeLayoutISO, got)
+	assert.NoError(t, err)
 }
 
 func TestFormatDurationFromMinutes(t *testing.T) {

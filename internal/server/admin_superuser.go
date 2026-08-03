@@ -325,7 +325,7 @@ func (s *Server) adminSuperuserTimeOffTableHandler(w http.ResponseWriter, r *htt
 		}
 
 		if to.ApprovedAt.Valid {
-			approvedAt = to.ApprovedAt.Time.Format(constants.DateTimeLayoutISO)
+			approvedAt = utils.FormatTimePH(to.ApprovedAt.Time)
 		} else {
 			approvedAt = "-"
 		}

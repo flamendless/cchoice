@@ -48,12 +48,12 @@ func formatAdminOrderPaymentPaidAt(value sql.NullTime) string {
 	if !value.Valid || value.Time.IsZero() {
 		return "-"
 	}
-	return value.Time.Format(constants.DateTimeLayoutISO)
+	return utils.FormatTimePH(value.Time)
 }
 
 func formatAdminOrderPaidAt(orderPaidAt, paymentPaidAt sql.NullTime) string {
 	if orderPaidAt.Valid {
-		return orderPaidAt.Time.Format(constants.DateTimeLayoutISO)
+		return utils.FormatTimePH(orderPaidAt.Time)
 	}
 	return formatAdminOrderPaymentPaidAt(paymentPaidAt)
 }
@@ -88,8 +88,8 @@ func mapAdminOrderListItemFromRow(
 		OrderReference: orderNumber,
 		Status:         enums.ParseOrderStatusToEnum(status),
 		IsPaid:         paidAt.Valid,
-		CreatedAt:      createdAt.Format(constants.DateTimeLayoutISO),
-		UpdatedAt:      updatedAt.Format(constants.DateTimeLayoutISO),
+		CreatedAt:      utils.FormatTimePH(createdAt),
+		UpdatedAt:      utils.FormatTimePH(updatedAt),
 		EarnedCPoints:  earnedCPoints,
 	}
 }

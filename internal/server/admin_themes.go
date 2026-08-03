@@ -77,7 +77,7 @@ func (s *Server) adminThemesListTableHandler(w http.ResponseWriter, r *http.Requ
 			EndDate:           t.EndDate,
 			ConfigurationType: t.ConfigurationType,
 			Active:            t.Active,
-			CreatedAt:         t.CreatedAt.Format(constants.DateTimeLayoutISO),
+			CreatedAt:         utils.FormatTimePH(t.CreatedAt),
 		})
 	}
 
@@ -262,7 +262,7 @@ func (s *Server) adminThemesEditPageHandler(w http.ResponseWriter, r *http.Reque
 		EndDate:           theme.EndDate,
 		Configuration:     configuration,
 		ConfigurationType: theme.ConfigurationType,
-		CreatedAt:         theme.CreatedAt.Format(constants.DateTimeLayoutISO),
+		CreatedAt:         utils.FormatTimePH(theme.CreatedAt),
 	}
 
 	if err := compadmin.ThemeEditModal(themeItem).Render(ctx, w); err != nil {

@@ -335,7 +335,7 @@ func (s *StaffService) GetTimeOffs(ctx context.Context, staffID string) ([]model
 		}
 
 		if to.ApprovedAt.Valid {
-			approvedAt = to.ApprovedAt.Time.Format(constants.DateTimeLayoutISO)
+			approvedAt = utils.FormatTimePH(to.ApprovedAt.Time)
 		} else {
 			approvedAt = "-"
 		}

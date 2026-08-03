@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
@@ -68,8 +69,8 @@ func mapAdminQuotationFromCreatedAtDesc(rows []queries.AdminGetQuotationsForList
 		result = append(result, mapAdminQuotationListItem(
 			row.ID,
 			row.Status,
-			row.CreatedAt.Format(constants.DateTimeLayoutISO),
-			row.UpdatedAt.Format(constants.DateTimeLayoutISO),
+			utils.FormatTimePH(row.CreatedAt),
+			utils.FormatTimePH(row.UpdatedAt),
 			row.CustomerFirstName,
 			row.CustomerMiddleName.String,
 			row.CustomerLastName,
@@ -90,8 +91,8 @@ func mapAdminQuotationFromCreatedAtAsc(rows []queries.AdminGetQuotationsForListi
 		result = append(result, mapAdminQuotationListItem(
 			row.ID,
 			row.Status,
-			row.CreatedAt.Format(constants.DateTimeLayoutISO),
-			row.UpdatedAt.Format(constants.DateTimeLayoutISO),
+			utils.FormatTimePH(row.CreatedAt),
+			utils.FormatTimePH(row.UpdatedAt),
 			row.CustomerFirstName,
 			row.CustomerMiddleName.String,
 			row.CustomerLastName,
@@ -112,8 +113,8 @@ func mapAdminQuotationFromStatusDesc(rows []queries.AdminGetQuotationsForListing
 		result = append(result, mapAdminQuotationListItem(
 			row.ID,
 			row.Status,
-			row.CreatedAt.Format(constants.DateTimeLayoutISO),
-			row.UpdatedAt.Format(constants.DateTimeLayoutISO),
+			utils.FormatTimePH(row.CreatedAt),
+			utils.FormatTimePH(row.UpdatedAt),
 			row.CustomerFirstName,
 			row.CustomerMiddleName.String,
 			row.CustomerLastName,
@@ -134,8 +135,8 @@ func mapAdminQuotationFromStatusAsc(rows []queries.AdminGetQuotationsForListingP
 		result = append(result, mapAdminQuotationListItem(
 			row.ID,
 			row.Status,
-			row.CreatedAt.Format(constants.DateTimeLayoutISO),
-			row.UpdatedAt.Format(constants.DateTimeLayoutISO),
+			utils.FormatTimePH(row.CreatedAt),
+			utils.FormatTimePH(row.UpdatedAt),
 			row.CustomerFirstName,
 			row.CustomerMiddleName.String,
 			row.CustomerLastName,
@@ -290,8 +291,8 @@ func (s *QuotationService) queryQuotationsForCustomerListing(
 ) ([]QuotationCustomerListItem, error) {
 	q := s.dbRO.GetQueries()
 
-	mapRow := func(id int64, status string, createdAt interface{ Format(string) string }, totalItems, totalOrig, totalSale int64, currency any) QuotationCustomerListItem {
-		return mapCustomerQuotationListItem(id, status, createdAt.Format(constants.DateTimeLayoutISO), totalItems, totalOrig, totalSale, currency)
+	mapRow := func(id int64, status string, createdAt time.Time, totalItems, totalOrig, totalSale int64, currency any) QuotationCustomerListItem {
+		return mapCustomerQuotationListItem(id, status, utils.FormatTimePH(createdAt), totalItems, totalOrig, totalSale, currency)
 	}
 
 	switch sortBy {
@@ -414,7 +415,7 @@ func mapQuotationStatusHistoryEntry(row queries.GetQuotationStatusHistoryByQuota
 		ToStatus:   row.ToStatus,
 		StaffName:  staffName,
 		Notes:      notes,
-		CreatedAt:  row.CreatedAt.Format(constants.DateTimeLayoutISO),
+		CreatedAt:  utils.FormatTimePH(row.CreatedAt),
 	}
 }
 
@@ -543,8 +544,8 @@ func (s *QuotationService) GetDetailForCustomer(ctx context.Context, customerIDS
 	return &QuotationCustomerDetailData{
 		ID:             quotation.ID,
 		Status:         currentStatus,
-		SubmittedAt:    quotation.CreatedAt.Format(constants.DateTimeLayoutISO),
-		UpdatedAt:      quotation.UpdatedAt.Format(constants.DateTimeLayoutISO),
+		SubmittedAt:    utils.FormatTimePH(quotation.CreatedAt),
+		UpdatedAt:      utils.FormatTimePH(quotation.UpdatedAt),
 		Lines:          s.mapLineItems(lines),
 		TotalItems:     summaryModel.TotalItems,
 		TotalPrice:     summaryModel.TotalPrice,

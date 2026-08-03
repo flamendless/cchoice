@@ -57,12 +57,23 @@ var (
 	staffIDErr  error
 )
 
-func ShouldSkipCommand(name string) bool {
-	if name == "" {
+func ShouldSkipCommand(cmd *cobra.Command) bool {
+	if cmd == nil {
 		return true
 	}
-	_, skip := skipCommands[name]
-	return skip
+	for c := cmd; c != nil; c = c.Parent() {
+		if c.Name() == "" {
+			continue
+		}
+		if _, skip := skipCommands[c.Name()]; skip {
+			return true
+		}
+	}
+	return cmd.Name() == ""
+}
+
+func isSystemCLIRun() bool {
+	return strings.TrimSpace(os.Getenv(EnvCLIStaffID)) == ""
 }
 
 func SetSummary(ctx context.Context, summary string) context.Context {
@@ -78,7 +89,7 @@ func SetDetails(ctx context.Context, details map[string]any) context.Context {
 }
 
 func Log(ctx context.Context, db database.IService, encoder encode.IEncode, cmd *cobra.Command, args []string, runErr error, duration time.Duration) {
-	if cmd == nil || ShouldSkipCommand(cmd.Name()) {
+	if cmd == nil || ShouldSkipCommand(cmd) || isSystemCLIRun() {
 		return
 	}
 

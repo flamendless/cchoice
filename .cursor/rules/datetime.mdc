@@ -1,0 +1,37 @@
+---
+description: UTC storage and PH timezone presentation for datetimes
+alwaysApply: true
+---
+
+# Datetime Conventions
+
+## Storage (database / writes) — UTC
+
+- Persist datetimes in UTC: SQL `datetime('now')` (SQLite UTC), or `time.Now().UTC()` in Go before writing.
+- Do **not** store Asia/Manila-local strings in `created_at`, `updated_at`, `emailed_at`, etc.
+- Date-only fields (`issue_date`, `due_date`, holidays) stay as `YYYY-MM-DD` — no timezone conversion.
+- Use layouts from `internal/constants/time.go`; never hardcode format strings.
+
+## Presentation (user-facing) — PH (Asia/Manila)
+
+Convert at the **mapping layer** (service/handler → model/template data), not in templ/HTML/JS.
+
+| Output | Helper |
+|--------|--------|
+| `time.Time` from sqlc | `utils.FormatTimePH(t)` |
+| `string` datetime from SQLite | `utils.ConvertToPH(s)` |
+| Date-only display | Pass through (`constants.DateLayoutISO`) |
+| "Today" / business-date logic | `utils.NowPH()` |
+
+Applies to: admin templ pages, customer-facing pages, email templates (`templates/`), PDF generators (`internal/services/*_pdf.go`), and any API/HTML that shows a datetime to a user.
+
+```go
+// BAD — UTC shown to user
+CreatedAt: row.CreatedAt.Format(constants.DateTimeLayoutISO)
+
+// GOOD — PH for display
+CreatedAt: utils.FormatTimePH(row.CreatedAt)
+
+// GOOD — string column from DB
+CreatedAt: utils.ConvertToPH(row.CreatedAt)
+```
