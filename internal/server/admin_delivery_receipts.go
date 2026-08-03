@@ -135,7 +135,7 @@ func (s *Server) adminDeliveryReceiptsCreateHandler(w http.ResponseWriter, r *ht
 	}
 
 	pdfStatus := "queued"
-	if err := s.queueDeliveryReceiptPDF(ctx, receiptDBID); err != nil {
+	if err := s.queueDeliveryReceiptPDF(ctx, staffID, receiptDBID); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		pdfStatus = "failed"
 	}
@@ -259,9 +259,12 @@ func (s *Server) adminDeliveryReceiptsPDFHandler(w http.ResponseWriter, r *http.
 
 	pdfBytes, err := s.services.deliveryReceipt.ReadStoredPDF(receiptDBID, receipt.PDFPath)
 	if err != nil {
+		staffID := s.sessionManager.GetString(ctx, SessionStaffID)
 		if s.deliveryReceiptJobRunner != nil {
 			if qerr := s.deliveryReceiptJobRunner.QueueGeneratePDF(ctx, receiptDBID); qerr != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(qerr))
+			} else {
+				s.services.deliveryReceipt.LogDeliveryReceiptPDFQueued(ctx, staffID, idStr)
 			}
 			http.Error(w, "PDF is being generated", http.StatusConflict)
 			return
@@ -287,7 +290,10 @@ func (s *Server) adminDeliveryReceiptsPDFHandler(w http.ResponseWriter, r *http.
 	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.pdf"`, filename))
 	if _, err := w.Write(pdfBytes); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		return
 	}
+
+	s.services.deliveryReceipt.LogDeliveryReceiptPDFDownload(ctx, s.sessionManager.GetString(ctx, SessionStaffID), idStr)
 }
 
 func (s *Server) adminDeliveryReceiptsJobStatusHandler(w http.ResponseWriter, r *http.Request) {
@@ -359,11 +365,15 @@ func (s *Server) adminDeliveryReceiptsEmailHandler(w http.ResponseWriter, r *htt
 	respondInvoiceHX(w, r, adminInvoicesPage, "Delivery receipt email queued", "")
 }
 
-func (s *Server) queueDeliveryReceiptPDF(ctx context.Context, receiptID int64) error {
+func (s *Server) queueDeliveryReceiptPDF(ctx context.Context, staffID string, receiptID int64) error {
 	if s.deliveryReceiptJobRunner != nil {
-		return s.deliveryReceiptJobRunner.QueueGeneratePDF(ctx, receiptID)
+		if err := s.deliveryReceiptJobRunner.QueueGeneratePDF(ctx, receiptID); err != nil {
+			return err
+		}
+		s.services.deliveryReceipt.LogDeliveryReceiptPDFQueued(ctx, staffID, s.encoder.Encode(receiptID))
+		return nil
 	}
-	return s.services.deliveryReceipt.GenerateAndStorePDF(ctx, receiptID)
+	return s.services.deliveryReceipt.GenerateAndStorePDF(ctx, staffID, receiptID)
 }
 
 func (s *Server) queueDeliveryReceiptEmail(ctx context.Context, staffID string, receiptID int64) error {

@@ -363,7 +363,12 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	sessionCfg := conf.Conf().Session
 	ApplyLoginSession(ctx, s.sessionManager, f.RememberMe, sessionCfg.Lifetime, sessionCfg.RememberLifetime)
-	s.sessionManager.Put(ctx, SessionStaffID, s.encoder.Encode(staff.ID))
+	staffIDStr := s.encoder.Encode(staff.ID)
+	s.sessionManager.Put(ctx, SessionStaffID, staffIDStr)
+
+	if err := s.services.staffLog.CreateLog(ctx, staffIDStr, constants.ActionLogin, constants.ModuleStaff, "success", nil); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+	}
 
 	useragentID := sql.NullInt64{}
 	if ua := r.UserAgent(); ua != "" {
@@ -398,11 +403,18 @@ func (s *Server) adminLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Logout Handler]"
 	ctx := r.Context()
 
+	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
 	accessID := s.sessionManager.GetInt64(ctx, SessionStaffAccessID)
 	if accessID != 0 {
 		_, err := s.dbRW.GetQueries().UpdateStaffAccessLogout(ctx, accessID)
 		if err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Int64("staff_access_id", accessID), zap.Error(err))
+		}
+	}
+
+	if staffID != "" {
+		if err := s.services.staffLog.CreateLog(ctx, staffID, constants.ActionLogout, constants.ModuleStaff, "success", nil); err != nil {
+			logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
 		}
 	}
 

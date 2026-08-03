@@ -149,7 +149,7 @@ func (s *Server) adminSuperuserStaffsRoleHandler(w http.ResponseWriter, r *http.
 
 	switch action {
 	case "ADD":
-		if err := s.services.role.AddRole(ctx, staffID, role); err != nil {
+		if err := s.services.role.AddRole(ctx, s.sessionManager.GetString(ctx, SessionStaffID), staffID, role); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Stringer("role", role), zap.String("action", action), zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, err.Error()))
 			return
@@ -179,7 +179,7 @@ func (s *Server) adminSuperuserStaffsRoleHandler(w http.ResponseWriter, r *http.
 		}
 
 	case "REMOVE":
-		if err := s.services.role.RemoveRole(ctx, staffID, role); err != nil {
+		if err := s.services.role.RemoveRole(ctx, s.sessionManager.GetString(ctx, SessionStaffID), staffID, role); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Stringer("role", role), zap.String("action", action), zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, err.Error()))
 			return

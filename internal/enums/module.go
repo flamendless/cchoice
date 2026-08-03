@@ -8,6 +8,7 @@ type Module int
 
 const (
 	MODULE_UNDEFINED Module = iota
+	MODULE_ATTENDANCE
 	MODULE_ATTENDANCE_REPORT_CSV
 	MODULE_ATTENDANCE_REPORT_XLSX
 	MODULE_BRAND
@@ -25,6 +26,7 @@ const (
 )
 
 var AllModules = []Module{
+	MODULE_ATTENDANCE,
 	MODULE_ATTENDANCE_REPORT_CSV,
 	MODULE_ATTENDANCE_REPORT_XLSX,
 	MODULE_BRANDS,
@@ -40,6 +42,8 @@ var AllModules = []Module{
 
 func ParseModuleToEnum(e string) Module {
 	switch strings.ToUpper(e) {
+	case MODULE_ATTENDANCE.String():
+		return MODULE_ATTENDANCE
 	case MODULE_ATTENDANCE_REPORT_CSV.String():
 		return MODULE_ATTENDANCE_REPORT_CSV
 	case MODULE_ATTENDANCE_REPORT_XLSX.String():

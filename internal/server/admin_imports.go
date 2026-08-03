@@ -75,7 +75,7 @@ func (s *Server) adminImportsProductsPreviewHandler(w http.ResponseWriter, r *ht
 	}
 	defer file.Close()
 
-	preview, sessionData, err := s.services.productBulkImport.PreviewFromReader(ctx, header.Filename, file)
+	preview, sessionData, err := s.services.productBulkImport.PreviewFromReader(ctx, s.sessionManager.GetString(ctx, SessionStaffID), header.Filename, file)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))

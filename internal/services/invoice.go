@@ -1012,27 +1012,39 @@ func invoicePDFDir() string {
 	return filepath.Join("cmd", "web", "static", "invoices")
 }
 
-func (s *InvoiceService) GenerateAndStorePDF(ctx context.Context, invoiceID int64) error {
+func (s *InvoiceService) GenerateAndStorePDF(ctx context.Context, staffID string, invoiceID int64) error {
+	result := "success"
+	defer func() {
+		if staffID != "" {
+			s.logInvoicePDFAction(ctx, staffID, s.encoder.Encode(invoiceID), constants.ActionRun, result)
+		}
+	}()
+
 	idStr := s.encoder.Encode(invoiceID)
 	invoice, lines, err := s.GetInvoice(ctx, idStr)
 	if err != nil {
+		result = err.Error()
 		return err
 	}
 	config, err := s.GetConfig(ctx)
 	if err != nil {
+		result = err.Error()
 		return err
 	}
 
 	pdfBytes, err := RenderInvoicePDF(config, invoice, lines)
 	if err != nil {
+		result = errors.Join(errs.ErrInvoicePDFFailed, err).Error()
 		return errors.Join(errs.ErrInvoicePDFFailed, err)
 	}
 
 	if err := os.MkdirAll(invoicePDFDir(), 0o755); err != nil {
+		result = err.Error()
 		return err
 	}
 	localPath := filepath.Join(invoicePDFDir(), fmt.Sprintf("%d.pdf", invoiceID))
 	if err := os.WriteFile(localPath, pdfBytes, 0o644); err != nil {
+		result = err.Error()
 		return err
 	}
 
@@ -1040,9 +1052,29 @@ func (s *InvoiceService) GenerateAndStorePDF(ctx context.Context, invoiceID int6
 		PdfPath: localPath,
 		ID:      invoiceID,
 	}); err != nil {
+		result = errors.Join(errs.ErrInvoice, err).Error()
 		return errors.Join(errs.ErrInvoice, err)
 	}
+
+	result = fmt.Sprintf("success. invoice ID '%s'", idStr)
 	return nil
+}
+
+func (s *InvoiceService) LogInvoicePDFDownload(ctx context.Context, staffID, invoiceID string) {
+	s.logInvoicePDFAction(ctx, staffID, invoiceID, constants.ActionDownload, fmt.Sprintf("success. invoice ID '%s'", invoiceID))
+}
+
+func (s *InvoiceService) LogInvoicePDFQueued(ctx context.Context, staffID, invoiceID string) {
+	s.logInvoicePDFAction(ctx, staffID, invoiceID, constants.ActionRun, fmt.Sprintf("queued. invoice ID '%s'", invoiceID))
+}
+
+func (s *InvoiceService) logInvoicePDFAction(ctx context.Context, staffID, invoiceID, action, result string) {
+	if staffID == "" {
+		return
+	}
+	if err := s.staffLog.CreateLog(ctx, staffID, action, constants.ModuleInvoices, result, nil); err != nil {
+		logs.Log().Warn("[InvoiceService] pdf staff log", zap.Error(err))
+	}
 }
 
 func (s *InvoiceService) ReadStoredPDF(invoiceID int64, pdfPath string) ([]byte, error) {
@@ -1086,7 +1118,7 @@ func (s *InvoiceService) SendInvoiceEmail(ctx context.Context, staffID string, i
 
 	decoded := s.encoder.Decode(id)
 	if strings.TrimSpace(invoice.PDFPath) == "" {
-		if err := s.GenerateAndStorePDF(ctx, decoded); err != nil {
+		if err := s.GenerateAndStorePDF(ctx, staffID, decoded); err != nil {
 			result = err.Error()
 			return err
 		}
@@ -1159,6 +1191,6 @@ var _ IService = (*InvoiceService)(nil)
 
 // Compile-time check for invoice job runner interface.
 var _ interface {
-	GenerateAndStorePDF(ctx context.Context, invoiceID int64) error
+	GenerateAndStorePDF(ctx context.Context, staffID string, invoiceID int64) error
 	SendInvoiceEmailByID(ctx context.Context, staffID string, invoiceID int64) error
 } = (*InvoiceService)(nil)

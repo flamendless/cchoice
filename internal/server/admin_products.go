@@ -3,8 +3,6 @@ package server
 import (
 	"bytes"
 	"cmp"
-	"context"
-	"fmt"
 	"io"
 	"math"
 	"net/http"
@@ -228,26 +226,11 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		salePriceWithVat = int64(math.Round(salePrice))
 	}
 
-	result := "success"
-	defer func() {
-		if err := s.services.staffLog.CreateLog(
-			context.Background(),
-			s.sessionManager.GetString(ctx, SessionStaffID),
-			constants.ActionCreate,
-			constants.ModuleProducts,
-			result,
-			nil,
-		); err != nil {
-			logs.Log().Error(logtag, zap.Error(err))
-		}
-	}()
-
 	var filename string
 	var brandName string
 	if conf.Conf().Test.LocalUploadImage || conf.Conf().IsProd() {
 		file, header, err := r.FormFile("product_image")
 		if err != nil {
-			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, errs.ErrProductImageRequired.Error()))
 			return
@@ -256,7 +239,6 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 
 		brandName, err = s.services.brand.GetNameByID(ctx, brandID)
 		if err != nil {
-			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, errs.ErrBrandNotFound.Error()))
 			return
@@ -270,7 +252,6 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		)
 		buf := bytes.Buffer{}
 		if _, err := io.Copy(&buf, file); err != nil {
-			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, errs.ErrFileRead.Error()))
 			return
@@ -284,7 +265,6 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 			&buf,
 			contentType,
 		); err != nil {
-			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			redirectHX(w, r, utils.URLWithError(page, errs.ErrProductImageUploadFailed.Error()))
 			return
@@ -331,7 +311,6 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 		})
 	if err != nil || product == nil {
 		err = cmp.Or(err, errs.ErrServerProductNil)
-		result = err.Error()
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
@@ -344,12 +323,9 @@ func (s *Server) adminSuperuserProductsCreatePostHandler(w http.ResponseWriter, 
 			SourcePath: filename,
 			Filename:   filepath.Base(filename),
 		}); err != nil {
-			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		}
 	}
-
-	result = fmt.Sprintf("success. ID '%s'", s.encoder.Encode(product.ID))
 
 	logs.LogCtx(ctx).Info(logtag, zap.Int64("product_id", product.ID), zap.String("name", name))
 	redirectHX(w, r, utils.URLWithSuccess(page, "Product created successfully"))
@@ -510,22 +486,8 @@ func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter
 		return
 	}
 
-	result := "success"
-	defer func() {
-		if err := s.services.staffLog.CreateLog(
-			context.Background(),
-			s.sessionManager.GetString(ctx, SessionStaffID),
-			constants.ActionUpdateStatus,
-			constants.ModuleProducts,
-			result,
-			nil,
-		); err != nil {
-			logs.Log().Error(logtag, zap.Error(err))
-		}
-	}()
-
-	if err := s.services.product.UpdateStatus(ctx, productIDStr, status); err != nil {
-		result = err.Error()
+	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
+	if err := s.services.product.UpdateStatus(ctx, staffID, productIDStr, status); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("product_id", productIDStr),
@@ -536,7 +498,6 @@ func (s *Server) adminSuperuserProductsUpdateStatusHandler(w http.ResponseWriter
 		return
 	}
 
-	result = fmt.Sprintf("success. ID '%s'", productIDStr)
 	redirectHX(w, r, utils.URLWithSuccess(page, "Product status updated successfully"))
 }
 
@@ -556,22 +517,8 @@ func (s *Server) adminSuperuserProductsDeleteHandler(w http.ResponseWriter, r *h
 		return
 	}
 
-	result := "success"
-	defer func() {
-		if err := s.services.staffLog.CreateLog(
-			context.Background(),
-			s.sessionManager.GetString(ctx, SessionStaffID),
-			constants.ActionDelete,
-			constants.ModuleProducts,
-			result,
-			nil,
-		); err != nil {
-			logs.Log().Error(logtag, zap.Error(err))
-		}
-	}()
-
-	if err := s.services.product.Delete(ctx, productIDStr); err != nil {
-		result = err.Error()
+	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
+	if err := s.services.product.Delete(ctx, staffID, productIDStr); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("product_id", productIDStr),
@@ -581,7 +528,6 @@ func (s *Server) adminSuperuserProductsDeleteHandler(w http.ResponseWriter, r *h
 		return
 	}
 
-	result = fmt.Sprintf("success. ID '%s'", productIDStr)
 	redirectHX(w, r, utils.URLWithSuccess(page, "Product deleted successfully"))
 }
 
@@ -892,26 +838,11 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 		ExternalLinks:       externalLinks,
 	}
 
-	result := "success"
-	defer func() {
-		if err := s.services.staffLog.CreateLog(
-			context.Background(),
-			s.sessionManager.GetString(ctx, SessionStaffID),
-			constants.ActionUpdate,
-			constants.ModuleProducts,
-			result,
-			nil,
-		); err != nil {
-			logs.Log().Error(logtag, zap.Error(err))
-		}
-	}()
-
 	if err := s.services.product.Update(
 		ctx,
 		s.sessionManager.GetString(ctx, SessionStaffID),
 		input,
 	); err != nil {
-		result = err.Error()
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
@@ -925,12 +856,10 @@ func (s *Server) adminSuperuserProductsUpdateHandler(w http.ResponseWriter, r *h
 			SourcePath: filename,
 			Filename:   filepath.Base(filename),
 		}); err != nil {
-			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		}
 	}
 
-	result = fmt.Sprintf("success. ID '%s'", productID)
 	redirectHX(w, r, utils.URLWithSuccess(page, "Product updated successfully"))
 }
 
@@ -1257,26 +1186,11 @@ func (s *Server) adminStaffProductsUpdateHandler(w http.ResponseWriter, r *http.
 		ExternalLinks:       externalLinks,
 	}
 
-	result := "success"
-	defer func() {
-		if err := s.services.staffLog.CreateLog(
-			context.Background(),
-			s.sessionManager.GetString(ctx, SessionStaffID),
-			constants.ActionUpdate,
-			constants.ModuleProducts,
-			result,
-			nil,
-		); err != nil {
-			logs.Log().Error(logtag, zap.Error(err))
-		}
-	}()
-
 	if err := s.services.product.Update(
 		ctx,
 		s.sessionManager.GetString(ctx, SessionStaffID),
 		input,
 	); err != nil {
-		result = err.Error()
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(page, err.Error()))
 		return
@@ -1290,12 +1204,10 @@ func (s *Server) adminStaffProductsUpdateHandler(w http.ResponseWriter, r *http.
 			SourcePath: filename,
 			Filename:   filepath.Base(filename),
 		}); err != nil {
-			result = err.Error()
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		}
 	}
 
-	result = fmt.Sprintf("success. ID '%s'", productID)
 	redirectHX(w, r, utils.URLWithSuccess(page, "Product updated successfully"))
 }
 

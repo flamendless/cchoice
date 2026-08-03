@@ -43,7 +43,7 @@ func (s *ProductBulkImportService) ImportFromReader(
 	filename string,
 	reader io.Reader,
 ) (*BulkImportResult, error) {
-	preview, sessionData, err := s.PreviewFromReader(ctx, filename, reader)
+	preview, sessionData, err := s.PreviewFromReader(ctx, staffID, filename, reader)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (s *ProductBulkImportService) upsertRow(
 				return "", fmt.Errorf("invalid status: %s", statusStr)
 			}
 			if status != enums.PRODUCT_STATUS_DRAFT {
-				if err := s.product.UpdateStatus(ctx, s.product.EncodeID(product.ID), status); err != nil {
+				if err := s.product.UpdateStatus(ctx, staffID, s.product.EncodeID(product.ID), status); err != nil {
 					return "", err
 				}
 			}

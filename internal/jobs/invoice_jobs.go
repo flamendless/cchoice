@@ -22,7 +22,7 @@ import (
 )
 
 type IInvoiceJobService interface {
-	GenerateAndStorePDF(ctx context.Context, invoiceID int64) error
+	GenerateAndStorePDF(ctx context.Context, staffID string, invoiceID int64) error
 	SendInvoiceEmailByID(ctx context.Context, staffID string, invoiceID int64) error
 }
 
@@ -193,7 +193,7 @@ func (ijr *InvoiceJobRunner) handleGenerateInvoicePDF(ctx context.Context, m []b
 		return errors.Join(errs.ErrInvoicePDFFailed, err)
 	}
 
-	if err := ijr.invoiceJobService.GenerateAndStorePDF(ctx, invoiceJob.InvoiceID); err != nil {
+	if err := ijr.invoiceJobService.GenerateAndStorePDF(ctx, "", invoiceJob.InvoiceID); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		err2 := ijr.updateJobStatus(ctx, invoiceJob.ID, enums.INVOICE_JOB_STATUS_FAILED, err.Error())
 		return errors.Join(errs.ErrInvoicePDFFailed, err, err2)
@@ -258,7 +258,7 @@ func (ijr *InvoiceJobRunner) handleSendInvoiceEmail(ctx context.Context, m []byt
 	}
 
 	if invoiceRow.TblInvoice.PdfPath == "" {
-		if err := ijr.invoiceJobService.GenerateAndStorePDF(ctx, invoiceJob.InvoiceID); err != nil {
+		if err := ijr.invoiceJobService.GenerateAndStorePDF(ctx, "", invoiceJob.InvoiceID); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			err2 := ijr.updateJobStatus(ctx, invoiceJob.ID, enums.INVOICE_JOB_STATUS_FAILED, err.Error())
 			return errors.Join(errs.ErrInvoicePDFFailed, err, err2)

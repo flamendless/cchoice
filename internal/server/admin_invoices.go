@@ -398,7 +398,7 @@ func (s *Server) adminInvoicesCreateHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	pdfStatus := "queued"
-	if err := s.queueInvoicePDF(ctx, invoiceDBID); err != nil {
+	if err := s.queueInvoicePDF(ctx, staffID, invoiceDBID); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		pdfStatus = "failed"
 	}
@@ -523,9 +523,12 @@ func (s *Server) adminInvoicesPDFHandler(w http.ResponseWriter, r *http.Request)
 
 	pdfBytes, err := s.services.invoice.ReadStoredPDF(invoiceDBID, invoice.PDFPath)
 	if err != nil {
+		staffID := s.sessionManager.GetString(ctx, SessionStaffID)
 		if s.invoiceJobRunner != nil {
 			if qerr := s.invoiceJobRunner.QueueGeneratePDF(ctx, invoiceDBID); qerr != nil {
 				logs.LogCtx(ctx).Error(logtag, zap.Error(qerr))
+			} else {
+				s.services.invoice.LogInvoicePDFQueued(ctx, staffID, idStr)
 			}
 			http.Error(w, "PDF is being generated", http.StatusConflict)
 			return
@@ -556,7 +559,10 @@ func (s *Server) adminInvoicesPDFHandler(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.pdf"`, filename))
 	if _, err := w.Write(pdfBytes); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		return
 	}
+
+	s.services.invoice.LogInvoicePDFDownload(ctx, s.sessionManager.GetString(ctx, SessionStaffID), idStr)
 }
 
 func (s *Server) adminInvoicesJobStatusHandler(w http.ResponseWriter, r *http.Request) {
@@ -628,11 +634,15 @@ func (s *Server) adminInvoicesEmailHandler(w http.ResponseWriter, r *http.Reques
 	respondInvoiceHX(w, r, adminInvoicesPage, "Invoice email queued", "")
 }
 
-func (s *Server) queueInvoicePDF(ctx context.Context, invoiceID int64) error {
+func (s *Server) queueInvoicePDF(ctx context.Context, staffID string, invoiceID int64) error {
 	if s.invoiceJobRunner != nil {
-		return s.invoiceJobRunner.QueueGeneratePDF(ctx, invoiceID)
+		if err := s.invoiceJobRunner.QueueGeneratePDF(ctx, invoiceID); err != nil {
+			return err
+		}
+		s.services.invoice.LogInvoicePDFQueued(ctx, staffID, s.encoder.Encode(invoiceID))
+		return nil
 	}
-	return s.services.invoice.GenerateAndStorePDF(ctx, invoiceID)
+	return s.services.invoice.GenerateAndStorePDF(ctx, staffID, invoiceID)
 }
 
 func (s *Server) queueInvoiceEmail(ctx context.Context, staffID string, invoiceID int64) error {

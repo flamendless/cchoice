@@ -48,6 +48,20 @@ func NewAttendanceService(
 	}
 }
 
+func (s *AttendanceService) logAttendance(
+	ctx context.Context,
+	staffID, action, result string,
+	useragentID sql.NullInt64,
+) {
+	var ua *int64
+	if useragentID.Valid {
+		ua = &useragentID.Int64
+	}
+	if err := s.staffLog.CreateLog(ctx, staffID, action, constants.ModuleAttendance, result, ua); err != nil {
+		logs.Log().Warn("create log", zap.Error(err))
+	}
+}
+
 func (s *AttendanceService) TimeIn(
 	ctx context.Context,
 	staffID string,
@@ -56,6 +70,11 @@ func (s *AttendanceService) TimeIn(
 	location sql.NullString,
 	useragentID sql.NullInt64,
 ) error {
+	result := "success"
+	defer func() {
+		s.logAttendance(ctx, staffID, constants.ActionTimeIn, result, useragentID)
+	}()
+
 	dbStaffID := s.encoder.Decode(staffID)
 	existing, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx,
 		queries.GetStaffAttendanceByDateParams{
@@ -64,10 +83,12 @@ func (s *AttendanceService) TimeIn(
 		})
 
 	if err != nil && err != sql.ErrNoRows {
+		result = err.Error()
 		return err
 	}
 
 	if err == nil && existing.TimeIn.Valid {
+		result = sql.ErrNoRows.Error()
 		return sql.ErrNoRows
 	}
 
@@ -81,6 +102,9 @@ func (s *AttendanceService) TimeIn(
 				InLocation:    location,
 				InUseragentID: useragentID,
 			})
+		if err != nil {
+			result = err.Error()
+		}
 		return err
 	}
 
@@ -93,6 +117,9 @@ func (s *AttendanceService) TimeIn(
 			InUseragentID: useragentID,
 		})
 
+	if err != nil {
+		result = err.Error()
+	}
 	return err
 }
 
@@ -104,6 +131,11 @@ func (s *AttendanceService) TimeOut(
 	location sql.NullString,
 	useragentID sql.NullInt64,
 ) error {
+	result := "success"
+	defer func() {
+		s.logAttendance(ctx, staffID, constants.ActionTimeOut, result, useragentID)
+	}()
+
 	dbStaffID := s.encoder.Decode(staffID)
 	existing, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx,
 		queries.GetStaffAttendanceByDateParams{
@@ -111,14 +143,17 @@ func (s *AttendanceService) TimeOut(
 			ForDate: date,
 		})
 	if err != nil {
+		result = err.Error()
 		return err
 	}
 
 	if !existing.TimeIn.Valid {
+		result = sql.ErrNoRows.Error()
 		return sql.ErrNoRows
 	}
 
 	if existing.TimeOut.Valid {
+		result = sql.ErrTxDone.Error()
 		return sql.ErrTxDone
 	}
 
@@ -131,6 +166,9 @@ func (s *AttendanceService) TimeOut(
 			ForDate:        date,
 		})
 
+	if err != nil {
+		result = err.Error()
+	}
 	return err
 }
 
@@ -142,6 +180,11 @@ func (s *AttendanceService) LunchBreakIn(
 	location sql.NullString,
 	useragentID sql.NullInt64,
 ) error {
+	result := "success"
+	defer func() {
+		s.logAttendance(ctx, staffID, constants.ActionLunchBreakIn, result, useragentID)
+	}()
+
 	_, err := s.dbRW.GetQueries().UpdateStaffAttendanceLunchBreakIn(ctx, queries.UpdateStaffAttendanceLunchBreakInParams{
 		LunchBreakIn:            sql.NullString{String: now, Valid: true},
 		LunchBreakInLocation:    location,
@@ -149,6 +192,9 @@ func (s *AttendanceService) LunchBreakIn(
 		StaffID:                 s.encoder.Decode(staffID),
 		ForDate:                 date,
 	})
+	if err != nil {
+		result = err.Error()
+	}
 	return err
 }
 
@@ -160,18 +206,26 @@ func (s *AttendanceService) LunchBreakOut(
 	location sql.NullString,
 	useragentID sql.NullInt64,
 ) error {
+	result := "success"
+	defer func() {
+		s.logAttendance(ctx, staffID, constants.ActionLunchBreakOut, result, useragentID)
+	}()
+
 	dbStaffID := s.encoder.Decode(staffID)
 	existing, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
 		StaffID: dbStaffID,
 		ForDate: date,
 	})
 	if err != nil {
+		result = err.Error()
 		return err
 	}
 	if !existing.LunchBreakIn.Valid {
+		result = sql.ErrNoRows.Error()
 		return sql.ErrNoRows
 	}
 	if existing.LunchBreakOut.Valid {
+		result = sql.ErrTxDone.Error()
 		return sql.ErrTxDone
 	}
 
@@ -182,6 +236,9 @@ func (s *AttendanceService) LunchBreakOut(
 		StaffID:                  dbStaffID,
 		ForDate:                  date,
 	})
+	if err != nil {
+		result = err.Error()
+	}
 	return err
 }
 
@@ -194,6 +251,24 @@ func (s *AttendanceService) TimeOff(
 	endDate time.Time,
 	useragentID sql.NullInt64,
 ) error {
+	result := "success"
+	defer func() {
+		var ua *int64
+		if useragentID.Valid {
+			ua = &useragentID.Int64
+		}
+		if err := s.staffLog.CreateLog(
+			ctx,
+			staffID,
+			constants.ActionCreate,
+			constants.ModuleTimeOff,
+			result,
+			ua,
+		); err != nil {
+			logs.Log().Warn("create log", zap.Error(err))
+		}
+	}()
+
 	_, err := s.dbRW.GetQueries().CreateStaffTimeOff(
 		ctx,
 		queries.CreateStaffTimeOffParams{
@@ -205,6 +280,9 @@ func (s *AttendanceService) TimeOff(
 			UseragentID: useragentID,
 		},
 	)
+	if err != nil {
+		result = err.Error()
+	}
 	return err
 }
 
@@ -214,6 +292,11 @@ func (s *AttendanceService) UpsertLocation(
 	date string,
 	location sql.NullString,
 ) error {
+	result := "success"
+	defer func() {
+		s.logAttendance(ctx, staffID, constants.ActionUpdate, result, sql.NullInt64{})
+	}()
+
 	dbStaffID := s.encoder.Decode(staffID)
 	_, err := s.dbRO.GetQueries().GetStaffAttendanceByDate(ctx, queries.GetStaffAttendanceByDateParams{
 		StaffID: dbStaffID,
@@ -221,6 +304,7 @@ func (s *AttendanceService) UpsertLocation(
 	})
 
 	if err != nil && err != sql.ErrNoRows {
+		result = err.Error()
 		return err
 	}
 
@@ -232,6 +316,9 @@ func (s *AttendanceService) UpsertLocation(
 			TimeOut:     sql.NullString{},
 			OutLocation: location,
 		})
+		if err != nil {
+			result = err.Error()
+		}
 		return err
 	}
 
@@ -241,6 +328,9 @@ func (s *AttendanceService) UpsertLocation(
 		ForDate:     date,
 	})
 
+	if err != nil {
+		result = err.Error()
+	}
 	return err
 }
 

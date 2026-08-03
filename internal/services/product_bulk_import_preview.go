@@ -46,15 +46,32 @@ var productImportDiffFields = []string{
 
 func (s *ProductBulkImportService) PreviewFromReader(
 	ctx context.Context,
+	staffID string,
 	filename string,
 	reader io.Reader,
 ) (*BulkImportPreview, *ProductImportSessionData, error) {
+	result := "success"
+	defer func() {
+		if err := s.staffLog.CreateLog(
+			ctx,
+			staffID,
+			constants.ActionTrigger,
+			constants.ModuleProductsBulkImport,
+			result,
+			nil,
+		); err != nil {
+			logs.LogCtx(ctx).Error("[ProductBulkImportService] failed to log import preview", zap.Error(err))
+		}
+	}()
+
 	headers, records, err := parseProductImportFile(filename, reader)
 	if err != nil {
+		result = err.Error()
 		return nil, nil, err
 	}
 
 	if _, err := parseProductExportHeaderMap(headers); err != nil {
+		result = err.Error()
 		return nil, nil, err
 	}
 	headerMap, _ := parseProductExportHeaderMap(headers)
@@ -69,6 +86,7 @@ func (s *ProductBulkImportService) PreviewFromReader(
 		row := rowValuesToMap(headers, values)
 		previewRow, rowErr := s.previewRow(ctx, line, row, headerMap)
 		if rowErr != nil {
+			result = rowErr.Error()
 			return nil, nil, rowErr
 		}
 		preview.Rows = append(preview.Rows, previewRow)
@@ -89,6 +107,16 @@ func (s *ProductBulkImportService) PreviewFromReader(
 	}
 
 	sortBulkImportPreviewRows(preview.Rows)
+
+	result = fmt.Sprintf(
+		"success. file '%s', rows %d, create %d, update %d, unchanged %d, errors %d",
+		filename,
+		preview.TotalRows,
+		preview.CreateCount,
+		preview.UpdateCount,
+		preview.UnchangedCount,
+		preview.ErrorCount,
+	)
 
 	return preview, &ProductImportSessionData{
 		Headers: headers,

@@ -22,7 +22,7 @@ import (
 )
 
 type IDeliveryReceiptJobService interface {
-	GenerateAndStorePDF(ctx context.Context, receiptID int64) error
+	GenerateAndStorePDF(ctx context.Context, staffID string, receiptID int64) error
 	SendDeliveryReceiptEmailByID(ctx context.Context, staffID string, receiptID int64) error
 }
 
@@ -193,7 +193,7 @@ func (drjr *DeliveryReceiptJobRunner) handleGenerateDeliveryReceiptPDF(ctx conte
 		return errors.Join(errs.ErrDeliveryReceiptPDFFailed, err)
 	}
 
-	if err := drjr.deliveryReceiptJobService.GenerateAndStorePDF(ctx, deliveryReceiptJob.DeliveryReceiptID); err != nil {
+	if err := drjr.deliveryReceiptJobService.GenerateAndStorePDF(ctx, "", deliveryReceiptJob.DeliveryReceiptID); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		err2 := drjr.updateJobStatus(ctx, deliveryReceiptJob.ID, enums.INVOICE_JOB_STATUS_FAILED, err.Error())
 		return errors.Join(errs.ErrDeliveryReceiptPDFFailed, err, err2)
@@ -258,7 +258,7 @@ func (drjr *DeliveryReceiptJobRunner) handleSendDeliveryReceiptEmail(ctx context
 	}
 
 	if receiptRow.TblDeliveryReceipt.PdfPath == "" {
-		if err := drjr.deliveryReceiptJobService.GenerateAndStorePDF(ctx, deliveryReceiptJob.DeliveryReceiptID); err != nil {
+		if err := drjr.deliveryReceiptJobService.GenerateAndStorePDF(ctx, "", deliveryReceiptJob.DeliveryReceiptID); err != nil {
 			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 			err2 := drjr.updateJobStatus(ctx, deliveryReceiptJob.ID, enums.INVOICE_JOB_STATUS_FAILED, err.Error())
 			return errors.Join(errs.ErrDeliveryReceiptPDFFailed, err, err2)

@@ -19,6 +19,8 @@ import (
 	"cchoice/internal/logs"
 	"cchoice/internal/seo"
 	"cchoice/internal/utils"
+
+	"go.uber.org/zap"
 )
 
 type ProductService struct {
@@ -54,23 +56,37 @@ func NewProductService(
 	}
 }
 
+func (s *ProductService) logProductAction(ctx context.Context, staffID, action, result string) {
+	if err := s.staffLog.CreateLog(ctx, staffID, action, constants.ModuleProducts, result, nil); err != nil {
+		logs.Log().Warn("[ProductService] staff log", zap.Error(err))
+	}
+}
+
 func (s *ProductService) Create(
 	ctx context.Context,
 	staffID string,
 	input CreateProductInput,
 ) (*queries.TblProduct, error) {
+	result := "success"
+	defer func() {
+		s.logProductAction(ctx, staffID, constants.ActionCreate, result)
+	}()
+
 	staffDBID := s.encoder.Decode(staffID)
 	if staffDBID == encode.INVALID {
+		result = errs.ErrDecode.Error()
 		return nil, errs.ErrDecode
 	}
 
 	brandID := s.encoder.Decode(input.BrandID)
 	if brandID == encode.INVALID {
+		result = errs.ErrDecode.Error()
 		return nil, errs.ErrDecode
 	}
 
 	brand, err := s.dbRO.GetQueries().GetBrandsByID(ctx, brandID)
 	if err != nil {
+		result = err.Error()
 		return nil, err
 	}
 
@@ -79,6 +95,7 @@ func (s *ProductService) Create(
 		Subcategory: sql.NullString{String: input.Subcategory, Valid: true},
 	})
 	if err != nil {
+		result = err.Error()
 		return nil, err
 	}
 
@@ -96,6 +113,7 @@ func (s *ProductService) Create(
 		WeightUnit:    sql.NullString{String: weightUnit, Valid: weightUnit != ""},
 	})
 	if err != nil {
+		result = err.Error()
 		return nil, err
 	}
 
@@ -122,6 +140,7 @@ func (s *ProductService) Create(
 		},
 	})
 	if err != nil {
+		result = err.Error()
 		return nil, err
 	}
 
@@ -129,6 +148,7 @@ func (s *ProductService) Create(
 		ProductID:  product.ID,
 		CategoryID: categoryRow.ID,
 	}); err != nil {
+		result = err.Error()
 		return nil, err
 	}
 
@@ -139,6 +159,7 @@ func (s *ProductService) Create(
 		input.Stocks,
 		input.StocksIn,
 	); err != nil {
+		result = err.Error()
 		return nil, err
 	}
 
@@ -152,6 +173,7 @@ func (s *ProductService) Create(
 			input.SaleStartDate,
 			input.SaleEndDate,
 		); err != nil {
+			result = err.Error()
 			return nil, err
 		}
 	}
@@ -167,14 +189,17 @@ func (s *ProductService) Create(
 			CdnUrl:          sql.NullString{String: cdnURL, Valid: cdnURL != ""},
 			CdnUrlThumbnail: sql.NullString{String: cdnURLThumbnail, Valid: cdnURLThumbnail != ""},
 		}); err != nil {
+			result = err.Error()
 			return nil, err
 		}
 	}
 
 	if err := s.SyncExternalPlatformLinks(ctx, product.ID, input.ExternalLinks); err != nil {
+		result = err.Error()
 		return nil, err
 	}
 
+	result = fmt.Sprintf("success. ID '%s'", s.encoder.Encode(product.ID))
 	return &product, nil
 }
 
@@ -208,25 +233,49 @@ func (s *ProductService) EncodeID(id int64) string {
 	return s.encoder.Encode(id)
 }
 
-func (s *ProductService) UpdateStatus(ctx context.Context, productID string, status enums.ProductStatus) error {
+func (s *ProductService) UpdateStatus(ctx context.Context, staffID string, productID string, status enums.ProductStatus) error {
+	result := "success"
+	defer func() {
+		s.logProductAction(ctx, staffID, constants.ActionUpdateStatus, result)
+	}()
+
 	decodedProductID := s.encoder.Decode(productID)
 	if decodedProductID == encode.INVALID {
+		result = errs.ErrDecode.Error()
 		return errs.ErrDecode
 	}
 
-	return s.dbRW.GetQueries().UpdateProductsStatus(ctx, queries.UpdateProductsStatusParams{
+	if err := s.dbRW.GetQueries().UpdateProductsStatus(ctx, queries.UpdateProductsStatusParams{
 		Status: status.String(),
 		ID:     decodedProductID,
-	})
+	}); err != nil {
+		result = err.Error()
+		return err
+	}
+
+	result = fmt.Sprintf("success. ID '%s'", productID)
+	return nil
 }
 
-func (s *ProductService) Delete(ctx context.Context, productID string) error {
+func (s *ProductService) Delete(ctx context.Context, staffID string, productID string) error {
+	result := "success"
+	defer func() {
+		s.logProductAction(ctx, staffID, constants.ActionDelete, result)
+	}()
+
 	decodedProductID := s.encoder.Decode(productID)
 	if decodedProductID == encode.INVALID {
+		result = errs.ErrDecode.Error()
 		return errs.ErrDecode
 	}
 
-	return s.dbRW.GetQueries().SoftDeleteProduct(ctx, decodedProductID)
+	if err := s.dbRW.GetQueries().SoftDeleteProduct(ctx, decodedProductID); err != nil {
+		result = err.Error()
+		return err
+	}
+
+	result = fmt.Sprintf("success. ID '%s'", productID)
+	return nil
 }
 
 func (s *ProductService) GetForListingAdmin(
@@ -597,19 +646,27 @@ func (s *ProductService) GetByIDForEdit(ctx context.Context, productID string) (
 }
 
 func (s *ProductService) Update(ctx context.Context, staffID string, input UpdateProductInput) error {
+	result := "success"
+	defer func() {
+		s.logProductAction(ctx, staffID, constants.ActionUpdate, result)
+	}()
+
 	staffIDDB := s.encoder.Decode(staffID)
 	if staffIDDB == encode.INVALID {
+		result = errs.ErrDecode.Error()
 		return errs.ErrDecode
 	}
 
 	productID := s.encoder.Decode(input.ProductID)
 	if productID == encode.INVALID {
+		result = errs.ErrDecode.Error()
 		return errs.ErrDecode
 	}
 
 	brandID := s.encoder.Decode(input.BrandID)
 	brand, err := s.dbRO.GetQueries().GetBrandsByID(ctx, brandID)
 	if err != nil {
+		result = err.Error()
 		return err
 	}
 
@@ -618,11 +675,13 @@ func (s *ProductService) Update(ctx context.Context, staffID string, input Updat
 		Subcategory: sql.NullString{String: input.Subcategory, Valid: true},
 	})
 	if err != nil {
+		result = err.Error()
 		return err
 	}
 
 	existingProduct, err := s.dbRO.GetQueries().GetProductsByID(ctx, productID)
 	if err != nil {
+		result = err.Error()
 		return err
 	}
 
@@ -640,6 +699,7 @@ func (s *ProductService) Update(ctx context.Context, staffID string, input Updat
 		Weight:        sql.NullFloat64{Float64: weightVal, Valid: weightErr == nil},
 		WeightUnit:    sql.NullString{String: weightUnit, Valid: weightUnit != ""},
 	}); err != nil {
+		result = err.Error()
 		return err
 	}
 
@@ -665,16 +725,19 @@ func (s *ProductService) Update(ctx context.Context, staffID string, input Updat
 			),
 		},
 	}); err != nil {
+		result = err.Error()
 		return err
 	}
 
 	if err := s.productInventory.SetQty(ctx, staffID, input.ProductID, input.Stocks, input.StocksIn); err != nil {
+		result = err.Error()
 		return err
 	}
 
 	categoryChanged := existingProduct.ProductCategory != input.Category || existingProduct.ProductSubcategory != input.Subcategory
 	if categoryChanged {
 		if err := s.dbRW.GetQueries().DeleteProductsCategories(ctx, productID); err != nil {
+			result = err.Error()
 			return err
 		}
 
@@ -682,6 +745,7 @@ func (s *ProductService) Update(ctx context.Context, staffID string, input Updat
 			ProductID:  productID,
 			CategoryID: categoryRow.ID,
 		}); err != nil {
+			result = err.Error()
 			return err
 		}
 	}
@@ -697,6 +761,7 @@ func (s *ProductService) Update(ctx context.Context, staffID string, input Updat
 				CdnUrl:          sql.NullString{String: cdnURL, Valid: cdnURL != ""},
 				CdnUrlThumbnail: sql.NullString{String: cdnURLThumbnail, Valid: cdnURLThumbnail != ""},
 			}); err != nil {
+				result = err.Error()
 				return err
 			}
 		} else {
@@ -707,6 +772,7 @@ func (s *ProductService) Update(ctx context.Context, staffID string, input Updat
 				CdnUrl:          sql.NullString{String: cdnURL, Valid: cdnURL != ""},
 				CdnUrlThumbnail: sql.NullString{String: cdnURLThumbnail, Valid: cdnURLThumbnail != ""},
 			}); err != nil {
+				result = err.Error()
 				return err
 			}
 		}
@@ -721,13 +787,16 @@ func (s *ProductService) Update(ctx context.Context, staffID string, input Updat
 		input.SaleStartDate,
 		input.SaleEndDate,
 	); err != nil {
+		result = err.Error()
 		return err
 	}
 
 	if err := s.SyncExternalPlatformLinks(ctx, productID, input.ExternalLinks); err != nil {
+		result = err.Error()
 		return err
 	}
 
+	result = fmt.Sprintf("success. ID '%s'", input.ProductID)
 	return nil
 }
 

@@ -434,28 +434,40 @@ func deliveryReceiptPDFDir() string {
 	return filepath.Join("cmd", "web", "static", "delivery_receipts")
 }
 
-func (s *DeliveryReceiptService) GenerateAndStorePDF(ctx context.Context, receiptID int64) error {
+func (s *DeliveryReceiptService) GenerateAndStorePDF(ctx context.Context, staffID string, receiptID int64) error {
+	result := "success"
 	idStr := s.encoder.Encode(receiptID)
+	defer func() {
+		if staffID != "" {
+			s.logDeliveryReceiptPDFAction(ctx, staffID, idStr, constants.ActionRun, result)
+		}
+	}()
+
 	receipt, lines, err := s.GetDeliveryReceipt(ctx, idStr)
 	if err != nil {
+		result = err.Error()
 		return err
 	}
 
 	config, err := s.invoiceService.GetConfig(ctx)
 	if err != nil {
+		result = err.Error()
 		return err
 	}
 
 	pdfBytes, err := RenderDeliveryReceiptPDF(config, receipt, lines)
 	if err != nil {
+		result = errors.Join(errs.ErrDeliveryReceiptPDFFailed, err).Error()
 		return errors.Join(errs.ErrDeliveryReceiptPDFFailed, err)
 	}
 
 	if err := os.MkdirAll(deliveryReceiptPDFDir(), 0o755); err != nil {
+		result = err.Error()
 		return err
 	}
 	localPath := filepath.Join(deliveryReceiptPDFDir(), strconv.FormatInt(receiptID, 10)+".pdf")
 	if err := os.WriteFile(localPath, pdfBytes, 0o644); err != nil {
+		result = err.Error()
 		return err
 	}
 
@@ -463,9 +475,29 @@ func (s *DeliveryReceiptService) GenerateAndStorePDF(ctx context.Context, receip
 		PdfPath: localPath,
 		ID:      receiptID,
 	}); err != nil {
+		result = errors.Join(errs.ErrDeliveryReceipt, err).Error()
 		return errors.Join(errs.ErrDeliveryReceipt, err)
 	}
+
+	result = fmt.Sprintf("success. receipt ID '%s'", idStr)
 	return nil
+}
+
+func (s *DeliveryReceiptService) LogDeliveryReceiptPDFDownload(ctx context.Context, staffID, receiptID string) {
+	s.logDeliveryReceiptPDFAction(ctx, staffID, receiptID, constants.ActionDownload, fmt.Sprintf("success. receipt ID '%s'", receiptID))
+}
+
+func (s *DeliveryReceiptService) LogDeliveryReceiptPDFQueued(ctx context.Context, staffID, receiptID string) {
+	s.logDeliveryReceiptPDFAction(ctx, staffID, receiptID, constants.ActionRun, fmt.Sprintf("queued. receipt ID '%s'", receiptID))
+}
+
+func (s *DeliveryReceiptService) logDeliveryReceiptPDFAction(ctx context.Context, staffID, receiptID, action, result string) {
+	if staffID == "" {
+		return
+	}
+	if err := s.staffLog.CreateLog(ctx, staffID, action, constants.ModuleDeliveryReceipts, result, nil); err != nil {
+		logs.Log().Warn("[DeliveryReceiptService] pdf staff log", zap.Error(err))
+	}
 }
 
 func (s *DeliveryReceiptService) ReadStoredPDF(receiptID int64, pdfPath string) ([]byte, error) {
@@ -509,7 +541,7 @@ func (s *DeliveryReceiptService) SendDeliveryReceiptEmail(ctx context.Context, s
 
 	decoded := s.encoder.Decode(id)
 	if strings.TrimSpace(receipt.PDFPath) == "" {
-		if err := s.GenerateAndStorePDF(ctx, decoded); err != nil {
+		if err := s.GenerateAndStorePDF(ctx, staffID, decoded); err != nil {
 			result = err.Error()
 			return err
 		}
@@ -574,6 +606,6 @@ func (s *DeliveryReceiptService) Log() {
 var _ IService = (*DeliveryReceiptService)(nil)
 
 var _ interface {
-	GenerateAndStorePDF(ctx context.Context, receiptID int64) error
+	GenerateAndStorePDF(ctx context.Context, staffID string, receiptID int64) error
 	SendDeliveryReceiptEmailByID(ctx context.Context, staffID string, receiptID int64) error
 } = (*DeliveryReceiptService)(nil)

@@ -17,24 +17,31 @@ import (
 	"cchoice/internal/logs"
 	"cchoice/internal/utils"
 
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type StaffService struct {
-	encoder encode.IEncode
-	dbRO    database.IService
-	dbRW    database.IService
+	encoder  encode.IEncode
+	dbRO     database.IService
+	dbRW     database.IService
+	staffLog *StaffLogsService
 }
 
 func NewStaffService(
 	encoder encode.IEncode,
 	dbRO database.IService,
 	dbRW database.IService,
+	staffLog *StaffLogsService,
 ) *StaffService {
+	if staffLog == nil {
+		panic("StaffLogsService is required")
+	}
 	return &StaffService{
-		encoder: encoder,
-		dbRO:    dbRO,
-		dbRW:    dbRW,
+		encoder:  encoder,
+		dbRO:     dbRO,
+		dbRW:     dbRW,
+		staffLog: staffLog,
 	}
 }
 
@@ -61,9 +68,17 @@ func (s *StaffService) GetByID(ctx context.Context, staffID string) (models.Admi
 }
 
 func (s *StaffService) UpdatePassword(ctx context.Context, staffID string, password string) error {
+	result := "success"
+	defer func() {
+		if err := s.staffLog.CreateLog(ctx, staffID, constants.ActionReset, constants.ModuleStaff, result, nil); err != nil {
+			logs.Log().Warn("[StaffService] update password log", zap.Error(err))
+		}
+	}()
+
 	decodedID := s.encoder.Decode(staffID)
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
+		result = err.Error()
 		return err
 	}
 
@@ -71,11 +86,22 @@ func (s *StaffService) UpdatePassword(ctx context.Context, staffID string, passw
 		Password: string(hash),
 		ID:       decodedID,
 	})
+	if err != nil {
+		result = err.Error()
+	}
 	return err
 }
 
 func (s *StaffService) UpdateProfile(ctx context.Context, params UpdateProfileParams) error {
+	result := "success"
+	defer func() {
+		if err := s.staffLog.CreateLog(ctx, params.ID, constants.ActionUpdate, constants.ModuleStaff, result, nil); err != nil {
+			logs.Log().Warn("[StaffService] update profile log", zap.Error(err))
+		}
+	}()
+
 	if !strings.HasPrefix(params.MobileNo, constants.PHMobilePrefix) {
+		result = errs.ErrValidationInvalidMobileNumber.Error()
 		return errs.ErrValidationInvalidMobileNumber
 	}
 
@@ -91,6 +117,9 @@ func (s *StaffService) UpdateProfile(ctx context.Context, params UpdateProfilePa
 		DateHired:  params.DateHired,
 		ID:         decodedID,
 	})
+	if err != nil {
+		result = err.Error()
+	}
 	return err
 }
 
