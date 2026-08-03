@@ -44,6 +44,7 @@ type appConfig struct {
 	Server             ServerConfig
 	Settings           Settings
 	RateLimit          RateLimitConfig
+	Session            SessionConfig
 	AppEnv             enums.AppEnv
 	LogMinLevel        int `env:"LOG_MIN_LEVEL" env-default:"1"`
 	Test               Test
@@ -61,6 +62,11 @@ type RateLimitConfig struct {
 	RPS   int           `env:"RATE_LIMIT_RPS" env-default:"5"`
 	Burst int           `env:"RATE_LIMIT_BURST" env-default:"10"`
 	TTL   time.Duration `env:"RATE_LIMIT_TTL" env-default:"3m"`
+}
+
+type SessionConfig struct {
+	Lifetime         time.Duration `env:"SESSION_LIFETIME" env-default:"4h"`
+	RememberLifetime time.Duration `env:"SESSION_REMEMBER_LIFETIME" env-default:"168h"` // 7 days
 }
 
 type BasicAuth struct {

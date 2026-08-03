@@ -40,8 +40,9 @@ func (f CustomerRegisterForm) Validate() error {
 }
 
 type CustomerLoginForm struct {
-	Email    string `form:"email" validate:"required,ph_email"`
-	Password string `form:"password" validate:"required,ph_password"`
+	Email      string `form:"email" validate:"required,ph_email"`
+	Password   string `form:"password" validate:"required,ph_password"`
+	RememberMe bool   `form:"remember_me"`
 }
 
 type CustomerProfileUpdateForm struct {

@@ -129,7 +129,8 @@ func (s *Server) GetProductImageProxyURL(ctx context.Context, thumbnailPath stri
 func NewServer() *ServerInstance {
 	cfg := conf.Conf()
 	sessionManager := scs.New()
-	sessionManager.Lifetime = 4 * time.Hour
+	sessionManager.Lifetime = cfg.Session.Lifetime
+	sessionManager.Cookie.Persist = false
 	sessionManager.Cookie.HttpOnly = true
 	sessionManager.Cookie.SameSite = http.SameSiteLaxMode
 	sessionManager.Cookie.Secure = cfg.Server.UseSSL

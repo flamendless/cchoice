@@ -360,6 +360,20 @@ templ BackToShopLink() {
 	</a>
 }
 
+templ RememberMeCheckbox() {
+	<div class="flex items-center gap-2">
+		<input
+			type="checkbox"
+			name="remember_me"
+			id="remember_me"
+			class="w-5 h-5 accent-primary rounded focus:ring-primary focus:border-primary"
+		/>
+		<label for="remember_me" class="text-sm font-medium text-gray-700 cursor-pointer">
+			Remember me for 7 days
+		</label>
+	</div>
+}
+
 templ ReleaseNotesLink() {
 	<a
 		href={ utils.URL("/changelogs") }

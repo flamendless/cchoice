@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	compadmin "cchoice/cmd/web/components/admin"
+	"cchoice/internal/conf"
 	"cchoice/internal/constants"
 	"cchoice/internal/database"
 	"cchoice/internal/database/queries"
@@ -326,6 +327,8 @@ func (s *Server) adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	metrics.Auth.LoginAttempt(metrics.AuthUserTypeAdmin, metrics.AuthResultSuccess)
 
+	sessionCfg := conf.Conf().Session
+	ApplyLoginSession(ctx, s.sessionManager, f.RememberMe, sessionCfg.Lifetime, sessionCfg.RememberLifetime)
 	s.sessionManager.Put(ctx, SessionStaffID, s.encoder.Encode(staff.ID))
 
 	useragentID := sql.NullInt64{}

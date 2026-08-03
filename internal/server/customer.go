@@ -6,6 +6,7 @@ import (
 
 	compcustomer "cchoice/cmd/web/components/customers"
 	"cchoice/cmd/web/models"
+	"cchoice/internal/conf"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/httputil"
@@ -103,6 +104,8 @@ func (s *Server) customerLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	metrics.Auth.LoginAttempt(metrics.AuthUserTypeCustomer, metrics.AuthResultSuccess)
 
+	sessionCfg := conf.Conf().Session
+	ApplyLoginSession(ctx, s.sessionManager, req.RememberMe, sessionCfg.Lifetime, sessionCfg.RememberLifetime)
 	s.sessionManager.Put(ctx, SessionCustomerID, s.encoder.Encode(customer.ID))
 	s.sessionManager.Put(ctx, SessionCustomerAccessID, 0)
 	redirectHX(w, r, utils.URL(portalPage))

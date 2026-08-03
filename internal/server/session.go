@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"slices"
 	"strconv"
+	"time"
 
 	"cchoice/cmd/web/models"
 	"cchoice/internal/services"
@@ -31,6 +32,21 @@ const (
 func init() {
 	gob.Register(models.HomePageFilters{})
 	gob.Register(&services.ProductImportSessionData{})
+}
+
+func ApplyLoginSession(
+	ctx context.Context,
+	sm *scs.SessionManager,
+	rememberMe bool,
+	lifetime, rememberLifetime time.Duration,
+) {
+	if rememberMe {
+		sm.RememberMe(ctx, true)
+		sm.SetDeadline(ctx, time.Now().Add(rememberLifetime))
+		return
+	}
+	sm.RememberMe(ctx, false)
+	sm.SetDeadline(ctx, time.Now().Add(lifetime))
 }
 
 func AddToCheckoutLineProductIDs(

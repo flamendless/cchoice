@@ -5,4 +5,5 @@ type AdminLoginForm struct {
 	Password    string `form:"password" validate:"required,ph_password"`
 	LocationLat string `form:"location_lat"`
 	LocationLng string `form:"location_lng"`
+	RememberMe  bool   `form:"remember_me"`
 }
