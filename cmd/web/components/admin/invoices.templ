@@ -6,12 +6,15 @@ import (
 
 	"cchoice/cmd/web/components/common"
 	"cchoice/cmd/web/components/header"
+	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
 	"cchoice/internal/services"
 	"cchoice/internal/utils"
 )
 
-templ AdminInvoicesListPage(config services.InvoiceConfig) {
+const invoiceTextareaClass = "px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full resize-y min-h-[4rem] max-h-48"
+
+templ AdminInvoicesListPage(config services.InvoiceConfig, canManage bool) {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
@@ -29,35 +32,78 @@ templ AdminInvoicesListPage(config services.InvoiceConfig) {
 				<div class="max-w-6xl mx-auto">
 					<div class="bg-white rounded-lg shadow-md p-6">
 						@header.AdminStaffHeaderWithBack()
-						<h1 class="text-2xl font-bold text-center text-primary mb-6">
-							Invoices
-						</h1>
-						@InvoiceConfigCard(config)
-						@InvoiceRecipientsSection()
-						@InvoicesSection()
+						@InvoicePageHeader(config)
+						@InvoiceToolbar(canManage)
+						@InvoiceRecipientsCollapsibleSection(canManage)
+						@InvoicesCollapsibleSection()
 					</div>
 				</div>
 			</div>
+			<div id="invoice-config-modal-container"></div>
 			<div id="invoice-recipient-modal-container"></div>
 			<div id="invoice-generate-modal-container"></div>
+			<div id="invoice-preview-modal-container"></div>
 			@ScrImageUpload()
 			@ScrInvoiceGenerate()
 		</body>
 	</html>
 }
 
-templ ScrInvoiceGenerate() {
-	<script type="text/javascript" src={ utils.URL(utils.VersionedAsset("/static/js/invoice_generate.js")) }></script>
+templ InvoicePageHeader(config services.InvoiceConfig) {
+	<div class="flex flex-col items-center mb-6">
+		if config.LogoURL != "" {
+			<img src={ config.LogoURL } alt="Logo" class="h-16 w-auto object-contain mb-3"/>
+		} else {
+			<img src={ constants.PathEmailLogoCDN } alt="C-Choice" class="h-16 w-auto object-contain mb-3"/>
+		}
+		<h1 class="text-2xl font-bold text-center text-primary">Invoices</h1>
+	</div>
 }
 
-templ InvoiceConfigCard(config services.InvoiceConfig) {
-	<div class="bg-white rounded-lg shadow-md border border-gray-100 p-6 mb-8">
-		<h2 class="text-xl font-semibold text-gray-900 mb-1">Business / Invoice Configuration</h2>
-		<p class="text-sm text-gray-500 mb-4">These details appear on every invoice you generate.</p>
+templ InvoiceToolbar(canManage bool) {
+	<div class="flex flex-wrap items-center justify-center gap-3 mb-8 pb-6 border-b border-gray-200">
+		if canManage {
+			<button
+				type="button"
+				class="px-5 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 text-sm font-medium"
+				hx-get={ utils.URL("/admin/invoices/config") }
+				hx-target="#invoice-config-modal-container"
+				hx-swap="innerHTML"
+				_="on click call metrics_event('admin_exec', 'open invoice config')"
+			>
+				Configure
+			</button>
+		} else {
+			<button
+				type="button"
+				disabled
+				class="px-5 py-2 bg-gray-300 text-gray-500 rounded-md text-sm font-medium cursor-not-allowed opacity-60"
+				title="Requires invoice management permission"
+			>
+				Configure
+			</button>
+		}
+		<button
+			type="button"
+			class="px-5 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm font-medium"
+			hx-get={ utils.URL("/admin/invoices/generate") }
+			hx-target="#invoice-generate-modal-container"
+			hx-swap="innerHTML"
+			_="on click call metrics_event('admin_exec', 'open invoice generator')"
+		>
+			Create Invoice
+		</button>
+	</div>
+}
+
+templ InvoiceConfigModal(config services.InvoiceConfig) {
+	@invoiceWideModalShell("invoice-config-modal", "Business Invoice Configuration") {
 		<form
 			hx-post={ utils.URL("/admin/invoices/config") }
 			enctype="multipart/form-data"
 			class="grid grid-cols-1 md:grid-cols-2 gap-4"
+			hx-swap="none"
+			hx-on::after-request="if(event.detail.successful){document.getElementById('invoice-config-modal-container').innerHTML=''}"
 			_="on submit call metrics_event('admin_exec', 'save invoice config')"
 		>
 			<div class="md:col-span-2">
@@ -65,7 +111,7 @@ templ InvoiceConfigCard(config services.InvoiceConfig) {
 			</div>
 			<div class="md:col-span-2">
 				<label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-				<textarea name="address" rows="2" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full">{ config.Address }</textarea>
+				<textarea name="address" rows="2" class={ invoiceTextareaClass }>{ config.Address }</textarea>
 			</div>
 			@invoiceTextFieldWrap("tin", "TIN", config.TIN, "000-000-000-000")
 			@invoiceTextFieldWrap("vat_registration", "VAT Registration", config.VATRegistration, "VAT / Non-VAT")
@@ -81,8 +127,19 @@ templ InvoiceConfigCard(config services.InvoiceConfig) {
 				<input type="number" step="0.01" min="0" name="vat_percentage" value={ orDefault(config.VATPercentage, "12") } class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
 			</div>
 			<div class="md:col-span-2">
+				@invoiceTextFieldWrap("proprietor_name", "Proprietor Name", config.ProprietorName, "Owner / Proprietor")
+			</div>
+			<div class="md:col-span-2">
+				@invoiceTextFieldWrap("bir_authority_to_print", "BIR Authority to Print No.", config.BIRAuthorityToPrint, "ATP No.")
+			</div>
+			@invoiceDateFieldWrap("bir_date_issued", "BIR Date Issued", config.BIRDateIssued)
+			<div class="md:col-span-2">
+				<label class="block text-sm font-medium text-gray-700 mb-1">BIR Booklets Info</label>
+				<textarea name="bir_booklets_info" rows="2" class={ invoiceTextareaClass }>{ config.BIRBookletsInfo }</textarea>
+			</div>
+			<div class="md:col-span-2">
 				<label class="block text-sm font-medium text-gray-700 mb-1">Footer Notes</label>
-				<textarea name="footer_notes" rows="2" placeholder="Thank you for your business!" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full">{ config.FooterNotes }</textarea>
+				<textarea name="footer_notes" rows="2" placeholder="Thank you for your business!" class={ invoiceTextareaClass }>{ config.FooterNotes }</textarea>
 			</div>
 			<div class="md:col-span-2">
 				@ImageUploadField(ImageUploadParams{
@@ -92,16 +149,21 @@ templ InvoiceConfigCard(config services.InvoiceConfig) {
 					MaxSize:      constants.MaxSizeImageUpload,
 					ExistingURL:  config.LogoURL,
 					PreviewClass: "h-20 w-auto object-contain rounded border border-gray-200",
-					HelpText:     "PNG or JPEG. Used on generated PDFs.",
+					HelpText:     "PNG or JPEG. Not uploading a photo will use the default logo.",
 				})
 			</div>
-			<div class="md:col-span-2 flex justify-end">
-				<button type="submit" class="px-5 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+			<div class="md:col-span-2 flex justify-end gap-2 pt-2">
+				<button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm" _="on click trigger closeModal">Cancel</button>
+				<button type="submit" class="px-5 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm">
 					Save Configuration
 				</button>
 			</div>
 		</form>
-	</div>
+	}
+}
+
+templ ScrInvoiceGenerate() {
+	<script type="text/javascript" src={ utils.URL(utils.VersionedAsset("/static/js/invoice_generate.js")) }></script>
 }
 
 templ invoiceTextField(name string, label string, value string, placeholder string, required bool) {
@@ -123,50 +185,76 @@ templ invoiceTextField(name string, label string, value string, placeholder stri
 	/>
 }
 
+templ invoiceDateFieldWrap(name string, label string, value string) {
+	<div>
+		<label class="block text-sm font-medium text-gray-700 mb-1">{ label }</label>
+		<input
+			type="date"
+			name={ name }
+			value={ value }
+			class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"
+		/>
+	</div>
+}
+
 templ invoiceTextFieldWrap(name string, label string, value string, placeholder string) {
 	<div>
 		@invoiceTextField(name, label, value, placeholder, false)
 	</div>
 }
 
-templ InvoiceRecipientsSection() {
-	<div class="bg-white rounded-lg shadow-md border border-gray-100 p-6 mb-8">
-		<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-			<div>
-				<h2 class="text-xl font-semibold text-gray-900">Recipients / Clients</h2>
-				<p class="text-sm text-gray-500">Manage the clients you issue invoices to.</p>
+templ InvoiceRecipientsCollapsibleSection(canManage bool) {
+	<details class="mb-6 border border-gray-200 rounded-lg" open>
+		<summary class="cursor-pointer select-none px-4 py-3 bg-gray-50 rounded-lg font-semibold text-gray-900 hover:bg-gray-100">
+			Recipients / Clients
+		</summary>
+		<div class="p-4">
+			<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+				<p class="text-sm text-gray-500">Clients you issue invoices to.</p>
+				if canManage {
+					<button
+						type="button"
+						class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm"
+						hx-get={ utils.URL("/admin/invoices/recipients/create") }
+						hx-target="#invoice-recipient-modal-container"
+						hx-swap="innerHTML"
+					>
+						Add Recipient
+					</button>
+				}
 			</div>
-			<button
-				type="button"
-				class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-				hx-get={ utils.URL("/admin/invoices/recipients/create") }
-				hx-target="#invoice-recipient-modal-container"
+			<form
+				class="flex gap-2 items-center mb-4"
+				hx-get={ utils.URL("/admin/invoices/recipients/table") }
+				hx-target="#invoice-recipients-table-content"
 				hx-swap="innerHTML"
 			>
-				Add Recipient
-			</button>
+				<input type="search" name="search" placeholder="Search recipients..." class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"/>
+				<button type="submit" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm">Search</button>
+			</form>
+			<div
+				hx-get={ utils.URL("/admin/invoices/recipients/table") }
+				hx-trigger="load"
+				hx-target="#invoice-recipients-table-content"
+				hx-swap="innerHTML"
+			>
+				<div id="invoice-recipients-table-content"></div>
+			</div>
 		</div>
-		<form
-			class="flex gap-2 items-center mb-4"
-			hx-get={ utils.URL("/admin/invoices/recipients/table") }
-			hx-target="#invoice-recipients-table"
-			hx-swap="innerHTML"
-		>
-			<input type="search" name="search" placeholder="Search recipients..." class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"/>
-			<button type="submit" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">Search</button>
-		</form>
-		<div
-			hx-get={ utils.URL("/admin/invoices/recipients/table") }
-			hx-trigger="load"
-			hx-target="#invoice-recipients-table"
-			hx-swap="innerHTML"
-		>
-			<div id="invoice-recipients-table"></div>
+	</details>
+}
+
+templ AdminInvoiceRecipientsTableContent(recipients []services.InvoiceRecipient, searchQuery string, canManage bool, p models.TablePagination) {
+	<div id="invoice-recipients-table-content">
+		<div id="invoice-recipients-pagination-top" hx-swap-oob="true">
+			@TablePaginationBar(p)
 		</div>
+		@AdminInvoiceRecipientsTable(recipients, canManage)
+		@TablePaginationBar(p)
 	</div>
 }
 
-templ AdminInvoiceRecipientsTable(recipients []services.InvoiceRecipient, searchQuery string) {
+templ AdminInvoiceRecipientsTable(recipients []services.InvoiceRecipient, canManage bool) {
 	<div class="overflow-x-auto">
 		<table class="min-w-full divide-y divide-gray-200">
 			<thead class="bg-gray-50">
@@ -175,13 +263,16 @@ templ AdminInvoiceRecipientsTable(recipients []services.InvoiceRecipient, search
 					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
 					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
 					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TIN</th>
-					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registered Name</th>
+					if canManage {
+						<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+					}
 				</tr>
 			</thead>
 			<tbody class="bg-white divide-y divide-gray-200">
 				if len(recipients) == 0 {
 					<tr>
-						<td colspan="5" class="px-4 py-4 text-center text-gray-500">
+						<td colspan={ recipientColspan(canManage) } class="px-4 py-4 text-center text-gray-500">
 							No recipients found.
 						</td>
 					</tr>
@@ -192,29 +283,32 @@ templ AdminInvoiceRecipientsTable(recipients []services.InvoiceRecipient, search
 							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{ orDash(recipient.Email) }</td>
 							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{ orDash(recipient.ContactNumber) }</td>
 							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{ orDash(recipient.TIN) }</td>
-							<td class="px-4 py-3 whitespace-nowrap text-sm">
-								<div class="flex items-center gap-2">
-									<button
-										type="button"
-										class="text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium"
-										hx-get={ utils.URLf("/admin/invoices/recipients/%s/edit", recipient.ID) }
-										hx-target="#invoice-recipient-modal-container"
-										hx-swap="innerHTML"
-									>
-										Edit
-									</button>
-									<button
-										type="button"
-										class="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs font-medium"
-										hx-delete={ utils.URLf("/admin/invoices/recipients/%s", recipient.ID) }
-										hx-target={ fmt.Sprintf("#invoice-recipient-row-%s", recipient.ID) }
-										hx-swap="outerHTML"
-										hx-confirm="Delete this recipient?"
-									>
-										Delete
-									</button>
-								</div>
-							</td>
+							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{ orDash(recipient.RegisteredName) }</td>
+							if canManage {
+								<td class="px-4 py-3 whitespace-nowrap text-sm">
+									<div class="flex items-center gap-2">
+										<button
+											type="button"
+											class="text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium"
+											hx-get={ utils.URLf("/admin/invoices/recipients/%s/edit", recipient.ID) }
+											hx-target="#invoice-recipient-modal-container"
+											hx-swap="innerHTML"
+										>
+											Edit
+										</button>
+										<button
+											type="button"
+											class="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs font-medium"
+											hx-delete={ utils.URLf("/admin/invoices/recipients/%s", recipient.ID) }
+											hx-target={ fmt.Sprintf("#invoice-recipient-row-%s", recipient.ID) }
+											hx-swap="outerHTML"
+											hx-confirm="Delete this recipient?"
+										>
+											Delete
+										</button>
+									</div>
+								</td>
+							}
 						</tr>
 					}
 				}
@@ -244,7 +338,8 @@ templ InvoiceRecipientForm(recipient services.InvoiceRecipient, action string, m
 		}
 		hx-swap="none"
 		class="flex flex-col gap-3"
-		hx-on::after-request="if(event.detail.successful){document.getElementById('invoice-recipient-modal-container').innerHTML='';htmx.ajax('GET','/admin/invoices/recipients/table',{target:'#invoice-recipients-table',swap:'innerHTML'})}"
+		data-recipients-table-url={ utils.URL("/admin/invoices/recipients/table") }
+		hx-on::after-request="if(event.detail.successful){document.getElementById('invoice-recipient-modal-container').innerHTML='';htmx.ajax('GET',event.target.dataset.recipientsTableUrl,{target:'#invoice-recipients-table-content',swap:'innerHTML'})}"
 	>
 		<div>
 			<label class="block text-sm font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
@@ -256,13 +351,16 @@ templ InvoiceRecipientForm(recipient services.InvoiceRecipient, action string, m
 				<input type="email" name="email" value={ recipient.Email } class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
 			</div>
 			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
-				<input type="text" name="contact_number" value={ recipient.ContactNumber } class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
+				@common.MobileNumberInput("contact_number", "contact_number", "Contact Number", "9123456789", recipient.ContactNumber, false)
 			</div>
 		</div>
 		<div>
 			<label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-			<textarea name="address" rows="2" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full">{ recipient.Address }</textarea>
+			<textarea name="address" rows="2" class={ invoiceTextareaClass }>{ recipient.Address }</textarea>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-1">Registered Name</label>
+			<input type="text" name="registered_name" value={ recipient.RegisteredName } class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
 		</div>
 		<div>
 			<label class="block text-sm font-medium text-gray-700 mb-1">TIN</label>
@@ -270,7 +368,7 @@ templ InvoiceRecipientForm(recipient services.InvoiceRecipient, action string, m
 		</div>
 		<div>
 			<label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-			<textarea name="notes" rows="2" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full">{ recipient.Notes }</textarea>
+			<textarea name="notes" rows="2" class={ invoiceTextareaClass }>{ recipient.Notes }</textarea>
 		</div>
 		<div class="flex w-full gap-2 justify-end pt-2">
 			<button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm" _="on click trigger closeModal">Cancel</button>
@@ -279,32 +377,32 @@ templ InvoiceRecipientForm(recipient services.InvoiceRecipient, action string, m
 	</form>
 }
 
-templ InvoicesSection() {
-	<div class="bg-white rounded-lg shadow-md border border-gray-100 p-6">
-		<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-			<div>
-				<h2 class="text-xl font-semibold text-gray-900">Invoices</h2>
-				<p class="text-sm text-gray-500">Generate, download and email invoices.</p>
-			</div>
-			<button
-				type="button"
-				class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-				hx-get={ utils.URL("/admin/invoices/generate") }
-				hx-target="#invoice-generate-modal-container"
+templ InvoicesCollapsibleSection() {
+	<details class="border border-gray-200 rounded-lg" open>
+		<summary class="cursor-pointer select-none px-4 py-3 bg-gray-50 rounded-lg font-semibold text-gray-900 hover:bg-gray-100">
+			Invoices
+		</summary>
+		<div class="p-4">
+			<p class="text-sm text-gray-500 mb-4">View, preview, and email generated invoices.</p>
+			<div
+				hx-get={ utils.URL("/admin/invoices/table") }
+				hx-trigger="load"
+				hx-target="#invoices-table-content"
 				hx-swap="innerHTML"
-				_="on click call metrics_event('admin_exec', 'open invoice generator')"
 			>
-				Generate Invoice
-			</button>
+				<div id="invoices-table-content"></div>
+			</div>
 		</div>
-		<div
-			hx-get={ utils.URL("/admin/invoices/table") }
-			hx-trigger="load"
-			hx-target="#invoices-table"
-			hx-swap="innerHTML"
-		>
-			<div id="invoices-table"></div>
+	</details>
+}
+
+templ AdminInvoicesTableContent(invoices []services.InvoiceListItem, p models.TablePagination) {
+	<div id="invoices-table-content">
+		<div id="invoices-pagination-top" hx-swap-oob="true">
+			@TablePaginationBar(p)
 		</div>
+		@AdminInvoicesTable(invoices)
+		@TablePaginationBar(p)
 	</div>
 }
 
@@ -316,7 +414,7 @@ templ AdminInvoicesTable(invoices []services.InvoiceListItem) {
 					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice #</th>
 					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recipient</th>
 					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issue Date</th>
-					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
 					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
 					<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
 				</tr>
@@ -330,32 +428,51 @@ templ AdminInvoicesTable(invoices []services.InvoiceListItem) {
 					for _, invoice := range invoices {
 						<tr>
 							<td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{ invoice.InvoiceNumber }</td>
-							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{ orDash(invoice.RecipientName) }</td>
+							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{ invoiceListRecipient(invoice.RecipientEmail) }</td>
 							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{ invoice.IssueDate }</td>
-							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{ invoice.Total }</td>
+							<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{ invoice.Subtotal }</td>
 							<td class="px-4 py-3 whitespace-nowrap text-sm">
 								<span class="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">{ invoice.Status.String() }</span>
+								if invoice.PDFReady {
+									<span class="ml-1 inline-flex px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">PDF Ready</span>
+								}
 								if invoice.Emailed {
 									<span class="ml-1 inline-flex px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Emailed</span>
 								}
 							</td>
 							<td class="px-4 py-3 whitespace-nowrap text-sm">
 								<div class="flex items-center gap-2">
-									<a
-										href={ utils.URLf("/admin/invoices/%s/pdf", invoice.ID) }
-										target="_blank"
-										class="text-primary hover:underline text-xs font-medium"
-									>
-										PDF
-									</a>
 									<button
 										type="button"
-										class="text-white bg-primary hover:bg-primary-dark px-3 py-1 rounded text-xs font-medium"
-										hx-post={ utils.URLf("/admin/invoices/%s/email", invoice.ID) }
-										hx-confirm="Email this invoice to the recipient?"
+										class="text-primary hover:underline text-xs font-medium"
+										hx-get={ utils.URLf("/admin/invoices/%s/preview", invoice.ID) }
+										hx-target="#invoice-preview-modal-container"
+										hx-swap="innerHTML"
 									>
-										Email
+										Preview
 									</button>
+									if invoice.Emailed {
+										<button
+											type="button"
+											disabled
+											class="text-xs font-medium px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed"
+											title="Already sent via email"
+										>
+											Send via Email
+										</button>
+									} else {
+										<button
+											type="button"
+											class="text-white bg-primary hover:bg-primary-dark px-3 py-1 rounded text-xs font-medium"
+											data-invoices-table-url={ utils.URL("/admin/invoices/table") }
+											hx-post={ utils.URLf("/admin/invoices/%s/email", invoice.ID) }
+											hx-confirm="Send this invoice to the recipient via email?"
+											hx-swap="none"
+											hx-on::after-request="if(event.detail.successful){htmx.ajax('GET',event.target.dataset.invoicesTableUrl,{target:'#invoices-table-content',swap:'innerHTML'})}"
+										>
+											Send via Email
+										</button>
+									}
 								</div>
 							</td>
 						</tr>
@@ -370,7 +487,7 @@ templ invoiceModalShell(id string, title string) {
 	<div
 		id={ id }
 		class="fixed inset-0 z-50 flex items-center justify-center"
-		_="on closeModal set #invoice-recipient-modal-container.innerHTML to '' then set #invoice-generate-modal-container.innerHTML to '' end"
+		_="on closeModal set #invoice-recipient-modal-container.innerHTML to '' then set #invoice-generate-modal-container.innerHTML to '' then set #invoice-config-modal-container.innerHTML to '' then set #invoice-preview-modal-container.innerHTML to '' end"
 	>
 		<div class="absolute inset-0 bg-black/50" _="on click trigger closeModal"></div>
 		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]">
@@ -387,20 +504,44 @@ templ invoiceModalShell(id string, title string) {
 	</div>
 }
 
-templ InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.InvoiceRecipient, products []services.InvoiceProductOption) {
+templ invoiceWideModalShell(id string, title string) {
+	<div
+		id={ id }
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		_="on closeModal set #invoice-recipient-modal-container.innerHTML to '' then set #invoice-generate-modal-container.innerHTML to '' then set #invoice-config-modal-container.innerHTML to '' then set #invoice-preview-modal-container.innerHTML to '' end"
+	>
+		<div class="absolute inset-0 bg-black/50" _="on click trigger closeModal"></div>
+		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 overflow-y-auto max-h-[92vh]">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-semibold text-gray-900">{ title }</h2>
+				<button type="button" class="text-gray-400 hover:text-gray-600" _="on click trigger closeModal">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			{ children... }
+		</div>
+	</div>
+}
+
+templ InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.InvoiceRecipient, products []services.InvoiceProductOption, canManage bool) {
 	<div
 		id="invoice-generate-modal"
 		class="fixed inset-0 z-50 flex items-center justify-center"
 		data-create-url={ utils.URL("/admin/invoices") }
 		data-table-url={ utils.URL("/admin/invoices/table") }
+		data-recipients-table-url={ utils.URL("/admin/invoices/recipients/table") }
+		data-preview-url-template={ utils.URL("/admin/invoices/%s/preview") }
 		data-currency={ orDefault(config.Currency, "PHP") }
 		data-vat={ orDefault(config.VATPercentage, "0") }
+		data-can-manage={ strconv.FormatBool(canManage) }
 		_="on closeModal set #invoice-generate-modal-container.innerHTML to '' end"
 	>
 		<div class="absolute inset-0 bg-black/50" _="on click trigger closeModal"></div>
 		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 overflow-y-auto max-h-[92vh]">
 			<div class="flex justify-between items-center mb-4">
-				<h2 class="text-xl font-semibold text-gray-900">Generate Invoice</h2>
+				<h2 class="text-xl font-semibold text-gray-900">Create Invoice</h2>
 				<button type="button" class="text-gray-400 hover:text-gray-600" _="on click trigger closeModal">
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -421,6 +562,17 @@ templ InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.
 					</select>
 				</div>
 				<div>
+					<label class="block text-sm font-medium text-gray-700 mb-1">Transaction Type</label>
+					<select id="invoice-transaction-type" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full">
+						<option value="CASH_SALES">Cash Sales</option>
+						<option value="CHARGE_SALES">Charge Sales</option>
+					</select>
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-gray-700 mb-1">Registered Name</label>
+					<input type="text" id="invoice-registered-name" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full" placeholder="Customer registered name"/>
+				</div>
+				<div>
 					<label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
 					<input type="date" id="invoice-due-date" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
 				</div>
@@ -435,8 +587,7 @@ templ InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.
 					<input type="email" data-new-recipient="email" class="px-3 py-2 border border-gray-300 rounded-md w-full"/>
 				</div>
 				<div>
-					<label class="block text-xs font-medium text-gray-600 mb-1">Contact Number</label>
-					<input type="text" data-new-recipient="contact_number" class="px-3 py-2 border border-gray-300 rounded-md w-full"/>
+					@common.MobileNumberInputEx("invoice-new-recipient-mobile", "", "Contact Number", "9123456789", "", false, "contact_number")
 				</div>
 				<div class="sm:col-span-2">
 					<label class="block text-xs font-medium text-gray-600 mb-1">Address</label>
@@ -470,6 +621,9 @@ templ InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.
 								<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
 								<th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase w-20">Qty</th>
 								<th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase w-32">Unit Price</th>
+								if canManage {
+									<th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase w-24">Tax</th>
+								}
 								<th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase w-32">Amount</th>
 								<th class="px-3 py-2 w-10"></th>
 							</tr>
@@ -481,19 +635,32 @@ templ InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.
 			<div class="flex flex-col sm:flex-row gap-4 justify-between items-start">
 				<div class="w-full sm:w-1/2">
 					<label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-					<textarea id="invoice-notes" rows="2" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"></textarea>
+					<textarea id="invoice-notes" rows="2" class={ invoiceTextareaClass }></textarea>
 				</div>
 				<div class="w-full sm:w-1/2 text-sm">
 					<div class="flex justify-between py-1"><span class="text-gray-500">Subtotal</span><span id="invoice-subtotal" class="text-gray-900 font-medium">—</span></div>
 					<div class="flex justify-between py-1"><span class="text-gray-500" id="invoice-vat-label">VAT</span><span id="invoice-vat" class="text-gray-900 font-medium">—</span></div>
+					if canManage {
+						<div class="flex justify-between py-1 items-center gap-2">
+							<span class="text-gray-500">Withholding Tax</span>
+							<input type="text" id="invoice-withholding-tax" class="line-price px-2 py-1 border border-gray-300 rounded w-28 text-right" placeholder="0.00"/>
+						</div>
+						<div class="flex justify-between py-1 items-center gap-2">
+							<span class="text-gray-500">SC/PWD Discount</span>
+							<input type="text" id="invoice-sc-pwd-discount" class="line-price px-2 py-1 border border-gray-300 rounded w-28 text-right" placeholder="0.00"/>
+						</div>
+						<div class="flex justify-between py-1 items-center gap-2">
+							<span class="text-gray-500">Add VAT</span>
+							<input type="text" id="invoice-add-vat" class="line-price px-2 py-1 border border-gray-300 rounded w-28 text-right" placeholder="0.00"/>
+						</div>
+					}
 					<div class="flex justify-between py-2 border-t border-gray-200 mt-1"><span class="text-primary font-semibold">Total</span><span id="invoice-total" class="text-primary font-bold">—</span></div>
 				</div>
 			</div>
 			<div class="flex flex-wrap gap-2 justify-end pt-4 mt-4 border-t border-gray-200">
 				<button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm" _="on click trigger closeModal">Cancel</button>
-				<button type="button" data-invoice-action="save" class="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 text-sm">Save</button>
-				<button type="button" data-invoice-action="download" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm">Save &amp; Download PDF</button>
-				<button type="button" data-invoice-action="email" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm">Save &amp; Email</button>
+				<button type="button" data-invoice-action="preview" class="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 text-sm">Preview</button>
+				<button type="button" data-invoice-action="save" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm">Save</button>
 			</div>
 		</div>
 	</div>
@@ -503,9 +670,11 @@ templ invoiceConfigPreview(config services.InvoiceConfig) {
 	<div class="flex items-center gap-4 mb-4 p-3 rounded-md bg-surface border border-gray-200">
 		if config.LogoURL != "" {
 			<img src={ config.LogoURL } alt="Logo" class="h-12 w-auto object-contain"/>
+		} else {
+			<img src={ constants.PathEmailLogoCDN } alt="Logo" class="h-12 w-auto object-contain"/>
 		}
 		<div class="text-sm">
-			<div class="font-semibold text-gray-900">{ orDefault(config.BusinessName, "Set up your business configuration above") }</div>
+			<div class="font-semibold text-gray-900">{ orDefault(config.BusinessName, "Set up your business configuration") }</div>
 			if config.Address != "" {
 				<div class="text-gray-500">{ config.Address }</div>
 			}
@@ -514,6 +683,13 @@ templ invoiceConfigPreview(config services.InvoiceConfig) {
 			}
 		</div>
 	</div>
+}
+
+func recipientColspan(canManage bool) string {
+	if canManage {
+		return "6"
+	}
+	return "5"
 }
 
 func orDefault(v string, fallback string) string {
@@ -528,6 +704,10 @@ func orDash(v string) string {
 		return "-"
 	}
 	return v
+}
+
+func invoiceListRecipient(email string) string {
+	return orDash(email)
 }
 
 func recipientOptionSuffix(r services.InvoiceRecipient) string {

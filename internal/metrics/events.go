@@ -91,6 +91,9 @@ const (
 	ExecRunExport           = "run export"
 	ExecSubmitTimeOff       = "submit time off"
 	ExecDeleteProduct       = "delete product"
+	ExecSaveInvoiceConfig   = "save invoice config"
+	ExecCreateInvoice       = "create invoice"
+	ExecSendInvoiceEmail    = "send invoice email"
 )
 
 var allowedClientEvents = map[string]struct{}{

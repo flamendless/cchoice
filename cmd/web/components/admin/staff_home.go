@@ -15,8 +15,9 @@ var baseStaffCards = []models.StaffCard{
 }
 
 var staffCardsWithRoles = []struct {
-	Card        models.StaffCard
-	AllowedRole enums.StaffRole
+	Card         models.StaffCard
+	AllowedRole  enums.StaffRole
+	AllowedRoles []enums.StaffRole
 }{
 	{Card: models.StaffCard{
 		Link:        "/admin/superuser/products/create",
@@ -82,7 +83,7 @@ var staffCardsWithRoles = []struct {
 	},
 	{
 		Card:        models.StaffCard{Link: "/admin/invoices", Title: "Invoices", Description: "Configure and generate invoices", Icon: svg.Document("text-primary")},
-		AllowedRole: enums.STAFF_ROLE_MANAGE_INVOICES,
+		AllowedRoles: []enums.StaffRole{enums.STAFF_ROLE_MANAGE_INVOICES, enums.STAFF_ROLE_CREATE_INVOICE},
 	},
 	{
 		Card:        models.StaffCard{Link: "/admin/imports", Title: "Imports", Description: "Bulk upload", Icon: svg.Document("text-primary")},
@@ -97,6 +98,15 @@ var staffCardsWithRoles = []struct {
 func filterStaffCardsByRole(roles []enums.StaffRole) []models.StaffCard {
 	result := make([]models.StaffCard, 0, len(staffCardsWithRoles))
 	for _, card := range staffCardsWithRoles {
+		if len(card.AllowedRoles) > 0 {
+			for _, allowed := range card.AllowedRoles {
+				if slices.Contains(roles, allowed) {
+					result = append(result, card.Card)
+					break
+				}
+			}
+			continue
+		}
 		if slices.Contains(roles, card.AllowedRole) {
 			result = append(result, card.Card)
 		}

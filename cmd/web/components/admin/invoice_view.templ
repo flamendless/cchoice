@@ -1,0 +1,210 @@
+package components
+
+import (
+	"cchoice/cmd/web/components/common"
+	"cchoice/internal/enums"
+	"cchoice/internal/constants"
+	"cchoice/internal/services"
+	"cchoice/internal/utils"
+)
+
+templ InvoicePreviewModal(data services.InvoiceRenderData) {
+	@invoiceWideModalShell("invoice-preview-modal", invoicePreviewModalTitle(data)) {
+		<div class="max-h-[70vh] overflow-y-auto pr-1">
+			@InvoiceViewBody(data)
+		</div>
+		<div class="flex justify-end gap-2 pt-4 mt-4 border-t border-gray-200">
+			<a
+				href={ utils.URLf("/admin/invoices/%s/pdf", data.Invoice.ID) }
+				target="_blank"
+				class="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 text-sm"
+			>
+				Download PDF
+			</a>
+			<button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm" _="on click trigger closeModal">Close</button>
+		</div>
+	}
+}
+
+templ AdminInvoiceViewPage(data services.InvoiceRenderData) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			@common.HeadMeta()
+			@common.TabTitle(data.Invoice.InvoiceNumber + " - Invoice")
+			<style type="text/css">
+				@media print {
+					.no-print { display: none !important; }
+					body { background: white; }
+				}
+			</style>
+		</head>
+		<body class="bg-gray-100 min-h-screen">
+			<div class="no-print p-4 max-w-4xl mx-auto flex gap-2">
+				<a href={ utils.URL("/admin/invoices") } class="text-primary hover:underline text-sm">&larr; Back to Invoices</a>
+				<a
+					href={ utils.URLf("/admin/invoices/%s/pdf", data.Invoice.ID) }
+					target="_blank"
+					class="ml-auto px-3 py-1 bg-primary text-white rounded text-sm hover:bg-primary-dark"
+				>
+					Download PDF
+				</a>
+			</div>
+			<div class="max-w-4xl mx-auto bg-white shadow-lg p-8 mb-8 print:shadow-none print:m-0">
+				@InvoiceViewBody(data)
+			</div>
+		</body>
+	</html>
+}
+
+templ InvoiceViewBody(data services.InvoiceRenderData) {
+	<div class="text-center mb-4">
+		<h1 class="text-2xl font-bold text-gray-900">SALES INVOICE</h1>
+		if data.Config.LogoURL != "" {
+			<img src={ data.Config.LogoURL } alt="Logo" class="h-16 mx-auto mt-2 object-contain"/>
+		} else {
+			<img src={ constants.PathEmailLogoCDN } alt="C-Choice" class="h-16 mx-auto mt-2 object-contain"/>
+		}
+		<p class="text-lg font-semibold mt-2">{ data.Config.BusinessName }</p>
+		if data.Config.ProprietorName != "" {
+			<p class="text-sm text-gray-600">Proprietor: { data.Config.ProprietorName }</p>
+		}
+		if data.Config.Address != "" {
+			<p class="text-sm text-gray-600">{ data.Config.Address }</p>
+		}
+		<div class="text-xs text-gray-500 mt-1">
+			if data.Config.TIN != "" {
+				<span>TIN: { data.Config.TIN }</span>
+			}
+			if data.Config.VATRegistration != "" {
+				<span class="ml-2">VAT Reg: { data.Config.VATRegistration }</span>
+			}
+		</div>
+	</div>
+	<div class="text-sm mb-4">
+		if data.Invoice.TransactionType == enums.INVOICE_TRANSACTION_CASH_SALES {
+			<span class="font-medium">[X] Cash Sales</span>
+			<span class="ml-4 text-gray-500">[ ] Charge Sales</span>
+		} else {
+			<span class="text-gray-500">[ ] Cash Sales</span>
+			<span class="ml-4 font-medium">[X] Charge Sales</span>
+		}
+	</div>
+	<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 text-sm">
+		<div>
+			<p class="text-xs uppercase text-gray-500 font-semibold mb-1">Sold To</p>
+			<p class="font-semibold">{ invoiceRegisteredName(data.Invoice) }</p>
+			if data.Invoice.RecipientAddress != "" {
+				<p class="text-gray-600">{ data.Invoice.RecipientAddress }</p>
+			}
+			if data.Invoice.RecipientContactNumber != "" {
+				<p class="text-gray-600">{ data.Invoice.RecipientContactNumber }</p>
+			}
+			if data.Invoice.RecipientEmail != "" {
+				<p class="text-gray-600">{ data.Invoice.RecipientEmail }</p>
+			}
+			if data.Invoice.RecipientTIN != "" {
+				<p class="text-gray-600">TIN: { data.Invoice.RecipientTIN }</p>
+			}
+		</div>
+		<div class="md:text-right">
+			<p><span class="text-gray-500">Invoice No:</span> <span class="font-semibold">{ data.Invoice.InvoiceNumber }</span></p>
+			<p><span class="text-gray-500">Date:</span> { data.Invoice.IssueDate }</p>
+			if data.Invoice.DueDate != "" {
+				<p><span class="text-gray-500">Due:</span> { data.Invoice.DueDate }</p>
+			}
+		</div>
+	</div>
+	<div class="overflow-x-auto mb-6">
+		<table class="min-w-full text-sm border border-gray-300">
+			<thead class="bg-gray-100">
+				<tr>
+					<th class="border border-gray-300 px-2 py-1 text-center">Qty</th>
+					<th class="border border-gray-300 px-2 py-1 text-right">Unit</th>
+					<th class="border border-gray-300 px-2 py-1 text-left">Description</th>
+					<th class="border border-gray-300 px-2 py-1 text-right">Amount</th>
+					<th class="border border-gray-300 px-2 py-1 text-center">Tax</th>
+				</tr>
+			</thead>
+			<tbody>
+				for _, line := range data.Lines {
+					<tr>
+						<td class="border border-gray-300 px-2 py-1 text-center">{ line.Quantity }</td>
+						<td class="border border-gray-300 px-2 py-1 text-right">{ line.UnitPrice }</td>
+						<td class="border border-gray-300 px-2 py-1">{ line.Description }</td>
+						<td class="border border-gray-300 px-2 py-1 text-right">{ line.LineTotal }</td>
+						<td class="border border-gray-300 px-2 py-1 text-center text-xs">{ line.TaxType.Label() }</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+	<div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm mb-6">
+		<div class="space-y-1">
+			@summaryRow("VATable Sales", data.Invoice.VATableSalesRaw, data.Invoice.Currency)
+			@summaryRow("VAT-Exempt Sales", data.Invoice.VATExemptSalesRaw, data.Invoice.Currency)
+			@summaryRow("Zero Rated Sales", data.Invoice.ZeroRatedSalesRaw, data.Invoice.Currency)
+			@summaryRow("VAT Amount", data.Invoice.VATAmountRaw, data.Invoice.Currency)
+			@summaryRow("Total Sales", data.Invoice.TotalSalesRaw, data.Invoice.Currency)
+		</div>
+		<div class="space-y-1">
+			@summaryRow("Total Sales (VAT Incl.)", data.Invoice.TotalSalesVATInclusiveRaw, data.Invoice.Currency)
+			@summaryRow("Less: VAT", data.Invoice.LessVATRaw, data.Invoice.Currency)
+			@summaryRow("Less: Withholding Tax", data.Invoice.WithholdingTaxRaw, data.Invoice.Currency)
+			@summaryRow("Amount Net of VAT", data.Invoice.AmountNetOfVATRaw, data.Invoice.Currency)
+			@summaryRow("Less: SC/PWD Discount", data.Invoice.SCPWDDiscountRaw, data.Invoice.Currency)
+			@summaryRow("Add: VAT", data.Invoice.AddVATRaw, data.Invoice.Currency)
+			<div class="flex justify-between font-bold text-primary border-t border-gray-300 pt-2 mt-2">
+				<span>TOTAL AMOUNT DUE</span>
+				<span>{ formatInvoiceMoney(data.Invoice.TotalSalesVATInclusiveRaw, data.Invoice.Currency) }</span>
+			</div>
+		</div>
+	</div>
+	if data.Config.BIRAuthorityToPrint != "" || data.Config.BIRDateIssued != "" || data.Config.BIRBookletsInfo != "" {
+		<div class="text-xs text-gray-500 text-center border-t border-gray-200 pt-3 mb-4">
+			if data.Config.BIRAuthorityToPrint != "" {
+				<p>BIR Authority to Print No. { data.Config.BIRAuthorityToPrint }</p>
+			}
+			if data.Config.BIRDateIssued != "" {
+				<p>Date Issued: { data.Config.BIRDateIssued }</p>
+			}
+			if data.Config.BIRBookletsInfo != "" {
+				<p>{ data.Config.BIRBookletsInfo }</p>
+			}
+		</div>
+	}
+	if data.Invoice.Notes != "" {
+		<div class="text-sm mb-4">
+			<p class="font-semibold text-gray-600">Remarks</p>
+			<p class="text-gray-700">{ data.Invoice.Notes }</p>
+		</div>
+	}
+	if data.Config.FooterNotes != "" {
+		<p class="text-xs text-gray-400 text-center italic">{ data.Config.FooterNotes }</p>
+	}
+}
+
+templ summaryRow(label string, amountRaw int64, currency string) {
+	<div class="flex justify-between">
+		<span class="text-gray-600">{ label }</span>
+		<span>{ formatInvoiceMoney(amountRaw, currency) }</span>
+	</div>
+}
+
+func invoicePreviewModalTitle(data services.InvoiceRenderData) string {
+	return "Invoice Preview — " + data.Invoice.InvoiceNumber
+}
+
+func invoiceRegisteredName(inv services.Invoice) string {
+	if inv.RecipientRegisteredName != "" {
+		return inv.RecipientRegisteredName
+	}
+	return inv.RecipientName
+}
+
+func formatInvoiceMoney(centavos int64, currency string) string {
+	if currency == "" {
+		currency = "PHP"
+	}
+	return utils.NewMoney(centavos, currency).Display()
+}

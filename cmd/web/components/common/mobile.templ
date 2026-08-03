@@ -4,6 +4,10 @@ import "strings"
 import "cchoice/internal/constants"
 
 templ MobileNumberInput(id, name, label, placeholder, value string, required bool) {
+	@MobileNumberInputEx(id, name, label, placeholder, value, required, "")
+}
+
+templ MobileNumberInputEx(id, name, label, placeholder, value string, required bool, dataRecipientKey string) {
 	<div>
 		if label != "" {
 			<label for={ id } class="block text-sm font-medium text-gray-700">
@@ -18,7 +22,12 @@ templ MobileNumberInput(id, name, label, placeholder, value string, required boo
 			<input
 				type="tel"
 				id={ id }
-				name={ name }
+				if name != "" {
+					name={ name }
+				}
+				if dataRecipientKey != "" {
+					data-new-recipient={ dataRecipientKey }
+				}
 				required?={ required }
 				pattern={ constants.PatternMobileNumberFE }
 				placeholder={ placeholder }

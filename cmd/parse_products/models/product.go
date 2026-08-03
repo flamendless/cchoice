@@ -279,8 +279,8 @@ func (product *Product) InsertToDB(ctx context.Context, db database.IService) (i
 				Valid: productSpecsID != 0,
 			},
 
-			UnitPriceWithoutVat: product.UnitPriceWithoutVat.Amount() * 100,
-			UnitPriceWithVat:    product.UnitPriceWithVat.Amount() * 100,
+			UnitPriceWithoutVat: product.UnitPriceWithoutVat.Amount(),
+			UnitPriceWithVat:    product.UnitPriceWithVat.Amount(),
 
 			UnitPriceWithoutVatCurrency: product.UnitPriceWithoutVat.Currency().Code,
 			UnitPriceWithVatCurrency:    product.UnitPriceWithoutVat.Currency().Code,
@@ -324,8 +324,8 @@ func (product *Product) UpdateToDB(ctx context.Context, db database.IService) (i
 				Valid: productSpecsID != 0,
 			},
 
-			UnitPriceWithoutVat: product.UnitPriceWithoutVat.Amount() * 100,
-			UnitPriceWithVat:    product.UnitPriceWithVat.Amount() * 100,
+			UnitPriceWithoutVat: product.UnitPriceWithoutVat.Amount(),
+			UnitPriceWithVat:    product.UnitPriceWithVat.Amount(),
 
 			UnitPriceWithoutVatCurrency: product.UnitPriceWithoutVat.Currency().Code,
 			UnitPriceWithVatCurrency:    product.UnitPriceWithoutVat.Currency().Code,

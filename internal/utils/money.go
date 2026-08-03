@@ -22,7 +22,10 @@ func NewMoneyFromString(price string, currency string) (*money.Money, error) {
 		parserErr := errs.NewParserError(errs.CantCovert, "%s", err.Error())
 		return nil, parserErr
 	}
-	m := money.New(int64(unitPrice.Coef()), currency)
+	// Rescale to currency minor units (e.g. centavos). Amount() is always in minor units:
+	// "100" -> 10000 (PHP 100.00), "99.50" -> 9950 (PHP 99.50).
+	scaled := unitPrice.Rescale(2)
+	m := money.New(int64(scaled.Coef()), currency)
 	return m, nil
 }
 

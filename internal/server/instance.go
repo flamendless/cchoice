@@ -17,11 +17,16 @@ type ServerInstance struct {
 
 func (si *ServerInstance) StartBackgroundJobs() {
 	cfg := conf.Conf()
-	if cfg.IsProd() && si.internal.mailJobRunner == nil {
-		panic("No email job runner initialized")
-	}
-	if cfg.IsProd() && si.internal.thumbnailJobRunner == nil {
-		panic("No thumbnail job runner initialized")
+	if cfg.IsProd() {
+		if si.internal.mailJobRunner == nil {
+			panic("No email job runner initialized")
+		}
+		if si.internal.thumbnailJobRunner == nil {
+			panic("No thumbnail job runner initialized")
+		}
+		if si.internal.invoiceJobRunner == nil {
+			panic("No invoice job runner initialized")
+		}
 	}
 
 	si.jobRunnerCtx, si.jobRunnerStop = context.WithCancel(context.Background())
@@ -30,6 +35,9 @@ func (si *ServerInstance) StartBackgroundJobs() {
 	}
 	if si.internal.thumbnailJobRunner != nil {
 		go si.internal.thumbnailJobRunner.Start(si.jobRunnerCtx)
+	}
+	if si.internal.invoiceJobRunner != nil {
+		go si.internal.invoiceJobRunner.Start(si.jobRunnerCtx)
 	}
 	logs.Log().Info("Background job runners started")
 }

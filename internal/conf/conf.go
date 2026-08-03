@@ -54,6 +54,7 @@ type Test struct {
 	LocalOTP            bool `env:"TEST_LOCAL_OTP" env-default:"0"`             // true = sends an email
 	LocalForgotPassword bool `env:"TEST_LOCAL_FORGOT_PASSWORD" env-default:"0"` // true = sends an email
 	LocalMemoEmailSend  bool `env:"TEST_LOCAL_MEMO_EMAIL_SEND" env-default:"0"`
+	LocalInvoiceJobs    bool `env:"TEST_LOCAL_INVOICE_JOBS" env-default:"0"`
 }
 
 type RateLimitConfig struct {

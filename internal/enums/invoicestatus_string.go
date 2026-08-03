@@ -10,15 +10,16 @@ func _() {
 	var x [1]struct{}
 	_ = x[INVOICE_STATUS_UNDEFINED-0]
 	_ = x[INVOICE_STATUS_DRAFT-1]
-	_ = x[INVOICE_STATUS_ISSUED-2]
-	_ = x[INVOICE_STATUS_SENT-3]
-	_ = x[INVOICE_STATUS_PAID-4]
-	_ = x[INVOICE_STATUS_CANCELLED-5]
+	_ = x[INVOICE_STATUS_PROCESSING-2]
+	_ = x[INVOICE_STATUS_ISSUED-3]
+	_ = x[INVOICE_STATUS_SENT-4]
+	_ = x[INVOICE_STATUS_PAID-5]
+	_ = x[INVOICE_STATUS_CANCELLED-6]
 }
 
-const _InvoiceStatus_name = "UNDEFINEDDRAFTISSUEDSENTPAIDCANCELLED"
+const _InvoiceStatus_name = "UNDEFINEDDRAFTPROCESSINGISSUEDSENTPAIDCANCELLED"
 
-var _InvoiceStatus_index = [...]uint8{0, 9, 14, 20, 24, 28, 37}
+var _InvoiceStatus_index = [...]uint8{0, 9, 14, 24, 30, 34, 38, 47}
 
 func (i InvoiceStatus) String() string {
 	idx := int(i) - 0
