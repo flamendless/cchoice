@@ -222,7 +222,7 @@ func BuildFast() error {
 	return run(Command{
 		Type: CmdGoBuild,
 		Out:  filepath.Join(tmpDir, "main"),
-		Tags: []string{"fts5", "staticfs", "imageprocessing"},
+		Tags: []string{"fts5", "staticfs"},
 	})
 }
 
@@ -1025,7 +1025,7 @@ func Dev() error {
 	if err := run(Command{
 		Type: CmdGoBuild,
 		Out:  filepath.Join(tmpDir, "cchoicedev"),
-		Tags: []string{"fts5", "staticfs", "imageprocessing"},
+		Tags: []string{"fts5", "staticfs"},
 	}); err != nil {
 		return err
 	}
@@ -1043,7 +1043,7 @@ func Prod() error {
 	if err := run(Command{
 		Type: CmdGoBuild,
 		Out:  filepath.Join(tmpDir, "cchoiceprod"),
-		Tags: []string{"fts5", "staticfs", "imageprocessing"},
+		Tags: []string{"fts5", "staticfs"},
 	}); err != nil {
 		return err
 	}

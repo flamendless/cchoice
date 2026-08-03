@@ -122,11 +122,6 @@ func CategoriesSidePanelList(categories []models.CategorySidePanelText) templ.Co
 	})
 }
 
-// CategoriesSidePanel renders the categories side panel. When lazy is true
-// (used for the mobile off-canvas menu, which starts as display:none), the
-// list is fetched via an "intersect" trigger instead of "load" so the
-// request is deferred until the menu is actually opened, avoiding a
-// duplicate network round trip on initial page load.
 func CategoriesSidePanel(lazy bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -168,7 +163,7 @@ func CategoriesSidePanel(lazy bool) templ.Component {
 			return "load once, history:restore"
 		}())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/category_side_panel.templ`, Line: 73, Col: 6}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/category_side_panel.templ`, Line: 68, Col: 6}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 		if templ_7745c5c3_Err != nil {
@@ -181,7 +176,7 @@ func CategoriesSidePanel(lazy bool) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/product-categories/side-panel/list"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/category_side_panel.templ`, Line: 74, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `shop/category_side_panel.templ`, Line: 69, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 		if templ_7745c5c3_Err != nil {

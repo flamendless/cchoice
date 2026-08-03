@@ -183,13 +183,17 @@ if _, err := foo(); err != nil {...}
 
 ### Build Tags
 Use these tags when building/running:
-- `fts5` - Enable FTS5 search
-- `staticfs` - Embed static files
-- `imageprocessing` - Enable image processing
+- `fts5` - Enable FTS5 in `github.com/mattn/go-sqlite3` (required for product search via `tbl_products_fts`)
+- `staticfs` - Serve static files from disk (`./cmd/web/static`); set `FSMODE=staticfs`
+- `embeddedfs` - Embed static files in the binary; set `FSMODE=embeddedfs` (not used in mage targets today)
+- `imageprocessing` - Include `convert_images` and `prepare_image_variants` CLI commands only; runtime thumbnails always use govips via `internal/services/thumbnail.go` regardless of this tag
+
+Without `staticfs` or `embeddedfs`, the binary uses `stubfs` (no static file serving).
 
 ```bash
-go build -tags="fts5,staticfs,imageprocessing" -o ./tmp/main
+go build -tags="fts5,staticfs" -o ./tmp/main
 go run -tags="fts5,staticfs" ./main.go
+go build -tags="imageprocessing,staticfs" -o ./tmp/genimages .  # image CLI tools (mage genimages)
 ```
 
 ### Database (sqlc)
