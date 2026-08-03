@@ -193,10 +193,12 @@ go run -tags="fts5,staticfs" ./main.go
 ```
 
 ### Database (sqlc)
-- SQL queries in `internal/database/queries/query.sql`
+- SQL queries in `internal/database/sql/`
 - Generated code in `internal/database/queries/`
 - Use `mage gensql` to regenerate
 - Parameter structs: `queries.CreateCustomerParams{...}`
+- Always use the `tbl_` prefix for application tables (e.g. `tbl_products`, `tbl_datamigrate_applied`). Exception: third-party/tool tables such as `goose_db_version` keep their established names.
+- Post-migrate CLI scripts are registered in `internal/datamigrate/manifest.go` and tracked in `tbl_datamigrate_applied`.
 - Always use UPPERCASE for text values like in CHECK CONSTRAINTS
 - Always use UPPERCASE for default values for TEXT like `status TEXT NOT NULL DEFAULT 'DRAFT',`
 

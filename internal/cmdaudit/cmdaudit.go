@@ -28,8 +28,9 @@ const (
 )
 
 var skipCommands = map[string]struct{}{
-	"web": {},
-	"api": {},
+	"web":         {},
+	"api":         {},
+	"datamigrate": {},
 }
 
 type auditResult struct {

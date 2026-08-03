@@ -133,5 +133,9 @@ var cmdPopulateProductImagesCDN = &cobra.Command{
 			zap.Int("updated", updated),
 			zap.Int("errors", errorCount),
 		)
+
+		if errorCount == 0 {
+			recordDatamigrateSuccess(cmd, args, db)
+		}
 	},
 }

@@ -9,6 +9,13 @@ import (
 	"time"
 )
 
+type GooseDbVersion struct {
+	ID        int64
+	VersionID int64
+	IsApplied int64
+	Tstamp    sql.NullTime
+}
+
 type Goqite struct {
 	ID       string
 	Created  string
@@ -130,6 +137,11 @@ type TblCustomerOtpCode struct {
 	ExpiresAt  string
 	CreatedAt  string
 	UsedAt     sql.NullString
+}
+
+type TblDatamigrateApplied struct {
+	Name      string
+	AppliedAt time.Time
 }
 
 type TblEmailJob struct {

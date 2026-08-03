@@ -5,9 +5,12 @@ import (
 
 	"cchoice/internal/cmdaudit"
 	"cchoice/internal/database"
+	"cchoice/internal/datamigrate"
 	"cchoice/internal/encode/sqids"
+	"cchoice/internal/logs"
 
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
 )
 
 var commandAuditEnabled bool
@@ -66,4 +69,12 @@ func logCommandAudit(cmd *cobra.Command, args []string, runErr error, duration t
 
 	encoder := sqids.MustSqids()
 	cmdaudit.Log(cmd.Context(), db, encoder, cmd, args, runErr, duration)
+
+	if err := datamigrate.TryRecord(cmd.Context(), db, cmd, args, runErr); err != nil {
+		logs.Log().Warn(
+			"[CmdAudit] failed to record datamigrate script",
+			zap.String("command", cmd.Name()),
+			zap.Error(err),
+		)
+	}
 }

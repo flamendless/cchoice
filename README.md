@@ -101,4 +101,34 @@ CPOINT_HMAC_SECRET="your-generated-secret"
 # NOTES:
 
 - For GH workflow, comment out `[ -z "$PS1" ] && return` in server's .bashrc.
-- After setup, there are cases wherein we must update/populate data, look at `commands.md` for the list
+
+---
+
+# Post-migrate scripts
+
+After `mage dbup`, some schema changes require one-off CLI backfills. These are registered in `internal/datamigrate/manifest.go` and tracked in `tbl_datamigrate_applied`. Successful runs (with `--dry-run=false`) are recorded automatically; `mage serve` and prod/dev builds fail until required scripts are applied.
+
+Check status (lists pending goose migrations first, then post-migrate scripts):
+
+```bash
+mage datamigratestatus
+# or after mage build:
+./tmp/main datamigrate status
+```
+
+Registered scripts (run in goose migration order — `AfterVersion` ascending):
+
+| # | Script | After migration | Command |
+|---|--------|-----------------|---------|
+| 1 | `apply_discount:sale_2025` | `20260109164336` (2026-01-09) | `./tmp/main apply_discount -i scripts/csv/sale_2025.csv --dry-run=false` |
+| 2 | `populate_product_images_cdn` | `20260327151912`; only when `STORAGE_PROVIDER` is Cloudflare Images | `./tmp/main populate_product_images_cdn --dry-run=false` |
+| 3 | `populate_product_slugs` | `20260418065629` | `./tmp/main populate_product_slugs --dry-run=false` |
+| 4 | `populate_brand_slugs` | `20260710120000` | `./tmp/main populate_brand_slugs --dry-run=false` |
+
+Already-applied scripts on existing databases are seeded by goose migration `20260803140000_seed_tbl_datamigrate_applied.sql` after you run `mage dbup`.
+
+Break-glass manual mark (use only when a script was applied outside the normal CLI path):
+
+```bash
+./tmp/main datamigrate mark <script-name>
+```

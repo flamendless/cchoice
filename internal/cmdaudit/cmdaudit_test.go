@@ -24,6 +24,7 @@ func TestShouldSkipCommand(t *testing.T) {
 		{name: "empty", command: "", expected: true},
 		{name: "web", command: "web", expected: true},
 		{name: "api", command: "api", expected: true},
+		{name: "datamigrate", command: "datamigrate", expected: true},
 		{name: "populate", command: "populate_brand_slugs", expected: false},
 	}
 

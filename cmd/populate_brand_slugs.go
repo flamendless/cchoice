@@ -78,6 +78,10 @@ var cmdPopulateBrandSlugs = &cobra.Command{
 			fmt.Sprintf("dry_run=%t brands=%d updated=%d failures=%d", flagsPopulateBrandSlugs.dryRun, len(brands), updated, len(updateErrors)),
 		))
 
+		if !flagsPopulateBrandSlugs.dryRun && len(updateErrors) == 0 {
+			recordDatamigrateSuccess(cmd, args, db)
+		}
+
 		return nil
 	},
 }

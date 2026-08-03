@@ -174,6 +174,12 @@ var cmdApplyDiscount = &cobra.Command{
 			fmt.Sprintf("dry_run=%t success=%d total=%d", flagDryRun, success, total),
 		))
 
+		if !flagDryRun {
+			recordDB := database.New(database.DB_MODE_RW)
+			defer recordDB.Close()
+			recordDatamigrateSuccess(cmd, args, recordDB)
+		}
+
 		return nil
 	},
 }

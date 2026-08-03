@@ -1,0 +1,60 @@
+---
+description: golangci-lint conventions (perfsprint, whitespace, error handling)
+globs: "**/*.go"
+alwaysApply: false
+---
+
+# Go Lint Conventions
+
+Project linters include `perfsprint`, `whitespace`, and others (see `.golangci.yml`). Fix issues before committing; run `mage scf` when validating locally.
+
+## perfsprint
+
+Prefer `strconv` over `fmt.Sprintf` for integer and boolean formatting.
+
+```go
+// BAD
+return fmt.Sprintf("%d", version)
+
+// GOOD
+return strconv.FormatInt(version, 10)
+```
+
+For zero-padded integers, pad `strconv.FormatInt` output instead of `fmt.Sprintf("%014d", n)`:
+
+```go
+s := strconv.FormatInt(version, 10)
+if len(s) < 14 {
+    s = strings.Repeat("0", 14-len(s)) + s
+}
+```
+
+`fmt.Sprintf` remains appropriate for multi-value or non-scalar format strings (e.g. `"%d. %s -> %s"`).
+
+## whitespace
+
+Do not put a blank line immediately after a function's opening `{`.
+
+```go
+// BAD
+func TestFoo(t *testing.T) {
+
+    migrationDir := t.TempDir()
+}
+
+// GOOD
+func TestFoo(t *testing.T) {
+    migrationDir := t.TempDir()
+}
+```
+
+## Error strings
+
+When wrapping errors with a fixed prefix, prefer string concatenation over `fmt.Errorf` with `%w` where golangci/perfsprint applies:
+
+```go
+// GOOD
+return errors.New(constants.MsgFailedCheck + ": " + err.Error())
+```
+
+Use sentinel errors from `internal/constants` or `internal/errs` for stable, reusable messages.

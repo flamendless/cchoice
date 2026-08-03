@@ -80,6 +80,10 @@ var cmdPopulateProductSlugs = &cobra.Command{
 			fmt.Sprintf("dry_run=%t products=%d failures=%d", flagsPopulateProductSlugs.dryRun, len(products), len(errors)),
 		))
 
+		if !flagsPopulateProductSlugs.dryRun && len(errors) == 0 {
+			recordDatamigrateSuccess(cmd, args, db)
+		}
+
 		return nil
 	},
 }

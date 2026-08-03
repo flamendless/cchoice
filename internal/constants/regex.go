@@ -21,6 +21,7 @@ const (
 	PatternExportPriceCleanup = `[^0-9.\-]`
 	PatternThemeTitle         = `[a-zA-Z0-9]{1,24}`
 	PatternThemeColor         = `#[0-9a-fA-F]{6}`
+	PatternGooseMigrationFile = `^(\d{14})_.+\.sql$`
 )
 
 var (
@@ -37,6 +38,7 @@ var (
 	ReExportPriceCleanup = regexp.MustCompile(PatternExportPriceCleanup)
 	ReThemeTitle         = regexp.MustCompile(`^` + PatternThemeTitle + `$`)
 	ReThemeColor         = regexp.MustCompile(`^` + PatternThemeColor + `$`)
+	ReGooseMigrationFile = regexp.MustCompile(PatternGooseMigrationFile)
 )
 
 var YoutubePatterns = []*regexp.Regexp{

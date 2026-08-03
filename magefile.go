@@ -71,7 +71,7 @@ func run(c Command) error {
 	case CmdGoRun:
 		args := []string{"run"}
 		if len(c.Tags) > 0 {
-			args = append(args, "-tags="+strings.Join(c.Tags, " "))
+			args = append(args, "-tags="+strings.Join(c.Tags, ","))
 		}
 		args = append(args, c.Args...)
 		cmd = exec.Command("go", args...)
@@ -142,6 +142,23 @@ func checkMigrations() error {
 	}
 	if strings.Contains(string(output), "Pending") {
 		return fmt.Errorf("there are pending migrations. Run 'mage DBUp' to apply them")
+	}
+	return nil
+}
+
+func checkDBState() error {
+	if err := checkMigrations(); err != nil {
+		return err
+	}
+
+	cmd := exec.Command("go", "run", "-tags=fts5,staticfs", "./main.go", "datamigrate", "check")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		msg := strings.TrimSpace(string(output))
+		if msg == "" {
+			return fmt.Errorf("datamigrate check failed: %w", err)
+		}
+		return fmt.Errorf("%s", msg)
 	}
 	return nil
 }
@@ -235,7 +252,7 @@ func serve(
 	airpath string,
 	app string,
 ) error {
-	if err := checkMigrations(); err != nil {
+	if err := checkDBState(); err != nil {
 		return err
 	}
 	if err := GenServe(); err != nil {
@@ -999,7 +1016,7 @@ func Prof(pkg, profType string) error {
 }
 
 func Dev() error {
-	if err := checkMigrations(); err != nil {
+	if err := checkDBState(); err != nil {
 		return err
 	}
 	if err := GenAll(); err != nil {
@@ -1017,7 +1034,7 @@ func Dev() error {
 }
 
 func Prod() error {
-	if err := checkMigrations(); err != nil {
+	if err := checkDBState(); err != nil {
 		return err
 	}
 	if err := GenAll(); err != nil {
@@ -1047,6 +1064,14 @@ func DBDown() error {
 		Type: CmdTmpExec,
 		Cmd:  "goose",
 		Args: []string{"down"},
+	})
+}
+
+func DatamigrateStatus() error {
+	return run(Command{
+		Type: CmdGoRun,
+		Tags: []string{"fts5", "staticfs"},
+		Args: []string{"./main.go", "datamigrate", "status"},
 	})
 }
 
