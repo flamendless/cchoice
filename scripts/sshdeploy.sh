@@ -112,14 +112,24 @@ if ! mage dbUp; then
 	exit 1
 fi
 
+echo "Running post-migrate scripts..."
+if ! mage datamigrateup; then
+	echo "Error: mage datamigrateup failed." >&2
+	exit 1
+fi
+
 echo "Building..."
 BUILD_LOG=$(mktemp)
 trap 'rm -f "$BUILD_LOG"' EXIT
 
-if ! mage "$MAGE_TARGET" 2>&1 | tee "$BUILD_LOG"; then
+# Redirect to a log file instead of piping through tee — piping mage stdout can
+# trigger "sync /dev/stdout: invalid argument" over SSH.
+if ! mage "$MAGE_TARGET" >"$BUILD_LOG" 2>&1; then
+	cat "$BUILD_LOG"
 	echo "Error: mage $MAGE_TARGET failed." >&2
 	exit 1
 fi
+cat "$BUILD_LOG"
 
 RUN_CMD=$(grep '^Run: ' "$BUILD_LOG" | head -n1 | sed 's/^Run: //' | sed 's/ > out.*//' | sed 's/ &//' | xargs)
 if [ -z "$RUN_CMD" ]; then

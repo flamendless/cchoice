@@ -14,6 +14,8 @@ func init() {
 	rootCmd.AddCommand(cmdDatamigrate)
 	cmdDatamigrate.AddCommand(cmdDatamigrateCheck)
 	cmdDatamigrate.AddCommand(cmdDatamigrateStatus)
+	cmdDatamigrate.AddCommand(cmdDatamigrateUp)
+	cmdDatamigrate.AddCommand(cmdDatamigrateDoctor)
 	cmdDatamigrate.AddCommand(cmdDatamigrateMark)
 }
 
@@ -64,6 +66,42 @@ var cmdDatamigrateStatus = &cobra.Command{
 		}
 
 		fmt.Println(datamigrate.FormatStatus(state, version, pendingGoose))
+	},
+}
+
+var cmdDatamigrateUp = &cobra.Command{
+	Use:   "up",
+	Short: "Run pending post-migrate scripts in order",
+	Run: func(cmd *cobra.Command, args []string) {
+		db := database.New(database.DB_MODE_RW)
+		defer db.Close()
+
+		if err := datamigrate.Up(cmd.Context(), db, datamigrate.DefaultCommandRunner()); err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+	},
+}
+
+var cmdDatamigrateDoctor = &cobra.Command{
+	Use:   "doctor",
+	Short: "Diagnose common migration and post-migrate data issues",
+	Run: func(cmd *cobra.Command, args []string) {
+		db := database.New(database.DB_MODE_RO)
+		defer db.Close()
+
+		findings, err := datamigrate.Doctor(cmd.Context(), db)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+
+		fmt.Println(datamigrate.FormatDoctor(findings))
+		for _, f := range findings {
+			if f.Severity == "error" {
+				os.Exit(1)
+			}
+		}
 	},
 }
 

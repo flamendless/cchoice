@@ -23,6 +23,9 @@ pkill -x "./tmp/main api" || echo "No existing process found."
 echo "Running migrations..."
 mage dbUp
 
+echo "Running post-migrate scripts..."
+mage datamigrateup
+
 echo "Building..."
 go generate ./...
 mage dev

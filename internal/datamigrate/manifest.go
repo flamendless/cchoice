@@ -15,6 +15,20 @@ type Script struct {
 	When         func() bool
 }
 
+func (s Script) BuildRunArgs() []string {
+	args := []string{s.Command}
+	for _, req := range s.RequiredArgs {
+		switch s.Command {
+		case "apply_discount":
+			args = append(args, "-i", req)
+		default:
+			args = append(args, req)
+		}
+	}
+	args = append(args, "--dry-run=false")
+	return args
+}
+
 var Scripts = []Script{
 	{
 		Name:         "apply_discount:sale_2025",

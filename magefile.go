@@ -1078,6 +1078,22 @@ func DatamigrateStatus() error {
 	})
 }
 
+func DatamigrateUp() error {
+	return run(Command{
+		Type: CmdGoRun,
+		Tags: []string{"fts5", "staticfs"},
+		Args: []string{"./main.go", "datamigrate", "up"},
+	})
+}
+
+func DatamigrateDoctor() error {
+	return run(Command{
+		Type: CmdGoRun,
+		Tags: []string{"fts5", "staticfs"},
+		Args: []string{"./main.go", "datamigrate", "doctor"},
+	})
+}
+
 func Prom() error {
 	if !checkProc("./tmp/main", 7331) {
 		return fmt.Errorf("api process not running")
