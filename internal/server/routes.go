@@ -313,6 +313,10 @@ func (s *Server) assetImageHandler(w http.ResponseWriter, r *http.Request) {
 	s.serveImage(w, r, cleanPath, ext, cacheKey, logtag)
 }
 
+func setProductImageCacheHeaders(w http.ResponseWriter) {
+	w.Header().Set("Cache-Control", "public, max-age=604800, stale-while-revalidate=86400")
+}
+
 func (s *Server) serveImage(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -323,7 +327,7 @@ func (s *Server) serveImage(
 ) {
 	ctx := r.Context()
 	if data, ok := s.cache.HasGet(nil, cacheKey); ok {
-		w.Header().Set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400")
+		setProductImageCacheHeaders(w)
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		if _, err := w.Write(data); err != nil {
 			logs.LogCtx(ctx).Error(
@@ -351,6 +355,7 @@ func (s *Server) serveImage(
 		if notModified {
 			return
 		}
+		setProductImageCacheHeaders(w)
 	}
 
 	imgData, err := images.GetImageDataB64(s.cache, s.productImageFS, path, ext)
@@ -443,12 +448,40 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 		zap.String("brand id", filters.BrandID),
 	)
 
+	var brandID int64
+	if filters.BrandID != "" {
+		brandID = s.encoder.Decode(filters.BrandID)
+	}
+
+	categorySections, err := requests.GetCategorySectionHandler(
+		ctx,
+		s.cache,
+		&s.SF,
+		s.dbRO,
+		s.encoder,
+		requests.GenerateCategorySectionCacheKey(0, constants.DefaultShopCategorySectionsPerPage),
+		0,
+		constants.DefaultShopCategorySectionsPerPage,
+	)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("message", "failed to get category sections"))
+	}
+
+	preloadedCategoryProducts := s.preloadCategorySectionProducts(
+		ctx,
+		categorySections,
+		brandID,
+		constants.DefaultShopInitialPreloadSubcategories,
+	)
+
 	homePageData := models.HomePageData{
-		Sections:          models.BuildPostHomeContentSections(s.GetBrandLogoCDNURL),
-		RandomSaleProduct: randomSaleProduct,
-		ActivePromos:      promoBanners,
-		Filters:           filters,
-		ThemeCSS:          s.activeThemeCSS(ctx, logtag),
+		Sections:                  models.BuildPostHomeContentSections(s.GetBrandLogoCDNURL),
+		RandomSaleProduct:         randomSaleProduct,
+		ActivePromos:              promoBanners,
+		Filters:                   filters,
+		ThemeCSS:                  s.activeThemeCSS(ctx, logtag),
+		CategorySections:          categorySections,
+		PreloadedCategoryProducts: preloadedCategoryProducts,
 	}
 
 	if err := compshop.HomePage(homePageData).Render(ctx, w); err != nil {

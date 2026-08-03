@@ -7,6 +7,7 @@ import (
 	"cchoice/cmd/web/components"
 	compshop "cchoice/cmd/web/components/shop"
 	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"cchoice/internal/errs"
 	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
@@ -19,6 +20,7 @@ import (
 func AddBrandPageHandlers(s *Server, r chi.Router) {
 	r.Get("/brands", s.brandsListingPageHandler)
 	r.Get("/brands/{brand}/sections/{section}", s.brandPrioritySectionHandler)
+	r.Get("/brands/{brand}/categories/products/batch", s.brandCategoryProductsBatchHandler)
 	r.Get("/brands/{brand}/categories/{category_id}/products", s.brandCategoryProductsHandler)
 	r.Get("/brands/{brand}", s.brandPageHandler)
 }
@@ -69,6 +71,12 @@ func (s *Server) brandPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	pageData.PreloadedCategoryProducts = s.preloadBrandCategorySectionProducts(
+		ctx,
+		pathReq.Brand,
+		pageData.CategorySections,
+		constants.DefaultShopInitialPreloadSubcategories,
+	)
 	pageData.ThemeCSS = s.activeThemeCSS(ctx, logtag)
 
 	if err := compshop.BrandPage(*pageData).Render(ctx, w); err != nil {
@@ -106,7 +114,61 @@ func (s *Server) brandPrioritySectionHandler(w http.ResponseWriter, r *http.Requ
 	sectionData := modelsCategorySectionProducts(pathReq.Section, products)
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := compshop.CategorySectionProductsInner(sectionData).Render(ctx, w); err != nil {
+	if err := compshop.CategorySectionProductsInner(sectionData.WithHighPriority(true)).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (s *Server) brandCategoryProductsBatchHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Brand Category Products Batch Handler]"
+	ctx := r.Context()
+
+	var pathReq forms.BrandPagePath
+	if err := httputil.BindPath(r, &pathReq); err != nil {
+		http.Error(w, httputil.ErrorMessage(err), http.StatusBadRequest)
+		return
+	}
+
+	var req forms.CategoryProductsBatchQuery
+	if err := httputil.BindQuery(r, &req); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, httputil.ErrorMessage(err), http.StatusBadRequest)
+		return
+	}
+
+	ids, err := ParseCategoryProductBatchIDs(req.IDs)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+		return
+	}
+
+	for _, id := range ids {
+		if _, err := httputil.RequireEncodedID(s.encoder, id); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+
+	sections := make([]models.CategorySectionProducts, 0, len(ids))
+	for _, id := range ids {
+		sectionProducts, err := s.services.brandPage.GetBrandCategoryProducts(ctx, pathReq.Brand, id, s.GetCDNURL)
+		if err != nil {
+			if errors.Is(err, errs.ErrNotFound) {
+				http.NotFound(w, r)
+				return
+			}
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		sections = append(sections, sectionProducts)
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := compshop.BrandCategorySectionBatchResponse(sections).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -139,7 +201,7 @@ func (s *Server) brandCategoryProductsHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := compshop.CategorySectionProductsInner(sectionProducts).Render(ctx, w); err != nil {
+	if err := compshop.CategorySectionProductsInner(sectionProducts.WithHighPriority(true)).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

@@ -1,6 +1,7 @@
 package shop
 
 import "cchoice/cmd/web/components/common"
+import "cchoice/internal/constants"
 
 templ ProductCardSkeleton() {
 	<div
@@ -27,7 +28,7 @@ templ ProductGridSkeleton(count int) {
 templ CategorySectionSkeleton() {
 	<div aria-hidden="true">
 		<div class="product-skeleton-shimmer h-5 w-40 rounded m-2 my-0"></div>
-		@ProductGridSkeleton(6)
+		@ProductGridSkeleton(constants.DefaultShopGridSkeletonCount)
 		@common.HR()
 	</div>
 }

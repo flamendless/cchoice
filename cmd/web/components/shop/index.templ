@@ -83,7 +83,7 @@ templ HomePageBody(data models.HomePageData) {
 			</div>
 			<div id="main-content" name="right-panel">
 				<div class="w-full">
-					@AllCategorySections()
+					@AllCategorySections(data.CategorySections, data.PreloadedCategoryProducts)
 					@PostHomeContentSections(data)
 				</div>
 			</div>

@@ -5,6 +5,7 @@ import (
 	"cchoice/cmd/web/components/footer"
 	"cchoice/cmd/web/components/header"
 	"cchoice/cmd/web/models"
+	"cchoice/internal/constants"
 	"cchoice/internal/utils"
 	"fmt"
 	"strings"
@@ -99,7 +100,7 @@ templ BrandPageBody(data models.BrandPageData) {
 						@BrandPrioritySection(data.HighestDiscount, data.Slug, "highest-discount")
 						@common.HR()
 					}
-					@BrandCategorySections(data.CategorySections)
+					@BrandCategorySections(data.CategorySections, data.Slug, data.PreloadedCategoryProducts)
 				</div>
 			</div>
 		</div>
@@ -130,10 +131,11 @@ templ BrandPrioritySection(section models.BrandPrioritySection, brandSlug string
 			class="w-full"
 		>
 			@CategorySectionProductsInner(models.CategorySectionProducts{
-				ID:          sectionKey,
-				Category:    section.Title,
-				Subcategory: section.Title,
-				Products:    section.Products,
+				ID:           sectionKey,
+				Category:     section.Title,
+				Subcategory:  section.Title,
+				Products:     section.Products,
+				HighPriority: true,
 			})
 		</div>
 		if section.HasMore {
@@ -153,7 +155,50 @@ templ BrandPrioritySection(section models.BrandPrioritySection, brandSlug string
 	</div>
 }
 
-templ BrandCategorySections(categories []models.BrandGroupedCategorySection) {
+templ brandSubcategorySection(
+	subcategory models.BrandSubcategorySection,
+	categoryLabel string,
+	batchURL string,
+	preloaded map[string]models.CategorySectionProducts,
+) {
+	if products, ok := preloaded[subcategory.CategoryID]; ok {
+		<div
+			id={ "brand-category-sections-" + subcategory.CategoryID }
+			class="w-full max-w-full ml-0.5 pr-2 lg:pr-6"
+			data-category-product-section
+			data-section-loaded="true"
+		>
+			if subcategory.Label != categoryLabel {
+				<p class="text-sm font-normal text-primary-dark m-2 ml-4 my-0">
+					{ subcategory.Label }
+				</p>
+			}
+			@CategorySectionProductsInner(products.WithHighPriority(true))
+		</div>
+	} else {
+		<div
+			id={ "brand-category-sections-" + subcategory.CategoryID }
+			class="w-full max-w-full ml-0.5 pr-2 lg:pr-6"
+			data-category-product-section
+			data-shop-preload="true"
+			data-section-id={ subcategory.CategoryID }
+			data-shop-batch-url={ batchURL }
+			hx-get={ subcategory.ProductsURL }
+			hx-target="this"
+			hx-swap="innerHTML"
+			hx-trigger="history:restore"
+		>
+			if subcategory.Label != categoryLabel {
+				<p class="text-sm font-normal text-primary-dark m-2 ml-4 my-0">
+					{ subcategory.Label }
+				</p>
+			}
+			@ProductGridSkeleton(constants.DefaultShopGridSkeletonCount)
+		</div>
+	}
+}
+
+templ BrandCategorySections(categories []models.BrandGroupedCategorySection, brandSlug string, preloaded map[string]models.CategorySectionProducts) {
 	if len(categories) > 0 {
 		<div id="brand-category-sections" class="w-full">
 			for _, category := range categories {
@@ -165,22 +210,12 @@ templ BrandCategorySections(categories []models.BrandGroupedCategorySection) {
 						{ category.Label }
 					</p>
 					for _, subcategory := range category.Subcategories {
-						<div
-							id={ "brand-category-sections-" + subcategory.CategoryID }
-							class="w-full max-w-full ml-0.5 pr-2 lg:pr-6"
-							data-category-product-section
-							hx-trigger="nearViewport once, history:restore"
-							hx-get={ subcategory.ProductsURL }
-							hx-target="this"
-							hx-swap="innerHTML"
-						>
-							if subcategory.Label != category.Label {
-								<p class="text-sm font-normal text-primary-dark m-2 ml-4 my-0">
-									{ subcategory.Label }
-								</p>
-							}
-							@ProductGridSkeleton(6)
-						</div>
+						@brandSubcategorySection(
+							subcategory,
+							category.Label,
+							utils.URLf("/brands/%s/categories/products/batch", brandSlug),
+							preloaded,
+						)
 					}
 				</div>
 				@common.HR()

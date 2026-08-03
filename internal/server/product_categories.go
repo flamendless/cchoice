@@ -8,13 +8,11 @@ import (
 	compshop "cchoice/cmd/web/components/shop"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/constants"
-	"cchoice/internal/database/queries"
 	"cchoice/internal/errs"
 	"cchoice/internal/httputil"
 	"cchoice/internal/logs"
 	"cchoice/internal/requests"
 	"cchoice/internal/server/forms"
-	"cchoice/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
@@ -23,6 +21,7 @@ import (
 func AddProductCategoriesHandlers(s *Server, r chi.Router) {
 	r.Get("/product-categories/side-panel/list", s.categoriesSidePanelHandler)
 	r.Get("/product-categories/sections", s.categorySectionHandler)
+	r.Get("/product-categories/products/batch", s.categoryProductsBatchHandler)
 	r.Get("/product-categories/{category_id}/products", s.categoryProductsHandler)
 }
 
@@ -88,13 +87,92 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := compshop.CategorySection(page, res).Render(ctx, w); err != nil {
+	if err := compshop.CategorySection(page, res, nil).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),
 		)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+}
+
+func ParseCategoryProductBatchIDs(idsParam string) ([]string, error) {
+	if strings.TrimSpace(idsParam) == "" {
+		return nil, errs.ErrInvalidParams
+	}
+
+	parts := strings.Split(idsParam, ",")
+	ids := make([]string, 0, len(parts))
+	seen := make(map[string]struct{}, len(parts))
+	for _, part := range parts {
+		id := strings.TrimSpace(part)
+		if id == "" {
+			continue
+		}
+		if _, exists := seen[id]; exists {
+			continue
+		}
+		seen[id] = struct{}{}
+		ids = append(ids, id)
+		if len(ids) > constants.DefaultShopBatchProductSections {
+			return nil, errs.ErrInvalidParams
+		}
+	}
+
+	if len(ids) == 0 {
+		return nil, errs.ErrInvalidParams
+	}
+	return ids, nil
+}
+
+func (s *Server) categoryProductsBatchHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Category Products Batch Handler]"
+	ctx := r.Context()
+
+	var req forms.CategoryProductsBatchQuery
+	if err := httputil.BindQuery(r, &req); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, httputil.ErrorMessage(err), http.StatusBadRequest)
+		return
+	}
+
+	ids, err := ParseCategoryProductBatchIDs(req.IDs)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+		return
+	}
+
+	for _, id := range ids {
+		if _, err := httputil.RequireEncodedID(s.encoder, id); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+			http.Error(w, errs.ErrInvalidParams.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+
+	var brandID int64
+	filters := GetHomePageFilters(ctx, s.sessionManager)
+	if filters.BrandID != "" {
+		brandID = s.encoder.Decode(filters.BrandID)
+	}
+
+	sections := make([]models.CategorySectionProducts, 0, len(ids))
+	for _, id := range ids {
+		sectionProducts, err := s.loadCategorySectionProducts(ctx, id, brandID)
+		if err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("category_id", id))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		sections = append(sections, sectionProducts)
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := compshop.CategorySectionBatchResponse(sections).Render(ctx, w); err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -114,75 +192,21 @@ func (s *Server) categoryProductsHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	categoryDBID := s.encoder.Decode(pathReq.CategoryID)
-	category, err := s.dbRO.GetQueries().GetProductCategoryByID(ctx, categoryDBID)
-	if err != nil {
-		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if category.Category.String == "" {
-		logs.LogCtx(ctx).Warn(
-			logtag,
-			zap.Int64("category id", category.ID),
-			zap.String("subcategory", category.Subcategory.String),
-		)
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		return
-	}
-
 	var brandID int64
 	filters := GetHomePageFilters(ctx, s.sessionManager)
 	if filters.BrandID != "" {
 		brandID = s.encoder.Decode(filters.BrandID)
 	}
 
-	products, err := s.dbRO.GetQueries().GetProductsByCategoryID(ctx, queries.GetProductsByCategoryIDParams{
-		CategoryID: categoryDBID,
-		BrandID:    brandID,
-		Limit:      constants.DefaultLimitProducts,
-	})
+	categorySectionProducts, err := s.loadCategorySectionProducts(ctx, pathReq.CategoryID, brandID)
 	if err != nil {
-		logs.LogCtx(ctx).Error(
-			logtag,
-			zap.Error(err),
-		)
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	validProducts := make([]int, 0, len(products))
-	for i, product := range products {
-		if !strings.HasSuffix(product.ThumbnailPath, constants.EmptyImageFilename) {
-			validProducts = append(validProducts, i)
-		} else {
-			logs.LogCtx(ctx).Debug("No valid image/thumbnail", zap.Int64("product id", product.ID))
-		}
-	}
-
-	productsWithValidImages := make([]queries.GetProductsByCategoryIDRow, 0, len(validProducts))
-	for _, i := range validProducts {
-		productsWithValidImages = append(productsWithValidImages, products[i])
-	}
-
-	if len(products) == 0 {
-		logs.LogCtx(ctx).Debug(
-			logtag,
-			zap.Int64("category id", category.ID),
-			zap.String("category name", category.Category.String),
-		)
-	}
-
-	categorySectionProducts := models.CategorySectionProducts{
-		ID:          pathReq.CategoryID,
-		Category:    utils.SlugToTile(category.Category.String),
-		Subcategory: utils.SlugToTile(category.Subcategory.String),
-		Products:    models.ToCategorySectionProducts(s.encoder, s.GetCDNURL, productsWithValidImages),
-	}
-
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := compshop.CategorySectionProductsInner(categorySectionProducts).Render(ctx, w); err != nil {
+	if err := compshop.CategorySectionProductsInner(categorySectionProducts.WithHighPriority(true)).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),

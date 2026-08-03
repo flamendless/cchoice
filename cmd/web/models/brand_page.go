@@ -16,14 +16,15 @@ type BrandListingCard struct {
 }
 
 type BrandPageData struct {
-	Slug              string
-	Name              string
-	LogoURL           string
-	BestSelling       BrandPrioritySection
-	HighestDiscount   BrandPrioritySection
-	CategorySections  []BrandGroupedCategorySection
-	SEO               SiteSEO
-	ThemeCSS          string
+	Slug                      string
+	Name                      string
+	LogoURL                   string
+	BestSelling               BrandPrioritySection
+	HighestDiscount           BrandPrioritySection
+	CategorySections          []BrandGroupedCategorySection
+	PreloadedCategoryProducts map[string]CategorySectionProducts
+	SEO                       SiteSEO
+	ThemeCSS                  string
 }
 
 type BrandPrioritySection struct {

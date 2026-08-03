@@ -67,10 +67,16 @@ type CategorySectionProduct struct {
 }
 
 type CategorySectionProducts struct {
-	ID          string
-	Category    string
-	Subcategory string
-	Products    []CategorySectionProduct
+	ID           string
+	Category     string
+	Subcategory  string
+	Products     []CategorySectionProduct
+	HighPriority bool
+}
+
+func (p CategorySectionProducts) WithHighPriority(highPriority bool) CategorySectionProducts {
+	p.HighPriority = highPriority
+	return p
 }
 
 type CDNURLFunc func(path string) string

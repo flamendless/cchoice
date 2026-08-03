@@ -39,11 +39,13 @@ type HomePageFilters struct {
 }
 
 type HomePageData struct {
-	RandomSaleProduct RandomSaleProduct
-	Sections          []PostHomeContentSection
-	ActivePromos      []PromoItem
-	Filters           HomePageFilters
-	ThemeCSS          string
+	RandomSaleProduct         RandomSaleProduct
+	Sections                  []PostHomeContentSection
+	ActivePromos              []PromoItem
+	Filters                   HomePageFilters
+	ThemeCSS                  string
+	CategorySections          []GroupedCategorySection
+	PreloadedCategoryProducts map[string]CategorySectionProducts
 }
 
 type RandomSaleProduct struct {

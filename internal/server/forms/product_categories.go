@@ -17,3 +17,7 @@ func (q CategorySectionQuery) EffectiveLimit() int {
 type CategoryProductsPath struct {
 	CategoryID string `param:"category_id" validate:"required"`
 }
+
+type CategoryProductsBatchQuery struct {
+	IDs string `form:"ids" validate:"required"`
+}

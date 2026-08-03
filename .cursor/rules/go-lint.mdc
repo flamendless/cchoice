@@ -31,6 +31,34 @@ if len(s) < 14 {
 
 `fmt.Sprintf` remains appropriate for multi-value or non-scalar format strings (e.g. `"%d. %s -> %s"`).
 
+### concat-loop
+
+Do not concatenate strings with `+=` inside a loop. Use `strings.Join`, `strings.Builder`, or `fmt.Appendf` on a `[]byte` buffer instead.
+
+```go
+// BAD
+input := ""
+for i, id := range ids {
+    if i > 0 {
+        input += ","
+    }
+    input += id
+}
+
+// GOOD
+input := strings.Join(ids, ",")
+
+// GOOD (when building incrementally without a pre-sized slice)
+var b strings.Builder
+for i, id := range ids {
+    if i > 0 {
+        b.WriteByte(',')
+    }
+    b.WriteString(id)
+}
+input := b.String()
+```
+
 ## whitespace
 
 Do not put a blank line immediately after a function's opening `{`.

@@ -9,6 +9,46 @@ import (
 	"strconv"
 )
 
+templ ProductGridImage(product models.CategorySectionProduct, highPriority bool) {
+	<div class="relative w-20 h-20 sm:w-24 sm:h-24">
+		<div
+			class="product-skeleton-shimmer absolute inset-0 rounded-lg product-image-placeholder"
+			aria-hidden="true"
+		></div>
+		<img
+			src={ product.CDNURL }
+			width="96"
+			height="96"
+			class="relative w-full h-full object-contain opacity-0 transition-opacity duration-200"
+			title="show high-quality image"
+			alt={ product.Name + " thumbnail" }
+			data-product-grid-image="true"
+			if highPriority || utils.IsProductOnSale(product.DiscountPercentage) {
+				loading="eager"
+				fetchpriority="high"
+			} else {
+				loading="lazy"
+			}
+			data-product-id={ product.ProductID }
+			data-product-thumbnail-path={ product.CDNURL1280 }
+			data-product-name={ product.Name }
+			data-product-brand={ product.BrandName }
+			data-product-price={ product.PriceDisplay }
+			data-product-on-sale={ strconv.FormatBool(utils.IsProductOnSale(product.DiscountPercentage)) }
+			_="
+				on load
+					add .opacity-100 to me
+					add .hidden to previous .product-image-placeholder
+				end
+				on click
+					set #selected-product-id.value to my @data-product-id
+					async call metrics_event('product_click', #selected-product-id.value)
+				end
+			"
+		/>
+	</div>
+}
+
 templ CategorySectionProductsInner(data models.CategorySectionProducts) {
 	if data.Subcategory != data.Category {
 		<p class="text-sm font-normal text-primary-dark m-2 ml-4 my-0">
@@ -22,25 +62,7 @@ templ CategorySectionProductsInner(data models.CategorySectionProducts) {
 				href={ utils.URLf("/product/%s", product.Slug) }
 			>
 				<div class="relative inline-block">
-					<img
-						src={ product.CDNURL }
-						class="w-20 max-w-20 h-20 sm:w-24 sm:max-w-24 sm:h-24 object-contain"
-						title="show high-quality image"
-						alt={ product.Name + " thumbnail" }
-						loading={ func() string { if utils.IsProductOnSale(product.DiscountPercentage) { return "eager" }; return "lazy" }() }
-						data-product-id={ product.ProductID }
-						data-product-thumbnail-path={ product.CDNURL1280 }
-						data-product-name={ product.Name }
-						data-product-brand={ product.BrandName }
-						data-product-price={ product.PriceDisplay }
-						data-product-on-sale={ strconv.FormatBool(utils.IsProductOnSale(product.DiscountPercentage)) }
-						_="
-							on click
-								set #selected-product-id.value to my @data-product-id
-								async call metrics_event('product_click', #selected-product-id.value)
-							end
-						"
-					/>
+					@ProductGridImage(product, data.HighPriority)
 					@common.DiscountRibbon(product.DiscountPercentage)
 				</div>
 				<div
@@ -73,13 +95,72 @@ templ CategorySectionProductsInner(data models.CategorySectionProducts) {
 	</div>
 }
 
+templ CategorySectionBatchResponse(sections []models.CategorySectionProducts) {
+	for i, section := range sections {
+		<div id={ "category-sections-" + section.ID } hx-swap-oob="innerHTML">
+			@CategorySectionProductsInner(section.WithHighPriority(i == 0))
+		</div>
+	}
+}
+
+templ BrandCategorySectionBatchResponse(sections []models.CategorySectionProducts) {
+	for i, section := range sections {
+		<div id={ "brand-category-sections-" + section.ID } hx-swap-oob="innerHTML">
+			@CategorySectionProductsInner(section.WithHighPriority(i == 0))
+		</div>
+	}
+}
+
 templ CategorySectionProducts(data models.CategorySectionProducts) {
 	<div id={ "category-sections-" + data.ID }>
 		@CategorySectionProductsInner(data)
 	</div>
 }
 
-templ CategorySection(page int, categories []models.GroupedCategorySection) {
+templ categorySubcategorySection(
+	subcategory models.Subcategory,
+	categoryLabel string,
+	preloaded map[string]models.CategorySectionProducts,
+	batchURL string,
+) {
+	if products, ok := preloaded[subcategory.CategoryID]; ok {
+		<div
+			id={ "category-sections-" + subcategory.CategoryID }
+			class="w-full max-w-full ml-0.5 pr-2 lg:pr-6 border-primary-dark"
+			data-category-product-section
+			data-section-loaded="true"
+		>
+			if subcategory.Label != categoryLabel {
+				<p class="text-sm font-normal text-primary-dark m-2 ml-4 my-0">
+					{ subcategory.Label }
+				</p>
+			}
+			@CategorySectionProductsInner(products.WithHighPriority(true))
+		</div>
+	} else {
+		<div
+			id={ "category-sections-" + subcategory.CategoryID }
+			class="w-full max-w-full ml-0.5 pr-2 lg:pr-6 border-primary-dark"
+			data-category-product-section
+			data-shop-preload="true"
+			data-section-id={ subcategory.CategoryID }
+			data-shop-batch-url={ batchURL }
+			hx-get={ utils.URL("/product-categories/" + subcategory.CategoryID + "/products") }
+			hx-target="this"
+			hx-swap="innerHTML"
+			hx-trigger="history:restore"
+		>
+			if subcategory.Label != categoryLabel {
+				<p class="text-sm font-normal text-primary-dark m-2 ml-4 my-0">
+					{ subcategory.Label }
+				</p>
+			}
+			@ProductGridSkeleton(constants.DefaultShopGridSkeletonCount)
+		</div>
+	}
+}
+
+templ CategorySection(page int, categories []models.GroupedCategorySection, preloaded map[string]models.CategorySectionProducts) {
 	for i, category := range categories {
 		<div>
 			<p
@@ -89,22 +170,12 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 				{ category.Label }
 			</p>
 			for _, subcategory := range category.Subcategories {
-				<div
-					id={ "category-sections-" + subcategory.CategoryID }
-					class="w-full max-w-full ml-0.5 pr-2 lg:pr-6 border-primary-dark"
-					data-category-product-section
-					hx-trigger="nearViewport once, history:restore"
-					hx-get={ utils.URL("/product-categories/" + subcategory.CategoryID + "/products") }
-					hx-target="this"
-					hx-swap="innerHTML"
-				>
-					if subcategory.Label != category.Label {
-						<p class="text-sm font-normal text-primary-dark m-2 ml-4 my-0">
-							{ subcategory.Label }
-						</p>
-					}
-					@ProductGridSkeleton(6)
-				</div>
+				@categorySubcategorySection(
+					subcategory,
+					category.Label,
+					preloaded,
+					utils.URL("/product-categories/products/batch"),
+				)
 			}
 		</div>
 		if category.Label != "" {
@@ -119,13 +190,13 @@ templ CategorySection(page int, categories []models.GroupedCategorySection) {
 				}) }
 				hx-target=".category-sections-inf-load"
 				hx-swap="outerHTML"
-				hx-trigger="nearViewport, history:restore"
+				hx-trigger="intersect once, history:restore"
 			></div>
 		}
 	}
 }
 
-templ AllCategorySections() {
+templ AllCategorySections(sections []models.GroupedCategorySection, preloaded map[string]models.CategorySectionProducts) {
 	@ModalProductImageViewer("", "")
 	<div id="all-category-sections" class="w-full overflow-x-hidden">
 		<div class="sticky top-0 bg-white z-20 flex flex-row justify-between items-center px-2">
@@ -134,20 +205,24 @@ templ AllCategorySections() {
 			</p>
 		</div>
 		@common.HR()
-		<div
-			id="category-sections"
-			class="w-full flex flex-col overflow-x-hidden"
-			hx-trigger="load once, history:restore"
-			hx-get={ utils.URLWithParams("/product-categories/sections", map[string]string{
-				"page":  "0",
-				"limit": fmt.Sprintf("%d", constants.DefaultShopCategorySectionsPerPage),
-			}) }
-			hx-target="this"
-			hx-swap="innerHTML"
-		>
-			@CategorySectionsLoading()
-		</div>
-		<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/revealed_preload.js")) }>
-		</script>
+		if len(sections) > 0 {
+			<div id="category-sections" class="w-full flex flex-col overflow-x-hidden">
+				@CategorySection(0, sections, preloaded)
+			</div>
+		} else {
+			<div
+				id="category-sections"
+				class="w-full flex flex-col overflow-x-hidden"
+				hx-trigger="load once, history:restore"
+				hx-get={ utils.URLWithParams("/product-categories/sections", map[string]string{
+					"page":  "0",
+					"limit": fmt.Sprintf("%d", constants.DefaultShopCategorySectionsPerPage),
+				}) }
+				hx-target="this"
+				hx-swap="innerHTML"
+			>
+				@CategorySectionsLoading()
+			</div>
+		}
 	</div>
 }
