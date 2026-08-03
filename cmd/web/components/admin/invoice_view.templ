@@ -58,27 +58,29 @@ templ AdminInvoiceViewPage(data services.InvoiceRenderData) {
 }
 
 templ InvoiceViewBody(data services.InvoiceRenderData) {
-	<div class="text-center mb-4">
-		<h1 class="text-2xl font-bold text-gray-900">SALES INVOICE</h1>
+	<div class="flex items-start gap-4 mb-4">
 		if data.Config.LogoURL != "" {
-			<img src={ data.Config.LogoURL } alt="Logo" class="h-16 mx-auto mt-2 object-contain"/>
+			<img src={ data.Config.LogoURL } alt="Logo" class="h-16 w-auto object-contain shrink-0"/>
 		} else {
-			<img src={ constants.PathEmailLogoCDN } alt="C-Choice" class="h-16 mx-auto mt-2 object-contain"/>
+			<img src={ constants.PathEmailLogoCDN } alt="C-Choice" class="h-16 w-auto object-contain shrink-0"/>
 		}
-		<p class="text-lg font-semibold mt-2">{ data.Config.BusinessName }</p>
-		if data.Config.ProprietorName != "" {
-			<p class="text-sm text-gray-600">Proprietor: { data.Config.ProprietorName }</p>
-		}
-		if data.Config.Address != "" {
-			<p class="text-sm text-gray-600">{ data.Config.Address }</p>
-		}
-		<div class="text-xs text-gray-500 mt-1">
-			if data.Config.TIN != "" {
-				<span>TIN: { data.Config.TIN }</span>
+		<div class="flex-grow text-center">
+			<h1 class="text-2xl font-bold text-gray-900">SALES INVOICE</h1>
+			<p class="text-lg font-semibold mt-2">{ data.Config.BusinessName }</p>
+			if data.Config.ProprietorName != "" {
+				<p class="text-sm text-gray-600">Proprietor: { data.Config.ProprietorName }</p>
 			}
-			if data.Config.VATRegistration != "" {
-				<span class="ml-2">VAT Reg: { data.Config.VATRegistration }</span>
+			if data.Config.Address != "" {
+				<p class="text-sm text-gray-600">{ data.Config.Address }</p>
 			}
+			<div class="text-xs text-gray-500 mt-1">
+				if data.Config.TIN != "" {
+					<span>TIN: { data.Config.TIN }</span>
+				}
+				if data.Config.VATRegistration != "" {
+					<span class="ml-2">VAT Reg: { data.Config.VATRegistration }</span>
+				}
+			</div>
 		</div>
 	</div>
 	<div class="text-sm mb-4">
@@ -110,6 +112,9 @@ templ InvoiceViewBody(data services.InvoiceRenderData) {
 		<div class="md:text-right">
 			<p><span class="text-gray-500">Invoice No:</span> <span class="font-semibold">{ data.Invoice.InvoiceNumber }</span></p>
 			<p><span class="text-gray-500">Date:</span> { data.Invoice.IssueDate }</p>
+			if data.Invoice.DeliveryDate != "" {
+				<p><span class="text-gray-500">Delivery:</span> { data.Invoice.DeliveryDate }</p>
+			}
 			if data.Invoice.DueDate != "" {
 				<p><span class="text-gray-500">Due:</span> { data.Invoice.DueDate }</p>
 			}

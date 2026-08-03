@@ -33,6 +33,10 @@ type AdminInvoicesTableQuery struct {
 	Page int `form:"page"`
 }
 
+type AdminInvoiceEntitySearchQuery struct {
+	Q string `form:"q"`
+}
+
 type AdminInvoiceLineInput struct {
 	ProductID   string `json:"product_id"`
 	Description string `json:"description"`
@@ -57,7 +61,11 @@ type AdminInvoiceCreateForm struct {
 	TransactionType         string                         `json:"transaction_type"`
 	RecipientRegisteredName string                         `json:"recipient_registered_name"`
 	Notes                   string                         `json:"notes"`
+	IssueDate               string                         `json:"issue_date"`
+	DeliveryDate            string                         `json:"delivery_date"`
 	DueDate                 string                         `json:"due_date"`
+	PaymentTermsValue       int64                          `json:"payment_terms_value"`
+	PaymentTermsUnit        string                         `json:"payment_terms_unit"`
 	WithholdingTax          string                         `json:"withholding_tax"`
 	SCPWDDiscount           string                         `json:"sc_pwd_discount"`
 	AddVAT                  string                         `json:"add_vat"`

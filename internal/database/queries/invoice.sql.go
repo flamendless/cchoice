@@ -51,6 +51,9 @@ INSERT INTO tbl_invoices (
     status,
     issue_date,
     due_date,
+    delivery_date,
+    payment_terms_value,
+    payment_terms_unit,
     notes,
     currency,
     subtotal,
@@ -74,7 +77,7 @@ INSERT INTO tbl_invoices (
     created_at,
     updated_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
 ) RETURNING id
 `
 
@@ -91,6 +94,9 @@ type CreateInvoiceParams struct {
 	Status                  string
 	IssueDate               string
 	DueDate                 string
+	DeliveryDate            string
+	PaymentTermsValue       int64
+	PaymentTermsUnit        string
 	Notes                   string
 	Currency                string
 	Subtotal                int64
@@ -127,6 +133,9 @@ func (q *Queries) CreateInvoice(ctx context.Context, arg CreateInvoiceParams) (i
 		arg.Status,
 		arg.IssueDate,
 		arg.DueDate,
+		arg.DeliveryDate,
+		arg.PaymentTermsValue,
+		arg.PaymentTermsUnit,
 		arg.Notes,
 		arg.Currency,
 		arg.Subtotal,
@@ -285,81 +294,8 @@ func (q *Queries) GetAllInvoiceRecipients(ctx context.Context, search interface{
 	return items, nil
 }
 
-const getAllInvoices = `-- name: GetAllInvoices :many
-SELECT
-    tbl_invoices.id,
-    tbl_invoices.invoice_number,
-    tbl_invoices.recipient_name,
-    tbl_invoices.recipient_email,
-    tbl_invoices.status,
-    tbl_invoices.issue_date,
-    tbl_invoices.currency,
-    tbl_invoices.subtotal,
-    tbl_invoices.vat_amount,
-    tbl_invoices.total,
-    tbl_invoices.pdf_path,
-    tbl_invoices.emailed_at,
-    tbl_invoices.created_at
-FROM tbl_invoices
-ORDER BY tbl_invoices.id DESC
-LIMIT 500
-`
-
-type GetAllInvoicesRow struct {
-	ID             int64
-	InvoiceNumber  string
-	RecipientName  string
-	RecipientEmail string
-	Status         string
-	IssueDate      string
-	Currency       string
-	Subtotal       int64
-	VatAmount      int64
-	Total          int64
-	PdfPath        string
-	EmailedAt      string
-	CreatedAt      string
-}
-
-func (q *Queries) GetAllInvoices(ctx context.Context) ([]GetAllInvoicesRow, error) {
-	rows, err := q.db.QueryContext(ctx, getAllInvoices)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetAllInvoicesRow
-	for rows.Next() {
-		var i GetAllInvoicesRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.InvoiceNumber,
-			&i.RecipientName,
-			&i.RecipientEmail,
-			&i.Status,
-			&i.IssueDate,
-			&i.Currency,
-			&i.Subtotal,
-			&i.VatAmount,
-			&i.Total,
-			&i.PdfPath,
-			&i.EmailedAt,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getInvoiceByID = `-- name: GetInvoiceByID :one
-SELECT tbl_invoices.id, tbl_invoices.invoice_number, tbl_invoices.recipient_id, tbl_invoices.recipient_name, tbl_invoices.recipient_email, tbl_invoices.recipient_contact_number, tbl_invoices.recipient_address, tbl_invoices.recipient_tin, tbl_invoices.recipient_registered_name, tbl_invoices.transaction_type, tbl_invoices.status, tbl_invoices.issue_date, tbl_invoices.due_date, tbl_invoices.notes, tbl_invoices.currency, tbl_invoices.subtotal, tbl_invoices.vat_percentage, tbl_invoices.vat_amount, tbl_invoices.total, tbl_invoices.vatable_sales, tbl_invoices.vat_exempt_sales, tbl_invoices.zero_rated_sales, tbl_invoices.total_sales, tbl_invoices.total_sales_vat_inclusive, tbl_invoices.less_vat, tbl_invoices.withholding_tax, tbl_invoices.amount_net_of_vat, tbl_invoices.sc_pwd_discount, tbl_invoices.add_vat, tbl_invoices.received_amount, tbl_invoices.sc_pwd_id_no, tbl_invoices.pdf_path, tbl_invoices.emailed_at, tbl_invoices.created_by, tbl_invoices.created_at, tbl_invoices.updated_at
+SELECT tbl_invoices.id, tbl_invoices.invoice_number, tbl_invoices.recipient_id, tbl_invoices.recipient_name, tbl_invoices.recipient_email, tbl_invoices.recipient_contact_number, tbl_invoices.recipient_address, tbl_invoices.recipient_tin, tbl_invoices.recipient_registered_name, tbl_invoices.transaction_type, tbl_invoices.status, tbl_invoices.issue_date, tbl_invoices.due_date, tbl_invoices.notes, tbl_invoices.currency, tbl_invoices.subtotal, tbl_invoices.vat_percentage, tbl_invoices.vat_amount, tbl_invoices.total, tbl_invoices.vatable_sales, tbl_invoices.vat_exempt_sales, tbl_invoices.zero_rated_sales, tbl_invoices.total_sales, tbl_invoices.total_sales_vat_inclusive, tbl_invoices.less_vat, tbl_invoices.withholding_tax, tbl_invoices.amount_net_of_vat, tbl_invoices.sc_pwd_discount, tbl_invoices.add_vat, tbl_invoices.received_amount, tbl_invoices.sc_pwd_id_no, tbl_invoices.pdf_path, tbl_invoices.emailed_at, tbl_invoices.created_by, tbl_invoices.created_at, tbl_invoices.updated_at, tbl_invoices.delivery_date, tbl_invoices.payment_terms_value, tbl_invoices.payment_terms_unit
 FROM tbl_invoices
 WHERE id = ?
 LIMIT 1
@@ -409,6 +345,9 @@ func (q *Queries) GetInvoiceByID(ctx context.Context, id int64) (GetInvoiceByIDR
 		&i.TblInvoice.CreatedBy,
 		&i.TblInvoice.CreatedAt,
 		&i.TblInvoice.UpdatedAt,
+		&i.TblInvoice.DeliveryDate,
+		&i.TblInvoice.PaymentTermsValue,
+		&i.TblInvoice.PaymentTermsUnit,
 	)
 	return i, err
 }
@@ -671,6 +610,89 @@ WHERE id = ?
 func (q *Queries) MarkInvoiceEmailed(ctx context.Context, id int64) error {
 	_, err := q.db.ExecContext(ctx, markInvoiceEmailed, id)
 	return err
+}
+
+const searchInvoices = `-- name: SearchInvoices :many
+SELECT
+    tbl_invoices.id,
+    tbl_invoices.invoice_number,
+    tbl_invoices.recipient_name,
+    tbl_invoices.recipient_email,
+    tbl_invoices.status,
+    tbl_invoices.issue_date,
+    tbl_invoices.currency,
+    tbl_invoices.subtotal,
+    tbl_invoices.vat_amount,
+    tbl_invoices.total,
+    tbl_invoices.pdf_path,
+    tbl_invoices.emailed_at,
+    tbl_invoices.created_at
+FROM tbl_invoices
+WHERE
+    (?1 IS NULL OR ?1 = '' OR
+        LOWER(tbl_invoices.invoice_number) LIKE '%' || LOWER(?1) || '%' OR
+        LOWER(tbl_invoices.recipient_name) LIKE '%' || LOWER(?1) || '%' OR
+        LOWER(tbl_invoices.recipient_email) LIKE '%' || LOWER(?1) || '%')
+ORDER BY tbl_invoices.id DESC
+LIMIT ?2
+`
+
+type SearchInvoicesParams struct {
+	Search interface{}
+	Limit  int64
+}
+
+type SearchInvoicesRow struct {
+	ID             int64
+	InvoiceNumber  string
+	RecipientName  string
+	RecipientEmail string
+	Status         string
+	IssueDate      string
+	Currency       string
+	Subtotal       int64
+	VatAmount      int64
+	Total          int64
+	PdfPath        string
+	EmailedAt      string
+	CreatedAt      string
+}
+
+func (q *Queries) SearchInvoices(ctx context.Context, arg SearchInvoicesParams) ([]SearchInvoicesRow, error) {
+	rows, err := q.db.QueryContext(ctx, searchInvoices, arg.Search, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SearchInvoicesRow
+	for rows.Next() {
+		var i SearchInvoicesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.InvoiceNumber,
+			&i.RecipientName,
+			&i.RecipientEmail,
+			&i.Status,
+			&i.IssueDate,
+			&i.Currency,
+			&i.Subtotal,
+			&i.VatAmount,
+			&i.Total,
+			&i.PdfPath,
+			&i.EmailedAt,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const setInvoiceNumber = `-- name: SetInvoiceNumber :exec

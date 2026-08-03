@@ -90,6 +90,52 @@ type TblCheckoutPayment struct {
 	PaymentIntentID        sql.NullString
 }
 
+type TblCollectionReceipt struct {
+	ID             int64
+	ReceiptNumber  string
+	InvoiceID      sql.NullInt64
+	ReceivedFrom   string
+	RecipientEmail string
+	Tin            string
+	Address        string
+	ReceiptDate    string
+	Amount         int64
+	AmountInWords  string
+	PaymentFor     string
+	PaymentForm    string
+	ScCitizenTin   string
+	OscaPwdIDNo    string
+	Status         string
+	PdfPath        string
+	EmailedAt      string
+	CreatedBy      int64
+	CreatedAt      string
+	UpdatedAt      string
+}
+
+type TblCollectionReceiptJob struct {
+	ID                  int64
+	QueueID             string
+	CollectionReceiptID int64
+	JobType             string
+	StaffID             sql.NullInt64
+	Status              string
+	ErrorMessage        string
+	CreatedAt           string
+	UpdatedAt           string
+}
+
+type TblCollectionReceiptSettlement struct {
+	ID                  int64
+	CollectionReceiptID int64
+	InvoiceID           sql.NullInt64
+	InvoiceNumber       string
+	Amount              int64
+	SortOrder           int64
+	CreatedAt           string
+	UpdatedAt           string
+}
+
 type TblCpoint struct {
 	ID          int64
 	CustomerID  int64
@@ -142,6 +188,48 @@ type TblCustomerOtpCode struct {
 type TblDatamigrateApplied struct {
 	Name      string
 	AppliedAt time.Time
+}
+
+type TblDeliveryReceipt struct {
+	ID             int64
+	ReceiptNumber  string
+	InvoiceID      sql.NullInt64
+	DeliveredTo    string
+	RecipientEmail string
+	Tin            string
+	Address        string
+	ReceiptDate    string
+	Terms          string
+	PoNumber       string
+	Status         string
+	PdfPath        string
+	EmailedAt      string
+	CreatedBy      int64
+	CreatedAt      string
+	UpdatedAt      string
+}
+
+type TblDeliveryReceiptJob struct {
+	ID                int64
+	QueueID           string
+	DeliveryReceiptID int64
+	JobType           string
+	StaffID           sql.NullInt64
+	Status            string
+	ErrorMessage      string
+	CreatedAt         string
+	UpdatedAt         string
+}
+
+type TblDeliveryReceiptLine struct {
+	ID                int64
+	DeliveryReceiptID int64
+	Quantity          string
+	Unit              string
+	Description       string
+	SortOrder         int64
+	CreatedAt         string
+	UpdatedAt         string
 }
 
 type TblEmailJob struct {
@@ -235,6 +323,9 @@ type TblInvoice struct {
 	CreatedBy               int64
 	CreatedAt               string
 	UpdatedAt               string
+	DeliveryDate            string
+	PaymentTermsValue       int64
+	PaymentTermsUnit        string
 }
 
 type TblInvoiceConfig struct {

@@ -109,6 +109,43 @@ LEFT JOIN tbl_product_sales
 WHERE tbl_products.status = 'ACTIVE'
 ORDER BY is_on_sale DESC;
 
+-- name: SearchProductsForInvoiceLineItems :many
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	tbl_product_categories.category,
+	tbl_product_categories.subcategory
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_categories ON tbl_product_categories.id = tbl_products_categories.category_id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE tbl_products.status = 'ACTIVE'
+	AND (
+		@search IS NULL OR @search = '' OR
+		LOWER(tbl_products.serial) LIKE '%' || LOWER(@search) || '%' OR
+		LOWER(tbl_products.name) LIKE '%' || LOWER(@search) || '%'
+	)
+ORDER BY is_on_sale DESC, tbl_products.name ASC
+LIMIT @limit;
+
 -- name: GetProductIDBySerial :one
 SELECT id
 FROM tbl_products

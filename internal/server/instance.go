@@ -39,6 +39,12 @@ func (si *ServerInstance) StartBackgroundJobs() {
 	if si.internal.invoiceJobRunner != nil {
 		go si.internal.invoiceJobRunner.Start(si.jobRunnerCtx)
 	}
+	if si.internal.deliveryReceiptJobRunner != nil {
+		go si.internal.deliveryReceiptJobRunner.Start(si.jobRunnerCtx)
+	}
+	if si.internal.collectionReceiptJobRunner != nil {
+		go si.internal.collectionReceiptJobRunner.Start(si.jobRunnerCtx)
+	}
 	logs.Log().Info("Background job runners started")
 }
 

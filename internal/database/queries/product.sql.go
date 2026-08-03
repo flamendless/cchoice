@@ -2445,6 +2445,104 @@ func (q *Queries) ListProductsForQuotations(ctx context.Context) ([]ListProducts
 	return items, nil
 }
 
+const searchProductsForInvoiceLineItems = `-- name: SearchProductsForInvoiceLineItems :many
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.slug,
+	tbl_products.name,
+	tbl_products.unit_price_with_vat,
+	tbl_products.unit_price_with_vat_currency,
+	tbl_product_sales.sale_price_with_vat,
+	tbl_product_sales.sale_price_with_vat_currency,
+	CASE
+		WHEN tbl_product_sales.id IS NOT NULL THEN true
+		ELSE false
+	END AS is_on_sale,
+	tbl_product_sales.discount_type,
+	tbl_product_sales.discount_value,
+	tbl_brands.name AS brand_name,
+	tbl_product_categories.category,
+	tbl_product_categories.subcategory
+FROM tbl_products
+INNER JOIN tbl_brands ON tbl_brands.id = tbl_products.brand_id
+LEFT JOIN tbl_products_categories ON tbl_products_categories.product_id = tbl_products.id
+LEFT JOIN tbl_product_categories ON tbl_product_categories.id = tbl_products_categories.category_id
+LEFT JOIN tbl_product_sales
+	ON tbl_product_sales.product_id = tbl_products.id
+	AND tbl_product_sales.is_active = 1
+	AND datetime('now') BETWEEN
+		tbl_product_sales.starts_at AND tbl_product_sales.ends_at
+WHERE tbl_products.status = 'ACTIVE'
+	AND (
+		?1 IS NULL OR ?1 = '' OR
+		LOWER(tbl_products.serial) LIKE '%' || LOWER(?1) || '%' OR
+		LOWER(tbl_products.name) LIKE '%' || LOWER(?1) || '%'
+	)
+ORDER BY is_on_sale DESC, tbl_products.name ASC
+LIMIT ?2
+`
+
+type SearchProductsForInvoiceLineItemsParams struct {
+	Search interface{}
+	Limit  int64
+}
+
+type SearchProductsForInvoiceLineItemsRow struct {
+	ID                       int64
+	Serial                   string
+	Slug                     sql.NullString
+	Name                     string
+	UnitPriceWithVat         int64
+	UnitPriceWithVatCurrency string
+	SalePriceWithVat         sql.NullInt64
+	SalePriceWithVatCurrency sql.NullString
+	IsOnSale                 int64
+	DiscountType             sql.NullString
+	DiscountValue            sql.NullInt64
+	BrandName                string
+	Category                 sql.NullString
+	Subcategory              sql.NullString
+}
+
+func (q *Queries) SearchProductsForInvoiceLineItems(ctx context.Context, arg SearchProductsForInvoiceLineItemsParams) ([]SearchProductsForInvoiceLineItemsRow, error) {
+	rows, err := q.db.QueryContext(ctx, searchProductsForInvoiceLineItems, arg.Search, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SearchProductsForInvoiceLineItemsRow
+	for rows.Next() {
+		var i SearchProductsForInvoiceLineItemsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Serial,
+			&i.Slug,
+			&i.Name,
+			&i.UnitPriceWithVat,
+			&i.UnitPriceWithVatCurrency,
+			&i.SalePriceWithVat,
+			&i.SalePriceWithVatCurrency,
+			&i.IsOnSale,
+			&i.DiscountType,
+			&i.DiscountValue,
+			&i.BrandName,
+			&i.Category,
+			&i.Subcategory,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const softDeleteProduct = `-- name: SoftDeleteProduct :exec
 UPDATE tbl_products
 SET status = 'DELETED', updated_at = datetime('now'), deleted_at = datetime('now')

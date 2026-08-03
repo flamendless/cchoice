@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delivery Receipt {{.ReceiptNumber}}</title>
+  </head>
+  <body style="margin:0; padding:0; font-family:Arial, sans-serif; background-color:#F7EFEA;">
+    <table align="center" cellpadding="0" cellspacing="0" width="100%" style="padding: 20px;">
+      <tr>
+        <td>
+          <table align="center" cellpadding="0" cellspacing="0" width="600" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(246,116,47,0.15);">
+            <tr>
+              {{if .LogoURL}}
+              <td align="center" style="background-color:#F7EFEA; color:#333333; padding: 30px 20px;">
+                <img src="{{.LogoURL}}" alt="{{.BusinessName}}" style="max-width:200px; height:auto; margin-bottom:15px;" />
+                <h1 style="margin:20px 0 0; font-size:24px; font-weight:normal; color:#F6742F;">Delivery Receipt {{.ReceiptNumber}}</h1>
+              </td>
+              {{else}}
+              <td align="center" style="background-color:#F6742F; color:#ffffff; padding: 30px 20px;">
+                <h2 style="margin:0 0 10px; font-size:28px; font-weight:bold; letter-spacing:1px;">{{.BusinessName}}</h2>
+                <h1 style="margin:20px 0 0; font-size:24px; font-weight:normal;">Delivery Receipt {{.ReceiptNumber}}</h1>
+              </td>
+              {{end}}
+            </tr>
+            <tr>
+              <td style="padding: 30px;">
+                <p style="margin:0 0 15px; font-size:14px; color:#333333;">Dear {{.DeliveredTo}},</p>
+                <p style="margin:0 0 20px; font-size:14px; color:#666666;">
+                  Please find your delivery receipt summary below. A PDF copy is attached to this email.
+                </p>
+                <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:20px;">
+                  <tr>
+                    <td style="padding:5px 0; color:#666666; font-size:14px;">Receipt Number:</td>
+                    <td style="padding:5px 0; color:#333333; font-size:14px; font-weight:bold; text-align:right;">{{.ReceiptNumber}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:5px 0; color:#666666; font-size:14px;">Receipt Date:</td>
+                    <td style="padding:5px 0; color:#333333; font-size:14px; text-align:right;">{{.ReceiptDate}}</td>
+                  </tr>
+                  {{if .InvoiceNumber}}
+                  <tr>
+                    <td style="padding:5px 0; color:#666666; font-size:14px;">Invoice Number:</td>
+                    <td style="padding:5px 0; color:#333333; font-size:14px; text-align:right;">{{.InvoiceNumber}}</td>
+                  </tr>
+                  {{end}}
+                  {{if .Terms}}
+                  <tr>
+                    <td style="padding:5px 0; color:#666666; font-size:14px;">Terms:</td>
+                    <td style="padding:5px 0; color:#333333; font-size:14px; text-align:right;">{{.Terms}}</td>
+                  </tr>
+                  {{end}}
+                  {{if .PONumber}}
+                  <tr>
+                    <td style="padding:5px 0; color:#666666; font-size:14px;">P.O. Number:</td>
+                    <td style="padding:5px 0; color:#333333; font-size:14px; text-align:right;">{{.PONumber}}</td>
+                  </tr>
+                  {{end}}
+                </table>
+                <table cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse; margin-bottom:20px;">
+                  <thead>
+                    <tr style="background-color:#F7EFEA;">
+                      <th style="padding:12px 10px; text-align:center; font-size:13px; color:#F46133; font-weight:600; border-bottom:2px solid #F6b08A;">Qty</th>
+                      <th style="padding:12px 10px; text-align:center; font-size:13px; color:#F46133; font-weight:600; border-bottom:2px solid #F6b08A;">Unit</th>
+                      <th style="padding:12px 10px; text-align:left; font-size:13px; color:#F46133; font-weight:600; border-bottom:2px solid #F6b08A;">Articles</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{range .LineItems}}
+                    <tr>
+                      <td style="padding:12px 10px; font-size:14px; color:#333333; border-bottom:1px solid #F6b08A; text-align:center;">{{.Quantity}}</td>
+                      <td style="padding:12px 10px; font-size:14px; color:#333333; border-bottom:1px solid #F6b08A; text-align:center;">{{.Unit}}</td>
+                      <td style="padding:12px 10px; font-size:14px; color:#333333; border-bottom:1px solid #F6b08A;">{{.Description}}</td>
+                    </tr>
+                    {{end}}
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="background-color:#F46133; color:#ffffff; padding: 20px; font-size:12px;">
+                <p style="margin:0 0 10px;">For questions about this delivery receipt, contact us at {{.MobileNo}} or {{.EMail}}.</p>
+                <p style="margin:0; color:#ffffffcc;">This is an automated message — please do not reply directly to this email.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

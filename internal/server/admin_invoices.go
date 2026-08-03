@@ -37,8 +37,15 @@ func (s *Server) adminInvoicesListPageHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	canManage := s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_INVOICES)
-	if err := compadmin.AdminInvoicesListPage(config, canManage).Render(ctx, w); err != nil {
+	access := compadmin.InvoicePageAccess{
+		CanManageInvoices:           s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_INVOICES),
+		CanCreateInvoice:            s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_INVOICES) || s.HasRole(ctx, enums.STAFF_ROLE_CREATE_INVOICE),
+		CanAccessDeliveryReceipts:   s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_DELIVERY_RECEIPTS) || s.HasRole(ctx, enums.STAFF_ROLE_CREATE_DELIVERY_RECEIPT),
+		CanCreateDeliveryReceipt:    s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_DELIVERY_RECEIPTS) || s.HasRole(ctx, enums.STAFF_ROLE_CREATE_DELIVERY_RECEIPT),
+		CanAccessCollectionReceipts: s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_COLLECTION_RECEIPTS) || s.HasRole(ctx, enums.STAFF_ROLE_CREATE_COLLECTION_RECEIPT),
+		CanCreateCollectionReceipt:  s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_COLLECTION_RECEIPTS) || s.HasRole(ctx, enums.STAFF_ROLE_CREATE_COLLECTION_RECEIPT),
+	}
+	if err := compadmin.AdminInvoicesListPage(config, access).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, err.Error()))
 		return
@@ -327,14 +334,8 @@ func (s *Server) adminInvoicesGenerateModalHandler(w http.ResponseWriter, r *htt
 		return
 	}
 
-	products, err := s.services.invoice.ListProductsForLineItems(ctx)
-	if err != nil {
-		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
-		products = nil
-	}
-
 	canManage := s.HasRole(ctx, enums.STAFF_ROLE_MANAGE_INVOICES)
-	if err := compadmin.InvoiceGenerateModal(config, recipients, products, canManage).Render(ctx, w); err != nil {
+	if err := compadmin.InvoiceGenerateModal(config, recipients, canManage).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
 		redirectHX(w, r, utils.URLWithError(adminInvoicesPage, errs.ErrRenderFailed.Error()))
 	}
@@ -357,7 +358,11 @@ func (s *Server) adminInvoicesCreateHandler(w http.ResponseWriter, r *http.Reque
 		TransactionType:         strings.TrimSpace(f.TransactionType),
 		RecipientRegisteredName: strings.TrimSpace(f.RecipientRegisteredName),
 		Notes:                   strings.TrimSpace(f.Notes),
+		IssueDate:               strings.TrimSpace(f.IssueDate),
+		DeliveryDate:            strings.TrimSpace(f.DeliveryDate),
 		DueDate:                 strings.TrimSpace(f.DueDate),
+		PaymentTermsValue:       f.PaymentTermsValue,
+		PaymentTermsUnit:        strings.TrimSpace(f.PaymentTermsUnit),
 	}
 	if canManage {
 		in.WithholdingTax = strings.TrimSpace(f.WithholdingTax)
@@ -687,6 +692,71 @@ func buildInvoiceNewRecipient(f forms.AdminInvoiceCreateForm) *services.InvoiceR
 		RegisteredName: regName,
 		Notes:          strings.TrimSpace(nr.Notes),
 	}
+}
+
+func (s *Server) adminInvoicesProductsSearchHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Invoices Products Search Handler]"
+	ctx := r.Context()
+
+	var q forms.AdminInvoiceEntitySearchQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+		writeInvoiceJSONError(w, http.StatusBadRequest, errs.ErrInvalidParams.Error())
+		return
+	}
+
+	products, err := s.services.invoice.SearchProductsForLineItems(ctx, q.Q, 20)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		writeInvoiceJSONError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	items := make([]map[string]any, 0, len(products))
+	for _, p := range products {
+		items = append(items, map[string]any{
+			"id":             p.ID,
+			"label":          services.ProductOptionLabel(p),
+			"name":           p.Name,
+			"serial":         p.Serial,
+			"price_centavos": p.UnitPrice,
+		})
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(map[string]any{"items": items})
+}
+
+func (s *Server) adminInvoicesSearchHandler(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Admin Invoices Search Handler]"
+	ctx := r.Context()
+
+	var q forms.AdminInvoiceEntitySearchQuery
+	if err := httputil.BindQuery(r, &q); err != nil {
+		logs.LogCtx(ctx).Warn(logtag, zap.Error(err))
+		writeInvoiceJSONError(w, http.StatusBadRequest, errs.ErrInvalidParams.Error())
+		return
+	}
+
+	invoices, err := s.services.invoice.SearchInvoices(ctx, q.Q, 20)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		writeInvoiceJSONError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	items := make([]map[string]any, 0, len(invoices))
+	for _, inv := range invoices {
+		items = append(items, map[string]any{
+			"id":             inv.ID,
+			"label":          services.InvoiceSearchLabel(inv),
+			"invoice_number": inv.InvoiceNumber,
+			"total":          inv.Total,
+		})
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(map[string]any{"items": items})
 }
 
 func writeInvoiceJSONError(w http.ResponseWriter, status int, message string) {

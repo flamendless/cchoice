@@ -26,6 +26,8 @@ const (
 	ModuleInvoices             = "invoices"
 	ModuleInvoiceConfig        = "invoice_config"
 	ModuleInvoiceRecipients    = "invoice_recipients"
+	ModuleDeliveryReceipts     = "delivery_receipts"
+	ModuleCollectionReceipts   = "collection_receipts"
 	ModuleMemos                = "memos"
 	ModuleOrders               = "orders"
 	ModuleQuotations           = "quotations"

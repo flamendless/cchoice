@@ -51,6 +51,8 @@ type Services struct {
 	passwordReset     *services.PasswordResetService
 	holiday           *services.HolidayService
 	invoice           *services.InvoiceService
+	deliveryReceipt   *services.DeliveryReceiptService
+	collectionReceipt *services.CollectionReceiptService
 	location          *services.LocationService
 	memo              *services.MemoService
 	product           *services.ProductService
@@ -87,7 +89,9 @@ type Server struct {
 	sessionManager     *scs.SessionManager
 	mailJobRunner      *jobs.EmailJobRunner
 	thumbnailJobRunner *jobs.ThumbnailJobRunner
-	invoiceJobRunner   *jobs.InvoiceJobRunner
+	invoiceJobRunner           *jobs.InvoiceJobRunner
+	deliveryReceiptJobRunner   *jobs.DeliveryReceiptJobRunner
+	collectionReceiptJobRunner *jobs.CollectionReceiptJobRunner
 	rateLimiter        *middleware.RateLimiter
 	address            string
 	services           Services
@@ -148,6 +152,8 @@ func NewServer() *ServerInstance {
 	var thumbnailService *services.ThumbnailService
 	var thumbnailJobRunner *jobs.ThumbnailJobRunner
 	var invoiceJobRunner *jobs.InvoiceJobRunner
+	var deliveryReceiptJobRunner *jobs.DeliveryReceiptJobRunner
+	var collectionReceiptJobRunner *jobs.CollectionReceiptJobRunner
 
 	if cfg.IsWeb() {
 		objStorage, productImageFS = mustInitStorageProvider()
@@ -187,7 +193,9 @@ func NewServer() *ServerInstance {
 		mailJobRunner:      emailJobRunner,
 		thumbnailService:   thumbnailService,
 		thumbnailJobRunner: thumbnailJobRunner,
-		invoiceJobRunner:   invoiceJobRunner,
+		invoiceJobRunner:           invoiceJobRunner,
+		deliveryReceiptJobRunner:   deliveryReceiptJobRunner,
+		collectionReceiptJobRunner: collectionReceiptJobRunner,
 		useHTTP2:           cfg.Server.UseHTTP2,
 		useSSL:             cfg.Server.UseSSL,
 		rateLimiter: middleware.NewRateLimiterWithDebug(
@@ -221,6 +229,8 @@ func NewServer() *ServerInstance {
 		cpointToken:       cpointTokenService,
 		holiday:           holidayService,
 		invoice:           services.NewInvoiceService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, mailService),
+		deliveryReceipt:   nil, // set after invoice
+		collectionReceipt: nil,
 		location:          services.NewLocationService(cfg.Settings.ShopLocation),
 		memo:              services.NewMemoService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, emailJobRunner),
 		product:           productService,
@@ -239,8 +249,17 @@ func NewServer() *ServerInstance {
 		order:             services.NewOrderService(newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, emailJobRunner),
 	}
 
+	newServer.services.deliveryReceipt = services.NewDeliveryReceiptService(
+		newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, mailService, newServer.services.invoice,
+	)
+	newServer.services.collectionReceipt = services.NewCollectionReceiptService(
+		newServer.encoder, newServer.dbRO, newServer.dbRW, staffLogService, mailService, newServer.services.invoice,
+	)
+
 	if cfg.IsProd() || cfg.Test.LocalInvoiceJobs {
 		newServer.invoiceJobRunner = jobs.NewInvoiceJobRunner(dbRW.GetDB(), dbRO, dbRW, newServer.services.invoice)
+		newServer.deliveryReceiptJobRunner = jobs.NewDeliveryReceiptJobRunner(dbRW.GetDB(), dbRO, dbRW, newServer.services.deliveryReceipt)
+		newServer.collectionReceiptJobRunner = jobs.NewCollectionReceiptJobRunner(dbRW.GetDB(), dbRO, dbRW, newServer.services.collectionReceipt)
 	}
 
 	newServer.services.all = []services.IService{
@@ -255,6 +274,8 @@ func NewServer() *ServerInstance {
 		newServer.services.productBulkImport,
 		newServer.services.holiday,
 		newServer.services.invoice,
+		newServer.services.deliveryReceipt,
+		newServer.services.collectionReceipt,
 		newServer.services.image,
 		newServer.services.location,
 		newServer.services.memo,

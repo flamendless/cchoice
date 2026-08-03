@@ -113,13 +113,18 @@
     var recipientId = recipientSelect ? recipientSelect.value : "";
     var registeredName = ((m.querySelector("#invoice-registered-name") || {}).value || "").trim();
     var isNewRecipient = recipientId === "__new__" || (!recipientId && registeredName);
+    var paymentTermsValue = parseInt((m.querySelector("#invoice-payment-terms-value") || {}).value, 10) || 0;
     var payload = {
       recipient_id: isNewRecipient ? "" : recipientId,
       new_recipient: null,
       transaction_type: (m.querySelector("#invoice-transaction-type") || {}).value || "CASH_SALES",
       recipient_registered_name: registeredName,
       notes: (m.querySelector("#invoice-notes") || {}).value || "",
+      issue_date: (m.querySelector("#invoice-issue-date") || {}).value || "",
+      delivery_date: (m.querySelector("#invoice-delivery-date") || {}).value || "",
       due_date: (m.querySelector("#invoice-due-date") || {}).value || "",
+      payment_terms_value: paymentTermsValue,
+      payment_terms_unit: (m.querySelector("#invoice-payment-terms-unit") || {}).value || "",
       withholding_tax: canManage() ? (m.querySelector("#invoice-withholding-tax") || {}).value || "" : "",
       sc_pwd_discount: canManage() ? (m.querySelector("#invoice-sc-pwd-discount") || {}).value || "" : "",
       add_vat: canManage() ? (m.querySelector("#invoice-add-vat") || {}).value || "" : "",
@@ -244,6 +249,66 @@
       });
   }
 
+  function todayPH() {
+    var m = modal();
+    if (m && m.dataset.todayPh) {
+      return m.dataset.todayPh;
+    }
+    return todayISO();
+  }
+
+  function todayISO() {
+    var d = new Date();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+
+  function parseISODate(s) {
+    if (!s) return null;
+    var parts = s.split("-");
+    if (parts.length !== 3) return null;
+    return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+  }
+
+  function formatISODate(d) {
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+
+  function computeDueDate() {
+    var m = modal();
+    if (!m) return;
+    var base = (m.querySelector("#invoice-issue-date") || {}).value || (m.querySelector("#invoice-delivery-date") || {}).value || todayPH();
+    var value = parseInt((m.querySelector("#invoice-payment-terms-value") || {}).value, 10) || 0;
+    var unit = (m.querySelector("#invoice-payment-terms-unit") || {}).value || "";
+    var start = parseISODate(base);
+    if (!start || value <= 0 || !unit) return;
+    var due = new Date(start.getTime());
+    if (unit === "DAYS") {
+      due.setMonth(due.getMonth() + Math.floor(value / 30));
+      due.setDate(due.getDate() + (value % 30));
+    } else if (unit === "MONTHS") {
+      due.setMonth(due.getMonth() + value);
+    } else if (unit === "YEARS") {
+      due.setFullYear(due.getFullYear() + value);
+    } else {
+      return;
+    }
+    var dueInput = m.querySelector("#invoice-due-date");
+    if (dueInput) dueInput.value = formatISODate(due);
+  }
+
+  function isDueDateTrigger(el) {
+    if (!el || !el.id) return false;
+    return (
+      el.id === "invoice-issue-date" ||
+      el.id === "invoice-payment-terms-value" ||
+      el.id === "invoice-payment-terms-unit"
+    );
+  }
+
   document.addEventListener("click", function (e) {
     var m = modal();
     if (!m) return;
@@ -257,13 +322,20 @@
 
     if (e.target.closest("#invoice-add-product")) {
       e.preventDefault();
-      var sel = m.querySelector("#invoice-product-select");
-      if (!sel || !sel.value) return;
-      var opt = sel.options[sel.selectedIndex];
-      var name = opt.getAttribute("data-name") || opt.textContent.trim();
-      var priceCentavos = parseInt(opt.getAttribute("data-price") || "0", 10) || 0;
+      var productId = (m.querySelector("#invoice-product-id") || {}).value || "";
+      if (!productId) return;
+      var productName = (m.querySelector("#invoice-product-name") || {}).value || "";
+      var priceCentavos = parseInt((m.querySelector("#invoice-product-price-centavos") || {}).value, 10) || 0;
       var pricePesos = (priceCentavos / 100).toFixed(2);
-      m.querySelector("#invoice-lines").appendChild(makeRow(name, pricePesos, sel.value));
+      m.querySelector("#invoice-lines").appendChild(makeRow(productName, pricePesos, productId));
+      var searchInput = m.querySelector("#invoice-product-search");
+      var hiddenId = m.querySelector("#invoice-product-id");
+      var hiddenName = m.querySelector("#invoice-product-name");
+      var hiddenPrice = m.querySelector("#invoice-product-price-centavos");
+      if (searchInput) searchInput.value = "";
+      if (hiddenId) hiddenId.value = "";
+      if (hiddenName) hiddenName.value = "";
+      if (hiddenPrice) hiddenPrice.value = "";
       recompute();
       return;
     }
@@ -287,6 +359,10 @@
   document.addEventListener("input", function (e) {
     var m = modal();
     if (!m || !m.contains(e.target)) return;
+    if (isDueDateTrigger(e.target)) {
+      computeDueDate();
+      return;
+    }
     if (
       e.target.closest(".invoice-line-row") ||
       e.target.id === "invoice-withholding-tax" ||
@@ -300,6 +376,10 @@
   document.addEventListener("change", function (e) {
     var m = modal();
     if (!m || !m.contains(e.target)) return;
+    if (isDueDateTrigger(e.target)) {
+      computeDueDate();
+      return;
+    }
     if (e.target.id === "invoice-recipient-select") {
       var newBox = m.querySelector("#invoice-new-recipient");
       if (newBox) {
@@ -311,12 +391,41 @@
     }
   });
 
+  function initProductSearch() {
+    var m = modal();
+    if (!m || !window.AdminEntitySearch) return;
+    window.AdminEntitySearch.bind(m, {
+      searchInputId: "invoice-product-search",
+      hiddenInputId: "invoice-product-id",
+      searchUrl: m.dataset.productSearchUrl,
+      onSelect: function (item) {
+        var nameInput = m.querySelector("#invoice-product-name");
+        var priceInput = m.querySelector("#invoice-product-price-centavos");
+        if (nameInput) nameInput.value = item.name || "";
+        if (priceInput) priceInput.value = String(item.price_centavos || 0);
+      },
+      onClear: function () {
+        var nameInput = m.querySelector("#invoice-product-name");
+        var priceInput = m.querySelector("#invoice-product-price-centavos");
+        if (nameInput) nameInput.value = "";
+        if (priceInput) priceInput.value = "";
+      },
+    });
+  }
+
   document.body.addEventListener("htmx:afterSwap", function (evt) {
     if (evt.detail && evt.detail.target && evt.detail.target.id === "invoice-generate-modal-container") {
       var m = modal();
-      if (m && m.querySelector("#invoice-lines") && m.querySelectorAll(".invoice-line-row").length === 0) {
-        m.querySelector("#invoice-lines").appendChild(makeRow("", "", ""));
-        recompute();
+      if (m) {
+        var issueDate = m.querySelector("#invoice-issue-date");
+        if (issueDate && !issueDate.value) {
+          issueDate.value = todayPH();
+        }
+        if (m.querySelector("#invoice-lines") && m.querySelectorAll(".invoice-line-row").length === 0) {
+          m.querySelector("#invoice-lines").appendChild(makeRow("", "", ""));
+          recompute();
+        }
+        initProductSearch();
       }
     }
   });

@@ -22,7 +22,16 @@ import (
 
 const invoiceTextareaClass = "px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full resize-y min-h-[4rem] max-h-48"
 
-func AdminInvoicesListPage(config services.InvoiceConfig, canManage bool) templ.Component {
+type InvoicePageAccess struct {
+	CanManageInvoices           bool
+	CanCreateInvoice            bool
+	CanAccessDeliveryReceipts   bool
+	CanCreateDeliveryReceipt    bool
+	CanAccessCollectionReceipts bool
+	CanCreateCollectionReceipt  bool
+}
+
+func AdminInvoicesListPage(config services.InvoiceConfig, access InvoicePageAccess) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -79,23 +88,33 @@ func AdminInvoicesListPage(config services.InvoiceConfig, canManage bool) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = InvoicePageHeader(config).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"mb-6\"><h1 class=\"text-2xl font-bold text-primary\">Invoices</h1></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = InvoiceToolbar(canManage).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = InvoiceToolbar(access).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = InvoiceRecipientsCollapsibleSection(canManage).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = InvoiceRecipientsCollapsibleSection(access.CanManageInvoices).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = InvoicesCollapsibleSection().Render(ctx, templ_7745c5c3_Buffer)
+		if access.CanCreateInvoice {
+			templ_7745c5c3_Err = InvoicesCollapsibleSection().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = DeliveryReceiptsCollapsibleSection(access.CanAccessDeliveryReceipts).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div></div></div><div id=\"invoice-config-modal-container\"></div><div id=\"invoice-recipient-modal-container\"></div><div id=\"invoice-generate-modal-container\"></div><div id=\"invoice-preview-modal-container\"></div>")
+		templ_7745c5c3_Err = CollectionReceiptsCollapsibleSection(access.CanAccessCollectionReceipts).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div></div><div id=\"invoice-config-modal-container\"></div><div id=\"invoice-recipient-modal-container\"></div><div id=\"invoice-generate-modal-container\"></div><div id=\"invoice-preview-modal-container\"></div><div id=\"delivery-receipt-generate-modal-container\"></div><div id=\"delivery-receipt-preview-modal-container\"></div><div id=\"collection-receipt-generate-modal-container\"></div><div id=\"collection-receipt-preview-modal-container\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -107,7 +126,15 @@ func AdminInvoicesListPage(config services.InvoiceConfig, canManage bool) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</body></html>")
+		templ_7745c5c3_Err = ScrDeliveryReceiptGenerate().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ScrCollectionReceiptGenerate().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -115,7 +142,7 @@ func AdminInvoicesListPage(config services.InvoiceConfig, canManage bool) templ.
 	})
 }
 
-func InvoicePageHeader(config services.InvoiceConfig) templ.Component {
+func InvoiceToolbar(access InvoicePageAccess) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -136,118 +163,92 @@ func InvoicePageHeader(config services.InvoiceConfig) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"flex flex-col items-center mb-6\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"flex flex-wrap items-center justify-center gap-3 mb-8 pb-6 border-b border-gray-200\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if config.LogoURL != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<img src=\"")
+		if access.CanManageInvoices {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<button type=\"button\" class=\"px-5 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 text-sm font-medium\" hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(config.LogoURL)
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/config"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 55, Col: 28}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 79, Col: 48}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" alt=\"Logo\" class=\"h-16 w-auto object-contain mb-3\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-target=\"#invoice-config-modal-container\" hx-swap=\"innerHTML\" _=\"on click call metrics_event('admin_exec', 'open invoice config')\">Configure</button> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<img src=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<button type=\"button\" disabled class=\"px-5 py-2 bg-gray-300 text-gray-500 rounded-md text-sm font-medium cursor-not-allowed opacity-60\" title=\"Requires invoice management permission\">Configure</button> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		if access.CanCreateInvoice {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<button type=\"button\" class=\"px-5 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm font-medium\" hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(constants.PathEmailLogoCDN)
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/generate"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 57, Col: 40}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 100, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" alt=\"C-Choice\" class=\"h-16 w-auto object-contain mb-3\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" hx-target=\"#invoice-generate-modal-container\" hx-swap=\"innerHTML\" _=\"on click call metrics_event('admin_exec', 'open invoice generator')\">Create Invoice</button> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<h1 class=\"text-2xl font-bold text-center text-primary\">Invoices</h1></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
+		if access.CanCreateDeliveryReceipt {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<button type=\"button\" class=\"px-5 py-2 bg-teal-700 text-white rounded-md hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 text-sm font-medium\" hx-get=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/delivery-receipts/generate"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 112, Col: 59}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-target=\"#delivery-receipt-generate-modal-container\" hx-swap=\"innerHTML\" _=\"on click call metrics_event('admin_exec', 'open delivery receipt generator')\">Create Delivery Receipt</button> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		return nil
-	})
-}
-
-func InvoiceToolbar(canManage bool) templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var5 == nil {
-			templ_7745c5c3_Var5 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"flex flex-wrap items-center justify-center gap-3 mb-8 pb-6 border-b border-gray-200\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if canManage {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<button type=\"button\" class=\"px-5 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 text-sm font-medium\" hx-get=\"")
+		if access.CanCreateCollectionReceipt {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<button type=\"button\" class=\"px-5 py-2 bg-indigo-700 text-white rounded-md hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 text-sm font-medium\" hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/config"))
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/collection-receipts/generate"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 69, Col: 48}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 124, Col: 61}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-target=\"#invoice-config-modal-container\" hx-swap=\"innerHTML\" _=\"on click call metrics_event('admin_exec', 'open invoice config')\">Configure</button> ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<button type=\"button\" disabled class=\"px-5 py-2 bg-gray-300 text-gray-500 rounded-md text-sm font-medium cursor-not-allowed opacity-60\" title=\"Requires invoice management permission\">Configure</button> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" hx-target=\"#collection-receipt-generate-modal-container\" hx-swap=\"innerHTML\" _=\"on click call metrics_event('admin_exec', 'open collection receipt generator')\">Create Collection Receipt</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<button type=\"button\" class=\"px-5 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm font-medium\" hx-get=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/generate"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 89, Col: 49}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" hx-target=\"#invoice-generate-modal-container\" hx-swap=\"innerHTML\" _=\"on click call metrics_event('admin_exec', 'open invoice generator')\">Create Invoice</button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -271,12 +272,12 @@ func InvoiceConfigModal(config services.InvoiceConfig) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var8 == nil {
-			templ_7745c5c3_Var8 = templ.NopComponent
+		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var7 == nil {
+			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Var9 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var8 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 			if !templ_7745c5c3_IsBuffer {
@@ -292,12 +293,12 @@ func InvoiceConfigModal(config services.InvoiceConfig) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var10 string
-			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/config"))
+			var templ_7745c5c3_Var9 string
+			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/config"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 102, Col: 48}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 138, Col: 48}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -313,8 +314,8 @@ func InvoiceConfigModal(config services.InvoiceConfig) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var11 = []any{invoiceTextareaClass}
-			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
+			var templ_7745c5c3_Var10 = []any{invoiceTextareaClass}
+			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var10...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -322,12 +323,12 @@ func InvoiceConfigModal(config services.InvoiceConfig) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var12 string
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var11).String())
+			var templ_7745c5c3_Var11 string
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var10).String())
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 1, Col: 0}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -335,12 +336,12 @@ func InvoiceConfigModal(config services.InvoiceConfig) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var13 string
-			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(config.Address)
+			var templ_7745c5c3_Var12 string
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(config.Address)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 114, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 150, Col: 85}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -372,12 +373,12 @@ func InvoiceConfigModal(config services.InvoiceConfig) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var14 string
-			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(orDefault(config.Currency, "PHP"))
+			var templ_7745c5c3_Var13 string
+			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(orDefault(config.Currency, "PHP"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 123, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 159, Col: 80}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -385,12 +386,12 @@ func InvoiceConfigModal(config services.InvoiceConfig) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var15 string
-			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(orDefault(config.VATPercentage, "12"))
+			var templ_7745c5c3_Var14 string
+			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(orDefault(config.VATPercentage, "12"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 127, Col: 112}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 163, Col: 112}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -422,8 +423,8 @@ func InvoiceConfigModal(config services.InvoiceConfig) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var16 = []any{invoiceTextareaClass}
-			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var16...)
+			var templ_7745c5c3_Var15 = []any{invoiceTextareaClass}
+			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var15...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -431,12 +432,12 @@ func InvoiceConfigModal(config services.InvoiceConfig) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var17 string
-			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var16).String())
+			var templ_7745c5c3_Var16 string
+			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var15).String())
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 1, Col: 0}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -444,12 +445,12 @@ func InvoiceConfigModal(config services.InvoiceConfig) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var18 string
-			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(config.BIRBookletsInfo)
+			var templ_7745c5c3_Var17 string
+			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(config.BIRBookletsInfo)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 138, Col: 103}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 174, Col: 103}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -457,8 +458,8 @@ func InvoiceConfigModal(config services.InvoiceConfig) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var19 = []any{invoiceTextareaClass}
-			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var19...)
+			var templ_7745c5c3_Var18 = []any{invoiceTextareaClass}
+			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var18...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -466,12 +467,12 @@ func InvoiceConfigModal(config services.InvoiceConfig) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var20 string
-			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var19).String())
+			var templ_7745c5c3_Var19 string
+			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var18).String())
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 1, Col: 0}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var20)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -479,12 +480,12 @@ func InvoiceConfigModal(config services.InvoiceConfig) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var21 string
-			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(config.FooterNotes)
+			var templ_7745c5c3_Var20 string
+			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(config.FooterNotes)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 142, Col: 137}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 178, Col: 137}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -510,7 +511,7 @@ func InvoiceConfigModal(config services.InvoiceConfig) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = invoiceWideModalShell("invoice-config-modal", "Business Invoice Configuration").Render(templ.WithChildren(ctx, templ_7745c5c3_Var9), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = invoiceWideModalShell("invoice-config-modal", "Business Invoice Configuration").Render(templ.WithChildren(ctx, templ_7745c5c3_Var8), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -534,25 +535,38 @@ func ScrInvoiceGenerate() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var22 == nil {
-			templ_7745c5c3_Var22 = templ.NopComponent
+		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var21 == nil {
+			templ_7745c5c3_Var21 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<script type=\"text/javascript\" src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		var templ_7745c5c3_Var22 string
+		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL(utils.VersionedAsset("/static/js/admin_entity_search.js")))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 202, Col: 106}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\"></script><script type=\"text/javascript\" src=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL(utils.VersionedAsset("/static/js/invoice_generate.js")))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 166, Col: 103}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 203, Col: 103}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\"></script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\"></script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -581,79 +595,79 @@ func invoiceTextField(name string, label string, value string, placeholder strin
 			templ_7745c5c3_Var24 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<label class=\"block text-sm font-medium text-gray-700 mb-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<label class=\"block text-sm font-medium text-gray-700 mb-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 171, Col: 9}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 208, Col: 9}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, " ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, " ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if required {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<span class=\"text-red-500\">*</span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<span class=\"text-red-500\">*</span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</label> <input type=\"text\" name=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</label> <input type=\"text\" name=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 178, Col: 13}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 215, Col: 13}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 179, Col: 15}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 216, Col: 15}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" placeholder=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" placeholder=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.ResolveAttributeValue(placeholder)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 180, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 217, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if required {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, " required")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, " required")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, " class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, " class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -682,46 +696,46 @@ func invoiceDateFieldWrap(name string, label string, value string) templ.Compone
 			templ_7745c5c3_Var29 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<div><label class=\"block text-sm font-medium text-gray-700 mb-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<div><label class=\"block text-sm font-medium text-gray-700 mb-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var30 string
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 190, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 227, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</label> <input type=\"date\" name=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</label> <input type=\"date\" name=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.ResolveAttributeValue(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 193, Col: 14}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 230, Col: 14}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var31)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var32 string
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.ResolveAttributeValue(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 194, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 231, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -750,7 +764,7 @@ func invoiceTextFieldWrap(name string, label string, value string, placeholder s
 			templ_7745c5c3_Var33 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "<div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -758,7 +772,7 @@ func invoiceTextFieldWrap(name string, label string, value string, placeholder s
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -787,56 +801,56 @@ func InvoiceRecipientsCollapsibleSection(canManage bool) templ.Component {
 			templ_7745c5c3_Var34 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "<details class=\"mb-6 border border-gray-200 rounded-lg\" open><summary class=\"cursor-pointer select-none px-4 py-3 bg-gray-50 rounded-lg font-semibold text-gray-900 hover:bg-gray-100\">Recipients / Clients</summary><div class=\"p-4\"><div class=\"flex flex-wrap items-center justify-between gap-3 mb-4\"><p class=\"text-sm text-gray-500\">Clients you issue invoices to.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<details class=\"mb-6 border border-gray-200 rounded-lg\"><summary class=\"cursor-pointer select-none px-4 py-3 bg-gray-50 rounded-lg font-semibold text-gray-900 hover:bg-gray-100\">Recipients / Clients</summary><div class=\"p-4\"><div class=\"flex flex-wrap items-center justify-between gap-3 mb-4\"><p class=\"text-sm text-gray-500\">Clients you issue invoices to.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if canManage {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<button type=\"button\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm\" hx-get=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "<button type=\"button\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm\" hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var35 string
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/recipients/create"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 218, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 255, Col: 61}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\" hx-target=\"#invoice-recipient-modal-container\" hx-swap=\"innerHTML\">Add Recipient</button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "\" hx-target=\"#invoice-recipient-modal-container\" hx-swap=\"innerHTML\">Add Recipient</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</div><form class=\"flex gap-2 items-center mb-4\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "</div><form class=\"flex gap-2 items-center mb-4\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var36 string
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/recipients/table"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 228, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 265, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "\" hx-target=\"#invoice-recipients-table-content\" hx-swap=\"innerHTML\"><input type=\"search\" name=\"search\" placeholder=\"Search recipients...\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"> <button type=\"submit\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm\">Search</button></form><div hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "\" hx-target=\"#invoice-recipients-table-content\" hx-swap=\"innerHTML\"><input type=\"search\" name=\"search\" placeholder=\"Search recipients...\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary\"> <button type=\"submit\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm\">Search</button></form><div hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var37 string
 		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/recipients/table"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 236, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 273, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "\" hx-trigger=\"load\" hx-target=\"#invoice-recipients-table-content\" hx-swap=\"innerHTML\"><div id=\"invoice-recipients-table-content\"></div></div></div></details>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "\" hx-trigger=\"load\" hx-target=\"#invoice-recipients-table-content\" hx-swap=\"innerHTML\"><div id=\"invoice-recipients-table-content\"></div></div></div></details>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -865,7 +879,7 @@ func AdminInvoiceRecipientsTableContent(recipients []services.InvoiceRecipient, 
 			templ_7745c5c3_Var38 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "<div id=\"invoice-recipients-table-content\"><div id=\"invoice-recipients-pagination-top\" hx-swap-oob=\"true\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "<div id=\"invoice-recipients-table-content\"><div id=\"invoice-recipients-pagination-top\" hx-swap-oob=\"true\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -873,7 +887,7 @@ func AdminInvoiceRecipientsTableContent(recipients []services.InvoiceRecipient, 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -885,7 +899,7 @@ func AdminInvoiceRecipientsTableContent(recipients []services.InvoiceRecipient, 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -914,76 +928,63 @@ func AdminInvoiceRecipientsTable(recipients []services.InvoiceRecipient, canMana
 			templ_7745c5c3_Var39 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<div class=\"overflow-x-auto\"><table class=\"min-w-full divide-y divide-gray-200\"><thead class=\"bg-gray-50\"><tr><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Name</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Email</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Contact</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">TIN</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Registered Name</th>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "<div class=\"overflow-x-auto\"><table class=\"min-w-full divide-y divide-gray-200\"><thead class=\"bg-gray-50\"><tr><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Name</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Email</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Contact</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">TIN</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Registered Name</th>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if canManage {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "<th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Actions</th>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "<th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Actions</th>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "</tr></thead> <tbody class=\"bg-white divide-y divide-gray-200\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "</tr></thead> <tbody class=\"bg-white divide-y divide-gray-200\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(recipients) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "<tr><td colspan=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "<tr><td colspan=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var40 string
 			templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.ResolveAttributeValue(recipientColspan(canManage))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 275, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 312, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var40)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\" class=\"px-4 py-4 text-center text-gray-500\">No recipients found.</td></tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\" class=\"px-4 py-4 text-center text-gray-500\">No recipients found.</td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
 			for _, recipient := range recipients {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "<tr id=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "<tr id=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var41 string
 				templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("invoice-recipient-row-%s", recipient.ID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 281, Col: 68}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 318, Col: 68}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var41)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\"><td class=\"px-4 py-3 whitespace-nowrap text-sm text-gray-900\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "\"><td class=\"px-4 py-3 whitespace-nowrap text-sm text-gray-900\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var42 string
 				templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(recipient.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 282, Col: 85}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 319, Col: 85}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "</td><td class=\"px-4 py-3 whitespace-nowrap text-sm text-gray-600\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var43 string
-				templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(orDash(recipient.Email))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 283, Col: 94}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -991,12 +992,12 @@ func AdminInvoiceRecipientsTable(recipients []services.InvoiceRecipient, canMana
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var44 string
-				templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(orDash(recipient.ContactNumber))
+				var templ_7745c5c3_Var43 string
+				templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(orDash(recipient.Email))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 284, Col: 102}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 320, Col: 94}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1004,12 +1005,12 @@ func AdminInvoiceRecipientsTable(recipients []services.InvoiceRecipient, canMana
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var45 string
-				templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(orDash(recipient.TIN))
+				var templ_7745c5c3_Var44 string
+				templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(orDash(recipient.ContactNumber))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 285, Col: 92}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 321, Col: 102}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1017,71 +1018,84 @@ func AdminInvoiceRecipientsTable(recipients []services.InvoiceRecipient, canMana
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
+				var templ_7745c5c3_Var45 string
+				templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(orDash(recipient.TIN))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 322, Col: 92}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "</td><td class=\"px-4 py-3 whitespace-nowrap text-sm text-gray-600\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 				var templ_7745c5c3_Var46 string
 				templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.JoinStringErrs(orDash(recipient.RegisteredName))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 286, Col: 103}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 323, Col: 103}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var46))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "</td>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "</td>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if canManage {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "<td class=\"px-4 py-3 whitespace-nowrap text-sm\"><div class=\"flex items-center gap-2\"><button type=\"button\" class=\"text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium\" hx-get=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "<td class=\"px-4 py-3 whitespace-nowrap text-sm\"><div class=\"flex items-center gap-2\"><button type=\"button\" class=\"text-white bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-xs font-medium\" hx-get=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var47 string
 					templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URLf("/admin/invoices/recipients/%s/edit", recipient.ID))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 293, Col: 82}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 330, Col: 82}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var47)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "\" hx-target=\"#invoice-recipient-modal-container\" hx-swap=\"innerHTML\">Edit</button> <button type=\"button\" class=\"text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs font-medium\" hx-delete=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "\" hx-target=\"#invoice-recipient-modal-container\" hx-swap=\"innerHTML\">Edit</button> <button type=\"button\" class=\"text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs font-medium\" hx-delete=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var48 string
 					templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URLf("/admin/invoices/recipients/%s", recipient.ID))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 302, Col: 80}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 339, Col: 80}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var48)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "\" hx-target=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "\" hx-target=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var49 string
 					templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("#invoice-recipient-row-%s", recipient.ID))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 303, Col: 77}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 340, Col: 77}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var49)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "\" hx-swap=\"outerHTML\" hx-confirm=\"Delete this recipient?\">Delete</button></div></td>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "\" hx-swap=\"outerHTML\" hx-confirm=\"Delete this recipient?\">Delete</button></div></td>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "</tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "</tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "</tbody></table></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "</tbody></table></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1204,87 +1218,87 @@ func InvoiceRecipientForm(recipient services.InvoiceRecipient, action string, me
 			templ_7745c5c3_Var54 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "<form")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "<form")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if method == "patch" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, " hx-patch=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, " hx-patch=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var55 string
 			templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.ResolveAttributeValue(action)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 335, Col: 20}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 372, Col: 20}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var55)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, " hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, " hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var56 string
 			templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.ResolveAttributeValue(action)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 337, Col: 19}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 374, Col: 19}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var56)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, " hx-swap=\"none\" class=\"flex flex-col gap-3\" data-recipients-table-url=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, " hx-swap=\"none\" class=\"flex flex-col gap-3\" data-recipients-table-url=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var57 string
 		templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/recipients/table"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 341, Col: 75}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 378, Col: 75}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var57)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "\" hx-on::after-request=\"if(event.detail.successful){document.getElementById('invoice-recipient-modal-container').innerHTML='';htmx.ajax('GET',event.target.dataset.recipientsTableUrl,{target:'#invoice-recipients-table-content',swap:'innerHTML'})}\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Name <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"name\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "\" hx-on::after-request=\"if(event.detail.successful){document.getElementById('invoice-recipient-modal-container').innerHTML='';htmx.ajax('GET',event.target.dataset.recipientsTableUrl,{target:'#invoice-recipients-table-content',swap:'innerHTML'})}\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Name <span class=\"text-red-500\">*</span></label> <input type=\"text\" name=\"name\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var58 string
 		templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.ResolveAttributeValue(recipient.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 346, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 383, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var58)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "\" required class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div class=\"grid grid-cols-1 sm:grid-cols-2 gap-3\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Email</label> <input type=\"email\" name=\"email\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "\" required class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div class=\"grid grid-cols-1 sm:grid-cols-2 gap-3\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Email</label> <input type=\"email\" name=\"email\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var59 string
 		templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.ResolveAttributeValue(recipient.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 351, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 388, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var59)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1292,7 +1306,7 @@ func InvoiceRecipientForm(recipient services.InvoiceRecipient, action string, me
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "</div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Address</label> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "</div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Address</label> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1301,7 +1315,7 @@ func InvoiceRecipientForm(recipient services.InvoiceRecipient, action string, me
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "<textarea name=\"address\" rows=\"2\" class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "<textarea name=\"address\" rows=\"2\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1314,46 +1328,46 @@ func InvoiceRecipientForm(recipient services.InvoiceRecipient, action string, me
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var62 string
 		templ_7745c5c3_Var62, templ_7745c5c3_Err = templ.JoinStringErrs(recipient.Address)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 359, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 396, Col: 87}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var62))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "</textarea></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Registered Name</label> <input type=\"text\" name=\"registered_name\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "</textarea></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Registered Name</label> <input type=\"text\" name=\"registered_name\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var63 string
 		templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.ResolveAttributeValue(recipient.RegisteredName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 363, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 400, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var63)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">TIN</label> <input type=\"text\" name=\"tin\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">TIN</label> <input type=\"text\" name=\"tin\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var64 string
 		templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.ResolveAttributeValue(recipient.TIN)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 367, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 404, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var64)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Notes</label> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Notes</label> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1362,7 +1376,7 @@ func InvoiceRecipientForm(recipient services.InvoiceRecipient, action string, me
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "<textarea name=\"notes\" rows=\"2\" class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 97, "<textarea name=\"notes\" rows=\"2\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1375,33 +1389,33 @@ func InvoiceRecipientForm(recipient services.InvoiceRecipient, action string, me
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 97, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 98, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var67 string
 		templ_7745c5c3_Var67, templ_7745c5c3_Err = templ.JoinStringErrs(recipient.Notes)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 371, Col: 83}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 408, Col: 83}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var67))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 98, "</textarea></div><div class=\"flex w-full gap-2 justify-end pt-2\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 99, "</textarea></div><div class=\"flex w-full gap-2 justify-end pt-2\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var68 string
 		templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.JoinStringErrs(submitLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 375, Col: 119}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 412, Col: 119}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var68))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 99, "</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, "</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1430,20 +1444,20 @@ func InvoicesCollapsibleSection() templ.Component {
 			templ_7745c5c3_Var69 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, "<details class=\"border border-gray-200 rounded-lg\" open><summary class=\"cursor-pointer select-none px-4 py-3 bg-gray-50 rounded-lg font-semibold text-gray-900 hover:bg-gray-100\">Invoices</summary><div class=\"p-4\"><p class=\"text-sm text-gray-500 mb-4\">View, preview, and email generated invoices.</p><div hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, "<details class=\"mb-6 border border-gray-200 rounded-lg\"><summary class=\"cursor-pointer select-none px-4 py-3 bg-gray-50 rounded-lg font-semibold text-gray-900 hover:bg-gray-100\">Invoices</summary><div class=\"p-4\"><p class=\"text-sm text-gray-500 mb-4\">View, preview, and email generated invoices.</p><div hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var70 string
 		templ_7745c5c3_Var70, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/table"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 388, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 425, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var70)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, "\" hx-trigger=\"load\" hx-target=\"#invoices-table-content\" hx-swap=\"innerHTML\"><div id=\"invoices-table-content\"></div></div></div></details>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "\" hx-trigger=\"load\" hx-target=\"#invoices-table-content\" hx-swap=\"innerHTML\"><div id=\"invoices-table-content\"></div></div></div></details>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1472,7 +1486,7 @@ func AdminInvoicesTableContent(invoices []services.InvoiceListItem, p models.Tab
 			templ_7745c5c3_Var71 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "<div id=\"invoices-table-content\"><div id=\"invoices-pagination-top\" hx-swap-oob=\"true\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "<div id=\"invoices-table-content\"><div id=\"invoices-pagination-top\" hx-swap-oob=\"true\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1480,7 +1494,7 @@ func AdminInvoicesTableContent(invoices []services.InvoiceListItem, p models.Tab
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1492,7 +1506,7 @@ func AdminInvoicesTableContent(invoices []services.InvoiceListItem, p models.Tab
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1521,40 +1535,27 @@ func AdminInvoicesTable(invoices []services.InvoiceListItem) templ.Component {
 			templ_7745c5c3_Var72 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "<div class=\"overflow-x-auto\"><table class=\"min-w-full divide-y divide-gray-200\"><thead class=\"bg-gray-50\"><tr><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Invoice #</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Recipient</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Issue Date</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Subtotal</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Status</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Actions</th></tr></thead> <tbody class=\"bg-white divide-y divide-gray-200\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "<div class=\"overflow-x-auto\"><table class=\"min-w-full divide-y divide-gray-200\"><thead class=\"bg-gray-50\"><tr><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Invoice #</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Recipient</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Issue Date</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Subtotal</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Status</th><th class=\"px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Actions</th></tr></thead> <tbody class=\"bg-white divide-y divide-gray-200\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(invoices) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "<tr><td colspan=\"6\" class=\"px-4 py-4 text-center text-gray-500\">No invoices yet.</td></tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, "<tr><td colspan=\"6\" class=\"px-4 py-4 text-center text-gray-500\">No invoices yet.</td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
 			for _, invoice := range invoices {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, "<tr><td class=\"px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, "<tr><td class=\"px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var73 string
 				templ_7745c5c3_Var73, templ_7745c5c3_Err = templ.JoinStringErrs(invoice.InvoiceNumber)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 430, Col: 104}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 467, Col: 104}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var73))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, "</td><td class=\"px-4 py-3 whitespace-nowrap text-sm text-gray-600\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var74 string
-				templ_7745c5c3_Var74, templ_7745c5c3_Err = templ.JoinStringErrs(invoiceListRecipient(invoice.RecipientEmail))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 431, Col: 115}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var74))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1562,118 +1563,131 @@ func AdminInvoicesTable(invoices []services.InvoiceListItem) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
+				var templ_7745c5c3_Var74 string
+				templ_7745c5c3_Var74, templ_7745c5c3_Err = templ.JoinStringErrs(invoiceListRecipient(invoice.RecipientEmail))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 468, Col: 115}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var74))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, "</td><td class=\"px-4 py-3 whitespace-nowrap text-sm text-gray-600\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 				var templ_7745c5c3_Var75 string
 				templ_7745c5c3_Var75, templ_7745c5c3_Err = templ.JoinStringErrs(invoice.IssueDate)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 432, Col: 88}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 469, Col: 88}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var75))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, "</td><td class=\"px-4 py-3 whitespace-nowrap text-sm text-gray-900\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "</td><td class=\"px-4 py-3 whitespace-nowrap text-sm text-gray-900\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var76 string
 				templ_7745c5c3_Var76, templ_7745c5c3_Err = templ.JoinStringErrs(invoice.Subtotal)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 433, Col: 87}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 470, Col: 87}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var76))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "</td><td class=\"px-4 py-3 whitespace-nowrap text-sm\"><span class=\"inline-flex px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, "</td><td class=\"px-4 py-3 whitespace-nowrap text-sm\"><span class=\"inline-flex px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var77 string
 				templ_7745c5c3_Var77, templ_7745c5c3_Err = templ.JoinStringErrs(invoice.Status.String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 435, Col: 128}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 472, Col: 128}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var77))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, "</span> ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, "</span> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if invoice.PDFReady {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, "<span class=\"ml-1 inline-flex px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700\">PDF Ready</span> ")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 114, "<span class=\"ml-1 inline-flex px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700\">PDF Ready</span> ")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
 				if invoice.Emailed {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 114, "<span class=\"ml-1 inline-flex px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700\">Emailed</span>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 115, "<span class=\"ml-1 inline-flex px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700\">Emailed</span>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 115, "</td><td class=\"px-4 py-3 whitespace-nowrap text-sm\"><div class=\"flex items-center gap-2\"><button type=\"button\" class=\"text-primary hover:underline text-xs font-medium\" hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 116, "</td><td class=\"px-4 py-3 whitespace-nowrap text-sm\"><div class=\"flex items-center gap-2\"><button type=\"button\" class=\"text-primary hover:underline text-xs font-medium\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var78 string
 				templ_7745c5c3_Var78, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URLf("/admin/invoices/%s/preview", invoice.ID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 448, Col: 71}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 485, Col: 71}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var78)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 116, "\" hx-target=\"#invoice-preview-modal-container\" hx-swap=\"innerHTML\">Preview</button> ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 117, "\" hx-target=\"#invoice-preview-modal-container\" hx-swap=\"innerHTML\">Preview</button> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if invoice.Emailed {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 117, "<button type=\"button\" disabled class=\"text-xs font-medium px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed\" title=\"Already sent via email\">Send via Email</button>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 118, "<button type=\"button\" disabled class=\"text-xs font-medium px-3 py-1 rounded bg-gray-200 text-gray-500 cursor-not-allowed\" title=\"Already sent via email\">Send via Email</button>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				} else {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 118, "<button type=\"button\" class=\"text-white bg-primary hover:bg-primary-dark px-3 py-1 rounded text-xs font-medium\" data-invoices-table-url=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 119, "<button type=\"button\" class=\"text-white bg-primary hover:bg-primary-dark px-3 py-1 rounded text-xs font-medium\" data-invoices-table-url=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var79 string
 					templ_7745c5c3_Var79, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/table"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 467, Col: 71}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 504, Col: 71}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var79)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 119, "\" hx-post=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 120, "\" hx-post=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var80 string
 					templ_7745c5c3_Var80, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URLf("/admin/invoices/%s/email", invoice.ID))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 468, Col: 71}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 505, Col: 71}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var80)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 120, "\" hx-confirm=\"Send this invoice to the recipient via email?\" hx-swap=\"none\" hx-on::after-request=\"if(event.detail.successful){htmx.ajax('GET',event.target.dataset.invoicesTableUrl,{target:'#invoices-table-content',swap:'innerHTML'})}\">Send via Email</button>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 121, "\" hx-confirm=\"Send this invoice to the recipient via email?\" hx-swap=\"none\" hx-on::after-request=\"if(event.detail.successful){htmx.ajax('GET',event.target.dataset.invoicesTableUrl,{target:'#invoices-table-content',swap:'innerHTML'})}\">Send via Email</button>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 121, "</div></td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 122, "</div></td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 122, "</tbody></table></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 123, "</tbody></table></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1702,33 +1716,33 @@ func invoiceModalShell(id string, title string) templ.Component {
 			templ_7745c5c3_Var81 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 123, "<div id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, "<div id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var82 string
 		templ_7745c5c3_Var82, templ_7745c5c3_Err = templ.ResolveAttributeValue(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 488, Col: 9}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 525, Col: 9}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var82)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, "\" class=\"fixed inset-0 z-50 flex items-center justify-center\" _=\"on closeModal set #invoice-recipient-modal-container.innerHTML to '' then set #invoice-generate-modal-container.innerHTML to '' then set #invoice-config-modal-container.innerHTML to '' then set #invoice-preview-modal-container.innerHTML to '' end\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 125, "\" class=\"fixed inset-0 z-50 flex items-center justify-center\" _=\"on closeModal set #invoice-recipient-modal-container.innerHTML to '' then set #invoice-generate-modal-container.innerHTML to '' then set #invoice-config-modal-container.innerHTML to '' then set #invoice-preview-modal-container.innerHTML to '' then set #delivery-receipt-generate-modal-container.innerHTML to '' then set #delivery-receipt-preview-modal-container.innerHTML to '' then set #collection-receipt-generate-modal-container.innerHTML to '' then set #collection-receipt-preview-modal-container.innerHTML to '' end\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var83 string
 		templ_7745c5c3_Var83, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 495, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 532, Col: 59}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var83))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 125, "</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 126, "</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1736,7 +1750,7 @@ func invoiceModalShell(id string, title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 126, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 127, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1765,33 +1779,33 @@ func invoiceWideModalShell(id string, title string) templ.Component {
 			templ_7745c5c3_Var84 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 127, "<div id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 128, "<div id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var85 string
 		templ_7745c5c3_Var85, templ_7745c5c3_Err = templ.ResolveAttributeValue(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 509, Col: 9}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 546, Col: 9}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var85)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 128, "\" class=\"fixed inset-0 z-50 flex items-center justify-center\" _=\"on closeModal set #invoice-recipient-modal-container.innerHTML to '' then set #invoice-generate-modal-container.innerHTML to '' then set #invoice-config-modal-container.innerHTML to '' then set #invoice-preview-modal-container.innerHTML to '' end\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 overflow-y-auto max-h-[92vh]\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, "\" class=\"fixed inset-0 z-50 flex items-center justify-center\" _=\"on closeModal set #invoice-recipient-modal-container.innerHTML to '' then set #invoice-generate-modal-container.innerHTML to '' then set #invoice-config-modal-container.innerHTML to '' then set #invoice-preview-modal-container.innerHTML to '' then set #delivery-receipt-generate-modal-container.innerHTML to '' then set #delivery-receipt-preview-modal-container.innerHTML to '' then set #collection-receipt-generate-modal-container.innerHTML to '' then set #collection-receipt-preview-modal-container.innerHTML to '' end\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 overflow-y-auto max-h-[92vh]\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var86 string
 		templ_7745c5c3_Var86, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 516, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 553, Col: 59}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var86))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, "</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 130, "</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1799,7 +1813,7 @@ func invoiceWideModalShell(id string, title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 130, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1807,7 +1821,7 @@ func invoiceWideModalShell(id string, title string) templ.Component {
 	})
 }
 
-func InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.InvoiceRecipient, products []services.InvoiceProductOption, canManage bool) templ.Component {
+func InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.InvoiceRecipient, canManage bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -1828,98 +1842,124 @@ func InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.I
 			templ_7745c5c3_Var87 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, "<div id=\"invoice-generate-modal\" class=\"fixed inset-0 z-50 flex items-center justify-center\" data-create-url=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 132, "<div id=\"invoice-generate-modal\" class=\"fixed inset-0 z-50 flex items-center justify-center\" data-create-url=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var88 string
 		templ_7745c5c3_Var88, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 532, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 569, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var88)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 132, "\" data-table-url=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 133, "\" data-table-url=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var89 string
 		templ_7745c5c3_Var89, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/table"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 533, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 570, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var89)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 133, "\" data-recipients-table-url=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "\" data-recipients-table-url=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var90 string
 		templ_7745c5c3_Var90, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/recipients/table"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 534, Col: 75}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 571, Col: 75}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var90)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "\" data-preview-url-template=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, "\" data-preview-url-template=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var91 string
 		templ_7745c5c3_Var91, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/%s/preview"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 535, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 572, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var91)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, "\" data-currency=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 136, "\" data-product-search-url=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var92 string
-		templ_7745c5c3_Var92, templ_7745c5c3_Err = templ.ResolveAttributeValue(orDefault(config.Currency, "PHP"))
+		templ_7745c5c3_Var92, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/admin/invoices/products/search"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 536, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 573, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var92)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 136, "\" data-vat=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 137, "\" data-currency=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var93 string
-		templ_7745c5c3_Var93, templ_7745c5c3_Err = templ.ResolveAttributeValue(orDefault(config.VATPercentage, "0"))
+		templ_7745c5c3_Var93, templ_7745c5c3_Err = templ.ResolveAttributeValue(orDefault(config.Currency, "PHP"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 537, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 574, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var93)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 137, "\" data-can-manage=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 138, "\" data-vat=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var94 string
-		templ_7745c5c3_Var94, templ_7745c5c3_Err = templ.ResolveAttributeValue(strconv.FormatBool(canManage))
+		templ_7745c5c3_Var94, templ_7745c5c3_Err = templ.ResolveAttributeValue(orDefault(config.VATPercentage, "0"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 538, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 575, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var94)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 138, "\" _=\"on closeModal set #invoice-generate-modal-container.innerHTML to '' end\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 overflow-y-auto max-h-[92vh]\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">Create Invoice</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 139, "\" data-can-manage=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var95 string
+		templ_7745c5c3_Var95, templ_7745c5c3_Err = templ.ResolveAttributeValue(strconv.FormatBool(canManage))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 576, Col: 49}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var95)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 140, "\" data-today-ph=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var96 string
+		templ_7745c5c3_Var96, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.NowPH().Format(constants.DateLayoutISO))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 577, Col: 63}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var96)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 141, "\" _=\"on closeModal set #invoice-generate-modal-container.innerHTML to '' end\"><div class=\"absolute inset-0 bg-black/50\" _=\"on click trigger closeModal\"></div><div class=\"relative bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 overflow-y-auto max-h-[92vh]\"><div class=\"flex justify-between items-center mb-4\"><h2 class=\"text-xl font-semibold text-gray-900\">Create Invoice</h2><button type=\"button\" class=\"text-gray-400 hover:text-gray-600\" _=\"on click trigger closeModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1927,52 +1967,52 @@ func InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.I
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 139, "<div id=\"invoice-generate-error\" class=\"hidden mb-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2\"></div><div class=\"grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Recipient <span class=\"text-red-500\">*</span></label> <select id=\"invoice-recipient-select\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"><option value=\"\">-- Select recipient --</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 142, "<div id=\"invoice-generate-error\" class=\"hidden mb-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2\"></div><div class=\"grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Recipient <span class=\"text-red-500\">*</span></label> <select id=\"invoice-recipient-select\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"><option value=\"\">-- Select recipient --</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, r := range recipients {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 140, "<option value=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var95 string
-			templ_7745c5c3_Var95, templ_7745c5c3_Err = templ.ResolveAttributeValue(r.ID)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 559, Col: 27}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var95)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 141, "\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var96 string
-			templ_7745c5c3_Var96, templ_7745c5c3_Err = templ.JoinStringErrs(r.Name)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 559, Col: 38}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var96))
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 143, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var97 string
-			templ_7745c5c3_Var97, templ_7745c5c3_Err = templ.JoinStringErrs(recipientOptionSuffix(r))
+			templ_7745c5c3_Var97, templ_7745c5c3_Err = templ.ResolveAttributeValue(r.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 559, Col: 66}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 598, Col: 27}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var97))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var97)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 142, "</option> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 144, "\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var98 string
+			templ_7745c5c3_Var98, templ_7745c5c3_Err = templ.JoinStringErrs(r.Name)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 598, Col: 38}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var98))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var99 string
+			templ_7745c5c3_Var99, templ_7745c5c3_Err = templ.JoinStringErrs(recipientOptionSuffix(r))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 598, Col: 66}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var99))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 145, "</option> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 143, "<option value=\"__new__\">+ New recipient…</option></select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Transaction Type</label> <select id=\"invoice-transaction-type\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"><option value=\"CASH_SALES\">Cash Sales</option> <option value=\"CHARGE_SALES\">Charge Sales</option></select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Registered Name</label> <input type=\"text\" id=\"invoice-registered-name\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\" placeholder=\"Customer registered name\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Due Date</label> <input type=\"date\" id=\"invoice-due-date\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div></div><div id=\"invoice-new-recipient\" class=\"hidden grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 p-3 rounded-md bg-gray-50 border border-gray-200\"><div class=\"sm:col-span-2\"><label class=\"block text-xs font-medium text-gray-600 mb-1\">New Recipient Name</label> <input type=\"text\" data-new-recipient=\"name\" class=\"px-3 py-2 border border-gray-300 rounded-md w-full\"></div><div><label class=\"block text-xs font-medium text-gray-600 mb-1\">Email</label> <input type=\"email\" data-new-recipient=\"email\" class=\"px-3 py-2 border border-gray-300 rounded-md w-full\"></div><div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 146, "<option value=\"__new__\">+ New recipient…</option></select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Transaction Type</label> <select id=\"invoice-transaction-type\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"><option value=\"CASH_SALES\">Cash Sales</option> <option value=\"CHARGE_SALES\">Charge Sales</option></select></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Registered Name</label> <input type=\"text\" id=\"invoice-registered-name\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\" placeholder=\"Customer registered name\"></div></div><div class=\"mb-4 p-3 rounded-md bg-gray-50 border border-gray-200\"><p class=\"text-sm font-semibold text-gray-800 mb-3\">Dates &amp; Payment Terms</p><div class=\"grid grid-cols-1 sm:grid-cols-2 gap-4\"><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Issue Date</label> <input type=\"date\" id=\"invoice-issue-date\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Delivery Date</label> <input type=\"date\" id=\"invoice-delivery-date\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Payment Terms</label><div class=\"flex gap-2\"><input type=\"number\" min=\"1\" step=\"1\" id=\"invoice-payment-terms-value\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-24\" placeholder=\"30\"> <select id=\"invoice-payment-terms-unit\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary flex-grow\"><option value=\"\">-- Unit --</option> <option value=\"DAYS\">Days</option> <option value=\"MONTHS\">Months</option> <option value=\"YEARS\">Years</option></select></div></div><div><label class=\"block text-sm font-medium text-gray-700 mb-1\">Due Date</label> <input type=\"date\" id=\"invoice-due-date\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"></div></div></div><div id=\"invoice-new-recipient\" class=\"hidden grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 p-3 rounded-md bg-gray-50 border border-gray-200\"><div class=\"sm:col-span-2\"><label class=\"block text-xs font-medium text-gray-600 mb-1\">New Recipient Name</label> <input type=\"text\" data-new-recipient=\"name\" class=\"px-3 py-2 border border-gray-300 rounded-md w-full\"></div><div><label class=\"block text-xs font-medium text-gray-600 mb-1\">Email</label> <input type=\"email\" data-new-recipient=\"email\" class=\"px-3 py-2 border border-gray-300 rounded-md w-full\"></div><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1980,111 +2020,57 @@ func InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.I
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 144, "</div><div class=\"sm:col-span-2\"><label class=\"block text-xs font-medium text-gray-600 mb-1\">Address</label> <input type=\"text\" data-new-recipient=\"address\" class=\"px-3 py-2 border border-gray-300 rounded-md w-full\"></div><div><label class=\"block text-xs font-medium text-gray-600 mb-1\">TIN</label> <input type=\"text\" data-new-recipient=\"tin\" class=\"px-3 py-2 border border-gray-300 rounded-md w-full\"></div></div><div class=\"mb-3\"><div class=\"flex flex-wrap items-end gap-2 mb-2\"><div class=\"flex-grow\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Add product line</label> <select id=\"invoice-product-select\" class=\"px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full\"><option value=\"\">-- Select a product --</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 147, "</div><div class=\"sm:col-span-2\"><label class=\"block text-xs font-medium text-gray-600 mb-1\">Address</label> <input type=\"text\" data-new-recipient=\"address\" class=\"px-3 py-2 border border-gray-300 rounded-md w-full\"></div><div><label class=\"block text-xs font-medium text-gray-600 mb-1\">TIN</label> <input type=\"text\" data-new-recipient=\"tin\" class=\"px-3 py-2 border border-gray-300 rounded-md w-full\"></div></div><div class=\"mb-3\"><div class=\"flex flex-wrap items-end gap-2 mb-2\"><div class=\"flex-grow\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Add product line</label>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, p := range products {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 145, "<option value=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var98 string
-			templ_7745c5c3_Var98, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.ID)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 608, Col: 28}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var98)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 146, "\" data-name=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var99 string
-			templ_7745c5c3_Var99, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.Name)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 608, Col: 49}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var99)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 147, "\" data-price=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var100 string
-			templ_7745c5c3_Var100, templ_7745c5c3_Err = templ.ResolveAttributeValue(strconv.FormatInt(p.UnitPrice, 10))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 608, Col: 99}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var100)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 148, "\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var101 string
-			templ_7745c5c3_Var101, templ_7745c5c3_Err = templ.JoinStringErrs(productOptionLabel(p))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 609, Col: 32}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var101))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 149, "</option>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
+		templ_7745c5c3_Err = AdminEntitySearch("invoice-product-search", "invoice-product-id", "Search by product code or name…", "", "").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 150, "</select></div><button type=\"button\" id=\"invoice-add-product\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm\">Add Product</button> <button type=\"button\" id=\"invoice-add-manual\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm\">Add Manual Line</button></div><div class=\"overflow-x-auto border border-gray-200 rounded-md\"><table class=\"min-w-full text-sm\"><thead class=\"bg-gray-50\"><tr><th class=\"px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase\">Description</th><th class=\"px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase w-20\">Qty</th><th class=\"px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase w-32\">Unit Price</th>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 148, "<input type=\"hidden\" id=\"invoice-product-name\" value=\"\"> <input type=\"hidden\" id=\"invoice-product-price-centavos\" value=\"\"></div><button type=\"button\" id=\"invoice-add-product\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm\">Add Product</button> <button type=\"button\" id=\"invoice-add-manual\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm\">Add Manual Line</button></div><div class=\"overflow-x-auto border border-gray-200 rounded-md\"><table class=\"min-w-full text-sm\"><thead class=\"bg-gray-50\"><tr><th class=\"px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase\">Description</th><th class=\"px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase w-20\">Qty</th><th class=\"px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase w-32\">Unit Price</th>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if canManage {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 151, "<th class=\"px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase w-24\">Tax</th>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 149, "<th class=\"px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase w-24\">Tax</th>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 152, "<th class=\"px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase w-32\">Amount</th><th class=\"px-3 py-2 w-10\"></th></tr></thead> <tbody id=\"invoice-lines\"></tbody></table></div></div><div class=\"flex flex-col sm:flex-row gap-4 justify-between items-start\"><div class=\"w-full sm:w-1/2\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Notes</label> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 150, "<th class=\"px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase w-32\">Amount</th><th class=\"px-3 py-2 w-10\"></th></tr></thead> <tbody id=\"invoice-lines\"></tbody></table></div></div><div class=\"flex flex-col sm:flex-row gap-4 justify-between items-start\"><div class=\"w-full sm:w-1/2\"><label class=\"block text-sm font-medium text-gray-700 mb-1\">Notes</label> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var102 = []any{invoiceTextareaClass}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var102...)
+		var templ_7745c5c3_Var100 = []any{invoiceTextareaClass}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var100...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 153, "<textarea id=\"invoice-notes\" rows=\"2\" class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 151, "<textarea id=\"invoice-notes\" rows=\"2\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var103 string
-		templ_7745c5c3_Var103, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var102).String())
+		var templ_7745c5c3_Var101 string
+		templ_7745c5c3_Var101, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var100).String())
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 1, Col: 0}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var103)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var101)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 154, "\"></textarea></div><div class=\"w-full sm:w-1/2 text-sm\"><div class=\"flex justify-between py-1\"><span class=\"text-gray-500\">Subtotal</span><span id=\"invoice-subtotal\" class=\"text-gray-900 font-medium\">—</span></div><div class=\"flex justify-between py-1\"><span class=\"text-gray-500\" id=\"invoice-vat-label\">VAT</span><span id=\"invoice-vat\" class=\"text-gray-900 font-medium\">—</span></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 152, "\"></textarea></div><div class=\"w-full sm:w-1/2 text-sm\"><div class=\"flex justify-between py-1\"><span class=\"text-gray-500\">Subtotal</span><span id=\"invoice-subtotal\" class=\"text-gray-900 font-medium\">—</span></div><div class=\"flex justify-between py-1\"><span class=\"text-gray-500\" id=\"invoice-vat-label\">VAT</span><span id=\"invoice-vat\" class=\"text-gray-900 font-medium\">—</span></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if canManage {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 155, "<div class=\"flex justify-between py-1 items-center gap-2\"><span class=\"text-gray-500\">Withholding Tax</span> <input type=\"text\" id=\"invoice-withholding-tax\" class=\"line-price px-2 py-1 border border-gray-300 rounded w-28 text-right\" placeholder=\"0.00\"></div><div class=\"flex justify-between py-1 items-center gap-2\"><span class=\"text-gray-500\">SC/PWD Discount</span> <input type=\"text\" id=\"invoice-sc-pwd-discount\" class=\"line-price px-2 py-1 border border-gray-300 rounded w-28 text-right\" placeholder=\"0.00\"></div><div class=\"flex justify-between py-1 items-center gap-2\"><span class=\"text-gray-500\">Add VAT</span> <input type=\"text\" id=\"invoice-add-vat\" class=\"line-price px-2 py-1 border border-gray-300 rounded w-28 text-right\" placeholder=\"0.00\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 153, "<div class=\"flex justify-between py-1 items-center gap-2\"><span class=\"text-gray-500\">Withholding Tax</span> <input type=\"text\" id=\"invoice-withholding-tax\" class=\"line-price px-2 py-1 border border-gray-300 rounded w-28 text-right\" placeholder=\"0.00\"></div><div class=\"flex justify-between py-1 items-center gap-2\"><span class=\"text-gray-500\">SC/PWD Discount</span> <input type=\"text\" id=\"invoice-sc-pwd-discount\" class=\"line-price px-2 py-1 border border-gray-300 rounded w-28 text-right\" placeholder=\"0.00\"></div><div class=\"flex justify-between py-1 items-center gap-2\"><span class=\"text-gray-500\">Add VAT</span> <input type=\"text\" id=\"invoice-add-vat\" class=\"line-price px-2 py-1 border border-gray-300 rounded w-28 text-right\" placeholder=\"0.00\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 156, "<div class=\"flex justify-between py-2 border-t border-gray-200 mt-1\"><span class=\"text-primary font-semibold\">Total</span><span id=\"invoice-total\" class=\"text-primary font-bold\">—</span></div></div></div><div class=\"flex flex-wrap gap-2 justify-end pt-4 mt-4 border-t border-gray-200\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"button\" data-invoice-action=\"preview\" class=\"px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 text-sm\">Preview</button> <button type=\"button\" data-invoice-action=\"save\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm\">Save</button></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 154, "<div class=\"flex justify-between py-2 border-t border-gray-200 mt-1\"><span class=\"text-primary font-semibold\">Total</span><span id=\"invoice-total\" class=\"text-primary font-bold\">—</span></div></div></div><div class=\"flex flex-wrap gap-2 justify-end pt-4 mt-4 border-t border-gray-200\"><button type=\"button\" class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm\" _=\"on click trigger closeModal\">Cancel</button> <button type=\"button\" data-invoice-action=\"preview\" class=\"px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 text-sm\">Preview</button> <button type=\"button\" data-invoice-action=\"save\" class=\"px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark text-sm\">Save</button></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -2108,26 +2094,44 @@ func invoiceConfigPreview(config services.InvoiceConfig) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var104 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var104 == nil {
-			templ_7745c5c3_Var104 = templ.NopComponent
+		templ_7745c5c3_Var102 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var102 == nil {
+			templ_7745c5c3_Var102 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 157, "<div class=\"flex items-center gap-4 mb-4 p-3 rounded-md bg-surface border border-gray-200\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 155, "<div class=\"flex items-center gap-4 mb-4 p-3 rounded-md bg-surface border border-gray-200\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if config.LogoURL != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 156, "<img src=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var103 string
+			templ_7745c5c3_Var103, templ_7745c5c3_Err = templ.ResolveAttributeValue(config.LogoURL)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 731, Col: 28}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var103)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 157, "\" alt=\"Logo\" class=\"h-12 w-auto object-contain\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 158, "<img src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var105 string
-			templ_7745c5c3_Var105, templ_7745c5c3_Err = templ.ResolveAttributeValue(config.LogoURL)
+			var templ_7745c5c3_Var104 string
+			templ_7745c5c3_Var104, templ_7745c5c3_Err = templ.ResolveAttributeValue(constants.PathEmailLogoCDN)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 672, Col: 28}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 733, Col: 40}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var105)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var104)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2135,53 +2139,54 @@ func invoiceConfigPreview(config services.InvoiceConfig) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 160, "<img src=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var106 string
-			templ_7745c5c3_Var106, templ_7745c5c3_Err = templ.ResolveAttributeValue(constants.PathEmailLogoCDN)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 674, Col: 40}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var106)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 161, "\" alt=\"Logo\" class=\"h-12 w-auto object-contain\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 162, "<div class=\"text-sm\"><div class=\"font-semibold text-gray-900\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 160, "<div class=\"text-sm\"><div class=\"font-semibold text-gray-900\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var107 string
-		templ_7745c5c3_Var107, templ_7745c5c3_Err = templ.JoinStringErrs(orDefault(config.BusinessName, "Set up your business configuration"))
+		var templ_7745c5c3_Var105 string
+		templ_7745c5c3_Var105, templ_7745c5c3_Err = templ.JoinStringErrs(orDefault(config.BusinessName, "Set up your business configuration"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 677, Col: 114}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 736, Col: 114}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var107))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var105))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 163, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 161, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if config.Address != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 164, "<div class=\"text-gray-500\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 162, "<div class=\"text-gray-500\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var108 string
-			templ_7745c5c3_Var108, templ_7745c5c3_Err = templ.JoinStringErrs(config.Address)
+			var templ_7745c5c3_Var106 string
+			templ_7745c5c3_Var106, templ_7745c5c3_Err = templ.JoinStringErrs(config.Address)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 679, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 738, Col: 47}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var108))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var106))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 163, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		if config.TIN != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 164, "<div class=\"text-gray-500\">TIN: ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var107 string
+			templ_7745c5c3_Var107, templ_7745c5c3_Err = templ.JoinStringErrs(config.TIN)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 741, Col: 48}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var107))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2190,26 +2195,7 @@ func invoiceConfigPreview(config services.InvoiceConfig) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if config.TIN != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 166, "<div class=\"text-gray-500\">TIN: ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var109 string
-			templ_7745c5c3_Var109, templ_7745c5c3_Err = templ.JoinStringErrs(config.TIN)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `admin/invoices.templ`, Line: 682, Col: 48}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var109))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 167, "</div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 168, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 166, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -2247,17 +2233,6 @@ func recipientOptionSuffix(r services.InvoiceRecipient) string {
 		return " (" + r.Email + ")"
 	}
 	return ""
-}
-
-func productOptionLabel(p services.InvoiceProductOption) string {
-	label := p.Name
-	if p.BrandName != "" {
-		label = p.BrandName + " - " + label
-	}
-	if p.Price != "" {
-		label = label + " · " + p.Price
-	}
-	return label
 }
 
 var _ = templruntime.GeneratedTemplate

@@ -83,7 +83,14 @@ var staffCardsWithRoles = []struct {
 	},
 	{
 		Card:        models.StaffCard{Link: "/admin/invoices", Title: "Invoices", Description: "Configure and generate invoices", Icon: svg.Document("text-primary")},
-		AllowedRoles: []enums.StaffRole{enums.STAFF_ROLE_MANAGE_INVOICES, enums.STAFF_ROLE_CREATE_INVOICE},
+		AllowedRoles: []enums.StaffRole{
+			enums.STAFF_ROLE_MANAGE_INVOICES,
+			enums.STAFF_ROLE_CREATE_INVOICE,
+			enums.STAFF_ROLE_MANAGE_DELIVERY_RECEIPTS,
+			enums.STAFF_ROLE_CREATE_DELIVERY_RECEIPT,
+			enums.STAFF_ROLE_MANAGE_COLLECTION_RECEIPTS,
+			enums.STAFF_ROLE_CREATE_COLLECTION_RECEIPT,
+		},
 	},
 	{
 		Card:        models.StaffCard{Link: "/admin/imports", Title: "Imports", Description: "Bulk upload", Icon: svg.Document("text-primary")},

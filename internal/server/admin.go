@@ -206,11 +206,27 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_ORDERS)).Get("/admin/orders/{id}/track", s.adminOrdersTrackModalHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_ORDERS)).Patch("/admin/orders/{id}/status", s.adminOrdersUpdateStatusHandler)
 
-	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_INVOICES, enums.STAFF_ROLE_CREATE_INVOICE)).Get("/admin/invoices", s.adminInvoicesListPageHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(
+		enums.STAFF_ROLE_MANAGE_INVOICES,
+		enums.STAFF_ROLE_CREATE_INVOICE,
+		enums.STAFF_ROLE_MANAGE_DELIVERY_RECEIPTS,
+		enums.STAFF_ROLE_CREATE_DELIVERY_RECEIPT,
+		enums.STAFF_ROLE_MANAGE_COLLECTION_RECEIPTS,
+		enums.STAFF_ROLE_CREATE_COLLECTION_RECEIPT,
+	)).Get("/admin/invoices", s.adminInvoicesListPageHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_INVOICES)).Get("/admin/invoices/config", s.adminInvoicesConfigModalHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_INVOICES)).Post("/admin/invoices/config", s.adminInvoicesConfigUpdateHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_INVOICES, enums.STAFF_ROLE_CREATE_INVOICE)).Get("/admin/invoices/table", s.adminInvoicesTableHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_INVOICES, enums.STAFF_ROLE_CREATE_INVOICE)).Get("/admin/invoices/generate", s.adminInvoicesGenerateModalHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_INVOICES, enums.STAFF_ROLE_CREATE_INVOICE)).Get("/admin/invoices/products/search", s.adminInvoicesProductsSearchHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(
+		enums.STAFF_ROLE_MANAGE_INVOICES,
+		enums.STAFF_ROLE_CREATE_INVOICE,
+		enums.STAFF_ROLE_MANAGE_DELIVERY_RECEIPTS,
+		enums.STAFF_ROLE_CREATE_DELIVERY_RECEIPT,
+		enums.STAFF_ROLE_MANAGE_COLLECTION_RECEIPTS,
+		enums.STAFF_ROLE_CREATE_COLLECTION_RECEIPT,
+	)).Get("/admin/invoices/search", s.adminInvoicesSearchHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_INVOICES, enums.STAFF_ROLE_CREATE_INVOICE)).Post("/admin/invoices", s.adminInvoicesCreateHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_INVOICES, enums.STAFF_ROLE_CREATE_INVOICE)).Get("/admin/invoices/recipients/table", s.adminInvoicesRecipientsTableHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_INVOICES)).Get("/admin/invoices/recipients/create", s.adminInvoicesRecipientCreateModalHandler)
@@ -223,6 +239,24 @@ func AddAdminHandlers(s *Server, r chi.Router) {
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_INVOICES, enums.STAFF_ROLE_CREATE_INVOICE)).Get("/admin/invoices/{id}/pdf", s.adminInvoicesPDFHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_INVOICES, enums.STAFF_ROLE_CREATE_INVOICE)).Get("/admin/invoices/{id}/job-status", s.adminInvoicesJobStatusHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_INVOICES, enums.STAFF_ROLE_CREATE_INVOICE)).Post("/admin/invoices/{id}/email", s.adminInvoicesEmailHandler)
+
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_DELIVERY_RECEIPTS, enums.STAFF_ROLE_CREATE_DELIVERY_RECEIPT)).Get("/admin/delivery-receipts/table", s.adminDeliveryReceiptsTableHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_DELIVERY_RECEIPTS, enums.STAFF_ROLE_CREATE_DELIVERY_RECEIPT)).Get("/admin/delivery-receipts/generate", s.adminDeliveryReceiptsGenerateModalHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_DELIVERY_RECEIPTS, enums.STAFF_ROLE_CREATE_DELIVERY_RECEIPT)).Post("/admin/delivery-receipts", s.adminDeliveryReceiptsCreateHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_DELIVERY_RECEIPTS, enums.STAFF_ROLE_CREATE_DELIVERY_RECEIPT)).Get("/admin/delivery-receipts/{id}/view", s.adminDeliveryReceiptsViewHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_DELIVERY_RECEIPTS, enums.STAFF_ROLE_CREATE_DELIVERY_RECEIPT)).Get("/admin/delivery-receipts/{id}/preview", s.adminDeliveryReceiptsPreviewModalHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_DELIVERY_RECEIPTS, enums.STAFF_ROLE_CREATE_DELIVERY_RECEIPT)).Get("/admin/delivery-receipts/{id}/pdf", s.adminDeliveryReceiptsPDFHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_DELIVERY_RECEIPTS, enums.STAFF_ROLE_CREATE_DELIVERY_RECEIPT)).Get("/admin/delivery-receipts/{id}/job-status", s.adminDeliveryReceiptsJobStatusHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_DELIVERY_RECEIPTS, enums.STAFF_ROLE_CREATE_DELIVERY_RECEIPT)).Post("/admin/delivery-receipts/{id}/email", s.adminDeliveryReceiptsEmailHandler)
+
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_COLLECTION_RECEIPTS, enums.STAFF_ROLE_CREATE_COLLECTION_RECEIPT)).Get("/admin/collection-receipts/table", s.adminCollectionReceiptsTableHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_COLLECTION_RECEIPTS, enums.STAFF_ROLE_CREATE_COLLECTION_RECEIPT)).Get("/admin/collection-receipts/generate", s.adminCollectionReceiptsGenerateModalHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_COLLECTION_RECEIPTS, enums.STAFF_ROLE_CREATE_COLLECTION_RECEIPT)).Post("/admin/collection-receipts", s.adminCollectionReceiptsCreateHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_COLLECTION_RECEIPTS, enums.STAFF_ROLE_CREATE_COLLECTION_RECEIPT)).Get("/admin/collection-receipts/{id}/view", s.adminCollectionReceiptsViewHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_COLLECTION_RECEIPTS, enums.STAFF_ROLE_CREATE_COLLECTION_RECEIPT)).Get("/admin/collection-receipts/{id}/preview", s.adminCollectionReceiptsPreviewModalHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_COLLECTION_RECEIPTS, enums.STAFF_ROLE_CREATE_COLLECTION_RECEIPT)).Get("/admin/collection-receipts/{id}/pdf", s.adminCollectionReceiptsPDFHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_COLLECTION_RECEIPTS, enums.STAFF_ROLE_CREATE_COLLECTION_RECEIPT)).Get("/admin/collection-receipts/{id}/job-status", s.adminCollectionReceiptsJobStatusHandler)
+	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_COLLECTION_RECEIPTS, enums.STAFF_ROLE_CREATE_COLLECTION_RECEIPT)).Post("/admin/collection-receipts/{id}/email", s.adminCollectionReceiptsEmailHandler)
 
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_QUOTATIONS)).Get("/admin/quotations", s.adminQuotationsListPageHandler)
 	r.With(s.requireStaffAuth, s.AllowRoles(enums.STAFF_ROLE_MANAGE_QUOTATIONS)).Get("/admin/quotations/table", s.adminQuotationsListTableHandler)

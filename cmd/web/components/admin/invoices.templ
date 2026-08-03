@@ -14,7 +14,16 @@ import (
 
 const invoiceTextareaClass = "px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full resize-y min-h-[4rem] max-h-48"
 
-templ AdminInvoicesListPage(config services.InvoiceConfig, canManage bool) {
+type InvoicePageAccess struct {
+	CanManageInvoices           bool
+	CanCreateInvoice            bool
+	CanAccessDeliveryReceipts   bool
+	CanCreateDeliveryReceipt    bool
+	CanAccessCollectionReceipts bool
+	CanCreateCollectionReceipt  bool
+}
+
+templ AdminInvoicesListPage(config services.InvoiceConfig, access InvoicePageAccess) {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
@@ -32,10 +41,16 @@ templ AdminInvoicesListPage(config services.InvoiceConfig, canManage bool) {
 				<div class="max-w-6xl mx-auto">
 					<div class="bg-white rounded-lg shadow-md p-6">
 						@header.AdminStaffHeaderWithBack()
-						@InvoicePageHeader(config)
-						@InvoiceToolbar(canManage)
-						@InvoiceRecipientsCollapsibleSection(canManage)
-						@InvoicesCollapsibleSection()
+						<div class="mb-6">
+							<h1 class="text-2xl font-bold text-primary">Invoices</h1>
+						</div>
+						@InvoiceToolbar(access)
+						@InvoiceRecipientsCollapsibleSection(access.CanManageInvoices)
+						if access.CanCreateInvoice {
+							@InvoicesCollapsibleSection()
+						}
+						@DeliveryReceiptsCollapsibleSection(access.CanAccessDeliveryReceipts)
+						@CollectionReceiptsCollapsibleSection(access.CanAccessCollectionReceipts)
 					</div>
 				</div>
 			</div>
@@ -43,26 +58,21 @@ templ AdminInvoicesListPage(config services.InvoiceConfig, canManage bool) {
 			<div id="invoice-recipient-modal-container"></div>
 			<div id="invoice-generate-modal-container"></div>
 			<div id="invoice-preview-modal-container"></div>
+			<div id="delivery-receipt-generate-modal-container"></div>
+			<div id="delivery-receipt-preview-modal-container"></div>
+			<div id="collection-receipt-generate-modal-container"></div>
+			<div id="collection-receipt-preview-modal-container"></div>
 			@ScrImageUpload()
 			@ScrInvoiceGenerate()
+			@ScrDeliveryReceiptGenerate()
+			@ScrCollectionReceiptGenerate()
 		</body>
 	</html>
 }
 
-templ InvoicePageHeader(config services.InvoiceConfig) {
-	<div class="flex flex-col items-center mb-6">
-		if config.LogoURL != "" {
-			<img src={ config.LogoURL } alt="Logo" class="h-16 w-auto object-contain mb-3"/>
-		} else {
-			<img src={ constants.PathEmailLogoCDN } alt="C-Choice" class="h-16 w-auto object-contain mb-3"/>
-		}
-		<h1 class="text-2xl font-bold text-center text-primary">Invoices</h1>
-	</div>
-}
-
-templ InvoiceToolbar(canManage bool) {
+templ InvoiceToolbar(access InvoicePageAccess) {
 	<div class="flex flex-wrap items-center justify-center gap-3 mb-8 pb-6 border-b border-gray-200">
-		if canManage {
+		if access.CanManageInvoices {
 			<button
 				type="button"
 				class="px-5 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 text-sm font-medium"
@@ -83,16 +93,42 @@ templ InvoiceToolbar(canManage bool) {
 				Configure
 			</button>
 		}
-		<button
-			type="button"
-			class="px-5 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm font-medium"
-			hx-get={ utils.URL("/admin/invoices/generate") }
-			hx-target="#invoice-generate-modal-container"
-			hx-swap="innerHTML"
-			_="on click call metrics_event('admin_exec', 'open invoice generator')"
-		>
-			Create Invoice
-		</button>
+		if access.CanCreateInvoice {
+			<button
+				type="button"
+				class="px-5 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm font-medium"
+				hx-get={ utils.URL("/admin/invoices/generate") }
+				hx-target="#invoice-generate-modal-container"
+				hx-swap="innerHTML"
+				_="on click call metrics_event('admin_exec', 'open invoice generator')"
+			>
+				Create Invoice
+			</button>
+		}
+		if access.CanCreateDeliveryReceipt {
+			<button
+				type="button"
+				class="px-5 py-2 bg-teal-700 text-white rounded-md hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 text-sm font-medium"
+				hx-get={ utils.URL("/admin/delivery-receipts/generate") }
+				hx-target="#delivery-receipt-generate-modal-container"
+				hx-swap="innerHTML"
+				_="on click call metrics_event('admin_exec', 'open delivery receipt generator')"
+			>
+				Create Delivery Receipt
+			</button>
+		}
+		if access.CanCreateCollectionReceipt {
+			<button
+				type="button"
+				class="px-5 py-2 bg-indigo-700 text-white rounded-md hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 text-sm font-medium"
+				hx-get={ utils.URL("/admin/collection-receipts/generate") }
+				hx-target="#collection-receipt-generate-modal-container"
+				hx-swap="innerHTML"
+				_="on click call metrics_event('admin_exec', 'open collection receipt generator')"
+			>
+				Create Collection Receipt
+			</button>
+		}
 	</div>
 }
 
@@ -163,6 +199,7 @@ templ InvoiceConfigModal(config services.InvoiceConfig) {
 }
 
 templ ScrInvoiceGenerate() {
+	<script type="text/javascript" src={ utils.URL(utils.VersionedAsset("/static/js/admin_entity_search.js")) }></script>
 	<script type="text/javascript" src={ utils.URL(utils.VersionedAsset("/static/js/invoice_generate.js")) }></script>
 }
 
@@ -204,7 +241,7 @@ templ invoiceTextFieldWrap(name string, label string, value string, placeholder 
 }
 
 templ InvoiceRecipientsCollapsibleSection(canManage bool) {
-	<details class="mb-6 border border-gray-200 rounded-lg" open>
+	<details class="mb-6 border border-gray-200 rounded-lg">
 		<summary class="cursor-pointer select-none px-4 py-3 bg-gray-50 rounded-lg font-semibold text-gray-900 hover:bg-gray-100">
 			Recipients / Clients
 		</summary>
@@ -378,7 +415,7 @@ templ InvoiceRecipientForm(recipient services.InvoiceRecipient, action string, m
 }
 
 templ InvoicesCollapsibleSection() {
-	<details class="border border-gray-200 rounded-lg" open>
+	<details class="mb-6 border border-gray-200 rounded-lg">
 		<summary class="cursor-pointer select-none px-4 py-3 bg-gray-50 rounded-lg font-semibold text-gray-900 hover:bg-gray-100">
 			Invoices
 		</summary>
@@ -487,7 +524,7 @@ templ invoiceModalShell(id string, title string) {
 	<div
 		id={ id }
 		class="fixed inset-0 z-50 flex items-center justify-center"
-		_="on closeModal set #invoice-recipient-modal-container.innerHTML to '' then set #invoice-generate-modal-container.innerHTML to '' then set #invoice-config-modal-container.innerHTML to '' then set #invoice-preview-modal-container.innerHTML to '' end"
+		_="on closeModal set #invoice-recipient-modal-container.innerHTML to '' then set #invoice-generate-modal-container.innerHTML to '' then set #invoice-config-modal-container.innerHTML to '' then set #invoice-preview-modal-container.innerHTML to '' then set #delivery-receipt-generate-modal-container.innerHTML to '' then set #delivery-receipt-preview-modal-container.innerHTML to '' then set #collection-receipt-generate-modal-container.innerHTML to '' then set #collection-receipt-preview-modal-container.innerHTML to '' end"
 	>
 		<div class="absolute inset-0 bg-black/50" _="on click trigger closeModal"></div>
 		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]">
@@ -508,7 +545,7 @@ templ invoiceWideModalShell(id string, title string) {
 	<div
 		id={ id }
 		class="fixed inset-0 z-50 flex items-center justify-center"
-		_="on closeModal set #invoice-recipient-modal-container.innerHTML to '' then set #invoice-generate-modal-container.innerHTML to '' then set #invoice-config-modal-container.innerHTML to '' then set #invoice-preview-modal-container.innerHTML to '' end"
+		_="on closeModal set #invoice-recipient-modal-container.innerHTML to '' then set #invoice-generate-modal-container.innerHTML to '' then set #invoice-config-modal-container.innerHTML to '' then set #invoice-preview-modal-container.innerHTML to '' then set #delivery-receipt-generate-modal-container.innerHTML to '' then set #delivery-receipt-preview-modal-container.innerHTML to '' then set #collection-receipt-generate-modal-container.innerHTML to '' then set #collection-receipt-preview-modal-container.innerHTML to '' end"
 	>
 		<div class="absolute inset-0 bg-black/50" _="on click trigger closeModal"></div>
 		<div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 overflow-y-auto max-h-[92vh]">
@@ -525,7 +562,7 @@ templ invoiceWideModalShell(id string, title string) {
 	</div>
 }
 
-templ InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.InvoiceRecipient, products []services.InvoiceProductOption, canManage bool) {
+templ InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.InvoiceRecipient, canManage bool) {
 	<div
 		id="invoice-generate-modal"
 		class="fixed inset-0 z-50 flex items-center justify-center"
@@ -533,9 +570,11 @@ templ InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.
 		data-table-url={ utils.URL("/admin/invoices/table") }
 		data-recipients-table-url={ utils.URL("/admin/invoices/recipients/table") }
 		data-preview-url-template={ utils.URL("/admin/invoices/%s/preview") }
+		data-product-search-url={ utils.URL("/admin/invoices/products/search") }
 		data-currency={ orDefault(config.Currency, "PHP") }
 		data-vat={ orDefault(config.VATPercentage, "0") }
 		data-can-manage={ strconv.FormatBool(canManage) }
+		data-today-ph={ utils.NowPH().Format(constants.DateLayoutISO) }
 		_="on closeModal set #invoice-generate-modal-container.innerHTML to '' end"
 	>
 		<div class="absolute inset-0 bg-black/50" _="on click trigger closeModal"></div>
@@ -572,9 +611,34 @@ templ InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.
 					<label class="block text-sm font-medium text-gray-700 mb-1">Registered Name</label>
 					<input type="text" id="invoice-registered-name" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full" placeholder="Customer registered name"/>
 				</div>
-				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-					<input type="date" id="invoice-due-date" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
+			</div>
+			<div class="mb-4 p-3 rounded-md bg-gray-50 border border-gray-200">
+				<p class="text-sm font-semibold text-gray-800 mb-3">Dates &amp; Payment Terms</p>
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-1">Issue Date</label>
+						<input type="date" id="invoice-issue-date" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
+					</div>
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-1">Delivery Date</label>
+						<input type="date" id="invoice-delivery-date" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
+					</div>
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-1">Payment Terms</label>
+						<div class="flex gap-2">
+							<input type="number" min="1" step="1" id="invoice-payment-terms-value" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-24" placeholder="30"/>
+							<select id="invoice-payment-terms-unit" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary flex-grow">
+								<option value="">-- Unit --</option>
+								<option value="DAYS">Days</option>
+								<option value="MONTHS">Months</option>
+								<option value="YEARS">Years</option>
+							</select>
+						</div>
+					</div>
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+						<input type="date" id="invoice-due-date" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full"/>
+					</div>
 				</div>
 			</div>
 			<div id="invoice-new-recipient" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 p-3 rounded-md bg-gray-50 border border-gray-200">
@@ -602,14 +666,9 @@ templ InvoiceGenerateModal(config services.InvoiceConfig, recipients []services.
 				<div class="flex flex-wrap items-end gap-2 mb-2">
 					<div class="flex-grow">
 						<label class="block text-sm font-medium text-gray-700 mb-1">Add product line</label>
-						<select id="invoice-product-select" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary w-full">
-							<option value="">-- Select a product --</option>
-							for _, p := range products {
-								<option value={ p.ID } data-name={ p.Name } data-price={ strconv.FormatInt(p.UnitPrice, 10) }>
-									{ productOptionLabel(p) }
-								</option>
-							}
-						</select>
+						@AdminEntitySearch("invoice-product-search", "invoice-product-id", "Search by product code or name…", "", "")
+						<input type="hidden" id="invoice-product-name" value=""/>
+						<input type="hidden" id="invoice-product-price-centavos" value=""/>
 					</div>
 					<button type="button" id="invoice-add-product" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm">Add Product</button>
 					<button type="button" id="invoice-add-manual" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm">Add Manual Line</button>
@@ -715,15 +774,4 @@ func recipientOptionSuffix(r services.InvoiceRecipient) string {
 		return " (" + r.Email + ")"
 	}
 	return ""
-}
-
-func productOptionLabel(p services.InvoiceProductOption) string {
-	label := p.Name
-	if p.BrandName != "" {
-		label = p.BrandName + " - " + label
-	}
-	if p.Price != "" {
-		label = label + " · " + p.Price
-	}
-	return label
 }

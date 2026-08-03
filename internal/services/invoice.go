@@ -101,16 +101,20 @@ type InvoiceLineInput struct {
 }
 
 type CreateInvoiceInput struct {
-	RecipientID            string
-	NewRecipient           *InvoiceRecipientInput
-	TransactionType        string
+	RecipientID             string
+	NewRecipient            *InvoiceRecipientInput
+	TransactionType         string
 	RecipientRegisteredName string
-	Notes                  string
-	DueDate                string
-	WithholdingTax         string
-	SCPWDDiscount          string
-	AddVAT                 string
-	Lines                  []InvoiceLineInput
+	Notes                   string
+	IssueDate               string
+	DeliveryDate            string
+	DueDate                 string
+	PaymentTermsValue       int64
+	PaymentTermsUnit        string
+	WithholdingTax          string
+	SCPWDDiscount           string
+	AddVAT                  string
+	Lines                   []InvoiceLineInput
 }
 
 type InvoiceLine struct {
@@ -136,7 +140,10 @@ type Invoice struct {
 	RecipientAddress        string
 	RecipientTIN            string
 	IssueDate               string
+	DeliveryDate            string
 	DueDate                 string
+	PaymentTermsValue       int64
+	PaymentTermsUnit        string
 	Notes                   string
 	Currency                string
 	VATPercentage           string
@@ -445,53 +452,68 @@ func (s *InvoiceService) DeleteRecipient(ctx context.Context, staffID string, id
 	return nil
 }
 
-func (s *InvoiceService) ListProductsForLineItems(ctx context.Context) ([]InvoiceProductOption, error) {
-	rows, err := s.dbRO.GetQueries().ListProductsForQuotations(ctx)
+func (s *InvoiceService) SearchProductsForLineItems(ctx context.Context, search string, limit int) ([]InvoiceProductOption, error) {
+	limit = max(1, min(limit, 50))
+	rows, err := s.dbRO.GetQueries().SearchProductsForInvoiceLineItems(ctx, queries.SearchProductsForInvoiceLineItemsParams{
+		Search: strings.TrimSpace(search),
+		Limit:  int64(limit),
+	})
 	if err != nil {
 		return nil, errors.Join(errs.ErrInvoice, err)
 	}
 	result := make([]InvoiceProductOption, 0, len(rows))
 	for _, row := range rows {
-		price := row.UnitPriceWithVat
-		currency := row.UnitPriceWithVatCurrency
-		if row.IsOnSale == 1 && row.SalePriceWithVat.Valid {
-			price = row.SalePriceWithVat.Int64
-			if row.SalePriceWithVatCurrency.Valid {
-				currency = row.SalePriceWithVatCurrency.String
-			}
-		}
-		result = append(result, InvoiceProductOption{
-			ID:        s.encoder.Encode(row.ID),
-			Name:      row.Name,
-			Serial:    row.Serial,
-			BrandName: row.BrandName,
-			UnitPrice: price,
-			Currency:  currency,
-			Price:     utils.NewMoney(price, currency).Display(),
-		})
+		result = append(result, s.mapInvoiceProductOption(row))
 	}
 	return result, nil
 }
 
+func ProductOptionLabel(p InvoiceProductOption) string {
+	label := p.Name
+	if p.Serial != "" {
+		label = p.Serial + " · " + label
+	}
+	if p.BrandName != "" {
+		label = p.BrandName + " - " + label
+	}
+	if p.Price != "" {
+		label += " · " + p.Price
+	}
+	return label
+}
+
+func InvoiceSearchLabel(inv InvoiceListItem) string {
+	label := inv.InvoiceNumber
+	if inv.RecipientEmail != "" {
+		label += " · " + inv.RecipientEmail
+	}
+	if inv.Total != "" {
+		label += " · " + inv.Total
+	}
+	return label
+}
+
+func (s *InvoiceService) mapInvoiceProductOption(row queries.SearchProductsForInvoiceLineItemsRow) InvoiceProductOption {
+	price := row.UnitPriceWithVat
+	currency := row.UnitPriceWithVatCurrency
+	if row.IsOnSale == 1 && row.SalePriceWithVat.Valid {
+		price = row.SalePriceWithVat.Int64
+		if row.SalePriceWithVatCurrency.Valid {
+			currency = row.SalePriceWithVatCurrency.String
+		}
+	}
+	return InvoiceProductOption{
+		ID:        s.encoder.Encode(row.ID),
+		Name:      row.Name,
+		Serial:    row.Serial,
+		BrandName: row.BrandName,
+		UnitPrice: price,
+		Currency:  currency,
+		Price:     utils.NewMoney(price, currency).Display(),
+	}
+}
+
 func (s *InvoiceService) productUnitPrice(ctx context.Context, productID int64) (int64, string, string, error) {
-	rows, err := s.dbRO.GetQueries().ListProductsForQuotations(ctx)
-	if err != nil {
-		return 0, "", "", err
-	}
-	for _, row := range rows {
-		if row.ID != productID {
-			continue
-		}
-		price := row.UnitPriceWithVat
-		currency := row.UnitPriceWithVatCurrency
-		if row.IsOnSale == 1 && row.SalePriceWithVat.Valid {
-			price = row.SalePriceWithVat.Int64
-			if row.SalePriceWithVatCurrency.Valid {
-				currency = row.SalePriceWithVatCurrency.String
-			}
-		}
-		return price, currency, row.Name, nil
-	}
 	product, err := s.dbRO.GetQueries().GetProductsByID(ctx, productID)
 	if err != nil {
 		return 0, "", "", err
@@ -500,14 +522,27 @@ func (s *InvoiceService) productUnitPrice(ctx context.Context, productID int64) 
 }
 
 func parseMoneyCentavos(raw, currency string) (int64, error) {
-	if strings.TrimSpace(raw) == "" {
+	cleaned := stripMoneyDecorations(raw)
+	if cleaned == "" {
 		return 0, nil
 	}
-	m, err := utils.NewMoneyFromString(strings.ReplaceAll(strings.TrimSpace(raw), ",", ""), currency)
+	m, err := utils.NewMoneyFromString(cleaned, currency)
 	if err != nil {
 		return 0, err
 	}
 	return m.Amount(), nil
+}
+
+func stripMoneyDecorations(raw string) string {
+	s := strings.TrimSpace(raw)
+	s = strings.ReplaceAll(s, ",", "")
+	var b strings.Builder
+	for _, r := range s {
+		if (r >= '0' && r <= '9') || r == '.' || r == '-' {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 func parseVATRate(v string) float64 {
@@ -568,7 +603,10 @@ func (s *InvoiceService) CreateInvoice(ctx context.Context, staffID string, in C
 		return Invoice{}, errs.ErrDecode
 	}
 
-	issueDate := utils.NowPH().Format(constants.DateLayoutISO)
+	issueDate := strings.TrimSpace(in.IssueDate)
+	if issueDate == "" {
+		issueDate = utils.NowPH().Format(constants.DateLayoutISO)
+	}
 	txType := defaultTransactionType(in.TransactionType)
 
 	tx, err := s.dbRW.GetDB().BeginTx(ctx, nil)
@@ -608,6 +646,9 @@ func (s *InvoiceService) CreateInvoice(ctx context.Context, staffID string, in C
 		Status:                  enums.INVOICE_STATUS_PROCESSING.String(),
 		IssueDate:               issueDate,
 		DueDate:                 strings.TrimSpace(in.DueDate),
+		DeliveryDate:            strings.TrimSpace(in.DeliveryDate),
+		PaymentTermsValue:       in.PaymentTermsValue,
+		PaymentTermsUnit:        strings.TrimSpace(in.PaymentTermsUnit),
 		Notes:                   strings.TrimSpace(in.Notes),
 		Currency:                currency,
 		Subtotal:                summary.Subtotal,
@@ -794,7 +835,10 @@ func (s *InvoiceService) mapInvoice(inv queries.TblInvoice, currency string) Inv
 		RecipientAddress:          inv.RecipientAddress,
 		RecipientTIN:              inv.RecipientTin,
 		IssueDate:                 inv.IssueDate,
+		DeliveryDate:              inv.DeliveryDate,
 		DueDate:                   inv.DueDate,
+		PaymentTermsValue:         inv.PaymentTermsValue,
+		PaymentTermsUnit:          inv.PaymentTermsUnit,
 		Notes:                     inv.Notes,
 		Currency:                  currency,
 		VATPercentage:             inv.VatPercentage,
@@ -884,9 +928,36 @@ func (s *InvoiceService) mapInvoiceListItem(r queries.ListInvoicesPaginatedRow) 
 	}
 }
 
-func (s *InvoiceService) GetAllInvoices(ctx context.Context) ([]InvoiceListItem, error) {
-	invoices, _, err := s.GetInvoicesPaginated(ctx, 1, 500)
-	return invoices, err
+func (s *InvoiceService) mapSearchInvoiceRow(r queries.SearchInvoicesRow) InvoiceListItem {
+	currency := cmpOr(r.Currency, constants.PHP)
+	return InvoiceListItem{
+		ID:             s.encoder.Encode(r.ID),
+		InvoiceNumber:  r.InvoiceNumber,
+		RecipientEmail: r.RecipientEmail,
+		Status:         enums.ParseInvoiceStatusToEnum(r.Status),
+		IssueDate:      r.IssueDate,
+		Subtotal:       utils.NewMoney(r.Subtotal, currency).Display(),
+		Total:          utils.NewMoney(r.Total, currency).Display(),
+		Emailed:        r.EmailedAt != "",
+		PDFReady:       strings.TrimSpace(r.PdfPath) != "",
+		CreatedAt:      utils.ConvertToPH(r.CreatedAt),
+	}
+}
+
+func (s *InvoiceService) SearchInvoices(ctx context.Context, search string, limit int) ([]InvoiceListItem, error) {
+	limit = max(1, min(limit, 50))
+	rows, err := s.dbRO.GetQueries().SearchInvoices(ctx, queries.SearchInvoicesParams{
+		Search: strings.TrimSpace(search),
+		Limit:  int64(limit),
+	})
+	if err != nil {
+		return nil, errors.Join(errs.ErrInvoice, err)
+	}
+	result := make([]InvoiceListItem, 0, len(rows))
+	for _, row := range rows {
+		result = append(result, s.mapSearchInvoiceRow(row))
+	}
+	return result, nil
 }
 
 func (s *InvoiceService) GetInvoicesPaginated(ctx context.Context, page, perPage int) ([]InvoiceListItem, int64, error) {

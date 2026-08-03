@@ -131,9 +131,11 @@ func drawCustomerBlock(pdf *fpdf.Fpdf, tr func(string) string, invoice Invoice, 
 	pdf.SetXY(12+leftW, metaY+9)
 	meta := [][2]string{
 		{"Date:", invoice.IssueDate},
-		{"Due:", orDash(invoice.DueDate)},
-		{"TIN:", orDash(invoice.RecipientTIN)},
 	}
+	if strings.TrimSpace(invoice.DeliveryDate) != "" {
+		meta = append(meta, [2]string{"Delivery:", invoice.DeliveryDate})
+	}
+	meta = append(meta, [2]string{"Due:", orDash(invoice.DueDate)}, [2]string{"TIN:", orDash(invoice.RecipientTIN)})
 	for _, mr := range meta {
 		pdf.SetX(12 + leftW)
 		pdf.CellFormat(18, 4, tr(mr[0]), "", 0, "L", false, 0, "")

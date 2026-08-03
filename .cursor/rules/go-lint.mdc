@@ -6,9 +6,24 @@ alwaysApply: false
 
 # Go Lint Conventions
 
-Project linters include `perfsprint`, `whitespace`, and others (see `.golangci.yml`). Fix issues before committing; run `mage scf` when validating locally.
+Enabled linters (see `.golangci.yml`): `govet`, `errcheck`, `staticcheck`, `unused`, `gocritic`, `usestdlibvars`, `prealloc`, `perfsprint`, `tparallel`, `whitespace`, `fatcontext`. Fix issues before committing; run `mage scf` when validating locally.
+
+## errcheck
+
+Always check returned errors. Do not assign to `_` unless the error is genuinely ignorable (rare).
+
+```go
+// BAD
+_, err := foo()
+if err != nil { ... }
+
+// GOOD
+if _, err := foo(); err != nil { ... }
+```
 
 ## perfsprint
+
+### Integer and boolean formatting
 
 Prefer `strconv` over `fmt.Sprintf` for integer and boolean formatting.
 
@@ -29,6 +44,8 @@ if len(s) < 14 {
 }
 ```
 
+### String concatenation
+
 For simple string suffixes/prefixes, use concatenation instead of `fmt.Sprintf("%s.pdf", name)`:
 
 ```go
@@ -41,22 +58,25 @@ FileName: cmpOr(invoice.InvoiceNumber, "invoice") + ".pdf"
 
 `fmt.Sprintf` remains appropriate for multi-value or non-scalar format strings (e.g. `"%d. %s -> %s"`).
 
-## modernize (min / max)
+### error-format
 
-Go 1.21+ built-in `min` and `max` replace manual compare-and-assign for bounds. Prefer them when clamping a single value.
+Reserve `fmt.Errorf` for wrapping (`%w`) or format verbs (`%s`, `%d`, etc.). For static error strings, define sentinel errors in `internal/errs` — do not use inline `errors.New` or `fmt.Errorf` in application code.
 
 ```go
 // BAD
-listPage := q.Page
-if listPage < 1 {
-    listPage = 1
-}
+return "", fmt.Errorf("invalid payment terms")
 
-// GOOD
-listPage := max(q.Page, 1)
+// BAD — inline static error
+return "", errors.New("invalid payment terms")
+
+// GOOD — sentinel in internal/errs
+return "", errs.ErrInvalidPaymentTerms
+
+// GOOD — wrapping
+return fmt.Errorf("failed to create customer: %w", err)
 ```
 
-Use `models.ClampPage` (or similar) when the upper bound depends on total count and page size—not when only enforcing a minimum of 1.
+Define sentinels in domain-scoped files under `internal/errs` (e.g. `payment_terms.go`, `invoice.go`). Use `errors.Is` in tests and handlers to match them.
 
 ### concat-loop
 
@@ -86,6 +106,74 @@ for i, id := range ids {
 input := b.String()
 ```
 
+## usestdlibvars
+
+Use named constants from the standard library instead of raw literals.
+
+```go
+// BAD
+w.WriteHeader(200)
+time.Sleep(time.Duration(5) * time.Second)
+
+// GOOD
+w.WriteHeader(http.StatusOK)
+time.Sleep(5 * time.Second)
+```
+
+## prealloc
+
+Preallocate slices when the final length is known or bounded.
+
+```go
+// BAD
+var result []Brand
+for _, b := range brands {
+    result = append(result, mapBrand(b))
+}
+
+// GOOD
+result := make([]Brand, 0, len(brands))
+for _, b := range brands {
+    result = append(result, mapBrand(b))
+}
+```
+
+## fatcontext
+
+Do not call `context.WithTimeout`, `context.WithCancel`, or `context.WithDeadline` inside a loop. Create the derived context once outside the loop.
+
+```go
+// BAD
+for _, item := range items {
+    ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+    defer cancel()
+    process(ctx, item)
+}
+
+// GOOD
+ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+defer cancel()
+for _, item := range items {
+    process(ctx, item)
+}
+```
+
+## tparallel
+
+Call `t.Parallel()` at the start of table-driven subtests (and the parent test when safe) to speed up the suite.
+
+```go
+func TestFoo(t *testing.T) {
+    t.Parallel()
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            t.Parallel()
+            // ...
+        })
+    }
+}
+```
+
 ## whitespace
 
 Do not put a blank line immediately after a function's opening `{`.
@@ -103,13 +191,19 @@ func TestFoo(t *testing.T) {
 }
 ```
 
-## Error strings
+## modernize (min / max)
 
-When wrapping errors with a fixed prefix, prefer string concatenation over `fmt.Errorf` with `%w` where golangci/perfsprint applies:
+Go 1.21+ built-in `min` and `max` replace manual compare-and-assign for bounds. Prefer them when clamping a single value.
 
 ```go
+// BAD
+listPage := q.Page
+if listPage < 1 {
+    listPage = 1
+}
+
 // GOOD
-return errors.New(constants.MsgFailedCheck + ": " + err.Error())
+listPage := max(q.Page, 1)
 ```
 
-Use sentinel errors from `internal/constants` or `internal/errs` for stable, reusable messages.
+Use `models.ClampPage` (or similar) when the upper bound depends on total count and page size—not when only enforcing a minimum of 1.

@@ -129,6 +129,9 @@ INSERT INTO tbl_invoices (
     status,
     issue_date,
     due_date,
+    delivery_date,
+    payment_terms_value,
+    payment_terms_unit,
     notes,
     currency,
     subtotal,
@@ -152,7 +155,7 @@ INSERT INTO tbl_invoices (
     created_at,
     updated_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
 ) RETURNING id;
 
 -- name: SetInvoiceNumber :exec
@@ -215,7 +218,7 @@ FROM tbl_invoices
 ORDER BY tbl_invoices.id DESC
 LIMIT @limit OFFSET @offset;
 
--- name: GetAllInvoices :many
+-- name: SearchInvoices :many
 SELECT
     tbl_invoices.id,
     tbl_invoices.invoice_number,
@@ -231,8 +234,13 @@ SELECT
     tbl_invoices.emailed_at,
     tbl_invoices.created_at
 FROM tbl_invoices
+WHERE
+    (@search IS NULL OR @search = '' OR
+        LOWER(tbl_invoices.invoice_number) LIKE '%' || LOWER(@search) || '%' OR
+        LOWER(tbl_invoices.recipient_name) LIKE '%' || LOWER(@search) || '%' OR
+        LOWER(tbl_invoices.recipient_email) LIKE '%' || LOWER(@search) || '%')
 ORDER BY tbl_invoices.id DESC
-LIMIT 500;
+LIMIT @limit;
 
 -- name: UpdateInvoiceStatus :exec
 UPDATE tbl_invoices

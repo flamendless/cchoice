@@ -5,7 +5,6 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -795,23 +794,23 @@ func SCF() error {
 	return nil
 }
 
-func HasTrailingWhitespace() bool {
+func HasTrailingWhitespace() error {
 	fmt.Println("Running has trailing whitespace...")
 	gitCmd := exec.Command("git", "diff", "--name-only", "HEAD")
 	var gitOut bytes.Buffer
 	gitCmd.Stdout = &gitOut
 	if err := gitCmd.Run(); err != nil {
-		return true
+		return fmt.Errorf("failed to list changed files: %w", err)
 	}
 
 	files := strings.Fields(gitOut.String())
 	if len(files) == 0 {
-		return false
+		return nil
 	}
 
 	validFiles := make([]string, 0, len(files))
 	for _, file := range files {
-		if strings.HasSuffix(file, ".png") {
+		if strings.HasSuffix(file, ".png") || strings.HasSuffix(file, ".pdf") {
 			continue
 		}
 		validFiles = append(validFiles, file)
@@ -833,14 +832,18 @@ func HasTrailingWhitespace() bool {
 			}
 		}
 		if n == len(msgs) {
-			return false
+			return nil
 		}
 		if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() == 1 {
-			return err == nil
+			return nil
 		}
+		return fmt.Errorf("trailing whitespace check failed: %w\n%s", err, strings.TrimSpace(string(out)))
 	}
 
-	return string(out) != ""
+	if matches := strings.TrimSpace(string(out)); matches != "" {
+		return fmt.Errorf("trailing whitespace detected:\n%s", matches)
+	}
+	return nil
 }
 
 func CheckCommitPrefix() error {
@@ -909,8 +912,8 @@ func hasPackageChanged(pkg string) (bool, error) {
 }
 
 func TestAll() error {
-	if hasTW := HasTrailingWhitespace(); hasTW {
-		return errors.New("trailing whitespace detected")
+	if err := HasTrailingWhitespace(); err != nil {
+		return err
 	}
 
 	hasChanges, err := hasExtChanges("*.go")
