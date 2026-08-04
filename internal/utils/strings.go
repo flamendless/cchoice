@@ -1,14 +1,23 @@
 package utils
 
 import (
-	"database/sql"
 	"cchoice/internal/enums"
 	"crypto/rand"
+	"database/sql"
 	"strings"
 	"unicode"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+)
+
+var productCodeReplacer = strings.NewReplacer(
+	" ", "",
+	"-", "",
+	"_", "",
+	"\t", "",
+	"\n", "",
+	"\r", "",
 )
 
 func GetInitials(str string) string {
@@ -104,4 +113,13 @@ func StringFromAny(v any) string {
 		return s
 	}
 	return ""
+}
+
+func NormalizeProductCode(code, brand string) string {
+	code = productCodeReplacer.Replace(strings.ToLower(strings.TrimSpace(code)))
+	brandPrefix := productCodeReplacer.Replace(strings.ToLower(strings.TrimSpace(brand)))
+	if brandPrefix != "" && strings.HasPrefix(code, brandPrefix) {
+		code = strings.TrimPrefix(code, brandPrefix)
+	}
+	return code
 }

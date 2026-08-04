@@ -21,6 +21,24 @@ func NowPH() time.Time {
 	return time.Now().In(phLocation)
 }
 
+func ParseOnlyBeforePH(value string) (time.Time, error) {
+	if value == "" {
+		now := NowPH()
+		start := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, phLocation)
+		return start.UTC(), nil
+	}
+
+	if t, err := time.ParseInLocation(constants.DateTimeLayoutISO, value, phLocation); err == nil {
+		return t.UTC(), nil
+	}
+	if t, err := time.ParseInLocation(constants.DateLayoutISO, value, phLocation); err == nil {
+		start := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, phLocation)
+		return start.UTC(), nil
+	}
+
+	return time.Time{}, fmt.Errorf("invalid only-before value %q", value)
+}
+
 func ConvertToPH(datetimeStr string) string {
 	if datetimeStr == "" {
 		return ""

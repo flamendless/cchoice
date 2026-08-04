@@ -1,7 +1,7 @@
 ---
 description: golangci-lint conventions (perfsprint, whitespace, error handling)
 globs: "**/*.go"
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Go Lint Conventions
@@ -207,3 +207,46 @@ listPage := max(q.Page, 1)
 ```
 
 Use `models.ClampPage` (or similar) when the upper bound depends on total count and page size—not when only enforcing a minimum of 1.
+
+## file-layout
+
+Declare all `type`, `struct`, and `interface` definitions at the top of each file, before `const`, `var`, and functions — including `cmd/*.go` CLI commands.
+
+## gocritic (ifElseChain)
+
+Rewrite `if` / `else if` / `else` chains with three or more branches to a `switch` (often `switch { case ... }` when conditions are unrelated).
+
+```go
+// BAD
+if state.PendingMigration {
+    ...
+} else if len(state.PendingScripts) == 0 {
+    ...
+} else {
+    ...
+}
+
+// GOOD
+switch {
+case state.PendingMigration:
+    ...
+case len(state.PendingScripts) == 0:
+    ...
+default:
+    ...
+}
+```
+
+## staticcheck (SA1019) — valgo
+
+Use current valgo string validators; deprecated methods are flagged by staticcheck.
+
+```go
+// BAD — deprecated, removed in valgo v1.0
+v.String(pw, "password").OfLengthBetween(8, 32)
+v.String(data.MobileNo, "mobile number").OfLength(13)
+
+// GOOD
+v.String(pw, "password").LengthBetween(8, 32)
+v.String(data.MobileNo, "mobile number").Length(13)
+```

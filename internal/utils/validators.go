@@ -31,7 +31,7 @@ func ValidateNotBlank(field string, key string) error {
 
 func ValidateUsername(username string) error {
 	val := v.Check(
-		v.String(username, "username").Not().Blank().OfLengthBetween(8, 32),
+		v.String(username, "username").Not().Blank().LengthBetween(8, 32),
 	)
 	if !val.Valid() {
 		errs := val.Errors()["username"]
@@ -47,7 +47,7 @@ func ValidateUsername(username string) error {
 
 func ValidatePW(pw string) error {
 	val := v.Check(
-		v.String(pw, "password").Not().Blank().OfLengthBetween(8, 32),
+		v.String(pw, "password").Not().Blank().LengthBetween(8, 32),
 	)
 	if !val.Valid() {
 		errs := val.Errors()["password"]
@@ -77,9 +77,9 @@ func ValidateUserReg(data ValidateUserRegInput) error {
 		v.String(data.MiddleName, "middle name").Not().Blank(),
 		v.String(data.LastName, "last name").Not().Blank(),
 		v.String(data.Email, "email").Not().Blank(),
-		v.String(data.Password, "password").Not().Blank().OfLengthBetween(8, 32),
-		v.String(data.ConfirmPassword, "confirm_password").Not().Blank().OfLengthBetween(8, 32).EqualTo(data.Password),
-		v.String(data.MobileNo, "mobile number").Not().Blank().OfLength(13),
+		v.String(data.Password, "password").Not().Blank().LengthBetween(8, 32),
+		v.String(data.ConfirmPassword, "confirm_password").Not().Blank().LengthBetween(8, 32).EqualTo(data.Password),
+		v.String(data.MobileNo, "mobile number").Not().Blank().Length(13),
 	)
 
 	if !val.Valid() {

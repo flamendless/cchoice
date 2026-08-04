@@ -178,3 +178,52 @@ func TestStringFromAny(t *testing.T) {
 		})
 	}
 }
+
+func TestNormalizeProductCode(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name  string
+		code  string
+		brand string
+		want  string
+	}{
+		{
+			name:  "lowercase and strip separators",
+			code:  "ABC-123",
+			brand: "BOSCH",
+			want:  "abc123",
+		},
+		{
+			name:  "strip brand prefix with separators",
+			code:  "BOSCH ABC-123",
+			brand: "BOSCH",
+			want:  "abc123",
+		},
+		{
+			name:  "strip brand prefix without separators",
+			code:  "BOSCHABC123",
+			brand: "BOSCH",
+			want:  "abc123",
+		},
+		{
+			name:  "filename stem style",
+			code:  "BOSCH_ABC-123",
+			brand: "BOSCH",
+			want:  "abc123",
+		},
+		{
+			name:  "mixed case brand prefix",
+			code:  "bosch abc 123",
+			brand: "Bosch",
+			want:  "abc123",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, tt.want, NormalizeProductCode(tt.code, tt.brand))
+		})
+	}
+}

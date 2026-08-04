@@ -145,7 +145,7 @@ import (
 - **Database field params**: `queries.CreateCustomerParams` style from sqlc
 
 ### File Layout
-- Declare all `type`, `struct`, and `interface` definitions at the top of each file, before `const`, `var`, and functions
+- Declare all `type`, `struct`, and `interface` definitions at the top of each file, before `const`, `var`, and functions — including `cmd/*.go` CLI commands
 - When a package grows large, split by responsibility into multiple files in the same package (e.g. types, constants, parsing, merge logic) instead of one long file
 - Keep related tests in similarly named files (e.g. `product_export_parse_test.go` for `product_export_parse.go`)
 

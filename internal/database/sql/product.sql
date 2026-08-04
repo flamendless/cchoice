@@ -978,3 +978,19 @@ WHERE status = 'ACTIVE'
 	AND slug != ''
 	AND slug IS NOT NULL
 ORDER BY updated_at DESC;
+
+-- name: GetProductsWithImagesByBrandID :many
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.name,
+	tbl_product_images.id AS product_image_id,
+	tbl_product_images.path,
+	tbl_product_images.thumbnail,
+	tbl_product_images.created_at AS image_created_at,
+	tbl_product_images.updated_at AS image_updated_at,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
+FROM tbl_products
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+WHERE tbl_products.brand_id = ?;

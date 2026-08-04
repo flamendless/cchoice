@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"fmt"
+	"net/http"
+
 	"cchoice/internal/constants"
 	"cchoice/internal/enums"
 )
@@ -32,6 +35,23 @@ func IsYouTubeURL(url string) bool {
 		}
 	}
 	return false
+}
+
+func IsValidProductImageContentType(contentType string) bool {
+	switch contentType {
+	case enums.IMAGE_FORMAT_JPEG.MIMEType(), enums.IMAGE_FORMAT_PNG.MIMEType(), enums.IMAGE_FORMAT_WEBP.MIMEType():
+		return true
+	default:
+		return false
+	}
+}
+
+func DetectProductImageContentType(data []byte) (string, error) {
+	contentType := http.DetectContentType(data)
+	if !IsValidProductImageContentType(contentType) {
+		return "", fmt.Errorf("invalid image content type: %s", contentType)
+	}
+	return contentType, nil
 }
 
 func ConvertYouTubeToEmbed(url string) string {

@@ -7,6 +7,7 @@ import (
 	"cchoice/internal/constants"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTimeToMinutes(t *testing.T) {
@@ -102,4 +103,30 @@ func TestFormatDurationFromMinutes(t *testing.T) {
 			assert.Equal(t, tt.expect, FormatDurationFromMinutes(tt.m))
 		})
 	}
+}
+
+func TestParseOnlyBeforePH(t *testing.T) {
+	t.Parallel()
+
+	t.Run("datetime", func(t *testing.T) {
+		t.Parallel()
+		got, err := ParseOnlyBeforePH("2026-08-04 15:30:00")
+		require.NoError(t, err)
+		want := time.Date(2026, 8, 4, 15, 30, 0, 0, phLocation).UTC()
+		assert.Equal(t, want, got)
+	})
+
+	t.Run("date only", func(t *testing.T) {
+		t.Parallel()
+		got, err := ParseOnlyBeforePH("2026-08-04")
+		require.NoError(t, err)
+		want := time.Date(2026, 8, 4, 0, 0, 0, 0, phLocation).UTC()
+		assert.Equal(t, want, got)
+	})
+
+	t.Run("invalid", func(t *testing.T) {
+		t.Parallel()
+		_, err := ParseOnlyBeforePH("not-a-date")
+		require.Error(t, err)
+	})
 }

@@ -78,20 +78,21 @@ func Doctor(ctx context.Context, db database.IService) ([]DoctorFinding, error) 
 	if err != nil {
 		return nil, err
 	}
-	if state.PendingMigration {
+	switch {
+	case state.PendingMigration:
 		findings = append(findings, DoctorFinding{
 			Severity: "error",
 			Title:    "datamigrate table",
 			Detail:   "tbl_datamigrate_applied missing",
 			Fix:      "mage dbUp",
 		})
-	} else if len(state.PendingScripts) == 0 {
+	case len(state.PendingScripts) == 0:
 		findings = append(findings, DoctorFinding{
 			Severity: "ok",
 			Title:    "post-migrate scripts",
 			Detail:   "all applied",
 		})
-	} else {
+	default:
 		var names []string
 		for _, p := range state.PendingScripts {
 			names = append(names, p.Name)
@@ -184,26 +185,27 @@ func checkSlugBackfills(ctx context.Context, db database.IService) []DoctorFindi
 		})
 	} else {
 		applied, err := scriptMarkedApplied(ctx, db, "populate_product_slugs")
-		if err != nil {
+		switch {
+		case err != nil:
 			findings = append(findings, DoctorFinding{
 				Severity: "warn",
 				Title:    "product slugs",
 				Detail:   "could not read datamigrate applied: " + err.Error(),
 			})
-		} else if productMissing == 0 {
+		case productMissing == 0:
 			findings = append(findings, DoctorFinding{
 				Severity: "ok",
 				Title:    "product slugs",
 				Detail:   "all products have slugs",
 			})
-		} else if applied {
+		case applied:
 			findings = append(findings, DoctorFinding{
 				Severity: "error",
 				Title:    "product slugs",
 				Detail:   fmt.Sprintf("%d products missing slugs but populate_product_slugs is marked applied", productMissing),
 				Fix:      "DELETE FROM tbl_datamigrate_applied WHERE name='populate_product_slugs'; then run populate_product_slugs --dry-run=false",
 			})
-		} else {
+		default:
 			findings = append(findings, DoctorFinding{
 				Severity: "warn",
 				Title:    "product slugs",
@@ -227,26 +229,27 @@ func checkSlugBackfills(ctx context.Context, db database.IService) []DoctorFindi
 		})
 	} else {
 		applied, err := scriptMarkedApplied(ctx, db, "populate_brand_slugs")
-		if err != nil {
+		switch {
+		case err != nil:
 			findings = append(findings, DoctorFinding{
 				Severity: "warn",
 				Title:    "brand slugs",
 				Detail:   "could not read datamigrate applied: " + err.Error(),
 			})
-		} else if brandMissing == 0 {
+		case brandMissing == 0:
 			findings = append(findings, DoctorFinding{
 				Severity: "ok",
 				Title:    "brand slugs",
 				Detail:   "all brands have slugs",
 			})
-		} else if applied {
+		case applied:
 			findings = append(findings, DoctorFinding{
 				Severity: "error",
 				Title:    "brand slugs",
 				Detail:   fmt.Sprintf("%d brands missing slugs but populate_brand_slugs is marked applied", brandMissing),
 				Fix:      "DELETE FROM tbl_datamigrate_applied WHERE name='populate_brand_slugs'; then run populate_brand_slugs --dry-run=false",
 			})
-		} else {
+		default:
 			findings = append(findings, DoctorFinding{
 				Severity: "warn",
 				Title:    "brand slugs",
@@ -264,19 +267,20 @@ func checkSlugBackfills(ctx context.Context, db database.IService) []DoctorFindi
 			GROUP BY slug HAVING COUNT(*) > 1
 		)
 	`)
-	if err != nil {
+	switch {
+	case err != nil:
 		findings = append(findings, DoctorFinding{
 			Severity: "warn",
 			Title:    "duplicate brand slugs",
 			Detail:   "query failed: " + err.Error(),
 		})
-	} else if dupBrands == 0 {
+	case dupBrands == 0:
 		findings = append(findings, DoctorFinding{
 			Severity: "ok",
 			Title:    "duplicate brand slugs",
 			Detail:   "none",
 		})
-	} else {
+	default:
 		findings = append(findings, DoctorFinding{
 			Severity: "error",
 			Title:    "duplicate brand slugs",

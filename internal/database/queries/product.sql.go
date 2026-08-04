@@ -1521,6 +1521,70 @@ func (q *Queries) GetProductsBySerial(ctx context.Context, serial string) (GetPr
 	return i, err
 }
 
+const getProductsWithImagesByBrandID = `-- name: GetProductsWithImagesByBrandID :many
+SELECT
+	tbl_products.id,
+	tbl_products.serial,
+	tbl_products.name,
+	tbl_product_images.id AS product_image_id,
+	tbl_product_images.path,
+	tbl_product_images.thumbnail,
+	tbl_product_images.created_at AS image_created_at,
+	tbl_product_images.updated_at AS image_updated_at,
+	tbl_product_images.cdn_url,
+	tbl_product_images.cdn_url_thumbnail
+FROM tbl_products
+LEFT JOIN tbl_product_images ON tbl_product_images.product_id = tbl_products.id
+WHERE tbl_products.brand_id = ?
+`
+
+type GetProductsWithImagesByBrandIDRow struct {
+	ID              int64
+	Serial          string
+	Name            string
+	ProductImageID  sql.NullInt64
+	Path            sql.NullString
+	Thumbnail       sql.NullString
+	ImageCreatedAt  sql.NullTime
+	ImageUpdatedAt  sql.NullTime
+	CdnUrl          sql.NullString
+	CdnUrlThumbnail sql.NullString
+}
+
+func (q *Queries) GetProductsWithImagesByBrandID(ctx context.Context, brandID int64) ([]GetProductsWithImagesByBrandIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProductsWithImagesByBrandID, brandID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductsWithImagesByBrandIDRow
+	for rows.Next() {
+		var i GetProductsWithImagesByBrandIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Serial,
+			&i.Name,
+			&i.ProductImageID,
+			&i.Path,
+			&i.Thumbnail,
+			&i.ImageCreatedAt,
+			&i.ImageUpdatedAt,
+			&i.CdnUrl,
+			&i.CdnUrlThumbnail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProductsWithoutSlugs = `-- name: GetProductsWithoutSlugs :many
 SELECT
 	tbl_products.id,
