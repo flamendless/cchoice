@@ -3,6 +3,7 @@ package constants
 const (
 	DefaultLimitCategories                 = 8
 	DefaultShopCategorySectionsPerPage     = 4
+	DefaultShopHomeCategorySections        = 100
 	DefaultShopGridSkeletonCount           = DefaultLimitProducts
 	DefaultShopInitialPreloadSubcategories = 6
 	DefaultShopBatchProductSections        = 4

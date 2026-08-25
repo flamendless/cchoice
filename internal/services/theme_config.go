@@ -12,7 +12,7 @@ import (
 	"cchoice/internal/enums"
 	"cchoice/internal/logs"
 
-	"github.com/go-ini/ini"
+	"gopkg.in/ini.v1"
 	"go.uber.org/zap"
 )
 

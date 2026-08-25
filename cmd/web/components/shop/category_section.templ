@@ -160,7 +160,7 @@ templ categorySubcategorySection(
 	}
 }
 
-templ CategorySection(page int, categories []models.GroupedCategorySection, preloaded map[string]models.CategorySectionProducts) {
+templ CategorySection(page int, categories []models.GroupedCategorySection, preloaded map[string]models.CategorySectionProducts, paginate bool) {
 	for i, category := range categories {
 		<div>
 			<p
@@ -181,7 +181,7 @@ templ CategorySection(page int, categories []models.GroupedCategorySection, prel
 		if category.Label != "" {
 			@common.HR()
 		}
-		if i == len(categories)-1 {
+		if paginate && i == len(categories)-1 {
 			<div
 				class="category-sections-inf-load"
 				hx-get={ utils.URLWithParams("/product-categories/sections", map[string]string{
@@ -196,7 +196,7 @@ templ CategorySection(page int, categories []models.GroupedCategorySection, prel
 	}
 }
 
-templ AllCategorySections(sections []models.GroupedCategorySection, preloaded map[string]models.CategorySectionProducts) {
+templ AllCategorySections(sections []models.GroupedCategorySection, preloaded map[string]models.CategorySectionProducts, paginate bool) {
 	@ModalProductImageViewer("", "")
 	<div id="all-category-sections" class="w-full overflow-x-hidden">
 		<div class="sticky top-0 bg-white z-20 flex flex-row justify-between items-center px-2">
@@ -207,7 +207,7 @@ templ AllCategorySections(sections []models.GroupedCategorySection, preloaded ma
 		@common.HR()
 		if len(sections) > 0 {
 			<div id="category-sections" class="w-full flex flex-col overflow-x-hidden">
-				@CategorySection(0, sections, preloaded)
+				@CategorySection(0, sections, preloaded, paginate)
 			</div>
 		} else {
 			<div

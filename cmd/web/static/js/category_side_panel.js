@@ -6,19 +6,24 @@
 		return header ? header.offsetHeight : 150;
 	}
 
+	function scrollToCategoryElement(target) {
+		const headerHeight = getHeaderHeight();
+		const top = target.getBoundingClientRect().top + window.scrollY - headerHeight;
+		window.scrollTo({ top: top, behavior: "smooth" });
+	}
+
 	function setupCategoryScrollLinks() {
 		document.querySelectorAll(".category-scroll-link").forEach(function(link) {
-			if (link.dataset.scrollListenerAdded)
-				return
+			if (link.dataset.scrollListenerAdded) {
+				return;
+			}
 			link.dataset.scrollListenerAdded = "true";
 			link.addEventListener("click", function(e) {
 				e.preventDefault();
 				const targetId = this.getAttribute("data-scroll-target");
-				const target = document.getElementById(targetId);
+				const target = targetId ? document.getElementById(targetId) : null;
 				if (target) {
-					const headerHeight = getHeaderHeight();
-					const scrollPos = target.offsetTop - headerHeight;
-					window.scrollTo({top: scrollPos, behavior: "smooth"});
+					scrollToCategoryElement(target);
 				}
 				return false;
 			});
@@ -31,8 +36,9 @@
 		}
 
 		const categoryLinks = document.querySelectorAll(".category-scroll-link");
-		if (categoryLinks.length === 0)
-			return
+		if (categoryLinks.length === 0) {
+			return;
+		}
 
 		const categorySections = Array.from(categoryLinks).map(function(link) {
 			const targetId = link.getAttribute("data-scroll-target");
@@ -44,8 +50,9 @@
 			return item.section !== null;
 		});
 
-		if (categorySections.length === 0)
-			return
+		if (categorySections.length === 0) {
+			return;
+		}
 
 		const headerHeight = getHeaderHeight();
 		const rootMargin = "-" + (headerHeight + 20) + "px 0px -60% 0px";
@@ -94,4 +101,3 @@
 	document.body.addEventListener("htmx:afterSwap", handleHTMXContentSwap);
 	document.body.addEventListener("htmx:afterSettle", handleHTMXContentSwap);
 })();
-

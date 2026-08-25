@@ -459,9 +459,9 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 		&s.SF,
 		s.dbRO,
 		s.encoder,
-		requests.GenerateCategorySectionCacheKey(0, constants.DefaultShopCategorySectionsPerPage),
+		requests.GenerateCategorySectionCacheKey(0, constants.DefaultShopHomeCategorySections),
 		0,
-		constants.DefaultShopCategorySectionsPerPage,
+		constants.DefaultShopHomeCategorySections,
 	)
 	if err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err), zap.String("message", "failed to get category sections"))
@@ -471,7 +471,7 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 		ctx,
 		categorySections,
 		brandID,
-		constants.DefaultShopInitialPreloadSubcategories,
+		0,
 	)
 
 	homePageData := models.HomePageData{

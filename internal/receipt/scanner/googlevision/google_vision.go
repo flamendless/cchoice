@@ -13,7 +13,7 @@ import (
 	"os"
 	"strings"
 
-	vision "cloud.google.com/go/vision/apiv1"
+	vision "cloud.google.com/go/vision/v2/apiv1"
 	"cloud.google.com/go/vision/v2/apiv1/visionpb"
 	"go.uber.org/zap"
 	"google.golang.org/api/option"
@@ -91,10 +91,16 @@ func (g *GoogleVisionScanner) ScanReceipt(imagePath string) (*scanner.ReceiptDat
 		ImageContext: imageContext,
 	}
 
-	response, err := g.client.AnnotateImage(ctx, request)
+	batchResp, err := g.client.BatchAnnotateImages(ctx, &visionpb.BatchAnnotateImagesRequest{
+		Requests: []*visionpb.AnnotateImageRequest{request},
+	})
 	if err != nil {
 		return nil, errors.Join(errs.ErrGVisionAPI, err)
 	}
+	if len(batchResp.Responses) == 0 {
+		return nil, errs.ErrReceiptNoTextFound
+	}
+	response := batchResp.Responses[0]
 
 	if response.Error != nil {
 		return nil, errors.Join(errs.ErrGVisionAPI, errors.New(response.Error.Message))

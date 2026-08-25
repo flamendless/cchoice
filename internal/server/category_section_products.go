@@ -71,15 +71,11 @@ func filterProductsWithValidImages(products []queries.GetProductsByCategoryIDRow
 }
 
 func firstSubcategoryIDs(sections []models.GroupedCategorySection, limit int) []string {
-	if limit <= 0 {
-		return nil
-	}
-
-	ids := make([]string, 0, limit)
+	ids := make([]string, 0)
 	for _, category := range sections {
 		for _, subcategory := range category.Subcategories {
 			ids = append(ids, subcategory.CategoryID)
-			if len(ids) >= limit {
+			if limit > 0 && len(ids) >= limit {
 				return ids
 			}
 		}

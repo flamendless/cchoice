@@ -87,7 +87,7 @@ func (s *Server) categorySectionHandler(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := compshop.CategorySection(page, res, nil).Render(ctx, w); err != nil {
+	if err := compshop.CategorySection(page, res, nil, true).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.Error(err),

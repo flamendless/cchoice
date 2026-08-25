@@ -655,7 +655,7 @@ func categorySubcategorySection(
 	})
 }
 
-func CategorySection(page int, categories []models.GroupedCategorySection, preloaded map[string]models.CategorySectionProducts) templ.Component {
+func CategorySection(page int, categories []models.GroupedCategorySection, preloaded map[string]models.CategorySectionProducts, paginate bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -732,7 +732,7 @@ func CategorySection(page int, categories []models.GroupedCategorySection, prelo
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if i == len(categories)-1 {
+			if paginate && i == len(categories)-1 {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "<div class=\"category-sections-inf-load\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -759,7 +759,7 @@ func CategorySection(page int, categories []models.GroupedCategorySection, prelo
 	})
 }
 
-func AllCategorySections(sections []models.GroupedCategorySection, preloaded map[string]models.CategorySectionProducts) templ.Component {
+func AllCategorySections(sections []models.GroupedCategorySection, preloaded map[string]models.CategorySectionProducts, paginate bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -797,7 +797,7 @@ func AllCategorySections(sections []models.GroupedCategorySection, preloaded map
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = CategorySection(0, sections, preloaded).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = CategorySection(0, sections, preloaded, paginate).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
