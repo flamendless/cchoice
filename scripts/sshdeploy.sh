@@ -83,14 +83,9 @@ echo "Navigating to project directory..."
 cd "$PROJECT_DIR"
 
 echo "Syncing repository..."
-if ! git pull origin main; then
-	echo "Pull failed, stashing local changes and retrying..."
-	git stash push -u -m "deploy stash $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-	git pull origin main
-fi
-
-echo "Fetching tags..."
+# fetch + reset — never stash; stash -u can pick up local DB files on the server
 git fetch --prune --tags origin
+git reset --hard origin/main
 
 echo "Syncing Go modules..."
 go mod download

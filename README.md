@@ -81,6 +81,7 @@ CPOINT_HMAC_SECRET="your-generated-secret"
     - E-Mail
 - Bugfix
 - AI
+- SEO
 
 ---
 

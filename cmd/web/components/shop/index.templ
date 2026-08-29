@@ -83,6 +83,7 @@ templ HomePageBody(data models.HomePageData) {
 			</div>
 			<div id="main-content" name="right-panel">
 				<div class="w-full">
+					<h1 class="sr-only">Power Tools &amp; Construction Supplies Philippines</h1>
 					@AllCategorySections(data.CategorySections, data.PreloadedCategoryProducts, false)
 					@PostHomeContentSections(data)
 				</div>

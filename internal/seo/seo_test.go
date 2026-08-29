@@ -92,7 +92,7 @@ func gma55Product() Product {
 	}
 }
 
-const gma55Title = "Bosch GMA 55 Table Saw Power Tools | Price, Specs, Buy Online | C-Choice"
+const gma55Title = "Bosch GMA 55 | Buy Online | C-Choice"
 
 func TestGenerateProductMeta(t *testing.T) {
 	product := gma55Product()
@@ -122,13 +122,16 @@ func TestGenerateProductMeta(t *testing.T) {
 }
 
 func TestBuildProductTitle(t *testing.T) {
+	t.Parallel()
 	title := buildProductTitle(gma55Product())
 	assert.Equal(t, gma55Title, title)
+	assert.LessOrEqual(t, len(title), 60)
 
 	saleProduct := gma55Product()
 	saleProduct.OnSale = true
 	saleTitle := buildProductTitle(saleProduct)
 	assert.Equal(t, "SALE! "+gma55Title, saleTitle)
+	assert.LessOrEqual(t, len(saleTitle), 60)
 }
 
 func TestGenerateProductMeta_TruncatesLongDescription(t *testing.T) {

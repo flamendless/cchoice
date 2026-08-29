@@ -162,7 +162,7 @@ func HomePageBody(data models.HomePageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div><div id=\"main-content\" name=\"right-panel\"><div class=\"w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div><div id=\"main-content\" name=\"right-panel\"><div class=\"w-full\"><h1 class=\"sr-only\">Power Tools &amp; Construction Supplies Philippines</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

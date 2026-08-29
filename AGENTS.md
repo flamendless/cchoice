@@ -319,6 +319,7 @@ cchoice/
 - `Config` - Configuration
 - `Docs` - Documentation
 - `Bugfix` - Bug fixes
+- `SEO`
 
 ---
 

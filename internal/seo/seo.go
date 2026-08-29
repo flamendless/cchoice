@@ -118,15 +118,8 @@ func BuildSitemapXML(homeURL string, products []SitemapEntry) string {
 
 func buildProductTitle(product Product) string {
 	const saleTitlePrefix = "SALE! "
-	parts := []string{product.BrandName, product.Name}
-	if product.ProductCategory != "" {
-		parts = append(parts, utils.SlugToTile(product.ProductCategory))
-	}
-	if product.ProductSubcategory != "" {
-		parts = append(parts, utils.SlugToTile(product.ProductSubcategory))
-	}
-	parts = append(parts, "Power Tools")
-	title := strings.Join(parts, " ") + " | Price, Specs, Buy Online | C-Choice"
+	const suffix = " | Buy Online | C-Choice"
+	title := strings.TrimSpace(product.BrandName+" "+product.Name) + suffix
 	if product.OnSale {
 		title = saleTitlePrefix + title
 	}

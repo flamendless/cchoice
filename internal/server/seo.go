@@ -58,7 +58,7 @@ func (s *Server) sitemapHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entries := make([]seo.SitemapEntry, 0, len(products))
+	productEntries := make(map[string]seo.SitemapEntry, len(products))
 	for _, product := range products {
 		if !product.Slug.Valid || product.Slug.String == "" {
 			continue
@@ -67,12 +67,20 @@ func (s *Server) sitemapHandler(w http.ResponseWriter, r *http.Request) {
 		if lastMod.IsZero() {
 			lastMod = time.Now().UTC()
 		}
-		entries = append(entries, seo.SitemapEntry{
+		entry := seo.SitemapEntry{
 			Loc:        utils.SiteURL("/product/" + product.Slug.String),
 			LastMod:    lastMod.UTC(),
 			ChangeFreq: "weekly",
 			Priority:   "0.8",
-		})
+		}
+		if existing, ok := productEntries[entry.Loc]; ok && !entry.LastMod.After(existing.LastMod) {
+			continue
+		}
+		productEntries[entry.Loc] = entry
+	}
+	entries := make([]seo.SitemapEntry, 0, len(productEntries)+len(products))
+	for _, entry := range productEntries {
+		entries = append(entries, entry)
 	}
 
 	categorySlugs, err := s.services.productCategory.ListCategorySitemapSlugs(ctx)
