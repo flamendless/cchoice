@@ -14,4 +14,5 @@ const (
 var CDNExcludePrefixKey = []string{
 	"payments-",
 	"brand_logos-",
+	"product_images-",
 }

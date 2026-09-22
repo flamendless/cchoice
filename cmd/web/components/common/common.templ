@@ -38,19 +38,19 @@ templ HR() {
 }
 
 templ HeadMeta() {
-	@HeadMetaBase()
+	@HeadMetaBase(true)
 	@HeadSEO(models.DefaultSiteSEO())
 }
 
 templ HeadMetaWithTheme(themeCSS string) {
-	@HeadMetaBase()
+	@HeadMetaBase(true)
 	if themeCSS != "" {
 		@ThemeStyle(themeCSS)
 	}
 	@HeadSEO(models.DefaultSiteSEO())
 }
 
-templ HeadMetaBase() {
+templ HeadMetaBase(includeAds bool) {
 	<base href="/"/>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 	<meta name="google" content="nositelinkssearchbox"/>
@@ -68,10 +68,6 @@ templ HeadMetaBase() {
 		href={ constants.PathStoreImageCDN }
 		as="image"
 	/>
-	<!--
-		TODO: (Brandon) - preload product images here
-		<link rel="preload" href={ utils.URL("/static/images/product_images/bosch/") } as="image" type="image/png"/>
-	-->
 	<meta charset="UTF-8"/>
 	@onceHeadLinks.Once() {
 		<link rel="icon" type="image/x-icon" sizes={ constants.DefaultThumbnailSize } href={ utils.URL(utils.VersionedAsset("/static/images/favicons/favicon.ico")) }/>
@@ -83,7 +79,9 @@ templ HeadMetaBase() {
 		<script defer type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/shop_viewport.js"))) }></script>
 		<script async type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/hyperscript.min.js"))) }></script>
 		<script async type="text/javascript" src={ templ.URL(utils.URL(utils.VersionedAsset("/static/js/metrics.js"))) }></script>
-		@ScrAdSense()
+		if includeAds {
+			@ScrAdSense()
+		}
 		@templ.JSONScript("url-prefix", utils.URL(""))
 		<script>
 			(function(){

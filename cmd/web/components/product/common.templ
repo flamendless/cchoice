@@ -2,8 +2,11 @@ package product
 
 import "cchoice/cmd/web/models"
 
-templ ProductSEO(meta models.ProductsMeta) {
+templ ProductSEO(meta models.ProductsMeta, heroImageURL string) {
 	<title>{ meta.Title }</title>
+	if heroImageURL != "" {
+		<link rel="preload" href={ heroImageURL } as="image" fetchpriority="high"/>
+	}
 	<link rel="canonical" href={ meta.CanonicalURL }/>
 	<meta name="description" content={ meta.Content }/>
 	<meta name="robots" content={ meta.Robots }/>

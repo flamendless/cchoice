@@ -67,7 +67,7 @@ templ NotPage() {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
-			@common.HeadMetaBase()
+			@common.HeadMetaBase(true)
 			@common.HeadSEO(models.NotFoundSEO())
 			@common.TabTitle("Page Not Found")
 		</head>

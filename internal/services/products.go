@@ -871,16 +871,16 @@ func (s *ProductService) syncProductSale(
 }
 
 func (s *ProductService) resolveSEOImageURL(cdnURL, cdnURLThumbnail, imagePath, thumbnailPath string) string {
-	if imagePath != "" {
-		if url := s.getCDNURL(imagePath); url != "" {
-			return url
-		}
-	}
 	if cdnURL != "" {
 		return cdnURL
 	}
 	if cdnURLThumbnail != "" {
 		return cdnURLThumbnail
+	}
+	if imagePath != "" {
+		if url := s.getCDNURL(imagePath); url != "" {
+			return url
+		}
 	}
 	if thumbnailPath != "" {
 		return s.getCDNURL(constants.ToPath1280(thumbnailPath))

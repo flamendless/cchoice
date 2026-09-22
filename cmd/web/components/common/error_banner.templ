@@ -9,6 +9,8 @@ templ ErrorBanner() {
 		@errorBannerHandlerOnce.Once() {
 			<div
 				class="fixed inset-0 flex items-start justify-center z-[9999] my-4"
+				role="alertdialog"
+				aria-labelledby="error_banner_text"
 				_="on click
 					if target is me
 						hide #error_banner
@@ -27,8 +29,8 @@ templ ErrorBanner() {
 						class="mr-6 ml-4 mt-2 mb-2"
 						hidden
 						alt="close error button"
-						aria-label="Close"
-						title="Close"
+						aria-label="Dismiss error message"
+						title="Dismiss error message"
 						_="on click hide #error_banner"
 					>
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">

@@ -41,7 +41,7 @@ func CategoryPage(data models.CategoryPageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = common.HeadMetaBase().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = common.HeadMetaBase(false).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

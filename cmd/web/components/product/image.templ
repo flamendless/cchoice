@@ -8,9 +8,13 @@ templ ProductImage(data models.ProductPageData) {
 		<div class="relative aspect-square w-full max-w-lg bg-gray-100 rounded-lg overflow-hidden">
 			<img
 				id="product-main-image"
-				src={ data.CDNURL }
+				src={ heroImageURL(data) }
 				alt={ fmt.Sprintf("%s %s", data.BrandName, data.Name) }
 				class="w-full h-full object-contain"
+				width="1280"
+				height="1280"
+				loading="eager"
+				fetchpriority="high"
 			/>
 		</div>
 		@ProductExternalPlatformLinks(data)

@@ -13,7 +13,7 @@ templ BrandsListingPage(data models.BrandsListingPageData) {
 	<!DOCTYPE html>
 	<html lang="en" style="overflow-x: clip;">
 		<head>
-			@common.HeadMetaBase()
+			@common.HeadMetaBase(false)
 			if data.ThemeCSS != "" {
 				@common.ThemeStyle(data.ThemeCSS)
 			}

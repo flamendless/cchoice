@@ -3,6 +3,7 @@ package server
 import (
 	"cchoice/internal/conf"
 	"cchoice/internal/encode"
+	"cchoice/internal/httputil"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
 	"cchoice/internal/metrics"
@@ -26,7 +27,7 @@ func SecurityHeadersMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
 		w.Header().Set("X-Download-Options", "noopen")
 
-		if conf.Conf().Server.UseSSL {
+		if conf.Conf().Server.UseSSL || httputil.RequestIsHTTPS(r) {
 			w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
 		}
 

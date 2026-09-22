@@ -12,8 +12,8 @@ templ ProductPage(data models.ProductPageData) {
 	<!DOCTYPE html>
 	<html lang="en" class="overflow-x-hidden">
 		<head>
-			@common.HeadMetaBase()
-			@ProductSEO(data.Meta)
+			@common.HeadMetaBase(false)
+			@ProductSEO(data.Meta, heroImageURL(data))
 		</head>
 		<body class="min-h-screen flex flex-col bg-white" _={ fmt.Sprintf("init call metrics_event('anon_visit', '%s')", data.ProductID) }>
 			@common.DevRibbon()

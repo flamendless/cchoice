@@ -26,13 +26,18 @@ func TestResolveSEOImageURL(t *testing.T) {
 		want            string
 	}{
 		{
-			name:      "prefers original image path",
+			name:      "prefers stored cdn url over image path",
 			imagePath: "/products/original.webp",
 			cdnURL:    "https://cdn.example.com/products/1280.webp",
+			want:      "https://cdn.example.com/products/1280.webp",
+		},
+		{
+			name:      "falls back to image path when cdn url missing",
+			imagePath: "/products/original.webp",
 			want:      "https://cdn.example.com/products/original.webp",
 		},
 		{
-			name:   "falls back to cdn url",
+			name:   "uses cdn url alone",
 			cdnURL: "https://cdn.example.com/products/full.webp",
 			want:   "https://cdn.example.com/products/full.webp",
 		},
