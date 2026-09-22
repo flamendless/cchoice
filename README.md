@@ -29,6 +29,23 @@ Users should set their own `BROWSER` env var in their shell. Example: `export BR
 
 ---
 
+# E2E tests (Playwright)
+
+```bash
+cd e2e
+pnpm install
+pnpm exec playwright install chromium
+cd ../
+bash scripts/e2e-prepare-db.sh && bash scripts/e2e-build.sh
+
+cd e2e
+# either of the two
+pnpm exec playwright test
+pnpm exec playwright test --ui --headed
+```
+
+---
+
 # Generate local cert (for STAGING and PROD environment only)
 
 ```
@@ -133,3 +150,12 @@ Break-glass manual mark (use only when a script was applied outside the normal C
 ```bash
 ./tmp/main datamigrate mark <script-name>
 ```
+
+---
+
+## LLM use
+
+Disclaimers:
+
+- This repo started without any use of LLM. The whole ecommerce flow (shop page through checkout) and some admin tools were built by hand before LLM use began (initial push, 2024-03-21).
+- I now use LLM extensively to further improve the system, but with utmost care for code review. LLM use started in [3b0d282](https://github.com/flamendless/cchoice/commit/3b0d2820e545fadba76c14b913aa09fd87032fad) (2026-04-10, "AI: Add LLM rule"), when `AGENTS.md` was first added to the repository.

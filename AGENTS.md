@@ -99,6 +99,19 @@ mage testSum     # Run tests with gotestsum (shuffle, race detection)
 mage benchmark  # Run benchmarks
 ```
 
+### E2E Tests (Playwright)
+```bash
+# one-time setup
+cd e2e && pnpm install && pnpm exec playwright install chromium
+
+bash scripts/e2e.sh           # headless shop e2e suite
+bash scripts/e2e.sh --ui      # Playwright UI mode
+
+# or from e2e/ (pretest prepares db + builds server)
+cd e2e && pnpm test
+cd e2e && pnpm run test:ui
+```
+
 ### Specific Package Tests
 ```bash
 go test ./internal/services/... -v
