@@ -1,7 +1,7 @@
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { expect, type Page } from '@playwright/test';
-import { gotoShop, waitForHtmx } from './shop';
+import { gotoShop, shopPath, waitForHtmx } from './shop';
 
 const repoRoot = path.resolve(__dirname, '../..');
 
@@ -66,8 +66,18 @@ export async function loginAdmin(page: Page, type: AdminUserType): Promise<TestA
 	return data;
 }
 
+export type StaffDataScope = 'attendance' | 'time-off' | 'all';
+
+function clearStaffData(scope: StaffDataScope = 'all') {
+	execSync(`bash scripts/e2e-clear-staff-data.sh ${scope}`, { cwd: repoRoot });
+}
+
+export function resetStaffData(scope: StaffDataScope = 'all') {
+	clearStaffData(scope);
+}
+
 export function resetStaffAttendance() {
-	execSync('bash scripts/e2e-clear-staff-attendance.sh', { cwd: repoRoot });
+	clearStaffData('attendance');
 }
 
 export async function gotoStaffAttendance(page: Page) {
@@ -106,4 +116,110 @@ export async function expectAttendanceButtonStates(
 export async function expectAttendanceRowTime(page: Page, rowLabel: string) {
 	const row = page.locator('#staff-attendance-table tr').filter({ hasText: rowLabel });
 	await expect(row.locator('td').last()).toHaveText(/\d{2}:\d{2}:\d{2}/);
+}
+
+export async function expectAttendanceRowDash(page: Page, rowLabel: string) {
+	const row = page.locator('#staff-attendance-table tr').filter({ hasText: rowLabel });
+	await expect(row.locator('td').last()).toHaveText('-');
+}
+
+export async function expectAttendanceDurationNotDash(page: Page) {
+	const row = page.locator('#staff-attendance-table tr').filter({ hasText: 'Duration' }).first();
+	await expect(row.locator('td').last()).not.toHaveText('-');
+}
+
+export function toISODate(date: Date): string {
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, '0');
+	const day = String(date.getDate()).padStart(2, '0');
+	return `${year}-${month}-${day}`;
+}
+
+export function todayISO(): string {
+	return toISODate(new Date());
+}
+
+export function yesterdayISO(): string {
+	const date = new Date();
+	date.setDate(date.getDate() - 1);
+	return toISODate(date);
+}
+
+export function tomorrowISO(): string {
+	const date = new Date();
+	date.setDate(date.getDate() + 1);
+	return toISODate(date);
+}
+
+export async function selectAttendanceDate(page: Page, isoDate: string) {
+	await Promise.all([
+		waitForHtmx(page, '/admin/staff/attendance/rows', 'GET'),
+		page.locator('#date-selector').fill(isoDate),
+	]);
+}
+
+export async function postAttendanceAction(page: Page, endpoint: string) {
+	return page.request.post(shopPath(endpoint));
+}
+
+export async function logoutAdmin(page: Page) {
+	const response = await page.request.post(shopPath('/admin/logout'));
+	expect(response.ok()).toBeTruthy();
+	await gotoAdminLogin(page);
+}
+
+export function resetStaffTimeOff() {
+	clearStaffData('time-off');
+}
+
+export type TimeOffRequest = {
+	type: string;
+	startDate: string;
+	endDate: string;
+	description: string;
+};
+
+export async function gotoStaffTimeOff(page: Page) {
+	await gotoShop(page, '/admin/staff/time-off');
+	await expect(page.getByRole('heading', { name: 'Request Time Off' })).toBeVisible();
+}
+
+export async function fillTimeOffForm(page: Page, request: TimeOffRequest) {
+	if (request.type) {
+		await page.locator('#type').selectOption(request.type);
+	}
+	await page.locator('#start-date').fill(request.startDate);
+	await page.locator('#end-date').fill(request.endDate);
+	await page.locator('#description').fill(request.description);
+}
+
+export async function submitTimeOffRequest(page: Page) {
+	await Promise.all([
+		waitForHtmx(page, '/admin/staff/time-off', 'POST'),
+		page.getByRole('button', { name: 'Submit' }).click(),
+	]);
+	await page.waitForURL(/\/admin\/staff\/time-off/);
+}
+
+export async function postTimeOffRequest(page: Page, request: TimeOffRequest) {
+	return page.request.post(shopPath('/admin/staff/time-off'), {
+		form: {
+			type: request.type,
+			'start-date': request.startDate,
+			'end-date': request.endDate,
+			description: request.description,
+		},
+	});
+}
+
+export async function expectTimeOffTableRow(page: Page, description: string) {
+	await expect(page.locator('#time-off-table')).toContainText(description);
+}
+
+export async function gotoSuperuserAttendance(page: Page) {
+	await Promise.all([
+		waitForHtmx(page, '/admin/superuser/attendance/table', 'GET'),
+		gotoShop(page, '/admin/superuser/attendance'),
+	]);
+	await expect(page.getByRole('heading', { name: 'Employee Attendance' })).toBeVisible();
 }
