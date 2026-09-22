@@ -35,6 +35,10 @@ templ StaffAttendanceSingleTable(record *models.Attendance) {
 	</div>
 }
 
+templ StaffAttendanceEmpty() {
+	<p class="text-gray-500 text-center py-4">No attendance record for this date</p>
+}
+
 templ StaffAttendanceRows(record *models.Attendance) {
 	<div class="overflow-x-auto">
 		<table class="min-w-full divide-y divide-gray-200">
@@ -89,7 +93,7 @@ templ AttendanceSectionForStaff(
 				<!-- @StaffAttendanceSingleTable(record) -->
 				@StaffAttendanceRows(record)
 			} else {
-				<p class="text-gray-500 text-center py-4">No attendance record for this date</p>
+				@StaffAttendanceEmpty()
 			}
 		</div>
 	</div>

@@ -99,6 +99,7 @@ CPOINT_HMAC_SECRET="your-generated-secret"
 - Bugfix
 - AI
 - SEO
+- Tests
 
 ---
 

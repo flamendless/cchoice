@@ -433,6 +433,13 @@ func (s *Server) adminStaffAttendanceRowsHandler(w http.ResponseWriter, r *http.
 		record = &rec
 	}
 
+	if record == nil {
+		if err := compadmin.StaffAttendanceEmpty().Render(ctx, w); err != nil {
+			logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		}
+		return
+	}
 	if err := compadmin.StaffAttendanceRows(record).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.String("path", r.URL.Path), zap.Error(err))
 		http.Error(w, "Internal server error", http.StatusInternalServerError)

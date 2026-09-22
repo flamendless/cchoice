@@ -19,4 +19,6 @@ if [[ ! -x ./tmp/main ]]; then
 	bash scripts/e2e-build.sh
 fi
 
+bash scripts/e2e-seed-staff.sh
+
 exec ./tmp/main api

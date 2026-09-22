@@ -42,4 +42,6 @@ go run -tags="fts5,staticfs" ./main.go parse_products \
 # Seed migration marks slug scripts applied before products exist; run explicitly.
 go run -tags="fts5,staticfs" ./main.go populate_product_slugs --dry-run=false
 
+bash scripts/e2e-seed-staff.sh
+
 echo "e2e database ready: $E2E_DB_NAME"
