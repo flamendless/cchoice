@@ -36,7 +36,7 @@ cd e2e
 pnpm install
 pnpm exec playwright install chromium
 cd ../
-bash scripts/e2e-prepare-db.sh && bash scripts/e2e-build.sh
+bash scripts/e2e-seed.sh && bash scripts/e2e-build.sh
 
 cd e2e
 # either of the two

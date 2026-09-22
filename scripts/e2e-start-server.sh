@@ -11,14 +11,10 @@ export GOOSE_DBSTRING="file:./e2e.db"
 export PORT="$E2E_PORT"
 export FSMODE="${FSMODE:-staticfs}"
 
-if [[ ! -f ./e2e.db ]]; then
-	bash scripts/e2e-prepare-db.sh
-fi
+bash scripts/e2e-seed.sh
 
 if [[ ! -x ./tmp/main ]]; then
 	bash scripts/e2e-build.sh
 fi
-
-bash scripts/e2e-seed-staff.sh
 
 exec ./tmp/main api
