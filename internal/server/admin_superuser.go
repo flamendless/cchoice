@@ -12,7 +12,6 @@ import (
 	compadmin "cchoice/cmd/web/components/admin"
 	"cchoice/cmd/web/models"
 	"cchoice/internal/conf"
-	"cchoice/internal/constants"
 	"cchoice/internal/database/queries"
 	"cchoice/internal/enums"
 	"cchoice/internal/errs"
