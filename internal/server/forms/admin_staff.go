@@ -47,4 +47,15 @@ type AdminStaffTimeOffForm struct {
 	Description string `form:"description" validate:"required"`
 	StartDate   string `form:"start-date" validate:"required"`
 	EndDate     string `form:"end-date" validate:"required"`
+	Hours       string `form:"hours" validate:"required"`
+}
+
+type AdminStaffLeaveCreditGrantForm struct {
+	StaffID string `form:"staff_id" validate:"required"`
+	Hours   string `form:"hours" validate:"required"`
+	Note    string `form:"note"`
+}
+
+type AdminTimeOffRejectForm struct {
+	RejectReason string `form:"reject_reason" validate:"required"`
 }

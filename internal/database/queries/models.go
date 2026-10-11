@@ -735,6 +735,16 @@ type TblStaffAttendance struct {
 	HolidayName              sql.NullString
 }
 
+type TblStaffLeaveCreditGrant struct {
+	ID        int64
+	StaffID   int64
+	Hours     float64
+	Note      sql.NullString
+	GrantedBy int64
+	CreatedAt string
+	UpdatedAt string
+}
+
 type TblStaffLog struct {
 	ID          int64
 	StaffID     int64
@@ -754,18 +764,23 @@ type TblStaffRole struct {
 }
 
 type TblStaffTimeOff struct {
-	ID          int64
-	Type        string
-	StartDate   time.Time
-	EndDate     time.Time
-	StaffID     int64
-	UseragentID sql.NullInt64
-	Description string
-	Approved    sql.NullBool
-	ApprovedBy  sql.NullInt64
-	ApprovedAt  sql.NullTime
-	CreatedAt   string
-	UpdatedAt   string
+	ID           int64
+	Type         string
+	StartDate    time.Time
+	EndDate      time.Time
+	StaffID      int64
+	UseragentID  sql.NullInt64
+	Description  string
+	Approved     sql.NullBool
+	ApprovedBy   sql.NullInt64
+	ApprovedAt   sql.NullTime
+	CreatedAt    string
+	UpdatedAt    string
+	Hours        float64
+	Status       string
+	RejectReason sql.NullString
+	RejectedBy   sql.NullInt64
+	RejectedAt   sql.NullTime
 }
 
 type TblTheme struct {

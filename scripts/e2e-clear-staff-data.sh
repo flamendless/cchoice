@@ -43,4 +43,13 @@ WHERE staff_id = (
         AND deleted_at = '1970-01-01 00:00:00+00:00'
 )
 AND '${SCOPE}' IN ('time-off', 'all');
+
+DELETE FROM tbl_staff_leave_credit_grants
+WHERE staff_id = (
+    SELECT id
+    FROM tbl_staffs
+    WHERE email = '${E2E_STAFF_EMAIL}'
+        AND deleted_at = '1970-01-01 00:00:00+00:00'
+)
+AND '${SCOPE}' IN ('time-off', 'all');
 SQL

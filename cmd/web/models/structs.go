@@ -379,17 +379,20 @@ type AdminProductExternalLink struct {
 }
 
 type StaffTimeOff struct {
-	ID          string
-	StaffID     string
-	FullName    string
-	StartDate   string
-	EndDate     string
-	Description string
-	CreatedAt   string
-	ApprovedBy  string
-	ApprovedAt  string
-	Type        enums.TimeOff
-	Approved    bool
+	ID           string
+	StaffID      string
+	FullName     string
+	StartDate    string
+	EndDate      string
+	Hours        float64
+	Description  string
+	CreatedAt    string
+	Status       enums.TimeOffStatus
+	RejectReason string
+	ApprovedBy   string
+	ApprovedAt   string
+	Type         enums.TimeOff
+	Approved     bool
 }
 
 type Staff struct {

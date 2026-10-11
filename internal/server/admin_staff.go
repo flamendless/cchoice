@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"net/http"
+	"strconv"
 	"time"
 
 	compadmin "cchoice/cmd/web/components/admin"
@@ -522,7 +523,13 @@ func (s *Server) adminStaffLunchBreakOutHandler(w http.ResponseWriter, r *http.R
 func (s *Server) adminStaffTimeOffPageHandler(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Admin Staff Request Time Off Page Handler]"
 	ctx := r.Context()
-	if err := compadmin.AdminStaffRequestTimeOffPage().Render(ctx, w); err != nil {
+	staffID := s.sessionManager.GetString(ctx, SessionStaffID)
+	balance, err := s.services.attendance.LeaveCreditBalance(ctx, staffID)
+	if err != nil {
+		logs.LogCtx(ctx).Error(logtag, zap.Error(err))
+		balance = 0
+	}
+	if err := compadmin.AdminStaffRequestTimeOffPage(balance).Render(ctx, w); err != nil {
 		logs.LogCtx(ctx).Error(
 			logtag,
 			zap.String("path", r.URL.Path),
@@ -567,6 +574,11 @@ func (s *Server) adminStaffTimeOffHandler(w http.ResponseWriter, r *http.Request
 		http.Error(w, "end date must not be before start date", http.StatusBadRequest)
 		return
 	}
+	hours, err := strconv.ParseFloat(f.Hours, 64)
+	if err != nil || hours <= 0 {
+		http.Error(w, errs.ErrInvalidLeaveHours.Error(), http.StatusBadRequest)
+		return
+	}
 	useragentID := getOrCreateUserAgentID(ctx, s.dbRW, r.UserAgent())
 	if err := s.services.attendance.TimeOff(
 		ctx,
@@ -575,6 +587,7 @@ func (s *Server) adminStaffTimeOffHandler(w http.ResponseWriter, r *http.Request
 		description,
 		startDate,
 		endDate,
+		hours,
 		useragentID,
 	); err != nil {
 		logs.LogCtx(ctx).Error(logtag, zap.Error(err))

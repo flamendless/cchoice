@@ -13,6 +13,7 @@ import (
 	"cchoice/internal/database/queries"
 	"cchoice/internal/encode"
 	"cchoice/internal/enums"
+	"cchoice/internal/errs"
 	"cchoice/internal/logs"
 	"cchoice/internal/types"
 	"cchoice/internal/utils"
@@ -249,8 +250,12 @@ func (s *AttendanceService) TimeOff(
 	description string,
 	startDate time.Time,
 	endDate time.Time,
+	hours float64,
 	useragentID sql.NullInt64,
 ) error {
+	if hours <= 0 {
+		return errs.ErrInvalidLeaveHours
+	}
 	result := "success"
 	defer func() {
 		var ua *int64
@@ -275,6 +280,7 @@ func (s *AttendanceService) TimeOff(
 			Type:        timeOffType.String(),
 			StartDate:   startDate,
 			EndDate:     endDate,
+			Hours:       hours,
 			Description: description,
 			StaffID:     s.encoder.Decode(staffID),
 			UseragentID: useragentID,
@@ -353,9 +359,74 @@ func (s *AttendanceService) ApproveTimeOff(
 		}
 	}()
 
+	timeOff, err := s.dbRO.GetQueries().GetStaffTimeOffByID(ctx, s.encoder.Decode(timeOffID))
+	if err != nil {
+		result = err.Error()
+		return err
+	}
+	if enums.ParseTimeOffStatusToEnum(timeOff.Status) != enums.TIME_OFF_STATUS_PENDING {
+		result = errs.ErrTimeOffNotPending.Error()
+		return errs.ErrTimeOffNotPending
+	}
+	balance, err := s.LeaveCreditBalance(ctx, s.encoder.Encode(timeOff.StaffID))
+	if err != nil {
+		result = err.Error()
+		return err
+	}
+	if timeOff.Hours > balance {
+		result = errs.ErrInsufficientLeaveCredits.Error()
+		return errs.ErrInsufficientLeaveCredits
+	}
+
 	if _, err := s.dbRW.GetQueries().ApproveStaffTimeOff(ctx, queries.ApproveStaffTimeOffParams{
 		ApprovedBy: sql.NullInt64{Int64: s.encoder.Decode(approvedByID), Valid: true},
 		ID:         s.encoder.Decode(timeOffID),
+	}); err != nil {
+		result = err.Error()
+		return err
+	}
+
+	result = fmt.Sprintf("success. ID '%s'", timeOffID)
+	return nil
+}
+
+func (s *AttendanceService) RejectTimeOff(
+	ctx context.Context,
+	timeOffID string,
+	rejectedByID string,
+	rejectReason string,
+) error {
+	if rejectReason == "" {
+		return errs.ErrTimeOffRejectReason
+	}
+	result := "success"
+	defer func() {
+		if err := s.staffLog.CreateLog(
+			ctx,
+			rejectedByID,
+			constants.ActionReject,
+			constants.ModuleTimeOff,
+			result,
+			nil,
+		); err != nil {
+			logs.Log().Warn("create log", zap.Error(err))
+		}
+	}()
+
+	timeOff, err := s.dbRO.GetQueries().GetStaffTimeOffByID(ctx, s.encoder.Decode(timeOffID))
+	if err != nil {
+		result = err.Error()
+		return err
+	}
+	if enums.ParseTimeOffStatusToEnum(timeOff.Status) != enums.TIME_OFF_STATUS_PENDING {
+		result = errs.ErrTimeOffNotPending.Error()
+		return errs.ErrTimeOffNotPending
+	}
+
+	if _, err := s.dbRW.GetQueries().RejectStaffTimeOff(ctx, queries.RejectStaffTimeOffParams{
+		RejectReason: sql.NullString{String: rejectReason, Valid: true},
+		RejectedBy:   sql.NullInt64{Int64: s.encoder.Decode(rejectedByID), Valid: true},
+		ID:           s.encoder.Decode(timeOffID),
 	}); err != nil {
 		result = err.Error()
 		return err
