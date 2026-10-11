@@ -14,7 +14,6 @@ import (
 	"github.com/alexedwards/scs/v2"
 	_ "github.com/joho/godotenv/autoload"
 	"go.uber.org/zap"
-	"golang.org/x/net/http2"
 	"golang.org/x/sync/singleflight"
 	"golang.org/x/time/rate"
 
@@ -373,10 +372,11 @@ func NewServer() *ServerInstance {
 		TLSConfig:    tlsConfig,
 	}
 	if newServer.useHTTP2 {
-		if err := http2.ConfigureServer(httpServer, &http2.Server{
+		httpServer.Protocols = new(http.Protocols)
+		httpServer.Protocols.SetHTTP2(true)
+		httpServer.Protocols.SetUnencryptedHTTP2(true)
+		httpServer.HTTP2 = &http.HTTP2Config{
 			MaxConcurrentStreams: 256,
-		}); err != nil {
-			logs.Log().Error("Server configure", zap.Error(err))
 		}
 	}
 
