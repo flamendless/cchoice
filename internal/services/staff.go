@@ -350,38 +350,80 @@ func (s *StaffService) GetTimeOffs(ctx context.Context, staffID string) ([]model
 
 	staffTimeOffs := make([]models.StaffTimeOff, 0, len(timeOffs))
 	for _, to := range timeOffs {
-		var approvedBy string
-		var approvedAt string
-
-		if to.ApprovedBy.Valid && to.ApproverFirstName.Valid {
-			approvedBy = utils.BuildFullName(
-				to.ApproverFirstName.String,
-				to.ApproverMiddleName.String,
-				to.ApproverLastName.String,
-			)
-		} else {
-			approvedBy = "-"
-		}
-
-		if to.ApprovedAt.Valid {
-			approvedAt = utils.FormatTimePH(to.ApprovedAt.Time)
-		} else {
-			approvedAt = "-"
-		}
-
-		staffTimeOffs = append(staffTimeOffs, models.StaffTimeOff{
-			ID:          s.encoder.Encode(to.ID),
-			Type:        enums.ParseTimeOffToEnum(to.Type),
-			CreatedAt:   utils.ConvertToPH(to.CreatedAt),
-			StartDate:   to.StartDate.Format(constants.DateLayoutISO),
-			EndDate:     to.EndDate.Format(constants.DateLayoutISO),
-			Description: to.Description,
-			Approved:    to.Approved.Bool,
-			ApprovedBy:  approvedBy,
-			ApprovedAt:  approvedAt,
-		})
+		staffTimeOffs = append(staffTimeOffs, buildStaffTimeOffModel(
+			s.encoder,
+			to.ID,
+			0,
+			"",
+			to.Type,
+			to.StartDate,
+			to.EndDate,
+			to.Hours,
+			to.Description,
+			to.Status,
+			to.Approved,
+			to.RejectReason,
+			to.ApproverFirstName,
+			to.ApproverMiddleName,
+			to.ApproverLastName,
+			to.ApprovedAt,
+			to.CreatedAt,
+		))
 	}
 	return staffTimeOffs, nil
+}
+
+func (s *StaffService) GetAllTimeOffs(ctx context.Context) ([]models.StaffTimeOff, error) {
+	timeOffs, err := s.dbRO.GetQueries().GetAllStaffTimeOffs(ctx)
+	if err != nil {
+		return nil, err
+	}
+	staffTimeOffs := make([]models.StaffTimeOff, 0, len(timeOffs))
+	for _, to := range timeOffs {
+		fullName := utils.BuildFullName(
+			to.StaffFirstName,
+			to.StaffMiddleName.String,
+			to.StaffLastName,
+		)
+		staffTimeOffs = append(staffTimeOffs, buildStaffTimeOffModel(
+			s.encoder,
+			to.ID,
+			to.StaffID,
+			fullName,
+			to.Type,
+			to.StartDate,
+			to.EndDate,
+			to.Hours,
+			to.Description,
+			to.Status,
+			to.Approved,
+			to.RejectReason,
+			to.ApproverFirstName,
+			to.ApproverMiddleName,
+			to.ApproverLastName,
+			to.ApprovedAt,
+			to.CreatedAt,
+		))
+	}
+	return staffTimeOffs, nil
+}
+
+func (s *StaffService) ListActiveStaffForSelect(ctx context.Context) ([]models.Staff, error) {
+	rows, err := s.dbRO.GetQueries().GetAllStaffsForAdmin(ctx, "")
+	if err != nil {
+		return nil, err
+	}
+	staffList := make([]models.Staff, 0, len(rows))
+	for _, row := range rows {
+		staffList = append(staffList, models.Staff{
+			ID:       s.encoder.Encode(row.ID),
+			FullName: utils.BuildFullName(row.FirstName, row.MiddleName.String, row.LastName),
+			Email:    row.Email,
+			Position: row.Position,
+			UserType: enums.ParseStaffUserTypeToEnum(row.UserType),
+		})
+	}
+	return staffList, nil
 }
 
 func (s *StaffService) ID() string {

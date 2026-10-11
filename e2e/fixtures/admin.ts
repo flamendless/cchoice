@@ -176,12 +176,13 @@ export type TimeOffRequest = {
 	type: string;
 	startDate: string;
 	endDate: string;
+	hours: string;
 	description: string;
 };
 
 export async function gotoStaffTimeOff(page: Page) {
 	await gotoShop(page, '/admin/staff/time-off');
-	await expect(page.getByRole('heading', { name: 'Request Time Off' })).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Request Leave' })).toBeVisible();
 }
 
 export async function fillTimeOffForm(page: Page, request: TimeOffRequest) {
@@ -190,6 +191,7 @@ export async function fillTimeOffForm(page: Page, request: TimeOffRequest) {
 	}
 	await page.locator('#start-date').fill(request.startDate);
 	await page.locator('#end-date').fill(request.endDate);
+	await page.locator('#hours').fill(request.hours);
 	await page.locator('#description').fill(request.description);
 }
 
@@ -207,6 +209,7 @@ export async function postTimeOffRequest(page: Page, request: TimeOffRequest) {
 			type: request.type,
 			'start-date': request.startDate,
 			'end-date': request.endDate,
+			hours: request.hours,
 			description: request.description,
 		},
 	});

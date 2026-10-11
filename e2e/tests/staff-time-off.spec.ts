@@ -27,6 +27,7 @@ test.describe('staff time off', () => {
 			type: 'VL',
 			startDate: today,
 			endDate: today,
+			hours: '8',
 			description: 'E2E vacation leave',
 		});
 		await submitTimeOffRequest(page);
@@ -46,6 +47,7 @@ test.describe('staff time off', () => {
 			type: 'VL',
 			startDate: tomorrowISO(),
 			endDate: todayISO(),
+			hours: '8',
 			description: 'Invalid date range',
 		});
 		expect(response.status()).toBe(400);
@@ -60,6 +62,7 @@ test.describe('staff time off', () => {
 			type: '',
 			startDate: todayISO(),
 			endDate: todayISO(),
+			hours: '8',
 			description: 'Missing type',
 		});
 		expect(response.status()).toBe(400);
@@ -75,13 +78,14 @@ test.describe('staff time off', () => {
 			type: 'SL',
 			startDate: today,
 			endDate: today,
+			hours: '4',
 			description: 'E2E sick leave',
 		});
 		await submitTimeOffRequest(page);
 		await expectTimeOffTableRow(page, 'E2E sick leave');
 
 		await page.reload();
-		await expect(page.getByRole('heading', { name: 'Request Time Off' })).toBeVisible();
+		await expect(page.getByRole('heading', { name: 'Request Leave' })).toBeVisible();
 		await expectTimeOffTableRow(page, 'E2E sick leave');
 		await expect(page.locator('#time-off-table')).toContainText('Sick Leave');
 	});

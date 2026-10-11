@@ -10,7 +10,7 @@ import (
 
 var baseStaffCards = []models.StaffCard{
 	{Link: "/admin/staff/attendance", Title: "Attendance", Description: "View your attendance", Icon: svg.Clock("text-primary")},
-	{Link: "/admin/staff/time-off", Title: "Time Off", Description: "Request a time off", Icon: svg.Box("text-primary")},
+	{Link: "/admin/staff/time-off", Title: "Leave", Description: "Request sick leave, vacation, or absence", Icon: svg.Box("text-primary")},
 	{Link: "/admin/profile", Title: "Profile", Description: "View and manage your profile", Icon: svg.User("text-primary")},
 }
 
@@ -37,6 +37,12 @@ var staffCardsWithRoles = []struct {
 		Description: "Manage Philippines holidays",
 		Icon:        svg.Calendar("text-primary"),
 	}, AllowedRole: enums.STAFF_ROLE_MANAGE_HOLIDAYS},
+	{Card: models.StaffCard{
+		Link:        "/admin/time-off",
+		Title:       "Leave Management",
+		Description: "Grant leave credits and approve requests",
+		Icon:        svg.Calendar("text-primary"),
+	}, AllowedRole: enums.STAFF_ROLE_MANAGE_TIME_OFF},
 	{
 		Card:        models.StaffCard{Link: "/admin/promos", Title: "Manage Promos", Description: "Manage promos", Icon: svg.Box("text-primary")},
 		AllowedRole: enums.STAFF_ROLE_MANAGE_PROMOS,

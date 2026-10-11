@@ -15,10 +15,14 @@ const approveStaffTimeOff = `-- name: ApproveStaffTimeOff :one
 UPDATE tbl_staff_time_offs
 SET
     approved = true,
+    status = 'APPROVED',
     approved_by = ?,
     approved_at = datetime('now'),
+    reject_reason = NULL,
+    rejected_by = NULL,
+    rejected_at = NULL,
     updated_at = datetime('now')
-WHERE id = ? AND approved = false
+WHERE id = ? AND status = 'PENDING'
 RETURNING id
 `
 
@@ -38,10 +42,11 @@ const cancelStaffTimeOff = `-- name: CancelStaffTimeOff :one
 UPDATE tbl_staff_time_offs
 SET
     approved = false,
+    status = 'PENDING',
     approved_by = NULL,
     approved_at = NULL,
     updated_at = datetime('now')
-WHERE id = ? AND approved = true
+WHERE id = ? AND status = 'APPROVED'
 RETURNING id
 `
 
@@ -170,13 +175,15 @@ INSERT INTO tbl_staff_time_offs (
     type,
     start_date,
     end_date,
+    hours,
     description,
     staff_id,
     useragent_id,
+    status,
     created_at,
     updated_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
+    ?, ?, ?, ?, ?, ?, ?, 'PENDING', datetime('now'), datetime('now')
 ) RETURNING id
 `
 
@@ -184,6 +191,7 @@ type CreateStaffTimeOffParams struct {
 	Type        string
 	StartDate   time.Time
 	EndDate     time.Time
+	Hours       float64
 	Description string
 	StaffID     int64
 	UseragentID sql.NullInt64
@@ -194,6 +202,7 @@ func (q *Queries) CreateStaffTimeOff(ctx context.Context, arg CreateStaffTimeOff
 		arg.Type,
 		arg.StartDate,
 		arg.EndDate,
+		arg.Hours,
 		arg.Description,
 		arg.StaffID,
 		arg.UseragentID,
@@ -209,10 +218,15 @@ SELECT
     sto.type,
     sto.start_date,
     sto.end_date,
+    sto.hours,
     sto.description,
+    sto.status,
+    sto.reject_reason,
     sto.approved,
     sto.approved_by,
     sto.approved_at,
+    sto.rejected_by,
+    sto.rejected_at,
     sto.created_at,
     sto.updated_at,
     sto.staff_id,
@@ -233,10 +247,15 @@ type GetAllStaffTimeOffsRow struct {
 	Type               string
 	StartDate          time.Time
 	EndDate            time.Time
+	Hours              float64
 	Description        string
+	Status             string
+	RejectReason       sql.NullString
 	Approved           sql.NullBool
 	ApprovedBy         sql.NullInt64
 	ApprovedAt         sql.NullTime
+	RejectedBy         sql.NullInt64
+	RejectedAt         sql.NullTime
 	CreatedAt          string
 	UpdatedAt          string
 	StaffID            int64
@@ -262,10 +281,15 @@ func (q *Queries) GetAllStaffTimeOffs(ctx context.Context) ([]GetAllStaffTimeOff
 			&i.Type,
 			&i.StartDate,
 			&i.EndDate,
+			&i.Hours,
 			&i.Description,
+			&i.Status,
+			&i.RejectReason,
 			&i.Approved,
 			&i.ApprovedBy,
 			&i.ApprovedAt,
+			&i.RejectedBy,
+			&i.RejectedAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.StaffID,
@@ -1250,16 +1274,86 @@ func (q *Queries) GetStaffByID(ctx context.Context, id int64) (GetStaffByIDRow, 
 	return i, err
 }
 
+const getStaffTimeOffByID = `-- name: GetStaffTimeOffByID :one
+SELECT
+    sto.id,
+    sto.type,
+    sto.start_date,
+    sto.end_date,
+    sto.hours,
+    sto.description,
+    sto.status,
+    sto.reject_reason,
+    sto.staff_id,
+    sto.approved,
+    sto.approved_by,
+    sto.approved_at,
+    sto.rejected_by,
+    sto.rejected_at,
+    sto.created_at,
+    sto.updated_at
+FROM tbl_staff_time_offs sto
+WHERE sto.id = ?
+`
+
+type GetStaffTimeOffByIDRow struct {
+	ID           int64
+	Type         string
+	StartDate    time.Time
+	EndDate      time.Time
+	Hours        float64
+	Description  string
+	Status       string
+	RejectReason sql.NullString
+	StaffID      int64
+	Approved     sql.NullBool
+	ApprovedBy   sql.NullInt64
+	ApprovedAt   sql.NullTime
+	RejectedBy   sql.NullInt64
+	RejectedAt   sql.NullTime
+	CreatedAt    string
+	UpdatedAt    string
+}
+
+func (q *Queries) GetStaffTimeOffByID(ctx context.Context, id int64) (GetStaffTimeOffByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getStaffTimeOffByID, id)
+	var i GetStaffTimeOffByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.Type,
+		&i.StartDate,
+		&i.EndDate,
+		&i.Hours,
+		&i.Description,
+		&i.Status,
+		&i.RejectReason,
+		&i.StaffID,
+		&i.Approved,
+		&i.ApprovedBy,
+		&i.ApprovedAt,
+		&i.RejectedBy,
+		&i.RejectedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getStaffTimeOffsByStaffID = `-- name: GetStaffTimeOffsByStaffID :many
 SELECT
     sto.id,
     sto.type,
     sto.start_date,
     sto.end_date,
+    sto.hours,
     sto.description,
+    sto.status,
+    sto.reject_reason,
     sto.approved,
     sto.approved_by,
     sto.approved_at,
+    sto.rejected_by,
+    sto.rejected_at,
     sto.created_at,
     sto.updated_at,
     approver.first_name as approver_first_name,
@@ -1276,10 +1370,15 @@ type GetStaffTimeOffsByStaffIDRow struct {
 	Type               string
 	StartDate          time.Time
 	EndDate            time.Time
+	Hours              float64
 	Description        string
+	Status             string
+	RejectReason       sql.NullString
 	Approved           sql.NullBool
 	ApprovedBy         sql.NullInt64
 	ApprovedAt         sql.NullTime
+	RejectedBy         sql.NullInt64
+	RejectedAt         sql.NullTime
 	CreatedAt          string
 	UpdatedAt          string
 	ApproverFirstName  sql.NullString
@@ -1301,10 +1400,15 @@ func (q *Queries) GetStaffTimeOffsByStaffID(ctx context.Context, staffID int64) 
 			&i.Type,
 			&i.StartDate,
 			&i.EndDate,
+			&i.Hours,
 			&i.Description,
+			&i.Status,
+			&i.RejectReason,
 			&i.Approved,
 			&i.ApprovedBy,
 			&i.ApprovedAt,
+			&i.RejectedBy,
+			&i.RejectedAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.ApproverFirstName,
@@ -1322,6 +1426,47 @@ func (q *Queries) GetStaffTimeOffsByStaffID(ctx context.Context, staffID int64) 
 		return nil, err
 	}
 	return items, nil
+}
+
+const rejectStaffTimeOff = `-- name: RejectStaffTimeOff :one
+UPDATE tbl_staff_time_offs
+SET
+    approved = false,
+    status = 'REJECTED',
+    reject_reason = ?,
+    rejected_by = ?,
+    rejected_at = datetime('now'),
+    approved_by = NULL,
+    approved_at = NULL,
+    updated_at = datetime('now')
+WHERE id = ? AND status = 'PENDING'
+RETURNING id
+`
+
+type RejectStaffTimeOffParams struct {
+	RejectReason sql.NullString
+	RejectedBy   sql.NullInt64
+	ID           int64
+}
+
+func (q *Queries) RejectStaffTimeOff(ctx context.Context, arg RejectStaffTimeOffParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, rejectStaffTimeOff, arg.RejectReason, arg.RejectedBy, arg.ID)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const sumApprovedStaffTimeOffHours = `-- name: SumApprovedStaffTimeOffHours :one
+SELECT COALESCE(SUM(hours), 0)
+FROM tbl_staff_time_offs
+WHERE staff_id = ? AND status = 'APPROVED'
+`
+
+func (q *Queries) SumApprovedStaffTimeOffHours(ctx context.Context, staffID int64) (interface{}, error) {
+	row := q.db.QueryRowContext(ctx, sumApprovedStaffTimeOffHours, staffID)
+	var coalesce interface{}
+	err := row.Scan(&coalesce)
+	return coalesce, err
 }
 
 const updateStaffAttendanceLocation = `-- name: UpdateStaffAttendanceLocation :one

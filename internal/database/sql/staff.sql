@@ -389,14 +389,42 @@ INSERT INTO tbl_staff_time_offs (
     type,
     start_date,
     end_date,
+    hours,
     description,
     staff_id,
     useragent_id,
+    status,
     created_at,
     updated_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')
+    ?, ?, ?, ?, ?, ?, ?, 'PENDING', datetime('now'), datetime('now')
 ) RETURNING id;
+
+-- name: GetStaffTimeOffByID :one
+SELECT
+    sto.id,
+    sto.type,
+    sto.start_date,
+    sto.end_date,
+    sto.hours,
+    sto.description,
+    sto.status,
+    sto.reject_reason,
+    sto.staff_id,
+    sto.approved,
+    sto.approved_by,
+    sto.approved_at,
+    sto.rejected_by,
+    sto.rejected_at,
+    sto.created_at,
+    sto.updated_at
+FROM tbl_staff_time_offs sto
+WHERE sto.id = ?;
+
+-- name: SumApprovedStaffTimeOffHours :one
+SELECT COALESCE(SUM(hours), 0)
+FROM tbl_staff_time_offs
+WHERE staff_id = ? AND status = 'APPROVED';
 
 -- name: GetStaffTimeOffsByStaffID :many
 SELECT
@@ -404,10 +432,15 @@ SELECT
     sto.type,
     sto.start_date,
     sto.end_date,
+    sto.hours,
     sto.description,
+    sto.status,
+    sto.reject_reason,
     sto.approved,
     sto.approved_by,
     sto.approved_at,
+    sto.rejected_by,
+    sto.rejected_at,
     sto.created_at,
     sto.updated_at,
     approver.first_name as approver_first_name,
@@ -424,10 +457,15 @@ SELECT
     sto.type,
     sto.start_date,
     sto.end_date,
+    sto.hours,
     sto.description,
+    sto.status,
+    sto.reject_reason,
     sto.approved,
     sto.approved_by,
     sto.approved_at,
+    sto.rejected_by,
+    sto.rejected_at,
     sto.created_at,
     sto.updated_at,
     sto.staff_id,
@@ -446,20 +484,39 @@ ORDER BY sto.created_at DESC;
 UPDATE tbl_staff_time_offs
 SET
     approved = true,
+    status = 'APPROVED',
     approved_by = ?,
     approved_at = datetime('now'),
+    reject_reason = NULL,
+    rejected_by = NULL,
+    rejected_at = NULL,
     updated_at = datetime('now')
-WHERE id = ? AND approved = false
+WHERE id = ? AND status = 'PENDING'
+RETURNING id;
+
+-- name: RejectStaffTimeOff :one
+UPDATE tbl_staff_time_offs
+SET
+    approved = false,
+    status = 'REJECTED',
+    reject_reason = ?,
+    rejected_by = ?,
+    rejected_at = datetime('now'),
+    approved_by = NULL,
+    approved_at = NULL,
+    updated_at = datetime('now')
+WHERE id = ? AND status = 'PENDING'
 RETURNING id;
 
 -- name: CancelStaffTimeOff :one
 UPDATE tbl_staff_time_offs
 SET
     approved = false,
+    status = 'PENDING',
     approved_by = NULL,
     approved_at = NULL,
     updated_at = datetime('now')
-WHERE id = ? AND approved = true
+WHERE id = ? AND status = 'APPROVED'
 RETURNING id;
 
 -- name: UpdateStaffAttendanceLunchBreakIn :one
