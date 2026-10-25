@@ -20,6 +20,8 @@ templ PostHomeContentSections(data models.HomePageData) {
 				@StoreSection(section)
 			case "partners":
 				@PartnerSection(section)
+			case "compliance":
+				@ComplianceSection(section)
 			}
 		}
 	</div>
@@ -170,5 +172,25 @@ templ PartnerSection(section models.PostHomeContentSection) {
 				</div>
 			</div>
 		}
+	</section>
+}
+
+templ ComplianceSection(section models.PostHomeContentSection) {
+	<section
+		id={ section.Href }
+		class="flex flex-row flex-wrap justify-center items-stretch gap-6 lg:gap-10 my-6 w-full max-w-full px-4 h-28 sm:h-32"
+	>
+		<img
+			src={ constants.PathBIRBadgeImageCDN }
+			class="h-full w-auto max-w-full object-contain object-left"
+			alt="Bureau of Internal Revenue Registered"
+			loading="lazy"
+		/>
+		<img
+			src={ constants.PathCORSealImageCDN }
+			class="h-full w-auto object-contain"
+			alt="DPO/DPS Registered Seal"
+			loading="lazy"
+		/>
 	</section>
 }

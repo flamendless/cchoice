@@ -252,5 +252,11 @@ func BuildPostHomeContentSections(getBrandLogoURL BrandLogoURLFunc) []PostHomeCo
 				},
 			},
 		},
+
+		{
+			Title:  "Compliance",
+			Href:   "compliance",
+			Others: []PostHomeContent{},
+		},
 	}
 }

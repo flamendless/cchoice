@@ -11,6 +11,7 @@ const (
 	PathSVGLogoWithCompleteText = "https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/09edef59-3e15-4b00-4573-ece6e98d2800/public"
 	PathStoreImageCDN           = "https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/store/public"
 	PathCORSealImageCDN         = "https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/CORSeal/public"
+	PathBIRBadgeImageCDN        = "https://imagedelivery.net/YnES7emCTPeSEVA2N0dB_g/f69c7c29-3c4a-46b7-5877-f53a60e27b00/public"
 	PathChangelogs              = "./CHANGELOGS.md"
 	MaxImagePathLength          = 512
 	PathLogoSmallLocal          = "cmd/web/static/svg/logo_only_small.png"

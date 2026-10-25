@@ -70,6 +70,7 @@ var cmdMigrateImagesCloudflare = &cobra.Command{
 			"logo.svg",
 			"store.webp",
 			"CORSeal.webp",
+			"bir.png",
 		}
 		logs.Log().Info(
 			"Collecting specific files from base images directory",
